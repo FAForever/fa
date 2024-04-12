@@ -22,6 +22,11 @@ ProjectileBlueprint {
         'ANTINAVY',
         'TORPEDO',
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         ImpactEffects = {
             Type = 'Small01',
@@ -53,10 +58,9 @@ ProjectileBlueprint {
         DestroyOnWater = false,
         InitialSpeed = 5,
         MaxSpeed = 18,
-        RotationalVelocity = 800,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 180,
         UseGravity = false,
         VelocityAlign = true,
     },

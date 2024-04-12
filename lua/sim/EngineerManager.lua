@@ -52,7 +52,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     -- Universal on/off functions
-    ---@param self EngineerManager
+    ---@param self EngineerManager unused
     ---@param group table
     EnableGroup = function(self, group)
         for k,v in group.Units do
@@ -179,7 +179,7 @@ EngineerManager = Class(BuilderManager) {
         self:EnableGroup(self.ConsumptionUnits.Engineers)
     end,
 
-    ---@param self EngineerManager
+    ---@param self EngineerManager unused
     ---@param econ any unused
     ---@param pauseVal number
     ---@return boolean
@@ -215,8 +215,8 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     -- Functions for when an AI Brain's energy runs dry
-    ---@param self EngineerManager
-    ---@param econ any unused
+    ---@param self EngineerManager unused
+    ---@param econ any 
     ---@param pauseVal number
     ---@return boolean
     EnergyCheck = function(self, econ, pauseVal)
@@ -230,7 +230,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param group string
-    ---@param econ any unused
+    ---@param econ any 
     ---@param pauseVal number
     ---@param unitCheckFunc any
     ---@param category EntityCategory
@@ -318,8 +318,8 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     -- Check if turning off this fabricator would destroy the mass income
-    ---@param unit Unit
-    ---@param econ any unused
+    ---@param unit Unit unused
+    ---@param econ any 
     ---@param pauseVal number
     ---@return number | true
     MassDrainCheck = function(unit, econ, pauseVal)

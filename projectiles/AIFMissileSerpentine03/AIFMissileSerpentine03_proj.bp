@@ -28,6 +28,7 @@ ProjectileBlueprint {
         Health = 2,
         MaxHealth = 2,
     },
+    DesiredShooterCap = 2,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -43,19 +44,22 @@ ProjectileBlueprint {
         Faction = 'AEON',
     },
     Physics = {
-        Acceleration = 1.5,
+        Acceleration = 2,
         DestroyOnWater = true,
         InitialSpeed = 15,
         Lifetime = 60,
         MaxSpeed = 30,
-        MaxZigZag = 5,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
         TrackTargetGround = true,
+        TrackTargetGroundFuzziness = 1.0,
+        TrackTargetGroundOffset = 2.5,
         TurnRate = 15,
         UseGravity = false,
         VelocityAlign = true,
-        ZigZagFrequency = 0.2,
+
+        MaxZigZag = 4,
+        ZigZagFrequency = 1.0,
     },
 }

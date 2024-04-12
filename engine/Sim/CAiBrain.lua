@@ -11,6 +11,12 @@ local CAiBrain = {}
 ---@field [2] number z
 ---@field [3] number threat value
 
+---@class BuildingTemplate
+---@field [1] string[] # builder types
+---@field [2] Vector2
+-- @field [...] Vector2
+
+---@alias TemplateBuilderTypeResources "Resource" | "T1Resource" | "T2Resource" | "T3Resource" | "T1HydroCarbon"
 
 --- Assigns a threat value to a given position, which is applied to the iMAP threat grid
 ---@param position Vector
@@ -58,9 +64,10 @@ end
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 
---- Returns true if the structure can be built at the given location
+--- Returns true if the structure can be built at the given location. May return false positives
 ---@param blueprintID string As an example: `ueb0101`
 ---@param location Vector
+---@return boolean
 function CAiBrain:CanBuildStructureAt(blueprintID, location)
 end
 
@@ -108,19 +115,41 @@ end
 function CAiBrain:FindClosestArmyWithBase()
 end
  
---- Find a free build place
--- @param buildingType Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
--- @param whatToBuild UnitID
--- @param baseTemplate A default table with buildingTypes of all factions and searchpattern for a build place
--- @param relative true/false. true = build coordinates are relative to the starting location, false = absolute coords
--- @param closeToBuilder true/false. Build near the engineer or the base the engineer is part of.
--- @param optIgnoreAlliance nil/Enemy ignores enemy buildings like massextractors
--- @param BuildLocationX Position where we start to search for a free build area
--- @param BuildLocationZ
--- @param optIgnoreThreatUnder Ignores enemy threat under value
--- @return PlaceToBuild {x, z, y}
-function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
+--- Takes a builder and returns the closest point that the structure can be
+--- built at in the list of building templates with matching builder types.
+---
+--- Let `startLocation` be the army start position, or the offset override if
+--- present.
+--- Let `targetLocation` be the builder's location (or the army start if somehow
+--- nil), or the offset overide if present.
+--- For each template:
+---    Let each points' location be `templateLocation`, added with
+---    `startLocation` if `relative` is true.
+---    It is considered if `structureName` can be built at this location and,
+---    If `optIgnoreThreatOver` is above 0.0, the anti-surface threat influence
+---    (calculated using ring=0) is less than `optIgnoreThreatOver`.
+--- The point with the small distance between `templateLocation` and
+--- `targetLocation` is returned.
+---
+--- If the builder type is one of `TemplateBuilderTypeResources` (and the
+--- "/nomass" commandline switch is absent), distance is calculated between
+--- `startingLocation` and all nearby deposits (mass points, unless the
+--- structure blueprint has the `"HYDROCARBON"` category) are queried and no
+--- points in the template are used.
+---
+---@param type          string
+---@param structureName filename # blueprint file
+---@param buildingTypes BuildingTemplate[]
+---@param relative      boolean
+---@param builder       Unit
+---@param optIgnoreAlliance?   AllianceType | nil # defaults to `nil`
+---@param optOverridePosX?     number  # defaults to 0.0; ignored if `optOverridePosZ` is absent
+---@param optOverridePosZ?     number  # defaults to 0.0
+---@param optIgnoreThreatOver? integer # defaults to 0 (accept all)
+---@return Vector2 location # a new table of `{x, z, 0}` for resource builder types, the actual point otherwise
+function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
 end
+
 --- Returns a unit that matches the categories, if available
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
@@ -166,8 +195,27 @@ end
 -- @param defaultValue Ff the stat doesn't exists, it creates it and returns this value.
 -- @return Number.
 
+---@alias AIBrainBlueprintStatEconomy
+--- | 'Economy_TotalProduced_Energy'
+--- | 'Economy_TotalConsumed_Energy'
+--- | 'Economy_Income_Energy' 
+--- | 'Economy_Output_Energy' 
+--- | 'Economy_Stored_Energy' 
+--- | 'Economy_Reclaimed_Energy'
+--- | 'Economy_MaxStorage_Energy'
+--- | 'Economy_PeakStorage_Energy'
+--- | 'Economy_TotalProduced_Mass'
+--- | 'Economy_TotalConsumed_Mass'
+--- | 'Economy_Income_Mass'
+--- | 'Economy_Output_Mass'
+--- | 'Economy_Stored_Mass'
+--- | 'Economy_Reclaimed_Mass'
+--- | 'Economy_MaxStorage_Mass'
+--- | 'Economy_PeakStorage_Mass'
+
 --- Returns the statistic of the army, if it doesn't exist it creates it and returns the default value
----@param statName string
+---@see CAiBrain:GetBlueprintStat(...) for army related statistics
+---@param statName AIBrainBlueprintStatEconomy
 ---@param defaultValue number | string | table
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
@@ -183,10 +231,29 @@ end
 function CAiBrain:GetAvailableFactories(location, radius)
 end
 
+---@alias AIBrainBlueprintStatUnits 
+--- | 'Units_History'
+--- | 'Units_Killed'
+--- | 'Units_BeingBuilt' 
+--- | 'Units_Active' 
+--- | 'Units_TotalDamageDealt' 
+--- | 'Units_TotalDamageReceive'
+
+---@alias AIBrainBlueprintStatEnemies
+--- | 'Enemies_Killed'
+--- | 'Enemies_MassValue_Destroyed'
+--- | 'Enemies_EnergyValue_Destroyed' 
+--- | 'Enemies_Commanders_Destroyed' 
+
+---@alias AIBrainBlueprintStatDamage
+--- | 'DamageStats_TotalDamageReceived'
+--- | 'DamageStats_TotalDamageDealt'
+
 --- Return a blueprint stat filtered by category.
--- @param statName String, name of the stats to get, example: "Enemies_Killed".
--- @param category Unit's category, example: categories.TECH2 .
--- @return Number.
+---@see CAiBrain:GetArmyStat(...) for army related statistics
+---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage
+---@param category EntityCategory 's category, example: categories.TECH2 .
+---@return number
 function CAiBrain:GetBlueprintStat(statName, category)
 end
 
@@ -206,27 +273,27 @@ function CAiBrain:GetCurrentUnits(category)
 end
 
 --- Returns current resource income.
--- @param resource 'ENERGY' or 'MASS'.
+---@param resource 'ENERGY'|'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyIncome(resource)
 end
 
 --- Return how much of the resource the brains wants to use.
 -- This is used for calculating Paragon's production.
--- @param resource 'ENERGY' or 'MASS'.
+---@param resource 'ENERGY'|'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyRequested(resource)
 end
 
 --- Return current resource amout in storage.
--- @param resource 'ENERGY' or 'MASS'.
+---@param resource 'ENERGY'|'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyStored(resource)
 end
 
 --- Returns the ratio between resource in storage to maximum storage amout.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Float Number 0.0 - 1
+---@param resource  'ENERGY' | 'MASS'.
+---@return number
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
 

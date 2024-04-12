@@ -28,46 +28,8 @@ local data = CreateEmptyProfilerTable()
 ---@param forceEnable boolean
 function ToggleProfiler(army, forceEnable)
 
-    -- basic checks for toggling the profiler
-    local gameHasAIs = ScenarioInfo.GameHasAIs
-    local cheatsEnabled = CheatsEnabled()
-    local isReplay = SessionIsReplay()
-
-    -- exception to allow toggling the profiler
-    local gameHasJip = false
-    for k, brain in ArmyBrains do
-        gameHasJip = gameHasJip or string.lower(brain.Nickname) == "jip"
-    end
-
-    -- return if conditions are not met
-    if not (gameHasAIs or cheatsEnabled or gameHasJip or isReplay) then
-        return
-    end
-
-    -- inform us why profiler can be toggled
-    if gameHasAIs then
-        SPEW("Profiler can be toggled: game has AIs")
-    end
-
-    if cheatsEnabled then
-        SPEW("Profiler can be toggled: game has cheats enabled")
-    end
-
-    if gameHasJip then
-        SPEW("Profiler can be toggled: a game developer is in the game")
-    end
-
-    if isReplay then
-        SPEW("Profiler can be toggled: session is a replay")
-    end
-
     -- Inform us in case of abuse
     SPEW("Profiler has been toggled on by army: " .. tostring(army))
-
-    -- if we're not the ones that initiated this call, get out
-    if GetFocusArmy() ~= army then
-        return
-    end
 
     -- allows us to remain enabled
     if forceEnable and isProfiling then

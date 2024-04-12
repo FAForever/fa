@@ -22,12 +22,13 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
         'TACTICAL',
         'MISSILE',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 2,
         MaxHealth = 2,
     },
+    DesiredShooterCap = 2,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -35,7 +36,7 @@ ProjectileBlueprint {
             Type = 'Medium01',
         },
         MeshBlueprint = '/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp',
-        StrategicIconSize = 2,
+        StrategicIconSize = 4,
     },
     Economy = {
         BuildCostEnergy = 3600,
@@ -53,7 +54,7 @@ ProjectileBlueprint {
         Acceleration = 3,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        MaxSpeed = 12,
+        MaxSpeed = 20,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -61,5 +62,8 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+
+        ZigZagFrequency = 1,
+        MaxZigZag = 1
     },
 }

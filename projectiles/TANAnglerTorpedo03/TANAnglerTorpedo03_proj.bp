@@ -16,8 +16,13 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
         StrategicIconSize = 1,
@@ -35,11 +40,18 @@ ProjectileBlueprint {
         Acceleration = 5,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        Lifetime = 7,
+        Lifetime = 10,
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 165,
         VelocityAlign = true,
+        UseGravity = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        AccelerationRange = 2,
+        MaxZigZag = 1,
+        ZigZagFrequency = 0.4,
+        TurnRateRange = 10,
     },
 }

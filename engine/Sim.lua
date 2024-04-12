@@ -29,10 +29,10 @@
 ---| "Water Mask"
 ---| "Water Normals"
 
----@alias Object Blip | CollisionBeam | Entity | Prop | Projectile | Unit
----@alias BoneObject Projectile | Prop | Unit | Entity
----@alias ReclaimObject Prop | Unit
----@alias TargetObject Prop | Unit
+---@alias Object Blip | CollisionBeam | moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
+---@alias BoneObject moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
+---@alias ReclaimObject moho.prop_methods | moho.unit_methods
+---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
 --- restricts the army from building the unit category
 ---@param army Army
@@ -115,8 +115,9 @@ end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
+---@param alignWithSpeed? boolean    # if set, animation rate takes into account the speed of the unit. Defaults to false
 ---@return moho.AnimationManipulator
-function CreateAnimator(object)
+function CreateAnimator(object, alignWithSpeed)
 end
 
 --- Creates a beam that is attached to an entity
@@ -469,7 +470,7 @@ end
 --- Deals damage to the target unit
 ---@param instigator TargetObject | nil
 ---@param location Vector origin of the damage, used for effects
----@param target Unit
+---@param target Unit | Projectile | Prop
 ---@param amount number
 ---@param damageType DamageType
 function Damage(instigator, location, target, amount, damageType)
@@ -625,8 +626,7 @@ function GetMapSize()
 end
 
 ---@overload fun(x0: number, z0: number, x1: number, z1: number): ReclaimObject[] | nil
---- Returns the reclaimable objects inside the given rectangle.
---- This includes props, units, wreckages.
+--- Returns the reclaimable objects inside the given rectangle. This includes props, units and wrecks. Unlike the brain functions, this function uses either the collision box (OO) or the visual box (AAB) for the query and is therefore much more accurate.
 ---@param rectangle Rectangle
 ---@return ReclaimObject[] | nil
 function GetReclaimablesInRect(rectangle)
@@ -735,7 +735,7 @@ end
 
 --- Orders a group of units to attack a target
 ---@param units Unit[]
----@param target Unit
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
 function IssueAttack(units, target)
 end
@@ -748,14 +748,22 @@ end
 function IssueBuildFactory(units, blueprintID, count)
 end
 
---- Orders a group of units to build a unit, each unit is assigned the closest building.
---- Takes some time to process (at least 3 ticks).
+--- Orders a group of units to build a unit, the nearest unit is given the order
+--- Takes some time to apply (at least 3 ticks).
 ---@param units Unit[]
 ---@param position Vector
 ---@param blueprintID string
 ---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
----@return SimCommand
 function IssueBuildMobile(units, position, blueprintID, table)
+end
+
+--- Orders a group of units to start building another unit by blueprint id
+--- Takes some time to apply (at least 3 ticks).
+---@param units Unit[]
+---@param position Vector
+---@param blueprintID string
+---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
+function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
 --- Orders a group of units to capture a target, usually engineers
@@ -765,7 +773,7 @@ end
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately
+--- Clears out all commands issued on the group of units, this happens immediately. See `IssueToUnitClearCommands` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)
@@ -850,7 +858,7 @@ end
 
 --- Orders a group of units to guard a target
 ---@param units Unit[]
----@param target Unit
+---@param target Unit | Vector
 ---@return SimCommand
 function IssueGuard(units, target)
 end
@@ -862,14 +870,14 @@ end
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position
+--- Orders a group of units to move to a position.  See `IssueToUnitMove` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site
+--- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to computationally efficiently apply it to a single unit
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand

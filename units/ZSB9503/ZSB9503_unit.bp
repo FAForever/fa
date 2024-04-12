@@ -1,4 +1,12 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'B04',
+            'B03',
+            'B06',
+            'B05'
+        }
+    },
     Audio = {
         Construct = Sound {
             Bank = 'XSB',
@@ -102,13 +110,13 @@ UnitBlueprint {
                 {
                     LODCutoff = 200,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    ShaderName = 'SeraphimNavy',
                 },
                 {
                     AlbedoName = 'zsb9503_lod1_albedo.dds',
                     LODCutoff = 600,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    ShaderName = 'SeraphimNavy',
                     SpecularName = 'zsb9503_lod1_specteam.dds',
                 },
             },
@@ -121,7 +129,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zsb9503',

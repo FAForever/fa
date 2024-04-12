@@ -1,5 +1,12 @@
 ---@meta
 
+---@class UIHighlightedCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field blueprintId? UnitId
+---@field commandType number
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
@@ -90,6 +97,12 @@ end
 function CopyCurrentReplay(profile, newFilename)
 end
 
+---Copies given string to clipboard, returns true if succeeded
+---@param s string
+---@return boolean
+function CopyToClipboard(s)
+end
+
 --- Creates a Unit AtMouse
 ---@param blueprintId string
 ---@param ownerArmyIndex number
@@ -150,11 +163,10 @@ end
 function EntityCategoryFilterOut(category, units)
 end
 
---- Executes some Lua code in the sim
+--- Executes some Lua code in the sim. Requires cheats to be enabled
 ---@param func function
----@param ... any this may actually be a comma-separated string of args instead of a vararg
----@return any
-function ExecLuaInSim(func, ...)
+---@param value any
+function ExecLuaInSim(func, value)
 end
 
 --- Requests that the application shut down
@@ -192,7 +204,7 @@ function GenerateBuildTemplateFromSelection()
 end
 
 --- Gets active build template back to Lua
----@return BuildTemplate
+---@return UIBuildTemplate
 function GetActiveBuildTemplate()
 end
 
@@ -247,12 +259,12 @@ function GetCommandLineArg(option, maxArgs)
 end
 
 --- Returns 'splash', 'frontend', or 'game' depending on the current state of the UI
----@return 'splash' | 'frontend' | 'game'
+---@return 'splash' | 'frontend' | 'game' | 'none'
 function GetCurrentUIState()
 end
 
 ---
----@return Cursor
+---@return UICursor
 function GetCursor()
 end
 
@@ -289,6 +301,11 @@ end
 function GetGameTime()
 end
 
+--- Returns information about the command of the command graph that is below the cursor
+---@return UIHighlightedCommand?
+function GetHighlightCommand()
+end
+
 --- Returns a table of idle engineer units for the army
 ---@return UserUnit[]
 function GetIdleEngineers()
@@ -320,6 +337,12 @@ end
 ---@param units UserUnit[]
 ---@return boolean
 function GetIsPaused(units)
+end
+
+--- Returns a boolean that indicates the unit is paused
+---@param unit UserUnit[]
+---@return boolean
+function GetIsPausedOfUnit(unit)
 end
 
 --- Sees if any units in the list are submerged
@@ -354,7 +377,11 @@ end
 function GetOptions(key)
 end
 
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- kilobytes worth of data!
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param string string
 ---@param default any?
 ---@return any
@@ -419,7 +446,7 @@ end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
 ---@param type string
----@return table
+---@return { extension: string, directory: string, files: table<string, string[]> }
 function GetSpecialFiles(type)
 end
 
@@ -452,12 +479,20 @@ end
 function GetUIControlsAlpha()
 end
 
---- Given a set of units, gets the union of orders and unit categories (for determining builds)
+--- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet any
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
----@return EntityCategory[] buildableCategories
+---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
+end
+
+--- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
+---@param unit any
+---@return string[] orders
+---@return CommandCap[] availableToggles
+---@return EntityCategory buildableCategories
+function GetUnitCommandDataOfUnit(unit)
 end
 
 --- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
@@ -637,12 +672,32 @@ end
 function IsObserver(playerId)
 end
 
----
----@param command string
----@param blueprintid string
+--- Issue a factory build or upgrade command to your selection
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
 ---@param count number
 ---@param clear boolean? defaults to false
 function IssueBlueprintCommand(command, blueprintid, count, clear)
+end
+
+--- Issue a factory build or upgrade command to the given units
+---@see IssueBlueprintCommand
+---@param units UserUnit[]
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
+---@param count number
+---@param clear boolean? defaults to false
+function IssueBlueprintCommandToUnits(units, command, blueprintid, count, clear)
+end
+
+--- Issue a factory build or upgrade command to the given unit
+---@see IssueBlueprintCommand
+---@param unit UserUnit
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
+---@param count number
+---@param clear boolean? defaults to false
+function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
 ---
@@ -660,8 +715,8 @@ end
 ---
 ---@param unitList UserUnit[]
 ---@param command string
----@param string string?
----@param clear boolean?
+---@param string? string
+---@param clear? boolean
 function IssueUnitCommand(unitList, command, string, clear)
 end
 
@@ -806,7 +861,10 @@ end
 function RestartSession()
 end
 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- game does this automatically when it exits, there should be no reason to call this manually.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 function SavePreferences()
 end
 
@@ -836,6 +894,7 @@ function SessionGetLocalCommandSource()
 end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
+--- Unlike other engine functions that return tables, this function returns the same table each time it is called.
 ---@return UIScenarioInfo
 function SessionGetScenarioInfo()
 end
@@ -885,7 +944,7 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildQueue
+---@param template UIBuildTemplate
 function SetActiveBuildTemplate(template)
 end
 
@@ -903,12 +962,12 @@ end
 
 ---
 ---@param unit UserUnit
----@return BuildQueue
+---@return UIBuildQueue
 function SetCurrentFactoryForQueueDisplay(unit)
 end
 
 ---
----@param cursor Cursor
+---@param cursor UICursor
 function SetCursor(cursor)
 end
 
@@ -953,13 +1012,21 @@ end
 function SetOverlayFilters(list)
 end
 
---- Pause builders in this list
----@param selection UserUnit[]
----@param paused boolean
-function SetPaused(selection, paused)
+--- Pause or unpause the given units
+---@param units UserUnit[]
+---@param pause boolean
+function SetPaused(units, pause)
 end
 
+--- Pause or unpause the given unit
+---@param unit UserUnit
+---@param pause boolean
+function SetPausedOfUnit(unit, pause)
+end
+
+--- Updates a value in the preference file. Updating the preference file on disk is delayed until the application exits.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param key string
 ---@param obj any
 function SetPreference(key, obj)
@@ -1055,6 +1122,22 @@ end
 function UIZoomTo(units, seconds)
 end
 
+---Draws circle in world. Must be called within `WorldView:OnRenderWorld`
+---@param pos Vector
+---@param size number
+---@param color Color
+---@param thickness? number
+function UI_DrawCircle(pos, size, color, thickness)
+end
+
+---Draws rectangle in world. Must be called within `WorldView:OnRenderWorld`
+---@param pos Vector
+---@param size number
+---@param color Color
+---@param thickness? number
+function UI_DrawRect(pos, size, color, thickness)
+end
+
 ---
 ---@param view WorldView
 ---@param point Vector2
@@ -1085,7 +1168,7 @@ function WorldIsPlaying()
 end
 
 --- For internal use by `Cursor.__init()`
----@param cursor Cursor
+---@param cursor UICursor
 ---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end

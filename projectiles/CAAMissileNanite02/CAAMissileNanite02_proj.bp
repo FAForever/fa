@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'CYBRAN',
         'PROJECTILE',
         'ANTIAIR',
-        'MISSILE',
     },
     Display = {
         MeshBlueprint = '/projectiles/CAAMissileNanite01/CAAMissileNanite01_mesh.bp',

@@ -1,4 +1,26 @@
 
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local tl = { 0, 0, 0 }
 local tr = { 0, 0, 0 }
 local bl = { 0, 0, 0 }
@@ -76,7 +98,7 @@ Grid = ClassSimple {
 
         local bx = 1
         if wx > 0 then
-            bx = ((wx * inverse) ^ 0) + 1
+            bx = math.floor(wx * inverse) + 1
             if bx > cellCount then
                 bx = cellCount
             end
@@ -84,7 +106,7 @@ Grid = ClassSimple {
 
         local bz = 1
         if wz > 0 then
-            bz = ((wz * inverse) ^ 0) + 1
+            bz = math.floor(wz * inverse) + 1
             if bz > cellCount then
                 bz = cellCount
             end

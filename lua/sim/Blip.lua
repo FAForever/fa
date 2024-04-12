@@ -9,10 +9,10 @@
 --****************************************************************************
 
 ---@class Blip : moho.blip_methods
+---@field DestroyHooks funBlip[]
 Blip = Class(moho.blip_methods) {
 
     ---@alias funBlip fun(blip: Blip)
-
     ---@param self Blip
     ---@param hook funBlip
     AddDestroyHook = function(self,hook)

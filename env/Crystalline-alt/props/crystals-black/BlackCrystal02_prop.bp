@@ -1,6 +1,7 @@
 PropBlueprint {
     Categories = {
         'RECLAIMABLE',
+        'OBSTRUCTSBUILDING'
     },
     Defense = {
         Health = 50,
@@ -22,7 +23,6 @@ PropBlueprint {
         UniformScale = 0.250,
     },
     Economy = {
-        ReclaimEnergyMax = '',
         ReclaimMassMax = 40,
         ReclaimTime = 5,
     },

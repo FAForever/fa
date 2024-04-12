@@ -1,16 +1,6 @@
---
--- CDFProtonCannon01
---
 local CDFProtonCannonProjectile = import("/lua/cybranprojectiles.lua").CDFProtonCannonProjectile
-CDFProtonCannon01 = ClassProjectile(CDFProtonCannonProjectile) {
-    OnCreate = function(self)
-        CDFProtonCannonProjectile.OnCreate(self)
-        self.Trash:Add(ForkThread(self.ImpactWaterThread, self))
-    end,
 
-    ImpactWaterThread = function(self)
-        WaitTicks(4)
-        self:SetDestroyOnWater(true)
-    end,
-}
+--- Cybran Proton Cannon
+---@class CDFProtonCannon01 : CDFProtonCannonProjectile
+CDFProtonCannon01 = ClassProjectile(CDFProtonCannonProjectile) {}
 TypeClass = CDFProtonCannon01

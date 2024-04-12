@@ -5,21 +5,18 @@
 
 local Debug = false
 function EnableDebugging()
-    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
-        Debug = true
-    end
+    Debug = true
 end
 
 function DisableDebugging()
-    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
-        Debug = false
-    end
+    Debug = false
 end
 
 -- upvalued for performance
 local GetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
 local GetEconomyRequested = moho.aibrain_methods.GetEconomyRequested
 local GetEconomyTrend = moho.aibrain_methods.GetEconomyTrend
+local GetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
 
 local MathMin = math.min
 
@@ -28,20 +25,24 @@ local MathMin = math.min
 ---@field EnergyRequested table<number, number>
 ---@field EnergyStorage table<number, number>
 ---@field EnergyTrend table<number, number>
+---@field EnergyStoredRatio table<number, number>
 ---@field MassIncome table<number, number>
 ---@field MassRequested table<number, number>
 ---@field MassStorage table<number, number>
 ---@field MassTrend table<number, number>
+---@field MassStoredRatio table<number, number>
 
 ---@class AIBrainEconomyOverTimeData
 ---@field EnergyIncome number
 ---@field EnergyRequested number
 ---@field EnergyEfficiencyOverTime number
 ---@field EnergyTrendOverTime number
+---@field EnergyStoredRatioOverTime number
 ---@field MassIncome number
 ---@field MassRequested number
 ---@field MassEfficiencyOverTime number
 ---@field MassTrendOverTime number
+---@field MassStoredRatioOverTime number
 
 ---@class AIBrainEconomyComponent : AIBrain
 ---@field EconomyData AIBrainEconomyData
@@ -61,10 +62,12 @@ AIBrainEconomyComponent = ClassSimple {
             EnergyRequested = {},
             EnergyStorage = {},
             EnergyTrend = {},
+            EnergyStoredRatio = {},
             MassIncome = {},
             MassRequested = {},
             MassStorage = {},
-            MassTrend = {}
+            MassTrend = {},
+            MassStoredRatio = {},
         }
 
         local economyData = self.EconomyData
@@ -73,10 +76,12 @@ AIBrainEconomyComponent = ClassSimple {
             economyData.EnergyRequested[k] = 0
             economyData.EnergyStorage[k] = 0
             economyData.EnergyTrend[k] = 0
+            economyData.EnergyStoredRatio[k] = 0
             economyData.MassIncome[k] = 0
             economyData.MassRequested[k] = 0
             economyData.MassStorage[k] = 0
             economyData.MassTrend[k] = 0
+            economyData.MassStoredRatio[k] = 0
         end
 
         self.EconomyOverTimeCurrent = {
@@ -84,10 +89,12 @@ AIBrainEconomyComponent = ClassSimple {
             EnergyRequested = 0,
             EnergyEfficiencyOverTime = 0,
             EnergyTrendOverTime = 0,
+            EnergyStoredRatioOverTime = 0,
             MassIncome = 0,
             MassRequested = 0,
             MassEfficiencyOverTime = 0,
             MassTrendOverTime = 0,
+            MassStoredRatioOverTime = 0,
         }
 
         self:EconomyUpdate()
@@ -106,6 +113,8 @@ AIBrainEconomyComponent = ClassSimple {
         local mIncome = 0
         local eRequested = 0
         local mRequested = 0
+        local eRatio = 0
+        local mRatio = 0
         local eTrend = 0
         local mTrend = 0
 
@@ -121,6 +130,8 @@ AIBrainEconomyComponent = ClassSimple {
             local EcoDataMassRequested = EcoData.MassRequested
             local EcoDataEnergyTrend = EcoData.EnergyTrend
             local EcoDataMassTrend = EcoData.MassTrend
+            local EcoDataEnergyStoredRatio = EcoData.EnergyStoredRatio
+            local EcoDataMassStoredRatio = EcoData.MassStoredRatio
 
             for point = 1, self.EconomySamples do
 
@@ -131,12 +142,16 @@ AIBrainEconomyComponent = ClassSimple {
                 mRequested = mRequested - EcoDataMassRequested[point]
                 eTrend = eTrend - EcoDataEnergyTrend[point]
                 mTrend = mTrend - EcoDataMassTrend[point]
+                eRatio = eRatio - EcoDataEnergyStoredRatio[point]
+                mRatio = mRatio - EcoDataMassStoredRatio[point]
 
                 -- add new data
                 EcoDataEnergyIncome[point] = GetEconomyIncome(self, 'ENERGY')
                 EcoDataMassIncome[point] = GetEconomyIncome(self, 'MASS')
                 EcoDataEnergyRequested[point] = GetEconomyRequested(self, 'ENERGY')
                 EcoDataMassRequested[point] = GetEconomyRequested(self, 'MASS')
+                EcoDataEnergyStoredRatio[point] = GetEconomyStoredRatio(self, 'ENERGY')
+                EcoDataMassStoredRatio[point] = GetEconomyStoredRatio(self, 'MASS')
 
                 -- special case for trend
                 energyTrend = GetEconomyTrend(self, 'ENERGY')
@@ -161,6 +176,8 @@ AIBrainEconomyComponent = ClassSimple {
                 mRequested = mRequested + EcoDataMassRequested[point]
                 eTrend = eTrend + EcoDataEnergyTrend[point]
                 mTrend = mTrend + EcoDataMassTrend[point]
+                eRatio = eRatio + EcoDataEnergyStoredRatio[point]
+                mRatio = mRatio + EcoDataMassStoredRatio[point]
 
                 -- calculate new over time values
                 local sampleInverse =  (1 / self.EconomySamples)
@@ -173,6 +190,8 @@ AIBrainEconomyComponent = ClassSimple {
                 economyOverTimeCurrent.MassEfficiencyOverTime = MathMin((mIncome * sampleInverse) / (mRequested * sampleInverse), 2)
                 economyOverTimeCurrent.EnergyTrendOverTime = eTrend * sampleInverse
                 economyOverTimeCurrent.MassTrendOverTime = mTrend * sampleInverse
+                economyOverTimeCurrent.EnergyStoredRatioOverTime = eRatio * sampleInverse
+                economyOverTimeCurrent.MassStoredRatioOverTime = mRatio * sampleInverse
 
                 if Debug then
                     local army = self:GetArmyIndex()

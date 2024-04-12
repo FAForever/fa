@@ -5,5 +5,8 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local CIridiumRocketProjectile = import("/lua/cybranprojectiles.lua").CIridiumRocketProjectile
+
+--- Cybran Iridium Rocket Tubes, DRL0204 : cyb T2 range bot (hoplite)
+---@class CDFRocketIridium02 : CIridiumRocketProjectile
 CDFRocketIridium02 = ClassProjectile(CIridiumRocketProjectile) { }
 TypeClass = CDFRocketIridium02

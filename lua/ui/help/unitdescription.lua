@@ -117,9 +117,9 @@ Description = {
     ['xel0209'] = "<LOC Unit_Description_0315> Tech 2 amphibious construction, repair, capture and reclamation unit. Armed with a Riot Gun and internal radar and jammer.",
     ['xeb0104'] = "<LOC Unit_Description_0446> Houses one flying Drone which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
     ['xeb0204'] = "<LOC Unit_Description_0453> Houses two flying Drones, each of which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
-    ['uea0001'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",
-    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",
-    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units",
+    ['uea0001'] = "<LOC Unit_Description_0457> Flying Drone, which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T1 structures. Vulnerable to any air fighters or anti-air units.",
+    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone, which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T3 structures. Vulnerable to any air fighters or anti-air units.",
+    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone, which can assist, repair, and reclaim any unit. Cannot be ordered to initiate the construction of structures. Vulnerable to any air fighters or anti-air units.",
 
     -- UEF -- Factories HQ
     ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
@@ -166,12 +166,13 @@ Description = {
     ['url0001'] = "<LOC Unit_Description_0304> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['url0001-ras'] = "<LOC Unit_Description_0106> Increases ACU's resource generation.",
     ['url0001-pcg'] = "<LOC Unit_Description_0107> Cloaks the ACU from optical sensors and increases maximum health. Can be detected by Omni Sensors. Requires Energy to run.",
+    ['url0001-srs'] = "<LOC Unit_Description_0465_faf>Massively increases the rate at which the ACU repairs its armour.",
     ['url0001-psg'] = "<LOC Unit_Description_0108> Hides the ACU from radar. Requires Energy to run.",
     ['url0001-pqt'] = "<LOC Unit_Description_0109> Adds teleporter. Requires considerable Energy to activate.",
     ['url0001-aes'] = "<LOC Unit_Description_0110> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
     ['url0001-ees'] = "<LOC Unit_Description_0111> Replaces the Tech 2 Engineering Suite. Expands the number of available schematics and further increases the ACU's build speed and maximum health.",
     ['url0001-acu'] = "<LOC Unit_Description_0112> Increases main cannon's rate of fire and range. Also increases range of the Molecular Ripper and Overcharge.",
-    ['url0001-mlg'] = "<LOC Unit_Description_0113> ACU can generate a beam laser that sweeps over enemy units.",
+    ['url0001-mlg'] = "<LOC Unit_Description_0113> ACU can generate a beam laser that sweeps over enemy units. Range of the beam increases with Gun Range.",
     ['url0001-ntt'] = "<LOC Unit_Description_0114> Equips the ACU with a standard Cybran Nanite torpedo tube and sonar.",
 
     -- CYBRAN -- Support Commander Units/Upgrades
@@ -326,8 +327,9 @@ Description = {
     -- AEON -- Armored Commander Unit/Upgrades
     ['ual0001'] = "<LOC Unit_Description_0305> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['ual0001-aes'] = "<LOC Unit_Description_0156> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
-    ['ual0001-cd'] = "<LOC Unit_Description_0157> Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High Energy Consumption.",
-    ['ual0001-cba'] = "<LOC Unit_Description_0158> Enhances the ACU's Quantum Disrupter beam. Nearly doubles its range.",
+    ['ual0001-cd'] = "<LOC Unit_Description_0157> Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High Energy Consumption. Range of the Field Adapts with the range of the Gun",
+    ['ual0001-cba'] = "<LOC Unit_Description_0158>Increases the range of the ACU's main cannon and that of Overcharge.",
+    ['ual0001-ecba'] = "<LOC Unit_Description_0466_faf>Massively increases the range of the ACU's main cannon and that of Overcharge.",
     ['ual0001-ess'] = "<LOC Unit_Description_0159> Greatly expands the range of the standard on-board ACU sensor systems.",
     ['ual0001-ees'] = "<LOC Unit_Description_0160> Replaces the Tech 2 Engineering Suite. Expands the number of available schematics and further increases the ACU's build speed and maximum health.",
     ['ual0001-hsa'] = "<LOC Unit_Description_0161> Rapidly cools the Quantum Disruptor beam. Increases rate of fire.",
@@ -343,7 +345,7 @@ Description = {
     ['ual0301-ras'] = "<LOC Unit_Description_0169> Increases SACU's resource generation.",
     ['ual0301-sp'] = "<LOC Unit_Description_0170> SACU is sacrificed and its Mass is added to a structure. This destroys the SACU.",
     ['ual0301-tsg'] = "<LOC Unit_Description_0171> Creates a protective shield around the SACU.",
-    ['ual0301-htsg'] = "<LOC Unit_Description_0172> Upgrades the SACU's protective shield. Requires Energy to run.",
+    ['ual0301-phtsg'] = "<LOC Unit_Description_0172> Upgrades the SACU's protective shield. Requires Energy to run.",
     ['ual0301-ss'] = "<LOC Unit_Description_0173> Equips the standard SACU's Reacton cannon with area-of-effect damage.",
     ['ual0301-sic'] = "<LOC Unit_Description_0174> Greatly increases the speed at which the SACU repairs itself.",
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
@@ -621,5 +623,6 @@ Description = {
     ['drlk001'] = "<LOC Unit_Description_0462> Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
     ['dalk003'] = "<LOC Unit_Description_0463> Mobile Anti-Air unit. Armed with a high-impact projectiles, excellent against enemy gunships or air-fighters.",
     ['dslk004'] = "<LOC Unit_Description_0464> Mobile Anti-Air unit. Armed with a long-range lasers, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
+    ['srl0310'] = "<LOC Unit_Description_srl0310> Mobile support unit. Designed to attack and destroy enemy shields. Weapon system only very briefly stuns enemy units.",
 
 }

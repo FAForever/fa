@@ -148,6 +148,7 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
     -- overwrite some globals for performance / safety
 
     import("/lua/ui/override/exit.lua")
@@ -182,20 +183,13 @@ function CreateUI(isReplay)
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')
 
-    -- tweak networking parameters
-    ConExecute('net_MinResendDelay 100')        -- standard value of 100ms
-    ConExecute('net_MaxResendDelay 1000')       -- standard value of 1000ms
-
-    ConExecute('net_MaxSendRate 2048')          -- standard value of 1024 bytes
-    ConExecute('net_MaxBacklog 2048')           -- standard value of 1024 bytes
-
-    ConExecute('net_SendDelay 5')               -- standard value of 25ms
-    ConExecute('net_AckDelay 5')                -- standard value of 25ms
-
     -- tweak decal properties
     ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
     ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
+
+    -- always try and render shadows
+    ConExecute("ren_ShadowLOD 20000")
 
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
@@ -209,7 +203,6 @@ function CreateUI(isReplay)
             end
 
             if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                ConExecute("ren_ShadowLOD 1024")
                 ConExecute("ren_ShadowSize 2048")
             end
         end)
@@ -222,7 +215,43 @@ function CreateUI(isReplay)
     OriginalFocusArmy = focusArmy
 
     ConExecute("Cam_Free off")
+
+    -- load it all fast to prevent stutters
+    ConExecute('res_AfterPrefetchDelay 10')
+    ConExecute('res_PrefetcherActivityDelay 1')
+
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
+
+    prefetchTable.batch_textures = table.concatenate(
+        DiskFindFiles("/textures/ui/common/game/cursors", "*.dds"),
+        DiskFindFiles("/textures/ui/common/game/orders", "*.dds"),
+        DiskFindFiles("/textures/ui/common/game/selection", "*.dds"),
+        DiskFindFiles("/textures/ui/common/game/waypoints", "*.dds"),
+        DiskFindFiles("/textures/ui/common/icons", "*.dds")
+    )
+
+    -- prefetchTable.d3d_textures = table.concatenate(
+    --     DiskFindFiles("/textures/particles", "*.dds"),
+    --     DiskFindFiles("/textures/effects", "*.dds"),
+    --     DiskFindFiles("/projectiles", "*.dds"),
+    --     DiskFindFiles("/meshes/", "*.dds")
+    -- )
+
+    -- prefetchTable.models = table.concatenate(
+    --     DiskFindFiles("/projectiles", "*.scm"),
+    --     DiskFindFiles("/meshes/", "*.scm")
+    -- )
+
+    -- prefetchTable.anims = table.concatenate(
+    --     DiskFindFiles("/units/", "*.sca")
+    -- )
+
+    SPEW(string.format("Preloading %d batch textures", table.getn(prefetchTable.batch_textures)))
+    SPEW(string.format("Preloading %d d3d textures", table.getn(prefetchTable.d3d_textures)))
+    SPEW(string.format("Preloading %d models", table.getn(prefetchTable.models)))
+    SPEW(string.format("Preloading %d animations", table.getn(prefetchTable.anims)))
+
+    Prefetcher:Update(prefetchTable)
 
     -- Set up our layout change function
     UIUtil.changeLayoutFunction = SetLayout
@@ -231,8 +260,6 @@ function CreateUI(isReplay)
     if focusArmy >= 1 then
         LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusArmy].nickname
     end
-
-    GameCommon.InitializeUnitIconBitmaps(prefetchTable.batch_textures)
 
     controls.gameParent = UIUtil.CreateScreenGroup(GetFrame(0), "GameMain ScreenGroup")
     gameParent = controls.gameParent
@@ -305,11 +332,6 @@ function CreateUI(isReplay)
         end
         return false
     end
-
-    Prefetcher:Update(prefetchTable)
-    -- UI assets should be loaded fast into memory to prevent stutter
-    ConExecute('res_AfterPrefetchDelay 100')
-    ConExecute('res_PrefetcherActivityDelay 1')
 
     if SessionIsReplay() then
         ForkThread(SendChat)
@@ -689,7 +711,11 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
+---@param newQueue UIBuildQueue
 function OnQueueChanged(newQueue)
+    -- update the Lua representation of the queue
+    UpdateCurrentFactoryForQueueDisplay(newQueue)
+
     if not gameUIHidden then
         import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
@@ -728,6 +754,22 @@ function OnUserPause(pause)
     if Tabs.CanUserPause() then
         if focus == -1 and not SessionIsReplay() then
             return
+        end
+
+        if not SessionIsReplay() then
+            if pause then
+                SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+                    to = 'all',
+                    text = 'Paused the game',
+                    Chat = true,
+                })
+            else
+                SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+                    to = 'all',
+                    text = 'Unpaused the game',
+                    Chat = true,
+                })
+            end
         end
 
         if pause then
@@ -847,7 +889,6 @@ end
 -- Given an UserUnit that is adjacent to a given blueprint, does it yield a
 -- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    -- fixme: todo
     return true
 end
 
@@ -993,16 +1034,34 @@ function HideNISBars()
     end
 end
 
+---@type table<string, fun(sender: string, data: table)>
 local chatFuncs = {}
 
-function RegisterChatFunc(func, dataTag)
-    table.insert(chatFuncs, {id = dataTag, func = func})
+---@param func fun(sender: string, data: table)
+---@param identifier string
+function RegisterChatFunc(func, identifier)
+    chatFuncs[identifier] = func
 end
 
+--- Called by the engine as (chat) messages are received.
+---@param sender string     # username
+---@param data table        
 function ReceiveChat(sender, data)
-    for i, chatFuncEntry in chatFuncs do
-        if data[chatFuncEntry.id] then
-            chatFuncEntry.func(sender, data)
+    if data.Identifier then
+
+        -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
+
+        local func = chatFuncs[data.Identifier]
+        if func then
+            func(sender, data)
+        end
+    else
+        -- for legacy support we also search through the chat functions the 'old way'
+
+        for identifier, func in chatFuncs do
+            if data[identifier] then
+                func(sender, data)
+            end
         end
     end
 end

@@ -11,8 +11,8 @@ PropBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = '',
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
     },
     Interface = {
         HelpText = 'Used as a node in a path graph.',

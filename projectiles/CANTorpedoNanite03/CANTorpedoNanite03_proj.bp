@@ -21,11 +21,12 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -63,11 +64,15 @@ ProjectileBlueprint {
         InitialSpeed = 14,
         Lifetime = 20,
         MaxSpeed = 14,
-        MaxZigZag = 0.5,
         StayUnderwater = true,
-        TrackTarget = true,
+        RealisticOrdinance = true,
+        TrackTarget = false,
         TurnRate = 230,
         VelocityAlign = true,
-        ZigZagFrequency = 1,
+        UseGravity = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        MaxZigZag = 1,
+        ZigZagFrequency = 0.4,
     },
 }

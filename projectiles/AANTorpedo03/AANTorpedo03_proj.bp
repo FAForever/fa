@@ -1,0 +1,69 @@
+ProjectileBlueprint {
+    Audio = {
+        EnterWater = Sound {
+            Bank = 'URAWeapon',
+            Cue = 'URA0204_Torpedo_Water',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'ANTINAVY',
+        'TORPEDO',
+    },
+    Defense = {
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
+    Display = {
+        CameraFollowTimeout = 2,
+        CameraFollowsProjectile = true,
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds',
+                    MeshName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm',
+                    ShaderName = 'TMeshGlow',
+                    LODCutoff = 130,
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.05,
+    },
+    General = {
+        Category = 'Anti Navy',
+        Faction = 'Aeon',
+        Weapon = 'Torpedo Cluster',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 0,
+        AccelerationRange = 0,
+        DestroyOnWater = false,
+        Lifetime = 25,
+        MaxSpeed = 18,
+        MaxZigZag = 5,
+        StayUnderwater = true,
+        StayUpright = false,
+        TrackTarget = false,
+        RealisticOrdinance = true,
+        TurnRate = 190,
+        TurnRateRange = 10,
+        VelocityAlign = true,
+        ZigZagFrequency = 0.2,
+    },
+}

@@ -17,6 +17,8 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
+local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
+
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
     ui_DisableCursorFixing = false,
@@ -212,7 +214,6 @@ local orderToCursorCallback = {
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
-    AutoBuild = false,
 
     ---@param self WorldView
     ---@param spec any
@@ -268,9 +269,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     SetDefaultSelectTolerance = function(self)
         local tolerance
         if SessionIsReplay() then
-            tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_replay')
+            tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_replay
         else 
-            tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_regular')
+            tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_regular
         end
 
         if tolerance != self.SelectionTolerance then
@@ -283,7 +284,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     --- Sets the selection tolerance to make it easier to reclaim
     ---@param self any
     SetReclaimSelectTolerance = function(self)
-        local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
+        local tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_reclaim
 
         if tolerance != self.SelectionTolerance then
             -- LOG('Tolerance set to: ' .. tolerance)
@@ -308,7 +309,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     --- Checks and toggles the ignore mode which only processes move and attack move commands
     ---@param self WorldView
     CheckIgnoreMode = function(self)
-        return IsKeyDown(KeyCodeCtrl) and (not IsKeyDown(KeyCodeShift)) and Prefs.GetFromCurrentProfile('options.commands_ignore_mode') == 'on' -- shift key
+        return IsKeyDown(KeyCodeCtrl) and (not IsKeyDown(KeyCodeShift)) and Prefs.GetFieldFromCurrentProfile('options').commands_ignore_mode == 'on' -- shift key
     end,
 
     --- Returns true if the reclaim command can be applied
@@ -329,7 +330,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         local selection = GetSelectedUnits()
         local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
         local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc and not in command mode
-        local holdAltToAttackMove = Prefs.GetFromCurrentProfile('options.alt_to_force_attack_move')
+        local holdAltToAttackMove = Prefs.GetFieldFromCurrentProfile('options').alt_to_force_attack_move
 
         -- process precedence hierarchy
         ---@type CommandCap | 'CommandHighlight'
@@ -379,6 +380,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- clean up previous cursor
         if not (self.CursorLastEvent == event) and self[self.CursorLastEvent] then
             self[self.CursorLastEvent](self, self.CursorLastIdentifier, false, false)
+            self.CursorTrash:Destroy()
         end
 
         -- attempt to create a new cursor
@@ -444,7 +446,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 self.Cursor[3] = nil
                 self.Cursor[4] = nil
                 self.Cursor[5] = nil
-
                 GetCursor():Reset()
             end
         end
@@ -531,7 +532,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
 
         -- if via prefs then we always show the splash indicator
-        local viaPrefs = Prefs.GetFromCurrentProfile('options.cursor_splash_damage') == 'on'
+        local viaPrefs = Prefs.GetFieldFromCurrentProfile('options').cursor_splash_damage == 'on'
         if viaPrefs then
             self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
 
@@ -616,6 +617,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
+                CommandMode.GetCommandMode()[2].reticle = TeleportReticle(self)
             end
         end
     end,
@@ -884,7 +886,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
-    --- Called whenever the mouse moves and clicks in the world view
+    --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
     ---@param self WorldView
     ---@param event any
     ---@return boolean
@@ -907,51 +909,28 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         elseif event.Type == 'WheelRotation' then
             self.zoomed = true
         end
-        if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or self.AutoBuild) then
-            local option = Prefs.GetFromCurrentProfile('options.automex')
-            if option ~= 'off' then
-                local Units = GetSelectedUnits()
-                if Units and not GetRolloverInfo() then
-                    local BuildType = false
-                    local MWP = GetMouseWorldPos()
-                    local Deposits = GetDepositsAroundPoint(MWP.x, MWP.z, 0.8, 0)
-                    if not table.empty(Deposits) then
-                        if Deposits[1].Type == 1 then
-                            BuildType = categories.MASSEXTRACTION
-                        else
-                            BuildType = categories.HYDROCARBON
-                        end
-                    end
-                    if BuildType then
-                        if self.AutoBuild and CommandMode.GetCommandMode()[2].name ~= self.AutoBuild then
-                            self.AutoBuild = false
-                        else
-                            local _, _, BuildableCategories = GetUnitCommandData(Units)
-                            BuildableCategories = BuildableCategories * BuildType
-                            if option == 'onlyT1' then
-                                BuildableCategories = BuildableCategories * categories.TECH1
-                            else
-                                local Techs = {categories.EXPERIMENTAL, categories.TECH3, categories.TECH2}
-                                for _, Tech in Techs do
-                                    if not EntityCategoryEmpty(BuildableCategories * Tech) then
-                                        BuildableCategories = BuildableCategories * Tech
-                                        break
-                                    end
-                                end
-                            end
-                            local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
-                            if BuildBP then
-                                CommandMode.StartCommandMode('build', { name = BuildBP })
-                                self.AutoBuild = BuildBP
-                            end
-                        end
-                    else
-                        CommandMode.EndCommandMode(true)
-                        self.AutoBuild = false
-                    end
+
+        -- template rotation feature that relies on a math trick that allows for rotating 2 dimensional positions at 90 degrees, see also:
+        -- - https://en.wikipedia.org/wiki/Rotation_matrix#Common_2D_rotations
+
+        if  event.Type == 'ButtonPress' and
+            event.Modifiers.Middle and
+            Prefs.GetFieldFromCurrentProfile('options').gui_template_rotator ~= 0
+        then
+            local template = GetActiveBuildTemplate()
+            if template and not table.empty(template) then
+                local temp = template[1]
+                template[1] = template[2]
+                template[2] = temp
+                for i = 3, table.getn(template) do
+                    local temp = template[i][3]
+                    template[i][3] = -1 * template[i][4]
+                    template[i][4] = temp
                 end
+                SetActiveBuildTemplate(template)
             end
         end
+
         return false
     end,
 
@@ -1365,11 +1344,11 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self._order = order or 5
         self._registered = true
         WorldViewMgr.RegisterWorldView(self)
-        if Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode") != nil then
-            self:SetCartographic(Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode"))
+        if Prefs.GetFieldFromCurrentProfile(cameraName.."_cartographic_mode") != nil then
+            self:SetCartographic(Prefs.GetFieldFromCurrentProfile(cameraName.."_cartographic_mode"))
         end
-        if Prefs.GetFromCurrentProfile(cameraName.."_resource_icons") != nil then
-            self:EnableResourceRendering(Prefs.GetFromCurrentProfile(cameraName.."_resource_icons"))
+        if Prefs.GetFieldFromCurrentProfile(cameraName.."_resource_icons") != nil then
+            self:EnableResourceRendering(Prefs.GetFieldFromCurrentProfile(cameraName.."_resource_icons"))
         end
         if GetCamera(self._cameraName) then
             GetCamera(self._cameraName):SetMaxZoomMult(import("/lua/ui/game/gamemain.lua").defaultZoom)
@@ -1378,5 +1357,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
     OnIconsVisible = function(self, areIconsVisible)
         -- called when strat icons are turned on/off
+    end,
+
+    OnRenderWorld = function (self, delta)
+        -- called when custom world rendering is enabled
     end,
 }

@@ -10,6 +10,7 @@
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 local Util = import("/lua/utilities.lua")
 
 -------------------------------
@@ -18,13 +19,13 @@ local Util = import("/lua/utilities.lua")
 ---@class SCCollisionBeam : CollisionBeam
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,-- EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = { },-- EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = EffectTemplate.DefaultProjectileAirUnitImpact,
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,    
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProp = { },
+    FxImpactShield = { },    
+    FxImpactNone = { },
 }
 
 -------------------------------
@@ -98,11 +99,11 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self QuantumBeamGeneratorCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread( self.ScorchThread )
             end
         else
             KillThread(self.Scorching)
@@ -178,7 +179,7 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
 
     ---@param self MicrowaveLaserCollisionBeam01
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -249,7 +250,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self PhasonLaserCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -312,6 +313,8 @@ TractorClawCollisionBeam = Class(CollisionBeam) {
 ------------------------------------
 --- unknown unit (big size though)
 ---@class ExperimentalPhasonLaserCollisionBeam : SCCollisionBeam
+---@field BeamEffectsBag TrashBag
+---@field Trash TrashBag
 ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
 
     TerrainImpactType = 'LargeBeam01',
@@ -324,7 +327,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -381,7 +384,6 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 			self.Trash:Add(fxBeam)
         end
         -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
-
     end,
 }
 
@@ -399,16 +401,26 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread( self.ScorchThread )
             end
         else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
+
+        -- add vision to make sure we can see the impact effect
+        local position = self:GetPosition(1)
+        if position then
+            local marker = VisionMarkerOpti({Owner = self.unit})
+            marker:UpdatePosition(position[1], position[3])
+            marker:UpdateDuration(1)
+            marker:UpdateIntel(self.Army, 4, 'Vision', true)
+        end
+
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
@@ -462,7 +474,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self UltraChromaticBeamGeneratorCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -534,7 +546,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
 
     ---@param self TDFHiroCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
@@ -617,7 +629,7 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self OrbitalDeathLaserCollisionBeam
     ---@param impactType string
-    ---@param targetEntity Unit | Projectile | Prop | nil
+    ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then

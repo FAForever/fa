@@ -16,6 +16,18 @@ end
 function CUIWorldView:CameraReset()
 end
 
+---Enables/Disables custom world rendering for worldview
+---@param bool boolean
+function CUIWorldView:SetCustomRender(bool)
+end
+
+---Projects multiple vectors at once.
+---@generic T
+---@param positions table<T, Vector>
+---@return table<T, Vector2>
+function CUIWorldView:ProjectMultiple(positions)
+end
+
 ---
 ---@param enable boolean
 function CUIWorldView:EnableResourceRendering(enable)

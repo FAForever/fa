@@ -32,6 +32,52 @@ local TableGetN = table.getn
 local MathPi = math.pi
 local MathAtan = math.atan
 
+---@alias UserCommandType
+--- | 'None' # by-product of other commands
+--- | 'Stop'
+--- | 'Reclaim'
+--- | 'Move'
+--- | 'Attack'
+--- | 'Guard'
+--- | 'AggressiveMove'
+--- | 'Upgrade'
+--- | 'Build'
+--- | 'BuildMobile'
+--- | 'Tactical'
+--- | 'Nuke'
+--- | 'TransportReverseLoadUnits' # when you right click a transport
+--- | 'TransportLoadUnits' # when you right click a unit with a transport in your selection
+--- | 'TransportUnloadUnits'
+--- | 'TransportUnloadSpecificUnits' # when you click to unload specific units
+--- | 'Ferry'
+--- | 'AssistMove' # by-product of other commands
+--- | 'Script' # as an example: enhancements
+--- | 'Capture'
+--- | 'FormMove'
+--- | 'FormAggressiveMove'
+--- | 'OverCharge'
+--- | 'FormAttack'
+--- | 'Teleport'
+--- | 'Patrol'
+--- | 'FormPatrol'
+--- | 'Sacrifice'
+--- | 'Pause'
+--- | 'Dock'
+--- | 'DetachFromTransport'
+
+---@class UserCommandTarget
+---@field EntityId? EntityId
+---@field Position Vector
+---@field Type 'Position' | 'Entity' | 'None'
+
+---@class UserCommand
+---@field Blueprint UnitId
+---@field Clear boolean
+---@field CommandType UserCommandType
+---@field LuaParams table
+---@field Target UserCommandTarget
+---@field Units UserUnit[]
+
 ---@class MeshInfo
 ---@field Position Vector
 ---@field Blueprint string
@@ -46,7 +92,7 @@ local MathAtan = math.atan
 ---@alias CommandMode 'order' | 'build' | 'buildanchored' | false
 
 ---@class CommandModeDataBase
----@field cursor? CommandCap        # Similar to the field 'name' 
+---@field cursor? CommandCap        # Similar to the field 'name'
 ---@field altCursor string          # Allows for an alternative cursor
 
 ---@class CommandModeDataOrder : CommandModeDataBase
@@ -78,15 +124,31 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 --- Callback triggers when command mode starts
---- @param behavior function<CommandMode, CommandModeData>
-function AddStartBehavior(behavior)
-    TableInsert(startBehaviors, behavior)
+---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
+---@param identifier? string
+function AddStartBehavior(behavior, identifier)
+    if identifier then
+        if startBehaviors[identifier] then
+            WARN("Overwriting command mode start behavior: " .. identifier)
+        end
+        startBehaviors[identifier] = behavior
+    else
+        TableInsert(startBehaviors, behavior)
+    end
 end
 
 --- Callback triggers when command mode ends
---- @param behavior function<CommandMode, CommandModeData>
-function AddEndBehavior(behavior)
-    TableInsert(endBehaviors, behavior)
+---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
+---@param identifier? string
+function AddEndBehavior(behavior, identifier)
+    if identifier then
+        if endBehaviors[identifier] then
+            WARN("Overwriting command mode end behavior: " .. identifier)
+        end
+        endBehaviors[identifier] = behavior
+    else
+        TableInsert(endBehaviors, behavior)
+    end
 end
 
 --- usually changing selection ends the command mode, this allows us to ignore that
@@ -99,7 +161,6 @@ end
 ---@param newCommandMode CommandMode
 ---@param data CommandModeData
 function StartCommandMode(newCommandMode, data)
-
     -- clean up previous command mode
     if commandMode then
         EndCommandMode(true)
@@ -118,7 +179,6 @@ end
 --- Called when the command mode ends and deconstructs all the data.
 ---@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
 function EndCommandMode(isCancel)
-
     if ignoreSelection then
         return
     end
@@ -163,8 +223,12 @@ function CacheAndClearCommandMode()
 end
 
 --- Restores the cached command mode
-function RestoreCommandMode()
+---@param ignorePreviousCommands? boolean when set resets the command mode as if no commands were issued
+function RestoreCommandMode(ignorePreviousCommands)
     if cachedCommandMode and cachedModeData then
+        if ignorePreviousCommands then
+            issuedOneCommand = false
+        end
         StartCommandMode(cachedCommandMode, cachedModeData)
     end
 end
@@ -190,7 +254,6 @@ end
 -- @param pos The position of the feedback animation.
 -- @param type The type of feedback animation.
 function AddCommandFeedbackByType(pos, type)
-
     if commandMeshResources[type] == nil then
         return false;
     else
@@ -235,180 +298,6 @@ function AddDefaultCommandFeedbackBlips(pos)
     )
 end
 
---- Allows us to detect a double / triple click
-local pStructure1 = nil
-local pStructure2 = nil
-function CapStructure(command)
-
-    -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
-    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
-
-    -- bail out - we're not interested
-    if option == 'off' then
-        return
-    end
-
-    -- check if we have engineers
-    local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
-    if not units[1] then return end
-
-    -- check if we have a building that we target
-    local structure = GetUnitById(command.Target.EntityId)
-    if not structure or IsDestroyed(structure) then return end
-
-    -- various conditions written out for maintainability
-    local isShiftDown = IsKeyDown('Shift')
-
-    local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
-    local isTripleTapped = structure ~= nil and (pStructure1 == structure) and (pStructure2 == structure)
-
-    local isUpgrading = structure:GetFocus() ~= nil
-
-    local isTech1 = structure:IsInCategory('TECH1')
-    local isTech2 = structure:IsInCategory('TECH2')
-    local isTech3 = structure:IsInCategory('TECH3')
-
-    -- only run logic for structures
-    if structure:IsInCategory('STRUCTURE') then
-
-        -- try and create storages and / or fabricators around it
-        if structure:IsInCategory('MASSEXTRACTION') then
-
-            -- check what type of buildings we'd like to make
-            local buildFabs =
-            option == 'full-suite'
-                and (
-                (isTech2 and isUpgrading and isTripleTapped and isShiftDown)
-                    or (isTech3 and isDoubleTapped and isShiftDown)
-                )
-
-            local buildStorages =
-            (
-                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and not isUpgrading)
-                    or isTech3
-                ) and not buildFabs
-
-            if buildStorages then
-
-                -- prevent consecutive calls
-                local gametime = GetGameTimeSeconds()
-                if structure.RingStoragesStamp then
-                    if structure.RingStoragesStamp + 0.75 > gametime then
-                        return
-                    end
-                end
-
-                structure.RingStoragesStamp = gametime
-
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }
-                    , true)
-
-                -- only clear state if we can't make fabricators
-                if (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) then
-                    structure = nil
-                    pStructure1 = nil
-                    pStructure2 = nil
-                end
-            end
-
-            if buildFabs then
-
-                -- prevent consecutive calls
-                local gametime = GetGameTimeSeconds()
-                if structure.RingFabsStamp then
-                    if structure.RingFabsStamp + 0.75 > gametime then
-                        return
-                    end
-                end
-
-                structure.RingFabsStamp = gametime
-
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 2, id = "b1104" } }
-                    , true)
-
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-            end
-
-            -- only apply these if we're interested in them
-        elseif option == 'full-suite' then
-
-            -- prevent consecutive calls
-            local gametime = GetGameTimeSeconds()
-            if structure.RingStamp then
-                if structure.RingStamp + 0.75 > gametime then
-                    return
-                end
-            end
-
-            structure.RingStamp = gametime
-
-            -- if we have a t3 fabricator, create storages around it
-            if structure:IsInCategory('MASSFABRICATION') and isTech3 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }
-                    , true)
-
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-                -- if we have a t2 artillery, create t1 pgens around it
-            elseif structure:IsInCategory('ARTILLERY') and isTech2 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }
-                    , true)
-
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-                -- if we have a radar, create t1 pgens around it
-            elseif structure:IsInCategory('RADAR')
-                and (
-                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and not isUpgrading)
-                )
-                or structure:IsInCategory('OMNI')
-            then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }
-                    , true)
-
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-                -- if we have a t1 point defense, create walls around it
-            elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b5101" } }
-                    , true)
-
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-            end
-        end
-    end
-
-    -- keep track of previous structure to identify a 2nd / 3rd click
-    pStructure2 = pStructure1
-    pStructure1 = structure
-
-    -- prevent building up state when upgrading but shift isn't pressed
-    if isUpgrading and not isShiftDown then
-        structure = nil
-        pStructure1 = nil
-        pStructure2 = nil
-    end
-end
-
 --- Creates a callback to spawn a unit triggered by the cheat menu.
 -- @param command Command that contains the position of the click
 -- @param data A shallow copy of the modeData to make the function pure data-wise
@@ -425,6 +314,7 @@ local function CheatSpawn(command, data)
             veterancy = data.vet,
             CreateTarmac = data.CreateTarmac,
             MeshOnly = data.MeshOnly,
+            ShowRaisedPlatforms = data.ShowRaisedPlatforms,
             UnitIconCameraMode = data.UnitIconCameraMode,
         }
     }, true)
@@ -435,38 +325,90 @@ local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 
---- Upgrades a tech 1 extractor that is being assisted
+---@param unit UserUnit
+local function UpgradeUnit(unit)
+    -- do not upgrade units that are already upgrading
+    if unit:GetFocus() then
+        return
+    end
+
+    ---@type UserUnit[]
+    local units = { unit }
+
+    -- paused units do not start upgrades
+    if GetIsPaused(units) then
+        SetPaused(units, false)
+        WaitTicks(5)
+    end
+
+    -- check if unit still exists
+    if IsDestroyed(unit) then
+        return
+    end
+
+    -- issue the upgrade
+    IssueBlueprintCommandToUnit(
+        unit, "UNITCOMMAND_Upgrade",
+        unit:GetBlueprint().General.UpgradesTo,
+        1, true
+    )
+
+    -- inform the user
+    print("Upgrade unit")
+
+    -- pause it
+    WaitTicks(5)
+    if IsDestroyed(unit) then
+        return
+    end
+
+    SetPaused(units, true)
+end
+
+---@param guardees UserUnit[]
 ---@param unit UserUnit
 local function OnGuardUpgrade(guardees, unit)
-    if EntityCategoryContains(categories.MASSEXTRACTION * categories.TECH1, unit) and
-        Prefs.GetFromCurrentProfile('options.assist_to_upgrade') == 'Tech1Extractors'
+    local unitBlueprint = unit:GetBlueprint()
+
+    -- check for radars
+    local upgradeRadar = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade_radar
+    local upgradeRadarTech1 = upgradeRadar == 'Tech1Radars' or upgradeRadar == 'Tech1Tech2Radars'
+    local upgradeRadarTech2 = upgradeRadar == 'Tech1Tech2Radars'
+    if upgradeRadarTech1 and
+        EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH1, unit)
     then
-        ForkThread(
-            function()
-                ---@type UserUnit
-                local units = { unit }
-                if not IsDestroyed(unit) and not unit:GetFocus() then
-                    import("/lua/ui/game/selection.lua").Hidden(
-                        function()
-                            SelectUnits(units)
-                            IssueBlueprintCommand("UNITCOMMAND_Upgrade", unit:GetBlueprint().General.UpgradesTo, 1, true)
-                        end
-                    )
+        ForkThread(UpgradeUnit, unit)
+    end
 
-                    WaitSeconds(0.5)
+    if upgradeRadarTech2 and
+        EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
+        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+    then
+        ForkThread(UpgradeUnit, unit)
+    end
 
-                    SetPaused(units, true)
-                end
-            end
-        )
+    -- check for mass extractors
+    local upgradeExtractor = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade
+    local upgradeExtractorTech1 = upgradeExtractor == 'Tech1Extractors' or upgradeExtractor == 'Tech1Tech2Extractors'
+    local upgradeExtractorTech2 = upgradeExtractor == 'Tech1Tech2Extractors'
+    if upgradeExtractorTech1 and
+        EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * categories.TECH1, unit)
+    then
+        ForkThread(UpgradeUnit, unit)
+    end
+
+    if upgradeExtractorTech2 and
+        EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * categories.TECH2, unit) and
+        unitBlueprint.Economy.ProductionPerSecondMass < unit:GetEconData().massProduced -- check for any adjacency
+    then
+        ForkThread(UpgradeUnit, unit)
     end
 end
 
---- Unpauses a
 ---@param guardees UserUnit[]
 ---@param target UserUnit
 local function OnGuardUnpause(guardees, target)
-    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
+    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_unpause
     if prefs == 'On' or
         (
         prefs == 'ExtractorsAndRadars' and
@@ -479,7 +421,7 @@ local function OnGuardUnpause(guardees, target)
         if not target.ThreadUnpause then
             local id = target:GetEntityId()
             target.ThreadUnpause = ForkThread(
-                function ()
+                function()
                     WaitSeconds(1.0)
                     local target = GetUnitById(id)
                     while target do
@@ -495,7 +437,7 @@ local function OnGuardUnpause(guardees, target)
                                         SetPaused({ target }, false)
                                         break
                                     end
-                                -- engineer is idle, died, we switch armies, ...
+                                    -- engineer is idle, died, we switch armies, ...
                                 else
                                     candidates[id] = nil
                                 end
@@ -503,7 +445,7 @@ local function OnGuardUnpause(guardees, target)
                         else
                             target.ThreadUnpauseCandidates = nil
                             target.ThreadUnpause = nil
-                            break;
+                            break
                         end
 
                         WaitSeconds(1.0)
@@ -514,9 +456,28 @@ local function OnGuardUnpause(guardees, target)
         end
 
         -- add these to keep track
-        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or { }
+        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or {}
         for k, guardee in guardees do
             target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
+        end
+    end
+end
+
+---@param guardees UserUnit[]
+---@param unit UserUnit
+local function OnGuardCopy(guardees, unit)
+    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_copy_command_queue
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, guardees)
+    if table.getn(engineers) > 0 and
+        (prefs == 'OnlyEngineers' or prefs == 'OnlyEngineersAddToSelection') and
+        EntityCategoryContains(categories.ENGINEER, unit)
+    then
+        if IsKeyDown('Control') then
+            SimCallback({ Func = 'CopyOrders', Args = { Target = unit:GetEntityId(), ClearCommands = true } }, true)
+
+            if prefs == 'OnlyEngineersAddToSelection' then
+                AddSelectUnits({ unit })
+            end
         end
     end
 end
@@ -528,12 +489,19 @@ local function OnGuard(guardees, unit)
     if unit:GetArmy() == GetFocusArmy() then
         OnGuardUpgrade(guardees, unit)
         OnGuardUnpause(guardees, unit)
+        OnGuardCopy(guardees, unit)
     end
 end
 
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
+---@param command UserCommand
+---@return boolean
 function OnCommandIssued(command)
+
+    if command.CommandType == 'Reclaim' and command.Target.EntityId then
+        SimCallback({ Func = 'ExtendReclaimOrder', Args = { TargetId = command.Target.EntityId } }, true)
+    end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then
@@ -570,7 +538,7 @@ function OnCommandIssued(command)
         local unit = GetUnitById(command.Target.EntityId)
         OnGuard(command.Units, unit)
 
-        -- validate factories assisting other factories
+        -- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then
             local factories = EntityCategoryFilterDown(categoriesFactories, command.Units) or {}
             if factories[1] then
@@ -587,7 +555,10 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            CapStructure(command)
+
+            local target = GetUnitById(command.Target.EntityId) --[[@as UserUnit]]
+            local units = command.Units --[[@as (UserUnit[])]]
+            import("/lua/ui/game/hotkeys/capping.lua").AssistToCap(target, units)
         end
 
         -- called when:
@@ -663,9 +634,6 @@ function OnCommandIssued(command)
             AddDefaultCommandFeedbackBlips(command.Target.Position)
         end
     end
-
-    -- used by spread attack to keep track of the orders of units
-    import("/lua/spreadattack.lua").MakeShadowCopyOrders(command)
 end
 
 --- ???

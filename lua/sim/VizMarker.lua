@@ -141,6 +141,7 @@ VisionMarkerOpti = Class(Entity) {
     UpdatePosition = function(self, x, z)
         PositionCache[1] = x
         PositionCache[3] = z
+        PositionCache[2] = GetTerrainHeight(x, z)
         Warp(self, PositionCache)
     end,
 
@@ -148,7 +149,7 @@ VisionMarkerOpti = Class(Entity) {
     ---@param self VisionMarkerOpti
     ---@param army number
     ---@param radius number
-    ---@param type EntityIntelType
+    ---@param type IntelType
     ---@param enable boolean Intel type is enabled when true and disabled otherwise
     UpdateIntel = function(self, army, radius, type, enable)
         if enable then

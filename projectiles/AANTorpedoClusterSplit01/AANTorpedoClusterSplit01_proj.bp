@@ -20,11 +20,13 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'ANTINAVY',
-        'NOSPLASHDAMAGE',
+        'TORPEDO',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -58,7 +60,8 @@ ProjectileBlueprint {
         StayUnderwater = true,
         StayUpright = true,
         TrackTarget = false,
-        TurnRate = 360,
+        TurnRate = 190,
+        TurnRateRange = 10,
         VelocityAlign = true,
         ZigZagFrequency = 0.2,
     },

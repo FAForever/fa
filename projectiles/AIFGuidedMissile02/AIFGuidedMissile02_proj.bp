@@ -20,7 +20,13 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'MISSILE',
+        'NOSPLASHDAMAGE'
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowsProjectile = true,
         StrategicIconSize = 1,
@@ -38,15 +44,16 @@ ProjectileBlueprint {
     Physics = {
         Acceleration = 5,
         DestroyOnWater = true,
-        InitialSpeed = 15,
+        InitialSpeed = 20,
         LeadTarget = false,
         Lifetime = 10,
         MaxSpeed = 35,
         MaxZigZag = 10,
-        TrackTarget = false,
-        TurnRate = 180,
+        TrackTarget = true,
+        TurnRate = 120,
+        TurnRateRange = 30,
         UseGravity = false,
         VelocityAlign = true,
-        ZigZagFrequency = 0.2,
+        ZigZagFrequency = 0.4,
     },
 }

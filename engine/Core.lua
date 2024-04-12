@@ -5,21 +5,22 @@
 ---@operator concat(FileName | string): FileName
 
 ---@class Quaternion
----@field [1] number
----@field [2] number
----@field [3] number
----@field [4] number
+---@field [1] number    # y
+---@field [2] number    # z
+---@field [3] number    # x
+---@field [4] number    # w
 
 ---@class Vector
----@field [1] number
----@field [2] number
----@field [3] number
+---@field [1] number    # x
+---@field [2] number    # y (up)
+---@field [3] number    # z
 
 ---@class Vector2
----@field [1] number
----@field [2] number
+---@field [1] number    # x
+---@field [2] number    # y
 
----@class Rectangle     # A point-to-point based rectangle, where the first point is usually in the top left corner
+--- A point-to-point based rectangle, where the first point is usually in the top left corner
+---@class Rectangle
 ---@field x0 number
 ---@field y0 number
 ---@field x1 number
@@ -78,10 +79,10 @@ end
 ---@param directory FileName
 ---@param pattern string
 ---@return FileName[]
-function DiskFindFiles(directory,  pattern)
+function DiskFindFiles(directory, pattern)
 end
 
---- returns a table of information for the given file, or `false` if the file doesn't exist 
+--- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
 ---@return table | false
 function DiskGetFileInfo(filename)
@@ -101,7 +102,8 @@ end
 
 --- returns true if a unit category contains this unit
 ---@param category EntityCategory
----@param unit Unit | UserUnit
+---@param unit Unit | UserUnit | UnitId | Projectile | Blip | Prop
+---@return boolean
 function EntityCategoryContains(category, unit)
 end
 
@@ -201,8 +203,8 @@ end
 function HasLocalizedVO(language)
 end
 
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsAlly(army1, army2)
 end
@@ -213,14 +215,14 @@ end
 function IsDestroyed(entity)
 end
 
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsEnemy(army1, army2)
 end
 
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsNeutral(army1, army2)
 end
@@ -243,7 +245,7 @@ end
 ---@param a number
 ---@param b number
 ---@return number
-function MATH_Lerp(s,  a,  b)
+function MATH_Lerp(s, a, b)
 end
 
 --- Applies linear interpolation between two quaternions `L` and `R`
@@ -390,12 +392,12 @@ end
 ---@param start number
 ---@param count number
 ---@return string
-function STR_Utf8SubString(string,  start,  count)
+function STR_Utf8SubString(string, start, count)
 end
 
 --- Converts an integer into a hexidecimal string
 ---@param int number
----@return string 
+---@return string
 function STR_itox(int)
 end
 
@@ -524,14 +526,13 @@ end
 --- will be used for the script's global variables.
 ---@param script FileName
 ---@param env? table
-function doscript(script,  env)
+function doscript(script, env)
 end
 
 --- returns true if the given resource file exists
 ---@param name FileName
 function exists(name)
 end
-
 
 ------
 -- New functions from engine patch:
@@ -558,4 +559,3 @@ end
 ---@return PatchedDepositResult[]
 function GetDepositsAroundPoint(x, z, radius, type)
 end
-

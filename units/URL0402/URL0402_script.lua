@@ -22,8 +22,6 @@ local Entity = import("/lua/sim/entity.lua").Entity
 ---@class URL0402 : CWalkingLandUnit
 ---@field AmbientExhaustEffectsBag TrashBag
 URL0402 = ClassUnit(CWalkingLandUnit) {
-    WalkingAnimRate = 1.2,
-
     AmbientExhaustBones = {
         'Exhaust01',
         'Exhaust02',
@@ -248,6 +246,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
 
         self:CreateWreckage(0.1)
         self:Destroy()
+        
     end,
 
     ---@deprecated
@@ -315,6 +314,21 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
     CreateDamageEffects = function(self, bone, army)
         for k, v in EffectTemplate.DamageFireSmoke01 do
             CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
+        end
+    end,
+
+    ---@param self URL0402
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
+    OnMotionHorzEventChange = function(self, new, old)
+        CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+
+        if (old == 'Stopped') then
+            local bpDisplay = self:GetBlueprint().Display
+            if bpDisplay.AnimationWalk and self.Animator then
+                self.Animator:SetDirectionalAnim(true)
+                self.Animator:SetRate(bpDisplay.AnimationWalkRate)
+            end
         end
     end,
 }

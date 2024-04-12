@@ -47,5 +47,6 @@ ProjectileBlueprint {
         TrackTarget = true,
         TurnRate = 230,
         VelocityAlign = true,
+        UseGravity = true,
     },
 }

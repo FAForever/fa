@@ -2,6 +2,7 @@ PropBlueprint {
     Categories = {
         'RECLAIMABLE',
 		'WALL',
+        'OBSTRUCTSBUILDING'
     },
     Defense = {
         Health = 2000,

@@ -4,5 +4,8 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local SZthuthaamArtilleryShell = import("/lua/seraphimprojectiles.lua").SZthuthaamArtilleryShell
+
+-- Zthuthaam Artillery Shell Projectile script. Seraphim T2 Artillery XSB2303
+---@class SIFZthuthaamArtilleryShell02 : SZthuthaamArtilleryShell
 SIFZthuthaamArtilleryShell02 = ClassProjectile(SZthuthaamArtilleryShell) { }
 TypeClass = SIFZthuthaamArtilleryShell02

@@ -20,6 +20,10 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- replace with assembly implementations
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
+
 -- load legacy builder systems
 doscript '/lua/system/GlobalPlatoonTemplate.lua'
 doscript '/lua/system/GlobalBuilderTemplate.lua'
@@ -78,16 +82,9 @@ function ShuffleStartPositions(syncNewPositions)
     end
 end
 
-Prefetcher = CreatePrefetchSet()
-
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
-
-    -- start prefetching
-    -- local template = import("/lua/sim/prefetchtemplates.lua").DefaultUnits
-    -- local prefetchData = import("/lua/sim/PrefetchUtilities.lua").CreatePrefetchSetFromBlueprints(template)
-    -- Prefetcher:Update(prefetchData)
 
     import("/lua/ai/gridreclaim.lua").Setup()
 
@@ -96,12 +93,6 @@ function SetupSession()
 
     -- assume there are no AIs
     ScenarioInfo.GameHasAIs = false
-
-    -- if the AI replacement is on then there may be AIs
-    if ScenarioInfo.Options.AIReplacement == 'On' then
-        ScenarioInfo.GameHasAIs = true
-        SPEW("Detected ai replacement option being enabled: enabling AI functionality")
-    end
 
     -- if we're doing a campaign / special map then there may be AIs
     if ScenarioInfo.type ~= 'skirmish' then
@@ -118,6 +109,8 @@ function SetupSession()
     -- LOG('SetupSession: ', repr(ScenarioInfo))
     ---@type AIBrain[]
     ArmyBrains = {}
+
+
 
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
@@ -157,6 +150,7 @@ function SetupSession()
     local buildRestrictions, enhRestrictions = nil, {}
 
     local restrictions = ScenarioInfo.Options.RestrictedCategories
+
     if restrictions then
         table.print(restrictions, 'RestrictedCategories')
         local presets = import("/lua/ui/lobby/unitsrestrictions.lua").GetPresetsData()
@@ -239,20 +233,29 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
     if (not info.Human) then
-        local instance
-        local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
+        local reference
+        local keys = import("/lua/aibrains/index.lua").keyToBrain
         if (not info.Civilian) and (info.AIPersonality != '') then
             -- likely a skirmish scenario
-            instance = keyToBrain[info.AIPersonality]
+            reference = keys[info.AIPersonality]
         else
             -- likely a campaign scenario
             if ScenarioInfo.type != 'skirmish' then
-                instance = keyToBrain['campaign']
+                reference = keys['campaign']
             end
         end
 
-        if instance then
-            setmetatable(brain, instance)
+        if reference then
+            local instance
+            if not table.empty(getmetatable(reference)) then
+                instance = reference
+            else
+                instance = import(reference[1])[reference[2]]
+            end
+
+            if instance then
+                setmetatable(brain, instance)
+            end
         end
     end
 
@@ -292,7 +295,7 @@ end
 
 -- BeginSession will be called by the engine after the armies are created (but without
 -- any units yet) and we're ready to start the game. It's responsible for setting up
--- the initial units and any other gameplay state we need.
+-- the initial units, alliances and any other gameplay state we need.
 function BeginSession()
 
     -- imported for side effects
@@ -317,6 +320,10 @@ function BeginSession()
 
     if syncStartPositions then
         Sync.StartPositions = syncStartPositions
+    end
+
+    if not Sync.NewPlayableArea then
+        Sync.NewPlayableArea = {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
     end
 
     -- keep track of user name for LOCs
@@ -380,10 +387,14 @@ function BeginSessionAI()
             import(file)
         end
 
-        -- import base templates, builder group templates and builder templates
-        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
-            import(file)
-        end
+        -- allow for debugging code
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineVisualize
+        )
+
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineSyncMessages
+        )
     end
 end
 
@@ -402,6 +413,10 @@ end
 
 --- Setup for team manangement
 function BeginSessionTeams()
+
+    -- up until this point all armies are considered to be enemies for skirmish maps,
+    -- we correct that here by applying the team setup of the lobby
+
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do
@@ -429,14 +444,14 @@ function BeginSessionTeams()
 
     -- setup special team options
     if ScenarioInfo.Options.CommonArmy == 'Union' then
-        BeginSessionUnionArmy()
+        BeginSessionUnionArmy(teams)
     elseif ScenarioInfo.Options.CommonArmy == 'Common' then
-        BeginSessionCommonArmy()
+        BeginSessionCommonArmy(teams)
     end
 end
 
 --- Setup for union army, where all teams can control the units of its allies
-function BeginSessionUnionArmy()
+function BeginSessionUnionArmy(teams)
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
@@ -450,17 +465,7 @@ end
 
 
 --- Setup for common army, where all teams are batched together into one army
-function BeginSessionCommonArmy()
-    local teams = {}
-    for name,army in ScenarioInfo.ArmySetup do
-        if army.Team > 1 then
-            if not teams[army.Team] then
-                teams[army.Team] = {}
-            end
-            table.insert(teams[army.Team],army.ArmyIndex)
-        end
-    end
-
+function BeginSessionCommonArmy(teams)
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -502,7 +507,9 @@ function BeginSessionCommonArmy()
                         local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
                         local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
                         SetArmyEconomy(i, v1, v2)
-                        SetFocusArmy(i - 1)
+                        if i2 == GetFocusArmy() then
+                            SetFocusArmy(i - 1)
+                        end
                         break
                     end
                 end, i, i2, Units[1])

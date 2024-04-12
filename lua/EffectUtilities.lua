@@ -52,6 +52,7 @@ local TrashBagAdd = TrashBag.Add
 
 ---@alias AdjacencyBeam {Unit: Unit, Trash: TrashBag}
 
+
 ---@deprecated
 --- Creates all effects in a table at an entity
 ---@param obj BoneObject
@@ -1088,12 +1089,12 @@ end
 
 --- Gets the teleport sizes of a unit
 ---@param unit Unit
----@return integer sizeX
----@return integer sizeY
----@return integer sizeZ
----@return integer offsetX
----@return integer offsetY
----@return integer offsetZ
+---@return number sizeX
+---@return number sizeY
+---@return number sizeZ
+---@return number offsetX
+---@return number offsetY
+---@return number offsetZ
 function TeleportGetUnitSizes(unit)
     -- Returns the sizes of the unit, to be used for teleportation effects
     local bp = unit.Blueprint
@@ -1108,7 +1109,7 @@ end
 
 --- Gets the teleport location, based on the terrain height and terrain type offset
 ---@param loc Vector
----@return Vector
+---@return table|nil
 function TeleportLocationToSurface(loc)
     -- Takes the given location, adjust the Y value to the surface height on that location
     local pos = TableCopy(loc)
@@ -1437,7 +1438,7 @@ end
 
 --- Destroys teleport charge-up effects
 ---@param unit Unit
----@param EffectsBag TrashBag
+---@param effectsBag TrashBag
 function DestroyTeleportChargingEffects(unit, effectsBag)
     -- Called when charging up is done because successful or cancelled
     if unit.TeleportChargeBag then

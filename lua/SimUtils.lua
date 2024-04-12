@@ -197,7 +197,8 @@ function TransferUnitsOwnership(units, toArmy, captured)
         newUnit.oldowner = oldowner
 
         -- A F T E R
-        unit:SetOrientation(orientation, true)
+
+        newUnit:SetOrientation(orientation, true)
 
         if massKilled and massKilled > 0 then
             newUnit:CalculateVeterancyLevelAfterTransfer(massKilled, true)

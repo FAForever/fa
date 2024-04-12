@@ -188,7 +188,7 @@ local WorldLabel = ClassUI(Group) {
         end
 
         local value = MathClamp(0.25 * MathSqrt(mass) * scaling + minSize, minSize, maxSize)
-        return value ^ 0
+        return math.floor(value)
     end,
 
     ---@param self WorldLabel
