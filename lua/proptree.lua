@@ -43,6 +43,8 @@ local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 ---@field NoBurn? boolean
 Tree = Class(Prop) {
 
+    IsTree = true,
+
     ---@param self Tree
     OnDestroy = function(self)
         Prop.OnDestroy(self)
@@ -269,6 +271,9 @@ Tree = Class(Prop) {
 ---@class TreeGroup : Prop
 TreeGroup = Class(Prop) {
 
+    IsTree = true,
+    IsTreeGroup = true,
+    
     --- Break when colliding with a projectile of some sort
     ---@param self TreeGroup
     ---@param other string

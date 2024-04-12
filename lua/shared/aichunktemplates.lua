@@ -56,7 +56,7 @@ function VerifyChunkTemplate(template)
             local offset = offsets[i]
 
             if not (offset[1] or offset[2]) then
-                WARN(string.format("AIChunkTemplates - invalid offset at size %d at index %d: %s ", k, i, repru(offset)))
+                WARN(string.format("AIChunkTemplates - invalid offset at size %d at index %d: (%f, %f) ", k, i, unpack(offset)))
             end
         end
     end

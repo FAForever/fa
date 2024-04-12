@@ -400,8 +400,8 @@ Weapon = ClassWeapon(WeaponMethods) {
     end,
 
     ---@param self Weapon
-    ---@param new any
-    ---@param old any
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
     end,
 

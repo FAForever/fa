@@ -21,7 +21,7 @@
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
-local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
@@ -30,7 +30,7 @@ local Buff = import("/lua/sim/buff.lua")
 ---@class UAL0001 : ACUUnit
 UAL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightDisruptor = ClassWeapon(ADFDisruptorCannonWeapon) {},
         ChronoDampener = ClassWeapon(ADFChronoDampener) {},
         OverCharge = ClassWeapon(ADFOverchargeWeapon) {},

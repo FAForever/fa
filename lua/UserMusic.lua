@@ -62,8 +62,6 @@ function NotifyBattle()
     local prevNotify = LastBattleNotify
     LastBattleNotify = tick
 
-    --LOG("*** NotifyBattle, tick=" .. repr(tick))
-
     if BattleStart == 0 then
         if tick - prevNotify > BattleCounterReset then
             BattleEventCounter = 1
