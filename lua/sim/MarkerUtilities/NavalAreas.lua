@@ -147,7 +147,7 @@ function Generate()
         if mapSize > 1024 then
             thresholdDistance = 30
         end
-        GenerateForExpansion(smallExpansions[k], thresholdDistance, thresholdSize, thresholdArea)
+        GenerateForExpansion(smallExpansions[k], thresholdDistance, thresholdSize, thresholdArea, 2)
     end
 
     -- generate for large expansions
@@ -156,7 +156,7 @@ function Generate()
         if mapSize > 1024 then
             thresholdDistance = 50
         end
-        GenerateForExpansion(largeExpansions[k], thresholdDistance, thresholdSize, thresholdArea)
+        GenerateForExpansion(largeExpansions[k], thresholdDistance, thresholdSize, thresholdArea, 4)
     end
 
     -- generate for spawn locations
@@ -167,7 +167,7 @@ function Generate()
         elseif mapSize >= 1024 then
             thresholdDistance = 150
         end
-        GenerateForExpansion(spawns[k], thresholdDistance, thresholdSize, thresholdArea, 5)
+        GenerateForExpansion(spawns[k], thresholdDistance, thresholdSize, thresholdArea, 6)
     end
 
     import("/lua/sim/markerutilities.lua").OverwriteMarkerByType('Naval Area', Markers)
