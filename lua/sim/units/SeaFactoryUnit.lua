@@ -1,13 +1,15 @@
 
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
+local FactoryUnitCalculateRollOffPoint = FactoryUnit.CalculateRollOffPoint
 
 ---@class SeaFactoryUnit : FactoryUnit
 SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     DestroyUnitBeingBuilt = function(self)
-        if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
-            self.UnitBeingBuilt:Destroy()
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
         end
     end,
 
@@ -15,7 +17,7 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
     CalculateRollOffPoint = function(self)
         -- backwards compatible, don't try and fix mods that rely on the old logic
         if not self.Blueprint.Physics.ComputeRollOffPoint then
-            return FactoryUnit.CalculateRollOffPoint(self)
+            return FactoryUnitCalculateRollOffPoint(self)
         end
 
         -- retrieve our position
@@ -41,7 +43,7 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
         -- find the nearest roll off point
         local bpKey = 1
-        local distance, lowest = nil
+        local distance, lowest = nil, nil
         for k, rolloffPoint in bp do
 
             local ropz = modz * rolloffPoint.Z

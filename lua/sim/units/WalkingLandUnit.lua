@@ -33,8 +33,8 @@ local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
 WalkingLandUnit = ClassUnit(MobileUnit) {
 
     ---@param self WalkingLandUnit
-    ---@param new string
-    ---@param old string
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         MobileUnitOnMotionHorzEventChange(self, new, old)
 

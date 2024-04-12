@@ -1535,7 +1535,7 @@ function HaveUnitsInCategoryBeingUpgraded(aiBrain, numunits, category, compareTy
             numBuilding = numBuilding + 1
         end
     end
-    --RNGLOG(aiBrain:GetArmyIndex()..' HaveUnitsInCategoryBeingUpgrade ( '..numBuilding..' '..compareType..' '..numunits..' ) --  return '..repr(CompareBody(numBuilding, numunits, compareType))..' ')
+
     return CompareBody(numBuilding, numunits, compareType)
 end
 function HaveLessThanUnitsInCategoryBeingUpgraded(aiBrain, numunits, category)
