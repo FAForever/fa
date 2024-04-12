@@ -260,7 +260,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 formation[2] = sparsityMultiplier * ((-1 * (ly - 1.5) - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
-                formation[5] = true
+                formation[5] = false
                 TableInsert(tacticalFormation, formation)
             else
                 LOG("No blueprint!", lx, unitsToProcess, formationRowLength, ly, formationColumnOccupied[lx])
@@ -459,7 +459,7 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
                 formation[2] = sparsityMultiplierZ * ((-1 * (ly - 1.0) - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
-                formation[5] = true
+                formation[5] = false
                 TableInsert(tacticalFormation, formation)
 
                 -------------------------------------------------------------------
