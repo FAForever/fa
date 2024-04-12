@@ -322,6 +322,10 @@ function BeginSession()
         Sync.StartPositions = syncStartPositions
     end
 
+    if not Sync.NewPlayableArea then
+        Sync.NewPlayableArea = {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
+    end
+
     -- keep track of user name for LOCs
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then

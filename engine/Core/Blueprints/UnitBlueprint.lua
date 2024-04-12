@@ -655,6 +655,7 @@
 
 ---@class UnitBlueprintTarmac
 ---@field Albedo FileName
+---@field Albedo2 FileName
 ---@field DeathLifetime number
 ---@field FadeOut number
 ---@field Length number
@@ -961,7 +962,7 @@
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
 ---@field UpgradesTo? UnitId
---- the base unit from which all units in this upgrade chain can be upgraded from
+--- the base unit from which all units in this upgrade chain can be upgraded from. If this field is lacking then the unit may refuse to upgrade even when `UpgradesFrom` and `UpgradesTo` are set
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
@@ -1000,7 +1001,7 @@
 --- used by the Seraphim T1 air scout for how long the after-death vison remains
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
----@field JamRadius {Max: number, Min: number}
+---@field JamRadius { Max: number, Min: number }
 --- how many blips does a jammer produce
 ---@field JammerBlips number
 --- used by the Soothsayer
@@ -1030,7 +1031,7 @@
 --- how far our sonar stealth goes
 ---@field SonarStealthFieldRadius number
 --- how far off displace blips
----@field SpoofRadius {Max: number, Min: number}
+---@field SpoofRadius { Max: number, Min: number }
 --- used by the Selen to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
 --- how far the unit can see above water and land

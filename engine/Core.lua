@@ -102,7 +102,7 @@ end
 
 --- returns true if a unit category contains this unit
 ---@param category EntityCategory
----@param unit Unit | UserUnit | UnitId | Projectile
+---@param unit Unit | UserUnit | UnitId | Projectile | Blip | Prop
 ---@return boolean
 function EntityCategoryContains(category, unit)
 end

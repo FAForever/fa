@@ -138,6 +138,7 @@ UnitBlueprint{
         MeshExtentsZ = 1.35,
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
+        RotateOnSpot = false,
         TurnRadius = 0,
         TurnRate = 90,
     },

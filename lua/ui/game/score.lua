@@ -520,17 +520,9 @@ function SetupPlayerLines()
     mapData.ShareConditionsDescription = mapData.ShareConditionsDescription .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
 
     -- add size to the score board
-    local mapWidth = sessionInfo.size[1]
-    local mapHeight = sessionInfo.size[2]
-    local areaData = Sync.NewPlayableArea
-    if areaData then
-        -- use the playable area if provided by the map
-        mapWidth = areaData[3] - areaData[1]
-        mapHeight = areaData[4] - areaData[2]
-    end
+    local mapWidth = sessionInfo.PlayableAreaWidth
+    local mapHeight = sessionInfo.PlayableAreaHeight
     mapData.SizeText = MapSizeText(mapWidth, mapHeight)
-    sessionInfo.PlayableAreaWidth = mapWidth
-    sessionInfo.PlayableAreaHeight = mapHeight
 
     -- add map title / description to the scoreboard
     mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
@@ -607,6 +599,8 @@ function DisplayResources(resources, line, mode)
 end
 
 local prevArmy = -2
+local prevPlayableWidth = sessionInfo.PlayableAreaWidth
+local prevPlayableHeight = sessionInfo.PlayableAreaHeight
 
 function _OnBeat()
     local s = string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate())
@@ -744,16 +738,13 @@ function _OnBeat()
     end
 
     -- this will be needed only for very few maps that change the playable area after initialization
-    local areaData = Sync.NewPlayableArea
-    if areaData then
-        local width = areaData[3] - areaData[1]
-        local height = areaData[4] - areaData[2]
-        if width ~= sessionInfo.PlayableAreaWidth or height ~= sessionInfo.PlayableAreaHeight then
-            sessionInfo.PlayableAreaWidth = width
-            sessionInfo.PlayableAreaHeight = height
-            if mapSizeUI then
-                mapSizeUI:SetText(MapSizeText(width, height))
-            end
+    local mapWidth = sessionInfo.PlayableAreaWidth
+    local mapHeight = sessionInfo.PlayableAreaHeight
+    if mapWidth ~= prevPlayableWidth or mapHeight ~= prevPlayableHeight then
+        prevPlayableWidth = mapWidth
+        prevPlayableHeight = mapHeight
+        if mapSizeUI then
+            mapSizeUI:SetText(MapSizeText(mapWidth, mapHeight))
         end
     end
 end

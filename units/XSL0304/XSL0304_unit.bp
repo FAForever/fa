@@ -165,6 +165,7 @@ UnitBlueprint{
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         StandUpright = true,
+        RotateOnSpot = false,
         TurnRadius = 2,
         TurnRate = 75,
     },

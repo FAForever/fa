@@ -179,6 +179,7 @@ UnitBlueprint{
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
+        RotateOnSpot = false,
         TurnFacingRate = 120,
         TurnRadius = 5,
         TurnRate = 90,
@@ -243,7 +244,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             SlavedToBody = true,
             SlavedToBodyArcRange = 5,
             TargetPriorities = {

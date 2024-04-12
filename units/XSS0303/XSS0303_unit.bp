@@ -19,6 +19,7 @@ UnitBlueprint{
     Categories = {
         "AIRSTAGINGPLATFORM",
         "ANTIAIR",
+        "ANTIMISSILE",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
         "INDIRECTFIRE",

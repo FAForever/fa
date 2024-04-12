@@ -1,7 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xsl0401_desc>Experimental Assault Bot",
     AI = {
-        AttackAngle = 1,
         TargetBones = {
             "pelvis",
             "Torso",
@@ -125,8 +124,8 @@ UnitBlueprint{
                             Offset = { z = -1 },
                             StraightLegs = false,
                             Tread = {
-                                TreadLifeTime = 135,
-                                TreadMarks = "CommanderPrint_albedo",
+                                TreadLifeTime = 8,
+                                TreadMarks = "ythotha_tread_right_01",
                                 TreadMarksSizeX = 1.7,
                                 TreadMarksSizeZ = 1.7,
                                 TreadOffset = { -1, 0, 2 },
@@ -141,8 +140,8 @@ UnitBlueprint{
                             Offset = { z = -1 },
                             StraightLegs = false,
                             Tread = {
-                                TreadLifeTime = 135,
-                                TreadMarks = "CommanderPrint_albedo",
+                                TreadLifeTime = 8,
+                                TreadMarks = "ythotha_tread_left_01",
                                 TreadMarksSizeX = 1.7,
                                 TreadMarksSizeZ = 1.7,
                                 TreadOffset = { 1, 0, 2 },
@@ -295,7 +294,7 @@ UnitBlueprint{
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 0.2,
             SlavedToBody = true,
-            SlavedToBodyArcRange = 135,
+            SlavedToBodyArcRange = 32,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -366,7 +365,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -510,7 +509,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
                 "AIR MOBILE GROUNDATTACK",
@@ -583,7 +582,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
                 "AIR MOBILE GROUNDATTACK",
