@@ -29,17 +29,6 @@ local TableSetn = table.setn
 local TableGetn = table.getn
 local TableInsert = table.insert
 
----@class FormationScaleParametersOfLayer
----@field GridSizeFraction number
----@field GridSizeAbsolute number
----@field MinSeparationFraction number
-
----@class FormationScaleParameters
----@field Land FormationScaleParametersOfLayer
----@field Air FormationScaleParametersOfLayer
----@field Naval FormationScaleParametersOfLayer
----@field Submersible FormationScaleParametersOfLayer
-
 -- preferences for land
 local LandGeneralPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandGeneralPreferences
 local LandShieldPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandShieldPreferences

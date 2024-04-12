@@ -28,14 +28,10 @@ local TableGetn = table.getn
 ---@param blueprintCountCache FormationBlueprintCount
 ---@param blueprintIds BlueprintId[]
 ---@return number # all size-x footprints combined
----@return number # the smallest size-z footprint
----@return number # the largest size-z footprint
 ComputeFootprintData = function(blueprintCountCache, blueprintIds)
     -- local scope for performance
     local __blueprints = __blueprints
 
-    local footprintMinimum = 1000
-    local footprintMaximum = 0
     local footprintTotalLength = 0
     for k = 1, TableGetn(blueprintIds) do
         local blueprintId            = blueprintIds[k]
@@ -44,16 +40,8 @@ ComputeFootprintData = function(blueprintCountCache, blueprintIds)
 
         if blueprintCount > 0 then
             footprintTotalLength = footprintTotalLength + blueprintCount * blueprintFootprintSize
-
-            if blueprintFootprintSize > footprintMaximum then
-                footprintMaximum = blueprintFootprintSize
-            end
-
-            if blueprintFootprintSize < footprintMinimum then
-                footprintMinimum = blueprintFootprintSize
-            end
         end
     end
 
-    return footprintTotalLength, footprintMinimum, footprintMaximum
+    return footprintTotalLength
 end

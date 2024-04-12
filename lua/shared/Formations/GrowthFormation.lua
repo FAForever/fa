@@ -27,9 +27,6 @@ local UpdateFormationNavalCategories = import('/lua/shared/Formations/shared.lua
 
 local ComputeEmbeddedFormation = import('/lua/shared/Formations/EmbeddedFormation.lua').ComputeEmbeddedFormation
 
-local FormationScaleParameters = import('/lua/shared/Formations/FormationScale.lua').FormationScaleParameters
-local ComputeFormationScale = import('/lua/shared/Formations/FormationScale.lua').ComputeFormationScale
-
 local ComputeFootprintData = import('/lua/shared/Formations/FormationFootprints.lua').ComputeFootprintData
 
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
@@ -88,7 +85,7 @@ end
 --- Constructs a land formation for the given blueprint identifiers.
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param formationBlueprintListLand FormationBlueprintListLand
-ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprintListLand, formationScaleParameters)
+ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprintListLand)
     -- local scope for performance
     local tacticalFormation = TacticalFormation
     local formationColumnOccupied = FormationColumnOccupied
@@ -107,16 +104,15 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
     end
 
     -- compute length of each row
-    local footprintTotalLength, footprintMinimum, footprintMaximum = ComputeFootprintData(
+    local footprintTotalLength = ComputeFootprintData(
         formationBlueprintCountCache,
         formationBlueprintListLand
     )
 
-    local formationScale = ComputeFormationScale(formationScaleParameters, footprintMinimum, footprintMaximum)
     local formationRowLength = 2 * MathCeil(MathSqrt(footprintTotalLength))
     local formationRowLengthHalf = 0.5 * formationRowLength
 
-    local sparsityMultiplier = 1.25
+    local sparsityMultiplier = 1.5
 
     local lx = 0
     local ly = 0
@@ -246,8 +242,8 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 local blueprintFootprintSizeZ = blueprintFootprint.SizeZ
 
                 -- occupy the next few rows for the current columns to make space for this unit
-                local lower = MathCeil(-0.5 * blueprintFootprintSizeX / sparsityMultiplier)
-                local upper = MathFloor(0.5 * blueprintFootprintSizeX / sparsityMultiplier)
+                local lower = MathCeil(-0.25 * blueprintFootprintSizeX / sparsityMultiplier)
+                local upper = MathFloor(0.25 * blueprintFootprintSizeX / sparsityMultiplier)
                 for k = lower, upper do
                     local index = ox + formationRowLengthHalf + k + 1
                     if index > 0 and index <= formationRowLength then
@@ -260,8 +256,8 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
 
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
-                formation[1] = sparsityMultiplier * (formationScale * ox)
-                formation[2] = sparsityMultiplier * (formationScale * (-1 * (ly - 1.5) - 0.5 * blueprintFootprintSizeZ))
+                formation[1] = sparsityMultiplier * (ox)
+                formation[2] = sparsityMultiplier * ((-1 * (ly - 1.5) - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = true
@@ -289,8 +285,7 @@ end
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param formationBlueprintListNaval FormationBlueprintListNaval
 ---@param formationBlueprintListHover FormationBlueprintListLand
----@param formationScaleParameters FormationScaleParametersOfLayer 
-ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprintListNaval, formationBlueprintListHover, formationScaleParameters)
+ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprintListNaval, formationBlueprintListHover)
     -- local scope for performance
     local tacticalFormation = TacticalFormation
     local formationColumnOccupied = FormationColumnOccupied
@@ -308,26 +303,21 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
     end
 
     -- compute length of each row
-    local footprintNavalTotalLength, footprintNavalMinimum, footprintNavalMaximum = ComputeFootprintData(
+    local footprintNavalTotalLength = ComputeFootprintData(
         formationBlueprintCountCache,
         formationBlueprintListNaval
     )
 
-    local footprintHoverTotalLength, footprintHoverMinimum, footprintHoverMaximum = ComputeFootprintData(
+    local footprintHoverTotalLength = ComputeFootprintData(
         formationBlueprintCountCache,
         formationBlueprintListHover
     )
 
-    local formationNavalScale = ComputeFormationScale(formationScaleParameters.Naval, footprintNavalMinimum, footprintNavalMaximum)
-    local formationHoverScale = ComputeFormationScale(formationScaleParameters.Land, footprintHoverMinimum, footprintHoverMaximum)
-
-    local formationRowLength = 4 * MathCeil(MathSqrt(footprintNavalTotalLength + footprintHoverTotalLength))
+    local formationRowLength = 2 * MathCeil(MathSqrt(footprintNavalTotalLength + footprintHoverTotalLength))
     local formationRowLengthHalf = 0.5 * formationRowLength
 
-    local sparsityMultiplierX = 1.5
-    local sparsityMultiplierZ = 1.25
-
-    LOG(formationNavalScale, formationHoverScale, sparsityMultiplierX)
+    local sparsityMultiplierX = 1.0
+    local sparsityMultiplierZ = 1.0
 
     local lx = 0
     local ly = 0
@@ -460,15 +450,13 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
                     end
                 end
 
-                -- LOG(repru(formationColumnOccupied, 1000 * 1000))
-
                 -------------------------------------------------------------------
                 -- And finally we describe the formation entry for the unit
 
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
-                formation[1] = sparsityMultiplierX * (formationNavalScale * ox)
-                formation[2] = sparsityMultiplierZ * (formationNavalScale * (-1 * (ly - 1.0)))
+                formation[1] = sparsityMultiplierX * (ox)
+                formation[2] = sparsityMultiplierZ * ((-1 * (ly - 1.0) - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = true
@@ -486,7 +474,7 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
                             formationBlueprintCountCache,
                             formationBlueprintListHover.Shield,
                             blueprintFormationEmbedShieldAt,
-                            1.5 * sparsityMultiplierX * formationNavalScale, 1.5 * sparsityMultiplierZ * formationNavalScale, formation[1], formation[2]
+                            sparsityMultiplierX, sparsityMultiplierZ, formation[1], formation[2]
                         )
                     end
 
@@ -497,7 +485,7 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
                             formationBlueprintCountCache,
                             formationBlueprintListHover.AntiAir,
                             blueprintFormationEmbedAntiAirAt,
-                            1.5 * sparsityMultiplierX * formationNavalScale, 1.5 * sparsityMultiplierZ * formationNavalScale, formation[1], formation[2]
+                            sparsityMultiplierX, sparsityMultiplierZ, formation[1], formation[2]
                         )
                     end
                 end
@@ -518,8 +506,6 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
         -- update the lookup data for the next row
         UpdateFormationNavalCategories(formationBlueprintCountCache, formationBlueprintListNaval)
     end
-
-    LOG(repru(tacticalFormation))
 end
 
 
@@ -568,8 +554,8 @@ ComputeFormation = function(units)
     -- formation is not the same, re-compute it!
     TableSetn(tacticalFormation, 0)
 
-    ComputeNavalFormation(formationBlueprintCountCache, formationBlueprintListCache.Naval, formationBlueprintListCache.Land, FormationScaleParameters)
-    ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache.Land, FormationScaleParameters.Land)
+    ComputeNavalFormation(formationBlueprintCountCache, formationBlueprintListCache.Naval, formationBlueprintListCache.Land)
+    ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache.Land)
 
     return tacticalFormation
 end
