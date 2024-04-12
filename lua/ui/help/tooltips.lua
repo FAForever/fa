@@ -89,12 +89,12 @@ Tooltips = {
     },
     overcharge = {
         title = "<LOC tooltipui0016>Overcharge",
-        description = "<LOC tooltipui0017>Needs 5000 energy in storage to activate. Right click to toggle auto-fire",
+        description = "<LOC tooltipui0017>Needs 7500 energy in storage to activate. Right click to toggle auto-fire",
         keyID = "overcharge",
     },
     transport = {
         title = "<LOC tooltipui0018>Transport",
-        description = "",
+        description = "<LOC tooltipui0019>Left click for transport order. Right click to load into transports.",
         keyID = "transport",
     },
     fire_nuke = {
@@ -261,6 +261,18 @@ Tooltips = {
     first_helptip = {
         title = "<LOC tooltipui0307>Help Tips",
         description = "<LOC tooltipui0344>Click on the question mark icon to view detailed suggestions on how to play Supreme Commander: Forged Alliance",
+    },
+    external_factory = {
+        title = "<LOC tooltipui0750>Mobile Factory",
+        description = "<LOC tooltipui0751>Select attached factory",
+    },
+    external_factory_unit = {
+        title = "<LOC tooltipui0750>Mobile Factory",
+        description = "<LOC tooltipui0752>Select base unit",
+    },
+    auto_deploy = {
+        title = "<LOC tooltipui0478>Deploy",
+        description = "<LOC tooltipui0753>Right click to automatically deploy constructed units",
     },
     drone = {
         title = "<LOC tooltipui0411>Select Drone",
@@ -622,6 +634,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
+    options_strat_icon_scale = {
+        title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_TITLE>Scale strategic icons",
+        description = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_DESCRIPTION>Increase the size of strategic icons. Also scales the pause and stun icons. Can be useful on monitors with a high pixel density. \r\n\r\n100%: the default scale.\r\n150%: may distort the strategic icons slightly.\r\n200%: does not distort the strategic icons, but the strategic icons can be quite large even on a minotor with a high pixel density. ",
+    },
     options_camera_shake_intensity = {
         title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
         description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
@@ -644,6 +660,12 @@ Tooltips = {
         title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
         description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
     },
+
+    options_assist_to_copy_command_queue = {
+        title = "<LOC ASSIST_TO_COPY_TITLE>Assist to copy command queue",
+        description = "<LOC ASSIST_TO_COPY_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
+    },
+
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",
@@ -794,6 +816,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0149>Vertical Sync",
         description = "<LOC OPTIONS_0150>Sync to vertical refresh of monitor",
     },
+    options_frametime = {
+        title = "<LOC OPTIONS_FRAMETIME_TITLE>Minimum frametime",
+        description = "<LOC OPTIONS_FRAMETIME_DESCRIPTION>Allows you to manipulate the minimum frametime. Incompatible with vertical sync, which is automatically disabled when you move the slider and apply the settings. May introduce image tearing. Option exists to give players a way to try to match the refresh rate of modern monitors. Note that the framerate is often CPU limited and not GPU limited, especially during visually intense fights. A list of values that map to common refresh rates: \r\n\r\n  - 16 = 60hz\r\n  - 10 = 100hz\r\n  - 8 = 120hz\r\n  - 7 = 144hz\r\n  - 6 = 165hz",
+    },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",
@@ -875,8 +901,24 @@ Tooltips = {
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
     options_structure_capping_feature_01 = {
-        title = "<LOC OPTIONS_0273>Automated Structure Ringing",
-        description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
+        title = "<LOC options_structure_capping_feature_01_title>Assist to cap",
+        description = "<LOC options_structure_capping_feature_01_description>Assist an extractor to cap it with storages",
+    },
+    options_structure_ringing_extractors_fabs = {
+        title = "<LOC options_structure_ringing_extractors_fabs_title>Assist to cap",
+        description = "<LOC options_structure_ringing_extractors_fabs_description>Assist an extractor to cap it with 4 or 8 fabricators",
+    },
+    options_structure_ringing_artillery = {
+        title = "<LOC options_structure_ringing_artillery_title>Assist to cap",
+        description = "<LOC options_structure_ringing_artillery_description>Assist a tech 2 artillery to cap it with tech 1 power generators",
+    },
+    options_structure_ringing_radar = {
+        title = "<LOC options_structure_ringing_radar_title>Assist to cap",
+        description = "<LOC options_structure_ringing_radar_description>Assist a radar or omni to cap it with tech 1 power generators",
+    },
+    options_structure_ringing_artillery_end_game = {
+        title = "<LOC options_structure_ringing_artillery_end_game_title>Assist to cap",
+        description = "<LOC options_structure_ringing_artillery_end_game_description>Assist an end game artillery to cap it with tech 3 power generators. Does not apply to the salvation",
     },
     options_automex = {
         title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
@@ -1017,11 +1059,11 @@ Tooltips = {
     },
     options_cursor_depth_scanning = {
         title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor.",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor. A separate indicator turns red when naval units are guaranteed to not be able to path at the location due to lack of depth.",
     },
     options_cursor_hover_scanning = {
         title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
+        description = "<LOC PLANE_HEIGHT_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
     },
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',

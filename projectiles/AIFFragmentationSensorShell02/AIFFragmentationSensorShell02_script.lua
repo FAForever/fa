@@ -8,10 +8,16 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile02
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+--- Aeon Quantic Cluster Fragmentation Sensor shell script , Child Projectile after 1st split - XAB2307
+---@class AIFFragmentationSensorShell02 : AArtilleryFragmentationSensorShellProjectile02
 AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
-    OnImpact = function(self, TargetType, TargetEntity) 
+
+	---@param self AIFFragmentationSensorShell02
+	---@param TargetType string
+	---@param TargetEntity Prop|Unit
+	OnImpact = function(self, TargetType, TargetEntity)
         if TargetType != 'Shield' then
-	        local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag02 
+	        local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag02
             local bp = self.Blueprint.Physics
 	        -- Split effects
 	        for k, v in FxFragEffect do

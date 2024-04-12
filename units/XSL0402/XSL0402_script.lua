@@ -14,7 +14,12 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 ---@class XSL0402 : SEnergyBallUnit
 XSL0402 = ClassUnit(SEnergyBallUnit) {
     Weapons = {
-        PhasonBeam = ClassWeapon(SDFUnstablePhasonBeam) {},
+        PhasonBeam = ClassWeapon(SDFUnstablePhasonBeam) {
+            -- we intentionally do not call the base class as that would immediately
+            -- remove the beam again, we remove the beam in the base class of the unit
+            OnLostTarget = function(self)
+            end,
+        },
     },
 
     OnCreate = function(self)

@@ -5,15 +5,39 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
-AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
-    OnCreate = function(self)
-		AGuidedMissileProjectile.OnCreate(self)
-		self.Trash:Add(ForkThread(self.MovementThread, self))
-    end,
+local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
+local utilities = import('/lua/utilities.lua')
+local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-	MovementThread = function(self)
-		WaitTicks(7)
-		self:TrackTarget(true)
-	end,
+
+AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
+    OnImpact = function(self, TargetType, TargetEntity)
+        local bp = self:GetBlueprint().Audio
+        local snd = bp['Impact' .. TargetType]
+        if snd then
+            self:PlaySound(snd)
+            --Generic Impact Sound
+        elseif bp.Impact then
+            self:PlaySound(bp.Impact)
+        end
+
+        --Vision for when projectile impacts
+        ---@type VisionMarkerOpti
+        local entity = VisionMarker({ Owner = self })
+
+        local px, py, pz = self:GetPositionXYZ()
+        entity:UpdatePosition(px, pz)
+        entity:UpdateIntel(self.Army, 12, 'Vision', true)
+        entity:UpdateDuration(10)
+
+        --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_1.bp')
+        --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_2.bp')
+        --local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle.bp')
+
+        -- let bloom thrive a bit
+        CreateLightParticleIntel(self, -1, self.Army, 5, 8, 'glow_02', 'ramp_flare_02')
+
+        self:Destroy()
+    end,
 }
 TypeClass = AIFGuidedMissile02

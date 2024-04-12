@@ -23,12 +23,13 @@ ProjectileBlueprint {
         'TACTICAL',
         'TACTICALNUKE',
         'MISSILE',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 4,
         MaxHealth = 4,
     },
+    DesiredShooterCap = 4,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -60,7 +61,7 @@ ProjectileBlueprint {
         Acceleration = 3,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        MaxSpeed = 12,
+        MaxSpeed = 16,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -68,5 +69,9 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+
+        ZigZagFrequency = 1,
+        MaxZigZag = 1
     },
+    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_tactical_nuke_missile.dds',
 }

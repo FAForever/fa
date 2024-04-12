@@ -161,7 +161,7 @@ end
 updatedecpoint()
 
 local function num2str (num)
-    return replace(fsub(tostring(num), numfilter, ""), decpoint, ".")
+    return replace(fsub(tostring(num), numfilter, ""), decpoint, ".0")
 end
 
 local function str2num (str)

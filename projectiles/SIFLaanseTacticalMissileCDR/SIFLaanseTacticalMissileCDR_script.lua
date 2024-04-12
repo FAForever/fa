@@ -1,55 +1,80 @@
--- File     :  /data/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissileCDR_script.lua
--- Author(s):  Gordon Duclos, Aaron Lundquist
--- Summary  :  Laanse Tactical Missile Projectile script, XSL0001
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
----------------------------------------------------------------------------------------------------
+
+--******************************************************************************************************
+--** Copyright (c) 2024 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
-SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile) {
-    OnCreate = function(self)
-        SLaanseTacticalMissile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
-    end,
+local SLaanseTacticalMissileOnImpact = SLaanseTacticalMissile.OnImpact
+local SLaanseTacticalMissileOnCreate = SLaanseTacticalMissile.OnCreate
+local SLaanseTacticalMissileOnExitWater = SLaanseTacticalMissile.OnExitWater
 
-    MovementThread = function(self)
-        self:SetTurnRate(8)
-        WaitTicks(4)
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
+local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+
+--- Used by XSL0001
+---@class SIFLaanseTacticalMissileCDR : SLaanseTacticalMissile, TacticalMissileComponent
+SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
+
+    LaunchTicks = 8,
+    LaunchTicksRange = 1,
+    LaunchTurnRate = 20,
+    LaunchTurnRateRange = 1,
+    HeightDistanceFactor = 8,
+    HeightDistanceFactorRange = 0,
+    MinHeight = 5,
+    MinHeightRange = 0,
+    FinalBoostAngle = 30,
+    FinalBoostAngleRange = 0,
+
+    TerminalSpeed = 13,
+    TerminalDistance = 30,
+
+    ---@param self SIFLaanseTacticalMissileCDR
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
+        SLaanseTacticalMissileOnCreate(self)
+        if not inWater then
             self:SetDestroyOnWater(true)
-            WaitTicks(2)
         end
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        --Get the nuke as close to 90 deg as possible
-        if dist > 50 then
-            --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(20)
-        elseif dist > 30 and dist <= 150 then
-            -- Increase check intervals
-            self:SetTurnRate(30)
-            WaitTicks(16)
-            self:SetTurnRate(30)
-        elseif dist > 10 and dist <= 30 then
-            -- Further increase check intervals
-            WaitTicks(4)
-            self:SetTurnRate(50)
-        elseif dist > 0 and dist <= 10 then
-            -- Further increase check intervals
-            self:SetTurnRate(100)
-            KillThread(self.MoveThread)
-        end
+    ---@param self SIFLaanseTacticalMissileCDR
+    OnExitWater = function(self)
+        SLaanseTacticalMissileOnExitWater(self)
+        self:SetDestroyOnWater(true)
     end,
 
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
-    end,
+    --- Called by the engine when the projectile impacts something
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        SLaanseTacticalMissileOnImpact(self, targetType, targetEntity)
+
+        local army = self.Army
+
+        -- create light flashes
+        CreateLightParticleIntel(self, -1, army, 6, 2, 'flare_lens_add_02', 'ramp_blue_build_spray')
+        CreateLightParticleIntel(self, -1, army, 10, 4, 'flare_lens_add_02', 'ramp_ser_11')
+    end
 }
 TypeClass = SIFLaanseTacticalMissileCDR
 

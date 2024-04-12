@@ -204,14 +204,26 @@ end
 
 ---@param aiBrain AIBrain
 ---@return true | nil
-function ArmyNeedsTransports(aiBrain)
+function TransportRequested(aiBrain)
     if aiBrain then
-        if aiBrain.NeedTransports and aiBrain:GetNoRushTicks() <= 0 then
+        if aiBrain.TransportRequested and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
 end
 
+-- deprecated kept for compatibility
+---@param aiBrain AIBrain
+---@return true | nil
+function ArmyNeedsTransports(aiBrain)
+    if aiBrain then
+        if aiBrain.NeedTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+            return true
+        end
+    end
+end
+
+-- deprecated kept for compatibility
 ---@param aiBrain AIBrain
 ---@param number number
 ---@return true | nil
@@ -381,6 +393,20 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
         return false
     end
 
+    return true
+end
+
+function ReclaimEnabledOnBrain(aiBrain)
+    -- this condition won't work without a reference to the reclaim grid
+    if aiBrain.ReclaimFailCounter > 10 then
+        local currentTime = GetGameTimeSeconds()
+        if aiBrain.ReclaimFailTimeStamp + 180 < currentTime then
+            aiBrain.ReclaimFailCounter = 0
+            aiBrain.ReclaimFailTimeStamp = 0
+        else
+            return false
+        end
+    end
     return true
 end
 

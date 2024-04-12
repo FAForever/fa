@@ -316,7 +316,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
-            { MIBC, 'ArmyNeedsTransports', {} },
+            { MIBC, 'TransportRequested', {} },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.AIR * categories.FACTORY } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },

@@ -7,6 +7,8 @@
 ---@field AverageDensity? number
 --- list of category names that this entity belongs to
 ---@field Categories CategoryName[]
+--- hash of category names that this entity belongs to
+---@field CategoriesHash table<CategoryName, true>
 --- shape to use for collisions with the entity
 ---@field CollisionShape CollisionShape
 --- the desired maximum number of shooters taking shots at the entity

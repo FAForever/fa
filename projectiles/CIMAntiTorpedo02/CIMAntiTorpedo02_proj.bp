@@ -29,11 +29,9 @@ ProjectileBlueprint {
         Acceleration = 10,
         DestroyOnWater = false,
         MaxSpeed = 3,
-
-        -- this is a workaround for tracking projectiles not intercepting correctly.  Original value: true
-        StayUnderwater = false,
+        StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 720,
+        TurnRate = 540,
         UseGravity = true,
         VelocityAlign = true,
     },

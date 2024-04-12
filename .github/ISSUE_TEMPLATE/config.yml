@@ -1,0 +1,11 @@
+
+contact_links:
+    - name: FAForever Discord Server
+      url: https://discord.gg/GEseYDXVRA
+      about: Discuss the game, report bugs, and get help with modding and development!
+    - name: FAForever Forums
+      url: https://forum.faforever.com/
+      about: Discuss the game and learn about the latest tournaments or news in the community!
+    - name: Looking for contributors
+      url: https://discord.gg/Rnpv8RwhdU
+      about: There's so much to do - we're always looking for contributors to help out with the project!

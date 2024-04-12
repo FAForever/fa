@@ -3,7 +3,7 @@
 ---@class moho.entity_methods : Destroyable
 local Entity = {}
 
----@alias EntityId number
+---@alias EntityId string
 
 ---@class CollisionExtents
 ---@field Max Vector

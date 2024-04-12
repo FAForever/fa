@@ -104,6 +104,17 @@ unitkeygroups = {
 
         "T2_Cruiser",
     },
+    ["Cycle_Templates"] = {
+        "_cycleTemplates", -- Special :)
+
+        "T2_Hover_Tank",
+        "T2_Assault_Tank",
+        "T2_Amphibious_Tank",
+
+        "T2_Gunship",
+
+        "T2_Cruiser",
+    },
     ["EngyStation"] = {
         "Engineering_Station",
 

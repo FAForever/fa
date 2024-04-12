@@ -45,7 +45,6 @@ function toggleOverlay(bool, lockout)
     else
         overlayDisabled = bool
         Prefs.SetToCurrentProfile('Notify_overlay_disabled', bool)
-        Prefs.SavePreferences()
         if not overlayDisabled then
             print 'Notify Overlay Enabled'
         elseif overlayDisabled then
@@ -92,7 +91,7 @@ function round(num, idp)
     if not idp then
         return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     else
-          local mult = 10 ^ (idp or 0)
+          local mult = math.pow(10, (idp or 0))
         return math.floor(num * mult + 0.5) / mult
       end
 end

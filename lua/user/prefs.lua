@@ -1,28 +1,80 @@
---*****************************************************************************
---* File: lua/modules/ui/prefs.lua
---* Author: Chris Blackwell
---* Summary: Access to preferences that are used in the UI
---*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+--******************************************************************************************************
+--** Copyright (c) 2024  FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local optionsLogic = import("/lua/options/optionslogic.lua")
 
--- do not run any code in the scope of the file for mod compatibility with Alliance of Heroes and others
+--- Acts as a cache to prevent accessing the preference file.
+---@type number | false
+local CurrentProfileIndex = false
 
--- check if there are any profiles defined
+--- Acts as a cache to prevent allocating tables from the preference file.
+---@type table | false
+local CurrentProfiles = false
+
+-- upvalue scope for performance
+local GetPreference = GetPreference
+local StringSplit = StringSplit
+
+local StringFind = string.find
+
+local TableGetn = table.getn
+local TableEmpty = table.empty
+
+--- Retrieves the (cached) index of the current profile. 
+---@return number?  # nil when there are no profiles
+local function GetCurrentProfileIndex()
+    local current = GetPreference('profile.current')
+    if not current then
+        -- reset our cache
+        CurrentProfileIndex = false
+        CurrentProfiles = false
+        return nil 
+    end
+
+    if current != CurrentProfileIndex then
+        -- populate our cache
+        CurrentProfileIndex = current
+        CurrentProfiles = GetPreference('profile.profiles')
+    end
+
+    return current
+end
+
+-- Returns a boolean that indicates whether there are user profiles.
+---@return boolean
 function ProfilesExist()
     local profiles = GetPreference("profile.profiles")
-    if (not profiles) or (table.empty(profiles)) then
+    if (not profiles) or (TableEmpty(profiles)) then
         return false
     end
     return true
 end
 
+--- Returns the number of profiles.
+---@return number
 function GetProfileCount()
     local profiles = GetPreference("profile.profiles")
     if profiles then
-        return table.getn(profiles)
+        return TableGetn(profiles)
     else
         return 0
     end
@@ -71,28 +123,78 @@ function CreateProfile(name)
     return true
 end
 
+--- Returns the (cached) current profile. 
+---@return table?   # nil when there are no profiles
 function GetCurrentProfile()
-    local current = GetPreference('profile.current')
-    if not current then return nil end
-    return GetPreference('profile.profiles.'..current)
-end
-
--- Get the map last requested by the player
-function GetFromCurrentProfile(fieldName)
-    local current = GetPreference('profile.current')
-    if not current then return nil end
-    return GetPreference('profile.profiles.'..current..'.'..fieldName)
-end
-
--- set the map
-function SetToCurrentProfile(fieldName, data)
-    local profile = GetPreference('profile')
-    if profile.current then
-        if profile.profiles[profile.current] then
-            profile.profiles[profile.current][fieldName] = data
-            SetPreference('profile', profile)
-        end
+    local currentProfileIndex = GetCurrentProfileIndex()
+    if not currentProfileIndex then
+        return nil
     end
+
+    -- populate the cache if it does not exist
+    if not CurrentProfiles then
+        return nil
+    end
+
+    return CurrentProfiles[currentProfileIndex]
+end
+
+--- Returns a value from the current profile.
+---@param fieldName string
+---@return any
+function GetFromCurrentProfile(fieldName)
+    local currentProfile = GetCurrentProfile()
+    if not currentProfile then
+        return nil
+    end
+
+    -- fields can try to access subfields, as an example: `options.options_show_player_names`. This 
+    -- pattern is actively discouraged, instead retrieve the initial field and manually search for sub fields,
+    -- as an example:
+    -- 
+    -- - `GetFromCurrentProfile('options').options_show_player_names`
+
+    if StringFind(fieldName, '.') then
+        local field = currentProfile
+        local fields = StringSplit(fieldName, '.')
+        local fieldCount = TableGetn(fields)
+        for k = 1, fieldCount do
+            field = field[fields[k]]
+        end
+
+        return field
+    else
+        return currentProfile[fieldName]
+    end
+end
+
+--- Returns a value from the current profile.
+---@param fieldName string
+---@return any
+function GetFieldFromCurrentProfile(fieldName)
+    local currentProfile = GetCurrentProfile()
+    if not currentProfile then
+        return nil
+    end
+    return currentProfile[fieldName]
+end
+
+--- Updates a value in the current profile.
+---@param fieldName string
+---@param data any
+function SetToCurrentProfile(fieldName, data)
+    local currentProfileIndex = GetCurrentProfileIndex()
+    if not currentProfileIndex then
+        return
+    end
+
+    if not CurrentProfiles then
+        return
+    end
+
+    -- store the data and set the preference
+    CurrentProfiles[currentProfileIndex][fieldName] = data
+    SetPreference('profile.profiles', CurrentProfiles)
 end
 
 -- read from the current options set, find and return default if not available
@@ -124,4 +226,11 @@ function SetOption(optionKey, newValue)
     end
 
     optionsLogic.SetCurrent(tempOptionTable)
+end
+
+
+local OldSavePreferences = _G.SavePreferences
+_G.SavePreferences = function()
+    LOG(debug.traceback())
+    OldSavePreferences()
 end

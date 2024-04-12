@@ -1,41 +1,35 @@
-UnitBlueprint {
+UnitBlueprint{
+    Description = "<LOC xro4001_desc>Armored Command Unit Remains",
     Audio = {
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'Cybran_Select_Structure',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },
     },
     Categories = {
-        'OPERATION',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'RECLAIMFRIENDLY',
+        "OPERATION",
+        "RECLAIMABLE",
+        "RECLAIMFRIENDLY",
+        "VISIBLETORECON",
     },
     Defense = {
-        ArmorType = 'Normal',
+        ArmorType = "Normal",
         Health = 1000,
         MaxHealth = 1000,
         RegenRate = 0,
     },
-    Description = '<LOC xro4001_desc>Armored Command Unit Remains',
     Display = {
+        HideLifebars = true,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    AlbedoName = '/units/url0001/url0001_Albedo.dds',
                     LODCutoff = 250,
-                    MeshName = '/units/url0001/url0001_LOD0.scm',
-                    ShaderName = 'Wreckage',
-                    SpecularName = '/env/common/props/wreckage_noise.dds',
+                    ShaderName = "Wreckage",
+                    MeshName = "/units/url0001/url0001_LOD0.scm",
+                    AlbedoName = "/units/url0001/url0001_Albedo.dds",
+                    SpecularName = "/env/common/props/wreckage_noise.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0000',
-        SpawnRandomRotation = true,
         UniformScale = 0.15,
-        HideLifebars = true,
     },
     Economy = {
         BuildCostEnergy = 1000,
@@ -43,8 +37,6 @@ UnitBlueprint {
         BuildTime = 50,
     },
     General = {
-        Category = 'Defense',
-        Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -59,17 +51,10 @@ UnitBlueprint {
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
-        FactionName = 'Cybran',
-        TechLevel = 'RULEUTL_Basic',
-        UnitName = '<LOC xro4001_name>Dostya',
-        UnitWeight = 1,
+        FactionName = "Cybran",
+        UnitName = "<LOC xro4001_name>Dostya",
     },
-    Intel = {
-        VisionRadius = 2,
-    },
-    Interface = {
-        HelpText = '<LOC xro4001_help>Armored Command Unit Remains',
-    },
+    Intel = { VisionRadius = 2 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.5,
     LifeBarSize = 1.25,
@@ -90,7 +75,7 @@ UnitBlueprint {
         MaxSpeedReverse = 0,
         MaxSteerForce = 12,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         StandUpright = true,
         TurnRadius = 10,
         TurnRate = 90,
@@ -104,6 +89,6 @@ UnitBlueprint {
     SizeX = 0.7,
     SizeY = 1.9,
     SizeZ = 0.55,
-    StrategicIconName = 'icon_commander_generic',
+    StrategicIconName = "icon_commander_generic",
     StrategicIconSortPriority = 0,
 }

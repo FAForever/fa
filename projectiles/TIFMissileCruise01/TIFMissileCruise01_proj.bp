@@ -2,12 +2,12 @@ ProjectileBlueprint {
     Audio = {
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'UEF_Expl_Med_Impact',
+            Cue = 'UEF_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_UEF',
+            Cue = 'UEF_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -22,12 +22,13 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
         'TACTICAL',
         'MISSILE',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 2,
         MaxHealth = 2,
     },
+    DesiredShooterCap = 2,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -42,7 +43,7 @@ ProjectileBlueprint {
                 },
             },
         },
-        StrategicIconSize = 3,
+        StrategicIconSize = 4,
         UniformScale = 0.15,
     },
     Economy = {
@@ -62,7 +63,7 @@ ProjectileBlueprint {
         DestroyOnWater = true,
         InitialSpeed = 3,
         LifeTime = 30,
-        MaxSpeed = 12,
+        MaxSpeed = 14,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -70,5 +71,8 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+
+        ZigZagFrequency = 1,
+        MaxZigZag = 1
     },
 }

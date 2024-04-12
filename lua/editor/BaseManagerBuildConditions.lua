@@ -13,6 +13,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 ---@param baseName string
 ---@return boolean
 function NeedAnyStructure(aiBrain, baseName)
+
     if not aiBrain.BaseManagers[baseName] then
         return false
     end

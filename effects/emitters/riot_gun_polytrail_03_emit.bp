@@ -1,7 +1,7 @@
 TrailEmitterBlueprint {
     BlueprintId = 'riot_gun_polytrail_03',
     Lifetime = -1.00,
-    TrailLength = 5,
+    TrailLength = 2,
     Size = 0.075,
     SortOrder = 0,
     BlendMode = 3,

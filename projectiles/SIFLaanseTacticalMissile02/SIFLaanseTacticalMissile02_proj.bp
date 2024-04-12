@@ -22,12 +22,13 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
         'TACTICAL',
         'MISSILE',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
         MaxHealth = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -38,21 +39,8 @@ ProjectileBlueprint {
         StrategicIconSize = 2,
         UniformScale = 0.05,
     },
-    Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
-        BuildTime = 30,
-    },
     General = {
         Category = 'Missile',
-        EntityCategory = {
-            'SERAPHIM',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'TACTICAL',
-            'MISSILE',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Seraphim',
     },
     Interface = {
@@ -63,7 +51,7 @@ ProjectileBlueprint {
         DestroyOnWater = true,
         InitialSpeed = 3,
         LifeTime = 30,
-        MaxSpeed = 12,
+        MaxSpeed = 28,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -71,5 +59,8 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+
+        ZigZagFrequency = 1,
+        MaxZigZag = 1
     },
 }

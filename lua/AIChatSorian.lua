@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/modules/AIChatSorian.lua
---**  Author(s): Mike Robbins aka Sorian
---**
---**  Summary  : AI Chat Functions
---**  Version  : 0.1
---****************************************************************************
-local Chat = import("/lua/ui/game/chat.lua")
+-------------------------------------------------
+-- File     :  /lua/modules/AIChatSorian.lua
+-- Author(s): Mike Robbins aka Sorian
+-- Summary  : AI Chat Functions
+-- Version  : 0.1
+-------------------------------------------------
 local ChatTo = import("/lua/lazyvar.lua").Create()
 
 ---@param group any
@@ -95,3 +92,6 @@ function GetArmyData(army)
     end
     return result
 end
+
+--- Kept for backwards compatibility
+local Chat = import("/lua/ui/game/chat.lua")

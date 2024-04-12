@@ -1,4 +1,4 @@
-UnitBlueprint {
+UnitBlueprint{
     Air = {
         BankFactor = 0.1,
         BankForward = false,
@@ -22,26 +22,19 @@ UnitBlueprint {
         Winged = false,
     },
     Categories = {
-        -- to allow it to build / repair when assist
-        'CONSTRUCTION',
-        'ENGINEER',
-        'REPAIR',
-
-        -- for unit restrictions
-        'POD',
-
-        -- for UI
-        'NOFORMATION',
-
-        -- makes it a dummy-isch unit
-        'UNTARGETABLE',
-        'INVULNERABLE',
-        'UNSPAWNABLE',
-        'UNSELECTABLE',
+        "CONSTRUCTION",
+        "ENGINEER",
+        "INVULNERABLE",
+        "NOFORMATION",
+        "POD",
+        "REPAIR",
+        "UNSELECTABLE",
+        "UNSPAWNABLE",
+        "UNTARGETABLE",
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Normal',
+        ArmorType = "Normal",
         EconomyThreatLevel = 0,
         Health = 30,
         MaxHealth = 30,
@@ -53,32 +46,23 @@ UnitBlueprint {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/Units/URA0004/URA0004_Albedo.dds',
                     LODCutoff = 200,
-                    MeshName = '/Units/URA0004/URA0004_LOD0.scm',
-                    NormalsName = '/UNITS/URA0004/URA0004_NormalsTS.dds',
-                    ShaderName = 'Insect',
-                    SpecularName = '/Units/URA0004/URA0004_SpecTeam.dds',
+                    ShaderName = "Insect",
+                    MeshName = "/Units/URA0004/URA0004_LOD0.scm",
+                    AlbedoName = "/Units/URA0004/URA0004_Albedo.dds",
+                    NormalsName = "/UNITS/URA0004/URA0004_NormalsTS.dds",
+                    SpecularName = "/Units/URA0004/URA0004_SpecTeam.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'URA0004',
-        SpawnRandomRotation = true,
         UniformScale = 0.12,
     },
     Economy = {
-        BuildRate = 0.00001,
+        BuildRate = 1e-005,
         MaxBuildDistance = 100,
-    },
-
-    Intel = {
-        VisionRadius = 0,
-        WaterVisionRadius = 0,
     },
     General = {
         CapCost = 0,
-        Category = 'Construction',
-        Classification = 'RULEUC_Engineer',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
@@ -93,11 +77,13 @@ UnitBlueprint {
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
-        FactionName = 'Cybran',
-        Icon = 'air',
+        FactionName = "Cybran",
+        Icon = "air",
         SelectionPriority = 3,
-        TechLevel = 'RULEUTL_Basic',
-        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 0,
+        WaterVisionRadius = 0,
     },
     Physics = {
         BankingSlope = 0.5,
@@ -116,7 +102,7 @@ UnitBlueprint {
         MaxSpeedReverse = 0,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_Air',
+        MotionType = "RULEUMT_Air",
         RotateBodyWhileMoving = true,
         TurnFacingRate = 100,
         TurnRadius = 360,

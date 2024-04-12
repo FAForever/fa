@@ -11,9 +11,12 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local SIFInainoStrategicMissileEffect01 = '/effects/Entities/SIFInainoStrategicMissileEffect01/SIFInainoStrategicMissileEffect01_proj.bp'
 local SIFInainoStrategicMissileEffect02 = '/effects/Entities/SIFInainoStrategicMissileEffect02/SIFInainoStrategicMissileEffect02_proj.bp'
 local SIFInainoStrategicMissileEffect03 = '/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp'
-local SIFInainoStrategicMissileEffect04 = '/effects/Entities/SIFInainoStrategicMissileEffect04/SIFInainoStrategicMissileEffect04_proj.bp'
 
+---@class InainoEffectController01 : NullShell
 InainoEffectController01 = Class(NullShell) {
+
+    ---@param self InainoEffectController01
+    ---@param Data table
     EffectThread = function(self, Data)
         self:ForkThread(self.CreateInitialHit, self.Army)
         self:ForkThread(self.CreateInitialBuildup, self.Army)
@@ -22,12 +25,16 @@ InainoEffectController01 = Class(NullShell) {
         self:ForkThread(self.MainBlast, self.Army)
     end,
 
+    ---@param self InainoEffectController01
+    ---@param army number
     CreateInitialHit = function(self, army)
         for k, v in EffectTemplate.SIFInainoHit01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
     end,
 
+    ---@param self InainoEffectController01
+    ---@param army number
     CreateInitialBuildup = function(self, army)
         WaitSeconds(2.0)
         for k, v in EffectTemplate.SIFInainoHit02 do
@@ -35,6 +42,8 @@ InainoEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self InainoEffectController01
+    ---@param army number
     MainBlast = function(self, army)
         WaitSeconds(5.00)
 
@@ -82,6 +91,7 @@ InainoEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self InainoEffectController01
     CreateGroundFingers = function(self)
         -- Outward rushing fingers that spawn the upward fingers
         local num_projectiles = 5
@@ -100,6 +110,7 @@ InainoEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self InainoEffectController01
     CreateInitialFingers = function(self)
         WaitSeconds(1.75)
         -- Upward rising fingers that join to form explosion
@@ -121,3 +132,6 @@ InainoEffectController01 = Class(NullShell) {
     end,
 }
 TypeClass = InainoEffectController01
+
+-- Kept for Backwards Compatibility
+local SIFInainoStrategicMissileEffect04 = '/effects/Entities/SIFInainoStrategicMissileEffect04/SIFInainoStrategicMissileEffect04_proj.bp'

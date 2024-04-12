@@ -58,7 +58,6 @@ XRB3301 = ClassUnit(CRadarUnit) {
     VisibleEntityDeathThread = function(entity, curRadius)
         local lifetime = 0
         while lifetime < 30 do
-            LOG("Tick!")
             if curRadius > 1 then
                 curRadius = curRadius - 1
                 if curRadius < 1 then

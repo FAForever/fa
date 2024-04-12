@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'UEF',
         'PROJECTILE',
         'ANTIAIR',
-        'MISSILE',
     },
     Display = {
         MeshBlueprint = '/projectiles/TAAMissileFlayer01/TAAMissileFlayer01_mesh.bp',

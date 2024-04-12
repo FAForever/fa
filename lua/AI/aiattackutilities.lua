@@ -212,12 +212,16 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     -- Need to use overall so we can get all the threat points on the map and then filter from there
     -- if a specific threat is used, it will only report back threat locations of that type
-    local enemyIndex = -1
+    local threatTable = {}
+    local enemyIndex = nil
     if aiBrain:GetCurrentEnemy() and TargetCurrentEnemy then
         enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     end
-
-    local threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
+    if enemyIndex then
+        threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
+    else
+        threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall')
+    end
 
     if table.empty(threatTable) then
         return false
@@ -289,8 +293,14 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         ----------------------------------
 
         -- Determine the value of the target
-        primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType, enemyIndex)
-        secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType, enemyIndex)
+        if enemyIndex then 
+            primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType, enemyIndex)
+            secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType, enemyIndex)
+        else
+            primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType)
+            secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType)
+        end
+
 
         baseThreat = primaryThreat + secondaryThreat
 
@@ -504,7 +514,9 @@ end
 ---@return Vector[]             # A table representing the path
 function AINavalPlanB(aiBrain, platoon)
     --Get a random naval area and issue a movement thar.
+    local NavUtils = import("/lua/sim/navutils.lua")
     local navalAreas = AIUtils.AIGetMarkerLocations(aiBrain, 'Naval Area')
+    platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
 
     for _,marker in RandomIter(navalAreas) do
         local pathable, bestPos = CheckPlatoonPathingEx(platoon, marker.Position)
@@ -512,8 +524,7 @@ function AINavalPlanB(aiBrain, platoon)
         if not pathable then
             continue
         end
-
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         if path then
             return path, reason
@@ -530,8 +541,12 @@ end
 function AIPlatoonNavalAttackVector(aiBrain, platoon)
 
     GetMostRestrictiveLayer(platoon)
+    local NavUtils = import("/lua/sim/navutils.lua")
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos, targetPos = GetBestThreatTarget(aiBrain, platoon)
+    if not platoon.PlatoonSurfaceThreat then
+        platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    end
 
     -- if no pathable attack spot found
     --DUNCAN - removed as still need to patrol
@@ -547,7 +562,7 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3]) then
 
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         -- clear command queue
         platoon:Stop()
@@ -586,9 +601,12 @@ end
 ---@param bAggro any            # Descriptor needed
 ---@return table                # A table of every command in every command queue for every unit in the platoon or an empty table if it fails
 function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
-
+    local NavUtils = import("/lua/sim/navutils.lua")
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos = GetBestThreatTarget(aiBrain, platoon)
+    if not platoon.PlatoonSurfaceThreat then
+        platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    end
 
     local bNeedTransports = false
     -- if no pathable attack spot found
@@ -636,7 +654,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
 
         GetMostRestrictiveLayer(platoon)
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         -- clear command queue
         platoon:Stop()
@@ -644,11 +662,10 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
         local usedTransports = false
         local position = platoon:GetPlatoonPosition()
         if (not path and reason == 'NoPath') or bNeedTransports then
-            
-            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, true)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 3, true)
         -- Require transports over 500 away
         elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 then
-            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, true)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 2, true)
         -- use if possible at 250
         elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 then
             usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, false)
@@ -703,7 +720,6 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
     GetMostRestrictiveLayer(platoon)
 
     local units = platoon:GetPlatoonUnits()
-
 
     -- only get transports for land (or partial land) movement
     if platoon.MovementLayer == 'Land' or platoon.MovementLayer == 'Amphibious' then
@@ -878,7 +894,6 @@ end
 function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequired, bSkipLastMove)
 
     GetMostRestrictiveLayer(platoon)
-
     local units = platoon:GetPlatoonUnits()
 
 
@@ -1514,6 +1529,31 @@ function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, t
             return retUnit
         end
     end
+end
+
+GetSurfaceThreatAtPosition = function(aiBrain, position, range )
+                
+    local IMAPblocks = aiBrain.IMAPConfig.Rings or 1
+    local TESTUNITS = categories.ALLUNITS - categories.FACTORY - categories.ECONOMIC - categories.SHIELD - categories.WALL
+    local sfake = aiBrain:GetThreatAtPosition(position, IMAPblocks, true, 'AntiSurface' )
+    surthreat = 0
+    local eunits = aiBrain:GetUnitsAroundPoint(TESTUNITS, position, range,  'Enemy')
+    if eunits then
+        for _,u in eunits do
+            if not u.Dead then
+                Defense = u.Blueprint.Defense
+                surthreat = surthreat + Defense.SurfaceThreatLevel
+            end
+        end
+    end
+    
+    -- if there is IMAP threat and it's greater than what we actually see
+    -- use the sum of both * .5
+    if sfake > 0 and sfake > surthreat then
+        surthreat = (surthreat + sfake) * .5
+    end
+    
+    return surthreat
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------

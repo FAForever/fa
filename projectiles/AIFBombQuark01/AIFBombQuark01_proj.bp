@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'INDIRECTFIRE',
+        'IGNOREASFONCOLLISION',
     },
     Display = {
         CameraFollowsProjectile = true,
@@ -30,9 +31,6 @@ ProjectileBlueprint {
 
         -- MeshBlueprint = '/meshes/projectiles/bomb_default_mesh.bp',
         UniformScale = 0.3,
-    },
-    DoNotCollideList = {
-        'ASF',
     },
     General = {
         Category = 'Bomb',

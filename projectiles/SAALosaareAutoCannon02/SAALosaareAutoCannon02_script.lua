@@ -4,5 +4,8 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------------------
 local SLosaareAAAutoCannon = import("/lua/seraphimprojectiles.lua").SLosaareAAAutoCannon
+
+--- Losaare AA AutoCannon Projectile script, XSA0401
+---@class SAALosaareAutoCannon02 : SLosaareAAAutoCannon
 SAALosaareAutoCannon02 = ClassProjectile(SLosaareAAAutoCannon) {}
 TypeClass = SAALosaareAutoCannon02

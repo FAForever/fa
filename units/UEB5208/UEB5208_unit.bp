@@ -1,13 +1,14 @@
-UnitBlueprint {
+UnitBlueprint{
+    Description = "<LOC ueb5208_desc>Sonar Beacon",
     Categories = {
-        'PRODUCTSC1',
-        'UEF',
-        'SONAR',
-        'VISIBLETORECON',
+        "PRODUCTSC1",
+        "SONAR",
+        "UEF",
+        "VISIBLETORECON",
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
+        ArmorType = "Structure",
         EconomyThreatLevel = 0.1,
         Health = 5,
         MaxHealth = 5,
@@ -15,32 +16,25 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC ueb5208_desc>Sonar Beacon',
     Display = {
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 215,
-                    ShaderName = 'Unit',
+                    ShaderName = "Unit",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0019',
-        SpawnRandomRotation = true,
         UniformScale = 0.15,
     },
     Economy = {
         BuildCostEnergy = 50,
         BuildCostMass = 5,
         BuildTime = 50,
-        RebuildBonusIds = {
-            'ueb5208',
-        },
+        RebuildBonusIds = { "ueb5208" },
     },
     General = {
-        Category = 'Intelligence',
-        Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -55,18 +49,13 @@ UnitBlueprint {
             RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
-        FactionName = 'UEF',
-        Icon = 'sea',
+        FactionName = "UEF",
+        Icon = "sea",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
-        UnitWeight = 1,
     },
     Intel = {
         SonarRadius = 128,
         VisionRadius = 0,
-    },
-    Interface = {
-        HelpText = '<LOC ueb5208_help>Sonar Beacon',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.6,
@@ -83,7 +72,7 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         SkirtSizeX = 1,
         SkirtSizeZ = 1,
         TurnRate = 0,

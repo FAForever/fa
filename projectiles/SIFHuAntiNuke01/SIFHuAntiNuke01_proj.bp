@@ -12,6 +12,7 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
         'SERAPHIM',
         'TECH3',
+        'KILLAIRONCOLLISION'
     },
     Description = 'Seraphim Anti Nuclear Missile',
     Display = {
@@ -22,9 +23,6 @@ ProjectileBlueprint {
         BuildCostEnergy = 360000,
         BuildCostMass = 3600,
         BuildTime = 259200,
-    },
-    DoNotCollideList = {
-        'AIR',
     },
     General = {
         Category = 'Defense',

@@ -206,7 +206,7 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
 ---@param unit Unit
----@param debrisMultiplier? integer
+---@param debrisMultiplier? number
 ---@param circularDebris? boolean
 function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 
@@ -392,10 +392,8 @@ function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 end
 
 --- Creates a flash and fire emitters that represents an explosion on hit.
--- @param obj The entity to create the flash at.
--- @param scale The scale of the flash.
----@param obj Unit
----@param scale number
+---@param obj Entity The entity to create the flash at.
+---@param scale number The scale of the flash.
 function CreateDefaultHitExplosion(obj, scale)
     if obj and not obj:BeenDestroyed() then
         local army = obj.Army
@@ -454,14 +452,14 @@ function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
         while deathAnimation:GetAnimationFraction() < 1 do
             CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
             obj:PlayUnitSound('DeathExplosion')
-            WaitSeconds(GetRandomFloat(0.2, 0.5))
+            WaitSeconds(GetRandomFloat(0.1, 0.2))
         end
     -- do generic destruction effect
     else
         for i = 0, numExplosions do
             CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
             obj:PlayUnitSound('DeathExplosion')
-            WaitSeconds(GetRandomFloat(0.2, 0.5))
+            WaitSeconds(GetRandomFloat(0.1, 0.2))
         end
     end
 end
@@ -496,7 +494,7 @@ end
 
 --- Old function that is no longer in use. Do not use this function - it creates a whole
 -- lot of overhead that is not necessary.
----@param obj Unit
+---@param obj Entity
 function _CreateScalableUnitExplosion(obj)
     local army = obj.Spec.Army
     local scale = obj.Spec.BoundingXZRadius
@@ -624,7 +622,7 @@ function CreateScorchMarkSplat(obj, scale, army)
         UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
         scale * 4, scale * 4,
         200 + 150 * Random(),
-        300 * 300 * Random(),
+        60 + 60 * Random(),
         army
     )
 end
@@ -641,7 +639,7 @@ function CreateScorchMarkDecal(obj, scale, army)
         '', 'Albedo', 
         scale * 3, scale * 3, 
         200 + 150 * Random(), 
-        300 * 300 * Random(), 
+        60 + 60 * Random(),
         army
     )
 end
@@ -649,8 +647,8 @@ end
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 ---@param obj Unit
 ---@param scale number
----@param LOD integer
----@param lifetime integer
+---@param LOD number
+---@param lifetime number
 ---@param army string
 function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
     CreateSplat(
@@ -770,7 +768,7 @@ end
 
 ---@param unit Unit
 ---@param scale number
----@param overKillRatio number
+---@param overKillRatio number unused
 function CreateDefaultExplosion(unit, scale, overKillRatio)
 
     local spec = {
@@ -804,7 +802,7 @@ function CreateDestructionSparks(object, scale)
 end
 
 ---@param object Unit
----@param scale number
+---@param scale number unused
 function CreateFirePlume(object, scale)
     local proj
     for i = 1, GetRandomInt(4, 8) do
@@ -819,10 +817,10 @@ function CreateFirePlume(object, scale)
 end
 
 ---@param object Unit
----@param projectile string
----@param minnumber integer
----@param maxnumber integer
----@param effect string
+---@param projectile FileName
+---@param minnumber number
+---@param maxnumber number
+---@param effect FileName
 ---@param fxscalemin number
 ---@param fxscalemax number
 ---@param gravitymin number
@@ -862,7 +860,7 @@ end
 -- *****************
 
 ---@param object Unit
----@param projBP string
+---@param projBP FileName
 ---@param posX number
 ---@param posY number
 ---@param posZ number
@@ -907,7 +905,7 @@ function CreateCompositeExplosionMeshes(object)
 end
 
 -----------------------------------------------------------------
---  Replaced by new effect structure (see EffectTemplates.lua) --
+--  Replaced by new effect structure (see effecttemplates.lua) --
 -----------------------------------------------------------------
 
 ---@param object Unit

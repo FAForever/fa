@@ -13,8 +13,6 @@ local TableDeepCopy = table.deepcopy
 ---@field BuilderConditions AIBuilderCondition[]       # Converted conditions from the builder template
 ---@field BuilderData AIBuilderData                            # Converted data from the builder template
 ---@field DisabledUntilTick number      # Allows us to temporarily disable builders
----@field EvaluatedAtTick number        # Allows us to cache evaluation results
----@field EvaluatedStatus boolean       # Allows us to cache evaluation results
 ---@field Priority number               # Priority of the builder, used for sorting
 ---@field Template AIBuilderTemplate    # Template that this builder originates from
 AIBuilder = ClassSimple {
@@ -28,24 +26,11 @@ AIBuilder = ClassSimple {
         self.Template = template
         self.Priority = template.BuilderPriority
 
-        -- cache evaluation
-        self.EvaluatedAtTick = -1
-        self.EvaluatedStatus = false
+
 
         -- copy over and convert conditions
         ---@type AIBuilderCondition[]
-        local conditions = { }
-        self.BuilderConditions = conditions
-        if template.BuilderConditions then
-            for k, data in template.BuilderConditions do
-                -- pre-import the function
-                ---@type function
-                local func = import(data[1])[data[2]]
-
-                -- re-create the condition
-                conditions[k] = { func, data[3] }
-            end
-        end
+        self.BuilderConditions = template.BuilderConditions or { }
 
         -- TODO PERFORMANCE: is this _really _ required here?
         -- copy over and convert builder data
@@ -65,24 +50,24 @@ AIBuilder = ClassSimple {
     ---@param self AIBuilder
     ---@param brain AIBrain
     ---@param base AIBase
+    ---@param platoon AIPlatoon
     ---@param tick number
     ---@return boolean
-    EvaluateBuilderConditions = function(self, brain, base, tick)
+    EvaluateBuilderConditions = function(self, brain, base, platoon, tick)
         if self.DisabledUntilTick > tick then
             return false
-        elseif self.EvaluatedAtTick > tick - 5 then
-            return self.EvaluatedStatus
         else
             local status = true
             for _, condition in self.BuilderConditions do
-                if not condition[1](brain, base, unpack(condition[2])) then
-                    status = false
-                    break
+                local func = condition[1]
+                local input = condition[2]
+                if input then
+                    status = status and func(brain, base, platoon, unpack(input))
+                else
+                    status = status and func(brain, base, platoon)
                 end
             end
 
-            self.EvaluatedAtTick = tick
-            self.EvaluatedStatus = status
             return status
         end
     end,

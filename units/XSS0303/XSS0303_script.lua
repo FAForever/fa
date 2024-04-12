@@ -12,21 +12,26 @@ local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
+local SAMElectrumMissileDefense = SeraphimWeapons.SAMElectrumMissileDefense
 
----@class XSS0303 : AircraftCarrier
-XSS0303 = ClassUnit(AircraftCarrier) {
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+
+---@class XSS0303 : AircraftCarrier, ExternalFactoryComponent
+XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
 
     Weapons = {
         AntiAirRight = ClassWeapon(SAALosaareAutoCannonWeapon) {},
         AntiAirLeft = ClassWeapon(SAALosaareAutoCannonWeapon) {},
         CruiseMissiles = ClassWeapon(SLaanseMissileWeapon) {},
+        AntiMissile = ClassWeapon(SAMElectrumMissileDefense) {},
     },
 
-
-    BuildAttachBone = 'XSS0303',
+    FactoryAttachBone = 'ExternalFactoryPoint',
+    BuildAttachBone = 'Attachpoint02',
 
     OnStopBeingBuilt = function(self,builder,layer)
         AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -35,10 +40,20 @@ XSS0303 = ClassUnit(AircraftCarrier) {
         ChangeState(self, self.IdleState)
     end,
 
+    OnLayerChange = function(self, new, old)
+        AircraftCarrier.OnLayerChange(self, new, old)
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        AircraftCarrier.OnKilled(self, instigator, type, overkillRatio)
+        ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
+            self:OnIdle()
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -54,32 +69,16 @@ XSS0303 = ClassUnit(AircraftCarrier) {
             self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
+            unitBuilding:AttachTo(self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
+        ---@param self XSS0303
+        ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
-            ChangeState(self, self.FinishedBuildingState)
-        end,
-    },
-
-    FinishedBuildingState = State {
-        Main = function(self)
-            self:SetBusy(true)
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
-            end
-            self:SetBusy(false)
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
 }

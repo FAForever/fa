@@ -9,11 +9,15 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
 local Templates = import("/lua/ui/game/build_templates.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
+local cycleTemplates = import("/lua/ui/game/hotkeys/context-based-templates.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Effect = import("/lua/maui/effecthelpers.lua")
+
+local Factions = import("/lua/factions.lua").Factions
+local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
 
 local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
 local ModifyBuildables = import("/lua/ui/notify/enhancementqueue.lua").ModifyBuildablesForACU
@@ -46,11 +50,11 @@ function initCycleButtons(values)
         cycleButtons[i] = Bitmap(cycleMap, UIUtil.SkinnableFile('/icons/units/' .. value .. '_icon.dds'))
         LayoutHelpers.SetDimensions(cycleButtons[i], buttonW, buttonH)
         cycleButtons[i].Depth:Set(1002)
-        LayoutHelpers.AtLeftTopIn(cycleButtons[i], cycleMap, 29 + buttonH * (i-1), 18)
-        i=i+1
+        LayoutHelpers.AtLeftTopIn(cycleButtons[i], cycleMap, 29 + buttonH * (i - 1), 18)
+        i = i + 1
     end
 
-    LayoutHelpers.SetDimensions(cycleMap, (i-1) * buttonH + 58, buttonH + 36)
+    LayoutHelpers.SetDimensions(cycleMap, (i - 1) * buttonH + 58, buttonH + 36)
     cycleMap:DisableHitTest(true)
 end
 
@@ -59,8 +63,8 @@ function initCycleMap()
 
     cycleMap.Depth:Set(1000) --always on top
     LayoutHelpers.SetDimensions(cycleMap, 400, 150)
-    cycleMap.Top:Set(function() return GetFrame(0).Bottom()*.75 end)
-    cycleMap.Left:Set(function() return (GetFrame(0).Right()-cycleMap.Width())/2 end)
+    cycleMap.Top:Set(function() return GetFrame(0).Bottom() * .75 end)
+    cycleMap.Left:Set(function() return (GetFrame(0).Right() - cycleMap.Width()) / 2 end)
     cycleMap:DisableHitTest()
     cycleMap:Hide()
 
@@ -149,7 +153,8 @@ function getUnitKeyGroups()
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
-            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' then
+            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' or
+                value == '_cycleTemplates' then
                 table.insert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
@@ -233,7 +238,7 @@ function cycleUnits(maxPos, name, effectiveIcons, selection, modifier)
 end
 
 -- look for template that can be built
-function availableTemplate(allTemplates,buildable)
+function availableTemplate(allTemplates, buildable)
     local effectiveTemplates = {}
     local effectiveIcons = {}
     for templateIndex, template in allTemplates do
@@ -262,11 +267,18 @@ function availableTemplate(allTemplates,buildable)
     return effectiveTemplates, effectiveIcons
 end
 
+--- A 'hack' to allow us to detect whether the `ButtonRelease` event was from a left-click
+factoryHotkeyLastClickWasLeft = false
+
 function factoryHotkey(units, count)
-    CommandMode.StartCommandMode("build", {name = ''})
+    CommandMode.StartCommandMode("build", { name = '' })
+
+    -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't
+    -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
     worldview.HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
+        if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             if event.Modifiers.Left then
+                factoryHotkeyLastClickWasLeft = true
                 if type(units) == "string" then
                     if IsKeyDown("Shift") then
                         count = 5
@@ -282,15 +294,21 @@ function factoryHotkey(units, count)
                     end
                     StopCycleMap(self, event)
                 end
-            else
-                StopCycleMap(self, event)
+            end
+        else
+            if event.Type == 'ButtonRelease' then
+                if factoryHotkeyLastClickWasLeft then
+                    factoryHotkeyLastClickWasLeft = false
+                else
+                    StopCycleMap(self, event)
+                end
             end
         end
     end
 end
 
 function StopCycleMap(self, event)
-    worldview.HandleEvent = oldHandleEvent(self, event)
+    worldview.HandleEvent = oldHandleEvent
     cycleThread = ForkThread(function()
         local options = Prefs.GetFromCurrentProfile('options')
         local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
@@ -321,7 +339,10 @@ function buildAction(name)
     local selection = GetSelectedUnits()
     if selection then
         -- If current selection is engineer or commander or megalith
-        if not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) or not table.empty(EntityCategoryFilterDown(categories.FACTORY * categories.EXPERIMENTAL * categories.CYBRAN, selection)) then
+        if not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) or
+            not
+            table.empty(EntityCategoryFilterDown(categories.FACTORY * categories.EXPERIMENTAL * categories.CYBRAN,
+                selection)) then
             buildActionBuilding(name, modifier)
         else -- Buildqueue or normal applying all the command
             buildActionUnit(name, modifier)
@@ -337,6 +358,9 @@ function buildActionBuilding(name, modifier)
 
     if table.find(allValues, "_templates") then
         return buildActionTemplate(modifier)
+    end
+    if table.find(allValues, "_cycleTemplates") then
+        return cycleTemplates.Cycle()
     end
 
     -- Reset everything that could be fading or running
@@ -366,7 +390,7 @@ function buildActionBuilding(name, modifier)
 
     local cmd = effectiveValues[cyclePos]
     ClearBuildTemplates()
-    CommandMode.StartCommandMode("build", {name = cmd})
+    CommandMode.StartCommandMode("build", { name = cmd })
 end
 
 function buildActionFactoryTemplate(modifier)
@@ -432,48 +456,58 @@ function buildActionTemplate(modifier)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
     -- Allow all races to build other races templates
-    local currentFaction = selection[1]:GetBlueprint().General.FactionName
+    local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+    local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
     if options.gui_all_race_templates ~= 0 and currentFaction then
-        local function ConvertID(BPID)
-            local prefixes = {
-                ["AEON"] = {"uab", "xab", "dab"},
-                ["UEF"] = {"ueb", "xeb", "deb"},
-                ["CYBRAN"] = {"urb", "xrb", "drb"},
-                ["SERAPHIM"] = {"xsb", "usb", "dsb"},
-            }
-            for i, prefix in prefixes[string.upper(currentFaction)] do
-                if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
-                    return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
-                end
-            end
-            return false
-        end
+        local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
         for templateIndex, template in allTemplates do
             local valid = true
-            local converted = false
             for _, entry in template.templateData do
                 if type(entry) == 'table' then
+
+                    -- check if entry is valid
+                    if not entry[1] then
+                        valid = false
+                        break
+                    end
+
+                    -- check if we can build the entry
+                    local converted = false
                     if not table.find(buildableUnits, entry[1]) then
-                        entry[1] = ConvertID(entry[1])
-                        converted = true
-                        if not table.find(buildableUnits, entry[1]) then
+                        for k, prefix in prefixes do
+                            local convertedId = string.gsub(entry[1], "(%a+)(%d+)", prefix .. "%2")
+                            if table.find(buildableUnits, convertedId) then
+                                converted = true
+                                entry[1] = convertedId
+                                break
+                            end
+                        end
+
+                        if not converted then
                             valid = false
                             break
                         end
                     end
                 end
             end
+
             if valid then
-                if converted then
-                    template.icon = ConvertID(template.icon)
+                -- also try to convert the template icon
+                for k, prefix in prefixes do
+                    local convertedId = string.gsub(template.icon, "(%a+)(%d+)", prefix .. "%2")
+                    if table.find(buildableUnits, convertedId) then
+                        template.icon = convertedId
+                        break
+                    end
                 end
+
                 template.templateID = templateIndex
                 table.insert(effectiveTemplates, template)
-            table.insert(effectiveIcons, template.icon)
+                table.insert(effectiveIcons, template.icon)
             end
         end
     else
-        effectiveTemplates, effectiveIcons = availableTemplate(allTemplates,buildableUnits)
+        effectiveTemplates, effectiveIcons = availableTemplate(allTemplates, buildableUnits)
     end
 
     local maxPos = table.getsize(effectiveTemplates)
@@ -489,35 +523,13 @@ function buildActionTemplate(modifier)
     local cmd = template.templateData[3][1]
 
     ClearBuildTemplates()
-    CommandMode.StartCommandMode("build", {name = cmd})
+    CommandMode.StartCommandMode("build", { name = cmd })
     SetActiveBuildTemplate(template.templateData)
-
-    if options.gui_template_rotator ~= 0 then
-        -- Rotating templates
-        local worldview = import("/lua/ui/game/worldview.lua").viewLeft
-        local oldHandleEvent = worldview.HandleEvent
-        worldview.HandleEvent = function(self, event)
-            if event.Type == 'ButtonPress' then
-                if event.Modifiers.Middle then
-                    ClearBuildTemplates()
-                    local tempTemplate = table.deepcopy(template.templateData)
-                    template.templateData[1] = tempTemplate[2]
-                    template.templateData[2] = tempTemplate[1]
-                    for i = 3, table.getn(template.templateData) do
-                        local index = i
-                        template.templateData[index][3] = 0 - tempTemplate[index][4]
-                        template.templateData[index][4] = tempTemplate[index][3]
-                    end
-                    SetActiveBuildTemplate(template.templateData)
-                elseif not event.Modifiers.Shift then
-                    worldview.HandleEvent = oldHandleEvent
-                end
-            end
-        end
-    end
 end
 
 function buildActionUnit(name, modifier)
+    LOG("buildActionUnit")
+    LOG(" - " .. name)
     local values = unitkeygroups[name]
     local factoryFlag = true
 
@@ -571,7 +583,7 @@ function buildActionUnit(name, modifier)
     end
 end
 
--- Helper function for the buildActionUpgrade() function below. 
+-- Helper function for the buildActionUpgrade() function below.
 -- Recursively finds and tries to order possible upgrades from highest tech to lowest tech. This allows queuing upgrades
 -- successively using keybinds, even if the previous upgrade isn't finished yet.
 -- Doing this fully recursively is probably overkill as the support fac / HQ is the only time when there are more than
@@ -581,7 +593,7 @@ function IssueUpgradeCommand(upgrades, buildableCategories)
     local success = false
     for _, u in upgrades do
         local bp = __blueprints[u]
-        local successiveUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        local successiveUpgrades = upgradeTab[bp.BlueprintId] or { bp.General.UpgradesTo }
         if successiveUpgrades then
             success = IssueUpgradeCommand(successiveUpgrades, buildableCategories)
             if success then
@@ -597,7 +609,7 @@ function IssueUpgradeCommand(upgrades, buildableCategories)
             end
         end
     end
-    return success 
+    return success
 end
 
 -- Does support upgrading T1 structures (facs, radars, etc.) that are currently upgrading to T2 to T3 when issued
@@ -608,12 +620,12 @@ function buildActionUpgrade()
 
     for index, unit in selectedUnits do
         local bp = unit:GetBlueprint()
-        -- If upgradeTab[bp.BlueprintId] returns a table, there are two or more possible upgrades, e.g. HQ and 
-        -- support factory. If instead bp.General.UpgradesTo returns a string, then there is only one possible 
-        -- upgrade, e.g. for a radar. For our helper function IssueUpgradeCommand we want a table, hence the { } 
+        -- If upgradeTab[bp.BlueprintId] returns a table, there are two or more possible upgrades, e.g. HQ and
+        -- support factory. If instead bp.General.UpgradesTo returns a string, then there is only one possible
+        -- upgrade, e.g. for a radar. For our helper function IssueUpgradeCommand we want a table, hence the { }
         -- brackets
-        local upgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
-        SelectUnits({unit})
+        local upgrades = upgradeTab[bp.BlueprintId] or { bp.General.UpgradesTo }
+        SelectUnits({ unit })
         local success = IssueUpgradeCommand(upgrades, buildableCategories)
         if not success then
             result = false

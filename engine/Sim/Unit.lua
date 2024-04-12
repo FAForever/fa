@@ -83,6 +83,7 @@ end
 --- Calculates the desired world position from the supplied relative vector from the center of the unit.
 --- Used for naval factories to set rally point under them.
 ---@param vector Vector
+---@return Vector
 function Unit:CalculateWorldPositionFromRelative(vector)
 end
 
@@ -145,7 +146,7 @@ function Unit:GetCargo()
 end
 
 --- Returns table of commands queued up for this unit
----@return OrderInfo[]
+---@return { }
 function Unit:GetCommandQueue()
 end
 
@@ -330,7 +331,7 @@ end
 
 --- makes the unit's bone invisible
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:HideBone(bone, affectChildren)
 end
 
@@ -354,7 +355,7 @@ end
 function Unit:IsMobile()
 end
 
---- returns true if the unit is moving or not
+--- Returns true if the position has changed with respect to the previous simulation tick
 ---@return boolean
 function Unit:IsMoving()
 end
@@ -659,7 +660,7 @@ end
 --- makes the unit's bone visible, and if `affectChildren` is true, all child bones as well
 --- (this is almost always what you want)
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:ShowBone(bone, affectChildren)
 end
 

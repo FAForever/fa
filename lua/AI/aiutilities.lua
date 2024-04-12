@@ -345,19 +345,17 @@ end
 function AIGetMarkerLocations(aiBrain, markerType)
     local markerList = {}
     if markerType == 'Start Location' then
-        local tempMarkers = AIGetMarkerLocations(aiBrain, 'Blank Marker')
+        local tempMarkers = AIGetMarkerLocations(aiBrain, 'Spawn')
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' then
                 table.insert(markerList, {Position = v.Position, Name = v.Name})
             end
         end
     else
-        local markers = ScenarioUtils.GetMarkers()
+        local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
         if markers then
             for k, v in markers do
-                if v.type == markerType then
-                    table.insert(markerList, {Position = v.position, Name = k})
-                end
+                table.insert(markerList, {Position = v.position, Name = k})
             end
         end
     end
@@ -506,7 +504,7 @@ end
 function AIGetMarkerLeastUnits(aiBrain, markerType, markerRadius, pos, posRad, unitCount, unitCat, tMin, tMax, tRings, tType)
     local markers = {}
     if markerType == 'Start Location' then
-        local tempMarkers = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, posRad, tMin, tMax, tRings, tType)
+        local tempMarkers = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, posRad, tMin, tMax, tRings, tType)
         local startX, startZ = aiBrain:GetArmyStartPos()
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' and VDist2(startX, startZ, v.Position[1], v.Position[3]) > 20 then
@@ -555,10 +553,22 @@ end
 ---@return table
 function AIFilterAlliedBases(aiBrain, positions)
     local retPositions = {}
+    local armyIndex = aiBrain:GetArmyIndex()
     for _, v in positions do
-        local threat = GetAlliesThreat(aiBrain, v, 2, 'StructuresNotMex')
-        if threat == 0 then
-            table.insert(retPositions, v)
+        local allyPosition = false
+        for index,brain in ArmyBrains do
+            if brain.BrainType == 'AI' and IsAlly(brain:GetArmyIndex(), armyIndex) then
+                if brain.BuilderManagers[v.Name]  or ( v.Position[1] == brain.BuilderManagers['MAIN'].Position[1] and v.Position[3] == brain.BuilderManagers['MAIN'].Position[3] ) then
+                    allyPosition = true
+                    break
+                end
+            end
+        end
+        if not allyPosition then
+            local threat = GetAlliesThreat(aiBrain, v, 2, 'StructuresNotMex')
+            if threat == 0 then
+                table.insert(retPositions, v)
+            end
         end
     end
 
@@ -684,13 +694,30 @@ function AIFindNavalAreaNeedsEngineer(aiBrain, locationType, radius, tMin, tMax,
     end
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Naval Area', pos, radius, tMin, tMax, tRings, tType)
 
+    local closest
     local retPos, retName
-    if eng then
-        retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, positions)
-    else
-        retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, pos, radius, tMin, tMax, tRings, tType, positions)
+    local positions = AIFilterAlliedBases(aiBrain, positions)
+    for _, v in positions do
+        local bx = pos[1] - v.Position[1]
+        local bz = pos[3] - v.Position[3]
+        local distance = bx * bx + bz * bz
+        if not aiBrain.BuilderManagers[v.Name] then
+            if not closest or distance < closest then
+                closest = distance
+                retPos = v.Position
+                retName = v.Name
+            end
+        else
+            local managers = aiBrain.BuilderManagers[v.Name]
+            if managers.EngineerManager:GetNumUnits('Engineers') == 0 and managers.FactoryManager:GetNumFactories() == 0 then
+                if not closest or distance < closest then
+                    closest = distance
+                    retPos = v.Position
+                    retName = v.Name
+                end
+            end
+        end
     end
-
     return retPos, retName
 end
 
@@ -2020,10 +2047,10 @@ function ReturnTransportsToPool(units, move)
             if move then
                 if safePath then
                     for _, p in safePath do
-                        IssueMove({unit}, p)
+                        IssueToUnitMove(unit, p)
                     end
                 else
-                    IssueMove({unit}, position)
+                    IssueToUnitMove(unit, position)
                 end
             end
         end
@@ -2077,13 +2104,14 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
+    local NavUtils = import("/lua/sim/navutils.lua")
     local TransportUtils = import("/lua/ai/transportutilities.lua")
     local pos = unit:GetPosition()
     -- don't check a path if we are in build range
     if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
         return true
     end
-    local result, bestPos = unit:CanPathTo(destination)
+    local result = NavUtils.CanPathTo('Amphibious', pos, destination)
     local bUsedTransports = false
     -- Increase check to 300 for transports
     if not result or VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300 * 300
@@ -2096,7 +2124,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
         -- Skip the last move... we want to return and do a build
         -- needTransports need to fix this
-        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 1, true)
+        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 3, true)
         if bUsedTransports then
             return true
         elseif VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
@@ -2107,13 +2135,13 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
+        local path, reason = NavUtils.PathToWithThreatThreshold('Amphibious', pos, destination, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 200, aiBrain.IMAPConfig.Rings)
         if path then
             local pathSize = table.getn(path)
             -- Move to way points (but not to destination... leave that for the final command)
             for widx, waypointPath in path do
                 if pathSize ~= widx then
-                    IssueMove({unit}, waypointPath)
+                    IssueToUnitMove(unit, waypointPath)
                 end
             end
         end
@@ -3099,7 +3127,7 @@ function AIFindFurthestStartLocationNeedsEngineer(aiBrain, locationType, radius,
     end
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
-    local positions = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, radius, tMin, tMax, tRings, tType)
+    local positions = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, radius, tMin, tMax, tRings, tType)
     local startX, startZ = aiBrain:GetArmyStartPos()
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
@@ -3186,7 +3214,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         IssueReclaim({eng}, unit)
                         action = true
                         break
@@ -3197,15 +3225,15 @@ function EngAvoidLocalDanger(aiBrain, eng)
             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         IssueReclaim({eng}, unit)
                         action = true
                         break
                     end
                 end
             else
-                IssueClearCommands({eng})
-                IssueMove({eng}, ShiftPosition(enemyUnitPos, engPos, 50, false))
+                IssueToUnitClearCommands(eng)
+                IssueToUnitMove(eng, ShiftPosition(enemyUnitPos, engPos, 50, false))
                 coroutine.yield(60)
                 action = true
             end
@@ -3224,7 +3252,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
     local action = false
     local bool,markers=CanBuildOnLocalMassPoints(aiBrain, eng:GetPosition(), 25)
     if bool then
-        IssueClearCommands({eng})
+        IssueToUnitClearCommands(eng)
         local factionIndex = aiBrain:GetFactionIndex()
         local buildingTmplFile = import('/lua/BuildingTemplates.lua')
         local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
@@ -3280,6 +3308,44 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     end
 end
 
+---@param aiBrain AIBrain
+---@param engPos table
+---@param distance number
+---@return boolean
+---@return table
+function CanBuildOnGridMassPoints(aiBrain, engPos, distance, layer)
+    -- Checks if an engineer can build on mass points close to its location
+    -- will return a bool if it found anything and if it did then a table of mass markers
+    -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
+    local pointDistance = distance * distance
+    local depositsGrid = aiBrain.GridDeposits
+    if not depositsGrid then
+        WARN('GridDeposits class is not setup for AI')
+        return
+    end
+    local massMarkers = depositsGrid:GetResourcesWithinDistance('Mass', engPos, distance, layer)
+    local NavUtils = import("/lua/sim/navutils.lua")
+    local validMassMarkers = {}
+    for _, v in massMarkers do
+        if v.type == 'Mass' then
+            local massBorderWarn = false
+            if v.position[1] <= 8 or v.position[1] >= ScenarioInfo.size[1] - 8 or v.position[3] <= 8 or v.position[3] >= ScenarioInfo.size[2] - 8 then
+                massBorderWarn = true
+            end 
+            local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) and NavUtils.CanPathTo('Amphibious', engPos, v.position) then
+                table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
+            end
+        end
+    end
+    table.sort(validMassMarkers, function(a,b) return a.Distance < b.Distance end)
+    if table.getn(validMassMarkers) > 0 then
+        return true, validMassMarkers
+    else
+        return false
+    end
+end
+
 ---@param eng Unit
 ---@param minimumReclaim number
 ---@return boolean
@@ -3309,7 +3375,7 @@ function EngPerformReclaim(eng, minimumReclaim)
             end
         end
         if table.getn(closeReclaim) > 0 then
-            IssueClearCommands({eng})
+            IssueToUnitClearCommands(eng)
             for _, rec in closeReclaim do
                 IssueReclaim({eng}, rec)
             end
@@ -3507,4 +3573,109 @@ function GetResourceMarkerWithinRadius(aiBrain, pos, markerType, radius, canBuil
         end
     end
     return false
+end
+
+MergeWithNearbyStatePlatoons = function(platoon, stateMachine, radius, maxMergeNumber, ignoreBase)
+    -- check to see we're not near an ally base
+    -- ignoreBase is not worded well, if false then ignore if too close to base
+    if IsDestroyed(platoon) then
+        return
+    end
+    local aiBrain = platoon:GetBrain()
+    if not aiBrain then
+        return
+    end
+
+    if platoon.UsingTransport then
+        return
+    end
+    local platUnits = platoon:GetPlatoonUnits()
+    local platCount = 0
+
+    for _, u in platUnits do
+        if not u.Dead then
+            platCount = platCount + 1
+        end
+    end
+
+    if (maxMergeNumber and platCount > maxMergeNumber) or platCount < 1 then
+        return
+    end 
+
+    local platPos = platoon:GetPlatoonPosition()
+    if not platPos then
+        return
+    end
+
+    local radiusSq = radius*radius
+    -- if we're too close to a base, forget it
+    if not ignoreBase then
+        if aiBrain.BuilderManagers then
+            for baseName, base in aiBrain.BuilderManagers do
+                if VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3]) <= (2*radiusSq) then
+                    --RNGLOG('Platoon too close to base, not merge happening')
+                    return
+                end
+            end
+        end
+    end
+
+    local AlliedPlatoons = aiBrain:GetPlatoonsList()
+    local bMergedPlatoons = false
+    for _,aPlat in AlliedPlatoons do
+        if aPlat.PlatoonName ~= stateMachine then
+            continue
+        end
+        if aPlat == platoon then
+            continue
+        end
+
+        if aPlat.UsingTransport then
+            continue
+        end
+
+        if aPlat.PlatoonFull then
+            --RNGLOG('Remote platoon is full, skip')
+            continue
+        end
+
+        local allyPlatPos = aPlat:GetPlatoonPosition()
+        if not allyPlatPos or not aiBrain:PlatoonExists(aPlat) then
+            continue
+        end
+
+        if not platoon.MovementLayer then
+            platoon:GetNavigationalLayer()
+        end
+        if not aPlat.MovementLayer then
+            aPlat:GetNavigationalLayer()
+        end
+
+        -- make sure we're the same movement layer type to avoid hamstringing air of amphibious
+        if platoon.MovementLayer ~= aPlat.MovementLayer then
+            continue
+        end
+
+        if  VDist2Sq(platPos[1], platPos[3], allyPlatPos[1], allyPlatPos[3]) <= radiusSq then
+            local units = aPlat:GetPlatoonUnits()
+            local validUnits = {}
+            local bValidUnits = false
+            for _,u in units do
+                if not u.Dead and not u:IsUnitState('Attached') then
+                    table.insert(validUnits, u)
+                    bValidUnits = true
+                end
+            end
+            if bValidUnits then
+                --LOG("*AI DEBUG: Merging platoons " .. platoon.BuilderName .. ": (" .. platPos[1] .. ", " .. platPos[3] .. ") and " .. aPlat.BuilderName .. ": (" .. allyPlatPos[1] .. ", " .. allyPlatPos[3] .. ")")
+                aiBrain:AssignUnitsToPlatoon(platoon, validUnits, 'Attack', 'GrowthFormation')
+                bMergedPlatoons = true
+            end
+        end
+    end
+    if bMergedPlatoons then
+        local platUnits = platoon:GetPlatoonUnits()
+        IssueClearCommands(platUnits)
+    end
+    return bMergedPlatoons
 end

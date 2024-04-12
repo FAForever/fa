@@ -1,166 +1,93 @@
-UnitBlueprint {
+UnitBlueprint{
+    Description = "<LOC xsb0101_desc>Land Factory",
     Audio = {
-        Construct = Sound {
-            Bank = 'XSB',
-            Cue = 'XSB0101_Construct_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ConstructLoop = Sound {
-            Bank = 'XSB',
-            Cue = 'XSB0101_Construct_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DeathExplosion = Sound {
-            Bank = 'XSL_Destroy',
-            Cue = 'XSB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'XSL_Destroy',
-            Cue = 'XSB_Destroy_Huge',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DoneBeingBuilt = Sound {
-            Bank = 'XSB',
-            Cue = 'XSB0101_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'SeraphimSelect',
-            Cue = 'Seraphim_Select_Factory',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0101_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0101_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB0101_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory',    LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 10,
     Categories = {
-        'PRODUCTFA',
-        'SELECTABLE',
-        'BUILTBYTIER1ENGINEER',
-        'BUILTBYTIER2ENGINEER',
-        'BUILTBYTIER3ENGINEER',
-        'BUILTBYCOMMANDER',
-        'SERAPHIM',
-        'STRUCTURE',
-        'LAND',
-        'TECH1',
-        'CONSTRUCTION',
-        'FACTORY',
-        'RALLYPOINT',
-        'DRAGBUILD',
-        'SIZE16',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'SHOWQUEUE',
-        'SORTCONSTRUCTION',
+        "BUILTBYCOMMANDER",
+        "BUILTBYTIER1ENGINEER",
+        "BUILTBYTIER2ENGINEER",
+        "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
+        "DRAGBUILD",
+        "FACTORY",
+        "LAND",
+        "PRODUCTFA",
+        "RALLYPOINT",
+        "RECLAIMABLE",
+        "SELECTABLE",
+        "SERAPHIM",
+        "SHOWQUEUE",
+        "SIZE16",
+        "SORTCONSTRUCTION",
+        "STRUCTURE",
+        "TECH1",
+        "VISIBLETORECON",
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
-        EconomyThreatLevel = 3,
+        ArmorType = "Structure",
+        EconomyThreatLevel = 110,
         Health = 3500,
         MaxHealth = 3500,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC xsb0101_desc>Land Factory',
     Display = {
-        Abilities = {
-            '<LOC ability_upgradable>Upgradeable',
-        },
+        Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = '/units/xsb0101/xsb0101_ADeath.sca',
+                Animation = "/units/xsb0101/xsb0101_ADeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
-        AnimationUpgrade = '/units/xsb0101/xsb0101_aupgrade.sca',
-        BuildAttachBone = 'Attachpoint',
+        AnimationUpgrade = "/units/xsb0101/xsb0101_aupgrade.sca",
+        BuildAttachBone = "Attachpoint",
         DamageEffects = {
-            {
-                Bone = 0,
-                OffsetX = 1.5,
-                OffsetY = 0,
-                OffsetZ = 1.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = -1.5,
-                OffsetY = 0,
-                OffsetZ = 1.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = -1.5,
-                OffsetY = 0,
-                OffsetZ = -1.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = 1.5,
-                OffsetY = 0,
-                OffsetZ = -1.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = 1.1,
-                OffsetY = 1.4,
-                OffsetZ = 0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = -1.1,
-                OffsetY = 1.4,
-                OffsetZ = 0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = 0,
-                OffsetY = 1.65,
-                OffsetZ = -0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = 0.5,
-                OffsetY = 0,
-                OffsetZ = 0.5,
-            },
+            { Bone = 0,     OffsetX = 1.5,   OffsetY = 0,     OffsetZ = 1.5 },
+            { Bone = 0,     OffsetX = -1.5,  OffsetY = 0,     OffsetZ = 1.5 },
+            { Bone = 0,     OffsetX = -1.5,  OffsetY = 0,     OffsetZ = -1.5 },
+            { Bone = 0,     OffsetX = 1.5,   OffsetY = 0,     OffsetZ = -1.5 },
+            { Bone = 0,     OffsetX = 1.1,   OffsetY = 1.4,   OffsetZ = 0.5 },
+            { Bone = 0,     OffsetX = -1.1,  OffsetY = 1.4,   OffsetZ = 0.5 },
+            { Bone = 0,     OffsetX = 0,     OffsetY = 1.65,  OffsetZ = -0.5 },
+            { Bone = 0,     OffsetX = 0.5,   OffsetY = 0,     OffsetZ = 0.5 },
         },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 200,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     Scrolling = true,
-                    ShaderName = 'Seraphim',
+                    ShaderName = "Seraphim",
                 },
                 {
-                    AlbedoName = 'xsb0101_lod1_albedo.dds',
                     LODCutoff = 500,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
-                    SpecularName = 'xsb0101_lod1_specteam.dds',
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
+                    ShaderName = "Seraphim",
+                    AlbedoName = "xsb0101_lod1_albedo.dds",
+                    SpecularName = "xsb0101_lod1_specteam.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0006',
-        SpawnRandomRotation = true,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar12x_seraphim_01_albedo',
+                Albedo = "Tarmacs/Tar12x_seraphim_01_albedo",
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 12.8,
-                Normal = 'Tarmacs/Tar12x_seraphim_01_normals',
-                Orientations = {
-                    0,
-                    90,
-                    180,
-                    270,
-                },
+                Normal = "Tarmacs/Tar12x_seraphim_01_normals",
+                Orientations = { 0, 90, 180, 270 },
                 RemoveWhenDead = false,
                 Width = 12.8,
             },
@@ -173,13 +100,11 @@ UnitBlueprint {
         BuildRate = 20,
         BuildTime = 300,
         BuildableCategory = {
-            'BUILTBYTIER1FACTORY SERAPHIM MOBILE CONSTRUCTION',
-            'BUILTBYTIER1FACTORY SERAPHIM STRUCTURE LAND',
-            'BUILTBYTIER1FACTORY SERAPHIM MOBILE LAND',
+            "BUILTBYTIER1FACTORY SERAPHIM MOBILE CONSTRUCTION",
+            "BUILTBYTIER1FACTORY SERAPHIM STRUCTURE LAND",
+            "BUILTBYTIER1FACTORY SERAPHIM MOBILE LAND",
         },
-        RebuildBonusIds = {
-            'xsb0101',
-        },
+        RebuildBonusIds = { "xsb0101" },
         StorageEnergy = 0,
         StorageMass = 80,
     },
@@ -189,12 +114,8 @@ UnitBlueprint {
     },
     General = {
         BuildBones = {
-            BuildEffectBones = {
-                'Muzzle01',
-            },
+            BuildEffectBones = { "Muzzle01" },
         },
-        Category = 'Factory',
-        Classification = 'RULEUC_Factory',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -211,21 +132,14 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         ConstructionBar = true,
-        FactionName = 'Seraphim',
-        Icon = 'land',
+        FactionName = "Seraphim",
+        Icon = "land",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
-        UnitName = '<LOC xsb0101_name>Hethiya',
-        UnitWeight = 1,
-        UpgradesFromBase = 'xsb0101',
-        UpgradesTo = 'xsb0201',
+        UnitName = "<LOC xsb0101_name>Hethiya",
+        UpgradesFromBase = "xsb0101",
+        UpgradesTo = "xsb0201",
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC xsb0101_help>Land Factory',
-    },
+    Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.9,
     LifeBarSize = 4.5,
@@ -246,145 +160,28 @@ UnitBlueprint {
         MeshExtentsY = 1,
         MeshExtentsZ = 4.5,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         RaisedPlatforms = {
+            --X,     Z,     height -- Offsets from center
 
-            -- Platform 1
-            -- TopLeft Offset From Center
-            -- x
-            -1.1,
+            -1.1,  -0.7,  0.65,    --Top left
+            1.1,   -0.7,  0.65,    --Top right
+            -1.1,  0.6,   0.65,    --Bottom left
+            1.1,   0.6,   0.65,    --Bottom right
 
-            -- z
-            -0.7,
+            -2,    -0.47, 0,       --Top left
+            -1.1,  -0.7,  0.65,    --Top right
+            -2,    0.5,   0,       --Bottom left
+            -1.1,  0.6,   0.65,    --Bottom right
 
-            -- y
-            0.65,
-
-            -- TopRight Offset From Center
-            -- x
-            1.1,
-
-            -- z
-            -0.7,
-
-            -- y
-            0.65,
-
-            -- BottomLeft Offset From Center
-            -- x
-            -1.1,
-
-            -- z
-            0.6,
-
-            -- y
-            0.65,
-
-            -- BottomRight Offset From Center
-            -- x
-            1.1,
-
-            -- z
-            0.6,
-
-            -- y
-            0.65,
-
-            -- Platform 2
-            -- TopLeft Offset From Center
-            -- x
-            -2,
-
-            -- z
-            -0.47,
-
-            -- y
-            0,
-
-            -- TopRight Offset From Center
-            -- x
-            -1.1,
-
-            -- z
-            -0.7,
-
-            -- y
-            0.65,
-
-            -- BottomLeft Offset From Center
-            -- x
-            -2,
-
-            -- z
-            0.5,
-
-            -- y
-            0,
-
-            -- BottomRight Offset From Center
-            -- x
-            -1.1,
-
-            -- z
-            0.6,
-
-            -- y
-            0.65,
-
-            -- Platform 3
-            -- TopLeft Offset From Center
-            -- x
-            1.1,
-
-            -- z
-            -0.7,
-
-            -- y
-            0.65,
-
-            -- TopRight Offset From Center
-            -- x
-            2,
-
-            -- z
-            -0.47,
-
-            -- y
-            0,
-
-            -- BottomLeft Offset From Center
-            -- x
-            1.1,
-
-            -- z
-            0.6,
-
-            -- y
-            0.65,
-
-            -- BottomRight Offset From Center
-            -- x
-            2,
-
-            -- z
-            0.5,
-
-            -- y
-            0,
+            1.1,   -0.7,  0.65,    --Top left
+            2,     -0.47, 0,       --Top right
+            1.1,   0.6,   0.65,    --Bottom left
+            2,     0.5,   0,       --Bottom right
         },
         RollOffPoints = {
-            {
-                UnitSpin = 90,
-                X = 2.75,
-                Y = 0,
-                Z = 0.1,
-            },
-            {
-                UnitSpin = -90,
-                X = -2.75,
-                Y = 0,
-                Z = 0.1,
-            },
+            { UnitSpin = 90,    X = 2.75,  Y = 0,     Z = 0.1 },
+            { UnitSpin = -90,   X = -2.75, Y = 0,     Z = 0.1 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
@@ -398,10 +195,10 @@ UnitBlueprint {
     SizeX = 3.1,
     SizeY = 0.8,
     SizeZ = 3.6,
-    StrategicIconName = 'icon_factory1_land',
+    StrategicIconName = "icon_factory1_land",
     StrategicIconSortPriority = 220,
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,

@@ -1378,11 +1378,18 @@ local function CreateTeamColorSettings()
     LayoutHelpers.AtLeftTopIn(window.CheckBoxScoreColors, window.CheckBoxAutoEnable, 0, 20)
     window.CheckBoxScoreColors.text = UIUtil.CreateText(window, "Change colors in scoreboard", 14, UIUtil.bodyFont)
     LayoutHelpers.AtLeftTopIn(window.CheckBoxScoreColors.text, window.CheckBoxScoreColors, 20, 0)
+
+    return window
 end
 
 function TeamColorHandler(self, modifiers)
     if modifiers.Right then
-        CreateTeamColorSettings()
+        if self.Dropout then
+            self.Dropout:Destroy()
+            self.Dropout = nil
+        else
+            self.Dropout = CreateTeamColorSettings()
+        end
     else
         if self._checkState == "checked" then
             TeamColorMode(false)

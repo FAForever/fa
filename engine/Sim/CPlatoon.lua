@@ -3,7 +3,7 @@
 
 ---@class PlatoonCommand : userdata
 
----@class moho.platoon_methods
+---@class moho.platoon_methods : InternalObject
 local CPlatoon = {}
 
 ---@alias PlatoonSquadType 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support'
@@ -153,8 +153,8 @@ end
 function CPlatoon:GetPlatoonLifetimeStats()
 end
 
---- Computes the average platoon position, returns {0,0,0} if the platoon has no units
----@return Vector
+--- Computes the average platoon position, returns nil if the platoon has no units
+---@return Vector?
 function CPlatoon:GetPlatoonPosition()
 end
 

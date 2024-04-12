@@ -109,7 +109,7 @@ Wreckage = Class(Prop) {
 ---@param energy number
 ---@param time number
 ---@param deathHitBox? table
----@return Prop
+---@return Wreckage
 function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
     local prop = CreateProp(position, bp.Wreckage.Blueprint)
     prop:SetOrientation(orientation, true)
@@ -140,7 +140,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sz = sz * 0.5
 
     -- set health
-    prop:SetMaxHealth(bp.Defense.Health)
+    prop:SetMaxHealth(bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
     prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
 
     -- set collision box and reclaim values, the latter depends on the health of the wreck

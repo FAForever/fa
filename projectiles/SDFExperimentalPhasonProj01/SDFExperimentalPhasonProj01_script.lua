@@ -4,5 +4,8 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------
 local SDFExperimentalPhasonProjectile = import("/lua/seraphimprojectiles.lua").SDFExperimentalPhasonProjectile
+
+--- Experimental Phason Projectile script, XSL0401
+---@class SDFExperimentalPhasonProj01 : SDFExperimentalPhasonProjectile
 SDFExperimentalPhasonProj01 = ClassProjectile(SDFExperimentalPhasonProjectile) {}
 TypeClass = SDFExperimentalPhasonProj01

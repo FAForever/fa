@@ -21,11 +21,12 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -42,13 +43,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Navy',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'ANTINAVY',
-            'TORPEDO',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Cybran',
         Weapon = 'Nanite Torpedo',
     },
@@ -59,13 +53,17 @@ ProjectileBlueprint {
         Acceleration = 5,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        Lifetime = 7,
-        MaxSpeed = 18,
-        MaxZigZag = 0.5,
+        Lifetime = 10,
+        MaxSpeed = 15,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 180,
         VelocityAlign = true,
-        ZigZagFrequency = 1,
+
+        -- these parameters make the path of the torpedo feel unique
+        AccelerationRange = 2,
+        TurnRateRange = 10,
+        MaxZigZag = 1,
+        ZigZagFrequency = 0.4,
     },
 }
