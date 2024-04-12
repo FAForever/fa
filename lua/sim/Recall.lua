@@ -2,7 +2,7 @@
 --** Shared under the MIT license
 --**************************************************************************************************
 
--- import recall parameters
+-- collect recall parameters (note it is not imported)
 doscript "/lua/shared/RecallParams.lua"
 
 -- TODO: generalize to abstract voting system, decoupled from recall
@@ -64,9 +64,8 @@ function OnArmyChange()
             StartTime = votingThreadBrain.RecallVoteStartTime,
             Open = VoteTime * 0.1,
             Blocks = teamSize,
-            -- TODO: rename to `Yes` and `No`
-            Accept = yes,
-            Veto = no,
+            Yes = yes,
+            No = no,
             CanVote = GetArmyBrain(focus).Vote ~= nil,
         }
     end
@@ -95,7 +94,7 @@ function OnAllianceChange(data)
     if votingThreadBrain then
         SPEW("Canceling recall voting for team " .. table.concat(oldTeam, ", ") .. " due to alliance break")
         votingThreadBrain.VoteCancelled = true
-        coroutine.resume(votingThreadBrain.recallVotingThread)
+        ResumeThread(votingThreadBrain.recallVotingThread)
         if IsAlly(votingThreadBrain, GetFocusArmy()) then
             SyncCancelRecallVote()
             SyncRecallStatus()
@@ -112,7 +111,7 @@ end
 function RecallRequestCooldown(lastTeamVote, lastPlayerRequest, playerGatein)
     -- note that this doesn't always return the reason that currently has the longest cooldown, it
     -- returns the more "fundamental" one (i.e. the reason whose base cooldown is longest)
-    -- this is more useful in reporting the reason, and isn't a problem when put in a loop
+    -- this is more useful in reporting the reason, and isn't a problem as the reason checker is a loop
     local gametime = GetGameTick()
     local gateCooldown = (playerGatein or 0) + PlayerGateCooldown - gametime
     if gateCooldown > 0 then
@@ -242,8 +241,7 @@ local function ArmyVoteRecall(army, vote, lastVote)
             if army ~= index and IsAlly(army, index) and not ally:IsDefeated() then
                 local thread = ally.recallVotingThread
                 if thread then
-                    -- end voting period
-                    ResumeThread(thread)
+                    ResumeThread(thread) -- end voting period
                     break
                 end
             end
@@ -296,7 +294,7 @@ function SetRecallVote(data)
     -- determine team voting status
     local isRequest = true
     local lastVote = true
-    local yesVotes = 0
+    local likeVotes = 0
     local teammates = 0
     local team = {}
     for index, ally in ArmyBrains do
@@ -307,12 +305,13 @@ function SetRecallVote(data)
                 end
                 return
             end
-            if ally.RecallVote then
-                yesVotes = yesVotes + 1
+            if ally.RecallVote == vote then
+                likeVotes = likeVotes + 1
             end
+
             local allyHasVoted = ally.RecallVote ~= nil
             lastVote = lastVote and allyHasVoted -- only the last vote if all allies have also voted
-            isRequest = isRequest and not allyHasVoted -- only the last vote if no allies have voted
+            isRequest = isRequest and not allyHasVoted -- only a request if no allies have voted yet
             teammates = teammates + 1
             team[teammates] = ally.Nickname
         end
@@ -338,7 +337,10 @@ function SetRecallVote(data)
         brain.RecallVote = vote
 
         -- if the vote will already be decided with this vote, close the voting session
-        if not lastVote and vote and RecallRequestAccepted(yesVotes + 1, teammates) then
+        if not lastVote and (
+            vote and RecallRequestAccepted(likeVotes + 1, teammates) or -- will succeed with our vote
+            !vote and !RecallRequestAccepted(teammates - (likeVotes + 1), teammates) -- won't ever be able to succeed
+        ) then
             lastVote = true
         end
         ArmyVoteRecall(army, vote, lastVote)
@@ -383,9 +385,9 @@ function SyncRecallVote(vote)
         Sync.RecallRequest = recallSync
     end
     if vote then
-        recallSync.Accept = (recallSync.Accept or 0) + 1
+        recallSync.Yes = (recallSync.Yes or 0) + 1
     else
-        recallSync.Veto = (recallSync.Veto or 0) + 1
+        recallSync.No = (recallSync.No or 0) + 1
     end
 end
 

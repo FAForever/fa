@@ -1187,6 +1187,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     OnRecalled = function(self)
+        -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
         local army = self.Army
