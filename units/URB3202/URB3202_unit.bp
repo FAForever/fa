@@ -72,8 +72,8 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 7200,
         BuildCostMass = 300,
-        BuildRate = 15,
-        BuildTime = 1680,
+        BuildRate = 20,
+        BuildTime = 780,
         BuildableCategory = { "urs0305" },
         MaintenanceConsumptionPerSecondEnergy = 100,
         RebuildBonusIds = {
@@ -122,7 +122,6 @@ UnitBlueprint{
     LifeBarOffset = 0.25,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -132,14 +131,11 @@ UnitBlueprint{
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = 0,
         SkirtOffsetZ = 0,
         SkirtSizeX = 1,
         SkirtSizeZ = 1,
-        TurnRate = 0,
     },
     SelectionSizeX = 0.45,
     SelectionSizeZ = 0.45,

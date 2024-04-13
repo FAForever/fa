@@ -499,6 +499,10 @@ end
 ---@return boolean
 function OnCommandIssued(command)
 
+    if command.CommandType == 'Reclaim' and command.Target.EntityId then
+        SimCallback({ Func = 'ExtendReclaimOrder', Args = { TargetId = command.Target.EntityId } }, true)
+    end
+
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then
         if not IsKeyDown('Shift') then

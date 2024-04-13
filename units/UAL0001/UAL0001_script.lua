@@ -21,7 +21,7 @@
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
-local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
@@ -30,7 +30,7 @@ local Buff = import("/lua/sim/buff.lua")
 ---@class UAL0001 : ACUUnit
 UAL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightDisruptor = ClassWeapon(ADFDisruptorCannonWeapon) {},
         ChronoDampener = ClassWeapon(ADFChronoDampener) {},
         OverCharge = ClassWeapon(ADFOverchargeWeapon) {},
@@ -268,23 +268,5 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:SetMaintenanceConsumptionActive()
     end
 }
-
-if true then
-
-    local oldUAL0001 = UAL0001
-    UAL0001 = ClassUnit(UAL0001) {
-        --- Adds a single level of veterancy
-        ---@param self Unit | VeterancyComponent
-        AddVetLevel = function(self)
-            oldUAL0001.AddVetLevel(self)
-
-            -- replace the mesh
-            local temp = string.format('/units/ual0001/wide/Aeon%d_mesh', self.VetLevel)
-            self:SetMesh(temp, true)
-        end
-    }
-
-end
-
 
 TypeClass = UAL0001

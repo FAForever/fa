@@ -26,6 +26,9 @@ URA0203 = ClassUnit(CAirUnit) {
         --self.Trash:Add(self.Rotator)
     end,
 
+    ---@param self URA0203
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         CAirUnit.OnMotionVertEventChange(self, new, old)
 
