@@ -41,7 +41,7 @@ local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * ((categories.DIRECTFIRE + categories.INDIRECTFIRE + categories.ANTINAVY) + (categories.DEFENSE + categories.ARTILLERY))
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * ((categories.DIRECTFIRE + categories.INDIRECTFIRE + categories.ANTINAVY) + (categories.DEFENSE - categories.uab4201 + categories.ARTILLERY))
 local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
 ---@class StructureUnit : Unit
