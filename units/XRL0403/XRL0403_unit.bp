@@ -191,6 +191,16 @@ UnitBlueprint {
         },
         MaxBuildDistance = 1,
     },
+    Formation = {
+        EmbeddedFormations = true,
+        EmbedAntiAirAt = { 2.5, 2.0, 2.5, -2.0, -2.5, 2.0, -2.5, -2.0},
+        EmbedShieldsAt = { 2.5, 1.0, 2.5, -1.0, -2.5, 1.0, -2.5, -1.0},
+        SizeX = 12,
+        SizeZ = 12,
+        OffsetX = 6,
+        OffsetZ = 6,
+        Layer = 'Land',
+    },
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,

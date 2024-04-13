@@ -241,13 +241,19 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 local blueprintFootprintSizeX = blueprintFootprint.SizeX
                 local blueprintFootprintSizeZ = blueprintFootprint.SizeZ
 
+                -- -- make sure it's always an odd number
+                -- if MathMod(blueprintFootprintSizeX, 2) == 0 then
+                --     blueprintFootprintSizeX = blueprintFootprintSizeX + 1
+                -- end
+
                 -- occupy the next few rows for the current columns to make space for this unit
-                local lower = MathCeil(-0.25 * blueprintFootprintSizeX / sparsityMultiplier)
-                local upper = MathFloor(0.25 * blueprintFootprintSizeX / sparsityMultiplier)
+                local lower = MathCeil(-0.5 * blueprintFootprintSizeX)
+                local upper = MathFloor(0.5 * blueprintFootprintSizeX)
+
                 for k = lower, upper do
                     local index = ox + formationRowLengthHalf + k + 1
-                    if index > 0 and index <= formationRowLength then
-                        formationColumnOccupied[index] = MathCeil(blueprintFootprintSizeZ / sparsityMultiplier)
+                    if index > 0 and index <= formationRowLength and formationColumnOccupied[index] < blueprintFootprintSizeZ then
+                        formationColumnOccupied[index] = blueprintFootprintSizeZ
                     end
                 end
 
@@ -257,11 +263,40 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
                 formation[1] = sparsityMultiplier * (ox)
-                formation[2] = sparsityMultiplier * ((-1 * (ly - 1.5) - 0.5 * blueprintFootprintSizeZ))
+                formation[2] = sparsityMultiplier * ((-1 * (ly - 1.0) - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = false
                 TableInsert(tacticalFormation, formation)
+
+                -------------------------------------------------------------------
+                -- And finally we describe the formation entry for the unit
+
+                local blueprintFormation = __blueprints[blueprintId].Formation
+                if blueprintFormation.EmbeddedFormations then
+                    local blueprintFormationEmbedShieldAt = blueprintFormation.EmbedShieldsAt
+                    if blueprintFormationEmbedShieldAt then
+                        ComputeEmbeddedFormation(
+                            tacticalFormation,
+                            formationBlueprintCountCache,
+                            formationBlueprintListLandShield,
+                            blueprintFormationEmbedShieldAt,
+                            1, 1, formation[1], formation[2]
+                        )
+                    end
+
+                    local blueprintFormationEmbedAntiAirAt = blueprintFormation.EmbedAntiAirAt
+                    if blueprintFormationEmbedAntiAirAt then
+                        ComputeEmbeddedFormation(
+                            tacticalFormation,
+                            formationBlueprintCountCache,
+                            formationBlueprintListLandAntiAir,
+                            blueprintFormationEmbedAntiAirAt,
+                            1, 1, formation[1], formation[2]
+                        )
+                    end
+                end
+
             else
                 LOG("No blueprint!", lx, unitsToProcess, formationRowLength, ly, formationColumnOccupied[lx])
             end
@@ -284,7 +319,7 @@ end
 --- Constructs a land formation for the given blueprint identifiers.
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param formationBlueprintListNaval FormationBlueprintListNaval
----@param formationBlueprintListHover FormationBlueprintListLand
+---@param formationBlueprintListHover FormationBlueprintListNaval
 ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprintListNaval, formationBlueprintListHover)
     -- local scope for performance
     local tacticalFormation = TacticalFormation
@@ -319,6 +354,7 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
     local sparsityMultiplierX = 1.0
     local sparsityMultiplierZ = 1.0
 
+    local ucr = 0
     local lx = 0
     local ly = 0
 
@@ -329,6 +365,7 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
     -- process rows
     while unitsToProcess > 0 do
 
+        ucr = 0
         lx = 1
         ly = ly + 1
 
@@ -388,8 +425,8 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
             if ly > 1 then
 
                 local rowMod4 = MathMod(ly, 4)
-                local columnMod3 = MathMod(offset, 3)
-
+                local columnMod3 = MathMod(lx, 3)
+                
                 if (rowMod4 == 0 or rowMod4 == 2) and columnMod3 == 2 then
                     -- we'd like a shield here
                     blueprintId = GetCachedFormationSpecificCategory(
@@ -462,6 +499,8 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
                 formation[5] = false
                 TableInsert(tacticalFormation, formation)
 
+                ucr = ucr + 1
+
                 -------------------------------------------------------------------
                 -- And finally we describe the formation entry for the unit
 
@@ -490,7 +529,7 @@ ComputeNavalFormation = function(formationBlueprintCountCache, formationBlueprin
                     end
                 end
             else
-                LOG("No blueprint!", lx, unitsToProcess, formationRowLength, ly, formationColumnOccupied[lx])
+                LOG("No (naval) blueprint!", lx, unitsToProcess, formationRowLength, ly, formationColumnOccupied[lx])
             end
 
             -------------------------------------------------------------------
@@ -554,8 +593,10 @@ ComputeFormation = function(units)
     -- formation is not the same, re-compute it!
     TableSetn(tacticalFormation, 0)
 
-    ComputeNavalFormation(formationBlueprintCountCache, formationBlueprintListCache.Naval, formationBlueprintListCache.Land)
+    ComputeNavalFormation(formationBlueprintCountCache, formationBlueprintListCache.Naval, formationBlueprintListCache.Naval)
     ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache.Land)
+
+    LOG(repru(tacticalFormation))
 
     return tacticalFormation
 end
