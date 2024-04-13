@@ -55,6 +55,7 @@ UnitBlueprint {
         "SELECTABLE",
         "SHOWQUEUE",
         "SNIPEMODE",
+        "SNIPER",
         "SONAR",
         "VISIBLETORECON",
     },
