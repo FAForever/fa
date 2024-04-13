@@ -192,7 +192,6 @@ UnitBlueprint {
     LifeBarOffset = 2,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -203,11 +202,9 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
         MeshExtentsX = 5.5,
         MeshExtentsY = 3,
         MeshExtentsZ = 5.5,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         RollOffPoints = {
             { UnitSpin = 0,     X = 0,     Y = 0,     Z = 3 },
@@ -219,7 +216,6 @@ UnitBlueprint {
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
         StandUpright = true,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -0.128,
     SelectionCenterOffsetZ = 0.067,
