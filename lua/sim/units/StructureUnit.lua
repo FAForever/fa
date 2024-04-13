@@ -163,7 +163,7 @@ StructureUnit = ClassUnit(Unit) {
             local weapons = self.Blueprint.Weapon
             if weapons then
                 for k, weapon in weapons do
-                    if weapon.MaxRadius and weapon.MaxRadius > radius then
+                    if weapon.MaxRadius and 1.1 * weapon.MaxRadius > radius then
                         radius = 1.1 * weapon.MaxRadius
                     end
                 end
