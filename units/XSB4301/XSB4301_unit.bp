@@ -97,7 +97,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 60000,
         BuildCostMass = 3600,
-        BuildTime = 5841,
+        BuildTime = 5800,
         MaintenanceConsumptionPerSecondEnergy = 500,
         RebuildBonusIds = { "xsb4301" },
     },
