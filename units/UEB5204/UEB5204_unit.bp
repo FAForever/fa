@@ -61,7 +61,6 @@ UnitBlueprint{
     Intel = { VisionRadius = 0 },
     LifeBarHeight = 0.075,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
