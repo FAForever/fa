@@ -250,7 +250,6 @@ UnitBlueprint{
         MeshExtentsX = 16,
         MeshExtentsY = 5,
         MeshExtentsZ = 16,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,

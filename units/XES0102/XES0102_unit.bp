@@ -154,7 +154,6 @@ UnitBlueprint{
         MeshExtentsX = 0.6,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 1.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 5,
         TurnRate = 100,

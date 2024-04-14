@@ -141,7 +141,6 @@ UnitBlueprint{
         MaxSpeed = 4,
         MaxSpeedReverse = 4,
         MaxSteerForce = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,

@@ -577,7 +577,6 @@ UnitBlueprint{
         MeshExtentsX = 0.85,
         MeshExtentsY = 2,
         MeshExtentsZ = 2.4,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,

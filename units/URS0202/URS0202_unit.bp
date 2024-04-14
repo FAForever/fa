@@ -194,7 +194,6 @@ UnitBlueprint {
         MaxSpeed = 4.5,
         MaxSpeedReverse = 4.5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 20,
         TurnRate = 40,

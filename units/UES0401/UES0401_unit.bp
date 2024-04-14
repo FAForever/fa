@@ -283,7 +283,6 @@ UnitBlueprint{
         MeshExtentsX = 2.5,
         MeshExtentsY = 2,
         MeshExtentsZ = 20,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -5.5,

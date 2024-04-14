@@ -113,7 +113,6 @@ UnitBlueprint {
         MeshExtentsX = 1,
         MeshExtentsY = 1,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         TurnRadius = 0,
         TurnRate = 80,

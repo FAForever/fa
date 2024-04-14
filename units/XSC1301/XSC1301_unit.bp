@@ -148,7 +148,6 @@ UnitBlueprint {
         MeshExtentsX = 3.2,
         MeshExtentsY = 2.2,
         MeshExtentsZ = 3.2,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

@@ -253,7 +253,6 @@ UnitBlueprint{
         MaxSpeed = 3.3,
         MaxSpeedReverse = 3.3,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 15,
         TurnRate = 50,

@@ -270,7 +270,6 @@ UnitBlueprint{
         MaxSpeed = 5,
         MaxSpeedReverse = 5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_AmphibiousFloating",
         TurnRadius = 15,
         TurnRate = 50,

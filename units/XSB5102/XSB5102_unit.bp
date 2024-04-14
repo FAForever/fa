@@ -73,7 +73,6 @@ UnitBlueprint{
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = 0,
         SkirtOffsetZ = 0,

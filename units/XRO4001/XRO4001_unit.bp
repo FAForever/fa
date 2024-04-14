@@ -74,7 +74,6 @@ UnitBlueprint{
         MaxSpeed = 1.7,
         MaxSpeedReverse = 0,
         MaxSteerForce = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         StandUpright = true,
         TurnRadius = 10,

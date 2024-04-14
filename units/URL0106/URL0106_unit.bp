@@ -129,7 +129,6 @@ UnitBlueprint{
         MaxSpeed = 4,
         MaxSpeedReverse = 0,
         MaxSteerForce = 7,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         StandUpright = true,
         TurnRadius = 1,

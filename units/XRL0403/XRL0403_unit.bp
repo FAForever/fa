@@ -235,7 +235,6 @@ UnitBlueprint {
         MaxAcceleration = 2,
         MaxSpeed = 2,
         MaxSpeedReverse = 1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         SinkLower = true,
         RotateOnSpot = false,

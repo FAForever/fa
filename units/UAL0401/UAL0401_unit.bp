@@ -201,7 +201,6 @@ UnitBlueprint{
         MeshExtentsX = 2.75,
         MeshExtentsY = 6.75,
         MeshExtentsZ = 3,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

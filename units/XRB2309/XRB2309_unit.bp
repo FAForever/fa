@@ -139,7 +139,6 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SinkSpeed = 0.5,
         SkirtOffsetX = -0.5,

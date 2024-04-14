@@ -129,7 +129,6 @@ UnitBlueprint{
         MeshExtentsX = 0.9,
         MeshExtentsY = 0.55,
         MeshExtentsZ = 1.05,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.5,
