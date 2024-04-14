@@ -251,7 +251,6 @@ UnitBlueprint{
     Physics = {
         AltMotionType = "RULEUMT_Water",
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
