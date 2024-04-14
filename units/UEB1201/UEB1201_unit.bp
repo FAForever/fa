@@ -111,7 +111,6 @@ UnitBlueprint{
     LifeBarOffset = 1.1,
     LifeBarSize = 3,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -125,7 +124,6 @@ UnitBlueprint{
         MeshExtentsX = 3.1,
         MeshExtentsY = 1.4,
         MeshExtentsZ = 3.1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
