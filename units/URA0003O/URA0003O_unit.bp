@@ -114,7 +114,6 @@ UnitBlueprint{
         MaxAcceleration = 10.5,
         MaxSpeed = 10.5,
         MaxSpeedReverse = 0,
-        MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Air",
         RotateBodyWhileMoving = true,
