@@ -114,14 +114,14 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread?
     ForkAIThread = function(self, fn, ...)
         if fn then
             self.AIThread = ForkThread(fn, self, unpack(arg))
             self.Trash:Add(self.AIThread)
             return self.AIThread
         else
-            return nil
+            return
         end
     end,
 
@@ -178,7 +178,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread?
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -464,8 +464,7 @@ Platoon = Class(moho.platoon_methods) {
             categories.STRUCTURE,
             categories.TECH3 * categories.MOBILE})
         while aiBrain:PlatoonExists(self) do
-            local target = false
-            local blip = false
+            local target
             while unit:GetTacticalSiloAmmoCount() < 1 or not target do
                 WaitSeconds(7)
                 target = false
@@ -830,7 +829,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- if true, look to guard highest threat, otherwise,
         -- guard the lowest threat specified
-        local bFindHighestThreat = self.PlatoonData.FindHighestThreat or false
+        local bFindHighestThreat = self.PlatoonData.FindHighestThreat or nil
 
         -- minimum threat to look for
         local minThreatThreshold = self.PlatoonData.MinThreatThreshold or -1
@@ -838,7 +837,7 @@ Platoon = Class(moho.platoon_methods) {
         local maxThreatThreshold = self.PlatoonData.MaxThreatThreshold  or 99999999
 
         -- Avoid bases (true or false)
-        local bAvoidBases = self.PlatoonData.AvoidBases or false
+        local bAvoidBases = self.PlatoonData.AvoidBases or nil
 
         -- Radius around which to avoid the main base
         local avoidBasesRadius = self.PlatoonData.AvoidBasesRadius or 0
@@ -956,7 +955,7 @@ Platoon = Class(moho.platoon_methods) {
 
 
         -- did we find a threat?
-        local usedTransports = false
+        local usedTransports
         if bestMarker then
             self.LastMarker[2] = self.LastMarker[1]
             self.LastMarker[1] = bestMarker.position
@@ -1065,8 +1064,8 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         local aiBrain = self:GetBrain()
         local armyIndex = aiBrain:GetArmyIndex()
-        local target = false
-        local basePosition = false
+        local target
+        local basePosition
 
         if self.PlatoonData.LocationType and self.PlatoonData.LocationType != 'NOTMAIN' then
             basePosition = aiBrain.BuilderManagers[self.PlatoonData.LocationType].Position
@@ -1245,7 +1244,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         while not scout.Dead do
-            local targetArea = false
+            local targetArea
             local highPri = false
 
             local mustScoutArea, mustScoutIndex = aiBrain:GetUntaggedMustScoutArea()
@@ -2010,7 +2009,7 @@ Platoon = Class(moho.platoon_methods) {
             local assistList = AIUtils.GetAssistees(aiBrain, assistData.AssistLocation, assistData.AssisteeType, category, assisteeCat)
             if not table.empty(assistList) then
                 -- only have one unit in the list; assist it
-                local low = false
+                local low
                 local bestUnit = false
                 for k,v in assistList do
                     --DUNCAN - check unit is inside assist range
@@ -2217,8 +2216,8 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         -------- CHOOSE APPROPRIATE BUILD FUNCTION AND SETUP BUILD VARIABLES --------
-        local reference = false
-        local refName = false
+        local reference
+        local refName
         local buildFunction
         local closeToBuilder
         local relative
@@ -2668,7 +2667,7 @@ Platoon = Class(moho.platoon_methods) {
         local target
         local blip
         local hadtarget = false
-        local basePosition = false
+        local basePosition
 
         if self.PlatoonData.LocationType and self.PlatoonData.LocationType != 'NOTMAIN' then
             basePosition = aiBrain.BuilderManagers[self.PlatoonData.LocationType].Position
@@ -3756,7 +3755,7 @@ Platoon = Class(moho.platoon_methods) {
         local aiBrain = self:GetBrain()
         local cmd = false
         local landed = false
-        local target = false
+        local target
         local targetLocation = false
 
         while aiBrain:PlatoonExists(self) and not landed do
@@ -3783,7 +3782,6 @@ Platoon = Class(moho.platoon_methods) {
    end,
 
    ---@param self Platoon
-   ---@return boolean
    GhettoAI = function(self)
        --LOG('*AI DEBUG:  Using Ghetto AI')
        local aiBrain = self:GetBrain()
@@ -3796,14 +3794,14 @@ Platoon = Class(moho.platoon_methods) {
            while AIUtils.GetTransports(self) < 1 do
                WaitSeconds(3)
                if not aiBrain:PlatoonExists(self) then
-                       return false
+                       return
                end
            end
            --LOG('*AI DEBUG:  Ghetto transport load')
            cmd = AIUtils.UseTransports(self:GetPlatoonUnits() , self:GetSquadUnits('Scout'), nil, nil)
        until cmd
 
-       local target = false
+       local target
        local atkPri = {}
        local categoryList = {}
        if data.PrioritizedCategories then
@@ -3878,7 +3876,7 @@ Platoon = Class(moho.platoon_methods) {
         self.PlatoonAirThreat = self:GetPlatoonThreat('Air', categories.ALLUNITS)
         while aiBrain:PlatoonExists(self) do
             target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
-            local newtarget = false
+            local newtarget
             if aiBrain.T4ThreatFound['Land'] or aiBrain.T4ThreatFound['Naval'] or aiBrain.T4ThreatFound['Structure'] then
                 newtarget = self:FindClosestUnit('Attack', 'Enemy', true, categories.EXPERIMENTAL * (categories.LAND + categories.NAVAL + categories.STRUCTURE + categories.ARTILLERY))
                 if newtarget then
@@ -3999,7 +3997,7 @@ Platoon = Class(moho.platoon_methods) {
         local armyIndex = aiBrain:GetArmyIndex()
         local target
         local blip
-        local cmd = false
+        local cmd
         local platoonUnits = self:GetPlatoonUnits()
         local PlatoonFormation = self.PlatoonData.UseFormation or 'NoFormation'
         self:SetPlatoonFormationOverride(PlatoonFormation)
@@ -4467,11 +4465,11 @@ Platoon = Class(moho.platoon_methods) {
         local buildingTmpl, buildingTmplFile, baseTmplFile, baseTmplDefault, templateKey
         local whatToBuild
         local hydroPresent = false
-        local buildLocation = false
+        local buildLocation
         local buildMassPoints = {}
         local buildMassDistantPoints = {}
         local playableArea = ScenarioInfo.PlayableArea or {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
-        local borderWarning = false
+        local borderWarning
         local factionIndex = aiBrain:GetFactionIndex()
         local platoonUnits = self:GetPlatoonUnits()
         local eng
@@ -4845,7 +4843,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if next(assistList) then
                 -- we have something in the assistList
-                local low = false
+                local low
                 local bestUnit = false
                 for k,v in assistList do
                     local unitPos = v:GetPosition()
