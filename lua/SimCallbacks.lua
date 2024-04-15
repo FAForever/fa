@@ -735,7 +735,7 @@ do
         end
 
         local target = lastCommand.target --[[@as Unit | Prop]]
-        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true)
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true, data.Radius)
     end
 
 end

@@ -95,9 +95,10 @@ end
 ---@param units Unit[]
 ---@param target Prop
 ---@param doPrint boolean
-local function ReclaimNearbyProps (units, target, doPrint)
+---@param areaRadius? number
+local function ReclaimNearbyProps (units, target, doPrint, areaRadius)
     local processed = 0
-    local radius = 4.0
+    local radius = areaRadius or 4.0
     local px, _, pz = target:GetPositionXYZ()
     local adjacentReclaim = GetReclaimablesInRect(px - radius, pz - radius, px + radius, pz + radius)
 
@@ -131,7 +132,7 @@ local function ReclaimNearbyProps (units, target, doPrint)
 
             -- limit the number of props to add so that we do not create too many reclaim orders. The command queue
             -- is limited to 501 commands, this limit exists to make it very difficult to reach the cap.
-            if processed >= 6 then
+            if (processed >= 6 and not areaRadius) or processed >= 400 then
                 break
             end
         end
@@ -146,7 +147,8 @@ end
 ---@param units Unit[]
 ---@param target Unit | Prop
 ---@param doPrint boolean           # if true, prints information about the order
-function AreaReclaimOrder(units, target, doPrint)
+---@param radius? number
+function AreaReclaimOrder(units, target, doPrint, radius)
     local unitCount = TableGetn(units)
     if unitCount == 0 then
         return
@@ -155,6 +157,6 @@ function AreaReclaimOrder(units, target, doPrint)
     if IsUnit(target) and EntityCategoryContains(categories.STRUCTURE, target) then
         return ReclaimAdjacentUnits(units, target, doPrint)
     elseif IsProp(target) then
-        return ReclaimNearbyProps(units, target, doPrint)
+        return ReclaimNearbyProps(units, target, doPrint, radius)
     end
 end

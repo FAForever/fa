@@ -15,6 +15,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
+local AreaReclaimDragger = import("/lua/ui/controls/draggers/areareclaim.lua").AreaReclaimDragger
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -499,8 +500,8 @@ end
 ---@return boolean
 function OnCommandIssued(command)
 
-    if command.CommandType == 'Reclaim' and command.Target.EntityId then
-        SimCallback({ Func = 'ExtendReclaimOrder', Args = { TargetId = command.Target.EntityId } }, true)
+    if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+        AreaReclaimDragger(command)
     end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
