@@ -2241,16 +2241,15 @@ Platoon = Class(moho.platoon_methods) {
         local relative
         local baseTmplList = {}
 
-        -- if we have nothing to build, disband!
-        if not cons.BuildStructures then
+        local platLoc = self:GetPlatoonPosition()
+        -- if we have nothing to build or no units, disband!
+        if not cons.BuildStructures or not platLoc then
             coroutine.yield(1)
             self:PlatoonDisband()
             return
         end
 
-        local platLoc = self:GetPlatoonPosition()
-
-        if cons.NearUnitCategory and platLoc then
+        if cons.NearUnitCategory then
             self:SetPrioritizedTargetList('support', {ParseEntityCategory(cons.NearUnitCategory)})
             local unitNearBy = self:FindPrioritizedUnit('support', 'Ally', false, platLoc, cons.NearUnitRadius or 50)
             --LOG("ENGINEER BUILD: " .. cons.BuildStructures[1] .." attempt near: ", cons.NearUnitCategory)
@@ -2391,7 +2390,7 @@ Platoon = Class(moho.platoon_methods) {
             reference, refName = AIUtils.AIGetClosestThreatMarkerLoc(aiBrain, cons.NearMarkerType, platLoc[1], platLoc[3],
                                                             cons.ThreatMin, cons.ThreatMax, cons.ThreatRings)
             if not reference then
-                reference = pos
+                reference = platLoc
             end
             table.insert(baseTmplList, AIBuildStructures.AIBuildBaseTemplateFromLocation(baseTmpl, reference))
             buildFunction = AIBuildStructures.AIExecuteBuildStructure
