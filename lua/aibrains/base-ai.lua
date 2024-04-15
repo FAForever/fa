@@ -59,10 +59,13 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
+---@field IMAPConfig table
 ---@field IntelData? table<string, number>
 ---@field IntelTriggerList table
+---@field InterestList table
 ---@field LayerPref "LAND" | "AIR"
 ---@field Name string
+---@field NumOpponents number
 ---@field Radars table<string, Unit[]>
 ---@field Result? AIResult
 ---@field Sorian boolean
@@ -1313,7 +1316,7 @@ AIBrain = Class(StandardBrain) {
     ---## Function: GetUntaggedMustScoutArea
     --- Gets an area that has been flagged with the AddScoutArea function that does not have a unit heading to scout it already.
     ---@param self BaseAIBrain
-    ---@return Vector location
+    ---@return ScoutLocation location
     ---@return number index
     GetUntaggedMustScoutArea = function(self)
         -- If any locations have been specifically tagged for scouting
