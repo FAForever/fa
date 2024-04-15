@@ -2790,10 +2790,10 @@ Platoon = Class(moho.platoon_methods) {
                     local platLoc = self:GetPlatoonPosition()
                     if platLoc then
                         for k,v in AIUtils.AIGetSortedMassLocations(aiBrain, 10, nil, nil, nil, nil, platLoc) do
-                        if v[1] < 0 or v[3] < 0 or v[1] > ScenarioInfo.size[1] or v[3] > ScenarioInfo.size[2] then
-                            --LOG('*AI DEBUG: STRIKE FORCE SENDING UNITS TO WRONG LOCATION - ' .. v[1] .. ', ' .. v[3])
-                        end
-                        self:MoveToLocation((v), false)
+                            if v[1] < 0 or v[3] < 0 or v[1] > ScenarioInfo.size[1] or v[3] > ScenarioInfo.size[2] then
+                                --LOG('*AI DEBUG: STRIKE FORCE SENDING UNITS TO WRONG LOCATION - ' .. v[1] .. ', ' .. v[3])
+                            end
+                            self:MoveToLocation((v), false)
                         end
                     end
                 end
@@ -3651,7 +3651,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         if not unit.ProcessBuild then
             --LOG("*AI DEBUG: Failed to build" .. unit.Sync.id)
-            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false) 
+            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false)
         end
     end,
 
