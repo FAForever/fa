@@ -551,6 +551,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
+---@field CustomUnits { [string]: EntityId[] }
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
