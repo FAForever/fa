@@ -2822,7 +2822,7 @@ Platoon = Class(moho.platoon_methods) {
 
             -- do something else for the experimental unit... act as a sub basically
             if EntityCategoryContains (categories.ues0401, v) then
-                return NavalForceAI(self)
+                return self:NavalForceAI()
             end
         end
 
