@@ -3664,7 +3664,7 @@ Platoon = Class(moho.platoon_methods) {
         coroutine.yield(10)
         local aiBrain = eng:GetAIBrain()
 
-        while not eng.Dead and not eng.PlatoonHandle.UsingTransport and (eng.GoingHome or eng.UnitBeingBuiltBehavior or eng.ProcessBuild != nil or not eng:IsIdleState()) do
+        while not eng.Dead and not eng.PlatoonHandle.UsingTransport and (eng.UnitBeingBuiltBehavior or eng.ProcessBuild != nil or not eng:IsIdleState()) do
             coroutine.yield(30)
         end
 
@@ -3787,7 +3787,6 @@ Platoon = Class(moho.platoon_methods) {
     EngineerDropAI = function(self)
         LOG('*AI DEBUG:  Using Engineer Drop')
         local aiBrain = self:GetBrain()
-        local cmd = false
         local landed = false
         local target
         local targetLocation = false
@@ -3806,7 +3805,6 @@ Platoon = Class(moho.platoon_methods) {
                while AIUtils.GetTransports(self) < 1 do
                        WaitSeconds(3)
                end
-               cmd = AIUtils.UseTransports(self:GetPlatoonUnits() , self:GetSquadUnits('Scout'), targetLocation, nil)
 
                self:SetAIPlan('EngineerBuildAI')
                landed = true
@@ -3917,7 +3915,7 @@ Platoon = Class(moho.platoon_methods) {
                     target = newtarget
                 end
             elseif aiBrain.AirAttackPoints and not table.empty(aiBrain.AirAttackPoints) then
-                newtarget = AIUtils.AIFindAirAttackTargetInRangeSorian(aiBrain, self, 'Attack', atkPri, self.AirAttackPoints[1].Position)
+                newtarget = AIUtils.AIFindAirAttackTargetInRangeSorian(aiBrain, self, 'Attack', atkPri, aiBrain.AirAttackPoints[1].Position)
                 if newtarget then
                     target = newtarget
                 end
