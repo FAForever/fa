@@ -24,6 +24,10 @@ local CoroutineYield = coroutine.yield
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
+---@class ScoutLocation
+---@field Position Vector
+---@field TaggedBy Unit
+
 ---@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias HqTech "TECH2" | "TECH3"
