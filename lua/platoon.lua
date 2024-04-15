@@ -835,7 +835,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- if true, look to guard highest threat, otherwise,
         -- guard the lowest threat specified
-        local bFindHighestThreat = self.PlatoonData.FindHighestThreat or nil
+        local bFindHighestThreat = self.PlatoonData.FindHighestThreat or false
 
         -- minimum threat to look for
         local minThreatThreshold = self.PlatoonData.MinThreatThreshold or -1
@@ -3574,7 +3574,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     --- greater than or less than check, based on what kind of threat order we want
-    ---@param findHighestThreat number[]
+    ---@param findHighestThreat boolean
     ---@param newMarker number
     ---@param oldMarker number
     ---@return boolean
