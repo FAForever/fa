@@ -27,6 +27,18 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@class Platoon : moho.platoon_methods
 ---@field PlatoonData table
+---@field Trash TrashBag
+---@field EventCallbacks table
+---@field MovementLayer string
+---@field AIThread? thread
+---@field PlanName string
+---@field PoolAIOn boolean
+---@field CreationTime number
+---@field BuilderName string
+---@field ArmyPool boolean
+---@field BuilderHandle PlatoonBuilder
+---@field DistressCall boolean
+---@field UsingTransport boolean
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
@@ -334,7 +346,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param category EntityCategory
     ---@param position Vector
     ---@param radius number
-    ---@return nil 
+    ---@return number
     GetNumCategoryUnits = function(self, category, position, radius)
         local numUnits = 0
         if position then
@@ -1395,7 +1407,7 @@ Platoon = Class(moho.platoon_methods) {
 
                     -- Backups old ai plan
                     local oldPlan = self:GetPlan()
-                    if self.AiThread then
+                    if self.AIThread then
                         self.AIThread:Destroy()
                     end
 
@@ -3557,7 +3569,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     -- Callback functions for EngineerBuildAI
-    ---@param unit Unit
+    ---@param unit EngineerBuilder
     ---@param params any
     EngineerBuildDone = function(unit, params)
         if not unit.PlatoonHandle then return end
@@ -3568,7 +3580,7 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuildDone = true
         end
     end,
-    ---@param unit Unit
+    ---@param unit EngineerBuilder
     ---@param params any
     EngineerCaptureDone = function(unit, params)
         if not unit.PlatoonHandle then return end
@@ -3578,7 +3590,7 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false)
         end
     end,
-    ---@param unit Unit
+    ---@param unit EngineerBuilder
     ---@param params any
     EngineerReclaimDone = function(unit, params)
         if not unit.PlatoonHandle then return end
@@ -3588,7 +3600,7 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false)
         end
     end,
-    ---@param unit Unit
+    ---@param unit EngineerBuilder
     ---@param params any
     EngineerFailedToBuild = function(unit, params)
         if not unit.PlatoonHandle then return end
@@ -3637,7 +3649,7 @@ Platoon = Class(moho.platoon_methods) {
     --- build order in queue, and if the engineer has nothing left to do
     --- will return the engineer back to the army pool by disbanding the
     --- the platoon.  Support function for EngineerBuildAI
-    ---@param eng any
+    ---@param eng EngineerBuilder
     ---@param removeLastBuild boolean
     ProcessBuildCommand = function(eng, removeLastBuild)
         if not eng or eng.Dead or not eng.PlatoonHandle then
