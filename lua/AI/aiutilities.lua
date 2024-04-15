@@ -141,10 +141,10 @@ end
 
 ---@param aiBrain AIBrain
 ---@param maxNum number
----@param tMin? number
----@param tMax? number
----@param tRings? number
----@param tType? string
+---@param tMin number
+---@param tMax number
+---@param tRings number
+---@param tType string
 ---@param position Vector
 ---@return unknown
 function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, position)
@@ -177,7 +177,7 @@ function AIGetSortedHydrocarbonLocation(aiBrain, maxNum, tMin, tMax, tRings, tTy
 end
 
 ---@param aiBrain AIBrain
----@param maxNum? number
+---@param maxNum number
 ---@return unknown
 function AIGetSortedNavalLocations(aiBrain, maxNum)
     local markerList = AIGetMarkerLocations(aiBrain, 'Naval Area')
@@ -282,10 +282,10 @@ end
 ---@param aiBrain AIBrain
 ---@param markerList any
 ---@param maxNumber number
----@param tMin? number
----@param tMax? number
----@param tRings? number
----@param tType? string
+---@param tMin number
+---@param tMax number
+---@param tRings number
+---@param tType string
 ---@param position Vector
 ---@return table
 function AISortMarkersFromLastPos(aiBrain, markerList, maxNumber, tMin, tMax, tRings, tType, position)
@@ -619,13 +619,13 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@param eng? Unit
----@return Vector?
----@return string?
+---@param eng Unit
+---@return boolean
+---@return string
 function AIFindStartLocationNeedsEngineer(aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
-        return
+        return false
     end
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
@@ -657,13 +657,13 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@param eng? Unit
----@return Vector?
----@return string?
+---@param eng Unit
+---@return boolean
+---@return string
 function AIFindExpansionAreaNeedsEngineer(aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
-        return
+        return false
     end
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Expansion Area', pos, radius, tMin, tMax, tRings, tType)
 
@@ -684,13 +684,13 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@param eng? Unit
----@return Vector?
----@return string?
+---@param eng Unit
+---@return boolean
+---@return string
 function AIFindNavalAreaNeedsEngineer(aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
-        return
+        return false
     end
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Naval Area', pos, radius, tMin, tMax, tRings, tType)
 
@@ -731,12 +731,12 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@return Vector?
----@return string?
+---@return boolean
+---@return any
 function AIFindNavalDefensivePointNeedsStructure(aiBrain, locationType, radius, category, markerRadius, unitMax, tMin, tMax, tRings, tType)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
-        return
+        return false
     end
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Naval Defensive Point', pos, radius, tMin, tMax, tRings, tType)
 
@@ -765,12 +765,12 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@return Vector?
----@return string?
+---@return boolean
+---@return any
 function AIFindDefensivePointNeedsStructure(aiBrain, locationType, radius, category, markerRadius, unitMax, tMin, tMax, tRings, tType)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
-        return
+        return false
     end
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Defensive Point', pos, radius, tMin, tMax, tRings, tType)
 
@@ -887,9 +887,9 @@ end
 
 ---@param aiBrain AIBrain
 ---@param markerType MarkerType
----@param startX number
----@param startZ number
----@param extraTypes? string
+---@param startX Vector
+---@param startZ Vector
+---@param extraTypes string
 ---@return unknown
 ---@return unknown
 function AIGetClosestMarkerLocation(aiBrain, markerType, startX, startZ, extraTypes)
@@ -923,12 +923,12 @@ end
 
 ---@param aiBrain AIBrain
 ---@param markerType MarkerType
----@param startX number
----@param startZ number
+---@param startX Vector
+---@param startZ Vector
 ---@param threatMin number
 ---@param threatMax number
 ---@param rings number
----@param threatType? string
+---@param threatType string
 ---@return unknown
 ---@return unknown
 function AIGetClosestThreatMarkerLoc(aiBrain, markerType, startX, startZ, threatMin, threatMax, rings, threatType)
@@ -1026,7 +1026,7 @@ end
 ---@param tMin number
 ---@param tMax number
 ---@param tRings number
----@param tType? string
+---@param tType string
 ---@return unknown
 function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMax, tRings, tType)
     local positions = {}
@@ -1100,8 +1100,8 @@ end
 ---@param aiBrain AIBrain
 ---@param locationType string
 ---@param assisteeType string
----@param buildingCategory EntityCategory
----@param assisteeCategory EntityCategory
+---@param buildingCategory string
+---@param assisteeCategory string
 ---@return unknown
 function GetAssistees(aiBrain, locationType, assisteeType, buildingCategory, assisteeCategory)
     if assisteeType == 'Factory' then
@@ -1217,9 +1217,9 @@ function AIReturnAssistingFactories(factory)
 end
 
 ---@param aiBrain AIBrain
----@param location Vector|string
+---@param location Vector
 ---@param radius number
----@param layer? Layer
+---@param layer Layer
 ---@return table
 function GetBasePatrolPoints(aiBrain, location, radius, layer)
     if type(location) == 'string' then
@@ -1306,13 +1306,13 @@ function GetUnitBaseStructureVector(unit)
 end
 
 ---@param aiBrain AIBrain
----@param category EntityCategory
+---@param category string
 ---@param location Vector
 ---@param radius number
 ---@param min number
 ---@param max number
 ---@param rings number
----@param tType? string
+---@param tType string
 ---@return table
 function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, rings, tType)
     local units = aiBrain:GetUnitsAroundPoint(category, location, radius, 'Ally')
@@ -1456,13 +1456,13 @@ end
 ---@param platoon Platoon
 ---@param squad PlatoonSquads
 ---@param maxRange number
----@param atkPri table
----@param enemyBrain AIBrain|number
----@return Unit? target
+---@param atkPri number
+---@param enemyBrain AIBrain
+---@return boolean
 function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, enemyBrain)
     local position = platoon:GetPlatoonPosition()
     if not aiBrain or not position or not maxRange or not platoon or not enemyBrain then
-        return
+        return false
     end
 
     local enemyIndex = enemyBrain:GetArmyIndex()
@@ -1473,7 +1473,7 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
             category = ParseEntityCategory(category)
         end
         local retUnit = false
-        local distance
+        local distance = false
         for num, unit in targetUnits do
             if not unit.Dead and EntityCategoryContains(category, unit) and unit:GetAIBrain():GetArmyIndex() == enemyIndex and platoon:CanAttackTarget(squad, unit) then
                 local unitPos = unit:GetPosition()
@@ -1488,7 +1488,7 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
         end
     end
 
-    return
+    return false
 end
 
 ---@param aiBrain AIBrain
@@ -1747,8 +1747,8 @@ end
 --- Get and load transports with platoon units
 ---@param units Unit[]
 ---@param transports AirUnit[]
----@param location? Vector
----@param transportPlatoon? Platoon
+---@param location Vector
+---@param transportPlatoon Platoon
 ---@return boolean
 function UseTransports(units, transports, location, transportPlatoon)
     local aiBrain
@@ -2341,12 +2341,12 @@ end
 ---@param aiBrain AIBrain
 ---@param platoon Platoon
 ---@param squad string
----@param atkPri table
+---@param atkPri number
 ---@param position Vector
----@return Unit? target
+---@return boolean
 function AIFindAirAttackTargetInRangeSorian(aiBrain, platoon, squad, atkPri, position)
     if not aiBrain or not position then
-        return
+        return false
     end
 
     local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, 100, 'Enemy')
@@ -2385,7 +2385,7 @@ function AIFindAirAttackTargetInRangeSorian(aiBrain, platoon, squad, atkPri, pos
         end
     end
 
-    return
+    return false
 end
 
 ---@param aiBrain AIBrain
@@ -2410,13 +2410,13 @@ end
 ---@param platoon Platoon
 ---@param squad string
 ---@param maxRange number
----@param atkPri table
+---@param atkPri number
 ---@param avoidbases any
----@return Unit? target
+---@return boolean
 function AIFindBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPri, avoidbases)
     local position = platoon:GetPlatoonPosition()
     if not aiBrain or not position or not maxRange then
-        return
+        return false
     end
 
     local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, maxRange, 'Enemy')
@@ -2465,7 +2465,7 @@ function AIFindBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPr
         end
     end
 
-    return
+    return false
 end
 
 ---@param aiBrain AIBrain
@@ -2635,12 +2635,12 @@ function GetOwnUnitsAroundPointSorian(aiBrain, category, location, radius, min, 
 end
 
 ---@param aiBrain AIBrain
----@param category EntityCategory
+---@param category string
 ---@param location Vector
 ---@param radius number
 ---@param maxUnits number
 ---@param maxRadius number
----@param avoidCat EntityCategory
+---@param avoidCat string
 ---@return table
 function FindUnclutteredArea(aiBrain, category, location, radius, maxUnits, maxRadius, avoidCat)
     local units = aiBrain:GetUnitsAroundPoint(category, location, radius, 'Ally')
@@ -3117,13 +3117,13 @@ end
 ---@param tMax number
 ---@param tRings number
 ---@param tType string
----@param eng? Unit
----@return Vector?
----@return string?
+---@param eng Unit
+---@return boolean
+---@return unknown
 function AIFindFurthestStartLocationNeedsEngineer(aiBrain, locationType, radius, tMin, tMax, tRings, tType, eng)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
-        return
+        return false
     end
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
@@ -3202,7 +3202,7 @@ function ShiftPosition(pos1, pos2, dist, reverse)
 end
 
 ---@param aiBrain AIBrain
----@param eng Unit
+---@param eng unit
 ---@return boolean
 function EngAvoidLocalDanger(aiBrain, eng)
     local engPos = eng:GetPosition()
@@ -3535,7 +3535,6 @@ function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, en
     return false
 end
 
----@return Marker
 function GetResourceMarkerWithinRadius(aiBrain, pos, markerType, radius, canBuild, maxThreat, threatType)
     local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
     local markerTable = {}
