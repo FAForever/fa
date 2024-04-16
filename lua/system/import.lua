@@ -119,7 +119,7 @@ function import(name, isLazy)
         return existing
     end
 
-    -- As this creates a lot of entries in your log very quickly, we only enable it on fafdevelop.
+    -- As this creates a lot of entries in your log very quickly, we only enable it on fafdevelop
     local GameType = rawget(_G, "GameType")
     if GameType == "fafdevelop" then
         SPEW(string.format("%sLoading module: %s", string.rep("-> ", indent) or "", name))
