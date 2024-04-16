@@ -22,6 +22,7 @@
 
 local SeaUnit = import("/lua/sim/units/seaunit.lua").SeaUnit
 local SeaUnitOnKilled = SeaUnit.OnKilled
+local SeaUnitKill = SeaUnit.Kill
 local SeaUnitOnTransportAttach = SeaUnit.OnTransportAttach
 local SeaUnitOnTransportDetach = SeaUnit.OnTransportDetach
 local SeaUnitOnAttachedKilled = SeaUnit.OnAttachedKilled
@@ -82,11 +83,10 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
-    ---@param type string
-    ---@param overkillRatio number
-    OnKilled = function(self, instigator, type, overkillRatio)
-        self:SaveCargoMass()
-        SeaUnitOnKilled(self, instigator, type, overkillRatio)
-        self:DetachCargo()
+    ---@param damageType string
+    ---@param excessDamageRatio number
+    Kill = function(self, instigator, damageType, excessDamageRatio)
+        self:KillCargo(instigator, damageType, excessDamageRatio)
+        SeaUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 }
