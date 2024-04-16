@@ -17,7 +17,7 @@ function AreaReclaimDragger(command)
         if not decal then
             decal = UserDecal()
             decal:SetTexture("/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds")
-            decal:SetScale({ 2, 1, 2 })
+            decal:SetScale({ rad * 2, 1, rad * 2 })
             decal:SetPosition(targetPos)
         elseif decal then
             decal:SetScale({ rad * 2, 1, rad * 2 })
@@ -31,7 +31,9 @@ function AreaReclaimDragger(command)
                 Radius = rad
             } }, true)
         end
-        if decal then decal:Destroy() end
+        if IsKeyDown("Shift") then
+            -- start a reticle, keep our radius
+        elseif decal then decal:Destroy() end
         dr:Destroy()
     end
 
