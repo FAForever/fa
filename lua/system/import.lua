@@ -119,8 +119,11 @@ function import(name, isLazy)
         return existing
     end
 
-    SPEW(string.format("%sLoading module: %s", string.rep("-> ", indent) or "", name))
-    indent = indent + 1
+    local GameType = rawget(_G, "GameType")
+    if GameType == "fafdevelop" then
+        SPEW(string.format("%sLoading module: %s", string.rep("-> ", indent) or "", name))
+        indent = indent + 1
+    end
 
     ---@type ModuleInfo
     local moduleinfo = {
