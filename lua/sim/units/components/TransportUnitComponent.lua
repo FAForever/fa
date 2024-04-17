@@ -81,9 +81,8 @@ BaseTransport = ClassSimple {
 
         local cargo = self:GetCargo()
 
-        -- If we have storage slots, don't cache our cargo, because it's stored inside and
-        -- we'll never have to deal with it again
-        local cacheCargo = (self:GetBlueprint().Transport.StorageSlots and false) and true
+        -- If we don't have storage slots (we have externally attached cargo), cache the cargo for when we deal with it when it falls off
+        local cacheCargo = self:GetBlueprint().Transport.StorageSlots == 0
 
         if cacheCargo and not table.empty(cargo) then
             self.killInstigator = instigator
