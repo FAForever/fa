@@ -29,6 +29,8 @@
 ---| "TreeFire"
 ---| "TreeForce"
 ---| "WallOverspill"
+---| "TransportInternal"
+---| "TransportExternal"
 
 ---@alias ArmorType
 ---| "ASF"

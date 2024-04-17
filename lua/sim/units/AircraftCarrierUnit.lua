@@ -89,7 +89,7 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
         damageType = damageType or "Normal"
         excessDamageRatio = excessDamageRatio or 0
 
-        self:KillCargo(instigator, damageType, excessDamageRatio)
+        self:KillCargo(instigator)
         SeaUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 }

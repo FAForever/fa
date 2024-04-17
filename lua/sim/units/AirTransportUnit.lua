@@ -123,7 +123,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         damageType = damageType or "Normal"
         excessDamageRatio = excessDamageRatio or 0
 
-        self:KillCargo(instigator, damageType, excessDamageRatio)
+        self:KillCargo(instigator)
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 

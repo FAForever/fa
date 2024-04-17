@@ -70,11 +70,10 @@ BaseTransport = ClassSimple {
     --- For units that store their cargo externally, it caches the cargo for later impact.
     ---@param self BaseTransport | Unit
     ---@param instigator Unit
-    ---@param damageType string
-    ---@param excessDamageRatio number
+    ---@param damageType? DamageType -- an override for when we have a transport with external storage inside internal storage
     ---@param disperseVeterancy? boolean -- To prevent lower recursions from jumping the gun on veterancy
     ---@return number? cargoMass -- The total mass value of the cargo
-    KillCargo = function(self, instigator, damageType, excessDamageRatio, disperseVeterancy)
+    KillCargo = function(self, instigator, damageType, disperseVeterancy)
 
         -- If we're dead already, bail to avoid crashing
         if self.Dead then return 0 end
@@ -85,10 +84,13 @@ BaseTransport = ClassSimple {
         local cacheCargo = self:GetBlueprint().Transport.StorageSlots == 0
 
         if cacheCargo and not table.empty(cargo) then
+            if not damageType then damageType = "TransportExternal" end
             self.killInstigator = instigator
-            self.killDamageType = damageType
-            self.killExcessDamageRatio = excessDamageRatio
             self.cargoCache = {}
+        else
+            -- if we have internal storage, we want to override the damage type so that transports (with
+            -- external storage, like stingers) inside the *internal* storage don't handle cargo like it's external
+            damageType = "TransportInternal"
         end
 
         -- Count our cargo's total veterancy value to disperse
@@ -98,7 +100,7 @@ BaseTransport = ClassSimple {
             -- Kill the contents of a transport in a transport, however that happened
             -- now with recursion!
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-                cargoMass = cargoMass + unit:KillCargo(instigator,  damageType, excessDamageRatio, false)
+                cargoMass = cargoMass + unit:KillCargo(instigator, damageType, false)
             end
 
             -- cache the cargo so we can impact it later (if needed)
@@ -117,7 +119,7 @@ BaseTransport = ClassSimple {
             -- the engine will allegedly handle actually killing the unit, but misses some, so we'll
             -- explicitly kill our unit (with an instigator) to avoid units slipping through the cracks
             -- (and so the engine can properly update kill counts, both for score and unit kills)
-            unit:Kill(instigator, damageType, excessDamageRatio)
+            unit:Kill(instigator, damageType, 0)
         end
 
         if disperseVeterancy ~= false then
@@ -135,7 +137,7 @@ BaseTransport = ClassSimple {
         for _, unit in self.cargoCache or {} do
             if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(self.killInstigator, self.killDamageType, 0)
+                unit:OnKilled(self.killInstigator, "TransportExternal", 0)
             end
         end
     end
