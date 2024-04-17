@@ -136,6 +136,7 @@ UnitBlueprint {
         BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 4.5,
         MeshExtentsY = 1.25,
         MeshExtentsZ = 4.5,

@@ -139,6 +139,7 @@ UnitBlueprint {
         BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        MaxGroundVariation = 1.1,
         MotionType = 'RULEUMT_None',
         RaisedPlatforms = {
             --X,    Z,     Height   -- Offsets from center
