@@ -21,7 +21,6 @@
 --**********************************************************************************
 
 local SeaUnit = import("/lua/sim/units/seaunit.lua").SeaUnit
-local SeaUnitOnKilled = SeaUnit.OnKilled
 local SeaUnitKill = SeaUnit.Kill
 local SeaUnitOnTransportAttach = SeaUnit.OnTransportAttach
 local SeaUnitOnTransportDetach = SeaUnit.OnTransportDetach
