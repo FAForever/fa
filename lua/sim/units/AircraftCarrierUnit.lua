@@ -82,9 +82,13 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
-    ---@param damageType string
-    ---@param excessDamageRatio number
+    ---@param damageType? string
+    ---@param excessDamageRatio? number
     Kill = function(self, instigator, damageType, excessDamageRatio)
+        -- needs to be defined
+        damageType = damageType or "Normal"
+        excessDamageRatio = excessDamageRatio or 0
+
         self:KillCargo(instigator, damageType, excessDamageRatio)
         SeaUnitKill(self, instigator, damageType, excessDamageRatio)
     end,

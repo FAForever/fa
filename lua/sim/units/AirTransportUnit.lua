@@ -116,9 +116,13 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
     ---@param self AirTransport
     ---@param instigator Unit
-    ---@param damageType DamageType
-    ---@param excessDamageRatio number
+    ---@param damageType? DamageType
+    ---@param excessDamageRatio? number
     Kill = function(self, instigator, damageType, excessDamageRatio)
+        -- needs to be defined
+        damageType = damageType or "Normal"
+        excessDamageRatio = excessDamageRatio or 0
+
         self:KillCargo(instigator, damageType, excessDamageRatio)
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
