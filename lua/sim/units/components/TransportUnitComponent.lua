@@ -103,8 +103,10 @@ BaseTransport = ClassSimple {
 
             -- cache the cargo so we can impact it later (if needed)
             -- exception for command units, which explode immediately
-            if not EntityCategoryContains(categories.COMMAND, unit) and cacheCargo then
+            if not EntityCategoryContains(categories.COMMAND, unit) then
                 unit.killedInTransport = true
+            end
+            if cacheCargo then
                 table.insert(self.cargoCache, unit)
             end
 
