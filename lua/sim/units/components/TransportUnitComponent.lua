@@ -102,6 +102,13 @@ BaseTransport = ClassSimple {
         local cargoMass = 0
 
         for _, unit in cargo do
+
+            -- If it's an external factory unit, just destroy it and continue
+            if EntityCategoryContains(categories.EXTERNALFACTORYUNIT, unit) then
+                unit:Destroy()
+                continue
+            end
+
             -- Kill the contents of a transport in a transport, however that happened
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then
                 cargoMass = cargoMass + unit:KillCargo(instigator, cargoDamageType, true)
