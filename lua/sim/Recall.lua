@@ -270,7 +270,6 @@ local function ArmyRequestRecall(army, teammates)
         end
     else
         -- it's just us; recall our army
-        SPEW("Recalling " .. brain.Nickname)
         brain:RecallAllCommanders()
 
     end
@@ -287,6 +286,11 @@ function SetRecallVote(data)
         if army == focus then
             SyncCannotRequestRecall("scenario")
         end
+        return
+    end
+    if ArmyBrains[army]:IsDefeated() then
+        SyncCannotRequestRecall("observer")
+        SPEW("Defeated army " .. tostring(army) .. " (" .. GetArmyBrain(army).Nickname .. ") trying to vote for recall!")
         return
     end
     local vote = data.Vote and true or false
@@ -327,13 +331,17 @@ function SetRecallVote(data)
             end
             return
         end
-        SPEW("Army " .. tostring(army) .. " is requesting recall for " .. table.concat(team, ','))
+        if teammates > 0 then
+            SPEW("Recall request from " .. brain.Nickname .. " for " .. table.concat(team, ','))
+        else
+            SPEW("Recalling " .. brain.Nickname)
+        end
         brain.RecallVote = vote
         ArmyRequestRecall(army, teammates)
     else
         -- the player is responding to a recall request; we don't count this against their
         -- individual recall request cooldown
-        SPEW("Army " .. tostring(army) .. " recall vote: " .. (vote and "yes" or "no"))
+        SPEW("Recall vote for " .. brain.Nickname .. ": " .. (vote and "yes" or "no"))
         brain.RecallVote = vote
 
         -- if the vote will already be decided with this vote, close the voting session
