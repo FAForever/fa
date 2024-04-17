@@ -92,7 +92,7 @@ BaseTransport = ClassSimple {
             self.cargoCache = {}
         end
 
-        -- Establish a local variable for counting our cargo haul
+        -- Count our cargo's total veterancy value to disperse
         local cargoMass = 0
 
         for _, unit in cargo do
