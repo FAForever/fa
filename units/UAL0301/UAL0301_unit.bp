@@ -56,8 +56,8 @@ UnitBlueprint{
         AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 968,
-        Health = 15000,
-        MaxHealth = 15000,
+        Health = 12000,
+        MaxHealth = 11000,
         RegenRate = 17,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 30,
@@ -189,7 +189,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 27100,
         BuildCostMass = 1950,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = { "BUILTBYTIER3ENGINEER AEON" },
         MaxBuildDistance = 10,
@@ -432,6 +432,7 @@ UnitBlueprint{
             BuildTime = 6048,
             Icon = "ss",
             Name = "<LOC enhancements_0031>Reacton Refractor",
+            NewDamageMod = 200;
             NewDamageRadiusMod = 3.5,
             NewMaxRadius = 40,
             Slot = "RCH",
@@ -606,7 +607,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 100,
             DamageType = "Normal",
             DisplayName = "Reacton Cannon",
             FireTargetLayerCapsTable = {

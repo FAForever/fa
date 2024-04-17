@@ -61,8 +61,8 @@ UnitBlueprint{
         AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 6155,
-        Health = 15500,
-        MaxHealth = 15500,
+        Health = 12500,
+        MaxHealth = 12500,
         RegenRate = 15,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 527,
@@ -198,7 +198,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 30200,
         BuildCostMass = 2400,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = { "BUILTBYTIER3ENGINEER SERAPHIM" },
         MaxBuildDistance = 10,
@@ -398,6 +398,7 @@ UnitBlueprint{
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
             Slot = "RCH",
+            NewDamageMod = 200,
             UpgradeEffectBones = {
                 "Right_Arm_Muzzle",
                 "Right_Arm_Barrel",

@@ -141,7 +141,7 @@ UAL0301 = ClassUnit(CommandUnit) {
             -- StabilitySupressant
         elseif enh == 'StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
+            wep:AddDamageMod(bp.NewDamageMod or 200)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
         elseif enh == 'StabilitySuppressantRemove' then
