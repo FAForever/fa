@@ -86,7 +86,11 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
     ---@param excessDamageRatio? number
     Kill = function(self, instigator, damageType, excessDamageRatio)
         -- handle the cargo killing
-        self:KillCargo(instigator)
+        -- skip for transports inside other transports, as our KillCargo will have
+        -- already been recursively called from the parent transports KillCargo call
+        if damageType ~= "TransportInternal" and damageType ~= "TransportExternal" then
+            self:KillCargo(instigator)
+        end
         -- these need to be defined for certain behaviors (like ctrl-k) to function
         damageType = damageType or "Normal"
         excessDamageRatio =  excessDamageRatio or 0

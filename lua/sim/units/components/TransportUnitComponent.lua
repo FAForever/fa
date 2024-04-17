@@ -1,3 +1,6 @@
+TableInsert = table.insert
+TableEmpty = table.empty
+
 ---@class BaseTransport
 ---@field DisableIntelOfCargo boolean
 ---@field cargoCache? table
@@ -70,27 +73,29 @@ BaseTransport = ClassSimple {
     --- For units that store their cargo externally, it caches the cargo for later impact.
     ---@param self BaseTransport | Unit
     ---@param instigator Unit
-    ---@param damageType? DamageType -- an override for when we have a transport with external storage inside internal storage
-    ---@param disperseVeterancy? boolean -- To prevent lower recursions from jumping the gun on veterancy
+    ---@param damageType? DamageType -- an override for when we have a transport inside another transports internal storage
+    ---@param recursive? boolean -- if we're in a recursive call or not
     ---@return number? cargoMass -- The total mass value of the cargo
-    KillCargo = function(self, instigator, damageType, disperseVeterancy)
-
+    KillCargo = function(self, instigator, damageType, recursive)
         -- If we're dead already, bail to avoid crashing
         if self.Dead then return 0 end
 
         local cargo = self:GetCargo()
+        if TableEmpty(cargo) then return 0 end
 
-        -- If we don't have storage slots (we have externally attached cargo), cache the cargo for when we deal with it when it falls off
-        local cacheCargo = self:GetBlueprint().Transport.StorageSlots == 0
+        local cacheCargo = true
+        local cargoDamageType
 
-        if cacheCargo and not table.empty(cargo) then
-            if not damageType then damageType = "TransportExternal" end
-            self.killInstigator = instigator
-            self.cargoCache = {}
+        -- We need to determine how to handle the cargo
+        -- Units in external storage have anims, effects, etc. and OnImpact is called for them
+        -- Units in internal storage are just killed/destroyed, and relevant numbers tallied up
+        if damageType == "TransportInternal" or self:GetBlueprint().Transport.StorageSlots ~= 0 then
+            cargoDamageType = "TransportInternal"
+            cacheCargo = false
         else
-            -- if we have internal storage, we want to override the damage type so that transports (with
-            -- external storage, like stingers) inside the *internal* storage don't handle cargo like it's external
-            damageType = "TransportInternal"
+            cargoDamageType = "TransportExternal"
+            self.cargoCache = {}
+            self.killInstigator = instigator
         end
 
         -- Count our cargo's total veterancy value to disperse
@@ -98,18 +103,15 @@ BaseTransport = ClassSimple {
 
         for _, unit in cargo do
             -- Kill the contents of a transport in a transport, however that happened
-            -- now with recursion!
             if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-                cargoMass = cargoMass + unit:KillCargo(instigator, damageType, false)
+                cargoMass = cargoMass + unit:KillCargo(instigator, cargoDamageType, true)
             end
 
             -- cache the cargo so we can impact it later (if needed)
             -- exception for command units, which explode immediately
-            if not EntityCategoryContains(categories.COMMAND, unit) then
+            if not EntityCategoryContains(categories.COMMAND, unit) and cacheCargo then
                 unit.SkipOnKilled = true
-            end
-            if cacheCargo then
-                table.insert(self.cargoCache, unit)
+                TableInsert(self.cargoCache, unit)
             end
 
             -- record the veterancy value of the unit
@@ -119,13 +121,13 @@ BaseTransport = ClassSimple {
             -- the engine will allegedly handle actually killing the unit, but misses some, so we'll
             -- explicitly kill our unit (with an instigator) to avoid units slipping through the cracks
             -- (and so the engine can properly update kill counts, both for score and unit kills)
-            unit:Kill(instigator, damageType, 0)
+            unit:Kill(instigator, cargoDamageType, 0)
         end
 
-        if disperseVeterancy ~= false then
-            self:VeterancyDispersal(cargoMass)
-        else
+        if recursive then
             return cargoMass
+        else
+            self:VeterancyDispersal(cargoMass)
         end
     end,
 
