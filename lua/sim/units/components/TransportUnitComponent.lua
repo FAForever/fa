@@ -111,7 +111,8 @@ BaseTransport = ClassSimple {
             end
 
             -- record the veterancy value of the unit
-            cargoMass = cargoMass + unit:GetTotalMassCost()
+            -- only take remaining health, so we don't double count
+            cargoMass = cargoMass + unit:GetTotalMassCost() * (unit:GetHealth() / unit:GetMaxHealth())
 
             -- the engine will allegedly handle actually killing the unit, but misses some, so we'll
             -- explicitly kill our unit (with an instigator) to avoid units slipping through the cracks
