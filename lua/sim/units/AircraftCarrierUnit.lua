@@ -85,11 +85,11 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
     ---@param damageType? string
     ---@param excessDamageRatio? number
     Kill = function(self, instigator, damageType, excessDamageRatio)
-        -- needs to be defined
-        damageType = damageType or "Normal"
-        excessDamageRatio = excessDamageRatio or 0
-
+        -- handle the cargo killing
         self:KillCargo(instigator)
+        -- these need to be defined for certain behaviors (like ctrl-k) to function
+        damageType = damageType or "Normal"
+        excessDamageRatio =  excessDamageRatio or 0
         SeaUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 }
