@@ -1494,7 +1494,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- Skip all audio/visual/death threads/shields/etc. if we're in internal storage
         -- (presumably these should already have been removed when the unit entered storage)
-        if type ~= "TransportInternal" then
+        if type ~= "TransportDamage" then
             -- Units killed while being invisible because they're teleporting should show when they're killed
             if self.TeleportFx_IsInvisible then
                 self:ShowBone(0, true)
@@ -1547,7 +1547,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
 
         -- If we're in internal storage, we're done, destroy the unit to avoid any errors
-        if type == "TransportInternal" then
+        if type == "TransportDamage" then
             self:Destroy()
         end
     end,

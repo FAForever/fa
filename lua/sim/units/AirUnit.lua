@@ -183,7 +183,7 @@ AirUnit = ClassUnit(MobileUnit) {
         then
             self.Dead = true
             -- We want to skip all the visual/audio/shield bounce/death weapon stuff if we're in internal storage
-            if type ~= "TransportInternal" then
+            if type ~= "TransportDamage" then
                 self:CreateUnitAirDestructionEffects(1.0)
                 self:DestroyTopSpeedEffects()
                 self:DestroyBeamExhaust()
@@ -231,7 +231,7 @@ AirUnit = ClassUnit(MobileUnit) {
             self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
 
             -- If we're in internal storage, we're done, destroy the unit to avoid OnImpact errors
-            if type == "TransportInternal" then
+            if type == "TransportDamage" then
                 self:Destroy()
             end
         else

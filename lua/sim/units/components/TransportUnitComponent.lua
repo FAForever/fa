@@ -89,11 +89,11 @@ BaseTransport = ClassSimple {
         -- We need to determine how to handle the cargo
         -- Units in external storage have anims, effects, etc. and OnImpact is called for them
         -- Units in internal storage are just killed/destroyed, and relevant numbers tallied up
-        if damageType == "TransportInternal" or self:GetBlueprint().Transport.StorageSlots ~= 0 then
-            cargoDamageType = "TransportInternal"
+        if damageType == "TransportDamage" or self:GetBlueprint().Transport.StorageSlots ~= 0 then
+            cargoDamageType = "TransportDamage"
             cacheCargo = false
         else
-            cargoDamageType = "TransportExternal"
+            cargoDamageType = "Normal"
             self.cargoCache = {}
             self.killInstigator = instigator
         end
@@ -146,7 +146,7 @@ BaseTransport = ClassSimple {
         for _, unit in self.cargoCache or {} do
             if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(self.killInstigator, "TransportExternal", 0)
+                unit:OnKilled(self.killInstigator, "Normal", 0)
             end
         end
     end

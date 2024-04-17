@@ -122,7 +122,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         -- handle the cargo killing
         -- skip for transports inside other transports, as our KillCargo will have
         -- already been recursively called from the parent transports KillCargo call
-        if damageType ~= "TransportInternal" and damageType ~= "TransportExternal" then
+        if damageType ~= "TransportDamage" then
             self:KillCargo(instigator)
         end
         -- these need to be defined for certain behaviors (like ctrl-k) to function
