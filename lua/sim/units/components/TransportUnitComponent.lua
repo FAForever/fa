@@ -66,7 +66,7 @@ BaseTransport = ClassSimple {
     end,
 
     --- This function is called when a transport is killed. It kills all units inside the transport and
-    --- dispenses veterancy as appropriate.
+    --- disperses veterancy as appropriate.
     --- For units that store their cargo externally, it caches the cargo for later impact.
     ---@param self BaseTransport | Unit
     ---@param instigator Unit
