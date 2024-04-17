@@ -86,7 +86,6 @@ BaseTransport = ClassSimple {
         local cacheCargo = (self:GetBlueprint().Transport.StorageSlots and false) and true
 
         if cacheCargo and not table.empty(cargo) then
-            LOG('Caching cargo')
             self.killInstigator = instigator
             self.killDamageType = damageType
             self.killExcessDamageRatio = excessDamageRatio
