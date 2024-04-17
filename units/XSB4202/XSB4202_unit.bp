@@ -102,7 +102,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 7000,
         BuildCostMass = 700,
-        BuildRate = 12.98,
+        BuildRate = 20,
         BuildTime = 1250,
         BuildableCategory = { "xsb4301" },
         MaintenanceConsumptionPerSecondEnergy = 250,
