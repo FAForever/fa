@@ -123,7 +123,15 @@ CaptureReticle = ClassUI(Reticle) {
 
             local time, energy = GetBlueprintCaptureCost(targetBp, selectionBuildRate)
 
-            self.eText:SetText(string.format('%.0f (-%.0f)', energy, energy/time))
+            local rate
+            if time == 0 then
+                -- pretend to capture in 1 tick
+                rate = energy * 10
+            else
+                rate = energy/time
+            end
+
+            self.eText:SetText(string.format('%.0f (%.0f)', energy, -rate))
             local minutes = MathFloor(time/60)
             local seconds = time - 60 * minutes
             self.tText:SetText(string.format('%02.0f:%02.0f', minutes, seconds))
