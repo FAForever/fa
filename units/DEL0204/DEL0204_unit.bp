@@ -182,7 +182,7 @@ UnitBlueprint{
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 115,
     Transport = {
-        CanFireFromTransport = false,
+        CanFireFromTransport = true,
         TransportClass = 2,
     },
     Veteran = {
@@ -207,6 +207,7 @@ UnitBlueprint{
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,
             FireTargetLayerCapsTable = {
+                Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
@@ -274,6 +275,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Heavy Fragmentation Grenade Launcher",
             FireTargetLayerCapsTable = {
+                Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
