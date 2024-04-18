@@ -3,13 +3,9 @@ local Util = import("/lua/utilities.lua")
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
-------------------------------------
---   HIRO LASER COLLISION BEAM
-------------------------------------
+-- Used by UEF Battlecruiser XES0307's TDFHiroPlasmaCannon
 ---@class TDFHiroCollisionBeam : CollisionBeam
 TDFHiroCollisionBeam = Class(CollisionBeam) { 
-    -- used by UEF battlecruser
-
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.TDFHiroGeneratorMuzzle01,
