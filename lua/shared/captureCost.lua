@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024 IL1I1
+--** Copyright (c) 2024 lL1l1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 -- - pure: they should only use the arguments provided, do not touch any global state.
 -- - sim / ui proof: they should work for both sim code and ui code.
 
---- Formula to compute the energy and time cost of capturing.
+--- Formula to compute the energy and time cost of capturing
 ---@param blueprint UnitBlueprint
 ---@param number buildRate
 ---@return number time
