@@ -1,6 +1,6 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
 
 -- Not used anymore. Tiny Cybran pulsing beam previously used by Cerberus and Rhino CDFParticleCannon
 ---@class ParticleCannonCollisionBeam : SCCollisionBeam

@@ -2,7 +2,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
-local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
 
 -- Used by Aeon Galactic Colossus UAL0401's ADFPhasonLaser
 ---@class PhasonLaserCollisionBeam : SCCollisionBeam

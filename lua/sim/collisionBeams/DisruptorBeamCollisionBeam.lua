@@ -1,6 +1,6 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
 
 -- Not used. Aeon style beam sized for a small unit
 ---@class DisruptorBeamCollisionBeam : SCCollisionBeam
