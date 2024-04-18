@@ -1546,7 +1546,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
 
-        -- If we're in internal storage, we're done, destroy the unit to avoid any errors
+        -- If we're in internal storage, destroy the unit since DeathThread isn't played to destroy it
         if type == "TransportDamage" then
             self:Destroy()
         end
