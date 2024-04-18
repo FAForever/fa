@@ -13,8 +13,9 @@ local watchForQueueChange = import("/lua/ui/game/construction.lua").watchForQueu
 local checkBadClean = import("/lua/ui/game/construction.lua").checkBadClean
 local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
+local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
-local AreaReclaimDragger = import("/lua/ui/controls/draggers/areareclaim.lua").AreaReclaimDragger
+local AreaDragger = import("/lua/ui/controls/draggers/areareclaim.lua").AreaDragger
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -500,7 +501,7 @@ end
 function OnCommandIssued(command)
 
     if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        AreaReclaimDragger(command)
+        AreaDragger({ Func = 'ExtendReclaimOrder', Args = {} })
     end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
