@@ -13,7 +13,6 @@ local watchForQueueChange = import("/lua/ui/game/construction.lua").watchForQueu
 local checkBadClean = import("/lua/ui/game/construction.lua").checkBadClean
 local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
-local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
 local AreaReclaimDragger = import("/lua/ui/controls/draggers/areareclaim.lua").AreaReclaimDragger
 
