@@ -237,14 +237,19 @@ end
 ---@return boolean # if further user sync should happen
 local function ArmyVoteRecall(army, vote, lastVote)
     if lastVote then
+        local foundThread = false
         for index, ally in ArmyBrains do
-            if army ~= index and IsAlly(army, index) and not ally:IsDefeated() then
+            if army ~= index and IsAlly(army, index) then
                 local thread = ally.recallVotingThread
                 if thread then
                     ResumeThread(thread) -- end voting period
+                    foundThread = true
                     break
                 end
             end
+        end
+        if not foundThread then
+            SPEW("Unable to find recall voting thread for " .. GetArmyBrain(army).Nickname .. '!')
         end
     end
 
@@ -302,22 +307,26 @@ function SetRecallVote(data)
     local teammates = 0
     local team = {}
     for index, ally in ArmyBrains do
-        if army ~= index and not ally:IsDefeated() and IsAlly(army, index) and not ArmyIsCivilian(index) then
-            if ally.BrainType ~= "Human" then
-                if army == focus then
-                    SyncCannotRequestRecall("ai")
+        if army ~= index and IsAlly(army, index) and not ArmyIsCivilian(index) then
+            if not ally:IsDefeated() then
+                if ally.BrainType ~= "Human" then
+                    if army == focus then
+                        SyncCannotRequestRecall("ai")
+                    end
+                    return
                 end
-                return
-            end
-            if ally.RecallVote == vote then
-                likeVotes = likeVotes + 1
-            end
+                if ally.RecallVote == vote then
+                    likeVotes = likeVotes + 1
+                end
 
-            local allyHasVoted = ally.RecallVote ~= nil
-            lastVote = lastVote and allyHasVoted -- only the last vote if all allies have also voted
-            isRequest = isRequest and not allyHasVoted -- only a request if no allies have voted yet
-            teammates = teammates + 1
-            team[teammates] = ally.Nickname
+                local allyHasVoted = ally.RecallVote ~= nil
+                lastVote = lastVote and allyHasVoted -- only the last vote if all allies have also voted
+                isRequest = isRequest and not allyHasVoted -- only a request if no allies have voted yet
+                teammates = teammates + 1
+                team[teammates] = ally.Nickname
+            elseif ally.recallVotingThread then
+                isRequest = false
+            end
         end
     end
 
