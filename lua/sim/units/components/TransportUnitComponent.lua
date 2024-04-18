@@ -147,7 +147,7 @@ BaseTransport = ClassSimple {
         for _, unit in self.cargoCache or {} do
             if not unit:BeenDestroyed() then
                 unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(self.killInstigator, "Normal", 0)
+                unit:OnKilled(self.killInstigator, "", 0)
             end
         end
     end
