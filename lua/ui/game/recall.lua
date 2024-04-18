@@ -336,7 +336,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         if passed then
             self:OnVoteAccepted()
         else
-            self:OnVoteVetoed()
+            self:OnVoteRejected()
         end
     end,
 
@@ -429,7 +429,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         self.label:SetText(LOC("<LOC diplomacy_0023>Recalling..."))
     end,
 
-    OnVoteVetoed = function(self)
+    OnVoteRejected = function(self)
         import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote did not pass."))
         self.label:SetText(LOC("<LOC diplomacy_0024>Not ready for recall"))
     end,
