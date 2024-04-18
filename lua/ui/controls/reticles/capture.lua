@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024  IL1I1
+--** Copyright (c) 2024  lL1l1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -27,32 +27,66 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
 local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
+
+local ObserveSelection = import("/lua/ui/game/gamemain.lua").ObserveSelection
  
 -- Local upvalues for performance
 local GetRolloverInfo = GetRolloverInfo
 local GetSelectedUnits = GetSelectedUnits
 local MathFloor = math.floor
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local tableEmpty = table.empty
 
---- Reticle for capture cost info
+---@param units UserUnit[]
+---@return number totalBuildRate
+local getBuildRateOfCapturerUnits = function(units)
+    local capturerUnits = EntityCategoryFilterDown(categories.CAPTURE, units)
+    if not tableEmpty(capturerUnits) then
+        local totalBuildRate = 0
+        for _, unit in capturerUnits do
+            totalBuildRate = totalBuildRate + unit:GetBuildRate()
+        end
+        return totalBuildRate
+    end
+    return 0
+end
+
+---@type number
+local selectionBuildRate
+---@param cachedSelection { oldSelection: UserUnit[], newSelection: UserUnit[], added: UserUnit[], removed: UserUnit[] }
+local OnSelectionChanged = function(cachedSelection)
+    selectionBuildRate = selectionBuildRate + getBuildRateOfCapturerUnits(cachedSelection.added) - getBuildRateOfCapturerUnits(cachedSelection.removed)
+end
+
+
+--- Reticle that displays the capture cost and rate of hovered-over units based on the current selection
 ---@class CaptureReticle : UIReticle
 ---@field BuildTimeIcon Bitmap
 ---@field EnergyCostIcon Bitmap
 ---@field eText Text
 ---@field tText Text
----@field selectionBuildRate number
 ---@field focusArmy Army
 CaptureReticle = ClassUI(Reticle) {
 
     ---@param self CaptureReticle
-    SetLayout = function(self)
-        local selection = GetSelectedUnits()
-        local totalBuildRate = 0
-        for _, unit in selection do
-            totalBuildRate = totalBuildRate + unit:GetBuildRate()
-        end
-        self.selectionBuildRate = totalBuildRate
+    ---@param parent Control
+    ---@param data any
+    __init = function(self, parent, data)
+        Reticle.__init(self, parent, data)
+
         self.focusArmy = GetFocusArmy()
 
+        selectionBuildRate = getBuildRateOfCapturerUnits(GetSelectedUnits())
+        ObserveSelection:AddObserver(OnSelectionChanged, "CaptureReticleSelectionObserver")
+    end,
+
+    ---@param self CaptureReticle
+    OnDestroy = function(self)
+        ObserveSelection:AddObserver(nil, "CaptureReticleSelectionObserver")
+    end,
+
+    ---@param self CaptureReticle
+    SetLayout = function(self)
         self.BuildTimeIcon = Bitmap(self)
         self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
         LayoutHelpers.SetDimensions(self.BuildTimeIcon, 19, 19)
@@ -95,7 +129,7 @@ CaptureReticle = ClassUI(Reticle) {
                 self:SetHidden(false)
             end
 
-            local time, energy = GetBlueprintCaptureCost(targetBp, self.selectionBuildRate)
+            local time, energy = GetBlueprintCaptureCost(targetBp, selectionBuildRate)
 
             self.eText:SetText(string.format('%.0f (-%.0f)', energy, energy/time))
             local minutes = MathFloor(time/60)
