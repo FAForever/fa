@@ -63,7 +63,6 @@ function CDROverChargeThread( cdr )
                 local priList = { categories.COMMAND, categories.EXPERIMENTAL, categories.TECH3 * categories.INDIRECTFIRE,
                     categories.TECH3 * categories.MOBILE, categories.TECH2 * categories.INDIRECTFIRE, categories.MOBILE * categories.TECH2,
                     categories.TECH1 * categories.INDIRECTFIRE, categories.TECH1 * categories.MOBILE, categories.ALLUNITS }
-                --LOG('*AI DEBUG: ARMY ' , repr(aiBrain:GetArmyIndex()),  ': CDR AI ACTIVATE - Commander go fight stuff! -- ' .. numUnits)
                 local target
                 local continueFighting = true
                 local counter = 0
@@ -124,7 +123,7 @@ function CDROverChargeThread( cdr )
                         IssueToUnitMove(cdr, {startX, 0, startZ} )
                     end
                 end
-                --LOG('*AI DEBUG: ARMY ', repr(aiBrain:GetArmyIndex()),  ': CDR AI DEACTIVATE - Nothing to see here!')
+
                 if aiBrain:PlatoonExists(plat) then
                     cdr:ForkThread( CDRRepairBuildingUnit, plat )
                 end

@@ -41,8 +41,8 @@ AirUnit = ClassUnit(MobileUnit) {
     end,
 
     ---@param self AirUnit
-    ---@param new string
-    ---@param old string
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         MobileUnitOnMotionVertEventChange(self, new, old)
 

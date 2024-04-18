@@ -227,7 +227,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self:ChangeState(self.Transporting)
                 return
             end
-            self:LogDebug(string.format('Reclaim engineer navigating to position '..repr(destination)))
+            self:LogDebug(string.format('Reclaim engineer navigating to position {%f, %f, %f}', unpack(destination)))
 
             while not IsDestroyed(self) do
                 local origin = eng:GetPosition()

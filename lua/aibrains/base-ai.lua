@@ -245,7 +245,7 @@ AIBrain = Class(StandardBrain) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', tostring(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,

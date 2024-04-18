@@ -57,7 +57,7 @@ function DoCallback(name, data, units)
     if fn then
         fn(data, units)
     else
-        SPEW('No callback named: ' .. repr(name))
+        SPEW('No callback named: ' .. tostring(name))
     end
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
@@ -97,14 +97,14 @@ end
 Callbacks.SetStatByCallback = function(data, units)
     for stat, value in data do
         if not type(value) == 'boolean' then
-            WARN('SetStatByCallback: received non boolean value ' .. repr(value) .. ' for stat ' .. repr(stat) .. '!')
+            WARN('SetStatByCallback: received non boolean value ' .. tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
             continue
         end
         value = (value and 1) or 0 -- numerize our bool
         for _, u in units or {} do
             if IsEntity(u) and OkayToMessWithArmy(u.Army) then
                 if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
-                    WARN('SetStatByCallback: ' .. repr(stat) .. ' is not a valid stat for this unit!')
+                    WARN('SetStatByCallback: ' .. tostring(stat) .. ' is not a valid stat for this unit!')
                     continue
                 end
                 u:UpdateStat(stat, value)
@@ -1285,7 +1285,7 @@ end
 Callbacks.ModeratorEvent = function(data)
     -- show up in the game logs
     local brain = GetArmyBrain(GetCurrentCommandSource())
-    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), repru(data, 10000)))
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
 end
 
 --#endregion
