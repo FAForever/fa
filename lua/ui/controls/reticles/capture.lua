@@ -24,6 +24,8 @@ local Bitmap   = import("/lua/maui/bitmap.lua").Bitmap
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Layouter = LayoutHelpers.ReusedLayoutFor
+
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
 local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
@@ -87,22 +89,12 @@ CaptureReticle = ClassUI(Reticle) {
 
     ---@param self CaptureReticle
     SetLayout = function(self)
-        self.BuildTimeIcon = Bitmap(self)
-        self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
-        LayoutHelpers.SetDimensions(self.BuildTimeIcon, 19, 19)
+        self.EnergyCostIcon = Layouter(Bitmap(self)):Texture(UIUtil.UIFile('/game/unit_view_icons/energy.dds')):Width(19):Height(19):RightOf(self, 4):End()
+        self.BuildTimeIcon = Layouter(Bitmap(self)):Texture(UIUtil.UIFile('/game/unit_view_icons/time.dds')):Width(19):Height(19):Below(self.EnergyCostIcon, 4):End()
 
-        self.EnergyCostIcon = Bitmap(self)
-        self.EnergyCostIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/energy.dds'))
-        LayoutHelpers.SetDimensions(self.EnergyCostIcon, 19, 19)
-
-        self.eText = UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)
-        self.tText = UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)
-        LayoutHelpers.RightOf(self.EnergyCostIcon, self, 4)
-        LayoutHelpers.RightOf(self.eText, self.EnergyCostIcon, 2)
-        LayoutHelpers.Below(self.BuildTimeIcon, self.EnergyCostIcon, 4)
-        LayoutHelpers.RightOf(self.tText, self.BuildTimeIcon, 2)
-
-        self.eText:SetColor('fff7c70f') -- from economy_mini.lua, same color as the energy stored/storage text
+        -- eText color is from economy_mini.lua, same color as the energy stored/storage text
+        self.eText = Layouter(UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)):RightOf(self.EnergyCostIcon, 4):Color('fff7c70f'):End()
+        self.tText = Layouter(UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)):RightOf(self.BuildTimeIcon, 4):End()
     end,
 
     ---@param self CaptureReticle
