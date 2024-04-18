@@ -22,7 +22,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread(self.ScorchThread)   
             end
         else
             KillThread(self.Scorching)
@@ -32,7 +32,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     end,
 
     ---@param self UltraChromaticBeamGeneratorCollisionBeam
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
@@ -48,7 +48,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
         -- local FriendlyFire = self.DamageData.DamageFriendly
         
         while true do
-            if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
+            if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 70, 50, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
@@ -60,7 +60,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
                 
-            WaitSeconds( self.ScorchSplatDropTime )
+            WaitSeconds(self.ScorchSplatDropTime)
             size = 1 + (Random() * 1)
             CurrentPosition = self:GetPosition(1)
         end

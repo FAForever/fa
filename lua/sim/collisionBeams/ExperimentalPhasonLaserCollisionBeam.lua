@@ -33,7 +33,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     end,
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
@@ -49,7 +49,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
         -- local FriendlyFire = self.DamageData.DamageFriendly
         
         while true do
-            if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
+            if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
@@ -61,7 +61,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
                 
-            WaitSeconds( self.ScorchSplatDropTime )
+            WaitSeconds(self.ScorchSplatDropTime)
             size = 4.0 + (Random() * 1.0)
             CurrentPosition = self:GetPosition(1)
         end
@@ -71,8 +71,8 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     CreateBeamEffects = function(self)
         SCCollisionBeam.CreateBeamEffects(self)
         for k, v in EffectTemplate.SExperimentalPhasonLaserBeam do
-			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), v )
-			table.insert( self.BeamEffectsBag, fxBeam )
+			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), v)
+			table.insert(self.BeamEffectsBag, fxBeam)
 			self.Trash:Add(fxBeam)
         end
         -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )

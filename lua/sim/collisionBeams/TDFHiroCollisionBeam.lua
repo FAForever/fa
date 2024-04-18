@@ -20,7 +20,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread(self.ScorchThread)   
             end
         else
             KillThread(self.Scorching)
@@ -30,7 +30,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
     end,
 
     ---@param self TDFHiroCollisionBeam
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   
@@ -46,7 +46,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
         -- local FriendlyFire = self.DamageData.DamageFriendly
         
         while true do
-            if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
+            if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 70, army )
                 LastPosition = CurrentPosition
                 skipCount = 1
@@ -58,7 +58,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
                 skipCount = skipCount + self.ScorchSplatDropTime
             end
                 
-            WaitSeconds( self.ScorchSplatDropTime )
+            WaitSeconds(self.ScorchSplatDropTime)
             size = 1.2 + (Random() * 1.5)
             CurrentPosition = self:GetPosition(1)
         end
