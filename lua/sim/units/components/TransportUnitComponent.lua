@@ -1,5 +1,6 @@
-TableInsert = table.insert
-TableEmpty = table.empty
+local TableInsert = table.insert
+local TableEmpty = table.empty
+local EntityCategoryContains = EntityCategoryContains
 
 ---@class BaseTransport
 ---@field DisableIntelOfCargo boolean
