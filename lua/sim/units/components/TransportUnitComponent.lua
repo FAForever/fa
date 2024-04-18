@@ -91,7 +91,7 @@ BaseTransport = ClassSimple {
         -- Units in internal storage are just killed/destroyed, and relevant numbers tallied up
         -- Units in external storage have anims, effects, etc. and OnImpact is called for them
         if damageType == "TransportDamage" or self:GetBlueprint().Transport.StorageSlots ~= 0 then
-            cargoDamageType = "TransportDamage"
+            cargoDamageType = "TransportDamage" -- This damage type makes sure we skip death effects for internal cargo
             cacheCargo = false
         else
             cargoDamageType = "Normal"
