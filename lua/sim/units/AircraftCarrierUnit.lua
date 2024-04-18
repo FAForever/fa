@@ -91,8 +91,8 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
         if damageType ~= "TransportDamage" then
             self:KillCargo(instigator)
         end
-        -- these need to be defined for certain behaviors (like ctrl-k) to function
-        damageType = damageType or "Normal"
+        -- certain behaviors (like ctrl-k) will call this with nil parameters, but they must be defined for the engine's Kill function to work
+        damageType = damageType or ""
         excessDamageRatio =  excessDamageRatio or 0
         SeaUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
