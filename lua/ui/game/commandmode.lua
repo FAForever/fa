@@ -505,9 +505,6 @@ function OnCommandIssued(command)
     if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
         RadialDragger('1', { Func = 'ExtendReclaimOrder', Args = {} })
     end
-    
-    reprsl(command)
-    reprsl(modeData)
 
         -- Area reclaim dragger, command mode only
     -- '1' is the left mouse button KeyCode
