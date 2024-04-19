@@ -1,6 +1,4 @@
-local PropFile = import("/lua/sim/prop.lua")
-local Prop = PropFile.Prop
-local Entity = PropFile.Entity
+local Entity = import('/lua/sim/Entity.lua').Entity
 local FireEffects = import("/lua/effecttemplates.lua").TreeBurning01
 local ApplyWindDirection = import("/lua/effectutilities.lua").ApplyWindDirection
 local CreateScorchMarkSplat = import("/lua/defaultexplosions.lua").CreateScorchMarkSplat
@@ -153,7 +151,7 @@ EntityTree = Class(Entity) {
     ---@param instigator Unit
     PlayUprootingEffect = function(self, instigator)
         CreateEmitterAtEntity( self, -1, '/effects/emitters/tree_uproot_01_emit.bp' )
-        self:PlayPropSound('TreeFall')
+        self:PlaySound('TreeFall')
     end,
 
     --- Contains all the falling logic
@@ -227,8 +225,8 @@ EntityTree = Class(Entity) {
         effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
 
         -- sounds
-        self:PlayPropSound('BurnStart')
-        self:PlayPropAmbientSound('BurnLoop')
+        self:PlaySound('BurnStart')
+        self:PlayAmbientSound('BurnLoop')
 
         -- wait a bit before we change to a scorched tree
         WaitTicks(50 + Random(0, 10))
@@ -258,7 +256,7 @@ EntityTree = Class(Entity) {
         DamageArea(self, position, 1, 1, 'TreeFire', true)
 
         -- stop all sound
-        self:PlayPropAmbientSound(nil)
+        self:PlayAmbientSound(nil)
 
         -- destroy all effects
         for k = 1, effectsHead - 1 do 
@@ -278,8 +276,27 @@ EntityTree = Class(Entity) {
         end
     end,
 
-    PlayPropSound = Prop.PlayPropSound,
-    PlayPropAmbientSound = Prop.PlayPropAmbientSound,
+    ---@param self EntityTree
+    ---@param sound string The identifier in the prop blueprint.
+    PlaySound = function(self, sound)
+        local bp = self.Blueprint.Audio
+        if bp and bp[sound] then
+            self:PlaySound(bp[sound])
+        end
+    end,
+
+    ---@param self EntityTree
+    ---@param sound string
+    PlayAmbientSound = function(self, sound)
+        if sound == nil then
+            self:SetAmbientSound(nil, nil)
+        else
+            local bp = self.Blueprint.Audio
+            if bp and bp[sound] then
+                self:SetAmbientSound(bp[sound], nil)
+            end
+        end
+    end,
 }
 
 ---@param treeGroup Prop
