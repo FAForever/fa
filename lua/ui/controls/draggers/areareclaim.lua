@@ -1,9 +1,10 @@
 local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 
----@param callbackTable table -- Should be of the form {Func = function, Args = {}} or {Func = "$simCallbackString", Args = {}}
----@param minRadius? number -- Optional radius, smaller than this will cancel the drag
-function AreaDragger(callbackTable, minRadius)
+---@param eventKey string -- button code for the dragger, dragger will watch for this button to be released
+---@param callbackTable table -- should be of the form {Func = function, Args = {}} or {Func = "$simCallbackString", Args = {}}
+---@param minRadius? number -- optional radius, smaller than this will cancel the drag and do nothing
+function AreaDragger(eventKey, callbackTable, minRadius)
 
     local view = import("/lua/ui/game/worldview.lua").viewLeft
     if not view then
@@ -33,7 +34,7 @@ function AreaDragger(callbackTable, minRadius)
         if rad > (minRadius or 1) then
             -- add our radius to our callback parameter table
             callbackTable.Args.Radius = rad
-            if type(callbackTable.Func) == string then
+            if type(callbackTable.Func) == "string" then
                 -- If our function in the callback table is a string, it's a SimCallback
                 SimCallback(callbackTable, true)
             else
@@ -51,7 +52,6 @@ function AreaDragger(callbackTable, minRadius)
         self:Destroy()
     end
 
-    -- Whatever this is, it registers the dragger with the engine
-    -- event.KeyCode is currently hard coded to '1', but should probably be obtained from the event
-    PostDragger(view:GetRootFrame(), '1', dragger)
+    -- Register the dragger with the engine
+    PostDragger(view:GetRootFrame(), eventKey, dragger)
 end

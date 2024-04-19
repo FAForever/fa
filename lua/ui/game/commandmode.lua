@@ -500,8 +500,10 @@ end
 ---@return boolean
 function OnCommandIssued(command)
 
+    -- Area reclaim dragger, command mode only
+    -- 
     if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        AreaDragger({ Func = 'ExtendReclaimOrder', Args = {} })
+        AreaDragger("1", { Func = 'ExtendReclaimOrder', Args = {} })
     end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
