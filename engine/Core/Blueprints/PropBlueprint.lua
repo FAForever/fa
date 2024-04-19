@@ -21,7 +21,7 @@
 ---@class PropBlueprintDisplay
 --- Name of mesh blueprint to use. Leave blank to use default mesh.
 ---@field MeshBlueprint string
----@field MeshBlueprintWreck string
+---@field MeshBlueprintWrecked FileName
 ---@field MeshBlueprintInvisible string
 
 ---@class PropBlueprintEconomy
