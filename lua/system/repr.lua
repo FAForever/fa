@@ -65,9 +65,6 @@ end
 ---@param str string
 ---@return string
 local function smartQuote(str)
-    if match(str, '"') and not match(str, "'") then
-        return "'" .. str .. "'"
-    end
     return '"' .. gsub(str, '"', '\\"') .. '"'
 end
 

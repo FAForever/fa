@@ -7,8 +7,10 @@
 ---@field Display PropBlueprintDisplay
 ---@field Economy PropBlueprintEconomy
 ---@field Physics PropBlueprintPhysics
+---@field SingleTreeDir? string
 ---@field ScriptClass PropType Class name for this prop
 ---@field ScriptModule FileName File to find class in
+
 
 ---@class PropBlueprintDefense
 --- max health value for the prop
@@ -19,6 +21,8 @@
 ---@class PropBlueprintDisplay
 --- Name of mesh blueprint to use. Leave blank to use default mesh.
 ---@field MeshBlueprint string
+---@field MeshBlueprintWreck string
+---@field MeshBlueprintInvisible string
 
 ---@class PropBlueprintEconomy
 --- maximum reclaimable mass in this prop (taking damage removes some)

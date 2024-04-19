@@ -269,11 +269,25 @@ Tree = Class(Prop) {
 }
 
 ---@class TreeGroup : Prop
+---@field IsBroken? boolean
 TreeGroup = Class(Prop) {
 
     IsTree = true,
     IsTreeGroup = true,
-    
+
+    OnCreate = function(self)
+        Prop.OnCreate(self)
+
+        ForkThread(
+            function()
+                -- if we wait a tick then this magically no longer works, but it does for individual trees?
+                WaitTicks(1)
+                LOG("Mesh changed from ", self.Blueprint.Display.MeshBlueprint, " to ", self.Blueprint.Display.MeshBlueprintInvisible)
+                EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintInvisible)
+            end
+        )
+    end,
+
     --- Break when colliding with a projectile of some sort
     ---@param self TreeGroup
     ---@param other string
@@ -302,23 +316,24 @@ TreeGroup = Class(Prop) {
 
     --- Breaks up the tree group into smaller trees
     ---@param self TreeGroup
-    ---@param instigator Unit
-    ---@param amount number
-    ---@param direction Vector
-    ---@param type DamageType
     ---@return (Tree[])?
     Breakup = function(self)
+
         -- can't do much when we're destroyed
-        if EntityBeenDestroyed(self) then
+        if EntityBeenDestroyed(self) or self.IsBroken then
             return
         end
 
-        -- a group with a single prop type in it
-        if self.Blueprint.SingleTreeBlueprint then
-            return SplitProp(self, self.Blueprint.SingleTreeBlueprint)
-        -- a group with multiple prop types in it
-        else 
-            return self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
+        -- 'remove' the mesh
+        self.IsBroken = true
+
+        -- create the children
+        local props = self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
+
+        local trash = self.Trash
+        for k = 1, table.getn(props) do
+            local prop = props[k]
+            trash:Add(prop)
         end
     end,
 }

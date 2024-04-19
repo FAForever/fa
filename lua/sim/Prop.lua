@@ -299,7 +299,7 @@ Prop = Class(moho.prop_methods) {
     --- You can pass an optional 'dirprefix' arg saying where to look for the child props.
     --- If not given, it defaults to one directory up from this prop's blueprint location.
     ---@param self Prop
-    ---@param dirprefix string
+    ---@param dirprefix? string
     ---@return table
     SplitOnBonesByName = function(self, dirprefix)
 
@@ -337,20 +337,19 @@ Prop = Class(moho.prop_methods) {
 
             -- determine prop name (removing _01, _02 from bone name)
             trimmedBoneName = StringGsub(bone, "_?[0-9]+$", "")
-            blueprint = dirprefix .. trimmedBoneName .. "_prop.bp"
+            blueprint = dirprefix .. trimmedBoneName .. "_prop_generated.bp"
 
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
             if ok then
                 out:SetMaxReclaimValues(time, mass, energy)
-                props[ibone] = out
+                TableInsert(props, out)
             else
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
                 WARN(out)
             end
         end
 
-        self:Destroy()
         return props
     end,
 

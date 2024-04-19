@@ -2899,6 +2899,16 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
     return float4( color.rgb, alpha );
 }
 
+/// InvisiblePS
+///
+/// Lighting using normal maps.
+/// Used by some props, mostly trees
+float4 InvisiblePS( NORMALMAPPED_VERTEX vertex) : COLOR0
+{
+    clip(1);
+    return float4(0, 0, 0, 0);
+}
+
 /// MapImagerPS0
 ///
 ///
@@ -5065,6 +5075,71 @@ technique UndulatingNormalMappedAlpha_LowFidelity
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 VertexNormalPS_LowFidelity( true, d3d_Greater, 0x80 );
+    }
+}
+
+/// Invisible
+///
+/// Normal mapped with alpha test.  No color mask or glow.
+technique Invisible_HighFidelity
+<
+    int fidelity = FIDELITY_HIGH;
+
+    string abstractTechnique = "Invisible";
+    string cartographicTechnique = "CartographicFeature";
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_a InvisiblePS();
+    }
+}
+
+technique Invisible_MedFidelity
+<
+    int fidelity = FIDELITY_MEDIUM;
+
+    string abstractTechnique = "Invisible";
+    string cartographicTechnique = "CartographicFeature";
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_a InvisiblePS();
+    }
+}
+
+technique Invisible_LowFidelity
+<
+    int fidelity = FIDELITY_LOW;
+
+    string abstractTechnique = "Invisible";
+    string cartographicTechnique = "CartographicFeature";
+
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable )
+        RasterizerState( Rasterizer_Cull_CW )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 InvisiblePS();
     }
 }
 

@@ -993,7 +993,7 @@ function PostModBlueprints(all_bps)
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
     PostProcessUnits(all_bps, all_bps.Unit)
-    PostProcessProps(all_bps.Prop)
+    PostProcessProps(all_bps, all_bps.Prop)
 end
 
 --- Loads all blueprints with optional parameters  

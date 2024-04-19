@@ -36,10 +36,73 @@ local function PostProcessProp(prop)
     end
 end
 
---- Post-processes all props
 ---@param props PropBlueprint[]
-function PostProcessProps(props)
+local function CreateUnreclaimableVersion(props, prop)
+    ---@type PropBlueprint
+    local staticProp = table.deepcopy(prop)
+
+    -- update categories
+    staticProp.CategoriesHash['GENERATED'] = true
+    staticProp.CategoriesHash['RECLAIMABLE'] = nil
+    staticProp.Categories = table.keys(staticProp.CategoriesHash)
+
+    -- update blueprint id
+    staticProp.BlueprintId = string.sub(prop.BlueprintId, 1, string.len(prop.BlueprintId) -3) .. '_generated.bp'
+
+    -- add to the props we load in
+    props[staticProp.BlueprintId] = staticProp
+end
+
+---@param allBlueprints BlueprintsTable
+---@param prop PropBlueprint
+local function CreateInvisblePropMesh(allBlueprints, prop)
+
+    local meshid = prop.Display.MeshBlueprint
+    if not meshid then
+        return
+    end
+
+    local meshbp = allBlueprints.Mesh[meshid]
+    if not meshbp then
+        return
+    end
+
+    local mesh = table.deepcopy(meshbp)
+    if mesh.LODs then
+        for _, lod in mesh.LODs do
+            lod.ShaderName = 'Invisible'
+            lod.LODCutoff  = 1
+        end
+    end
+
+    mesh.BlueprintId = prop.Display.MeshBlueprint .. '_invisible'
+    MeshBlueprint(mesh)
+
+    LOG("Created invisible blueprint mesh:", mesh.BlueprintId)
+
+    -- keep track of the mesh blueprint
+    prop.Display.MeshBlueprintInvisible = mesh.BlueprintId
+
+end
+
+--- Post-processes all props
+---@param allBlueprints BlueprintsTable
+---@param props PropBlueprint[]
+function PostProcessProps(allBlueprints, props)
     for _, prop in props do
         PostProcessProp(prop)
+    end
+
+    local generatedProps = {}
+    for _, prop in props do
+        CreateUnreclaimableVersion(generatedProps, prop)
+    end
+
+    for _, prop in props do
+        CreateInvisblePropMesh(allBlueprints, prop)
+    end
+
+    for id, blueprint in generatedProps do
+        props[id] = blueprint
     end
 end
