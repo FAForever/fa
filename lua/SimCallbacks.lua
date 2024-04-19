@@ -738,6 +738,28 @@ do
         import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true, data.Radius)
     end
 
+        ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendAttackOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 10 ) or lastCommand.target then
+            return
+        end
+
+        local target = lastCommand.target --[[@as Unit | Prop]]
+        import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection, {lastCommand.x, lastCommand.y, lastCommand.z}, true, data.Radius)
+    end
+
 end
 
 --#endregion
