@@ -120,6 +120,7 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        MaxGroundVariation = 1.1,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
