@@ -15,7 +15,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
-local AreaDragger = import("/lua/ui/controls/draggers/areareclaim.lua").AreaDragger
+local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -501,9 +501,9 @@ end
 function OnCommandIssued(command)
 
     -- Area reclaim dragger, command mode only
-    -- 
+    -- '1' is the left mouse button KeyCode
     if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        AreaDragger("1", { Func = 'ExtendReclaimOrder', Args = {} })
+        RadialDragger('1', { Func = 'ExtendReclaimOrder', Args = {} })
     end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately

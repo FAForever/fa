@@ -4,7 +4,7 @@ local Dragger = import('/lua/maui/dragger.lua').Dragger
 ---@param eventKey string -- button code for the dragger, dragger will watch for this button to be released
 ---@param callbackTable table -- should be of the form {Func = function, Args = {}} or {Func = "$simCallbackString", Args = {}}
 ---@param minRadius? number -- optional radius, smaller than this will cancel the drag and do nothing
-function AreaDragger(eventKey, callbackTable, minRadius)
+function RadialDragger(eventKey, callbackTable, minRadius)
 
     local view = import("/lua/ui/game/worldview.lua").viewLeft
     if not view then
