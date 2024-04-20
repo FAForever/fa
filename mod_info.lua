@@ -3,7 +3,7 @@
 -- Documentation for the extended FAF mod_info.lua format can be found here:
 -- https://github.com/FAForever/fa/wiki/mod_info.lua-documentation
 name = "Forged Alliance Forever"
-version = 3808
+version = 3809          -- needs to be an integer as it is parsed as a short (16 bit integer)
 _faf_modname='faf'
 copyright = "Forged Alliance Forever Community"
 description = "Forged Alliance Forever extends Forged Alliance, bringing new patches, game modes, units, ladder, and much more!"
