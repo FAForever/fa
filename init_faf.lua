@@ -8,8 +8,6 @@
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
 
-local GameType = rawget(_G, "GameType")
-
 LOG("Client version: " .. tostring(ClientVersion))
 LOG("Game version: " .. tostring(GameVersion))
 LOG("Game type: " .. tostring(GameType))
