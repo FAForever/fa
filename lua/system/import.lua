@@ -163,9 +163,11 @@ function import(name, isLazy)
         -- load immediately if said so
         LoadModule(module)
     end
-
-    indent = indent - 1
-
+    
+    if informDevOfLoad then
+        indent = indent - 1
+    end
+    
     return module
 end
 
