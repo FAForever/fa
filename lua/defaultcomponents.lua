@@ -1,4 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
+local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -867,8 +868,21 @@ ExternalFactoryComponent = ClassSimple {
         -- create the factory somewhere completely unrelated
         local px, py, pz = self:GetPositionXYZ(self.FactoryAttachBone)
 
+        -- the anchor entity prevents the "deploy" command from detaching
+        -- the external factory from the base unit
+        local anchorEntity = Entity({Owner = self})
+        self.Trash:Add(anchorEntity)
+        anchorEntity:AttachTo(self, self.FactoryAttachBone)
+
+        -- the anchor unit has the "CARRIER" category, which prevents the
+        -- external factory from being highlighted or selected with the cursor, but
+        -- doesn't prevent selecting it with the exFac button
+        local anchorUnit = CreateUnitHPR('ZXA0003', self.Army, px, py, pz, 0, 0, 0)
+        self.Trash:Add(anchorUnit)
+        anchorUnit:AttachTo(anchorEntity, -1)
+
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, px, py, pz, 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
+        self.ExternalFactory:AttachTo(anchorUnit, -1)
         self.ExternalFactory:SetCreator(self)
         self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
