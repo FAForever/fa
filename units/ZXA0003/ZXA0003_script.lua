@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024 FAForever
+--** Copyright (c) 2022  clyf
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,38 +20,22 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- You can learn more about how the server parses this type of file here:
--- - https://github.com/FAForever/faf-java-commons/blob/develop/faf-commons-data%2Fsrc%2Fmain%2Fjava%2Fcom%2Ffaforever%2Fcommons%2Fmod%2FModReader.java
--- 
--- You can learn more about how the game parses this type of file here:
--- - https://github.com/FAForever/fa/blob/deploy/fafdevelop/lua/MODS.LUA
+local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
 
-name = "Forged Alliance Forever"
-version = 3809          -- needs to be an integer as it is parsed as a short (16 bit integer)
-_faf_modname='faf'
-copyright = "Forged Alliance Forever Community"
-description = "Forged Alliance Forever extends Forged Alliance, bringing new patches, game modes, units, ladder, and much more!"
-author = "Forged Alliance Forever Community"
-url = "https://www.faforever.com"
-uid = "dcd9a5e5-5444-4266-a016-edfaff528268"
-selectable = false
-exclusive = false
-ui_only = false
-conflicts = {}
-mountpoints = {
-    etc = "/etc",
-    env = "/env",
-    loc = '/loc',
-    schook = '/schook',
-    effects = '/effects',
-    lua = '/lua',
-    meshes = '/meshes',
-    modules = '/modules',
-    projectiles = '/projectiles',
-    textures = '/textures',
-    units = '/units',
-    props = '/props'
+---@class ZXA0003 : DummyUnit
+ZXA0003 = ClassUnit(DummyUnit) {
+
+    OnCreate = function (self)
+        self:HideBone(0, true)
+        -- do not allow the unit to be killed or to take damage
+        self.CanTakeDamage = false
+
+        -- do not allow the unit to be reclaimed or targeted by weapons
+        self:SetReclaimable(false)
+        self:SetDoNotTarget(true)
+    end,
+
+    DetachFrom = function(self)
+    end,
 }
-hooks = {
-    '/schook'
-}
+TypeClass = ZXA0003
