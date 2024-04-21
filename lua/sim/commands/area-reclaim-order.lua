@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024 Willem 'Jip' Wijnia
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -145,10 +145,9 @@ end
 
 --- Applies additional reclaim orders to nearby similar entities that are similar to the target
 ---@param units Unit[]
----@param target Unit | Prop
+---@param ps Unit | 
 ---@param doPrint boolean           # if true, prints information about the order
----@param radius? number
-function AreaReclaimOrder(units, target, doPrint, radius)
+function AreaReclaimOrder(units, ps, pe, width, doPrint)
     local unitCount = TableGetn(units)
     if unitCount == 0 then
         return
@@ -158,5 +157,100 @@ function AreaReclaimOrder(units, target, doPrint, radius)
         return ReclaimAdjacentUnits(units, target, doPrint)
     elseif IsProp(target) then
         return ReclaimNearbyProps(units, target, doPrint, radius)
+    end
+end
+
+---@param units Unit[]
+---@param ps Vector
+---@param pe Vector
+---@param width number
+---@param doPrint boolean
+function AreaReclaimProps(units, ps, pe, width, doPrint)
+
+    local processed = 0
+
+    -- determine the direction from ps to pe
+    local dx = ps[1] - pe[1]
+    local dz = ps[3] - pe[3]
+    local distance = math.sqrt(dx * dx + dz * dz)
+
+    local nx = (1 / distance) * dx
+    local nz = (1 / distance) * dz
+
+    -- orthogonal normalized direction
+    local ox = nz
+    local oz = -nx
+
+    -- determine edge points
+    local ps1 = { ps[1] + width * ox, ps[2], ps[3] + width * oz }
+    local ps2 = { ps[1] - width * ox, ps[2], ps[3] - width * oz }
+
+    local pe1 = { pe[1] + width * ox, pe[2], pe[3] + width * oz }
+    local pe2 = { pe[1] - width * ox, pe[2], pe[3] - width * oz }
+
+    -- determine bounding box
+    local minX = math.min(ps1[1], ps2[1], pe1[1], pe2[1])
+    local minZ = math.min(ps1[3], ps2[3], pe1[3], pe2[3])
+    local maxX = math.max(ps1[1], ps2[1], pe1[1], pe2[1])
+    local maxZ = math.max(ps1[3], ps2[3], pe1[3], pe2[3])
+
+    local reclaim = GetReclaimablesInRect(minX, minZ, maxX, maxZ)
+    if reclaim then
+
+        -- clean up previous iterations
+        for entityId, _ in distances do
+            distances[entityId] = nil
+        end
+
+        -- compute distances for sorting
+        for k = 1, TableGetn(reclaim) do
+            local entity = reclaim[k] --[[@as Prop]]
+            local ex, _, ez = entity:GetPositionXYZ()
+            local dx, dz = ps[1] - ex, ps[3] - ez
+            distances[entity.EntityId] = dx * dx + dz * dz
+        end
+
+        -- sort the props by distance
+        TableSort(reclaim, lambdaSortProps)
+
+        -- compute distances for filtering
+        for k = 1, TableGetn(reclaim) do
+            local entity = reclaim[k] --[[@as Prop]]
+            local ex, _, ez = entity:GetPositionXYZ()
+
+            -- project onto the line segment
+            -- https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+
+            local pvx = ex - ps[1]
+            local pvz = ez - ps[3]
+            local wvx = pe[1] - ps[1]
+            local wvz = pe[3] - ps[3]
+            local dot = pvx * wvx + pvz * wvz
+            local t = math.max(0, math.min(1, dot / (distance * distance)))
+            local prx = ps[1] + t * wvx
+            local prz = ps[3] + t * wvz
+
+            -- compute distance of projected vector
+            local dx = ex - prx
+            local dz = ez - prz
+            distances[entity.EntityId] = dx * dx + dz * dz
+        end
+
+        -- filter the props by distance
+        for k = 1, TableGetn(reclaim) do
+            local entity = reclaim[k] --[[@as Prop]]
+            if IsProp(entity) and
+                entity.MaxMassReclaim > 0 and
+                (not entity.IsTree) and
+                distances[entity.EntityId] <= width * width
+            then
+                IssueReclaim(units, entity)
+                processed = processed + 1
+            end
+        end
+    end
+
+    if doPrint and processed > 0 and (GetFocusArmy() == GetCurrentCommandSource()) then
+        print(StringFormat("Reclaiming %d additional props", processed))
     end
 end

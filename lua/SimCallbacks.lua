@@ -97,7 +97,8 @@ end
 Callbacks.SetStatByCallback = function(data, units)
     for stat, value in data do
         if not type(value) == 'boolean' then
-            WARN('SetStatByCallback: received non boolean value ' .. tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
+            WARN('SetStatByCallback: received non boolean value ' ..
+                tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
             continue
         end
         value = (value and 1) or 0 -- numerize our bool
@@ -716,7 +717,7 @@ end
 
 do
 
-    ---@param data table
+    ---@param data { Distance: number, Vector: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
         -- verify selection
@@ -734,11 +735,43 @@ do
             return
         end
 
-        local target = lastCommand.target --[[@as Unit | Prop]]
-        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true, data.Radius)
+        reprsl(data, { depth = 2, })
+
+        local ps = lastCommand.target:GetPosition()
+        local pe = data.Vector
+        local dx = ps[1] - pe[1]
+        local dz = ps[3] - pe[3]
+        local distance = math.sqrt(dx * dx + dz * dz)
+
+
+        local nx = (1 / distance) * dx
+        local nz = (1 / distance) * dz
+
+        -- radius = math.min(distance, maximumDistance)
+
+
+        local width = 5
+        local ox = nz
+        local oz = -nx
+
+        DrawCircle(ps, 1, 'ffffff')
+        DrawCircle(pe, 1, 'ffffff')
+        local ps1 = { ps[1] + width * ox, ps[2], ps[3] + width * oz }
+        local ps2 = { ps[1] - width * ox, ps[2], ps[3] - width * oz }
+
+        DrawCircle(ps1, 1, 'ffffff')
+        DrawCircle(ps2, 1, 'ffffff')
+
+        local pe1 = { pe[1] + width * ox, pe[2], pe[3] + width * oz }
+        local pe2 = { pe[1] - width * ox, pe[2], pe[3] - width * oz }
+
+        DrawCircle(pe1, 1, 'ffffff')
+        DrawCircle(pe2, 1, 'ffffff')
+
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimProps(selection, ps, pe, 5, true)
     end
 
-        ---@param data table
+    ---@param data table
     ---@param selection Unit[]
     Callbacks.ExtendAttackOrder = function(data, selection)
         -- verify selection
@@ -752,12 +785,13 @@ do
         local queue = unit:GetCommandQueue()
         local lastCommand = queue[table.getn(queue)]
 
-        if not (lastCommand and lastCommand.commandType == 10 ) or lastCommand.target then
+        if not (lastCommand and lastCommand.commandType == 10) or lastCommand.target then
             return
         end
 
         local target = lastCommand.target --[[@as Unit | Prop]]
-        import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection, {lastCommand.x, lastCommand.y, lastCommand.z}, true, data.Radius)
+        import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection,
+            { lastCommand.x, lastCommand.y, lastCommand.z }, true, data.Radius)
     end
 
 end

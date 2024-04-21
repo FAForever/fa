@@ -16,6 +16,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
+local VectorDragger = import("/lua/ui/controls/draggers/vector.lua").VectorDragger
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -503,7 +504,7 @@ function OnCommandIssued(command)
     -- Area reclaim dragger, command mode only
     -- '1' is the left mouse button KeyCode
     if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        RadialDragger('1', { Func = 'ExtendReclaimOrder', Args = {} })
+        VectorDragger('1', { Func = 'ExtendReclaimOrder', Args = {} }, 5, 20)
     end
 
         -- Area reclaim dragger, command mode only
