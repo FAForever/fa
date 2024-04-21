@@ -1065,10 +1065,6 @@
 ---@field BuildRestriction UnitBuildRestriction
 --- acceleration to allow unit to catch up to the target when it starts to drift
 ---@field CatchUpAcc number
---- used by the Loyalist for its charge ability
----@field ChargeAccMult? number
---- used by the Loyalist for its charge ability
----@field ChargeSpeedMult? number
 --- unknown if significant in `Physics`
 ---@field CollisionOffsetX? number
 --- if a naval factory uses the special rolloff point computation
@@ -1106,8 +1102,11 @@
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsX number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsY number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
 --- method of locomotion
@@ -1128,7 +1127,7 @@
 ---@field RotateBodyWhileMoving? boolean
 --- if this unit can try to rotate on the spot
 ---@field RotateOnSpot? boolean
---- threshold for rotate on spot to take effect when moving
+--- threshold speed in ogrids/s for rotate on spot to take effect. defaults to 0.5
 ---@field RotateOnSpotThreshold? number
 --- unknown behavior, used by Spiderbot and Megabot
 ---@field SinkLower? boolean
@@ -1148,9 +1147,10 @@
 ---@field SubSpeedMultiplier? number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
---- turn radius for the unit, in wolrd units
+--- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
+--- and if it results in a faster turn rate than `TurnRate`. Disabled at 0
 ---@field TurnRadius number
---- turn radius for the unit, in degrees per second
+--- turn rate for the unit, in degrees per second. Turning acts improperly when at 0
 ---@field TurnRate number
 --- when present, the speed multiplier is set to this number when entering the water layer
 ---@field WaterSpeedMultiplier? number
