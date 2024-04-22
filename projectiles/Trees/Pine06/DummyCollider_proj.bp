@@ -1,0 +1,41 @@
+ProjectileBlueprint {
+    Categories = {
+        'PROJECTILE',
+        'HELPER',
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 175,
+            LODs = {
+                {
+                    AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
+                    LODCutoff = 150,
+                    MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
+                    NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
+                    ShaderName = 'Unit',
+                    SpecularName = '/Units/UEA0001/UEA0001_SpecTeam.dds',
+                },
+            },
+        },
+        UniformScale = 0.01,
+    },
+    General = {
+        Category = 'HELPER',
+        EntityCategory = {
+            'PROJECTILE',
+            'HELPER',
+        },
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        CollideSurface = true,
+        DestroyOnWater = false,
+        InitialSpeed = 0,
+        LeadTarget = false,
+        UseGravity = false,
+        VelocityAlign = false,
+        RotationalVelocity = 0,
+    },
+}
