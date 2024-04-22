@@ -161,6 +161,7 @@ XSL0301 = ClassUnit(CommandUnit) {
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            wep:AddDamageMod(bp.NewDamageMod or -300)
             local wep = self:GetWeaponByLabel('OverCharge')
             wep:ChangeMaxRadius(35)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')

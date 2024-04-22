@@ -57,7 +57,7 @@ UnitBlueprint{
         ArmorType = "Normal",
         EconomyThreatLevel = 968,
         Health = 12000,
-        MaxHealth = 11000,
+        MaxHealth = 12000,
         RegenRate = 17,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 30,

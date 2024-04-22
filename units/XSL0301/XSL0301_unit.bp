@@ -398,7 +398,7 @@ UnitBlueprint{
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
             Slot = "RCH",
-            NewDamageMod = 200,
+            NewDamageMod = 300,
             UpgradeEffectBones = {
                 "Right_Arm_Muzzle",
                 "Right_Arm_Barrel",
