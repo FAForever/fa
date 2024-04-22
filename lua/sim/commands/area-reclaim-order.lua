@@ -202,7 +202,7 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
             distances[entityId] = nil
         end
 
-        -- compute distances for sorting
+        -- compute squared distances for sorting
         for k = 1, TableGetn(reclaim) do
             local entity = reclaim[k] --[[@as Prop]]
             local ex, _, ez = entity:GetPositionXYZ()
@@ -213,7 +213,7 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
         -- sort the props by distance
         TableSort(reclaim, lambdaSortProps)
 
-        -- compute distances for filtering
+        -- compute squared distances for filtering
         for k = 1, TableGetn(reclaim) do
             local entity = reclaim[k] --[[@as Prop]]
             local ex, _, ez = entity:GetPositionXYZ()
@@ -230,7 +230,7 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
             local prx = ps[1] + t * wvx
             local prz = ps[3] + t * wvz
 
-            -- compute distance of projected vector
+            -- compute squared distance of projected vector
             local dx = ex - prx
             local dz = ez - prz
             distances[entity.EntityId] = dx * dx + dz * dz
@@ -240,7 +240,7 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
         for k = 1, TableGetn(reclaim) do
             local entity = reclaim[k] --[[@as Prop]]
             if IsProp(entity) and
-                entity.MaxMassReclaim > 0 and
+                entity.MaxMassReclaim > 1 and
                 (not entity.IsTree) and
                 distances[entity.EntityId] <= width * width
             then
