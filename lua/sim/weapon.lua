@@ -409,6 +409,10 @@ Weapon = ClassWeapon(WeaponMethods) {
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self.Blueprint
         local damageTable = {}
+ 
+        if weaponBlueprint.DamageToShields then
+            damageTable.DamageToShields = weaponBlueprint.DamageToShields
+        end
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
         damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod

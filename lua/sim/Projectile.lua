@@ -695,6 +695,22 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 -- check for entity-specific damage
             elseif DamageData.DamageAmount and targetEntity then
 
+                local damageToShields = DamageData.DamageToShields
+                local entityShield = targetEntity.MyShield or targetEntity.IsOn and targetEntity
+                if damageToShields and entityShield and entityShield.IsOn() then
+                    local health = entityShield:GetHealth()
+                    if damageToShields > health then
+                        damageToShields = health
+                    end
+                    Damage(
+                        instigator,
+                        cachedPosition,
+                        entityShield,
+                        damageToShields,
+                        DamageData.DamageType
+                    )
+                end
+
                 -- check for damage-over-time
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
 
