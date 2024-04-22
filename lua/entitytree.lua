@@ -19,7 +19,7 @@ local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
 
-local EntityMethods = moho.entity_methods 
+local EntityMethods = moho.entity_methods
 local EntityDestroy = EntityMethods.Destroy
 local EntitySetMesh = EntityMethods.SetMesh
 local EntitySetScale = EntityMethods.SetScale
@@ -47,19 +47,24 @@ EntityTree = Class(Entity) {
     ---@param self EntityTree
     ---@param spec EntitySpec
     OnCreate = function(self, spec)
+        LOG('EntityTree on create')
         self.Trash = TrashBag()
         self.EntityId = self:GetEntityId()
         self.Blueprint = spec.Blueprint
-        self.CachePosition = self:GetPosition()
         local scale = self.Blueprint.Display.UniformScale
 
         EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
-        EntitySetScale(self, scale *2, scale *2, scale *2)
+        EntitySetScale(self, scale *0.5, scale *2, scale *0.5)
         self:SetCollisionShape('Box', 0,0,0, self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ)
+
+        self:SetPosition(spec.Pos, true)
+        --self:SetOrientation(spec.Quat, true)
+        self.CachePosition = spec.Pos
     end,
 
     ---@param self EntityTree
     OnDestroy = function(self)
+        LOG('EntityTree on destroy')
         Entity.OnDestroy(self)
 
         -- reduce burning tree count
@@ -73,6 +78,7 @@ EntityTree = Class(Entity) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
+        LOG('EntityTree on collision check')
         return not self.Fallen
     end,
 
@@ -115,19 +121,21 @@ EntityTree = Class(Entity) {
         local canFall = not self.Fallen 
         local canBurn = (not self.Burning) and (not self.NoBurn)
 
+        --EntityDestroy(self)
+        --if true then return end
         if type == 'Disintegrate' or type == "Reclaimed" then
             -- we just got obliterated
             EntityDestroy(self)
 
         elseif type == 'Force' or type == "TreeForce" then
-            if canFall then 
+            if canFall then
                 -- change internal state
                 self.NoBurn = true
                 self.Fallen = true
                 TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
 
                 -- change the mesh
-                EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
+                --EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
             end
 
         elseif type == 'Nuke' and canBurn then
@@ -137,7 +145,6 @@ EntityTree = Class(Entity) {
             end
 
         elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
-
             -- fire type damage, slightly higher odds to catch fire
             if Random(1, 35) <= 2 then
                 self:Burn()
@@ -168,8 +175,12 @@ EntityTree = Class(Entity) {
     ---@param depth number
     FallThread = function(self, dx, dy, dz, depth)
         -- make it fall down
-        local motor = self:FallDown()
-        motor:Whack(dx, dy, dz, depth, true)
+        --local motor = self:FallDown()
+        LOG('EntityTree fall thread:', dx, dy, dz, depth)
+        --if true then return end
+        --motor:Whack(dx, dy, dz, 0.1, false)
+        local rotator = CreateRotator(self, 0, 'x', 0, 10, 5, 0)
+        self.Trash:Add(rotator)
 
         -- no longer be able to catch fire after a while
         WaitTicks(150 + Random(0, 50))
@@ -306,9 +317,9 @@ EntityTree = Class(Entity) {
 }
 
 ---@param treeGroup Prop
+---@param trash TrashBag
 ---@param dirprefix? string
----@return table
-SplitIntoEntityTrees = function(treeGroup, dirprefix)
+SplitIntoEntityTrees = function(treeGroup, trash, dirprefix)
 
     -- compute directory prefix if it is not set
     if not dirprefix then
@@ -318,10 +329,9 @@ SplitIntoEntityTrees = function(treeGroup, dirprefix)
     end
 
     -- values used in the for loop
-    local trimmedBoneName, blueprint, bone, ok, out
+    local trimmedBoneName, blueprint, bone, ok, dummyProp
 
-    -- contains the new entities and the expected number of entities
-    local entities = {}
+    -- expected number of entities
     local count = treeGroup:GetBoneCount() - 1
 
     for ibone = 1, count do
@@ -337,30 +347,28 @@ SplitIntoEntityTrees = function(treeGroup, dirprefix)
         -- there's probably a way to do this directly and this is a hack job
         if not blueprint then
             blueprint = dirprefix .. trimmedBoneName .. "_prop_generated.bp"
-            ok, out = pcall(treeGroup.CreatePropAtBone, treeGroup, ibone, blueprint)
-            blueprint = out:GetBlueprint() or nil
+            ok, dummyProp = pcall(treeGroup.CreatePropAtBone, treeGroup, ibone, blueprint)
+            blueprint = dummyProp:GetBlueprint() or nil
             if not (ok and blueprint) then
                 WARN("Unable to split a prop: " .. treeGroup.Blueprint.BlueprintId .. " -> " .. blueprint)
-                WARN(out)
-                return entities
+                return
+            else
+                EntityDestroy(dummyProp)
             end
         end
 
         spec = {
             Owner = nil,
             Blueprint = blueprint,
+            Pos = treeGroup:GetPosition(ibone),
+            Quat = EulerToQuaternion(treeGroup:GetBoneDirection(ibone))
         }
         -- make our entity tree
-        entity = EntityTree(spec)
-        if entity then
-            entity:AttachTo(treeGroup, ibone)
-            entity:SetOrientation(EulerToQuaternion(treeGroup:GetBoneDirection(ibone)), true)
-            TableInsert(entity, out)
+        entityTree = EntityTree(spec)
+        if entityTree then
+            TrashAdd(trash, entityTree)
         else
             WARN("Unable to split a prop: " .. treeGroup.Blueprint.BlueprintId .. " -> " .. blueprint)
-            WARN(out)
         end
     end
-
-    return entities
 end

@@ -499,7 +499,7 @@ end
 ---@return boolean
 function OnCommandIssued(command)
 
-    if command.CommandType == 'Reclaim' and command.Target.EntityId then
+    if command.CommandType == 'Reclaim' and command.Target.EntityId and false then
         SimCallback({ Func = 'ExtendReclaimOrder', Args = { TargetId = command.Target.EntityId } }, true)
     end
 

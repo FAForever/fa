@@ -11,7 +11,10 @@ local FireEffects = import("/lua/effecttemplates.lua").TreeBurning01
 local ApplyWindDirection = import("/lua/effectutilities.lua").ApplyWindDirection
 local CreateScorchMarkSplat = import("/lua/defaultexplosions.lua").CreateScorchMarkSplat
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
-local SplitIntoEntityTrees = import("/lua/entitytree.lua").SplitIntoEntityTrees
+--local SplitIntoEntityTrees = import("/lua/entitytree.lua").SplitIntoEntityTrees
+local EntityTree = import("/lua/entitytree.lua").EntityTree
+
+local GridReclaimInstance = import("/lua/AI/GridReclaim.lua").GridReclaimInstance
 
 local BurningTrees = 0
 local MaximumBurningTrees = 150
@@ -37,6 +40,8 @@ local EffectMethods = moho.IEffect
 local EffectScaleEmitter = EffectMethods.ScaleEmitter
 local EffectOffsetEmitter = EffectMethods.OffsetEmitter
 local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
+
+local StringGsub = string.gsub
 
 ---@class Tree : Prop
 ---@field Fallen? boolean
@@ -319,6 +324,7 @@ TreeGroup = Class(Prop) {
     ---@param self TreeGroup
     ---@return (Tree[])?
     Breakup = function(self)
+        LOG('TreeGroup:Breakup')
 
         -- can't do much when we're destroyed
         if EntityBeenDestroyed(self) or self.IsBroken then
@@ -327,28 +333,63 @@ TreeGroup = Class(Prop) {
 
         -- 'remove' the mesh
         self.IsBroken = true
-        --self:Destroy()
-        --if true then return end
 
         -- create the children
-        -- local props = self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
-        local entityTrees = SplitIntoEntityTrees(self, self.Blueprint.SingleTreeDir)
-
-        local trash = self.Trash
-        for k = 1, table.getn(entityTrees) do
-            local entity = entityTrees[k]
-            trash:Add(entity)
-        end
+        -- split function adds them into the trash bag parameter automatically
+        self:SplitIntoEntityTrees()
     end,
 
     ---@param self Prop
-    OnDestroy = function(self)
-        self:CleanupUILabel()
-        self.Trash:Destroy()
+    SplitIntoEntityTrees = function(self)
 
-        -- keep track of reclaim
-        if GridReclaimInstance then
-            GridReclaimInstance:OnReclaimDestroyed(self)
+        -- compute directory prefix if it is not set
+        local dirprefix
+        if not self.Blueprint.SingleTreeDir then
+            -- default dirprefix to parent dir of our own blueprint
+            -- trim ".../groups/blah_prop.bp" to just ".../"
+            dirprefix = StringGsub(self.Blueprint.BlueprintId, "[^/]*/[^/]*$", "")
+        else
+            dirprefix = self.Blueprint.SingleTreeDir
         end
-    end,
+
+        -- expected number of entities
+        local count = self:GetBoneCount() - 1
+
+        -- determine prop name
+        local boneName = dirprefix .. StringGsub(self:GetBoneName(1), "_?[0-9]+$", "") .. "_prop_generated.bp"
+
+        -- make the prop so we can get its blueprint
+        -- there's probably a way to do this directly which makes this a hack job
+        local ok, dummyProp = pcall(self.CreatePropAtBone, self, 1, boneName)
+        local blueprint = dummyProp:GetBlueprint() or nil
+        if not (ok and blueprint) then
+            WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
+            return
+        else
+            -- we are finished with our dummy prop, destroy it
+            EntityDestroy(dummyProp)
+        end
+
+        -- declare our spec table for reuse in the loop
+        local spec = {
+            Owner = nil,
+            Blueprint = blueprint,
+        }
+
+        local trash = self.Trash
+
+        for ibone = 1, count do
+            spec.Pos = self:GetPosition(ibone)
+            local roll, pitch, yaw = self:GetBoneDirection(ibone)
+            LOG('Splitting tree at', spec.Pos, roll, pitch, yaw)
+            spec.Quat = EulerToQuaternion(roll, pitch, yaw)
+            -- make our entity tree
+            local entityTree = EntityTree(spec)
+            if entityTree then
+                TrashAdd(trash, entityTree)
+            else
+                WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
+            end
+        end
+    end
 }
