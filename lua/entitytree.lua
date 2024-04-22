@@ -61,8 +61,8 @@ EntityTree = Class(Entity) {
         self.CachePosition = spec.Pos
 
         self.Collider = self:CreateProjectileAtBone('DummyCollider', 0)
-
-        self:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY/2, self.Blueprint.SizeZ)
+        self.Collider.Parent = self
+        self.Collider:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY/2, self.Blueprint.SizeZ)
     end,
 
     ---@param self EntityTree
@@ -87,12 +87,11 @@ EntityTree = Class(Entity) {
 
     --- Collision check with units
     ---@param self EntityTree
-    ---@param other Unit
-    ---@param nx number
-    ---@param ny number
-    ---@param nz number
-    ---@param depth number
-    OnCollision = function(self, other, nx, ny, nz, depth)
+    ---@param targetType string
+    ---@param targetEntity Unit
+    OnCollision = function(self, targetType, targetEntity)
+        local pos = self.CachePosition
+        local tPos = targetEntity:GetPosition()
         LOG('EntityTree on collision')
         if self.Fallen then
             return
@@ -104,8 +103,8 @@ EntityTree = Class(Entity) {
 
         -- change internal state
         self.Fallen = true
-        TrashAdd(self.Trash, ForkThread(self.FallThread, self, nx, ny, nz, depth))
-        self:PlayUprootingEffect(other)
+        TrashAdd(self.Trash, ForkThread(self.FallThread, self, tPos[1] - pos[1], 0, tPos[3] - pos[3], 0.5))
+        self:PlayUprootingEffect(targetEntity)
     end,
 
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
@@ -159,6 +158,8 @@ EntityTree = Class(Entity) {
             if Random(1, 20) <= 1 then
                 self:Burn()
             end
+            self.Fallen = true
+            TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
         end
     end,
 
