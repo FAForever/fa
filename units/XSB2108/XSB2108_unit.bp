@@ -45,7 +45,10 @@ UnitBlueprint{
         SurfaceThreatLevel = 290,
     },
     Display = {
-        Abilities = { "<LOC ability_manuallaunch>Manual Launch" },
+        Abilities = { 
+            "<LOC ability_manuallaunch>Manual Launch", 
+            "<LOC ability_deathaoe>Volatile",
+        },
         AnimationDeath = {
             {
                 Animation = "/units/xsb2108/xsb2108_ADeath.sca",

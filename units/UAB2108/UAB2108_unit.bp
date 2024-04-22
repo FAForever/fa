@@ -44,7 +44,10 @@ UnitBlueprint{
         SurfaceThreatLevel = 290,
     },
     Display = {
-        Abilities = { "<LOC ability_manuallaunch>Manual Launch" },
+        Abilities = { 
+            "<LOC ability_manuallaunch>Manual Launch", 
+            "<LOC ability_deathaoe>Volatile",
+        },
         DamageEffects = {
             { Bone = 0,     OffsetX = 0.1,   OffsetY = 0,     OffsetZ = 0.5 },
             { Bone = 0,     OffsetX = -0.1,  OffsetY = 0,     OffsetZ = 0.5 },

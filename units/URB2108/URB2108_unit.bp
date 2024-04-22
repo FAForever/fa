@@ -41,7 +41,10 @@ UnitBlueprint{
         SurfaceThreatLevel = 290,
     },
     Display = {
-        Abilities = { "<LOC ability_manuallaunch>Manual Launch" },
+        Abilities = { 
+            "<LOC ability_manuallaunch>Manual Launch", 
+            "<LOC ability_deathaoe>Volatile",
+        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
