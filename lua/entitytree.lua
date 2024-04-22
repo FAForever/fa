@@ -22,6 +22,7 @@ local TrashDestroy = TrashBag.Destroy
 local EntityMethods = moho.entity_methods 
 local EntityDestroy = EntityMethods.Destroy
 local EntitySetMesh = EntityMethods.SetMesh
+local EntitySetScale = EntityMethods.SetScale
 local EntityBeenDestroyed = EntityMethods.BeenDestroyed
 
 local EffectMethods = moho.IEffect
@@ -50,7 +51,10 @@ EntityTree = Class(Entity) {
         self.EntityId = self:GetEntityId()
         self.Blueprint = spec.Blueprint
         self.CachePosition = self:GetPosition()
+        local scale = self.Blueprint.Display.UniformScale
 
+        EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
+        EntitySetScale(self, scale *2, scale *2, scale *2)
         self:SetCollisionShape('Box', 0,0,0, self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ)
     end,
 
@@ -80,6 +84,7 @@ EntityTree = Class(Entity) {
     ---@param nz number
     ---@param depth number
     OnCollision = function(self, other, nx, ny, nz, depth)
+        LOG('EntityTree on collision')
         if self.Fallen then
             return
         end
@@ -102,6 +107,7 @@ EntityTree = Class(Entity) {
     ---@param direction number
     ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
+        LOG('EntityTree on damage')
         if self:BeenDestroyed() then
             return
         end
@@ -336,18 +342,19 @@ SplitIntoEntityTrees = function(treeGroup, dirprefix)
             if not (ok and blueprint) then
                 WARN("Unable to split a prop: " .. treeGroup.Blueprint.BlueprintId .. " -> " .. blueprint)
                 WARN(out)
+                return entities
             end
-            
         end
 
         spec = {
-            Owner = treeGroup,
+            Owner = nil,
             Blueprint = blueprint,
         }
         -- make our entity tree
         entity = EntityTree(spec)
         if entity then
             entity:AttachTo(treeGroup, ibone)
+            entity:SetOrientation(EulerToQuaternion(treeGroup:GetBoneDirection(ibone)), true)
             TableInsert(entity, out)
         else
             WARN("Unable to split a prop: " .. treeGroup.Blueprint.BlueprintId .. " -> " .. blueprint)

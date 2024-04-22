@@ -11,6 +11,7 @@ local FireEffects = import("/lua/effecttemplates.lua").TreeBurning01
 local ApplyWindDirection = import("/lua/effectutilities.lua").ApplyWindDirection
 local CreateScorchMarkSplat = import("/lua/defaultexplosions.lua").CreateScorchMarkSplat
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local SplitIntoEntityTrees = import("/lua/entitytree.lua").SplitIntoEntityTrees
 
 local BurningTrees = 0
 local MaximumBurningTrees = 150
@@ -326,14 +327,28 @@ TreeGroup = Class(Prop) {
 
         -- 'remove' the mesh
         self.IsBroken = true
+        --self:Destroy()
+        --if true then return end
 
         -- create the children
-        local props = self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
+        -- local props = self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
+        local entityTrees = SplitIntoEntityTrees(self, self.Blueprint.SingleTreeDir)
 
         local trash = self.Trash
-        for k = 1, table.getn(props) do
-            local prop = props[k]
-            trash:Add(prop)
+        for k = 1, table.getn(entityTrees) do
+            local entity = entityTrees[k]
+            trash:Add(entity)
+        end
+    end,
+
+    ---@param self Prop
+    OnDestroy = function(self)
+        self:CleanupUILabel()
+        self.Trash:Destroy()
+
+        -- keep track of reclaim
+        if GridReclaimInstance then
+            GridReclaimInstance:OnReclaimDestroyed(self)
         end
     end,
 }

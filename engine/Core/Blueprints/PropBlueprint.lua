@@ -23,6 +23,7 @@
 ---@field MeshBlueprint string
 ---@field MeshBlueprintWrecked FileName
 ---@field MeshBlueprintInvisible string
+---@field UniformScale number
 
 ---@class PropBlueprintEconomy
 --- maximum reclaimable mass in this prop (taking damage removes some)
