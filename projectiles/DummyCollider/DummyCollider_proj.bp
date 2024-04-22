@@ -5,11 +5,11 @@ ProjectileBlueprint {
     },
     Display = {
         Mesh = {
-            IconFadeInZoom = 175,
+            IconFadeInZoom = 10000,
             LODs = {
                 {
                     AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
-                    LODCutoff = 150,
+                    LODCutoff = 10000,
                     MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
                     NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
                     ShaderName = 'Unit',
@@ -30,7 +30,7 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        CollideSurface = true,
+        CollideSurface = false,
         DestroyOnWater = false,
         InitialSpeed = 0,
         LeadTarget = false,
