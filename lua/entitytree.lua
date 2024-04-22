@@ -51,15 +51,16 @@ EntityTree = Class(Entity) {
         self.Trash = TrashBag()
         self.EntityId = self:GetEntityId()
         self.Blueprint = spec.Blueprint
-        local scale = self.Blueprint.Display.UniformScale
 
-        EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
-        EntitySetScale(self, scale *0.5, scale *2, scale *0.5)
-        self:SetCollisionShape('Box', 0,0,0, self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ)
+        EntitySetMesh(self, self.Blueprint.Display.MeshBlueprint)
+        local scale = self.Blueprint.Display.UniformScale
+        EntitySetScale(self, scale, scale, scale)
 
         self:SetPosition(spec.Pos, true)
-        --self:SetOrientation(spec.Quat, true)
+        self:SetOrientation(spec.Quat, true)
         self.CachePosition = spec.Pos
+
+        self:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ)
     end,
 
     ---@param self EntityTree
@@ -175,24 +176,22 @@ EntityTree = Class(Entity) {
     ---@param depth number
     FallThread = function(self, dx, dy, dz, depth)
         -- make it fall down
-        --local motor = self:FallDown()
-        LOG('EntityTree fall thread:', dx, dy, dz, depth)
-        --if true then return end
-        --motor:Whack(dx, dy, dz, 0.1, false)
-        local rotator = CreateRotator(self, 0, 'x', 0, 10, 5, 0)
-        self.Trash:Add(rotator)
+        -- we wait one tick, then SinkAway imperceptibly to prevent weird entity wiggling
+        self:PushOver(dx, dy, dz, depth)
+        WaitTicks(1)
+        self:SinkAway(-.001)
 
         -- no longer be able to catch fire after a while
         WaitTicks(150 + Random(0, 50))
-        self.NoBurn = true 
+        self.NoBurn = true
 
         -- make it sink after a while
-        WaitTicks(150 + Random(0, 50))
-        self:SinkAway(-.1)
+        --WaitTicks(150 + Random(0, 50))
+        --self:SinkAway(-.1)
 
         -- get rid of it when it is completely below the terrain
-        WaitTicks(100)
-        EntityDestroy(self)
+        --WaitTicks(100)
+        --EntityDestroy(self)
     end,
 
     ---@param self EntityTree
@@ -315,60 +314,3 @@ EntityTree = Class(Entity) {
         end
     end,
 }
-
----@param treeGroup Prop
----@param trash TrashBag
----@param dirprefix? string
-SplitIntoEntityTrees = function(treeGroup, trash, dirprefix)
-
-    -- compute directory prefix if it is not set
-    if not dirprefix then
-        -- default dirprefix to parent dir of our own blueprint
-        -- trim ".../groups/blah_prop.bp" to just ".../"
-        dirprefix = StringGsub(treeGroup.Blueprint.BlueprintId, "[^/]*/[^/]*$", "")
-    end
-
-    -- values used in the for loop
-    local trimmedBoneName, blueprint, bone, ok, dummyProp
-
-    -- expected number of entities
-    local count = treeGroup:GetBoneCount() - 1
-
-    for ibone = 1, count do
-
-        -- get the bone name
-        bone = treeGroup:GetBoneName(ibone)
-
-        -- determine prop name (removing _01, _02 from bone name)
-        trimmedBoneName = StringGsub(bone, "_?[0-9]+$", "")
-        
-
-        -- make the prop so we can get its blueprint
-        -- there's probably a way to do this directly and this is a hack job
-        if not blueprint then
-            blueprint = dirprefix .. trimmedBoneName .. "_prop_generated.bp"
-            ok, dummyProp = pcall(treeGroup.CreatePropAtBone, treeGroup, ibone, blueprint)
-            blueprint = dummyProp:GetBlueprint() or nil
-            if not (ok and blueprint) then
-                WARN("Unable to split a prop: " .. treeGroup.Blueprint.BlueprintId .. " -> " .. blueprint)
-                return
-            else
-                EntityDestroy(dummyProp)
-            end
-        end
-
-        spec = {
-            Owner = nil,
-            Blueprint = blueprint,
-            Pos = treeGroup:GetPosition(ibone),
-            Quat = EulerToQuaternion(treeGroup:GetBoneDirection(ibone))
-        }
-        -- make our entity tree
-        entityTree = EntityTree(spec)
-        if entityTree then
-            TrashAdd(trash, entityTree)
-        else
-            WARN("Unable to split a prop: " .. treeGroup.Blueprint.BlueprintId .. " -> " .. blueprint)
-        end
-    end
-end

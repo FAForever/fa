@@ -281,19 +281,6 @@ TreeGroup = Class(Prop) {
     IsTree = true,
     IsTreeGroup = true,
 
-    OnCreate = function(self)
-        Prop.OnCreate(self)
-
-        ForkThread(
-            function()
-                -- if we wait a tick then this magically no longer works, but it does for individual trees?
-                WaitTicks(1)
-                LOG("Mesh changed from ", self.Blueprint.Display.MeshBlueprint, " to ", self.Blueprint.Display.MeshBlueprintInvisible)
-                EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintInvisible)
-            end
-        )
-    end,
-
     --- Break when colliding with a projectile of some sort
     ---@param self TreeGroup
     ---@param other string
@@ -334,62 +321,44 @@ TreeGroup = Class(Prop) {
         -- 'remove' the mesh
         self.IsBroken = true
 
+                -- can't do much when we're destroyed
+        if EntityBeenDestroyed(self) then
+            return
+        end
+
+        local props
+
+        -- a group with a single prop type in it
+        if self.Blueprint.SingleTreeBlueprint then
+            props = SplitProp(self, self.Blueprint.SingleTreeBlueprint)
+        -- a group with multiple prop types in it
+        else 
+            props = self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
+        end
+
         -- create the children
         -- split function adds them into the trash bag parameter automatically
-        self:SplitIntoEntityTrees()
+        self:GenerateEntityTrees(props)
     end,
 
     ---@param self Prop
-    SplitIntoEntityTrees = function(self)
+    GenerateEntityTrees = function(self, props)
 
-        -- compute directory prefix if it is not set
-        local dirprefix
-        if not self.Blueprint.SingleTreeDir then
-            -- default dirprefix to parent dir of our own blueprint
-            -- trim ".../groups/blah_prop.bp" to just ".../"
-            dirprefix = StringGsub(self.Blueprint.BlueprintId, "[^/]*/[^/]*$", "")
-        else
-            dirprefix = self.Blueprint.SingleTreeDir
-        end
-
-        -- expected number of entities
-        local count = self:GetBoneCount() - 1
-
-        -- determine prop name
-        local boneName = dirprefix .. StringGsub(self:GetBoneName(1), "_?[0-9]+$", "") .. "_prop_generated.bp"
-
-        -- make the prop so we can get its blueprint
-        -- there's probably a way to do this directly which makes this a hack job
-        local ok, dummyProp = pcall(self.CreatePropAtBone, self, 1, boneName)
-        local blueprint = dummyProp:GetBlueprint() or nil
-        if not (ok and blueprint) then
-            WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
-            return
-        else
-            -- we are finished with our dummy prop, destroy it
-            EntityDestroy(dummyProp)
-        end
-
-        -- declare our spec table for reuse in the loop
-        local spec = {
-            Owner = nil,
-            Blueprint = blueprint,
-        }
-
+        local spec = {Owner = nil}
         local trash = self.Trash
 
-        for ibone = 1, count do
-            spec.Pos = self:GetPosition(ibone)
-            local roll, pitch, yaw = self:GetBoneDirection(ibone)
-            LOG('Splitting tree at', spec.Pos, roll, pitch, yaw)
-            spec.Quat = EulerToQuaternion(roll, pitch, yaw)
-            -- make our entity tree
-            local entityTree = EntityTree(spec)
-            if entityTree then
-                TrashAdd(trash, entityTree)
-            else
-                WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
-            end
+        -- cycle through props and replace each with an entity imposter
+        -- then delete the prop
+        for _, prop in props do
+            spec.Blueprint = prop:GetBlueprint()
+            spec.Pos = prop:GetPosition()
+            spec.Quat = prop:GetOrientation()
+            EntityDestroy(prop)
+            TrashAdd(trash, EntityTree(spec))
         end
+
+        -- move us underground where no one can see us
+        local x,y,z = self:GetPositionXYZ()
+        self:SetPosition({x, y - self.Blueprint.SizeY, z}, true)
     end
 }
