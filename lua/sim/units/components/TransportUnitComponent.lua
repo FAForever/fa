@@ -118,7 +118,7 @@ BaseTransport = ClassSimple {
             -- cache the cargo so we can impact it later (if needed)
             -- exception for command units, which explode immediately
             if not EntityCategoryContains(categories.COMMAND, unit) and cacheCargo then
-                unit.SkipOnKilled = true
+                unit.killedInTransport = true
                 TableInsert(self.cargoCache, unit)
             end
 
@@ -127,8 +127,8 @@ BaseTransport = ClassSimple {
             cargoMass = cargoMass + unit:GetTotalMassCost() * (unit:GetHealth() / unit:GetMaxHealth())
 
             -- the engine will allegedly handle actually killing the unit, but misses some, so we'll
-            -- explicitly kill our unit (with an instigator) to avoid units slipping through the cracks
-            -- (and so the engine can properly update kill counts, both for score and unit kills)
+            -- explicitly kill our unit to avoid any slipping through the cracks
+            -- (instigator allows engine to properly update kill counts, both for score and unit kills)
             unit:Kill(instigator, cargoDamageType, 0)
         end
 

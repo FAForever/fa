@@ -97,8 +97,8 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     OnKilled = function(self, instigator, type, overkillRatio)
         -- Skips a single OnKilled call
         -- currently used by transports with external storage, so that death effects can be applied later from OnImpact
-        if self.SkipOnKilled then
-            self.SkipOnKilled = false
+        if self.killedInTransport then
+            self.killedInTransport = false
         else
             UnitOnKilled(self, instigator, type, overkillRatio)
         end
