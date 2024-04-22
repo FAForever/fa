@@ -344,7 +344,7 @@ TreeGroup = Class(Prop) {
     ---@param self Prop
     GenerateEntityTrees = function(self, props)
 
-        local spec = {Owner = nil}
+        local spec = {Owner = 17}
         local trash = self.Trash
 
         -- cycle through props and replace each with an entity imposter

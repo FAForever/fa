@@ -60,7 +60,9 @@ EntityTree = Class(Entity) {
         self:SetOrientation(spec.Quat, true)
         self.CachePosition = spec.Pos
 
-        self:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ)
+        self.Collider = self:CreateProjectileAtBone('DummyCollider', 0)
+
+        self:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY/2, self.Blueprint.SizeZ)
     end,
 
     ---@param self EntityTree
