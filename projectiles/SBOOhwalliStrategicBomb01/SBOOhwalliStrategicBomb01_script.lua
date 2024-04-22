@@ -44,8 +44,11 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
         local data = self.DamageData
         local damage = data.DamageAmount
         local radius = data.DamageRadius or 0
+        local damageType = data.DamageType
+        local damageFriendly = data.DamageFriendly
+        local damageSelf = data.DamageSelf or false
         local instigator = self.Launcher or self
-        ForkThread(self.DamageThread, self, position, instigator, damage, radius)
+        ForkThread(self.DamageThread, self, position, instigator, damage, radius, damageType, damageFriendly, damageSelf)
 
         self:Destroy()
     end,
@@ -55,25 +58,25 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
     ---@param instigator? Unit | Projectile
     ---@param damage number
     ---@param radius number
-    DamageThread = function(self, position, instigator, damage, radius)
+    DamageThread = function(self, position, instigator, damage, radius, damageType, damageFriendly, damageSelf)
         -- knock over trees
         DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
         DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
 
         -- initial damage
-        DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', true, true)
+        DamageArea(instigator, position, radius, 0.1 * damage, damageType, damageFriendly, damageSelf)
         DamageArea(instigator, position, 0.9 * radius, 1, 'TreeFire', true, true)
 
         -- wait for the full explosion and then deal the remaining damage
         WaitTicks(26)
         DamageArea(instigator, position, 0.2 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', true, true)
+        DamageArea(instigator, position, radius, 0.3 * damage, damageType, damageFriendly, damageSelf)
         WaitTicks(1)
         DamageArea(instigator, position, 0.3 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', true, true)
+        DamageArea(instigator, position, radius, 0.3 * damage, damageType, damageFriendly, damageSelf)
         WaitTicks(1)
         DamageArea(instigator, position, 0.4 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', true, true)
+        DamageArea(instigator, position, radius, 0.3 * damage, damageType, damageFriendly, damageSelf)
     end,
 }
 TypeClass = SBOOhwalliStategicBomb01
