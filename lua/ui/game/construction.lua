@@ -1502,9 +1502,23 @@ function OnClickHandler(button, modifiers)
 
             -- Add or Remove the entity to the session selection
             if button:GetOverrideEnabled() then
-                AddToSessionExtraSelectList(item.unit)
+                -- See if our control has multiple units in it
+                if item.units then
+                    for _, unit in item.units do
+                        AddToSessionExtraSelectList(unit)
+                    end
+                else
+                    AddToSessionExtraSelectList(item.unit)
+                end
             else
-                RemoveFromSessionExtraSelectList(item.unit)
+                -- See if our control has multiple units in it
+                if item.units then
+                    for _, unit in item.units do
+                        RemoveFromSessionExtraSelectList(unit)
+                    end
+                else
+                    RemoveFromSessionExtraSelectList(item.unit)
+                end
             end
         end
     elseif item.type == 'templates' then

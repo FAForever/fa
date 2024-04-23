@@ -6,6 +6,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 
 local TableGetN = table.getn
+local TableInsert = table.insert
 
 ---@class SpecialGrid : Group
 SpecialGrid = ClassUI(Group) {
@@ -87,10 +88,13 @@ SpecialGrid = ClassUI(Group) {
         for _, item in self.DisplayData do
             if itemHash[item.id] then
                 itemHash[item.id].count = itemHash[item.id].count + 1
+                TableInsert(itemHash[item.id].units, item.unit)
             elseif item.id then
+                item.count = 1
+                item.units = {item.unit}
+                item.unit = nil
                 itemHash[item.id] = item
-                itemHash[item.id].count = 1
-                table.insert(newDisplayData, item)
+                TableInsert(newDisplayData, item)
             end
         end
         self.DisplayData = newDisplayData
