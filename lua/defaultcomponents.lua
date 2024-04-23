@@ -608,10 +608,12 @@ VeterancyComponent = ClassSimple {
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
-            self:UpdateStat('VetLevel', 0)
             self:UpdateStat('VetExperience', 0)
+            self:UpdateStat('VetLevel', 0)
+            self:UpdateStat('MassValueKilled', 0)
             self.VetExperience = 0
             self.VetLevel = 0
+            self.MassValueKilled = 0
         end
     end,
 
@@ -659,6 +661,11 @@ VeterancyComponent = ClassSimple {
         if not blueprint.VetEnabled then
             return
         end
+
+        -- Update a mass value killed stat, not used
+        -- by veterancy but potentially useful to the player
+        self.MassValueKilled = self.MassValueKilled + experience
+        self:UpdateStat('MassValueKilled', self.MassValueKilled)
 
         local currExperience = self.VetExperience
         local currLevel = self.VetLevel
