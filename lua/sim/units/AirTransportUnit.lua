@@ -30,6 +30,9 @@ local HorzUnloadMargin = 2.5
 -- Factor by which to multiply TransportHoverHeight when determining if we can unload cargo
 local VertUnloadFactor = 1.5
 
+-- time delay after which quick drop fires (drops can be faster than this, but not slower)
+local QuickDropDelay = 10
+
 ---@class AirTransport: AirUnit, BaseTransport
 ---@field slots table<Bone, Unit>
 ---@field GroundImpacted boolean
@@ -68,9 +71,15 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
                     return
                 end
 
-                -- Tell our navigator to abort the move
+                -- Tell our navigator to abort the move after a delay/if we haven't detached cargo in the interim
                 -- this has the effect of causing the next unload command to be executed immediately
-                navigator:AbortMove()
+                self.dropFlag = true
+                ForkThread(function()
+                    WaitTicks(QuickDropDelay)
+                    if self.dropFlag then
+                        navigator:AbortMove()
+                    end
+                end)
             end
         end
     end,
@@ -87,6 +96,8 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param attachBone Bone
     ---@param unit Unit
     OnTransportDetach = function(self, attachBone, unit)
+        -- Tell quick drop we didn't need it, and not to abort the next move
+        if self.dropFlag then self.dropFlag = nil end
         AirUnitOnTransportDetach(self, attachBone, unit)
         BaseTransportOnTransportDetach(self, attachBone, unit)
     end,
