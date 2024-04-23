@@ -104,7 +104,6 @@ Callbacks.SetStatByCallback = function(data, units)
         for _, u in units or {} do
             if IsEntity(u) and OkayToMessWithArmy(u.Army) then
                 if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
-                    WARN('SetStatByCallback: ' .. tostring(stat) .. ' is not a valid stat for this unit!')
                     continue
                 end
                 u:UpdateStat(stat, value)

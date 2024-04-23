@@ -6,6 +6,8 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 
 local TableGetN = table.getn
+local TableInsert = table.insert
+local TableSort = table.sort
 
 ---@class SpecialGrid : Group
 SpecialGrid = ClassUI(Group) {
@@ -79,6 +81,28 @@ SpecialGrid = ClassUI(Group) {
                 self:CalcVisible()
             end
         end
+    end,
+
+    CondenseByBlueprint = function(self)
+        local itemHash = {}
+        local newDisplayData = {}
+        for _, item in self.DisplayData do
+            if itemHash[item.id] then
+                itemHash[item.id].count = itemHash[item.id].count + 1
+                TableInsert(itemHash[item.id].units, item.unit)
+            elseif item.id then
+                item.count, item.units, item.unit = 1, {item.unit}, nil
+                itemHash[item.id] = item
+                TableInsert(newDisplayData, item)
+            end
+        end
+        -- This is a horribly inefficient sort algorithm and should be replaced
+        -- with something better, faster, and that can be used elsewhere
+        TableSort(newDisplayData, function(a, b)
+            return tonumber(string.sub(a.id, -4)) < tonumber(string.sub(b.id, -4))
+        end
+        )
+        self.DisplayData = newDisplayData
     end,
 
     ---@param self SpecialGrid
@@ -178,11 +202,15 @@ SpecialGrid = ClassUI(Group) {
 
     ---@param self SpecialGrid
     ---@param newData any
-    Refresh = function(self, newData)
+    Refresh = function(self, newData, condense)
         self.top = 1
         self.DisplayData = newData
+        if condense then
+            self:CondenseByBlueprint()
+        end
         self:CalcVisible()
     end,
+
 }
 
 -- kept for mod backwards compatibility
