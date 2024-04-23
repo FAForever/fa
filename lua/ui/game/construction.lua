@@ -2416,6 +2416,7 @@ function SetSecondaryDisplay(type)
     lastDisplayType = type
     if updateQueue then -- Don't update the queue the tick after a buttonreleasecallback
         local data = {}
+        local condense = true
         if type == 'buildQueue' then
             modifiedCommandQueue = table.copy(currentCommandQueue or {})
             if sortedOptions.selection and table.getn(sortedOptions.selection) == 1 then
@@ -2451,15 +2452,23 @@ function SetSecondaryDisplay(type)
                 controls.secondaryProgress:SetAlpha(0, true)
             end
         elseif type == 'attached' then
-            local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
-            if attachedUnits and not table.empty(attachedUnits) then
-                for _, v in attachedUnits do
-                    table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
+            local numTransports = table.getn(EntityCategoryFilterDown(categories.TRANSPORTATION, sortedOptions.selection))
+            local numCarriers = table.getn(EntityCategoryFilterDown(categories.CARRIER, sortedOptions.selection))
+            -- only show if we don't have both transports and carriers
+            if not (numTransports > 0 and numCarriers > 0) then
+                if numTransports == 1 then
+                    condense = false
+                end
+                local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
+                if attachedUnits and not table.empty(attachedUnits) then
+                    for _, v in attachedUnits do
+                        table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
+                    end
                 end
             end
             controls.secondaryProgress:SetAlpha(0, true)
         end
-        controls.secondaryChoices:Refresh(data)
+        controls.secondaryChoices:Refresh(data, condense)
     else
         updateQueue = true
     end

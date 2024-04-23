@@ -111,9 +111,6 @@ SpecialGrid = ClassUI(Group) {
         local itemIndex = 1
         local minControl = 'Left'
         local maxControl = 'Right'
-        if self.DisplayData then
-            self:CondenseByBlueprint()
-        end
         if self._vertical then
             minControl = 'Top'
             maxControl = 'Bottom'
@@ -205,9 +202,12 @@ SpecialGrid = ClassUI(Group) {
 
     ---@param self SpecialGrid
     ---@param newData any
-    Refresh = function(self, newData)
+    Refresh = function(self, newData, condense)
         self.top = 1
         self.DisplayData = newData
+        if condense then
+            self:CondenseByBlueprint()
+        end
         self:CalcVisible()
     end,
 
