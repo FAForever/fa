@@ -7,6 +7,7 @@ local Group = import("/lua/maui/group.lua").Group
 
 local TableGetN = table.getn
 local TableInsert = table.insert
+local TableSort = table.sort
 
 ---@class SpecialGrid : Group
 SpecialGrid = ClassUI(Group) {
@@ -90,13 +91,17 @@ SpecialGrid = ClassUI(Group) {
                 itemHash[item.id].count = itemHash[item.id].count + 1
                 TableInsert(itemHash[item.id].units, item.unit)
             elseif item.id then
-                item.count = 1
-                item.units = {item.unit}
-                item.unit = nil
+                item.count, item.units, item.unit = 1, {item.unit}, nil
                 itemHash[item.id] = item
                 TableInsert(newDisplayData, item)
             end
         end
+        -- This is a horribly inefficient sort algorithm and should be replaced
+        -- with something better, faster, and that can be used elsewhere
+        TableSort(newDisplayData, function(a, b)
+            return tonumber(string.sub(a.id, -4)) < tonumber(string.sub(b.id, -4))
+        end
+        )
         self.DisplayData = newDisplayData
     end,
 
@@ -205,6 +210,7 @@ SpecialGrid = ClassUI(Group) {
         self.DisplayData = newData
         self:CalcVisible()
     end,
+
 }
 
 -- kept for mod backwards compatibility
