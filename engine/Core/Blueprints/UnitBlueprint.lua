@@ -410,7 +410,9 @@
 --- stunning).
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `TransportShield`.
 ---@field PersonalShield? boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult? number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient
 --- energy. Defaults to `10` in the shield spec.
@@ -857,7 +859,9 @@
 ---@field OwnerShieldMesh string
 --- Personal shiled toggle
 ---@field PersonalShield boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient energy. Defaults to 10 in the shield spec.
 ---@field ShieldEnergyDrainRechargeTime number
