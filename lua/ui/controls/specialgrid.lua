@@ -81,12 +81,30 @@ SpecialGrid = ClassUI(Group) {
         end
     end,
 
+    CondenseByBlueprint = function(self)
+        local itemHash = {}
+        local newDisplayData = {}
+        for _, item in self.DisplayData do
+            if itemHash[item.id] then
+                itemHash[item.id].count = itemHash[item.id].count + 1
+            elseif item.id then
+                itemHash[item.id] = item
+                itemHash[item.id].count = 1
+                table.insert(newDisplayData, item)
+            end
+        end
+        self.DisplayData = newDisplayData
+    end,
+
     ---@param self SpecialGrid
     CalcVisible = function(self)
         local maxItemWidth = 0
         local itemIndex = 1
         local minControl = 'Left'
         local maxControl = 'Right'
+        if self.DisplayData then
+            self:CondenseByBlueprint()
+        end
         if self._vertical then
             minControl = 'Top'
             maxControl = 'Bottom'
