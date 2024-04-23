@@ -592,8 +592,9 @@ local VeterancyRegenBuffs = {
 }
 
 ---@class VeterancyComponent
+---@field VetDamage table<EntityId, number>
 ---@field VetDamageTaken number
----@field VetInstigators table<Unit, number>
+---@field VetInstigators table<EntityId, Unit>
 ---@field VetExperience? number
 ---@field VetLevel? number
 VeterancyComponent = ClassSimple {
@@ -604,6 +605,7 @@ VeterancyComponent = ClassSimple {
 
         -- these fields are always required
         self.VetDamageTaken = 0
+        self.VetDamage = {}
         self.VetInstigators = setmetatable({}, { __mode = 'v' })
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
@@ -632,8 +634,10 @@ VeterancyComponent = ClassSimple {
             self.VetDamageTaken = self.VetDamageTaken + amount
             local entityId = instigator.EntityId
             local vetInstigators = self.VetInstigators
+            local vetDamage = self.VetDamage
 
-            vetInstigators[instigator] = (vetInstigators[instigator] or 0) + amount
+            vetInstigators[entityId] = instigator
+            vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
         end
     end,
 
@@ -642,11 +646,12 @@ VeterancyComponent = ClassSimple {
     ---@param experience? number -- override for amount of experience to be distributed
     VeterancyDispersal = function(self, experience)
         local vetWorth = experience or (self:GetFractionComplete() * self:GetTotalMassCost())
+        local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
         local vetDamageTaken = self.VetDamageTaken
-        for unit, damage in vetInstigators do
+        for id, unit in vetInstigators do
             if unit.Blueprint.VetEnabled and (not IsDestroyed(unit)) then
-                local proportion = vetWorth * (damage / vetDamageTaken)
+                local proportion = vetWorth * (vetDamage[id] / vetDamageTaken)
                 unit:AddVetExperience(proportion)
             end
         end
