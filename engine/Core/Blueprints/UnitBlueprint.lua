@@ -1006,7 +1006,7 @@
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
 ---@field JamRadius { Max: number, Min: number }
---- how many blips does a jammer produce
+--- How many blips a jammer produces. Maximum 255
 ---@field JammerBlips number
 --- used by the Soothsayer
 ---@field MaxVisionRadius? number
