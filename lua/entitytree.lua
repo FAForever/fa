@@ -60,18 +60,20 @@ EntityTree = Class(Entity) {
         self:SetOrientation(spec.Quat, true)
         self.CachePosition = spec.Pos
 
-        self.Collider = self:CreateProjectileAtBone('DummyCollider', 0)
-        self.Collider.Parent = self
-        self.Collider:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY/2, self.Blueprint.SizeZ)
+        -- Remove this if the collider is working properly
+        self:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY/2, self.Blueprint.SizeZ)
+
+        --self.Collider = self:CreateProjectileAtBone('/projectiles/DummyCollider/DummyCollider_proj.bp', 0)
+        --self.Collider.Parent = self
+        --self.Collider:SetCollisionShape('Box', 0, self.Blueprint.SizeY/2 ,0 , self.Blueprint.SizeX, self.Blueprint.SizeY/2, self.Blueprint.SizeZ)
     end,
 
     ---@param self EntityTree
     OnDestroy = function(self)
-        LOG('EntityTree on destroy')
         Entity.OnDestroy(self)
 
         -- reduce burning tree count
-        if self.Burning then 
+        if self.Burning then
             BurningTrees = BurningTrees - 1
         end
     end,
@@ -81,7 +83,7 @@ EntityTree = Class(Entity) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        LOG('EntityTree on collision check')
+        LOG('EntityTree:OnCollisionCheck')
         return not self.Fallen
     end,
 
@@ -90,19 +92,15 @@ EntityTree = Class(Entity) {
     ---@param targetType string
     ---@param targetEntity Unit
     OnCollision = function(self, targetType, targetEntity)
+        LOG('EntityTree:OnCollision')
+        if self.Fallen or self:BeenDestroyed() then
+            return
+        end
+
         local pos = self.CachePosition
         local tPos = targetEntity:GetPosition()
-        LOG('EntityTree on collision')
-        if self.Fallen then
-            return
-        end
-
-        if self:BeenDestroyed() then
-            return
-        end
 
         -- change internal state
-        self.Fallen = true
         TrashAdd(self.Trash, ForkThread(self.FallThread, self, tPos[1] - pos[1], 0, tPos[3] - pos[3], 0.5))
         self:PlayUprootingEffect(targetEntity)
     end,
@@ -115,15 +113,14 @@ EntityTree = Class(Entity) {
     ---@param direction number
     ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
-        LOG('EntityTree on damage')
+        LOG('EntityTree:OnDamage')
         if self:BeenDestroyed() then
             return
         end
 
-        local canFall = not self.Fallen 
+        local canFall = not self.Fallen
         local canBurn = (not self.Burning) and (not self.NoBurn)
 
-        --EntityDestroy(self)
         --if true then return end
         if type == 'Disintegrate' or type == "Reclaimed" then
             -- we just got obliterated
@@ -131,13 +128,8 @@ EntityTree = Class(Entity) {
 
         elseif type == 'Force' or type == "TreeForce" then
             if canFall then
-                -- change internal state
-                self.NoBurn = true
-                self.Fallen = true
+                -- start our fall thread
                 TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
-
-                -- change the mesh
-                --EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
             end
 
         elseif type == 'Nuke' and canBurn then
@@ -158,7 +150,6 @@ EntityTree = Class(Entity) {
             if Random(1, 20) <= 1 then
                 self:Burn()
             end
-            self.Fallen = true
             TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
         end
     end,
@@ -178,6 +169,12 @@ EntityTree = Class(Entity) {
     ---@param dz number
     ---@param depth number
     FallThread = function(self, dx, dy, dz, depth)
+        self.Fallen = true
+        -- destroy the collider if it exists
+        if self.Collider then
+            EntityDestroy(self.Collider)
+        end
+
         -- make it fall down
         -- we wait one tick, then SinkAway imperceptibly to prevent weird entity wiggling
         self:PushOver(dx, dy, dz, depth)
@@ -200,10 +197,11 @@ EntityTree = Class(Entity) {
     ---@param self EntityTree
     Burn = function(self)
         -- limit maximum number of burning trees on the map
-        if Random(1, MaximumBurningTrees) > BurningTrees then 
+        if Random(1, MaximumBurningTrees) > BurningTrees then
             BurningTrees = BurningTrees + 1
+            EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
 
-            self.Burning = true 
+            self.Burning = true
             TrashAdd(self.Trash, ForkThread(self.BurnThread, self))
         end
     end,
@@ -289,8 +287,7 @@ EntityTree = Class(Entity) {
         TrashAdd(trash, effect)
 
         -- fall down in a random direction if we didn't before
-        if not self.Fallen then 
-            self.Fallen = true
+        if not self.Fallen then
             self:FallThread(Random() * 2 - 1, 0, Random() * 2 - 1, 0.25)
         end
     end,
@@ -298,6 +295,7 @@ EntityTree = Class(Entity) {
     ---@param self EntityTree
     ---@param sound string The identifier in the prop blueprint.
     PlaySound = function(self, sound)
+        if EntityBeenDestroyed(self) then return end
         local bp = self.Blueprint.Audio
         if bp and bp[sound] then
             self:PlaySound(bp[sound])
@@ -307,6 +305,7 @@ EntityTree = Class(Entity) {
     ---@param self EntityTree
     ---@param sound string
     PlayAmbientSound = function(self, sound)
+        if EntityBeenDestroyed(self) then return end
         if sound == nil then
             self:SetAmbientSound(nil, nil)
         else
