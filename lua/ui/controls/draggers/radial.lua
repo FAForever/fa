@@ -1,10 +1,10 @@
-local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 
 ---@param eventKey string -- button code for the dragger, dragger will watch for this button to be released
 ---@param callbackTable table -- should be of the form {Func = function, Args = {}} or {Func = "$simCallbackString", Args = {}}
+---@param color? string -- optional color for the circle, defaults to 'Yellow'
 ---@param minRadius? number -- optional radius, smaller than this will cancel the drag and do nothing
-function RadialDragger(eventKey, callbackTable, minRadius)
+function RadialDragger(eventKey, callbackTable, color, minRadius)
 
     local view = import("/lua/ui/game/worldview.lua").viewLeft
     if not view then
@@ -14,19 +14,17 @@ function RadialDragger(eventKey, callbackTable, minRadius)
     local targetPos = GetMouseWorldPos()
     local worldPos
     local dragger = Dragger()
-    local decal
+    local circle
     local rad = 0
 
     dragger.OnMove = function(self, x, y)
         worldPos = UnProject(view, {x,y})
         rad = VDist2(targetPos[1], targetPos[3], worldPos[1], worldPos[3])
-        if not decal then
-            decal = UserDecal()
-            -- we could add a texture parameter and use it here
-            decal:SetTexture("/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds")
+        if not circle then
+            circle = {shape = 'Circle', pos = targetPos, color = color or 'Yellow'}
+            view:UI_DrawShapesRegistry(circle, true)
         end
-        decal:SetScale({ rad * 2, 1, rad * 2 })
-        decal:SetPosition(targetPos)
+        circle.size = rad
     end
 
     -- When we release the mouse button, check our radius and do the callback
@@ -42,13 +40,13 @@ function RadialDragger(eventKey, callbackTable, minRadius)
                 callbackTable.Func(callbackTable.Args)
             end
         end
-        if decal then decal:Destroy() end
+        view:UI_DrawShapesRegistry(circle, false)
         self:Destroy()
     end
 
     -- Not sure under what conditions this would be called,
     dragger.OnCancel = function(self)
-        if decal then decal:Destroy() end
+        view:UI_DrawShapesRegistry(circle, false)
         self:Destroy()
     end
 
