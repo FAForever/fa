@@ -596,7 +596,8 @@ local VeterancyRegenBuffs = {
 ---@field VetDamageTaken number
 ---@field VetInstigators table<EntityId, Unit>
 ---@field VetExperience? number
----@field VetLevel? number
+---@field VetLevel? number 
+---@field VetMassKillCredit? number -- bookkeeping number available to the player via stat
 VeterancyComponent = ClassSimple {
 
     ---@param self VeterancyComponent | Unit
@@ -612,10 +613,10 @@ VeterancyComponent = ClassSimple {
         if blueprint.VetEnabled then
             self:UpdateStat('VetExperience', 0)
             self:UpdateStat('VetLevel', 0)
-            self:UpdateStat('MassValueKilled', 0)
+            self:UpdateStat('VetMassKillCredit', 0)
             self.VetExperience = 0
             self.VetLevel = 0
-            self.MassValueKilled = 0
+            self.VetMassKillCredit = 0
         end
     end,
 
@@ -667,10 +668,11 @@ VeterancyComponent = ClassSimple {
             return
         end
 
-        -- Update a mass value killed stat, not used
-        -- by veterancy but potentially useful to the player
-        self.MassValueKilled = self.MassValueKilled + experience
-        self:UpdateStat('MassValueKilled', self.MassValueKilled)
+        -- VetMassKillCredit is not otherwise used by the vet system, but
+        -- is available for players as a bookkeeping item for total mass
+        -- killed without the level gain limitations on VetExperience
+        self.VetMassKillCredit = self.VetMassKillCredit + experience
+        self:UpdateStat('VetMassKillCredit', self.VetMassKillCredit)
 
         local currExperience = self.VetExperience
         local currLevel = self.VetLevel
