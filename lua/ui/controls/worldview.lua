@@ -1377,12 +1377,12 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     OnRenderWorld = function (self, delta)
         -- called when custom world rendering is enabled
         for index, data in self.DrawShapesTable do
-            if data.remove then
+            if data.Remove then
                 self.DrawShapesTable[index] = nil
-            elseif data.shape == 'Circle' then
-                UI_DrawCircle(data.pos, data.size, data.color, data.thickness)
-            elseif data.shape == 'Rect' then
-                UI_DrawRect(data.pos, data.size, data.color, data.thickness)
+            elseif data.Shape == 'Circle' then
+                UI_DrawCircle(data.Pos, data.Size, data.Color, data.Thickness)
+            elseif data.Shape == 'Rect' then
+                UI_DrawRect(data.Pos, data.Size, data.Color, data.Thickness)
             end
         end
         --- if we have no shapes to draw, disable custom rendering
