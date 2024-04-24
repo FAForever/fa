@@ -15,11 +15,11 @@ XSB1303 = ClassUnit(SMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         SMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
-        self.RingManip1 = CreateRotator(self, 'Blades01', 'y', nil, 0, 15, -30)
+        self.RingManip1 = CreateRotator(self, 'Blades01', '-y', nil, 0, 15, 30)
         self.Trash:Add(self.RingManip1)
         self.RingManip2 = CreateRotator(self, 'Blades02', 'y', nil, 0, 15, 45)
         self.Trash:Add(self.RingManip2)
-        self.RingManip3 = CreateRotator(self, 'Blades03', 'y', nil, 0, 15, -60)
+        self.RingManip3 = CreateRotator(self, 'Blades03', '-y', nil, 0, 15, 60)
         self.Trash:Add(self.RingManip3)
     end,
 
