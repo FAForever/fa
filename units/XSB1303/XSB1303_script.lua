@@ -1,9 +1,9 @@
 --****************************************************************************
 --**
---**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
+--**  File     :  /units/XSB1303/XSB1303_script.lua
 --**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
 --**
---**  Summary  :  Aeon T3 Mass Fabricator
+--**  Summary  :  Seraphim T3 Mass Fabricator
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
@@ -15,6 +15,7 @@ XSB1303 = ClassUnit(SMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         SMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
+        -- 1: Bottom, 2: Middle, 3: Top
         self.RingManip1 = CreateRotator(self, 'Blades01', '-y', nil, 0, 15, 30)
         self.Trash:Add(self.RingManip1)
         self.RingManip2 = CreateRotator(self, 'Blades02', 'y', nil, 0, 15, 45)
