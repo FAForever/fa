@@ -717,7 +717,7 @@ end
 
 do
 
-    ---@param data { Distance: number, Vector: Vector}
+    ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
         -- verify selection
@@ -738,7 +738,7 @@ do
         reprsl(data, { depth = 2, })
 
         local ps = lastCommand.target:GetPosition()
-        local pe = data.Vector
+        local pe = data.Destination
         local dx = ps[1] - pe[1]
         local dz = ps[3] - pe[3]
         local distance = math.sqrt(dx * dx + dz * dz)
