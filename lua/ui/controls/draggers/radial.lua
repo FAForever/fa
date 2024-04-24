@@ -22,7 +22,7 @@ function RadialDragger(eventKey, callbackTable, color, minRadius)
         rad = VDist2(targetPos[1], targetPos[3], worldPos[1], worldPos[3])
         if not circle then
             circle = {shape = 'Circle', pos = targetPos, color = color or 'Yellow'}
-            view:UI_DrawShapesRegistry(circle, true)
+            view:AddDrawShape(circle)
         end
         circle.size = rad
     end
@@ -40,13 +40,14 @@ function RadialDragger(eventKey, callbackTable, color, minRadius)
                 callbackTable.Func(callbackTable.Args)
             end
         end
-        view:UI_DrawShapesRegistry(circle, false)
+        -- Setting circle.remove to true tells the worldView to deregister it
+        circle.remove = true
         self:Destroy()
     end
 
     -- Not sure under what conditions this would be called,
     dragger.OnCancel = function(self)
-        view:UI_DrawShapesRegistry(circle, false)
+        circle.remove = true
         self:Destroy()
     end
 

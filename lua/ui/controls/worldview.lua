@@ -211,7 +211,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
----@field UI_DrawShapesTable table
+---@field DrawShapesTable table
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
@@ -241,8 +241,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self.CursorOverride = false
 
         self.Trash = TrashBag()
-        self.UI_DrawShapesTable = { }
-        self.Trash:Add(self.UI_DrawShapesTable)
+
+        self.DrawShapesTable = {}
+
     end,
 
     ---@param self WorldView
@@ -1362,26 +1363,30 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- called when strat icons are turned on/off
     end,
 
+    ---Add a shape to the draw table
     ---@param self WorldView
+    ---@param id string
     ---@param data table
-    ---@param add? boolean -- add if true, remove if false/nil
-    UI_DrawShapesRegistry = function(self, data, add)
+    AddDrawShape = function(self, data)
         if data then
             self:SetCustomRender(true)
-            self.UI_DrawShapesTable[data] = add or nil
+            table.insert(self.DrawShapesTable, data)
         end
     end,
 
     OnRenderWorld = function (self, delta)
         -- called when custom world rendering is enabled
-        for data, _ in self.UI_DrawShapesTable do
-            if data.shape == 'Circle' then
+        for index, data in self.DrawShapesTable do
+            if data.remove then
+                self.DrawShapesTable[index] = nil
+            elseif data.shape == 'Circle' then
                 UI_DrawCircle(data.pos, data.size, data.color, data.thickness)
             elseif data.shape == 'Rect' then
                 UI_DrawRect(data.pos, data.size, data.color, data.thickness)
             end
         end
-        if table.empty(self.UI_DrawShapesTable) then
+        --- if we have no shapes to draw, disable custom rendering
+        if table.empty(self.DrawShapesTable) then
             self:SetCustomRender(false)
         end
     end,
