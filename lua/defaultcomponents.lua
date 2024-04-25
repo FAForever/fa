@@ -594,7 +594,6 @@ local VeterancyRegenBuffs = {
 ---@class VeterancyComponent
 ---@field VetDamage table<EntityId, number>
 ---@field VetDamageTaken number
----@field VetInstigators table<EntityId, Unit>
 ---@field VetExperience? number
 ---@field VetLevel? number 
 ---@field VetMassKillCredit? number -- bookkeeping number available to the player via stat
@@ -607,7 +606,6 @@ VeterancyComponent = ClassSimple {
         -- these fields are always required
         self.VetDamageTaken = 0
         self.VetDamage = {}
-        self.VetInstigators = setmetatable({}, { __mode = 'v' })
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
@@ -634,10 +632,8 @@ VeterancyComponent = ClassSimple {
         then
             self.VetDamageTaken = self.VetDamageTaken + amount
             local entityId = instigator.EntityId
-            local vetInstigators = self.VetInstigators
             local vetDamage = self.VetDamage
 
-            vetInstigators[entityId] = instigator
             vetDamage[entityId] = (vetDamage[entityId] or 0) + amount
         end
     end,
@@ -648,11 +644,12 @@ VeterancyComponent = ClassSimple {
     VeterancyDispersal = function(self, experience)
         local vetWorth = experience or (self:GetFractionComplete() * self:GetTotalMassCost())
         local vetDamage = self.VetDamage
-        local vetInstigators = self.VetInstigators
         local vetDamageTaken = self.VetDamageTaken
-        for id, unit in vetInstigators do
+        local unit
+        for id, damage in vetDamage do
+            unit = GetEntityById(id) ---@cast unit Unit
             if unit.Blueprint.VetEnabled and (not IsDestroyed(unit)) then
-                local proportion = vetWorth * (vetDamage[id] / vetDamageTaken)
+                local proportion = vetWorth * (damage / vetDamageTaken)
                 unit:AddVetExperience(proportion)
             end
         end
@@ -661,7 +658,7 @@ VeterancyComponent = ClassSimple {
     -- Adds experience to a unit
     ---@param self Unit | VeterancyComponent
     ---@param experience number
-    ---@param noLimit boolean
+    ---@param noLimit? boolean
     AddVetExperience = function(self, experience, noLimit)
         local blueprint = self.Blueprint
         if not blueprint.VetEnabled then
