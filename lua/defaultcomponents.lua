@@ -641,8 +641,9 @@ VeterancyComponent = ClassSimple {
 
     --- Disperses the veterancy, expects to be only called once
     ---@param self VeterancyComponent | Unit
-    VeterancyDispersal = function(self)
-        local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
+    ---@param experience? number -- override for amount of experience to be distributed
+    VeterancyDispersal = function(self, experience)
+        local vetWorth = experience or (self:GetFractionComplete() * self:GetTotalMassCost())
         local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
         local vetDamageTaken = self.VetDamageTaken
