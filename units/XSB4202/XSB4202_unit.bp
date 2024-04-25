@@ -102,7 +102,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 7000,
         BuildCostMass = 700,
-        BuildRate = 12.98,
+        BuildRate = 20,
         BuildTime = 1250,
         BuildableCategory = { "xsb4301" },
         MaintenanceConsumptionPerSecondEnergy = 250,
@@ -159,6 +159,7 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 3,
         MeshExtentsY = 2,
         MeshExtentsZ = 3,

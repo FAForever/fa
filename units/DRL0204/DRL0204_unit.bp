@@ -181,7 +181,7 @@ UnitBlueprint{
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 135,
     Transport = {
-        CanFireFromTransport = true,
+        CanFireFromTransport = false,
         TransportClass = 2,
     },
     Veteran = {
@@ -204,7 +204,6 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Iridium Rocket Pack",
             FireTargetLayerCapsTable = {
-                Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
