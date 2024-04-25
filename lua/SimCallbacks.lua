@@ -735,8 +735,6 @@ do
             return
         end
 
-        reprsl(data, { depth = 2, })
-
         local ps = lastCommand.target:GetPosition()
         local pe = data.Destination
         local dx = ps[1] - pe[1]
