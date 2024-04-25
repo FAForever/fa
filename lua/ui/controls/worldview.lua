@@ -33,6 +33,9 @@ local KeyCodeShift = 16
 
 local weaponsCached = { }
 
+---@class Renderable : Destroyable
+---@field OnRender fun(self:Renderable, worldView:WorldView)
+
 ---@class WorldViewDecalData
 ---@field texture string
 ---@field scale number
@@ -211,7 +214,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
----@field DrawShapesTable table
+---@field Renderables table<string, Renderable>
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
@@ -242,7 +245,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
         self.Trash = TrashBag()
 
-        self.DrawShapesTable = {}
+        self.Renderables = {}
 
     end,
 
@@ -1376,19 +1379,40 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
-    OnRenderWorld = function (self, delta)
-        -- called when custom world rendering is enabled
-        -- we need to draw our shapes each frame
-        for _, data in self.DrawShapesTable do
-            if data.Shape == 'Circle' then
-                UI_DrawCircle(data.Pos, data.Size, data.Color, data.Thickness)
-            elseif data.Shape == 'Rect' then
-                UI_DrawRect(data.Pos, data.Size, data.Color, data.Thickness)
-            end
+    --#region Custom Rendering
+
+    --- Register a renderable to render each frame
+    ---@param self WorldView
+    ---@param renderable Renderable
+    ---@param id string
+    RegisterRenderable = function(self, renderable, id)
+        self.Trash:Add(renderable)
+        self.Renderables[id] = renderable
+
+        if not table.empty(self.Renderables) then
+            self:SetCustomRender(true)
         end
-        --- if we have no shapes to draw, disable custom rendering
-        if table.empty(self.DrawShapesTable) then
+    end,
+
+    --- Unregister a renderable
+    ---@param self WorldView
+    ---@param id string
+    UnregisterRenderable = function(self, id)
+        self.Renderables[id] = nil
+
+        if table.empty(self.Renderables) then
             self:SetCustomRender(false)
         end
     end,
+
+    --- Is called each frame to render shapes when custom rendering is enabled
+    ---@param self WorldView
+    ---@param delta number
+    OnRenderWorld = function (self, delta)
+        for id, renderable in self.Renderables do
+            renderable:OnRender(delta, delta)
+        end
+    end,
+
+    --#endregion
 }
