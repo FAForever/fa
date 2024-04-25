@@ -10,9 +10,9 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
 
+    FxBeamStartPoint = EffectTemplate.TOrbitalDeathLaserMuzzleFlash01,
     FxBeam = EffectTemplate.TOrbitalDeathLaserBeam,
-    FxBeamEndPoint = EffectTemplate.TOrbitalDeathLaserMuzzleFlash01,
-    FxBeamStartPoint = EffectTemplate.TOrbitalDeathLaserHit01,
+    FxBeamEndPoint = EffectTemplate.TOrbitalDeathLaserHit01,
 
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.5,
