@@ -1363,23 +1363,24 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- called when strat icons are turned on/off
     end,
 
-    ---Add a shape to the draw table
+    ---Add a shape to the draw table, pass an id with no data to remove it
     ---@param self WorldView
-    ---@param id string
-    ---@param data table
-    AddDrawShape = function(self, data)
+    ---@param id string -- id for tracking individual shapes
+    ---@param data? table -- data table for shape, pass nil to remove the given id
+    DrawShapeRegistry = function(self, id, data)
         if data then
             self:SetCustomRender(true)
-            table.insert(self.DrawShapesTable, data)
+            self.DrawShapesTable[id] = data
+        else
+            self.DrawShapesTable[id] = nil
         end
     end,
 
     OnRenderWorld = function (self, delta)
         -- called when custom world rendering is enabled
-        for index, data in self.DrawShapesTable do
-            if data.Remove then
-                self.DrawShapesTable[index] = nil
-            elseif data.Shape == 'Circle' then
+        -- we need to draw our shapes each frame
+        for _, data in self.DrawShapesTable do
+            if data.Shape == 'Circle' then
                 UI_DrawCircle(data.Pos, data.Size, data.Color, data.Thickness)
             elseif data.Shape == 'Rect' then
                 UI_DrawRect(data.Pos, data.Size, data.Color, data.Thickness)

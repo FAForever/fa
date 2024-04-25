@@ -17,13 +17,19 @@ function RadialDragger(eventKey, callbackTable, color, minRadius)
     local circle
     local rad = 0
 
+    -- Need a more robust id system if we're going to be drawing multiple shapes
+    -- but this works for one at a time (and we only expect one here)
+    local shapeId = 'radial-dragger'
+
     dragger.OnMove = function(self, x, y)
         worldPos = UnProject(view, {x,y})
         rad = VDist2(targetPos[1], targetPos[3], worldPos[1], worldPos[3])
         if not circle then
             circle = {Shape = 'Circle', Pos = targetPos, Color = color or 'Yellow'}
-            view:AddDrawShape(circle)
+            view:DrawShapeRegistry(shapeId, circle)
         end
+        -- We're only changing the size of the circle, but any of the shape properties
+        -- can be altered dynamically (color, shape, root position, etc.)
         circle.Size = rad
     end
 
@@ -40,14 +46,14 @@ function RadialDragger(eventKey, callbackTable, color, minRadius)
                 callbackTable.Func(callbackTable.Args)
             end
         end
-        -- Setting circle.remove to true tells the worldView to deregister it
-        circle.Remove = true
+        -- Unregister our shape
+        view:DrawShapeRegistry(shapeId)
         self:Destroy()
     end
 
-    -- Not sure under what conditions this would be called,
+    -- Not sure under what conditions this would be called
     dragger.OnCancel = function(self)
-        circle.Remove = true
+        view:DrawShapeRegistry(shapeId)
         self:Destroy()
     end
 
