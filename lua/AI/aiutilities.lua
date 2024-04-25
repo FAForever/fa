@@ -453,7 +453,7 @@ function AIGetMarkerPositionsAroundLocation(aiBrain, markerType, pos, radius, th
     local markers = AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local retMarkers = {}
     for _, v in markers do
-        table.insert(markers, v.Position)
+        table.insert(retMarkers, v.Position)
     end
 
     return retMarkers
