@@ -40,8 +40,8 @@ local UIRenderableCircle = import('/lua/ui/game/renderable/circle.lua').UIRender
 ---@field Callback fun(origin: Vector, destination: Vector)
 RectangleDragger = Class(Dragger) {
 
-    Size = 0.1,
-    Thickness = 0.1,
+    Size = 0.2,
+    Thickness = 0.05,
     Color = 'ffffff',
 
     ---@param self LineDrag
