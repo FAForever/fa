@@ -85,7 +85,7 @@ XSL0301 = ClassUnit(CommandUnit) {
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             self:CreateShield(bp)
-          	local wep = self:GetWeaponByLabel('LightChronatronCannon')
+            local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:AddDamageMod(bp.NewDamageMod or 300)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
