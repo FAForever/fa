@@ -85,7 +85,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 55000,
         BuildCostMass = 3300,
-        BuildTime = 4988,
+        BuildTime = 5000,
         MaintenanceConsumptionPerSecondEnergy = 400,
         RebuildBonusIds = { "ueb4301" },
     },
@@ -137,6 +137,7 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 4.25,
         MeshExtentsY = 4.25,
         MeshExtentsZ = 4.5,
