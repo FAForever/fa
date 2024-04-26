@@ -166,6 +166,17 @@ end
 ---@param width number
 ---@param doPrint boolean
 function AreaReclaimProps(units, ps, pe, width, doPrint)
+    if TableGetn(units) == 0 then
+        return
+    end
+
+    -- feature: prevent over saturating the command queue
+    local commandQueueCount = TableGetn(units[1]:GetCommandQueue())
+    local maximumCommandsToProcess = 480 - commandQueueCount
+    if maximumCommandsToProcess <= 0 then
+        print(StringFormat("Command queue is saturated"))
+        return
+    end
 
     local processed = 0
 
@@ -246,11 +257,22 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
             then
                 IssueReclaim(units, entity)
                 processed = processed + 1
+
+                -- feature: prevent over saturating the command queue
+                if processed > maximumCommandsToProcess then
+                    break
+                end
             end
         end
     end
 
-    if doPrint and processed > 0 and (GetFocusArmy() == GetCurrentCommandSource()) then
-        print(StringFormat("Reclaiming %d additional props", processed))
+    if doPrint and (GetFocusArmy() == GetCurrentCommandSource()) then
+        if processed > 0 then
+            print(StringFormat("Reclaiming %d additional props", processed))
+        end
+
+        if processed > maximumCommandsToProcess then
+            print(StringFormat("Command queue is saturated"))
+        end
     end
 end

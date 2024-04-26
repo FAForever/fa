@@ -501,15 +501,13 @@ end
 function OnCommandIssued(command)
 
     -- Area reclaim dragger, command mode only
-    -- '1' is the left mouse button KeyCode
     if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
         import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
     end
 
     -- Area reclaim dragger, command mode only
-    -- '1' is the left mouse button KeyCode
     if command.CommandType == 'Attack' and command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
-        RadialDragger('1', { Func = 'ExtendAttackOrder', Args = {} })
+        import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
     end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately

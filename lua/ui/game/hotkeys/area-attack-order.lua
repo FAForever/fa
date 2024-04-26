@@ -21,7 +21,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local RectangleDragger = import("/lua/ui/controls/draggers/rectangle.lua").RectangleDragger
+local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 local MaximumWidth = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
 local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
 
@@ -50,21 +50,21 @@ SetDragKeyCode = function(value)
 end
 
 ---@param origin Vector
----@param destination Vector
-local AreaReclaimOrderCallback = function(origin, destination)
-    if VDist3(origin, destination) < MinimumDistance then
+---@param radius number
+local AreaReclaimOrderCallback = function(origin, radius)
+    if radius < MinimumDistance then
         return
     end
 
-    SimCallback({ Func = 'ExtendReclaimOrder', Args = { Origin = origin, Destination = destination } }, true)
+    SimCallback({ Func = 'ExtendAttackOrder', Args = { Origin = origin, Radius = radius } }, true)
 end
 
 ---@param command UserCommand
-AreaReclaimOrder = function(command)
+AreaAttackOrder = function(command)
 
     local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
-    RectangleDragger(
+    RadialDragger(
         worldView,
         AreaReclaimOrderCallback,
         DragKeycode,

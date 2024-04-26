@@ -98,8 +98,8 @@ RectangleDragger = Class(Dragger) {
         local ps = self.Origin
         local pe = UnProject(view, { x, y })
 
-        local dx = ps[1] - pe[1]
-        local dz = ps[3] - pe[3]
+        local dx = pe[1] - ps[1]
+        local dz = pe[3] - ps[3]
         local distance = math.sqrt(dx * dx + dz * dz)
 
         local nx = (1 / distance) * dx
@@ -107,6 +107,13 @@ RectangleDragger = Class(Dragger) {
 
         local ox = nz
         local oz = -nx
+
+        -- limit the distance
+        local maximumDistance = self.MaximumDistance
+        if distance > maximumDistance then
+            pe[1] = (1 / distance) * maximumDistance * dx + ps[1]
+            pe[3] = (1 / distance) * maximumDistance * dz + ps[3]
+        end
 
         if distance > self.MinimumDistance then
             self.ShapeStart:Show()
