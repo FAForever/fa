@@ -599,7 +599,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 400,
+            Damage = 100,
             DamageType = "Normal",
             DisplayName = "Light Chronotron Cannon",
             FireTargetLayerCapsTable = {
