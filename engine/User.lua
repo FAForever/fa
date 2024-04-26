@@ -19,7 +19,7 @@
 ---| 1 # Hold fire
 ---| 2 # Ground fire
 
----@alias Keycodes
+---@alias Keycode
 --- | 'BACK'
 --- | 'TAB'
 --- | 'RETURN'
@@ -907,7 +907,7 @@ end
 --- Make `dragger` the active dragger from a particular frame.
 --- You can pass `nil` to cancel the current dragger.
 ---@param originFrame Frame
----@param keycode Keycodes
+---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
 ---@param dragger Dragger | nil
 function PostDragger(originFrame, keycode, dragger)
 end

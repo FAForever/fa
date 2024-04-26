@@ -20,4 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-BuildRateToDistanceMultiplier = 3
+---@type number
+MaximumWidth = 7
+
+---@type number
+MaximumDistance = 24

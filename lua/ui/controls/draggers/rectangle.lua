@@ -25,15 +25,17 @@ local UIRenderableCircle = import('/lua/ui/game/renderable/circle.lua').UIRender
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local DraggerInit = Dragger.__init
 
----@class LineDrag : Dragger
+---@class UIRectangleDragger : Dragger
 ---@field Origin Vector
 ---@field Destination Vector
----@field ShapeStart table
----@field ShapeEnd table
----@field ShapeStart1 table
----@field ShapeStart2 table
----@field ShapeEnd1 table
----@field ShapeEnd2 table
+---@field ShapeStart UIRenderableCircle
+---@field ShapeEnd UIRenderableCircle
+---@field ShapeStart1 UIRenderableCircle
+---@field ShapeStart2 UIRenderableCircle
+---@field ShapeEnd1 UIRenderableCircle
+---@field ShapeEnd2 UIRenderableCircle
+---@field MinimumDistance number
+---@field MaximumDistance number
 ---@field Width number
 ---@field WorldView WorldView
 ---@field Callback fun(origin: Vector, destination: Vector)
@@ -43,15 +45,20 @@ RectangleDragger = Class(Dragger) {
     Thickness = 0.05,
     Color = 'ffffff',
 
-    ---@param self LineDrag
+    ---@param self UIRectangleDragger
     ---@param view WorldView
     ---@param callback fun(origin: Vector, destination: Vector)
-    ---@param width number
-    __init = function(self, view, callback, width)
+    ---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
+    ---@param maximumWidth number
+    ---@param minimumDistance number
+    ---@param maximumDistance number
+    __init = function(self, view, callback, keycode, maximumWidth, minimumDistance, maximumDistance)
         DraggerInit(self)
 
         -- store parameters
-        self.Width = width
+        self.Width = maximumWidth
+        self.MinimumDistance = minimumDistance
+        self.MaximumDistance = maximumDistance
         self.WorldView = view
         self.Callback = callback
 
@@ -77,11 +84,11 @@ RectangleDragger = Class(Dragger) {
         self.Origin = mouseWorldPosition
 
         -- register the dragger
-        PostDragger(view:GetRootFrame(), 'LBUTTON', self)
+        PostDragger(view:GetRootFrame(), keycode, self)
     end,
 
     --- Called by the engine when the mouse is moved
-    ---@param self LineDrag
+    ---@param self UIRectangleDragger
     ---@param x number  # x coordinate of screen position
     ---@param y number  # y coordinate of screen position
     OnMove = function(self, x, y)
@@ -101,18 +108,33 @@ RectangleDragger = Class(Dragger) {
         local ox = nz
         local oz = -nx
 
-        -- update locations
-        self.ShapeStart1:SetPosition(ps[1] + width * ox, ps[2], ps[3] + width * oz)
-        self.ShapeStart2:SetPosition(ps[1] - width * ox, ps[2], ps[3] - width * oz)
+        if distance > self.MinimumDistance then
+            self.ShapeStart:Show()
+            self.ShapeStart1:Show()
+            self.ShapeStart2:Show()
+            self.ShapeEnd1:Show()
+            self.ShapeEnd2:Show()
+            self.ShapeEnd:Show()
 
-        self.ShapeEnd1:SetPosition(pe[1] + width * ox, pe[2], pe[3] + width * oz)
-        self.ShapeEnd2:SetPosition(pe[1] - width * ox, pe[2], pe[3] - width * oz)
-
-        self.ShapeEnd:SetPosition(pe[1], pe[2], pe[3])
+            -- update locations
+            self.ShapeStart1:SetPosition(ps[1] + width * ox, ps[2], ps[3] + width * oz)
+            self.ShapeStart2:SetPosition(ps[1] - width * ox, ps[2], ps[3] - width * oz)
+            self.ShapeEnd1:SetPosition(pe[1] + width * ox, pe[2], pe[3] + width * oz)
+            self.ShapeEnd2:SetPosition(pe[1] - width * ox, pe[2], pe[3] - width * oz)
+            self.ShapeEnd:SetPosition(pe[1], pe[2], pe[3])
+        else
+            -- try to hide it
+            self.ShapeStart:Hide()
+            self.ShapeStart1:Hide()
+            self.ShapeStart2:Hide()
+            self.ShapeEnd1:Hide()
+            self.ShapeEnd2:Hide()
+            self.ShapeEnd:Hide()
+        end
     end,
 
     --- Called by the engine when the button we're tracking is released
-    ---@param self LineDrag
+    ---@param self UIRectangleDragger
     ---@param x number  # x coordinate of screen position
     ---@param y number  # y coordinate of screen position
     OnRelease = function(self, x, y)
@@ -128,7 +150,7 @@ RectangleDragger = Class(Dragger) {
     end,
 
     --- Called by the engine when the dragger is cancelled
-    ---@param self LineDrag
+    ---@param self UIRectangleDragger
     OnCancel = function(self)
         self:Destroy()
     end,

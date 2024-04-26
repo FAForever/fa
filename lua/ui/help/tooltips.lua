@@ -653,7 +653,12 @@ Tooltips = {
 
     options_alt_to_force_attack_move = {
         title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
-        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>When enabled holding alt will always turn orders into an attack move order"
+        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_DESCRIPTION>When enabled holding alt will always turn orders into an attack move order"
+    },
+
+    options_area_commands_button = {
+        title = "<LOC area_commands_button_title>Button to trigger area commands",
+        description = "<LOC area_commands_button_description>When holding this button you'll trigger area command interface as you issue a command in command mode."
     },
 
     options_assist_to_unpause = {

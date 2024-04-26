@@ -22,6 +22,7 @@
 
 ---@class UIRenderableCircle : Renderable
 ---@field Identifier string
+---@field Hidden boolean
 ---@field Position Vector
 ---@field Size number
 ---@field Color Color
@@ -62,7 +63,29 @@ UIRenderableCircle = ClassSimple {
     ---@param self UIRenderableCircle
     ---@param delta number
     OnRender = function(self, delta)
-        UI_DrawCircle(self.Position, self.Size, self.Color, self.Thickness)
+        if not self.Hidden then
+            UI_DrawCircle(self.Position, self.Size, self.Color, self.Thickness)
+        end
+    end,
+
+    ---@param self UIRenderableCircle
+    Hide = function(self)
+        self.Hidden = true
+    end,
+
+    ---@param self UIRenderableCircle
+    Show = function(self)
+        self.Hidden = false
+    end,
+
+    ---@param self UIRenderableCircle
+    SetHidden = function(self, hide)
+        self.Hidden = hide
+    end,
+
+    ---@param self UIRenderableCircle
+    IsHidden = function(self)
+        return self.Hidden
     end,
 
     --#region Properties
@@ -79,6 +102,9 @@ UIRenderableCircle = ClassSimple {
     end,
 
     ---@param self UIRenderableCircle
+    ---@return number
+    ---@return number
+    ---@return number
     GetPosition = function(self)
         return unpack(self.Position)
     end

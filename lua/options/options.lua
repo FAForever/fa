@@ -661,6 +661,33 @@ options = {
             },
 
             {
+                title = '<LOC OPTIONS_0323>Area commands',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC area_commands_button>Button to drag area commands",
+                key = 'area_commands_button',
+                type = 'toggle',
+                default = "LBUTTON",
+                set = function(key, value, startup)
+                    LOG("Trying to set the area keycode to: ", value)
+                    import("/lua/ui/game/hotkeys/area-reclaim-order.lua").SetDragKeyCode(value)
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _LBUTTON>Left mouse button", key = "LBUTTON" },
+                        { text = "<LOC _RBUTTON>Right mouse button", key = "RBUTTON" },
+                        { text = "<LOC _MBUTTON>Middle mouse button", key = "MBUTTON" },
+                    },
+                },
+            },
+
+            {
                 title = '<LOC OPTIONS_0322>Selection',
                 type = 'header',
 
