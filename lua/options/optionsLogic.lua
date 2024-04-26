@@ -116,7 +116,6 @@ function SetCurrent(newOptions, compareOptions)
                     end
                 end
                 if item.set then    -- only run set if it exists in this item
-                    LOG(newOptions[item.key] , " " , curOptions[item.key])
                     if newOptions[item.key] != curOptions[item.key] then
                         table.insert(itemsToSet, item)
                     end
@@ -126,8 +125,6 @@ function SetCurrent(newOptions, compareOptions)
     end
 
     local function SetAndSave()
-        LOG("SetAndSave")
-        reprsl(itemsToSet)
         for index, item in itemsToSet do
             item.set(item.key, newOptions[item.key], false)
         end
