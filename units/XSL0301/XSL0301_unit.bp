@@ -426,6 +426,7 @@ UnitBlueprint{
             ImpactEffects = "SeraphimShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 300,
             Name = "<LOC enhancements_0028>Personal Shield Generator",
+            NewDamageMod = 300,
             OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
             PersonalShield = true,
             RegenAssistMult = 10,

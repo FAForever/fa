@@ -85,10 +85,14 @@ XSL0301 = ClassUnit(CommandUnit) {
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             self:CreateShield(bp)
+          	local wep = self:GetWeaponByLabel('LightChronatronCannon')
+            wep:AddDamageMod(bp.NewDamageMod or 300)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            local wep = self:GetWeaponByLabel('LightChronatronCannon')
+            wep:AddDamageMod(-self.Blueprint.Enhancements['EnhancedSensors'].NewDamageMod or -300)
             -- Overcharge
         elseif enh == 'Overcharge' then
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
