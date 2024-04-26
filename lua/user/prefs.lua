@@ -20,61 +20,23 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local optionsLogic = import("/lua/options/optionslogic.lua")
+-- do not run any code in the scope of the file for mod compatibility with Alliance of Heroes and others
 
---- Acts as a cache to prevent accessing the preference file.
----@type number | false
-local CurrentProfileIndex = false
-
---- Acts as a cache to prevent allocating tables from the preference file.
----@type table | false
-local CurrentProfiles = false
-
--- upvalue scope for performance
-local GetPreference = GetPreference
-local StringSplit = StringSplit
-
-local StringFind = string.find
-
-local TableGetn = table.getn
-local TableEmpty = table.empty
-
---- Retrieves the (cached) index of the current profile. 
----@return number?  # nil when there are no profiles
-local function GetCurrentProfileIndex()
-    local current = GetPreference('profile.current')
-    if not current then
-        -- reset our cache
-        CurrentProfileIndex = false
-        CurrentProfiles = false
-        return nil 
-    end
-
-    if current != CurrentProfileIndex then
-        -- populate our cache
-        CurrentProfileIndex = current
-        CurrentProfiles = GetPreference('profile.profiles')
-    end
-
-    return current
-end
-
--- Returns a boolean that indicates whether there are user profiles.
+-- check if there are any profiles defined
 ---@return boolean
 function ProfilesExist()
     local profiles = GetPreference("profile.profiles")
-    if (not profiles) or (TableEmpty(profiles)) then
+    if (not profiles) or (table.empty(profiles)) then
         return false
     end
     return true
 end
 
---- Returns the number of profiles.
 ---@return number
 function GetProfileCount()
     local profiles = GetPreference("profile.profiles")
     if profiles then
-        return TableGetn(profiles)
+        return table.getn(profiles)
     else
         return 0
     end
@@ -82,127 +44,83 @@ end
 
 -- creates a profile and sets it as current
 -- if it returns false, the name is already chosen
+---@return boolean
 function CreateProfile(name)
     local profiles = GetPreference("profile.profiles")
     if not profiles then
         profiles = {}
     end
-
     local foundName = 0
     for key, value in profiles do
         if value.Name == name then
             foundName = key
         end
     end
-
     local primaryAdapter = GetOption('primary_adapter')
     local secondaryAdapter = GetOption('secondary_adapter')
-
     if primaryAdapter == 'overridden' then
         primaryAdapter = '1024,768,60'
     end
-
     if secondaryAdapter == 'overridden' then
         secondaryAdapter = 'disabled'
     end
-
     if foundName == 0 then
-        table.insert(profiles, {Name = name})
+        table.insert(profiles, { Name = name })
         SetPreference("profile.current", table.getn(profiles)) -- table.insert adds to the end of the table
     else
         return false
     end
-
     SetPreference("profile.profiles", profiles)
-
     -- set default video options in to new profile, but don't actually cause any functions to get set
-    SetToCurrentProfile('options', {primary_adapter = primaryAdapter, secondary_adapter = secondaryAdapter})
-
+    SetToCurrentProfile('options', { primary_adapter = primaryAdapter, secondary_adapter = secondaryAdapter })
     SavePreferences()
-
     return true
 end
 
---- Returns the (cached) current profile. 
----@return table?   # nil when there are no profiles
+---@return table?
 function GetCurrentProfile()
-    local currentProfileIndex = GetCurrentProfileIndex()
-    if not currentProfileIndex then
-        return nil
-    end
-
-    -- populate the cache if it does not exist
-    if not CurrentProfiles then
-        return nil
-    end
-
-    return CurrentProfiles[currentProfileIndex]
+    local current = GetPreference('profile.current')
+    if not current then return nil end
+    return GetPreference('profile.profiles.' .. current)
 end
 
---- Returns a value from the current profile.
----@param fieldName string
+-- Get the map last requested by the player
 ---@return any
 function GetFromCurrentProfile(fieldName)
-    local currentProfile = GetCurrentProfile()
-    if not currentProfile then
-        return nil
-    end
-
-    -- fields can try to access subfields, as an example: `options.options_show_player_names`. This 
-    -- pattern is actively discouraged, instead retrieve the initial field and manually search for sub fields,
-    -- as an example:
-    -- 
-    -- - `GetFromCurrentProfile('options').options_show_player_names`
-
-    if StringFind(fieldName, '.') then
-        local field = currentProfile
-        local fields = StringSplit(fieldName, '.')
-        local fieldCount = TableGetn(fields)
-        for k = 1, fieldCount do
-            field = field[fields[k]]
-        end
-
-        return field
-    else
-        return currentProfile[fieldName]
-    end
+    local current = GetPreference('profile.current')
+    if not current then return nil end
+    return GetPreference('profile.profiles.' .. current .. '.' .. fieldName)
 end
 
 --- Returns a value from the current profile.
+---@deprecated
 ---@param fieldName string
 ---@return any
 function GetFieldFromCurrentProfile(fieldName)
-    local currentProfile = GetCurrentProfile()
-    if not currentProfile then
-        return nil
-    end
-    return currentProfile[fieldName]
+    return GetFromCurrentProfile(fieldName)
 end
 
 --- Updates a value in the current profile.
 ---@param fieldName string
 ---@param data any
 function SetToCurrentProfile(fieldName, data)
-    local currentProfileIndex = GetCurrentProfileIndex()
-    if not currentProfileIndex then
-        return
+    local profile = GetPreference('profile')
+    if profile.current then
+        if profile.profiles[profile.current] then
+            profile.profiles[profile.current][fieldName] = data
+            SetPreference('profile', profile)
+        end
     end
-
-    if not CurrentProfiles then
-        return
-    end
-
-    -- store the data and set the preference
-    CurrentProfiles[currentProfileIndex][fieldName] = data
-    SetPreference('profile.profiles', CurrentProfiles)
 end
 
--- read from the current options set, find and return default if not available
+-- Retrieves an option. Returns the default value if the option does not exist.
+---@param optionKey string
 function GetOption(optionKey)
     local ret = GetOptions(optionKey)
 
+    -- try to find the default value
     if ret == nil then
-        for section, secInfo in optionsLogic.GetOptionsData() do
+        for section, secInfo in import("/lua/options/optionslogic.lua").GetOptionsData() do
             for index, item in secInfo.items do
                 if item.key == optionKey then
                     ret = item.default
@@ -211,13 +129,14 @@ function GetOption(optionKey)
             end
         end
     end
-
     return ret
 end
 
+--- Updates an option
+---@param optionKey string
+---@param newValue any
 function SetOption(optionKey, newValue)
-    local tempOptionTable = optionsLogic.GetCurrent()
-
+    local tempOptionTable = import("/lua/options/optionslogic.lua").GetCurrent()
     for i, v in tempOptionTable do
         if i == optionKey then
             tempOptionTable[i] = newValue
@@ -225,12 +144,5 @@ function SetOption(optionKey, newValue)
         end
     end
 
-    optionsLogic.SetCurrent(tempOptionTable)
-end
-
-
-local OldSavePreferences = _G.SavePreferences
-_G.SavePreferences = function()
-    LOG(debug.traceback())
-    OldSavePreferences()
+    import("/lua/options/optionslogic.lua").SetCurrent(tempOptionTable)
 end
