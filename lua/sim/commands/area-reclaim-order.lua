@@ -91,75 +91,6 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
     end
 end
 
---- Applies a reclaim order to all nearby props
----@param units Unit[]
----@param target Prop
----@param doPrint boolean
----@param areaRadius? number
-local function ReclaimNearbyProps (units, target, doPrint, areaRadius)
-    local processed = 0
-    local radius = areaRadius or 4.0
-    local px, _, pz = target:GetPositionXYZ()
-    local adjacentReclaim = GetReclaimablesInRect(px - radius, pz - radius, px + radius, pz + radius)
-
-    if adjacentReclaim then
-        -- clean up previous iterations
-        for entityId, _ in distances do
-            distances[entityId] = nil
-        end
-
-        -- compute distances
-        for k = 1, TableGetn(adjacentReclaim) do
-            local entity = adjacentReclaim[k] --[[@as Prop]]
-            local ex, _, ez = entity:GetPositionXYZ()
-            local dx, dz = px - ex, pz - ez
-            distances[entity.EntityId] = dx * dx + dz * dz
-        end
-
-        -- sort the props by distance
-        TableSort(adjacentReclaim, lambdaSortProps)
-
-        for k = 1, TableGetn(adjacentReclaim) do
-            local entity = adjacentReclaim[k] --[[@as Prop]]
-            if target != entity and IsProp(entity) and
-                entity.MaxMassReclaim > 0 and
-                entity.IsTree == target.IsTree and
-                distances[entity.EntityId] <= radius * radius
-            then
-                IssueReclaim(units, entity)
-                processed = processed + 1
-            end
-
-            -- limit the number of props to add so that we do not create too many reclaim orders. The command queue
-            -- is limited to 501 commands, this limit exists to make it very difficult to reach the cap.
-            if (processed >= 6 and not areaRadius) or processed >= 400 then
-                break
-            end
-        end
-    end
-
-    if doPrint and processed > 0 and (GetFocusArmy() == GetCurrentCommandSource()) then
-        print(StringFormat("Reclaiming %d nearby props", processed))
-    end
-end
-
---- Applies additional reclaim orders to nearby similar entities that are similar to the target
----@param units Unit[]
----@param ps Unit | 
----@param doPrint boolean           # if true, prints information about the order
-function AreaReclaimOrder(units, ps, pe, width, doPrint)
-    local unitCount = TableGetn(units)
-    if unitCount == 0 then
-        return
-    end
-
-    if IsUnit(target) and EntityCategoryContains(categories.STRUCTURE, target) then
-        return ReclaimAdjacentUnits(units, target, doPrint)
-    elseif IsProp(target) then
-        return ReclaimNearbyProps(units, target, doPrint, radius)
-    end
-end
-
 ---@param units Unit[]
 ---@param ps Vector
 ---@param pe Vector
@@ -172,7 +103,7 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
 
     -- feature: prevent over saturating the command queue
     local commandQueueCount = TableGetn(units[1]:GetCommandQueue())
-    local maximumCommandsToProcess = 480 - commandQueueCount
+    local maximumCommandsToProcess = 450 - commandQueueCount
     if maximumCommandsToProcess <= 0 then
         print(StringFormat("Command queue is saturated"))
         return
