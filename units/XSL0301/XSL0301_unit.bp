@@ -347,7 +347,7 @@ UnitBlueprint{
             NewMaxRadius = 35,
             NewOmniRadius = 60,
             NewVisionRadius = 36,
-            NewDamageMod = 200,
+            NewDamageMod = 300,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
