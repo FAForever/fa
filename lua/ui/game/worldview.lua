@@ -306,6 +306,7 @@ function ToggleMainCartographicView()
     end
 end
 
+---@param view WorldView
 function RegisterWorldView(view)
     if not MapControls[view._cameraName] then MapControls[view._cameraName] = {} end
     MapControls[view._cameraName] = view
@@ -317,6 +318,7 @@ function RegisterWorldView(view)
     end
 end
 
+---@param view WorldView
 function UnregisterWorldView(view)
     if MapControls[view._cameraName] then
         MapControls[view._cameraName] = nil
