@@ -95,7 +95,6 @@ XSL0301 = ClassUnit(CommandUnit) {
             self:AddCommandCap('RULEUCC_Overcharge')
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
             self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = false
-            wep:AddDamageMod(bp.NewDamageMod or 200)
         elseif enh == 'OverchargeRemove' then
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             self:RemoveCommandCap('RULEUCC_Overcharge')
@@ -103,7 +102,6 @@ XSL0301 = ClassUnit(CommandUnit) {
             self:SetWeaponEnabledByLabel('AutoOverCharge', false)
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
             self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
-            wep:AddDamageMod(-self.Blueprint.Enhancements['LightChronatronCannon'].NewDamageMod)
             -- Engineering Throughput Upgrade
         elseif enh == 'EngineeringThroughput' then
             if not Buffs['SeraphimSCUBuildRate'] then

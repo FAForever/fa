@@ -347,6 +347,7 @@ UnitBlueprint{
             NewMaxRadius = 35,
             NewOmniRadius = 60,
             NewVisionRadius = 36,
+            NewDamageMod = 200,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
@@ -398,7 +399,6 @@ UnitBlueprint{
             Icon = "oc",
             Name = "<LOC enhancements_0139>Overcharge",
             Slot = "RCH",
-            NewDamageMod = 300,
             UpgradeEffectBones = {
                 "Right_Arm_Muzzle",
                 "Right_Arm_Barrel",
