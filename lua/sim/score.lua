@@ -330,14 +330,12 @@ local function GameOverScore()
         local allStats = brain:GetUnitStats()
         for _, unitId in unitIdsForAchievements do
 
-
+            LOG(index, unitId, brain:GetBlueprintStat("Enemies_Killed", categories[unitId]), '->', allStats[unitId]['kills'])
+            LOG(index, unitId, brain:GetBlueprintStat("Units_History", categories[unitId]), '->', allStats[unitId]['built'])
+            LOG(index, unitId, brain:GetBlueprintStat("Units_History", categories[unitId]) - brain:GetBlueprintStat("Units_Active", categories[unitId]), '->', allStats[unitId]['lost'])
 
             local unitStats = allStats[unitId]
             if unitStats then
-                LOG(index, unitId, brain:GetBlueprintStat("Enemies_Killed", categories[unitId]), '->', unitStats['kills'])
-                LOG(index, unitId, brain:GetBlueprintStat("Units_History", categories[unitId]), '->', unitStats['built'])
-                LOG(index, unitId, brain:GetBlueprintStat("Units_History", categories[unitId]) - brain:GetBlueprintStat("Units_Active", categories[unitId]), '->', unitStats['lost'])
-
                 -- track the statistics for these specific units
                 unitStats['kills'] = brain:GetBlueprintStat("Enemies_Killed", categories[unitId])
                 unitStats['built'] = brain:GetBlueprintStat("Units_History", categories[unitId])
