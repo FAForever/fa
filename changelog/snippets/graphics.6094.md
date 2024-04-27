@@ -1,3 +1,0 @@
-- (#6094) GRAPHICS
-
-Mauris augue neque gravida in fermentum et sollicitudin. Viverra adipiscing at in tellus integer feugiat scelerisque varius. Egestas quis ipsum suspendisse ultrices gravida dictum fusce. Tincidunt augue interdum velit euismod in pellentesque massa. Eget mi proin sed libero enim sed faucibus turpis in. Rhoncus urna neque viverra justo nec ultrices. Tempor orci dapibus ultrices in iaculis nunc sed. Duis ultricies lacus sed turpis tincidunt id aliquet. Sit amet nisl suscipit adipiscing. Feugiat in fermentum posuere urna nec tincidunt praesent. Pulvinar neque laoreet suspendisse interdum. Viverra nam libero justo laoreet sit amet cursus sit. Mi sit amet mauris commodo quis imperdiet massa.

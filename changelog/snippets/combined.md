@@ -8,39 +8,124 @@ ABC
 
 ## Bug fixes
 
-- (#6092) FIX
+- (#6102) Fix Ahwassa's bomb dealing full damage to ASF.
 
-In massa tempor nec feugiat nisl pretium fusce id. Amet venenatis urna cursus eget nunc scelerisque. Sodales ut etiam sit amet nisl purus in mollis nunc. Ut aliquam purus sit amet luctus. Feugiat nibh sed pulvinar proin gravida. Enim blandit volutpat maecenas volutpat blandit aliquam etiam. Fames ac turpis egestas integer eget aliquet nibh praesent. Scelerisque varius morbi enim nunc faucibus a pellentesque sit amet. Pretium fusce id velit ut tortor pretium. Interdum consectetur libero id faucibus nisl tincidunt eget nullam non. Euismod nisi porta lorem mollis aliquam ut. Tempus urna et pharetra pharetra massa massa ultricies mi.
+- (#6105) Fix a typo in the script file of the Seraphim Tech 3 Mass Fabricator.
+
+- (#6105) Fix the Seraphim Tech 3 Mass Fabricator's rotators not spinning down when production is disabled.
+
+- (#6106) Fix partially built units not transferring properly in Full Share.
+
 
 ## Balance
 
-- (#6090) BALANCE
+- (#5874) Fine tune the balance of the Tech 2 Navy stage.
+  - Uashavoh: T2 Destroyer (XSS0201):
+    - AntiTorpedo RateOfFire: 0.26 --> 0.3
+  - Salem Class: T2 Destroyer (URS0201):
+    - BackUpDistance: 5 --> 10
+  - Cooper: T2 Torpedo Boat (XES0102):
+    - Health: 1750 --> 2000
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+- (#5895) After receiving several buffs, the Seraphim Tech 3 Submarine Hunter has become too oppressive, especially in larger formations. These changes aim to bring it back in line, while keeping its identity.
+  - Yathsou: T3 Submarine Hunter (XSS0304):
+    - Damage: 290 --> 380
+    - RateOfFire: 0.25 --> 0.22
+    - MuzzleSalvoDelay: 0.7 --> 1
+    - MuzzleSalvoSize: 5 --> 4
+    - DPS: 363 --> 338
+    - Torpedo Defense RateOfFire (x2): 0.15 --> 0.1
+
+- (#5901) Increase UEF T3 MAA's DPS and damage, and swap its speed with Aeon's T3 MAA.
+
+  - Cougar: DPS: 176 -> 206, Damage per volley: 1200 -> 1400, Speed: 3.3 -> 3.5
+  - Redeemer: Speed: 3.5 -> 3.3
+
+  This brings its DPS closer in line with other factions, lets it 3 shot strategic bombers instead of 4 shot, and lets it better escort Titans/Parashields.
+  Redeemer's extra speed wasn't very necessary for its role within Aeon, so it was chosen to be swapped with.
+
+- (#6043) The `BuildRate` and `BuildTime` stats of all Radars and Sonars are updated to be more streamlined. The build time of Tech 2 Sonars is corrected to ensure it is not longer than that of Tech 3 Sonars. Tech 3 Sonars get their very low build time increased, to compensate for their Tech 2 counterparts being much quicker to build and providing more build power.
+  - Tech 1 Radars
+    - BuildRate: 14.08 --> 13
+  - Tech 2 Radars
+    - BuildRate: 21.46 --> 20
+    - BuildTime: 845 --> 780
+  - Tech 3 Radars
+    - BuildTime: 2575 --> 2400
+  - Tech 1 Sonars
+    - BuildRate: 14.08 --> 13
+    - BuildTime: 127.5 --> 125
+    - BuildCostEnergy: 1275 --> 1250
+  - Tech 2 Sonars
+    - BuildRate: 15 --> 20
+    - BuildTime: 1680 --> 780
+    - BuildTime: 2120 --> 1040 (Seraphim)
+  - Tech 3 Sonars
+    - BuildTime: 750 --> 1200
+    - BuildTime: 900 --> 1400 (Cybran)
+
+- (#6060) Make shields absorb ACU explosions.
+
+  Both mobile and static shields absorb full damage from ACU explosions. For example, this prevents ACU explosions from killing all engineers inside shielded bases/firebases or killing all units in mobile-shielded T2 armies.
+  The structure part of static shields still takes reduced structure damage from ACU explosions.
+
+- (#6073, #6094) Allow Mongoose to fire from transports.
+
+- (#6082) The `BuildRate` and `BuildTime` stats of several Shield Generators are updated to be more streamlined. The Seraphim Tech 2 Shield Generator gains build power, as it previously had a very low amount. The Aeon Tech 2 Shield Generator loses its build power, as it cannot be upgraded.
+  - Tech 2 Shield Generators
+    - BuildRate: 13.66 --> 0 (Aeon)
+    - BuildRate: 12.98 --> 20 (Seraphim)
+    - BuildRate: 19.95 --> 20 (UEF)
+  - Tech 3 Shield Generators
+    - BuildTime: 5841 --> 5800 (Seraphim)
+    - BuildTime: 4988 --> 5000 (UEF)
+
+- (#6104) Reduce TML HP and add a Death Weapon
+  - HP: 1500 --> 900
+  - Death Weapon
+    - Damage: 750
+    - AoE (UEF/Aeon/Sera): 2
+    - AoE (Cybran): 3
+
+- (#6125) Increase the hitpoints of the Aeon Tech 1 MAA so that it can survive a single bomb from a Seraphim Tech 1 bomber.
+  - Thistle: T1 Mobile Anti-Air Gun (UAL0104):
+    - MaxHealth: 250 --> 265
+
 
 ## Features
 
-- (#6090) FEATURE
+## Features
 
-Quis vel eros donec ac odio. Non curabitur gravida arcu ac tortor dignissim. Sit amet venenatis urna cursus eget. Justo donec enim diam vulputate ut. Orci nulla pellentesque dignissim enim sit amet. Sit amet commodo nulla facilisi nullam vehicula ipsum a. Quis lectus nulla at volutpat diam ut venenatis tellus in. Leo vel orci porta non pulvinar neque laoreet. Phasellus faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis. Purus non enim praesent elementum facilisis leo vel. Consequat mauris nunc congue nisi. Id velit ut tortor pretium viverra suspendisse potenti. Nam aliquam sem et tortor consequat id porta nibh. Non quam lacus suspendisse faucibus interdum.
+- (#6079) Make various structures easier to place to help with base building.
+  - All Tech 3 Power Generators, Tech 3 Mass Fabricators, Tech 3 Artilleries, Shield Structures, Land Factories and Air Factories:
+    - MaxGroundVariation: 1.0 --> 1.1
+  - All Game Enders except for the Scathis:
+    - MaxGroundVariation: 1.0 --> 1.2
 
-## Graphics
-
-- (#6094) GRAPHICS
-
-Mauris augue neque gravida in fermentum et sollicitudin. Viverra adipiscing at in tellus integer feugiat scelerisque varius. Egestas quis ipsum suspendisse ultrices gravida dictum fusce. Tincidunt augue interdum velit euismod in pellentesque massa. Eget mi proin sed libero enim sed faucibus turpis in. Rhoncus urna neque viverra justo nec ultrices. Tempor orci dapibus ultrices in iaculis nunc sed. Duis ultricies lacus sed turpis tincidunt id aliquet. Sit amet nisl suscipit adipiscing. Feugiat in fermentum posuere urna nec tincidunt praesent. Pulvinar neque laoreet suspendisse interdum. Viverra nam libero justo laoreet sit amet cursus sit. Mi sit amet mauris commodo quis imperdiet massa.
 
 ## AI
 
-- (#6093) AI
+- (#6046) Fix issue with T2 static artillery not receiving any surface threat during blueprint pass over.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Viverra suspendisse potenti nullam ac. Gravida dictum fusce ut placerat orci nulla. Amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Eget nullam non nisi est sit amet. Ipsum dolor sit amet consectetur adipiscing elit pellentesque habitant. Netus et malesuada fames ac turpis egestas maecenas. Enim tortor at auctor urna nunc id cursus. Turpis egestas sed tempus urna et. Pellentesque id nibh tortor id aliquet lectus proin nibh. Amet mattis vulputate enim nulla. Eu turpis egestas pretium aenean pharetra. Facilisi cras fermentum odio eu feugiat pretium nibh ipsum consequat. Facilisi nullam vehicula ipsum a arcu cursus vitae congue.
 
 ## Other changes
 
-- (#6094) PERFORMANCE
+- (#5668, #6066) Rework Seraphim weapon modules
 
-Elit sed vulputate mi sit amet mauris commodo quis imperdiet. Ac feugiat sed lectus vestibulum mattis. Egestas congue quisque egestas diam in arcu cursus. Commodo elit at imperdiet dui accumsan sit amet. Mauris ultrices eros in cursus turpis massa tincidunt. Dictum at tempor commodo ullamcorper a. Tortor id aliquet lectus proin nibh nisl. Amet venenatis urna cursus eget nunc scelerisque. Ac turpis egestas integer eget aliquet nibh praesent tristique. Est pellentesque elit ullamcorper dignissim cras. Risus feugiat in ante metus dictum at tempor commodo. Arcu odio ut sem nulla pharetra diam sit amet. Mauris a diam maecenas sed enim ut. Cursus risus at ultrices mi tempus imperdiet nulla. Leo a diam sollicitudin tempor id. Diam phasellus vestibulum lorem sed. Orci eu lobortis elementum nibh tellus molestie nunc non. Proin sagittis nisl rhoncus mattis rhoncus urna neque. Turpis egestas integer eget aliquet. Pellentesque massa placerat duis ultricies lacus sed turpis tincidunt id.
+- (#6041, #6055) Clean up the blueprint-files of various structures.
+
+- (#6042) Improve annotations for `OnMotionHorzEventChange` and `OnMotionVertEventChange`
+
+- (#6067) Fix a performance issue related to AIs and their transport logic
+
+- (#6077) Improve the targeting of the Tempest's anti-torpedo weapon.
+
+- (#6086) Ensure that the Cooper's hitbox aligns with its model
+
+- (#6091) Count cargo for veterancy when a transport or carrier is killed
+
+- (#6109) Annotate the shield assist mechanics of `RegenAssistMult`
+
 
 ## Contributors
 
