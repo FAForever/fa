@@ -64,34 +64,36 @@ end
 -- rate of fire that the game uses.
 ---@param rateOfFire number
 local function rateOfFireTest(rateOfFire)
-    luft.expect(rateOfFire).to.be.number()
+    return function()
+        luft.expect(rateOfFire).to.be.number()
 
-    if rateOfFire > 6.6666 then
-        luft.expect(rateOfFire).to.be.close.to(10)
-    elseif rateOfFire > 4.0 then
-        luft.expect(rateOfFire).to.be.close.to(5)
-    elseif rateOfFire > 2.8571 then
-        luft.expect(rateOfFire).to.be.close.to(3.333)
-    elseif rateOfFire > 2.2222 then
-        luft.expect(rateOfFire).to.be.close.to(2.5)
-    elseif rateOfFire > 1.8182 then
-        luft.expect(rateOfFire).to.be.close.to(2.0)
-    elseif rateOfFire > 1.5384 then
-        luft.expect(rateOfFire).to.be.close.to(1.666)
-    elseif rateOfFire > 1.3333 then
-        luft.expect(rateOfFire).to.be.close.to(1.428)
-    elseif rateOfFire > 1.1765 then
-        luft.expect(rateOfFire).to.be.close.to(1.25)
-    elseif rateOfFire > 1.0526 then
-        luft.expect(rateOfFire).to.be.close.to(1.111)
-    elseif rateOfFire > 0.9524 then
-        luft.expect(rateOfFire).to.be.close.to(1.0)
-    elseif rateOfFire > 0.8696 then
-        luft.expect(rateOfFire).to.be.close.to(0.909)
-    elseif rateOfFire > 0.8 then
-        luft.expect(rateOfFire).to.be.close.to(0.833)
-    elseif rateOfFire > 0.7407 then
-        luft.expect(rateOfFire).to.be.close.to(0.769)
+        if rateOfFire > 6.6666 then
+            luft.expect(rateOfFire).to.be.close.to(10)
+        elseif rateOfFire > 4.0 then
+            luft.expect(rateOfFire).to.be.close.to(5)
+        elseif rateOfFire > 2.8571 then
+            luft.expect(rateOfFire).to.be.close.to(3.333)
+        elseif rateOfFire > 2.2222 then
+            luft.expect(rateOfFire).to.be.close.to(2.5)
+        elseif rateOfFire > 1.8182 then
+            luft.expect(rateOfFire).to.be.close.to(2.0)
+        elseif rateOfFire > 1.5384 then
+            luft.expect(rateOfFire).to.be.close.to(1.666)
+        elseif rateOfFire > 1.3333 then
+            luft.expect(rateOfFire).to.be.close.to(1.428)
+        elseif rateOfFire > 1.1765 then
+            luft.expect(rateOfFire).to.be.close.to(1.25)
+        elseif rateOfFire > 1.0526 then
+            luft.expect(rateOfFire).to.be.close.to(1.111)
+        elseif rateOfFire > 0.9524 then
+            luft.expect(rateOfFire).to.be.close.to(1.0)
+        elseif rateOfFire > 0.8696 then
+            luft.expect(rateOfFire).to.be.close.to(0.909)
+        elseif rateOfFire > 0.8 then
+            luft.expect(rateOfFire).to.be.close.to(0.833)
+        elseif rateOfFire > 0.7407 then
+            luft.expect(rateOfFire).to.be.close.to(0.769)
+        end
     end
 end
 
