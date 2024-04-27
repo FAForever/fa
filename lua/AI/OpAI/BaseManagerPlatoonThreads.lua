@@ -613,7 +613,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
     -- Enter build monitoring loop, the bulk of the data assigning logic is handled in "EngineerOnStartBuild()"
 	repeat
 		WaitTicks(30)
-		if not aiBrain:PlatoonExists(platoon) then
+		if not aiBrain:PlatoonExists(singleEngineerPlatoon) then
             return
         end
     until engineer:IsIdleState()
