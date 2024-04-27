@@ -16,13 +16,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            changelog/snippets/*.md
-            changelog/snippets/*.sh
+            *.md
+            *.sh
             
       - name: Create the changelog
         working-directory: ./changelog/snippets
         run: |
-          "bash ./combine.sh"
+          ls */*.md
+          bash ./combine.sh
           
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
