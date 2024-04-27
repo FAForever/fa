@@ -613,7 +613,10 @@ function DoConditionalBuild(singleEngineerPlatoon)
     -- Enter build monitoring loop, the bulk of the data assigning logic is handled in "EngineerOnStartBuild()"
 	repeat
 		WaitTicks(30)
-    until not aiBrain:PlatoonExists(singleEngineerPlatoon) or engineer:IsIdleState()
+		if not aiBrain:PlatoonExists(platoon) then
+            return
+        end
+    until engineer:IsIdleState()
 	
     IssueToUnitClearCommands(engineer)
     TriggerFile.RemoveUnitTrigger(engineer, ConditionalBuilderDead)
@@ -984,10 +987,10 @@ function BaseManagerEngineerThread(platoon)
     local StructureFound, UnitName
 	
 	-- The idea is to search for a structure (or any unit, but 99% it's a structure) based on the priorities set above that needs to be built
-	-- If we found one, and the build order could be issued (see 'BuildBaseManagerStructure()' for that), we wait until our engineer finishes task, then check for the next structure
+	-- If we found one, and the build order could be issued (see 'BuildBaseManagerStructure()' for that), we wait until our engineer finishes its task, then check for the next structure
 	-- The original iteration uses the same dual 'for' loop, however if a structure of a higher priority got destroyed, the engineer would ignore that until all remaining categories were exhausted
 	-- In this case we check through the priorities every single time
-	-- So for example, our Engineer half-way done building all walls, and a T3 resource structure is destroyed during that, our engineer will rebuild said resource structure, and return to finishing the walls
+	-- Ie., our Engineer half-way done building all walls, and a T3 resource structure is destroyed during that, our engineer will rebuild said resource structure, and return to finishing the walls
 	while aiBrain:PlatoonExists(platoon) do
 		-- Assume we found no structure at the start of each loop
 		StructureFound = false
@@ -1021,6 +1024,9 @@ function BaseManagerEngineerThread(platoon)
 		-- We gotta wait at least once under any circumstances, so I'm not using a "while" loop here, because this function can freeze the sim if say, an T1 Aeon Bomber stuns our engineer unit
 		repeat
 			WaitTicks(20)
+			if not aiBrain:PlatoonExists(platoon) then
+                return
+            end
         until Engineer.Dead or Engineer:IsIdleState()
 		
 		-- Break out if we couldn't find a structure to build

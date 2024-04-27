@@ -160,14 +160,13 @@ local BuildingCounterDefaultValues = {
 
 --- Failsafe callback function when a structure marked for needing an upgrade starts building something
 --- If that 'something' is the upgrade itself, create a callback for the upgrade
----@param@ unit Unit
+---@param unit Unit
 ---@param unitBeingBuilt Unit
 function FailSafeStructureOnStartBuild(unit, unitBeingBuilt)
 	-- If we are in the upgrading state, then it's the upgrade we want under normal circumstances.
 	-- We don't use different upgrades paths for coop, only that of the original SCFA (no Support Factory upgrade paths whatsoever)
 	-- If you decide to mess around with AI armies in cheat mode, and order a newly added upgrade path instead anyway, then any mishaps happening afterwards is on you!
 	if unit:IsUnitState('Upgrading') then
-		--LOG('Structure building upgrade named: ' .. tostring(unit.UnitName))
 		unitBeingBuilt.UnitName = unit.UnitName
 		unitBeingBuilt.BaseName = unit.BaseName
 

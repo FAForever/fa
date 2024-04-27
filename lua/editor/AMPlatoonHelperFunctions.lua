@@ -6,8 +6,6 @@
 ----------------------------------------------------------------------
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 
--- === utility function === --
-
 ---@param time number
 ---@param name string
 function UnlockTimer(time, name)

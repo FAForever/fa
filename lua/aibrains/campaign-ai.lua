@@ -180,7 +180,7 @@ AIBrain = Class(StandardBrain) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            WARN('*WARNING: TRIED TO IMPORT PLAN NAME: ' .. tostring(planName) .. ', BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,
@@ -209,7 +209,7 @@ AIBrain = Class(StandardBrain) {
             self.CurrentPlan = bestPlan
         end
         if not self.CurrentPlan then
-            error('*AI ERROR: Invalid plan list for army - '..self.Name, 2)
+            error('*AI ERROR: Invalid plan list for army - ' .. self.Name, 2)
         end
     end,
 
@@ -353,8 +353,7 @@ AIBrain = Class(StandardBrain) {
     ---@param pltnTable PlatoonTable
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
-            local stng = '*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE.  '
-            error(stng, 1)
+            error('*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE', 1)
             return
         end
 
@@ -921,8 +920,7 @@ AIBrain = Class(StandardBrain) {
     ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
          if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
-            local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType), ') WAS PASSED IN.'
-            error(strng, 2)
+            error('*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (' .. tostring(platoonType) .. ') WAS PASSED IN.', 2)
             return false
         end
         local sortedList = {}
