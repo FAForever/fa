@@ -8,12 +8,14 @@ jobs:
     name: Bundle changelog
     runs-on: ubuntu-latest
     steps:
+      - name: Install tooling
+        run: apk add bash git findutils
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            *.md
-
+          sparse-checkout: "*.md"
+            
       - name: Create the changelog
         working-directory: ./changelog/snippets
         run: |
