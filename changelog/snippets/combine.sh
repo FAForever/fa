@@ -87,7 +87,7 @@ fi
 #region Combine the changelog snippets into one large changelog
 
 # Output file name
-output="combined.md"
+output="changelog.md"
 rm -f "$output"
 
 # Add the initial header
