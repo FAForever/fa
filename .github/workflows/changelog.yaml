@@ -15,7 +15,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          sparse-checkout: "*.md"
+          sparse-checkout: |
+            changelog/snippets/*.md
+            changelog/snippets/*.sh
             
       - name: Create the changelog
         working-directory: ./changelog/snippets
