@@ -1,10 +1,11 @@
-name: Changelog # todo: Bundle changelog
+name: Create changelog
 
 on: 
   workflow_dispatch:
+  push:
   
 jobs:
-  create:
+  bundle:
     name: Bundle
     runs-on: ubuntu-latest
     steps:
