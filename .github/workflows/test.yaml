@@ -3,6 +3,9 @@ name: Test
 on: 
   workflow_dispatch:
   pull_request:
+    paths: 
+      - '*.lua'
+      - '*.bp'
   push:
     branches:
       - deploy/fafdevelop
