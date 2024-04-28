@@ -110,6 +110,7 @@ if ls fix.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No bug fix snippets found."
+    echo ""
 fi
 
 # Add balance changes
@@ -129,6 +130,7 @@ if ls balance.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No balance snippets found."
+    echo ""
 fi
 
 # Add features
@@ -148,6 +150,7 @@ if ls features.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No feature snippets found."
+    echo ""
 fi
 
 # Add graphics changes
@@ -167,6 +170,7 @@ if ls graphics.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No graphics snippets found."
+    echo ""
 fi
 
 # Add AI changes
@@ -186,6 +190,7 @@ if ls ai.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No ai snippets found."
+    echo ""
 fi
 
 # Add other changes
@@ -205,6 +210,7 @@ if ls other.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No other snippets found."
+    echo ""
 fi
 
 # Add the final footer
