@@ -96,15 +96,17 @@ cat "$templateHeader" >>"$output"
 # Add bug fixes
 if ls fix.*.md >/dev/null 2>&1; then
 
+    echo "Processing bug fix snippets"
     cat "$templateFix" >>"$output"
     echo "" >>"$output"
 
     for file in fix.*.md; do
-        echo "Processing bug fix snippet: $file"
+        echo " - Processing bug fix snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
+    echo ""
     echo "" >>"$output"
 else
     echo "No bug fix snippets found."
@@ -113,15 +115,17 @@ fi
 # Add balance changes
 if ls balance.*.md >/dev/null 2>&1; then
 
+    echo "Processing balance snippets"
     cat "$templateBalance" >>"$output"
     echo "" >>"$output"
 
     for file in balance.*.md; do
-        echo "Processing balance snippet: $file"
+        echo " - Processing balance snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
+    echo ""
     echo "" >>"$output"
 else
     echo "No balance snippets found."
@@ -130,15 +134,17 @@ fi
 # Add features
 if ls features.*.md >/dev/null 2>&1; then
 
+    echo "Processing feature snippets"
     cat "$templateFeatures" >>"$output"
     echo "" >>"$output"
 
     for file in features.*.md; do
-        echo "Processing feature snippet: $file"
+        echo " - Processing feature snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
+    echo ""
     echo "" >>"$output"
 else
     echo "No feature snippets found."
@@ -147,15 +153,17 @@ fi
 # Add graphics changes
 if ls graphics.*.md >/dev/null 2>&1; then
 
+    echo "Processing graphics snippets"
     cat "$templateGraphics" >>"$output"
     echo "" >>"$output"
 
     for file in graphics.*.md; do
-        echo "Processing graphics snippet: $file"
+        echo " - Processing graphics snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
+    echo ""
     echo "" >>"$output"
 else
     echo "No graphics snippets found."
@@ -164,15 +172,17 @@ fi
 # Add AI changes
 if ls ai.*.md >/dev/null 2>&1; then
 
+    echo "Processing ai snippets"
     cat "$templateAI" >>"$output"
     echo "" >>"$output"
 
     for file in ai.*.md; do
-        echo "Processing ai snippet: $file"
+        echo " - Processing ai snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
+    echo ""
     echo "" >>"$output"
 else
     echo "No ai snippets found."
@@ -181,15 +191,17 @@ fi
 # Add other changes
 if ls other.*.md >/dev/null 2>&1; then
 
+    echo "Processing other snippets"
     cat "$templateOther" >>"$output"
     echo "" >>"$output"
 
     for file in other.*.md; do
-        echo "Processing other snippet: $file"
+        echo " - Processing other snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
+    echo ""
     echo "" >>"$output"
 else
     echo "No other snippets found."
