@@ -3,6 +3,8 @@ name: Create changelog
 on:
   workflow_dispatch:
   pull_request:
+    paths: 
+      - 'changelog/snippets/*.md'
   push:
     branches:
       - deploy/fafdevelop
