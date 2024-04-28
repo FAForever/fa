@@ -125,7 +125,7 @@ if ls balance.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 else
     echo "No balance snippets found."
-end
+fi
 
 # Add features
 if ls features.*.md >/dev/null 2>&1; then
