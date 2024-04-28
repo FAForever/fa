@@ -53,7 +53,7 @@ is_valid_filename() {
 
 for file in *.md; do
     if is_valid_filename "$file"; then
-        echo " - Processing: $file"
+        echo " - Verified: $file"
     else
         echo "Invalid format: $file"
         exit 1
