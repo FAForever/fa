@@ -35,7 +35,7 @@ if ! [ -e "$templateHeader" ]; then
 fi
 
 templateFooter="sections/template-footer.md"
-if ! [ -e "$templateHeader" ]; then
+if ! [ -e "$templateFooter" ]; then
     echo "No markdown template for the footer found. Are you starting the script from the wrong directory?"
     exit 1
 fi
@@ -100,11 +100,14 @@ if ls fix.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 
     for file in fix.*.md; do
+        echo "Processing bug fix snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
     echo "" >>"$output"
+else
+    echo "No bug fix snippets found."
 fi
 
 # Add balance changes
@@ -114,12 +117,15 @@ if ls balance.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 
     for file in balance.*.md; do
+        echo "Processing balance snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
     echo "" >>"$output"
-fi
+else
+    echo "No balance snippets found."
+end
 
 # Add features
 if ls features.*.md >/dev/null 2>&1; then
@@ -128,11 +134,14 @@ if ls features.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 
     for file in features.*.md; do
+        echo "Processing feature snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
     echo "" >>"$output"
+else
+    echo "No feature snippets found."
 fi
 
 # Add graphics changes
@@ -142,11 +151,14 @@ if ls graphics.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 
     for file in graphics.*.md; do
+        echo "Processing graphics snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
     echo "" >>"$output"
+else
+    echo "No graphics snippets found."
 fi
 
 # Add AI changes
@@ -156,11 +168,14 @@ if ls ai.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 
     for file in ai.*.md; do
+        echo "Processing ai snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
     echo "" >>"$output"
+else
+    echo "No ai snippets found."
 fi
 
 # Add other changes
@@ -170,14 +185,17 @@ if ls other.*.md >/dev/null 2>&1; then
     echo "" >>"$output"
 
     for file in other.*.md; do
+        echo "Processing other snippet: $file"
         cat "$file" >>"$output"
         echo "" >>"$output"
     done
 
     echo "" >>"$output"
+else
+    echo "No other snippets found."
 fi
 
-# Add the initial header
+# Add the final footer
 cat "$templateFooter" >>"$output"
 
 #endregion

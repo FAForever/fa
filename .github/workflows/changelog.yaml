@@ -1,11 +1,11 @@
-name: Changelog
+name: Bundle changelog
 
 on: 
   workflow_dispatch:
   
 jobs:
   create:
-    name: Bundle changelog
+    name: Bundle
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,7 +15,7 @@ jobs:
             changelog/snippets
             
       - name: Create the changelog
-        working-directory: changelog/snippets
+        working-directory: changelog/snippets   # script assumes it is in this directory
         run: |
           ./combine.sh
           
