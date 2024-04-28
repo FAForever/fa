@@ -70,6 +70,12 @@ if ! [ -e "$templateAI" ]; then
     exit 1
 fi
 
+templatePerformance="sections/template-performance.md"
+if ! [ -e "$templatePerformance" ]; then
+    echo "No markdown template for performance found. Are you starting the script from the wrong directory?"
+    exit 1
+fi
+
 templateOther="sections/template-other.md"
 if ! [ -e "$templateOther" ]; then
     echo "No markdown template for other changes found. Are you starting the script from the wrong directory?"
@@ -86,6 +92,31 @@ fi
 # -----------------------------------------------------------------------------
 #region Combine the changelog snippets into one large changelog
 
+# Function to process snippets
+process_snippets() {
+    local snippet_type="$1"
+    local template_file="$2"
+    local output_file="$3"
+
+    if ls "$snippet_type".*.md >/dev/null 2>&1; then
+        echo "Processing $snippet_type snippets"
+        cat "$template_file" >> "$output_file"
+        echo "" >> "$output_file"
+
+        for file in "$snippet_type".*.md; do
+            echo " - Processing $snippet_type snippet: $file"
+            cat "$file" >> "$output_file"
+            echo "" >> "$output_file"
+        done
+
+        echo ""
+        echo "" >> "$output_file"
+    else
+        echo "No $snippet_type snippets found."
+        echo ""
+    fi
+}
+
 # Output file name
 output="changelog.md"
 rm -f "$output"
@@ -93,125 +124,13 @@ rm -f "$output"
 # Add the initial header
 cat "$templateHeader" >>"$output"
 
-# Add bug fixes
-if ls fix.*.md >/dev/null 2>&1; then
-
-    echo "Processing bug fix snippets"
-    cat "$templateFix" >>"$output"
-    echo "" >>"$output"
-
-    for file in fix.*.md; do
-        echo " - Processing bug fix snippet: $file"
-        cat "$file" >>"$output"
-        echo "" >>"$output"
-    done
-
-    echo ""
-    echo "" >>"$output"
-else
-    echo "No bug fix snippets found."
-    echo ""
-fi
-
-# Add balance changes
-if ls balance.*.md >/dev/null 2>&1; then
-
-    echo "Processing balance snippets"
-    cat "$templateBalance" >>"$output"
-    echo "" >>"$output"
-
-    for file in balance.*.md; do
-        echo " - Processing balance snippet: $file"
-        cat "$file" >>"$output"
-        echo "" >>"$output"
-    done
-
-    echo ""
-    echo "" >>"$output"
-else
-    echo "No balance snippets found."
-    echo ""
-fi
-
-# Add features
-if ls features.*.md >/dev/null 2>&1; then
-
-    echo "Processing feature snippets"
-    cat "$templateFeatures" >>"$output"
-    echo "" >>"$output"
-
-    for file in features.*.md; do
-        echo " - Processing feature snippet: $file"
-        cat "$file" >>"$output"
-        echo "" >>"$output"
-    done
-
-    echo ""
-    echo "" >>"$output"
-else
-    echo "No feature snippets found."
-    echo ""
-fi
-
-# Add graphics changes
-if ls graphics.*.md >/dev/null 2>&1; then
-
-    echo "Processing graphics snippets"
-    cat "$templateGraphics" >>"$output"
-    echo "" >>"$output"
-
-    for file in graphics.*.md; do
-        echo " - Processing graphics snippet: $file"
-        cat "$file" >>"$output"
-        echo "" >>"$output"
-    done
-
-    echo ""
-    echo "" >>"$output"
-else
-    echo "No graphics snippets found."
-    echo ""
-fi
-
-# Add AI changes
-if ls ai.*.md >/dev/null 2>&1; then
-
-    echo "Processing ai snippets"
-    cat "$templateAI" >>"$output"
-    echo "" >>"$output"
-
-    for file in ai.*.md; do
-        echo " - Processing ai snippet: $file"
-        cat "$file" >>"$output"
-        echo "" >>"$output"
-    done
-
-    echo ""
-    echo "" >>"$output"
-else
-    echo "No ai snippets found."
-    echo ""
-fi
-
-# Add other changes
-if ls other.*.md >/dev/null 2>&1; then
-
-    echo "Processing other snippets"
-    cat "$templateOther" >>"$output"
-    echo "" >>"$output"
-
-    for file in other.*.md; do
-        echo " - Processing other snippet: $file"
-        cat "$file" >>"$output"
-        echo "" >>"$output"
-    done
-
-    echo ""
-    echo "" >>"$output"
-else
-    echo "No other snippets found."
-    echo ""
-fi
+process_snippets "fix" "$templateFix" "$output"
+process_snippets "balance" "$templateBalance" "$output"
+process_snippets "features" "$templateFeature" "$output"
+process_snippets "graphics" "$templateGraphics" "$output"
+process_snippets "ai" "$templateAI" "$output"
+process_snippets "performance" "$templatePerformance" "$output"
+process_snippets "other" "$templateOther" "$output"
 
 # Add the final footer
 cat "$templateFooter" >>"$output"
