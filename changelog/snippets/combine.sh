@@ -104,7 +104,7 @@ process_snippets() {
         echo "" >> "$output_file"
 
         for file in "$snippet_type".*.md; do
-            echo " - Processing $snippet_type snippet: $file"
+            echo " - Processing: $file"
             cat "$file" >> "$output_file"
             echo "" >> "$output_file"
         done
