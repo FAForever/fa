@@ -1,4 +1,4 @@
-name: Bundle changelog
+name: Changelog # todo: Bundle changelog
 
 on: 
   workflow_dispatch:
