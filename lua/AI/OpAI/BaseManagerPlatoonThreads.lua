@@ -691,7 +691,7 @@ function PermanentFactoryAssist(platoon)
 
         -- Determine the number of guards on all factories
         local high, highFac, low, lowFac
-        for k, v in facs do
+        for _, v in facs do
             if not v.Dead then
                 local guards = v:GetGuards()
                 local numGuards = 0
@@ -914,10 +914,11 @@ end
 ---@param platoon Platoon
 function ExpansionPlatoonDestroyed(brain, platoon)
     local aiBrain = platoon:GetBrain()
-    local bManager = aiBrain.BaseManagers[platoon.PlatoonData.BaseName]
+    local data = platoon.PlatoonData
+    local bManager = aiBrain.BaseManagers[data.BaseName]
 
     for num, eData in bManager.ExpansionBaseData do
-        if eData.BaseName == platoon.PlatoonData.ExpansionBase then
+        if eData.BaseName == data.ExpansionBase then
             eData.IncomingEngineers = eData.IncomingEngineers - 1
         end
     end
