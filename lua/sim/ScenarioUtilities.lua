@@ -1075,7 +1075,7 @@ end
 ---@return table|nil
 ---@return Platoon[]|nil
 function CreateArmyGroup(strArmy, strGroup, wreckage, balance)
-    LOG('CreateArmy group ' .. repr(strArmy))
+    LOG('CreateArmy group ' .. tostring(strArmy))
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)

@@ -95,7 +95,8 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        -- OnKilled will be called a second time by the transport's OnImpact
+        -- Skips a single OnKilled call
+        -- currently used by transports with external storage, so that death effects can be applied later from OnImpact
         if self.killedInTransport then
             self.killedInTransport = false
         else

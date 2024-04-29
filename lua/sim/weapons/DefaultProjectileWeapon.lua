@@ -357,8 +357,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Triggers when the weapon is moved horizontally, usually by owner's motion
     ---@param self DefaultProjectileWeapon
-    ---@param new string
-    ---@param old string
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         Weapon.OnMotionHorzEventChange(self, new, old)
 
