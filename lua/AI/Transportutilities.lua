@@ -42,7 +42,7 @@ local NavUtils = import("/lua/sim/navutils.lua")
 
 local AIRTRANSPORTS = categories.AIR * categories.TRANSPORTFOCUS
 local ENGINEERS = categories.ENGINEER
-local TransportDialog = true
+local TransportDialog = false
 
 -- this function will create the TransportPool platoon and put the reference to it in the brain
 function CreateTransportPool( aiBrain )
