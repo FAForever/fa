@@ -15,6 +15,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
+local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -498,6 +499,16 @@ end
 ---@param command UserCommand
 ---@return boolean
 function OnCommandIssued(command)
+
+    -- Area reclaim dragger, command mode only
+    if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
+    end
+
+    -- Area reclaim dragger, command mode only
+    if command.CommandType == 'Attack' and command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
+        import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
+    end
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then

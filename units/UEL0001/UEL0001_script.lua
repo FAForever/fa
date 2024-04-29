@@ -19,7 +19,7 @@ local Shield = import("/lua/shield.lua").Shield
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local TerranWeaponFile = import("/lua/terranweapons.lua")
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
-local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
@@ -28,7 +28,7 @@ local Buff = import("/lua/sim/buff.lua")
 ---@class UEL0001 : ACUUnit
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
         OverCharge = ClassWeapon(TDFOverchargeWeapon) {},
         AutoOverCharge = ClassWeapon(TDFOverchargeWeapon) {},
@@ -463,24 +463,5 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 }
-
-if true then
-
-    local oldUEL0001 = UEL0001
-    UEL0001 = ClassUnit(UEL0001) {
-        --- Adds a single level of veterancy
-        ---@param self Unit | VeterancyComponent
-        AddVetLevel = function(self)
-            oldUEL0001.AddVetLevel(self)
-
-            LOG("UEL0001 AddVetLevel")
-
-            -- replace the mesh
-            local temp = string.format('/units/uel0001/wide/UEF%d_mesh', self.VetLevel)
-            self:SetMesh(temp, true)
-        end
-    }
-
-end
 
 TypeClass = UEL0001

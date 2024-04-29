@@ -96,7 +96,6 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 5760,
         BuildCostMass = 480,
-        BuildRate = 13.66,
         BuildTime = 950,
         MaintenanceConsumptionPerSecondEnergy = 150,
         RebuildBonusIds = {
@@ -141,7 +140,6 @@ UnitBlueprint{
     LifeBarOffset = 0.9,
     LifeBarSize = 2.25,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -152,17 +150,15 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 3,
         MeshExtentsY = 2,
         MeshExtentsZ = 3,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 6,
         SkirtSizeZ = 6,
-        TurnRate = 0,
     },
     SelectionSizeX = 1.5,
     SelectionSizeZ = 1.5,

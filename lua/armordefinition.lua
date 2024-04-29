@@ -29,6 +29,7 @@
 ---| "TreeFire"
 ---| "TreeForce"
 ---| "WallOverspill"
+---| "TransportDamage" # Skips visual effects in OnKilled
 
 ---@alias ArmorType
 ---| "ASF"

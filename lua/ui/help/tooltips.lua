@@ -653,7 +653,12 @@ Tooltips = {
 
     options_alt_to_force_attack_move = {
         title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
-        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>When enabled holding alt will always turn orders into an attack move order"
+        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_DESCRIPTION>When enabled holding alt will always turn orders into an attack move order"
+    },
+
+    options_area_commands_button = {
+        title = "<LOC area_commands_button_title>Button to trigger area commands",
+        description = "<LOC area_commands_button_description>When holding this button you'll trigger area command interface as you issue a command in command mode."
     },
 
     options_assist_to_unpause = {
@@ -1756,12 +1761,11 @@ Tooltips = {
         title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
     },
-    -- TODO: rename to `dip_recall_request_yes` and `dip_recall_request_no`
-    dip_recall_request_accept = {
+    dip_recall_request_yes = {
         title = "<LOC tooltipui0732>Yes Vote",
         description = "<LOC tooltipui0733>Vote yes to your team recalling from battle as a defeat.",
     },
-    dip_recall_request_veto = {
+    dip_recall_request_no = {
         title = "<LOC tooltipui0734>No Vote",
         description = "<LOC tooltipui0735>Vote no to your team recalling from battle as a defeat.",
     },
