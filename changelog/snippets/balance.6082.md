@@ -1,0 +1,8 @@
+- (#6082) The `BuildRate` and `BuildTime` stats of several Shield Generators are updated to be more streamlined. The Seraphim Tech 2 Shield Generator gains build power, as it previously had a very low amount. The Aeon Tech 2 Shield Generator loses its build power, as it cannot be upgraded.
+  - Tech 2 Shield Generators
+    - BuildRate: 13.66 --> 0 (Aeon)
+    - BuildRate: 12.98 --> 20 (Seraphim)
+    - BuildRate: 19.95 --> 20 (UEF)
+  - Tech 3 Shield Generators
+    - BuildTime: 5841 --> 5800 (Seraphim)
+    - BuildTime: 4988 --> 5000 (UEF)

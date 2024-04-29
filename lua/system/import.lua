@@ -119,8 +119,11 @@ function import(name, isLazy)
         return existing
     end
 
-    SPEW(string.format("%sLoading module: %s", string.rep("-> ", indent) or "", name))
-    indent = indent + 1
+    -- As this creates a lot of entries in your log very quickly, we disable it by default
+    if informDevOfLoad then
+        SPEW(string.format("%sLoading module: %s", string.rep("-> ", indent) or "", name))
+        indent = indent + 1
+    end
 
     ---@type ModuleInfo
     local moduleinfo = {
@@ -160,9 +163,11 @@ function import(name, isLazy)
         -- load immediately if said so
         LoadModule(module)
     end
-
-    indent = indent - 1
-
+    
+    if informDevOfLoad then
+        indent = indent - 1
+    end
+    
     return module
 end
 
