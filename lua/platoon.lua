@@ -1015,13 +1015,19 @@ Platoon = Class(moho.platoon_methods) {
                 self:AggressiveMoveToLocation(bestMarker.position)
             end
 
-            -- wait till we get there
+            -- get our position, return if we don't have one (no units)
             local oldPlatPos = self:GetPlatoonPosition()
+            if not oldPlatPos then
+                return
+            end
+
             local StuckCount = 0
             repeat
                 WaitSeconds(5)
                 platLoc = self:GetPlatoonPosition()
-                if not platLoc then break end ---@cast oldPlatPos Vector
+                if not platLoc then
+                    return
+                end
                 if VDist3(oldPlatPos, platLoc) < 1 then
                     StuckCount = StuckCount + 1
                 else
@@ -2242,7 +2248,11 @@ Platoon = Class(moho.platoon_methods) {
         local baseTmplList = {}
 
         local platLoc = self:GetPlatoonPosition()
-        -- if we have nothing to build or no units, disband!
+        -- if we have no units, return
+        if not platLoc then
+            return
+        end
+        -- if we have nothing to build, disband!
         if not cons.BuildStructures or not platLoc then
             coroutine.yield(1)
             self:PlatoonDisband()
@@ -3346,7 +3356,6 @@ Platoon = Class(moho.platoon_methods) {
                 WaitTicks(100)
                 platPos = self:GetPlatoonPosition()
                 if not platPos then
-                    self:PlatoonDisband() -- units are dead, disband anyway
                     return
                 end
                 local distSq = VDist2Sq(platPos[1], platPos[3], returnPos[1], returnPos[3])
