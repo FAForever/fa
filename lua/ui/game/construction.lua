@@ -1175,16 +1175,18 @@ function OnRolloverHandler(button, state)
     end
 end
 
+---@param unit UserUnit
 function watchForQueueChange(unit)
     if watchingUnit == unit then
         return
     end
+    updateQueue = false
+    watchingUnit = unit
     ForkThread(QueueChangeWatchThread, unit)
 end
 
+---@param unit UserUnit
 function QueueChangeWatchThread(unit)
-    updateQueue = false
-    watchingUnit = unit
     local threadWatchingUnit = watchingUnit
     while unit:GetCommandQueue()[1].type ~= 'Script' do
         WaitSeconds(0.2)

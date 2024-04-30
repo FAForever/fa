@@ -765,15 +765,15 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             return
         end
 
-        ForkThread(self.PlayVOSoundThread, self, string, bank, cue)
-    end,
-
-    PlayVOSoundThread = function(self, key, bank, cue)
-        self.VOTable[key] = true
-        import("/lua/SimSyncUtils.lua").SyncVoice {
+        self.VOTable[string] = true
+        ForkThread(self.PlayVOSoundThread, self, string, {
             Cue = cue,
             Bank = bank
-        }
+        })
+    end,
+
+    PlayVOSoundThread = function(self, key, data)
+        import("/lua/SimSyncUtils.lua").SyncVoice(data)
         WaitSeconds(self.VOSounds["timeout"])
 
         self.VOTable[key] = nil

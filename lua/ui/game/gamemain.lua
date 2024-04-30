@@ -629,7 +629,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         newSelection, changed = DeselectSelens(newSelection)
 
         if changed then
-            ForkThread(SelectUnits, newSelection)
+            ForkThread(function()
+                SelectUnits(newSelection) -- cannot fork cfunction directly
+            end)
             return
         end
 

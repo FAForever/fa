@@ -9,17 +9,25 @@ MaxPingMarkers = 15
 Sync.MaxPingMarkers = MaxPingMarkers
 
 ---@param entity Entity
----@param lifetime number
+---@param lifetime? number
 function AnimatePingMesh(entity, lifetime)
     local time = 0
-    while entity and lifetime > 0 do
-        entity:SetScale(MATH_Lerp(math.sin(time), -0.5, 0.5, 0.3, 0.5))
-        time = time + 0.3
-        WaitSeconds(0.1)
+    if lifetime then
+        while entity and lifetime > 0 do
+            entity:SetScale(MATH_Lerp(math.sin(time), -0.5, 0.5, 0.3, 0.5))
+            time = time + 0.3
+            WaitSeconds(0.1)
 
-        lifetime = lifetime - 0.1
+            lifetime = lifetime - 0.1
+        end
+        entity:Destroy()
+    else
+        while entity do
+            entity:SetScale(MATH_Lerp(math.sin(time), -0.5, 0.5, 0.3, 0.5))
+            time = time + 0.3
+            WaitSeconds(0.1)
+        end
     end
-    entity:Destroy()
 end
 
 function SpawnPing(data)
