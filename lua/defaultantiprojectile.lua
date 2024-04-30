@@ -244,34 +244,7 @@ MissileRedirect = Class(Entity) {
                     proj.MoveThread = nil
                 end
 
-                proj:ForkThread(function()
-                    local projPos = proj:GetPosition()
-                    local above = { projPos[1] + GetRandomFloat(-2, 2), projPos[2] + GetRandomFloat(4, 6),
-                        projPos[3] + GetRandomFloat(-2, 2) }
-
-                    proj:SetLifetime(30)
-                    proj:SetCollideSurface(true)
-                    proj:SetTurnRate(160)
-                    proj:SetNewTargetGround(above)
-                    proj:TrackTarget(true)
-                    WaitSeconds(1)
-
-                    if proj:BeenDestroyed() then return end
-                    if not enemy then
-                        proj:DoTakeDamage(self.Owner, 30, Vector(0, 1, 0), 'Fire')
-                    elseif not enemy:BeenDestroyed() then
-                        proj:SetNewTarget(enemy)
-                        WaitSeconds(2)
-                        enemyPos = enemy:GetPosition()
-                    end
-
-                    -- aim at right below surface if unit is submerged
-                    enemyPos = enemyPos or projPos
-                    local surfaceHeight = GetSurfaceHeight(enemyPos[1], enemyPos[3]) - 0.02
-                    enemyPos[2] = math.max(surfaceHeight, enemyPos[2])
-
-                    proj:SetNewTargetGround(enemyPos)
-                end)
+                proj:ForkThread(self.RedirectionThread)
             end
 
             WaitSeconds(1 / self.RedirectRateOfFire)
@@ -280,6 +253,35 @@ MissileRedirect = Class(Entity) {
             end
 
             ChangeState(self, self.WaitingState)
+        end,
+
+        RedirectionThread = function(proj)
+            local projPos = proj:GetPosition()
+            local above = { projPos[1] + GetRandomFloat(-2, 2), projPos[2] + GetRandomFloat(4, 6),
+                projPos[3] + GetRandomFloat(-2, 2) }
+
+            proj:SetLifetime(30)
+            proj:SetCollideSurface(true)
+            proj:SetTurnRate(160)
+            proj:SetNewTargetGround(above)
+            proj:TrackTarget(true)
+            WaitSeconds(1)
+
+            if proj:BeenDestroyed() then return end
+            if not enemy then
+                proj:DoTakeDamage(self.Owner, 30, Vector(0, 1, 0), 'Fire')
+            elseif not enemy:BeenDestroyed() then
+                proj:SetNewTarget(enemy)
+                WaitSeconds(2)
+                enemyPos = enemy:GetPosition()
+            end
+
+            -- aim at right below surface if unit is submerged
+            enemyPos = enemyPos or projPos
+            local surfaceHeight = GetSurfaceHeight(enemyPos[1], enemyPos[3]) - 0.02
+            enemyPos[2] = math.max(surfaceHeight, enemyPos[2])
+
+            proj:SetNewTargetGround(enemyPos)
         end,
 
         OnCollisionCheck = function(self, other)

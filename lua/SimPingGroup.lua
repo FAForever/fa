@@ -54,13 +54,16 @@ function OnClickCallback(data)
 end
 
 function OnPostLoad()
-    ForkThread(function()
-        WaitSeconds(5)
-        if not Sync.AddPingGroups then 
-            Sync.AddPingGroups = {}
-        end
-        for _, PingGroup in PingGroups do
-            table.insert(Sync.AddPingGroups, {ID = PingGroup._id, Name = PingGroup.Name, BlueprintID = PingGroup.BlueprintID, Type = PingGroup.Type})
-        end
-    end)
+    ForkThread(OnPostLoadThread)
+end
+
+function OnPostLoadThread()
+    WaitSeconds(5)
+
+    if not Sync.AddPingGroups then
+        Sync.AddPingGroups = {}
+    end
+    for _, PingGroup in PingGroups do
+        table.insert(Sync.AddPingGroups, {ID = PingGroup._id, Name = PingGroup.Name, BlueprintID = PingGroup.BlueprintID, Type = PingGroup.Type})
+    end
 end

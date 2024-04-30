@@ -1403,11 +1403,17 @@ function TeamColorHandler(self, modifiers)
     end
 end
 
-if teamColorSettings.autoEnable then
-    ForkThread(function() 
-        WaitSeconds(0.5) 
-        TeamColorMode(calculateTeamColors()) 
-        TeamColorMode(true) 
-        GetButton('teamcolor'):ToggleCheck() 
-    end)
+ForkThread(function()
+    -- some mandatory wait time to let the global function be defined (or redefined in a hook)
+    WaitSeconds(0.1)
+    TeamColorSettingStartup()
+end)
+
+function TeamColorSettingStartup()
+    WaitSeconds(0.5 - --[[has already occured]]0.1)
+    if teamColorSettings.autoEnable then
+        TeamColorMode(calculateTeamColors())
+        TeamColorMode(true)
+        GetButton('teamcolor'):ToggleCheck()
+    end
 end

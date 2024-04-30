@@ -765,14 +765,18 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             return
         end
 
-        self.VOTable[string] = true
-        import('/lua/SimSyncUtils.lua').SyncVoice({ Cue = cue, Bank = bank })
+        ForkThread(self.PlayVOSoundThread, self, string, bank, cue)
+    end,
 
-        local timeout = VO['timeout']
-        ForkThread(function()
-            WaitSeconds(timeout)
-            self.VOTable[string] = nil
-        end)
+    PlayVOSoundThread = function(self, key, bank, cue)
+        self.VOTable[key] = true
+        import("/lua/SimSyncUtils.lua").SyncVoice {
+            Cue = cue,
+            Bank = bank
+        }
+        WaitSeconds(self.VOSounds["timeout"])
+
+        self.VOTable[key] = nil
     end,
 
     --- Triggers based on an AiBrain

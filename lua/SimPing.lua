@@ -66,7 +66,10 @@ function SpawnPing(data)
             end
         end
 
-        ForkThread(function(owner) WaitSeconds(PingTimeout) PingsRemaining[owner] = PingsRemaining[owner] + 1 end, data.Owner)
+        ForkThread(function(owner)
+            WaitSeconds(PingTimeout)
+            PingsRemaining[owner] = PingsRemaining[owner] + 1
+        end, data.Owner)
     end
 end
 

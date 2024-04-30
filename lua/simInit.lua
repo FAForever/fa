@@ -333,14 +333,7 @@ function BeginSession()
     end
 
     -- add on game over callbacks
-    ForkThread(function()
-        while not IsGameOver() do
-            WaitTicks(1)
-        end
-        for _, v in GameOverListeners do
-            v()
-        end
-    end)
+    ForkThread(GameOverListenerThread)
 
     -- log game time
     ForkThread(GameTimeLogger)
@@ -351,6 +344,15 @@ function BeginSession()
     -- trigger event for brains
     for k, brain in ArmyBrains do
         brain:OnBeginSession()
+    end
+end
+
+function GameOverListenerThread()
+    while not IsGameOver() do
+        WaitTicks(1)
+    end
+    for _, v in GameOverListeners do
+        v()
     end
 end
 

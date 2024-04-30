@@ -102,28 +102,9 @@ function OnFirstUpdate()
     local armiesInfo = GetArmiesTable()
     local focusArmy = armiesInfo.focusArmy
     local playerArmy = armiesInfo.armiesTable[focusArmy]
-    if avatars and avatars[1]:IsInCategory("COMMAND") then
+    if avatars and  avatars[1]:IsInCategory("COMMAND") then
         avatars[1]:SetCustomName(playerArmy.nickname)
-        PlaySound(Sound {
-            Bank = 'AmbientTest',
-            Cue = 'AMB_Planet_Rumble_zoom'
-        })
-        ForkThread(function()
-            WaitSeconds(1)
-
-            UIZoomTo(avatars, 1)
-            WaitSeconds(1.5)
-
-            local selected = false
-            repeat
-                WaitSeconds(0.1)
-
-                if not gameUIHidden then
-                    SelectUnits(avatars)
-                    selected = GetSelectedUnits()
-                end
-            until not table.empty(selected) or GameTick() > 50
-        end)
+        ForkThread(StartupSequence, avatars)
     end
 
     FlushEvents()
@@ -145,6 +126,28 @@ function OnFirstUpdate()
         end
     end
     UIUtil.UpdateCurrentSkin()
+end
+
+---@param avatars UserUnit[]
+function StartupSequence(avatars)
+    PlaySound(Sound {
+        Bank = "AmbientTest",
+        Cue = "AMB_Planet_Rumble_zoom"
+    })
+    WaitSeconds(1)
+
+    UIZoomTo(avatars, 1)
+    WaitSeconds(1.5)
+
+    local selected = false
+    repeat
+        WaitSeconds(0.1)
+
+        if not gameUIHidden then
+            SelectUnits(avatars)
+            selected = GetSelectedUnits()
+        end
+    until not table.empty(selected) or GameTick() > 50
 end
 
 function CreateUI(isReplay)
@@ -195,17 +198,7 @@ function CreateUI(isReplay)
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
         Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
     then
-        ForkThread(function()
-            WaitSeconds(1.0)
-
-            if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-                ConExecute("cam_SetLOD WorldCamera 0.70")
-            end
-
-            if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                ConExecute("ren_ShadowSize 2048")
-            end
-        end)
+        ForkThread(ExperimentalGraphicsSettingsThread)
     end
 
     local focusArmy = GetFocusArmy()
@@ -350,6 +343,18 @@ function CreateUI(isReplay)
     import("/lua/keymap/hotkeylabels.lua").init()
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
+end
+
+function ExperimentalGraphicsSettingsThread()
+    WaitSeconds(1.0)
+
+    if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
+        ConExecute("cam_SetLOD WorldCamera 0.70")
+    end
+
+    if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
+        ConExecute("ren_ShadowSize 2048")
+    end
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
@@ -624,9 +629,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         newSelection, changed = DeselectSelens(newSelection)
 
         if changed then
-            ForkThread(function()
-                SelectUnits(newSelection)
-            end)
+            ForkThread(SelectUnits, newSelection)
             return
         end
 
@@ -701,9 +704,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             local mode, data = unpack(CM.GetCommandMode())
 
             if mode then
-                ForkThread(function()
-                    CM.StartCommandMode(mode, data)
-                end)
+                ForkThread(CM.StartCommandMode, mode, data)
             end
         end
     end
