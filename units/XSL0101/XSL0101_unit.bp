@@ -146,7 +146,7 @@ UnitBlueprint{
         Cloak = true,
         RadarRadius = 40,
         RadarStealth = true,
-        StealthWaitTime = 3,
+        StealthWaitTime = 1.5,
         VisionRadius = 24,
     },
     LifeBarHeight = 0.075,
