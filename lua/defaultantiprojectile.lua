@@ -236,15 +236,13 @@ MissileRedirect = Class(Entity) {
 
             if not self.EnemyProj:BeenDestroyed() then
                 local proj = self.EnemyProj
-                local enemy = self.Enemy
-                local enemyPos = enemy and enemy:GetPosition()
 
                 if proj.MoveThread then
                     KillThread(proj.MoveThread)
                     proj.MoveThread = nil
                 end
 
-                proj:ForkThread(self.RedirectionThread)
+                ForkThread(self.RedirectionThread, self, proj, self.Enemy)
             end
 
             WaitSeconds(1 / self.RedirectRateOfFire)
@@ -255,11 +253,14 @@ MissileRedirect = Class(Entity) {
             ChangeState(self, self.WaitingState)
         end,
 
-        RedirectionThread = function(proj)
+        RedirectionThread = function(self, proj, enemy)
+            local enemyPos = enemy and enemy:GetPosition()
             local projPos = proj:GetPosition()
-            local above = { projPos[1] + GetRandomFloat(-2, 2), projPos[2] + GetRandomFloat(4, 6),
-                projPos[3] + GetRandomFloat(-2, 2) }
-
+            local above = {
+                projPos[1] + GetRandomFloat(-2, 2),
+                projPos[2] + GetRandomFloat(4, 6),
+                projPos[3] + GetRandomFloat(-2, 2)
+            }
             proj:SetLifetime(30)
             proj:SetCollideSurface(true)
             proj:SetTurnRate(160)
@@ -267,12 +268,15 @@ MissileRedirect = Class(Entity) {
             proj:TrackTarget(true)
             WaitSeconds(1)
 
-            if proj:BeenDestroyed() then return end
+            if proj:BeenDestroyed() then
+                return
+            end
             if not enemy then
-                proj:DoTakeDamage(self.Owner, 30, Vector(0, 1, 0), 'Fire')
+                proj:DoTakeDamage(self.Owner, 30, Vector(0, 1, 0), "Fire")
             elseif not enemy:BeenDestroyed() then
                 proj:SetNewTarget(enemy)
                 WaitSeconds(2)
+
                 enemyPos = enemy:GetPosition()
             end
 
