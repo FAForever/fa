@@ -397,10 +397,10 @@ IntelComponent = ClassSimple {
 }
 
 local TechToDuration = {
-    TECH1 = 1,
-    TECH2 = 2,
-    TECH3 = 3,
-    EXPERIMENTAL = 6,
+    TECH1 = 1.0,
+    TECH2 = 1.0,
+    TECH3 = 1.0,
+    EXPERIMENTAL = 4,
 }
 
 local TechToLOD = {
@@ -641,8 +641,9 @@ VeterancyComponent = ClassSimple {
 
     --- Disperses the veterancy, expects to be only called once
     ---@param self VeterancyComponent | Unit
-    VeterancyDispersal = function(self)
-        local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
+    ---@param experience? number -- override for amount of experience to be distributed
+    VeterancyDispersal = function(self, experience)
+        local vetWorth = experience or (self:GetFractionComplete() * self:GetTotalMassCost())
         local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
         local vetDamageTaken = self.VetDamageTaken

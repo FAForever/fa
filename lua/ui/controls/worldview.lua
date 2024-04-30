@@ -34,6 +34,9 @@ local KeyCodeShift = 16
 
 local weaponsCached = { }
 
+---@class Renderable : Destroyable
+---@field OnRender fun(self:Renderable, worldView:WorldView)
+
 ---@class WorldViewDecalData
 ---@field texture string
 ---@field scale number
@@ -212,6 +215,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
+---@field Renderables table<string, Renderable>
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
@@ -241,6 +245,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self.CursorOverride = false
 
         self.Trash = TrashBag()
+
+        self.Renderables = {}
+
     end,
 
     ---@param self WorldView
@@ -1361,7 +1368,53 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- called when strat icons are turned on/off
     end,
 
-    OnRenderWorld = function (self, delta)
-        -- called when custom world rendering is enabled
+    ---Add a shape to the draw table, pass an id with no data to remove it
+    ---@param self WorldView
+    ---@param id string -- id for tracking individual shapes
+    ---@param data? table -- data table for shape, pass nil to remove the given id
+    DrawShapeRegistry = function(self, id, data)
+        if data then
+            self:SetCustomRender(true)
+            self.DrawShapesTable[id] = data
+        else
+            self.DrawShapesTable[id] = nil
+        end
     end,
+
+    --#region Custom Rendering
+
+    --- Register a renderable to render each frame
+    ---@param self WorldView
+    ---@param renderable Renderable
+    ---@param id string
+    RegisterRenderable = function(self, renderable, id)
+        self.Trash:Add(renderable)
+        self.Renderables[id] = renderable
+
+        if not table.empty(self.Renderables) then
+            self:SetCustomRender(true)
+        end
+    end,
+
+    --- Unregister a renderable
+    ---@param self WorldView
+    ---@param id string
+    UnregisterRenderable = function(self, id)
+        self.Renderables[id] = nil
+
+        if table.empty(self.Renderables) then
+            self:SetCustomRender(false)
+        end
+    end,
+
+    --- Is called each frame to render shapes when custom rendering is enabled
+    ---@param self WorldView
+    ---@param delta number
+    OnRenderWorld = function (self, delta)
+        for id, renderable in self.Renderables do
+            renderable:OnRender(delta, delta)
+        end
+    end,
+
+    --#endregion
 }

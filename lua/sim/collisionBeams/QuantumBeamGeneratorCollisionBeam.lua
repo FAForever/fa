@@ -10,9 +10,9 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
 
+    FxBeamStartPoint = EffectTemplate.AQuantumBeamGeneratorMuzzleFlash01,
     FxBeam =  EffectTemplate.AQuantumBeamGeneratorBeam,
-    FxBeamEndPoint = EffectTemplate.AQuantumBeamGeneratorMuzzleFlash01,
-    FxBeamStartPoint = EffectTemplate.AQuantumBeamGeneratorHit01,
+    FxBeamEndPoint = EffectTemplate.AQuantumBeamGeneratorHit01,
 
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.5,

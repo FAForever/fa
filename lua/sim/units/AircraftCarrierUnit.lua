@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local SeaUnit = import("/lua/sim/units/seaunit.lua").SeaUnit
-local SeaUnitOnKilled = SeaUnit.OnKilled
+local SeaUnitKill = SeaUnit.Kill
 local SeaUnitOnTransportAttach = SeaUnit.OnTransportAttach
 local SeaUnitOnTransportDetach = SeaUnit.OnTransportDetach
 local SeaUnitOnAttachedKilled = SeaUnit.OnAttachedKilled
@@ -82,11 +82,18 @@ AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
-    ---@param type string
-    ---@param overkillRatio number
-    OnKilled = function(self, instigator, type, overkillRatio)
-        self:SaveCargoMass()
-        SeaUnitOnKilled(self, instigator, type, overkillRatio)
-        self:DetachCargo()
+    ---@param damageType? string
+    ---@param excessDamageRatio? number
+    Kill = function(self, instigator, damageType, excessDamageRatio)
+        -- handle the cargo killing
+        -- skip for transports inside other transports, as our KillCargo will have
+        -- already been recursively called from the parent transports KillCargo call
+        if damageType ~= "TransportDamage" then
+            self:KillCargo(instigator)
+        end
+        -- certain behaviors (like ctrl-k) will call this with nil parameters, but they must be defined for the engine's Kill function to work
+        damageType = damageType or ""
+        excessDamageRatio =  excessDamageRatio or 0
+        SeaUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 }

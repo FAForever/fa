@@ -28,19 +28,23 @@ UnitBlueprint{
         "TACTICALMISSILEPLATFORM",
         "TECH2",
         "VISIBLETORECON",
+        "VOLATILE"
     },
     Defense = {
         AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 17285,
-        Health = 1500,
-        MaxHealth = 1500,
+        Health = 900,
+        MaxHealth = 900,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 290,
     },
     Display = {
-        Abilities = { "<LOC ability_manuallaunch>Manual Launch" },
+        Abilities = { 
+            "<LOC ability_manuallaunch>Manual Launch", 
+            "<LOC ability_deathaoe>Volatile",
+        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -217,6 +221,16 @@ UnitBlueprint{
             TurretYawSpeed = 0,
             Turreted = false,
             WeaponCategory = "Missile",
+        },
+        {
+            Damage = 750,
+            DamageFriendly = true,
+            DamageRadius = 3,
+            DamageType = "DeathExplosion",
+            DisplayName = "Death Weapon",
+            DummyWeapon = true,
+            Label = "DeathWeapon",
+            WeaponCategory = "Death",
         },
     },
     Wreckage = {
