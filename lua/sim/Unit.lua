@@ -722,17 +722,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.Captors[captor.EntityId] = captor
 
         if not self.CaptureThread then
-            self.CaptureThread = self:ForkThread(function()
-                local captors = self.Captors or {}
-                while not table.empty(captors) do
-                    for _, c in captors do
-                        self:CheckCaptor(c)
-                    end
+            self.CaptureThread = self:ForkThread(self.BeingCapturedThread)
+        end
+    end,
 
-                    WaitTicks(1)
-                    captors = self.Captors or {}
-                end
-            end)
+    BeingCapturedThread = function(self)
+        local captors = self.Captors or {}
+        while not table.empty(captors) do
+            for _, c in captors do
+                self:CheckCaptor(c)
+            end
+            WaitTicks(1)
+
+            captors = self.Captors or {}
         end
     end,
 

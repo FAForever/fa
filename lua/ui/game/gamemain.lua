@@ -102,7 +102,7 @@ function OnFirstUpdate()
     local armiesInfo = GetArmiesTable()
     local focusArmy = armiesInfo.focusArmy
     local playerArmy = armiesInfo.armiesTable[focusArmy]
-    if avatars and  avatars[1]:IsInCategory("COMMAND") then
+    if avatars and avatars[1]:IsInCategory("COMMAND") then
         avatars[1]:SetCustomName(playerArmy.nickname)
         ForkThread(StartupSequence, avatars)
     end

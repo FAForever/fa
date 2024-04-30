@@ -8,14 +8,18 @@ MaxPingMarkers = 15
 --On first ping, send data to the user layer telling it the maximum allowable markers per army
 Sync.MaxPingMarkers = MaxPingMarkers
 
-function AnimatePingMesh(entity)
+---@param entity Entity
+---@param lifetime number
+function AnimatePingMesh(entity, lifetime)
     local time = 0
-    local ascending = true
-    while entity do
-        entity:SetScale(MATH_Lerp(math.sin(time), -.5, 0.5, .3, .5))
-        time = time + .3
-        WaitSeconds(.001)
+    while entity and lifetime > 0 do
+        entity:SetScale(MATH_Lerp(math.sin(time), -0.5, 0.5, 0.3, 0.5))
+        time = time + 0.3
+        WaitSeconds(0.1)
+
+        lifetime = lifetime - 0.1
     end
+    entity:Destroy()
 end
 
 function SpawnPing(data)
@@ -35,23 +39,7 @@ function SpawnPing(data)
             data.ID = GetPingID(data.Owner)
             PingMarkers[data.Owner][data.ID] = data
         else
-            local Entity = import("/lua/sim/entity.lua").Entity
-            data.Location[2] = data.Location[2]+2
-            local pingSpec = {Owner = data.Owner, Location = data.Location}
-            local ping = Entity(pingSpec)
-            Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
-            ping:SetVizToFocusPlayer('Always')
-            ping:SetVizToEnemies('Never')
-            ping:SetVizToAllies('Always')
-            ping:SetVizToNeutrals('Never')
-            ping:SetMesh('/meshes/game/ping_'..data.Mesh)
-
-            local animThread = ForkThread(AnimatePingMesh, ping)
-            ForkThread(function()
-                WaitSeconds(data.Lifetime)
-                KillThread(animThread)
-                ping:Destroy()
-            end)
+            SpawnPingMesh(data)
         end
 
         SendData(data)
@@ -66,32 +54,19 @@ function SpawnPing(data)
             end
         end
 
-        ForkThread(function(owner)
-            WaitSeconds(PingTimeout)
-            PingsRemaining[owner] = PingsRemaining[owner] + 1
-        end, data.Owner)
+        ForkThread(DelayPingCountThread, data.Owner)
     end
+end
+
+function DelayPingCountThread(owner)
+    WaitSeconds(PingTimeout)
+
+    PingsRemaining[owner] = PingsRemaining[owner] + 1
 end
 
 function SpawnSpecialPing(data)
     --This function is used to generate automatic nuke pings
-    local Entity = import("/lua/sim/entity.lua").Entity
-    data.Location[2] = data.Location[2]+2
-    local pingSpec = {Owner = data.Owner, Location = data.Location}
-    local ping = Entity(pingSpec)
-    Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
-    ping:SetVizToFocusPlayer('Always')
-    ping:SetVizToEnemies('Never')
-    ping:SetVizToAllies('Always')
-    ping:SetVizToNeutrals('Never')
-    ping:SetMesh('/meshes/game/ping_'..data.Mesh)
-    local animThread = ForkThread(AnimatePingMesh, ping)
-    ForkThread(function()
-        WaitSeconds(data.Lifetime)
-        KillThread(animThread)
-        ping:Destroy()
-    end)
-
+    SpawnPingMesh(data)
     SendData(data)
 
     -- Callbacks to allied brains
@@ -103,6 +78,20 @@ function SpawnSpecialPing(data)
             end
         end
     end
+end
+
+function SpawnPingMesh(data)
+    local Entity = import("/lua/sim/entity.lua").Entity
+    data.Location[2] = data.Location[2] + 2
+    local pingSpec = {Owner = data.Owner, Location = data.Location}
+    local ping = Entity(pingSpec)
+    Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
+    ping:SetVizToFocusPlayer("Always")
+    ping:SetVizToEnemies("Never")
+    ping:SetVizToAllies("Always")
+    ping:SetVizToNeutrals("Never")
+    ping:SetMesh("/meshes/game/ping_" .. data.Mesh)
+    ForkThread(AnimatePingMesh, ping, data.Lifetime)
 end
 
 function GetPingID(owner)
@@ -131,16 +120,7 @@ function OnArmyChange()
     --Add All of the relevant marker data on the next sync
     local focus = GetFocusArmy()
     if focus ~= -1 then
-        ForkThread(function()
-            for ownerID, pingTable in PingMarkers do
-                if IsAlly(ownerID+1, focus) then
-                    for pingID, ping in pingTable do
-                        ping.Renew = true
-                        SendData(ping)
-                    end
-                end
-            end
-        end)
+        ForkThread(RenewAllPingsTo, focus)
     end
 end
 
@@ -159,20 +139,23 @@ function UpdateMarker(data)
         elseif data.Action == 'renew' then
             local focus = GetFocusArmy()
             if focus ~= -1 then
-                ForkThread(function()
-                    for ownerID, pingTable in PingMarkers do
-                        if IsAlly(ownerID+1, focus) then
-                            for pingID, ping in pingTable do
-                                ping.Renew = true
-                                SendData(ping)
-                            end
-                        end
-                    end
-                end)
+                ForkThread(RenewAllPingsTo, focus)
             end
             return
         end
         SendData(data)
+    end
+end
+
+---@param focus Army
+function RenewAllPingsTo(focus)
+    for ownerID, pingTable in PingMarkers do
+        if IsAlly(ownerID + 1, focus) then
+            for _, ping in pingTable do
+                ping.Renew = true
+                SendData(ping)
+            end
+        end
     end
 end
 

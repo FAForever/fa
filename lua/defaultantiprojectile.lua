@@ -242,7 +242,9 @@ MissileRedirect = Class(Entity) {
                     proj.MoveThread = nil
                 end
 
-                ForkThread(self.RedirectionThread, self, proj, self.Enemy)
+                local enemy = self.Enemy
+                local enemyPos = enemy and enemy:GetPosition()
+                proj.Trash:Add(ForkThread(self.RedirectionThread, self, proj, enemy, enemyPos))
             end
 
             WaitSeconds(1 / self.RedirectRateOfFire)
@@ -253,8 +255,7 @@ MissileRedirect = Class(Entity) {
             ChangeState(self, self.WaitingState)
         end,
 
-        RedirectionThread = function(self, proj, enemy)
-            local enemyPos = enemy and enemy:GetPosition()
+        RedirectionThread = function(self, proj, enemy, enemyPos)
             local projPos = proj:GetPosition()
             local above = {
                 projPos[1] + GetRandomFloat(-2, 2),
