@@ -26,11 +26,6 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
     Weapons = {
         MainGun = ClassWeapon(ADFCannonOblivionWeapon) {},
         Torpedo01 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo02 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo03 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo04 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo05 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo06 = ClassWeapon(AANChronoTorpedoWeapon) {},
         AntiTorpedo01 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
         AntiTorpedo02 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
     },
