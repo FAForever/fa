@@ -140,6 +140,7 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 5,
         MeshExtentsY = 4.5,
         MeshExtentsZ = 5.45,
