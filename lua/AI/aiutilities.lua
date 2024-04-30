@@ -1049,7 +1049,7 @@ function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMa
     end
     for _, v in positions do
         if Utils.XZDistanceTwoVectors(v, mainPos) < radius then
-            local tempUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(unitCategory), v, 30))
+            local tempUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, unitCategory, v, 30))
             local numWalls = table.getn(GetOwnUnitsAroundPoint(aiBrain, categories.WALL, v, 40))
             if tempUnits > count and numWalls < 10 and (not bestFit or tempUnits > mostUnits) then
                 bestFit = v
