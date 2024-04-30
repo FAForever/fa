@@ -213,9 +213,9 @@ Platoon = Class(moho.platoon_methods) {
     ---@return number?
     GetThreatLevel = function(self, rings)
         local brain = self:GetBrain()
-        local platLoc = self:GetPlatoonPosition()
-        if platLoc then
-            return brain:GetThreatAtPosition(platLoc, rings, true)
+        local platPos = self:GetPlatoonPosition()
+        if platPos then
+            return brain:GetThreatAtPosition(platPos, rings, true)
         else
             return
         end
@@ -800,9 +800,9 @@ Platoon = Class(moho.platoon_methods) {
     GuardMarker = function(self)
         local aiBrain = self:GetBrain()
 
-        local platLoc = self:GetPlatoonPosition()
+        local platPos = self:GetPlatoonPosition()
 
-        if not aiBrain:PlatoonExists(self) or not platLoc then
+        if not aiBrain:PlatoonExists(self) or not platPos then
             return
         end
 
@@ -913,7 +913,7 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         markerThreat = aiBrain:GetThreatAtPosition(marker.position, 0, true, threatType)
                     end
-                    local distSq = VDist2Sq(marker.position[1], marker.position[3], platLoc[1], platLoc[3])
+                    local distSq = VDist2Sq(marker.position[1], marker.position[3], platPos[1], platPos[3])
 
                     if markerThreat >= minThreatThreshold and markerThreat <= maxThreatThreshold then
                         if self:AvoidsBases(marker.position, bAvoidBases, avoidBasesRadius) then
@@ -942,7 +942,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             for _,marker in markerLocations do
                 if (self.MovementLayer == 'Land' and marker.NavLayer ~= 'Amphibious') or (self.MovementLayer == 'Water' and marker.NavLayer == 'Amphibious') then
-                    local distSq = VDist2Sq(marker.position[1], marker.position[3], platLoc[1], platLoc[3])
+                    local distSq = VDist2Sq(marker.position[1], marker.position[3], platPos[1], platPos[3])
                     if self:AvoidsBases(marker.position, bAvoidBases, avoidBasesRadius) and distSq > (avoidClosestRadius * avoidClosestRadius) then
                         if distSq < bestDistSq then
                             if self.LastMarker[1] and marker.position[1] == self.LastMarker[1][1] and marker.position[3] == self.LastMarker[1][3] then
@@ -966,13 +966,13 @@ Platoon = Class(moho.platoon_methods) {
             self.LastMarker[2] = self.LastMarker[1]
             self.LastMarker[1] = bestMarker.position
             --LOG("GuardMarker: Attacking " .. bestMarker.Name)
-            local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, platLoc, bestMarker.position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
+            local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, platPos, bestMarker.position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
             local success, bestGoalPos = AIAttackUtils.CheckPlatoonPathingEx(self, bestMarker.position)
             IssueClearCommands(self:GetPlatoonUnits())
             if path then
-                if not success or VDist2(platLoc[1], platLoc[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
+                if not success or VDist2(platPos[1], platPos[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
                     usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 2, true)
-                elseif VDist2(platLoc[1], platLoc[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
+                elseif VDist2(platPos[1], platPos[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
                     usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, false)
                 end
                 if not usedTransports then
@@ -1024,11 +1024,11 @@ Platoon = Class(moho.platoon_methods) {
             local StuckCount = 0
             repeat
                 WaitSeconds(5)
-                platLoc = self:GetPlatoonPosition()
-                if not platLoc then
+                platPos = self:GetPlatoonPosition()
+                if not platPos then
                     return
                 end
-                if VDist3(oldPlatPos, platLoc) < 1 then
+                if VDist3(oldPlatPos, platPos) < 1 then
                     StuckCount = StuckCount + 1
                 else
                     StuckCount = 0
@@ -1036,8 +1036,8 @@ Platoon = Class(moho.platoon_methods) {
                 if StuckCount > 5 then
                     return self:GuardMarker()
                 end
-                oldPlatPos = platLoc
-            until VDist2Sq(platLoc[1], platLoc[3], bestMarker.position[1], bestMarker.position[3]) < 64 or not aiBrain:PlatoonExists(self)
+                oldPlatPos = platPos
+            until VDist2Sq(platPos[1], platPos[3], bestMarker.position[1], bestMarker.position[3]) < 64 or not aiBrain:PlatoonExists(self)
 
             -- if we're supposed to guard for some time
             if moveNext == 'None' then
@@ -2247,13 +2247,13 @@ Platoon = Class(moho.platoon_methods) {
         local relative
         local baseTmplList = {}
 
-        local platLoc = self:GetPlatoonPosition()
+        local platPos = self:GetPlatoonPosition()
         -- if we have no units, return
-        if not platLoc then
+        if not platPos then
             return
         end
         -- if we have nothing to build, disband!
-        if not cons.BuildStructures or not platLoc then
+        if not cons.BuildStructures or not platPos then
             coroutine.yield(1)
             self:PlatoonDisband()
             return
@@ -2261,7 +2261,7 @@ Platoon = Class(moho.platoon_methods) {
 
         if cons.NearUnitCategory then
             self:SetPrioritizedTargetList('support', {ParseEntityCategory(cons.NearUnitCategory)})
-            local unitNearBy = self:FindPrioritizedUnit('support', 'Ally', false, platLoc, cons.NearUnitRadius or 50)
+            local unitNearBy = self:FindPrioritizedUnit('support', 'Ally', false, platPos, cons.NearUnitRadius or 50)
             --LOG("ENGINEER BUILD: " .. cons.BuildStructures[1] .." attempt near: ", cons.NearUnitCategory)
             if unitNearBy then
                 reference = table.copy(unitNearBy:GetPosition())
@@ -2277,7 +2277,7 @@ Platoon = Class(moho.platoon_methods) {
             buildFunction = AIBuildStructures.AIExecuteBuildStructure
             table.insert(baseTmplList, AIBuildStructures.AIBuildBaseTemplateFromLocation(baseTmpl, reference))
         elseif cons.Wall then
-            local pos = aiBrain:PBMGetLocationCoords(cons.LocationType) or cons.Position or platLoc
+            local pos = aiBrain:PBMGetLocationCoords(cons.LocationType) or cons.Position or platPos
             local radius = cons.LocationRadius or aiBrain.BuilderManagers[cons.LocationType].EngineerManager.Radius or 100
             relative = false
             reference = AIUtils.GetLocationNeedingWalls(aiBrain, 200, 4, categories.STRUCTURE - categories.WALL, cons.ThreatMin, cons.ThreatMax, cons.ThreatRings)
@@ -2303,7 +2303,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
         elseif cons.NearMarkerType and cons.ExpansionBase then
-            local pos = aiBrain:PBMGetLocationCoords(cons.LocationType) or cons.Position or platLoc
+            local pos = aiBrain:PBMGetLocationCoords(cons.LocationType) or cons.Position or platPos
             local radius = cons.LocationRadius or aiBrain.BuilderManagers[cons.LocationType].EngineerManager.Radius or 100
 
             if cons.NearMarkerType == 'Expansion Area' then
@@ -2397,10 +2397,10 @@ Platoon = Class(moho.platoon_methods) {
                 cons.ThreatRings = 0
             end
             relative = false
-            reference, refName = AIUtils.AIGetClosestThreatMarkerLoc(aiBrain, cons.NearMarkerType, platLoc[1], platLoc[3],
+            reference, refName = AIUtils.AIGetClosestThreatMarkerLoc(aiBrain, cons.NearMarkerType, platPos[1], platPos[3],
                                                             cons.ThreatMin, cons.ThreatMax, cons.ThreatRings)
             if not reference then
-                reference = platLoc
+                reference = platPos
             end
             table.insert(baseTmplList, AIBuildStructures.AIBuildBaseTemplateFromLocation(baseTmpl, reference))
             buildFunction = AIBuildStructures.AIExecuteBuildStructure
@@ -2415,7 +2415,7 @@ Platoon = Class(moho.platoon_methods) {
                 baseTmpl = baseTmplFile['ExpansionBaseTemplates'][factionIndex]
             end
             relative = false
-            reference, refName = AIUtils.AIGetClosestThreatMarkerLoc(aiBrain, cons.NearMarkerType, platLoc[1], platLoc[3],
+            reference, refName = AIUtils.AIGetClosestThreatMarkerLoc(aiBrain, cons.NearMarkerType, platPos[1], platPos[3],
                                                             cons.ThreatMin, cons.ThreatMax, cons.ThreatRings)
             if cons.ExpansionBase and refName then
                 AIBuildStructures.AINewExpansionBase(aiBrain, refName, reference, (cons.ExpansionRadius or 100), cons.ExpansionTypes, nil, cons)
@@ -2796,9 +2796,9 @@ Platoon = Class(moho.platoon_methods) {
                 elseif not movingToScout then
                     movingToScout = true
                     self:Stop()
-                    local platLoc = self:GetPlatoonPosition()
-                    if platLoc then
-                        for k,v in AIUtils.AIGetSortedMassLocations(aiBrain, 10, nil, nil, nil, nil, platLoc) do
+                    local platPos = self:GetPlatoonPosition()
+                    if platPos then
+                        for k,v in AIUtils.AIGetSortedMassLocations(aiBrain, 10, nil, nil, nil, nil, platPos) do
                             if v[1] < 0 or v[3] < 0 or v[1] > ScenarioInfo.size[1] or v[3] > ScenarioInfo.size[2] then
                                 --LOG('*AI DEBUG: STRIKE FORCE SENDING UNITS TO WRONG LOCATION - ' .. v[1] .. ', ' .. v[3])
                             end
@@ -2840,10 +2840,10 @@ Platoon = Class(moho.platoon_methods) {
             self.LastAttackDestination = {}
         end
 
-        local platLoc = self:GetPlatoonPosition()
-        while aiBrain:PlatoonExists(self) and platLoc do
+        local platPos = self:GetPlatoonPosition()
+        while aiBrain:PlatoonExists(self) and platPos do
             -- this table is sorted already from highest to lowest threat...
-            local threatTable = aiBrain:GetThreatsAroundPosition(platLoc, 16, true, 'Air')
+            local threatTable = aiBrain:GetThreatsAroundPosition(platPos, 16, true, 'Air')
 
             local attackPos = nil
             -- so go through until we find the first threat that's pathable
@@ -2879,7 +2879,7 @@ Platoon = Class(moho.platoon_methods) {
             if attackPos and oldPathSize == 0 or attackPos[1] != self.LastAttackDestination[oldPathSize][1] or attackPos[3] != self.LastAttackDestination[oldPathSize][3] then
                 AIAttackUtils.GetMostRestrictiveLayer(self)
                 -- check if we can path to here safely... give a large threat weight to sort by threat first
-                local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, platLoc, attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonAirThreat * 10, aiBrain.IMAPConfig.Rings)
+                local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, platPos, attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonAirThreat * 10, aiBrain.IMAPConfig.Rings)
                 -- clear command queue
                 self:Stop()
 
@@ -2908,7 +2908,7 @@ Platoon = Class(moho.platoon_methods) {
 
             -- and loop back on the while
             WaitSeconds(20)
-            platLoc = self:GetPlatoonPosition()
+            platPos = self:GetPlatoonPosition()
         end
     end,
 
@@ -2947,16 +2947,16 @@ Platoon = Class(moho.platoon_methods) {
         local bp = unit:GetBlueprint()
         local weapon = bp.Weapon[1]
         local maxRadius = weapon.MaxRadius
-        local platLoc = self:GetPlatoonPosition()
+        local platPos = self:GetPlatoonPosition()
 
-        while aiBrain:PlatoonExists(self) and platLoc do
-            local target = self:FindPrioritizedUnit('Artillery', 'Enemy', true, platLoc, maxRadius)
+        while aiBrain:PlatoonExists(self) and platPos do
+            local target = self:FindPrioritizedUnit('Artillery', 'Enemy', true, platPos, maxRadius)
             if target then
                 self:Stop()
                 self:AttackTarget(target)
             end
             WaitSeconds(20)
-            platLoc = self:GetPlatoonPosition()
+            platPos = self:GetPlatoonPosition()
         end
     end,
 
