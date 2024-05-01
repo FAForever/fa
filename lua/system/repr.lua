@@ -258,7 +258,6 @@ end
 ---@param options? DebugInspectOptions
 ---@return string
 local function inspect(root, options)
-    LOG(debug.traceback())
     options = options or {}
 
     local depth = options.depth or 1
