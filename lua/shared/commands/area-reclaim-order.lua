@@ -24,4 +24,4 @@
 MaximumWidth = 7
 
 ---@type number
-MaximumDistance = 24
+MaximumDistance = 40

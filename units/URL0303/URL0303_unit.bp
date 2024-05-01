@@ -398,6 +398,16 @@ UnitBlueprint {
             WeaponUnpacks = false,
             UseFiringSolutionInsteadOfAimBone = true,
         },
+        {
+            Damage = 0,
+            DamageFriendly = false,
+            DamageRadius = 10,
+            DamageType = "EMP",
+            DisplayName = "Death EMP",
+            DummyWeapon = true,
+            Label = "DeathStun",
+            WeaponCategory = "Death",
+        },
     },
     Wreckage = {
         Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",

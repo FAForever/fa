@@ -816,11 +816,11 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param loc Vector
-    ---@return Vector | false
+    ---@param loc string
+    ---@return Vector?
     PBMGetLocationCoords = function(self, loc)
         if not loc then
-            return false
+            return
         end
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
@@ -835,7 +835,6 @@ AIBrain = Class(StandardBrain) {
         elseif self.BuilderManagers[loc] then
             return self.BuilderManagers[loc].FactoryManager:GetLocationCoords()
         end
-        return false
     end,
 
     ---@param self CampaignAIBrain
