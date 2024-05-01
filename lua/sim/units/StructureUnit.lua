@@ -42,6 +42,11 @@ local MathClamp = math.clamp
 local MathMax = math.max
 local MathFloor = math.floor
 local MathCeil = math.ceil
+local MathSin = math.sin
+local MathCos = math.cos
+local DegToRad = math.pi/180
+local unpack = unpack
+local MathAtan2 = math.atan2
 
 local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
@@ -214,16 +219,16 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- get direction vector, atanify it for angle
-        local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
+        local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3])
 
         if EntityCategoryContains(StructureUnitRotateStaticArty, self) then
              -- The static arties might have footprint that might affect pathing/terrain unless rotation is at 90 degree steps.
-            rad = MathFloor((rad + 0.25*math.pi) / (0.5 * math.pi)) * 0.5 * math.pi
+            rad = MathFloor((rad + 45 * DegToRad) / (90 * DegToRad)) * 90 * DegToRad
         end
 
         -- rotation quaternion {cos, 0, sin, 0}
-        local cos = math.cos(rad/2)
-        local sin = math.sin(rad/2)
+        local cos = MathCos(rad/2)
+        local sin = MathSin(rad/2)
 
         -- quatRotate * quatOrient
         local rhs1, rhs2, rhs3, rhs4 = unpack(self:GetOrientation())
