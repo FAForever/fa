@@ -138,7 +138,7 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
-        -- rotate weaponry towards enemy
+        -- rotate weapon structures towards enemy
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
@@ -221,8 +221,16 @@ StructureUnit = ClassUnit(Unit) {
         -- get direction vector, atanify it for angle
         local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3])
 
-        if EntityCategoryContains(StructureUnitRotateStaticArty, self) then
-             -- The static arties might have footprint that might affect pathing/terrain unless rotation is at 90 degree steps.
+
+        local bpFootprint = self.Blueprint.Footprint
+        if bpFootprint.SizeX ~= bpFootprint.SizeY then
+            -- Avoid rotating units with oblong footprints as the pathing and visuals won't match
+            stepSize = 180 * DegToRad
+        elseif EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+            stepSize = 90 * DegToRad
+        end
+
+        if stepSize then
             rad = MathFloor((rad + 45 * DegToRad) / (90 * DegToRad)) * 90 * DegToRad
         end
 
