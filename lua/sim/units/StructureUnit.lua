@@ -130,6 +130,11 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
+        -- rotate weaponry towards enemy
+        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
+            self:RotateTowardsEnemy()
+        end
+
         -- create decal below structure
         if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
@@ -233,11 +238,6 @@ StructureUnit = ClassUnit(Unit) {
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         UnitOnStartBeingBuilt(self, builder, layer)
-
-        -- rotate weaponry towards enemy
-        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
-            self:RotateTowardsEnemy()
-        end
 
         -- procedure to remove props that do not obstruct the building
         local blueprint = self.Blueprint
