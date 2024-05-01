@@ -78,10 +78,10 @@ XSL0101 = ClassUnit(SWalkingLandUnit) {
                     Duration = -1,
                     Affects = {
                         VisionRadius = {
-                            Mult = 0.6,
+                            Mult = 0.8,
                         },
                         RadarRadius = {
-                            Mult = 0.6,
+                            Mult = 0.8,
                         },
                     },
                 }

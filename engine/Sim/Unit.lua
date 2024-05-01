@@ -604,7 +604,7 @@ function Unit:SetRegenRate(rate)
 end
 
 --- sets the script bit
----@param bit number
+---@param bit number|string
 ---@param state boolean
 function Unit:SetScriptBit(bit, state)
 end

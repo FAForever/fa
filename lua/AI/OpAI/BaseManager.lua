@@ -10,8 +10,10 @@
 
 ---@class MarkerChain: string                   # Name reference to a marker chain as defined in the map
 ---@class Area: string                          # Name reference to a area as defined in the map
----@class Marker: string                        # Name reference to a marker as defined in the map
 ---@class UnitGroup: string                     # Name reference to a unit group as defined in the map
+
+---@class Marker: string                        # Name reference to a marker as defined in the map
+---@field Position Vector                       # A { x, y, z } array-based table
 
 -- types commonly used in repository
 
