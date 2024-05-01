@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - deploy/fafdevelop
-
+      
 jobs:
   verify:
     name: Verify
