@@ -218,8 +218,8 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
-        -- get direction vector, atanify it for angle
-        local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3])
+        -- get direction vector, atanify it for angle, then subtract our existing heading if we were spawned in angled
+        local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3]) - self:GetHeading()
 
 
         local bpFootprint = self.Blueprint.Footprint
