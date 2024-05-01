@@ -207,15 +207,25 @@ StructureUnit = ClassUnit(Unit) {
 
         -- get direction vector, atanify it for angle
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
-        local degrees = rad * (180 / math.pi)
 
         if EntityCategoryContains(StructureUnitRotateStaticArty, self) then
-            degrees = MathFloor((degrees + 45) / 90) * 90 -- The static artys might have footprint that might affect pathing/terrain unless rotation is at 90 angle steps.
+             -- The static arties might have footprint that might affect pathing/terrain unless rotation is at 90 degree steps.
+            rad = MathFloor((rad + 0.25*math.pi) / (0.5 * math.pi)) * 0.5 * math.pi
         end
 
-        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
-        rotator:SetPrecedence(1)
-        self.Trash:Add(rotator)
+        -- rotation quaternion {cos, 0, sin, 0}
+        local cos = math.cos(rad/2)
+        local sin = math.sin(rad/2)
+
+        -- quatRotate * quatOrient
+        local rhs1, rhs2, rhs3, rhs4 = unpack(self:GetOrientation())
+        rhs1, rhs2, rhs3, rhs4 = 
+            cos * rhs1 - sin * rhs3,
+            cos * rhs2 + sin * rhs4,
+            cos * rhs3 + sin * rhs1,
+            cos * rhs4 - sin * rhs2
+
+        self:SetOrientation({rhs1, rhs2, rhs3, rhs4}, true)
     end,
 
     ---@param self StructureUnit
