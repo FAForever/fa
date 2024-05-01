@@ -1,8 +1,79 @@
 ---@type number
-last_version = 3802
+last_version = 3809
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3808,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3808 (7th of April, 2024)",
+            "",
+            "A small hotfix because we it appears we finally managed to get achievements working again. ",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3807,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3807 (3th of April, 2024)",
+            "",
+            "Fixes various reported issues and removes the 1st april pranks from the game again.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3806,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3806 (31th of March, 2024)",
+            "",
+            "Fixes various bugs and visual inconsistencies that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3805,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3805 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3804,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3804 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions. The most notable issue is the bug where the fog of war is not ",
+            "removed when a game ends.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
     {
         version = 3803,
         name = "Hotfix",

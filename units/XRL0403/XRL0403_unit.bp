@@ -29,6 +29,7 @@ UnitBlueprint {
     BuildBotTotal = 12,
     BuildIconSortPriority = 30,
     Categories = {
+        "ANTITORPEDO",
         "AMPHIBIOUS",
         "BOT",
         "BUILTBYTIER3COMMANDER",

@@ -139,7 +139,6 @@ UnitBlueprint{
     LifeBarOffset = 1.25,
     LifeBarSize = 3.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -150,14 +149,12 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
+        MaxGroundVariation = 1.1,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -2.5,
         SkirtOffsetZ = -2.5,
         SkirtSizeX = 6,
         SkirtSizeZ = 6,
-        TurnRate = 0,
     },
     SelectionSizeX = 2.2,
     SelectionSizeZ = 2.2,

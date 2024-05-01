@@ -12,7 +12,6 @@ UnitBlueprint{
     Categories = {
         "ANTIAIR",
         "ANTIMISSILE",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CRUISER",
