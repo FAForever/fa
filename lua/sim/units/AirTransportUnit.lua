@@ -30,12 +30,23 @@ local HorzUnloadMargin = 2.5
 -- Factor by which to multiply TransportHoverHeight when determining if we can unload cargo
 local VertUnloadFactor = 1.5
 
--- time delay after which quick drop fires (drops can be faster than this, but not slower)
-local QuickDropDelay = 10
+-- Time in ticks to wait before we check if we're within the margin to drop cargo via navigator:AbortMove
+-- Aborting the move has the effect of causing a transport with an unload command to drop its cargo immediately
+-- Units can drop faster than this, but not slower (unless the transport has missed the target)
+local MaximumUnloadWaitTicks = 10
+
+-- Thread we'll fork to wait for our unload delay to expire
+---@param transport AirTransport
+---@param navigator Navigator
+local DropCheckWaitThread = function(transport, navigator)
+    WaitTicks(MaximumUnloadWaitTicks)
+    navigator:AbortMove()
+end
 
 ---@class AirTransport: AirUnit, BaseTransport
 ---@field slots table<Bone, Unit>
 ---@field GroundImpacted boolean
+---@field dropThread? thread
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param self AirTransport
     OnCreate = function(self)
@@ -73,13 +84,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
                 -- Tell our navigator to abort the move after a delay/if we haven't detached cargo in the interim
                 -- this has the effect of causing the next unload command to be executed immediately
-                self.dropFlag = true
-                ForkThread(function()
-                    WaitTicks(QuickDropDelay)
-                    if self.dropFlag then
-                        navigator:AbortMove()
-                    end
-                end)
+                self.dropThread = ForkThread(DropCheckWaitThread, self, navigator)
             end
         end
     end,
@@ -96,8 +101,8 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param attachBone Bone
     ---@param unit Unit
     OnTransportDetach = function(self, attachBone, unit)
-        -- Tell quick drop we didn't need it, and not to abort the next move
-        if self.dropFlag then self.dropFlag = nil end
+        -- Destroy the drop thread (if it exists) because we dropped our cargo in the interim
+        if self.dropThread then self.dropThread:Destroy() end
         AirUnitOnTransportDetach(self, attachBone, unit)
         BaseTransportOnTransportDetach(self, attachBone, unit)
     end,
@@ -130,6 +135,9 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param damageType? DamageType
     ---@param excessDamageRatio? number
     Kill = function(self, instigator, damageType, excessDamageRatio)
+        -- Clear out our drop thread if we were killed while dropping cargo
+        if self.dropThread then self.dropThread:Destroy() end
+
         -- handle the cargo killing
         -- skip for transports inside other transports, as our KillCargo will have
         -- already been recursively called from the parent transports KillCargo call
