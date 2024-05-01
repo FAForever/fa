@@ -53,8 +53,11 @@ local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 ---@field OwnedByEntity EntityId
 
 -- compute once and store as upvalue for performance
+-- Enemy units that are searched for when rotating structures
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
+-- Structures that rotate towards the enemy: PD, AA, Torp launchers, Artillery, and TMD (except Volcano)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR + categories.ANTINAVY + categories.ARTILLERY + (categories.ANTIMISSILE - categories.SILO - categories.uab4201))
+-- Structures that rotate in 90 degree steps: T2/T3/T4 Artillery
 local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
 ---@class StructureUnit : Unit
@@ -157,7 +160,7 @@ StructureUnit = ClassUnit(Unit) {
         end
     end,
 
-    --- Rotates the structure towards the enemy, primarily used for point defenses
+    --- Rotates the structure towards the enemy or map center
     ---@param self StructureUnit
     RotateTowardsEnemy = function(self)
 
