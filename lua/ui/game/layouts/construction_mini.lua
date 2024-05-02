@@ -446,6 +446,8 @@ function OnTabChangeLayout(type)
     end
 end
 
+local flipFlop = false
+
 function OnSelection(empty)
     local controls = import("/lua/ui/game/construction.lua").controls
     if empty then
@@ -456,6 +458,13 @@ function OnSelection(empty)
         if controls.constructionGroup:IsHidden() then
             LOG('showing construction group')
             controls.constructionGroup:Show()
+            if not flipFlop then
+                flipFlop = true
+                controls.constructionGroup:TechTabLayout(nil, 500)
+            else
+                flipFlop = false
+                controls.constructionGroup:TechTabLayout()
+            end
         end
     end
 end

@@ -5,12 +5,41 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
+-- Putting these here for now, need to be moved to somewhere where
+-- they can be dynamically updated when the skin changes
+local txrs = {
+    bgLeftCapTech = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'),
+    bgLeftCap = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
+    bgRightCap = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_r.dds'),
+    bgTechTab = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'),
+    bgTechTabCap = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'),
+    bgMain = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
+
+    leftBracketLower = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
+    leftBracketUpper = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
+    leftBracketMiddle = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
+    rightBracketLower = UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'),
+    rightBracketUpper = UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'),
+    rightBracketMiddle = UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'),
+}
+
+---@class ConstructionPanel: Group
+---@field bgLeftCap Bitmap
+---@field bgRightCap Bitmap
+---@field bgTechTab Bitmap
+---@field bgTechTabCap Bitmap
+---@field bgMain Bitmap
+---@field leftBracketLower Bitmap
+---@field leftBracketUpper Bitmap
+---@field leftBracketMiddle Bitmap
+---@field rightBracketLower Bitmap
+---@field rightBracketUpper Bitmap
+---@field rightBracketMiddle Bitmap
 ConstructionPanel = ClassUI(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        LOG('Background Init')
         self.bgLeftCap = Bitmap(self)
         self.bgRightCap = Bitmap(self)
         self.bgTechTab = Bitmap(self)
@@ -29,135 +58,124 @@ ConstructionPanel = ClassUI(Group) {
 
     Layout = function(self)
 
+        LOG('background.lua/ConstructionPanel:Layout')
         Layouter(self.bgLeftCap)
-            :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'))
-            :AtBottomIn(self, 4)
-            :AtLeftIn(self, 67)
-            :ResetRight()
-            :ResetTop()
-            :Dimensions(self.bgLeftCap.BitmapWidth(), self.bgLeftCap.BitmapHeight())
+            :Texture(txrs.bgLeftCapTech)
+            :AtLeftBottomIn(self, 67, 4)
 
         Layouter(self.bgRightCap)
-            :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_r.dds'))
-            :AtBottomIn(self.bgLeftCap, 1)
+            :Texture(txrs.bgRightCap)
+            :AtBottomIn(self.bgLeftCap)
             :AtRightIn(self, 2)
-            :ResetLeft()
-            :ResetTop()
 
+        Layouter(self.bgTechTab)
+            :Texture(txrs.bgTechTab)
+            :AnchorToRight(self.bgLeftCap)
+            :FillVertically(self.bgLeftCap)
+
+        Layouter(self.bgTechTabCap)
+            :Texture(txrs.bgTechTabCap)
+            :DimensionsFromTexture(txrs.bgTechTabCap)
+            :RightOf(self.bgTechTab)
+
+        Layouter(self.bgMain)
+            :Texture(txrs.bgMain)
+            :AnchorToRight(self.bgTechTabCap)
+            :AnchorToLeft(self.bgRightCap)
+            :FillVertically(self.bgRightCap)
+
+        -- With no arguments, this will apply the default tech tab layout (no tab visible)
+        self:TechTabLayout()
+
+        -- Brackets in a separate function to keep things organized
+        self:BracketLayout()
+    end,
+
+    ---Morph us into a layout that shows the tech tab, or not
+    ---@param self ConstructionPanel
+    ---@param controlToAlignTo? Control
+    ---@param width? number -- Hard parameter, just for testing
+    TechTabLayout = function(self, controlToAlignTo, width)
+        LOG('background.lua/ConstructionPanel:TechTabLayout')
+        if controlToAlignTo or width then
+            LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo|width != nil')
+
+            -- This is just for testing, because we don't have a proper tech control to pass yet
+            local techTabAlignTestValue
+            if controlToAlignTo and controlToAlignTo.Right then
+                techTabAlignTestValue = controlToAlignTo.Right
+            else
+                techTabAlignTestValue = self.bgLeftCap.Right() + width
+            end
+
+            -- Change our left cap texture to the tall tech tab version
+            Layouter(self.bgLeftCap)
+                :Texture(txrs.bgLeftCapTech)
+                -- We get taller/wider, so we need to update our size
+                :DimensionsFromTexture(txrs.bgLeftCapTech)
+            -- Set the width of the tech tab background bitmap
+            Layouter(self.bgTechTab)
+                :Right(techTabAlignTestValue)
+            -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
+            Layouter(self.bgMain)
+                :AnchorToRight(self.bgTechTabCap)
+
+            -- Show our tech tab elements
+            self.bgTechTab:Show()
+            self.bgTechTabCap:Show()
+        else
+            LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo == nil')
+            -- Change our left cap texture to the short version
+            Layouter(self.bgLeftCap)
+                :Texture(txrs.bgLeftCap)
+                -- We need to update our size, because we got shorter/narrower
+                :DimensionsFromTexture(txrs.bgLeftCap)
+            -- Anchor our main background to the left cap, bypassing the tech tab elements
+            Layouter(self.bgMain)
+                :AnchorToRight(self.bgLeftCap)
+            
+            -- Hide our tech tab elements
+            self.bgTechTab:Hide()
+            self.bgTechTabCap:Hide()
+        end
+    end,
+
+    ---Handles the laying out of brackets
+    BracketLayout = function(self)
+        -- The left brackets are positioned with respect to the build/select/cargo tab buttons, which
+        -- aren't included here (yet). If they end up elsewhere, it's probably appropriate to create these
+        -- tabs there instead of here.
         Layouter(self.leftBracketLower)
-            :Texture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
+            :Texture(txrs.leftBracketLower)
             :AtLeftIn(self, 4)
             :AtTopIn(self, 21)
 
         Layouter(self.leftBracketUpper)
-            :Texture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
+            :Texture(txrs.leftBracketUpper)
             :AtLeftIn(self.leftBracketLower)
             :AtBottomIn(self, 2)
 
         Layouter(self.leftBracketMiddle)
-            :Texture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
+            :Texture(txrs.leftBracketMiddle)
             :AtLeftIn(self.leftBracketLower)
             :Bottom(self.leftBracketUpper.Top)
             :Top(self.leftBracketLower.Bottom)
 
+        -- 
         Layouter(self.rightBracketLower)
-            :Texture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'))
+            :Texture(txrs.rightBracketLower)
             :AtRightIn(self.bgRightCap, -21)
             :AtTopIn(self.bgRightCap, -6)
 
         Layouter(self.rightBracketUpper)
-            :Texture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'))
+            :Texture(txrs.rightBracketUpper)
             :AtRightIn(self.bgRightCap, -21)
             :AtBottomIn(self.bgRightCap, -5)
 
         Layouter(self.rightBracketMiddle)
-            :Texture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'))
+            :Texture(txrs.rightBracketMiddle)
             :AtRightIn(self.bgRightCap, -14)
             :Bottom(self.rightBracketUpper.Top)
             :Top(self.rightBracketLower.Bottom)
-
-        Layouter(self.bgTechTab)
-            :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'))
-            :Left(self.bgLeftCap.Right)
-            :Bottom(self.bgLeftCap.Bottom)
-            :Dimensions(self.bgTechTab.BitmapWidth(), self.bgTechTab.BitmapHeight())
-            :ResetTop()
-
-        Layouter(self.bgTechTabCap)
-            :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
-            :Left(self.bgTechTab.Right)
-            :Bottom(self.bgLeftCap.Bottom)
-            :Dimensions(self.bgTechTabCap.BitmapWidth(), self.bgTechTabCap.BitmapHeight())
-            :ResetTop()
-
-        Layouter(self.bgMain)
-            :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'))
-            :Dimensions(self.bgMain.BitmapWidth(), self.bgMain.BitmapHeight())
-            :Left(self.bgTechTabCap.Right)
-            :Right(self.bgRightCap.Left)
-            :Bottom(self.bgRightCap.Bottom)
-            :Height(self.bgMain.BitmapHeight())
-            :ResetWidth()
-            :ResetTop()
-    end,
-
-    TechTabLayout = function(self, controlToAlignTo)
-        if controlToAlignTo then
-            LOG('controlToAlignTo present')
-            Layouter(self.bgLeftCap) -- minBG
-                :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'))
-                :Dimensions(self.bgLeftCap.BitmapWidth(), self.bgLeftCap.BitmapHeight())
-                :AtLeftBottomIn(self, 67, 4)
-            Layouter(self.bgTechTab) -- BG1
-                :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'))
-                :Dimensions(self.bgTechTab.BitmapWidth(), self.bgTechTab.BitmapHeight())
-                :RightOf(self.bgLeftCap.Right)
-                :Right(controlToAlignTo.Right)
-            Layouter(self.bgTechTabCap) -- BG2
-                :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
-                :Dimensions(self.bgTechTabCap.BitmapWidth(), self.bgTechTabCap.BitmapHeight())
-                :RightOf(self.bgTechTab.Right)
-            Layouter(self.bgMain) -- BG3
-                :Left(self.bgTechTabCap.Right)
-            --controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'))
-            --controls.midBG1.Right:Set(prevControl.Right)
-            --controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
-            --controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'))
-            --controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'))
-            --LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO: This is an ugly hack for the problem described above
-            --LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight()) -- TODO
-            --LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight()) -- TODO
-            --LayoutHelpers.SetDimensions(controls.midBG3, controls.midBG3.BitmapWidth(), controls.midBG3.BitmapHeight()) -- TODO
-            --LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 67)
-            --LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 1)
-            --LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 4)
-        else
-            LOG('controlToAlignTo present')
-            Layouter(self.bgLeftCap)
-                :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'))
-                :Dimensions(self.bgLeftCap.BitmapWidth(), self.bgLeftCap.BitmapHeight())
-                :AtLeftBottomIn(self, 69, 5)
-            Layouter(self.bgTechTab)
-                :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-                :Dimensions(self.bgTechTab.BitmapWidth(), self.bgTechTab.BitmapHeight())
-                :RightOf(self.bgLeftCap.Right)
-            Layouter(self.bgTechTabCap)
-                :Texture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
-                :Dimensions(self.bgTechTabCap.BitmapWidth(), self.bgTechTabCap.BitmapHeight())
-                :RightOf(self.bgTechTab.Right)
-            Layouter(self.bgMain)
-                :Left(self.bgTechTabCap.Right)
-            --controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-            --controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-            --controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-            --controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'))
-            --LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO
-            --LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight()) -- TODO
-            --LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight()) -- TODO
-            --LayoutHelpers.SetDimensions(controls.midBG3, controls.midBG3.BitmapWidth(), controls.midBG3.BitmapHeight()) -- TODO
-            --LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 69)
-            --LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 0)
-            --LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 5)
-        end
     end,
 }
