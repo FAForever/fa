@@ -568,7 +568,6 @@ end
 
 -- Generic script button specific behvior
 local function ScriptButtonOrderBehavior(self, modifiers, subState)
-local function ScriptButtonOrderBehavior(self, modifiers, subState)
     local state
     if subState ~= nil then
         state = subState
@@ -617,7 +616,6 @@ local function ScriptButtonInitFunction(control, unitList, subCheck)
         LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
     end
     if not subCheck then
-    if not subCheck then
         control:SetCheck(result) -- Selected state
     else
         return result, mixed -- Return our values so our meta button can do what it likes with them
@@ -662,12 +660,10 @@ local function StatToggleInitFunction(control, unitList, subCheck)
         local thisUnitStatus = (v:GetStat(control._data.statToggle, 0).Value == 1 and true) or false
         if result == nil then
             result = thisUnitStatus
-        else
-            if thisUnitStatus ~= result then
-                mixed = true
-                result = true
-                break
-            end
+        elseif thisUnitStatus ~= result then
+            mixed = true
+            result = true
+            break
         end
     end
     if mixed then
@@ -677,7 +673,6 @@ local function StatToggleInitFunction(control, unitList, subCheck)
     if not subCheck then
         control:SetCheck(result) -- Selected state
     else
-        return result, mixed -- Return our values so our meta button can do what it likes with them
         return result, mixed -- Return our values so our meta button can do what it likes with them
     end
 end
@@ -869,12 +864,10 @@ local function CreateOnBuildTogglePopup(parent, selected)
             local thisUnitStatus = v:GetStat(statToggle.stat, 0).Value
             if result == nil then
                 result = thisUnitStatus
-            else
-                if thisUnitStatus ~= result then
-                    mixed = true
-                    result = true
-                    break
-                end
+            elseif thisUnitStatus ~= result then
+                mixed = true
+                result = true
+                break
             end
         end
         if mixed then
@@ -1024,21 +1017,21 @@ local function RetaliateOrderBehavior(self, modifiers)
     if self._popup then
         self._popup:Destroy()
         self._popup = nil
-    else
-        self._popup = CreateFirestatePopup(self, self._toggleState)
-        local function CollapsePopup(event)
-            if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
-                self._popup:Destroy()
-                self._popup = nil
-            end
+        return
+    end
+    self._popup = CreateFirestatePopup(self, self._toggleState)
+    local function CollapsePopup(event)
+        if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
+            self._popup:Destroy()
+            self._popup = nil
         end
+    end
 
-        UIMain.AddOnMouseClickedFunc(CollapsePopup)
+    UIMain.AddOnMouseClickedFunc(CollapsePopup)
 
-        self._popup.OnDestroy = function(self)
-            UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
-            Checkbox.OnDestroy(self)
-        end
+    self._popup.OnDestroy = function(self)
+        UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
+        Checkbox.OnDestroy(self)
     end
 end
 
