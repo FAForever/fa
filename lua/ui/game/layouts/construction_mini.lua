@@ -1,10 +1,11 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Layouter = LayoutHelpers.ReusedLayoutFor
 local Grid = import("/lua/maui/grid.lua").Grid
 local Button = import("/lua/maui/button.lua").Button
+local IconButton
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
-
 
 function SetLayout()
     local textures = {
@@ -47,146 +48,85 @@ function SetLayout()
     local controls = import("/lua/ui/game/construction.lua").controls
     local ordersControl = import("/lua/ui/game/construction.lua").ordersControl
     local controlClusterGroup = import("/lua/ui/game/construction.lua").controlClusterGroup
-    LayoutHelpers.AtTopIn(controls.constructionGroup, controlClusterGroup, 12)
-    controls.constructionGroup.Bottom:Set(controlClusterGroup.Bottom)
+
+    Layouter(controls.constructionGroup)
+        :AtTopIn(controlClusterGroup, 12)
+        :Bottom(controlClusterGroup.Bottom)
+        :AtRightIn(controlClusterGroup, 18)
+        :ResetLeft()
+        :DisableHitTest()
     if ordersControl then
-        LayoutHelpers.AnchorToRight(controls.constructionGroup, ordersControl, -6)
+        LOG('we have orders control')
+        Layouter(controls.constructionGroup):AnchorToRight(ordersControl, -6)
     else
-        controls.constructionGroup.Left:Set(controlClusterGroup.Left)
+        Layouter(controls.constructionGroup):Left(controlClusterGroup.Left)
     end
-    LayoutHelpers.AtRightIn(controls.constructionGroup, controlClusterGroup, 18)
+    Layouter(controls.constructionGroup):End()
 
-    controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'))
-    LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 4)
-    LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 67)
-    LayoutHelpers.ResetRight(controls.minBG)
-    LayoutHelpers.ResetTop(controls.minBG)
-    LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO: This is now set value instead of a function to get Bitmap dimension. When when the texture changes, it wont properly resize anymore
-    --controls.minBG.Width:Set(controls.minBG.BitmapWidth)
-    --controls.minBG.Height:Set(controls.minBG.BitmapHeight)
-
-    controls.leftBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
-    LayoutHelpers.AtLeftIn(controls.leftBracketMin, controls.constructionGroup, 4)
-    LayoutHelpers.AtTopIn(controls.leftBracketMin, controls.constructionGroup, 21)
-
-    controls.leftBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
-    LayoutHelpers.AtLeftIn(controls.leftBracketMax, controls.leftBracketMin)
-    LayoutHelpers.AtBottomIn(controls.leftBracketMax, controls.constructionGroup, 2)
-
-    controls.leftBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
-    LayoutHelpers.AtLeftIn(controls.leftBracketMid, controls.leftBracketMin)
-    controls.leftBracketMid.Bottom:Set(controls.leftBracketMax.Top)
-    controls.leftBracketMid.Top:Set(controls.leftBracketMin.Bottom)
-
-    controls.rightBracketMin:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'))
-    LayoutHelpers.AtRightIn(controls.rightBracketMin, controls.maxBG, -21)
-    LayoutHelpers.AtTopIn(controls.rightBracketMin, controls.maxBG, -6)
-
-    controls.rightBracketMax:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'))
-    LayoutHelpers.AtRightIn(controls.rightBracketMax, controls.maxBG, -21)
-    LayoutHelpers.AtBottomIn(controls.rightBracketMax, controls.maxBG, -5)
-
-    controls.rightBracketMid:SetTexture(UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'))
-    LayoutHelpers.AtRightIn(controls.rightBracketMid, controls.maxBG, -14)
-    controls.rightBracketMid.Bottom:Set(controls.rightBracketMax.Top)
-    controls.rightBracketMid.Top:Set(controls.rightBracketMin.Bottom)
-
-    controls.maxBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_r.dds'))
-    LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 1)
-    LayoutHelpers.AtRightIn(controls.maxBG, controls.constructionGroup, 2)
-    LayoutHelpers.ResetLeft(controls.maxBG)
-    LayoutHelpers.ResetTop(controls.maxBG)
-
-    if not controls.midBG1 then
-        controls.midBG1 = Bitmap(controls.constructionGroup)
-    end
-    controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'))
-    controls.midBG1.Left:Set(controls.minBG.Right)
-    controls.midBG1.Bottom:Set(controls.minBG.Bottom)
-    LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight())-- TODO: Same scaling issue as the first one
-    --controls.midBG1.Height:Set(controls.midBG1.BitmapHeight)
-    --controls.midBG1.Width:Set(controls.midBG1.BitmapWidth)
-    LayoutHelpers.ResetTop(controls.midBG1)
-
-    if not controls.midBG2 then
-        controls.midBG2 = Bitmap(controls.constructionGroup)
-    end
-    controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
-    controls.midBG2.Left:Set(controls.midBG1.Right)
-    controls.midBG2.Bottom:Set(controls.minBG.Bottom)
-    LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight())-- TODO: Same scaling issue as the first one
-    --controls.midBG2.Height:Set(controls.midBG2.BitmapHeight)
-    --controls.midBG2.Width:Set(controls.midBG2.BitmapWidth)
-    LayoutHelpers.ResetTop(controls.midBG2)
-
-    controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'))
-    controls.midBG3.Left:Set(controls.midBG2.Right)
-    controls.midBG3.Right:Set(controls.maxBG.Left)
-    controls.midBG3.Bottom:Set(controls.maxBG.Bottom)
-    --controls.midBG3:SetTiled(true) -- TODO: Find out what this does, with true the line isnt set properly
-    LayoutHelpers.SetHeight(controls.midBG3, controls.midBG3.BitmapHeight())-- TODO: Same scaling issue as the first one
-    --controls.midBG3.Height:Set(controls.midBG3.BitmapHeight)
-    LayoutHelpers.ResetWidth(controls.midBG3)
-    LayoutHelpers.ResetTop(controls.midBG3)
-    LayoutHelpers.SetHeight(controls.midBG3, controls.midBG3.BitmapHeight())-- TODO: Same scaling issue as the first one
-    --controls.midBG3.Height:Set(controls.midBG3.BitmapHeight)
-
-    LayoutHelpers.AtTopIn(controls.choices, controls.minBG, 5)
-    LayoutHelpers.SetHeight(controls.choices, 50)
     controls.choices:SetToVertical(false)
-    LayoutHelpers.AtLeftIn(controls.choices, controls.minBG, 26)
-    LayoutHelpers.AtRightIn(controls.choices, controls.maxBG, 25)
-    LayoutHelpers.ResetWidth(controls.choices)
-    LayoutHelpers.ResetBottom(controls.choices)
+    Layouter(controls.choices)
+        :AtTopIn(controls.minBG, 5)
+        :Height(50)
+        :AtLeftIn(controls.minBG, 26)
+        :AtRightIn(controls.maxBG, 25)
+        :ResetWidth()
+        :ResetBottom()
 
-    controls.choicesBGMin:SetTexture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_l.dds'))
-    LayoutHelpers.AtLeftTopIn(controls.choicesBGMin, controls.choices, -46)
-    controls.choicesBGMax:SetTexture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_r.dds'))
-    LayoutHelpers.AtRightTopIn(controls.choicesBGMax, controls.choices, -43)
-    LayoutHelpers.ResetLeft(controls.choicesBGMax)
-    LayoutHelpers.ResetBottom(controls.choicesBGMax)
-    controls.choicesBGMid:SetTexture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_m.dds'))
-    LayoutHelpers.AtTopIn(controls.choicesBGMid, controls.choices)
-    LayoutHelpers.ResetBottom(controls.choicesBGMid)
-    controls.choicesBGMid.Left:Set(controls.choicesBGMin.Right)
-    controls.choicesBGMid.Right:Set(controls.choicesBGMax.Left)
+    Layouter(controls.choicesBGMin)
+        :Texture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_l.dds'))
+        :AtLeftTopIn(controls.choices, -46)
+        :Under(controls.choices, 1)
 
-    controls.choicesBGMax.Depth:Set(function() return controls.choices.Depth() - 1 end)
-    controls.choicesBGMid.Depth:Set(function() return controls.choices.Depth() - 1 end)
-    controls.choicesBGMin.Depth:Set(function() return controls.choices.Depth() - 1 end)
+    Layouter(controls.choicesBGMax)
+        :Texture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_r.dds'))
+        :AtRightTopIn(controls.choices, -43)
+        :ResetLeft()
+        :ResetBottom()
+        :Under(controls.choices, 1)
 
-    controls.scrollMin:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
-    controls.scrollMin:SetTexture(textures.midBtn.up)
-    LayoutHelpers.AnchorToLeft(controls.scrollMin, controls.choices, 4)
-    LayoutHelpers.AtVerticalCenterIn(controls.scrollMin, controls.choices)
-    LayoutHelpers.ResetLeft(controls.scrollMin)
-    LayoutHelpers.ResetBottom(controls.scrollMin)
-    LayoutHelpers.SetDimensions(controls.scrollMin, controls.scrollMin.BitmapWidth(), controls.scrollMin.BitmapHeight())-- TODO: Same scaling issue as the first one
-    --controls.scrollMin.Height:Set(controls.scrollMin.BitmapHeight)
-    --controls.scrollMin.Width:Set(controls.scrollMin.BitmapWidth)
+    Layouter(controls.choicesBGMid)
+        :Texture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_m.dds'))
+        :AtTopIn(controls.choices)
+        :Left(controls.choicesBGMin.Right)
+        :Right(controls.choicesBGMax.Left)
+        :ResetBottom()
+        :Under(controls.choices, 1)
 
-    controls.scrollMinIcon:SetTexture(textures.minIcon.on)
-    LayoutHelpers.AtCenterIn(controls.scrollMinIcon, controls.scrollMin)
-    controls.scrollMinIcon:DisableHitTest()
-    controls.scrollMin.OnDisable = function(self)
-        controls.scrollMinIcon:SetTexture(textures.minIcon.off)
-        Button.OnDisable(self)
-    end
-    controls.scrollMin.OnEnable = function(self)
-        controls.scrollMinIcon:SetTexture(textures.minIcon.on)
-        Button.OnEnable(self)
-    end
+    controls.scrollMin:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over,
+        textures.midBtn.dis, textures.minIcon.on, textures.minIcon.off)
+    Layouter(controls.scrollMin)
+        :Texture(textures.midBtn.up)
+        :AnchorToLeft(controls.choices, 4)
+        :AtVerticalCenterIn(controls.choices)
+        :ResetLeft()
+        :ResetBottom()
+        :Dimensions(controls.scrollMin.BitmapWidth(), controls.scrollMin.BitmapHeight())
+
+    --Layouter(controls.scrollMinIcon)
+    --    :Texture(textures.minIcon.on)
+    --    :AtCenterIn(controls.scrollMin)
+    --    :DisableHitTest()
+    --controls.scrollMin.OnDisable = function(self)
+    --    controls.scrollMinIcon:SetTexture(textures.minIcon.off)
+    --    Button.OnDisable(self)
+    --end
+    --controls.scrollMin.OnEnable = function(self)
+    --    controls.scrollMinIcon:SetTexture(textures.minIcon.on)
+    --    Button.OnEnable(self)
+    --end
 
     controls.scrollMax:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
-    controls.scrollMax:SetTexture(textures.midBtn.up)
-    controls.scrollMax.Left:Set(controls.choices.Right)
-    LayoutHelpers.AtVerticalCenterIn(controls.scrollMax, controls.choices)
-    LayoutHelpers.ResetRight(controls.scrollMax)
-    LayoutHelpers.ResetBottom(controls.scrollMax)
+    Layouter(controls.scrollMax)
+        :Texture(textures.midBtn.up)
+        :Left(controls.choices.Right)
+        :AtVerticalCenterIn(controls.choices)
+        :ResetRight()
+        :ResetBottom()
 
-    controls.scrollMaxIcon:SetTexture(textures.maxIcon.on)
-    LayoutHelpers.AtCenterIn(controls.scrollMaxIcon, controls.scrollMax)
-    controls.scrollMaxIcon:DisableHitTest()
+    Layouter(controls.scrollMaxIcon)
+        :Texture(textures.maxIcon.on)
+        :AtCenterIn(controls.scrollMax)
+        :DisableHitTest()
     controls.scrollMax.OnDisable = function(self)
         controls.scrollMaxIcon:SetTexture(textures.maxIcon.off)
         Button.OnDisable(self)
@@ -197,15 +137,17 @@ function SetLayout()
     end
 
     controls.pageMin:SetNewTextures(textures.minBtn.up, textures.minBtn.down, textures.minBtn.over, textures.minBtn.dis)
-    controls.pageMin:SetTexture(textures.minBtn.up)
-    controls.pageMin.Right:Set(controls.scrollMin.Left)
-    LayoutHelpers.AtVerticalCenterIn(controls.pageMin, controls.choices)
-    LayoutHelpers.ResetLeft(controls.pageMin)
-    LayoutHelpers.ResetBottom(controls.pageMin)
+    Layouter(controls.pageMin)
+        :Texture(textures.minBtn.up)
+        :Right(controls.scrollMin.Left)
+        :AtVerticalCenterIn(controls.choices)
+        :ResetLeft()
+        :ResetBottom()
 
-    controls.pageMinIcon:SetTexture(textures.pageMinIcon.on)
-    LayoutHelpers.AtCenterIn(controls.pageMinIcon, controls.pageMin)
-    controls.pageMinIcon:DisableHitTest()
+    Layouter(controls.pageMinIcon)
+        :Texture(textures.pageMinIcon.on)
+        :AtCenterIn(controls.pageMin)
+        :DisableHitTest()
     controls.pageMin.OnDisable = function(self)
         controls.pageMinIcon:SetTexture(textures.pageMinIcon.off)
         Button.OnDisable(self)
@@ -216,15 +158,17 @@ function SetLayout()
     end
 
     controls.pageMax:SetNewTextures(textures.maxBtn.up, textures.maxBtn.down, textures.maxBtn.over, textures.maxBtn.dis)
-    controls.pageMax:SetTexture(textures.maxBtn.up)
-    controls.pageMax.Left:Set(controls.scrollMax.Right)
-    LayoutHelpers.AtVerticalCenterIn(controls.pageMax, controls.choices)
-    LayoutHelpers.ResetRight(controls.pageMax)
-    LayoutHelpers.ResetBottom(controls.pageMax)
+    Layouter(controls.pageMax)
+        :Texture(textures.maxBtn.up)
+        :Left(controls.scrollMax.Right)
+        :AtVerticalCenterIn(controls.choices)
+        :ResetRight()
+        :ResetBottom()
 
-    controls.pageMaxIcon:SetTexture(textures.pageMaxIcon.on)
-    LayoutHelpers.AtCenterIn(controls.pageMaxIcon, controls.pageMax)
-    controls.pageMaxIcon:DisableHitTest()
+    Layouter(controls.pageMaxIcon)
+        :Texture(textures.pageMaxIcon.on)
+        :AtCenterIn(controls.pageMax)
+        :DisableHitTest()
     controls.pageMax.OnDisable = function(self)
         controls.pageMaxIcon:SetTexture(textures.pageMaxIcon.off)
         Button.OnDisable(self)
@@ -234,43 +178,51 @@ function SetLayout()
         Button.OnEnable(self)
     end
 
-    LayoutHelpers.AnchorToBottom(controls.secondaryChoices, controls.choices, 1)
-    LayoutHelpers.AnchorToTop(controls.secondaryChoices, controls.secondaryChoices, -50)
-    controls.secondaryChoices.Left:Set(controls.choices.Left)
-    controls.secondaryChoices.Right:Set(controls.choices.Right)
+    Layouter(controls.secondaryChoices)
+        :AnchorToBottom(controls.choices, 1)
+        :AnchorToTop(controls.secondaryChoices, -50)
+        :Left(controls.choices.Left)
+        :Right(controls.choices.Right)
     controls.secondaryChoices:SetToVertical(false)
 
-    controls.secondaryChoicesBGMin:SetTexture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_l.dds'))
-    LayoutHelpers.AtLeftTopIn(controls.secondaryChoicesBGMin, controls.secondaryChoices, -46)
-    controls.secondaryChoicesBGMax:SetTexture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_r.dds'))
-    LayoutHelpers.AtRightTopIn(controls.secondaryChoicesBGMax, controls.secondaryChoices, -43)
-    LayoutHelpers.ResetLeft(controls.secondaryChoicesBGMax)
-    LayoutHelpers.ResetBottom(controls.secondaryChoicesBGMax)
-    controls.secondaryChoicesBGMid:SetTexture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_m.dds'))
-    LayoutHelpers.AtTopIn(controls.secondaryChoicesBGMid, controls.secondaryChoices)
-    controls.secondaryChoicesBGMid.Left:Set(controls.secondaryChoicesBGMin.Right)
-    controls.secondaryChoicesBGMid.Right:Set(controls.secondaryChoicesBGMax.Left)
-    LayoutHelpers.ResetBottom(controls.secondaryChoicesBGMid)
+    Layouter(controls.secondaryChoicesBGMin)
+        :Texture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_l.dds'))
+        :AtLeftTopIn(controls.secondaryChoices, -46)
+        :Under(controls.secondaryChoices, 1)
 
-    controls.secondaryChoicesBGMin.Depth:Set(function() return controls.secondaryChoices.Depth() - 1 end)
-    controls.secondaryChoicesBGMax.Depth:Set(function() return controls.secondaryChoices.Depth() - 1 end)
-    controls.secondaryChoicesBGMid.Depth:Set(function() return controls.secondaryChoices.Depth() - 1 end)
+    Layouter(controls.secondaryChoicesBGMax)
+        :Texture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_r.dds'))
+        :AtRightTopIn(controls.secondaryChoices, -43)
+        :ResetLeft()
+        :ResetBottom()
+        :Under(controls.secondaryChoices, 1)
 
-    LayoutHelpers.AtLeftIn(controls.secondaryProgress, controls.secondaryChoices, 5)
-    LayoutHelpers.AtTopIn(controls.secondaryProgress, controls.secondaryChoices, 42)
-    controls.secondaryProgress.Depth:Set(function() return controls.secondaryChoices.Depth() + 5 end)
-    LayoutHelpers.SetDimensions(controls.secondaryProgress, 40, 4)
+    Layouter(controls.secondaryChoicesBGMid)
+        :Texture(UIUtil.UIFile('/game/construct-panel/que-panel_bmp_m.dds'))
+        :AtTopIn(controls.secondaryChoices)
+        :Left(controls.secondaryChoicesBGMin.Right)
+        :Right(controls.secondaryChoicesBGMax.Left)
+        :ResetBottom()
+        :Under(controls.secondaryChoices, 1)
+
+    Layouter(controls.secondaryProgress)
+        :AtLeftIn(controls.secondaryChoices, 5)
+        :AtTopIn(controls.secondaryChoices, 42)
+        :Over(controls.secondaryChoices, 5)
+        :Dimensions(40, 4)
 
     controls.secondaryScrollMin:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
-    controls.secondaryScrollMin:SetTexture(textures.midBtn.up)
-    LayoutHelpers.AnchorToLeft(controls.secondaryScrollMin, controls.secondaryChoices, 4)
-    LayoutHelpers.AtVerticalCenterIn(controls.secondaryScrollMin, controls.secondaryChoices)
-    LayoutHelpers.ResetLeft(controls.secondaryScrollMin)
-    LayoutHelpers.ResetBottom(controls.secondaryScrollMin)
+    Layouter(controls.secondaryScrollMin)
+        :Texture(textures.midBtn.up)
+        :AnchorToLeft(controls.secondaryChoices, 4)
+        :AtVerticalCenterIn(controls.secondaryChoices)
+        :ResetLeft()
+        :ResetBottom()
 
-    controls.secondaryScrollMinIcon:SetTexture(textures.minIcon.on)
-    LayoutHelpers.AtCenterIn(controls.secondaryScrollMinIcon, controls.secondaryScrollMin)
-    controls.secondaryScrollMinIcon:DisableHitTest()
+    Layouter(controls.secondaryScrollMinIcon)
+        :Texture(textures.minIcon.on)
+        :AtCenterIn(controls.secondaryScrollMin)
+        :DisableHitTest()
     controls.secondaryScrollMin.OnDisable = function(self)
         controls.secondaryScrollMinIcon:SetTexture(textures.minIcon.off)
         Button.OnDisable(self)
@@ -281,15 +233,17 @@ function SetLayout()
     end
 
     controls.secondaryScrollMax:SetNewTextures(textures.midBtn.up, textures.midBtn.down, textures.midBtn.over, textures.midBtn.dis)
-    controls.secondaryScrollMax:SetTexture(textures.midBtn.up)
-    controls.secondaryScrollMax.Left:Set(controls.secondaryChoices.Right)
-    LayoutHelpers.AtVerticalCenterIn(controls.secondaryScrollMax, controls.secondaryChoices)
-    LayoutHelpers.ResetRight(controls.secondaryScrollMax)
-    LayoutHelpers.ResetBottom(controls.secondaryScrollMax)
+    Layouter(controls.secondaryScrollMax)
+        :Texture(textures.midBtn.up)
+        :Left(controls.secondaryChoices.Right)
+        :AtVerticalCenterIn(controls.secondaryChoices)
+        :ResetRight()
+        :ResetBottom()
 
-    controls.secondaryScrollMaxIcon:SetTexture(textures.maxIcon.on)
-    LayoutHelpers.AtCenterIn(controls.secondaryScrollMaxIcon, controls.secondaryScrollMax)
-    controls.secondaryScrollMaxIcon:DisableHitTest()
+    Layouter(controls.secondaryScrollMaxIcon)
+        :Texture(textures.maxIcon.on)
+        :AtCenterIn(controls.secondaryScrollMax)
+        :DisableHitTest()
     controls.secondaryScrollMax.OnDisable = function(self)
         controls.secondaryScrollMaxIcon:SetTexture(textures.maxIcon.off)
         Button.OnDisable(self)
@@ -300,15 +254,17 @@ function SetLayout()
     end
 
     controls.secondaryPageMin:SetNewTextures(textures.minBtn.up, textures.minBtn.down, textures.minBtn.over, textures.minBtn.dis)
-    controls.secondaryPageMin:SetTexture(textures.minBtn.up)
-    controls.secondaryPageMin.Right:Set(controls.secondaryScrollMin.Left)
-    LayoutHelpers.AtVerticalCenterIn(controls.secondaryPageMin, controls.secondaryChoices)
-    LayoutHelpers.ResetBottom(controls.secondaryPageMin)
-    LayoutHelpers.ResetLeft(controls.secondaryPageMin)
+    Layouter(controls.secondaryPageMin)
+        :Texture(textures.minBtn.up)
+        :Right(controls.secondaryScrollMin.Left)
+        :AtVerticalCenterIn(controls.secondaryChoices)
+        :ResetBottom()
+        :ResetLeft()
 
-    controls.secondaryPageMinIcon:SetTexture(textures.pageMinIcon.on)
-    LayoutHelpers.AtCenterIn(controls.secondaryPageMinIcon, controls.secondaryPageMin)
-    controls.secondaryPageMinIcon:DisableHitTest()
+    Layouter(controls.secondaryPageMinIcon)
+        :Texture(textures.pageMinIcon.on)
+        :AtCenterIn(controls.secondaryPageMin)
+        :DisableHitTest()
     controls.secondaryPageMin.OnDisable = function(self)
         controls.secondaryPageMinIcon:SetTexture(textures.pageMinIcon.off)
         Button.OnDisable(self)
@@ -319,14 +275,16 @@ function SetLayout()
     end
 
     controls.secondaryPageMax:SetNewTextures(textures.maxBtn.up, textures.maxBtn.down, textures.maxBtn.over, textures.maxBtn.dis)
-    controls.secondaryPageMax:SetTexture(textures.maxBtn.up)
-    controls.secondaryPageMax.Left:Set(controls.scrollMax.Right)
-    LayoutHelpers.AtVerticalCenterIn(controls.secondaryPageMax, controls.secondaryChoices)
-    LayoutHelpers.ResetBottom(controls.secondaryPageMax)
+    Layouter(controls.secondaryPageMax)
+        :Texture(textures.maxBtn.up)
+        :Left(controls.secondaryScrollMax.Right)
+        :AtVerticalCenterIn(controls.secondaryChoices)
+        :ResetBottom()
 
-    controls.secondaryPageMaxIcon:SetTexture(textures.pageMaxIcon.on)
-    LayoutHelpers.AtCenterIn(controls.secondaryPageMaxIcon, controls.secondaryPageMax)
-    controls.secondaryPageMaxIcon:DisableHitTest()
+    Layouter(controls.secondaryPageMaxIcon)
+        :Texture(textures.pageMaxIcon.on)
+        :AtCenterIn(controls.secondaryPageMax)
+        :DisableHitTest()
     controls.secondaryPageMax.OnDisable = function(self)
         controls.secondaryPageMaxIcon:SetTexture(textures.pageMaxIcon.off)
         Button.OnDisable(self)
@@ -338,14 +296,15 @@ function SetLayout()
 
     controls.extraBtn1:SetNewTextures(textures.midBtn.up, textures.midBtn.selected, textures.midBtn.over,
         textures.midBtn.over, textures.midBtn.dis, textures.midBtn.dis)
+    Layouter(controls.extraBtn1)
+        :AtLeftTopIn(controls.minBG, 10, 31)
+
     controls.extraBtn2:SetNewTextures(textures.midBtn.up, textures.midBtn.selected, textures.midBtn.over,
         textures.midBtn.over, textures.midBtn.dis, textures.midBtn.dis)
-    LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 10, 31)
-    LayoutHelpers.Below(controls.extraBtn2, controls.extraBtn1, 1)
+    Layouter(controls.extraBtn2)
+        :Below(controls.extraBtn1, 1)
 
-    controls.constructionGroup:DisableHitTest()
     LayoutTabs(import("/lua/ui/game/construction.lua").controls)
-    controls.constructionGroup:Hide()
 end
 
 function LayoutTabs(controls)
@@ -412,30 +371,32 @@ function LayoutTabs(controls)
 
             prevControl = control
         end
-        controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'))
-        controls.midBG1.Right:Set(prevControl.Right)
-        controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
-        controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'))
-        controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'))
-        LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO: This is an ugly hack for the problem described above
-        LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight()) -- TODO
-        LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight()) -- TODO
-        LayoutHelpers.SetDimensions(controls.midBG3, controls.midBG3.BitmapWidth(), controls.midBG3.BitmapHeight()) -- TODO
-        LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 67)
-        LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 1)
-        LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 4)
+        --controls.constructionGroup:TechTabLayout(prevControl)
+        -- controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'))
+        -- controls.midBG1.Right:Set(prevControl.Right)
+        -- controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'))
+        -- controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'))
+        -- controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'))
+        -- LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO: This is an ugly hack for the problem described above
+        -- LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight()) -- TODO
+        -- LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight()) -- TODO
+        -- LayoutHelpers.SetDimensions(controls.midBG3, controls.midBG3.BitmapWidth(), controls.midBG3.BitmapHeight()) -- TODO
+        -- LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 67)
+        -- LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 1)
+        -- LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 4)
     else
-        controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-        controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-        controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
-        controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'))
-        LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO
-        LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight()) -- TODO
-        LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight()) -- TODO
-        LayoutHelpers.SetDimensions(controls.midBG3, controls.midBG3.BitmapWidth(), controls.midBG3.BitmapHeight()) -- TODO
-        LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 69)
-        LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 0)
-        LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 5)
+        --controls.constructionGroup:TechTabLayout()
+        -- controls.midBG1:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
+        -- controls.midBG2:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
+        -- controls.midBG3:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_m.dds'))
+        -- controls.minBG:SetTexture(UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'))
+        -- LayoutHelpers.SetDimensions(controls.minBG, controls.minBG.BitmapWidth(), controls.minBG.BitmapHeight()) -- TODO
+        -- LayoutHelpers.SetDimensions(controls.midBG1, controls.midBG1.BitmapWidth(), controls.midBG1.BitmapHeight()) -- TODO
+        -- LayoutHelpers.SetDimensions(controls.midBG2, controls.midBG2.BitmapWidth(), controls.midBG2.BitmapHeight()) -- TODO
+        -- LayoutHelpers.SetDimensions(controls.midBG3, controls.midBG3.BitmapWidth(), controls.midBG3.BitmapHeight()) -- TODO
+        -- LayoutHelpers.AtLeftIn(controls.minBG, controls.constructionGroup, 69)
+        -- LayoutHelpers.AtBottomIn(controls.maxBG, controls.minBG, 0)
+        -- LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 5)
     end
 
     SetupTab(controls.constructionTab)
@@ -493,6 +454,7 @@ function OnSelection(empty)
         end
     else
         if controls.constructionGroup:IsHidden() then
+            LOG('showing construction group')
             controls.constructionGroup:Show()
         end
     end

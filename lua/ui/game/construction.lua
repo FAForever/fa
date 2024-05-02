@@ -14,6 +14,7 @@ local SpecialGrid = import("/lua/ui/controls/specialgrid.lua").SpecialGrid
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 local Button = import("/lua/maui/button.lua").Button
 local FixableButton = import("/lua/maui/button.lua").FixableButton
+local IconButton = import("/lua/maui/button.lua").IconButton
 local Edit = import("/lua/maui/edit.lua").Edit
 local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
 local GameCommon = import("/lua/ui/game/gamecommon.lua")
@@ -36,6 +37,7 @@ local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
 local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local getEnhancementQueue = EnhancementQueueFile.getEnhancementQueue
+local ConstructionPanel = import("/lua/ui/game/construction/background.lua").ConstructionPanel
 
 local modifiedCommandQueue = {}
 local previousModifiedCommandQueue = {}
@@ -255,44 +257,44 @@ function CreateTab(parent, id, onCheckFunc)
 end
 
 function CreateUI()
-    controls.constructionGroup = Group(controlClusterGroup)
-    controls.minBG = Bitmap(controls.constructionGroup)
-    controls.maxBG = Bitmap(controls.constructionGroup)
-    controls.midBG1 = Bitmap(controls.constructionGroup)
-    controls.midBG2 = Bitmap(controls.constructionGroup)
-    controls.midBG3 = Bitmap(controls.constructionGroup)
-    controls.choices = SpecialGrid(controls.constructionGroup, false)
-    controls.choicesBGMin = Bitmap(controls.constructionGroup)
-    controls.choicesBGMid = Bitmap(controls.constructionGroup)
-    controls.choicesBGMax = Bitmap(controls.constructionGroup)
-    controls.scrollMin = Button(controls.choices)
-    controls.scrollMax = Button(controls.choices)
-    controls.scrollMinIcon = Button(controls.choices)
-    controls.scrollMaxIcon = Button(controls.choices)
-    controls.pageMin = Button(controls.choices)
-    controls.pageMax = Button(controls.choices)
-    controls.pageMinIcon = Button(controls.choices)
-    controls.pageMaxIcon = Button(controls.choices)
-    controls.secondaryChoices = SpecialGrid(controls.constructionGroup, false)
-    controls.secondaryChoicesBGMin = Bitmap(controls.constructionGroup)
-    controls.secondaryChoicesBGMid = Bitmap(controls.constructionGroup)
-    controls.secondaryChoicesBGMax = Bitmap(controls.constructionGroup)
-    controls.secondaryScrollMin = Button(controls.secondaryChoices)
-    controls.secondaryScrollMax = Button(controls.secondaryChoices)
-    controls.secondaryScrollMinIcon = Button(controls.secondaryChoices)
-    controls.secondaryScrollMaxIcon = Button(controls.secondaryChoices)
-    controls.secondaryPageMin = Button(controls.secondaryChoices)
-    controls.secondaryPageMax = Button(controls.secondaryChoices)
-    controls.secondaryPageMinIcon = Button(controls.secondaryChoices)
-    controls.secondaryPageMaxIcon = Button(controls.secondaryChoices)
-    controls.leftBracketMin = Bitmap(controls.constructionGroup)
-    controls.leftBracketMax = Bitmap(controls.constructionGroup)
-    controls.leftBracketMid = Bitmap(controls.constructionGroup)
-    controls.rightBracketMin = Bitmap(controls.constructionGroup)
-    controls.rightBracketMax = Bitmap(controls.constructionGroup)
-    controls.rightBracketMid = Bitmap(controls.constructionGroup)
-    controls.extraBtn1 = Checkbox(controls.minBG)
-    controls.extraBtn1.icon = Bitmap(controls.extraBtn1)
+    controls.constructionGroup = ConstructionPanel(controlClusterGroup) -- Overall container for the construction UI
+    controls.minBG = Bitmap(controls.constructionGroup) -- Leftmost bg section for construction panel
+    controls.maxBG = Bitmap(controls.constructionGroup) -- Rightmost bg section for construction panel
+    controls.midBG1 = Bitmap(controls.constructionGroup) -- Bg section under tech tab
+    controls.midBG2 = Bitmap(controls.constructionGroup) -- Small bg connecting tech tab to main panel
+    controls.midBG3 = Bitmap(controls.constructionGroup) -- Bg section that stretches to right of screen
+    controls.choices = SpecialGrid(controls.constructionGroup, false) -- Main grid for build options
+    controls.choicesBGMin = Bitmap(controls.constructionGroup) -- Leftmost bg section for build options
+    controls.choicesBGMid = Bitmap(controls.constructionGroup) -- Middle bg section for build options
+    controls.choicesBGMax = Bitmap(controls.constructionGroup) -- Rightmost bg section for build options
+    controls.scrollMin = IconButton(controls.choices) -- Top left inner scroll button (play button)
+    controls.scrollMax = Button(controls.choices) -- Top right inner scroll button (play button)
+    controls.scrollMinIcon = Button(controls.choices) -- Icon for scroll button
+    controls.scrollMaxIcon = Button(controls.choices) -- Icon for scroll button
+    controls.pageMin = Button(controls.choices) -- Top left outer skip button
+    controls.pageMax = Button(controls.choices) -- Top right outer skip button
+    controls.pageMinIcon = Button(controls.choices) -- Icon for skip button
+    controls.pageMaxIcon = Button(controls.choices) -- Icon for skip button
+    controls.secondaryChoices = SpecialGrid(controls.constructionGroup, false) -- Lower grid for cargo/queue etc.
+    controls.secondaryChoicesBGMin = Bitmap(controls.constructionGroup) -- same as choices
+    controls.secondaryChoicesBGMid = Bitmap(controls.constructionGroup) -- ""
+    controls.secondaryChoicesBGMax = Bitmap(controls.constructionGroup) -- ""
+    controls.secondaryScrollMin = Button(controls.secondaryChoices) -- ""
+    controls.secondaryScrollMax = Button(controls.secondaryChoices) -- ""
+    controls.secondaryScrollMinIcon = Button(controls.secondaryChoices) -- ""
+    controls.secondaryScrollMaxIcon = Button(controls.secondaryChoices) -- ""
+    controls.secondaryPageMin = Button(controls.secondaryChoices) -- ""
+    controls.secondaryPageMax = Button(controls.secondaryChoices) -- ""
+    controls.secondaryPageMinIcon = Button(controls.secondaryChoices) -- ""
+    controls.secondaryPageMaxIcon = Button(controls.secondaryChoices) -- ""
+    controls.leftBracketMin = Bitmap(controls.constructionGroup) -- lower left end bracket
+    controls.leftBracketMax = Bitmap(controls.constructionGroup) -- upper left end bracket
+    controls.leftBracketMid = Bitmap(controls.constructionGroup) -- middle left end bracket
+    controls.rightBracketMin = Bitmap(controls.constructionGroup) -- lower right end bracket
+    controls.rightBracketMax = Bitmap(controls.constructionGroup) -- upper right end bracket
+    controls.rightBracketMid = Bitmap(controls.constructionGroup) -- middle right end bracket
+    controls.extraBtn1 = Checkbox(controls.minBG) -- pause button
+    controls.extraBtn1.icon = Bitmap(controls.extraBtn1) -- pause icon
     controls.extraBtn1.icon.OnTexture = UIUtil.SkinnableFile('/game/construct-sm_btn/pause_on.dds')
     controls.extraBtn1.icon.OffTexture = UIUtil.SkinnableFile('/game/construct-sm_btn/pause_off.dds')
     LayoutHelpers.AtCenterIn(controls.extraBtn1.icon, controls.extraBtn1)
@@ -2486,181 +2488,181 @@ end
 function OnSelection(buildableCategories, selection, isOldSelection)
     buildableCategories = EnhancementQueueFile.ModifyBuildablesForACU(buildableCategories, selection)
 
-    if table.empty(selection) then
-        sortedOptions.selection = {}
-    end
+    -- if table.empty(selection) then
+    --     sortedOptions.selection = {}
+    -- end
 
-    if options.gui_templates_factory ~= 0 then
-        if table.empty(selection) then
-            allFactories = false
-        else
-            allFactories = true
-            for i, v in selection do
-                if not (v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
-                    allFactories = false
-                    break
-                end
-            end
-        end
-    end
+    -- if options.gui_templates_factory ~= 0 then
+    --     if table.empty(selection) then
+    --         allFactories = false
+    --     else
+    --         allFactories = true
+    --         for i, v in selection do
+    --             if not (v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
+    --                 allFactories = false
+    --                 break
+    --             end
+    --         end
+    --     end
+    -- end
 
-    if table.getn(selection) == 1 then
-        -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
-        -- show the queue of its attached external factory
-        -- this automatically supports removing/modifying the queue, neat!
-        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
-            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
-        else
-            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
-        end
-    else
-        currentCommandQueue = {}
-        ClearCurrentFactoryForQueueDisplay()
-    end
+    -- if table.getn(selection) == 1 then
+    --     -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
+    --     -- show the queue of its attached external factory
+    --     -- this automatically supports removing/modifying the queue, neat!
+    --     if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
+    --         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
+    --     else
+    --         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+    --     end
+    -- else
+    --     currentCommandQueue = {}
+    --     ClearCurrentFactoryForQueueDisplay()
+    -- end
 
     if not table.empty(selection) then
-        capturingKeys = false
-        -- Sorting down units
-        local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
-        if not isOldSelection then
-            previousTabSet = nil
-            previousTabSize = nil
-            activeTab = nil
-            ClearSessionExtraSelectList()
-        end
-        sortedOptions = {}
-        UnitViewDetail.Hide()
+        -- capturingKeys = false
+        -- -- Sorting down units
+        -- local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+        -- if not isOldSelection then
+        --     previousTabSet = nil
+        --     previousTabSize = nil
+        --     activeTab = nil
+        --     ClearSessionExtraSelectList()
+        -- end
+        -- sortedOptions = {}
+        -- UnitViewDetail.Hide()
 
-        if not selection[1]:IsInCategory('FACTORY') then
-            local inQueue = {}
-            for _, v in currentCommandQueue or {} do
-                inQueue[v.id] = true
-            end
+        -- if not selection[1]:IsInCategory('FACTORY') then
+        --     local inQueue = {}
+        --     for _, v in currentCommandQueue or {} do
+        --         inQueue[v.id] = true
+        --     end
 
 
-            local bpid = __blueprints[selection[1]:GetBlueprint().BlueprintId].General.UpgradesTo
-            if bpid then
-                while bpid and bpid ~= '' do -- UpgradesTo is sometimes ''??
-                    if not inQueue[bpid] then
-                        table.insert(buildableUnits, bpid)
-                    end
-                    bpid = __blueprints[bpid].General.UpgradesTo
-                end
+        --     local bpid = __blueprints[selection[1]:GetBlueprint().BlueprintId].General.UpgradesTo
+        --     if bpid then
+        --         while bpid and bpid ~= '' do -- UpgradesTo is sometimes ''??
+        --             if not inQueue[bpid] then
+        --                 table.insert(buildableUnits, bpid)
+        --             end
+        --             bpid = __blueprints[bpid].General.UpgradesTo
+        --         end
 
-                buildableUnits = table.unique(buildableUnits)
-            end
-        end
+        --         buildableUnits = table.unique(buildableUnits)
+        --     end
+        -- end
 
-        -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
-        local allFactory = true
-        for i, v in selection do
-            if allFactory and not ( v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
-                allFactory = false
-            end
-        end
+        -- -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
+        -- local allFactory = true
+        -- for i, v in selection do
+        --     if allFactory and not ( v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
+        --         allFactory = false
+        --     end
+        -- end
 
-        if allFactory then
-            local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-            sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-            sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-            sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
-            sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+        -- if allFactory then
+        --     local sortDowns = EntityCategoryFilterDown(categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+        --     sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+        --     sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+        --     sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3 - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
+        --     sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL - categories.CONSTRUCTIONSORTDOWN, buildableUnits)
 
-            for _, unit in sortDowns do
-                if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
-                    table.insert(sortedOptions.t3, unit)
-                elseif EntityCategoryContains(categories.TECH3, unit) then
-                    table.insert(sortedOptions.t2, unit)
-                elseif EntityCategoryContains(categories.TECH2, unit) then
-                    table.insert(sortedOptions.t1, unit)
-                end
-            end
-        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY + categories.EXTERNALFACTORY, selection[1]) then
-            sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
-            sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
-            sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
-            sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
-        else
-            sortedOptions.t1 = buildableUnits
-        end
+        --     for _, unit in sortDowns do
+        --         if EntityCategoryContains(categories.EXPERIMENTAL, unit) then
+        --             table.insert(sortedOptions.t3, unit)
+        --         elseif EntityCategoryContains(categories.TECH3, unit) then
+        --             table.insert(sortedOptions.t2, unit)
+        --         elseif EntityCategoryContains(categories.TECH2, unit) then
+        --             table.insert(sortedOptions.t1, unit)
+        --         end
+        --     end
+        -- elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY + categories.EXTERNALFACTORY, selection[1]) then
+        --     sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
+        --     sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
+        --     sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)
+        --     sortedOptions.t4 = EntityCategoryFilterDown(categories.EXPERIMENTAL, buildableUnits)
+        -- else
+        --     sortedOptions.t1 = buildableUnits
+        -- end
 
-        if not table.empty(buildableUnits) then
-            controls.constructionTab:Enable()
-        else
-            controls.constructionTab:Disable()
-            if BuildMode.IsInBuildMode() then
-                BuildMode.ToggleBuildMode()
-            end
-        end
+        -- if not table.empty(buildableUnits) then
+        --     controls.constructionTab:Enable()
+        -- else
+        --     controls.constructionTab:Disable()
+        --     if BuildMode.IsInBuildMode() then
+        --         BuildMode.ToggleBuildMode()
+        --     end
+        -- end
 
-        sortedOptions.selection = selection
-        controls.selectionTab:Enable()
+        -- sortedOptions.selection = selection
+        -- controls.selectionTab:Enable()
 
-        local allSameUnit = true
-        local bpID = false
-        local allMobile = true
-        for i, v in selection do
-            if allMobile and not v:IsInCategory('MOBILE') then
-                allMobile = false
-            end
-            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
-                allSameUnit = false
-            else
-                bpID = v:GetBlueprint().BlueprintId
-            end
-            if not allMobile and not allSameUnit then
-                break
-            end
-        end
+        -- local allSameUnit = true
+        -- local bpID = false
+        -- local allMobile = true
+        -- for i, v in selection do
+        --     if allMobile and not v:IsInCategory('MOBILE') then
+        --         allMobile = false
+        --     end
+        --     if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
+        --         allSameUnit = false
+        --     else
+        --         bpID = v:GetBlueprint().BlueprintId
+        --     end
+        --     if not allMobile and not allSameUnit then
+        --         break
+        --     end
+        -- end
 
-        if table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements then
-            controls.enhancementTab:Enable()
-        else
-            controls.enhancementTab:Disable()
-        end
+        -- if table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements then
+        --     controls.enhancementTab:Enable()
+        -- else
+        --     controls.enhancementTab:Disable()
+        -- end
 
-        local templates = Templates.GetTemplates()
-        if allMobile and templates and not table.empty(templates) then
-            sortedOptions.templates = {}
-            for templateIndex, template in templates do
-                local valid = true
-                for _, entry in template.templateData do
-                    if type(entry) == 'table' then
-                        if not table.find(buildableUnits, entry[1]) then
-                            valid = false
-                            break
-                        end
-                    end
-                end
-                if valid then
-                    template.templateID = templateIndex
-                    table.insert(sortedOptions.templates, template)
-                end
-            end
-        end
+        -- local templates = Templates.GetTemplates()
+        -- if allMobile and templates and not table.empty(templates) then
+        --     sortedOptions.templates = {}
+        --     for templateIndex, template in templates do
+        --         local valid = true
+        --         for _, entry in template.templateData do
+        --             if type(entry) == 'table' then
+        --                 if not table.find(buildableUnits, entry[1]) then
+        --                     valid = false
+        --                     break
+        --                 end
+        --             end
+        --         end
+        --         if valid then
+        --             template.templateID = templateIndex
+        --             table.insert(sortedOptions.templates, template)
+        --         end
+        --     end
+        -- end
 
-        if not isOldSelection then
-            if not controls.constructionTab:IsDisabled() then
-                controls.constructionTab:SetCheck(true)
-            else
-                controls.selectionTab:SetCheck(true)
-            end
-        elseif controls.constructionTab:IsChecked() then
-            controls.constructionTab:SetCheck(true)
-        elseif controls.enhancementTab:IsChecked() then
-            controls.enhancementTab:SetCheck(true)
-        else
-            controls.selectionTab:SetCheck(true)
-        end
+        -- if not isOldSelection then
+        --     if not controls.constructionTab:IsDisabled() then
+        --         controls.constructionTab:SetCheck(true)
+        --     else
+        --         controls.selectionTab:SetCheck(true)
+        --     end
+        -- elseif controls.constructionTab:IsChecked() then
+        --     controls.constructionTab:SetCheck(true)
+        -- elseif controls.enhancementTab:IsChecked() then
+        --     controls.enhancementTab:SetCheck(true)
+        -- else
+        --     controls.selectionTab:SetCheck(true)
+        -- end
 
-        prevSelection = selection
-        prevBuildCategories = buildableCategories
-        prevBuildables = buildableUnits
+        -- prevSelection = selection
+        -- prevBuildCategories = buildableCategories
+        -- prevBuildables = buildableUnits
         import(UIUtil.GetLayoutFilename('construction')).OnSelection(false)
 
-        controls.constructionGroup:Show()
-        controls.choices:CalcVisible()
-        controls.secondaryChoices:CalcVisible()
+        --controls.constructionGroup:Show()
+        --controls.choices:CalcVisible()
+        --controls.secondaryChoices:CalcVisible()
     else
         if BuildMode.IsInBuildMode() then
             BuildMode.ToggleBuildMode()
@@ -2668,151 +2670,152 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         currentCommandQueue = {}
         ClearCurrentFactoryForQueueDisplay()
         import(UIUtil.GetLayoutFilename('construction')).OnSelection(true)
+        --controls.constructionGroup:Hide()
     end
 
-    if not table.empty(selection) then
-        -- Repeated from original to access the local variables
-        local allSameUnit = true
-        local bpID = false
-        local allMobile = true
-        for i, v in selection do
-            if allMobile and not v:IsInCategory('MOBILE') then
-                allMobile = false
-            end
-            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
-                allSameUnit = false
-            else
-                bpID = v:GetBlueprint().BlueprintId
-            end
-            if not allMobile and not allSameUnit then
-                break
-            end
-        end
+    -- if not table.empty(selection) then
+    --     -- Repeated from original to access the local variables
+    --     local allSameUnit = true
+    --     local bpID = false
+    --     local allMobile = true
+    --     for i, v in selection do
+    --         if allMobile and not v:IsInCategory('MOBILE') then
+    --             allMobile = false
+    --         end
+    --         if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
+    --             allSameUnit = false
+    --         else
+    --             bpID = v:GetBlueprint().BlueprintId
+    --         end
+    --         if not allMobile and not allSameUnit then
+    --             break
+    --         end
+    --     end
 
-        -- Upgrade multiple SCU at once
-        if selection[1]:GetBlueprint().Enhancements and allSameUnit then
-            controls.enhancementTab:Enable()
-        end
+    --     -- Upgrade multiple SCU at once
+    --     if selection[1]:GetBlueprint().Enhancements and allSameUnit then
+    --         controls.enhancementTab:Enable()
+    --     end
 
-        -- Allow all races to build other races templates
-        if options.gui_all_race_templates ~= 0 then
-            local templates = Templates.GetTemplates()
-            local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
-            if allMobile and templates and not table.empty(templates) then
+    --     -- Allow all races to build other races templates
+    --     if options.gui_all_race_templates ~= 0 then
+    --         local templates = Templates.GetTemplates()
+    --         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+    --         if allMobile and templates and not table.empty(templates) then
 
-                local unitFactionName = selection[1]:GetBlueprint().General.FactionName
-                local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
+    --             local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+    --             local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
 
-                if currentFaction then
-                    sortedOptions.templates = {}
+    --             if currentFaction then
+    --                 sortedOptions.templates = {}
 
-                    local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
-                    for templateIndex, template in templates do
-                        local valid = true
-                        for _, entry in template.templateData do
-                            if type(entry) == 'table' then
+    --                 local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
+    --                 for templateIndex, template in templates do
+    --                     local valid = true
+    --                     for _, entry in template.templateData do
+    --                         if type(entry) == 'table' then
 
-                                -- check if entry is valid
-                                if not entry[1] then
-                                    valid = false
-                                    break
-                                end
+    --                             -- check if entry is valid
+    --                             if not entry[1] then
+    --                                 valid = false
+    --                                 break
+    --                             end
 
-                                -- check if we can build the entry
-                                local converted = false
-                                if not table.find(buildableUnits, entry[1]) then
-                                    for k, prefix in prefixes do
-                                        local convertedId = string.gsub(entry[1], "(%a+)(%d+)", prefix .. "%2")
-                                        if table.find(buildableUnits, convertedId) then
-                                            converted = true
-                                            entry[1] = convertedId
-                                            break
-                                        end
-                                    end
+    --                             -- check if we can build the entry
+    --                             local converted = false
+    --                             if not table.find(buildableUnits, entry[1]) then
+    --                                 for k, prefix in prefixes do
+    --                                     local convertedId = string.gsub(entry[1], "(%a+)(%d+)", prefix .. "%2")
+    --                                     if table.find(buildableUnits, convertedId) then
+    --                                         converted = true
+    --                                         entry[1] = convertedId
+    --                                         break
+    --                                     end
+    --                                 end
 
-                                    if not converted then
-                                        valid = false
-                                        break
-                                    end
-                                end
-                            end
-                        end
+    --                                 if not converted then
+    --                                     valid = false
+    --                                     break
+    --                                 end
+    --                             end
+    --                         end
+    --                     end
 
-                        if valid then
-                            -- also try to convert the template icon
-                            for k, prefix in prefixes do
-                                local convertedId = string.gsub(template.icon, "(%a+)(%d+)", prefix .. "%2")
-                                if table.find(buildableUnits, convertedId) then
-                                    template.icon = convertedId
-                                    break
-                                end
-                            end
+    --                     if valid then
+    --                         -- also try to convert the template icon
+    --                         for k, prefix in prefixes do
+    --                             local convertedId = string.gsub(template.icon, "(%a+)(%d+)", prefix .. "%2")
+    --                             if table.find(buildableUnits, convertedId) then
+    --                                 template.icon = convertedId
+    --                                 break
+    --                             end
+    --                         end
 
-                            template.templateID = templateIndex
-                            table.insert(sortedOptions.templates, template)
-                        end
-                    end
-                end
+    --                         template.templateID = templateIndex
+    --                         table.insert(sortedOptions.templates, template)
+    --                     end
+    --                 end
+    --             end
 
-                -- Refresh the construction tab to show any new available templates
-                if not isOldSelection then
-                    if not controls.constructionTab:IsDisabled() then
-                        controls.constructionTab:SetCheck(true)
-                    else
-                        controls.selectionTab:SetCheck(true)
-                    end
-                elseif controls.constructionTab:IsChecked() then
-                    controls.constructionTab:SetCheck(true)
-                elseif controls.enhancementTab:IsChecked() then
-                    controls.enhancementTab:SetCheck(true)
-                else
-                    controls.selectionTab:SetCheck(true)
-                end
-            end
-        end
-    end
+    --             -- Refresh the construction tab to show any new available templates
+    --             if not isOldSelection then
+    --                 if not controls.constructionTab:IsDisabled() then
+    --                     controls.constructionTab:SetCheck(true)
+    --                 else
+    --                     controls.selectionTab:SetCheck(true)
+    --                 end
+    --             elseif controls.constructionTab:IsChecked() then
+    --                 controls.constructionTab:SetCheck(true)
+    --             elseif controls.enhancementTab:IsChecked() then
+    --                 controls.enhancementTab:SetCheck(true)
+    --             else
+    --                 controls.selectionTab:SetCheck(true)
+    --             end
+    --         end
+    --     end
+    -- end
 
-    -- Add valid templates for selection
-    if allFactories then
-        sortedOptions.templates = {}
-        local templates = TemplatesFactory.GetTemplates()
-        if templates and not table.empty(templates) then
-            local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
-            for templateIndex, template in ipairs(templates) do
-                local valid = true
-                for index, entry in ipairs(template.templateData) do
-                    if not table.find(buildableUnits, entry.id) then
-                        valid = false
-                        -- Allow templates containing factory upgrades & higher tech units
-                        if index > 1 then
-                            for i = index - 1, 1, -1 do
-                                local blueprint = __blueprints[template.templateData[i].id]
-                                if blueprint.General.UpgradesFrom ~= 'none' then
-                                    -- Previous entry is a (valid) upgrade
-                                    valid = true
-                                    break
-                                end
-                            end
-                        end
-                        break
-                    end
-                end
-                if valid then
-                    template.templateID = templateIndex
-                    table.insert(sortedOptions.templates, template)
-                end
-            end
-        end
+    -- -- Add valid templates for selection
+    -- if allFactories then
+    --     sortedOptions.templates = {}
+    --     local templates = TemplatesFactory.GetTemplates()
+    --     if templates and not table.empty(templates) then
+    --         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
+    --         for templateIndex, template in ipairs(templates) do
+    --             local valid = true
+    --             for index, entry in ipairs(template.templateData) do
+    --                 if not table.find(buildableUnits, entry.id) then
+    --                     valid = false
+    --                     -- Allow templates containing factory upgrades & higher tech units
+    --                     if index > 1 then
+    --                         for i = index - 1, 1, -1 do
+    --                             local blueprint = __blueprints[template.templateData[i].id]
+    --                             if blueprint.General.UpgradesFrom ~= 'none' then
+    --                                 -- Previous entry is a (valid) upgrade
+    --                                 valid = true
+    --                                 break
+    --                             end
+    --                         end
+    --                     end
+    --                     break
+    --                 end
+    --             end
+    --             if valid then
+    --                 template.templateID = templateIndex
+    --                 table.insert(sortedOptions.templates, template)
+    --             end
+    --         end
+    --     end
 
-        -- Templates tab enable & refresh
-        local templatesTab = GetTabByID('templates')
-        if templatesTab then
-            templatesTab:Enable()
-            if templatesTab:IsChecked() then
-                templatesTab:SetCheck(true)
-            end
-        end
-    end
+    --     -- Templates tab enable & refresh
+    --     local templatesTab = GetTabByID('templates')
+    --     if templatesTab then
+    --         templatesTab:Enable()
+    --         if templatesTab:IsChecked() then
+    --             templatesTab:SetCheck(true)
+    --         end
+    --     end
+    -- end
 end
 
 function ShowBuildModeKeys(show)
