@@ -59,11 +59,11 @@ local txrs = {
 }
 
 ---@class ConstructionPanel: Group
+---@field bgMainBody Bitmap
 ---@field bgMainCapL Bitmap
 ---@field bgMainCapR Bitmap
 ---@field bgTechTabBody Bitmap
 ---@field bgTechTabCapR Bitmap
----@field bgMainBody Bitmap
 ---@field leftBracketLower Bitmap
 ---@field leftBracketUpper Bitmap
 ---@field leftBracketMiddle Bitmap
@@ -88,6 +88,9 @@ ConstructionPanel = ClassUI(Group) {
         self.rightBracketLower = Bitmap(self)
         self.rightBracketUpper = Bitmap(self)
         self.rightBracketMiddle = Bitmap(self)
+
+        --ALERT: test field for toggling displays
+        self.flipFlop = false
 
     end,
 
@@ -180,6 +183,7 @@ ConstructionPanel = ClassUI(Group) {
     end,
 
     ---Handles the laying out of brackets on the left and right side of the construction panel
+    ---@param self ConstructionPanel
     BracketLayout = function(self)
         -- The left brackets are positioned with respect to the build/select/cargo tab buttons, which
         -- aren't handled here. If those tabs end up elsewhere, it's probably appropriate to handle these
@@ -216,5 +220,28 @@ ConstructionPanel = ClassUI(Group) {
             :AtRightIn(self.bgMainCapR, -14)
             :Bottom(self.rightBracketUpper.Top)
             :Top(self.rightBracketLower.Bottom)
+    end,
+
+    ---Provisional function for hiding/showing the construction panel based on selection
+    ---@param self ConstructionPanel
+    ---@param noUnitsSelected boolean
+    OnSelection = function(self, noUnitsSelected)
+        if not noUnitsSelected then
+            if self:IsHidden() then
+                LOG('showing ConstructionPanel')
+                self:Show()
+                if not self.flipFlop then
+                    self.flipFlop = true
+                    self:TechTabLayout(nil, 500)
+                else
+                    self.flipFlop = false
+                    self:TechTabLayout()
+                end
+            end
+        else
+            if not self:IsHidden() then
+                self:Hide()
+            end
+        end
     end,
 }

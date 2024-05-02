@@ -2658,7 +2658,8 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         -- prevSelection = selection
         -- prevBuildCategories = buildableCategories
         -- prevBuildables = buildableUnits
-        import(UIUtil.GetLayoutFilename('construction')).OnSelection(false)
+        --import(UIUtil.GetLayoutFilename('construction')).OnSelection(false)
+        controls.constructionGroup:OnSelection(false)
 
         --controls.constructionGroup:Show()
         --controls.choices:CalcVisible()
@@ -2669,7 +2670,8 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
         currentCommandQueue = {}
         ClearCurrentFactoryForQueueDisplay()
-        import(UIUtil.GetLayoutFilename('construction')).OnSelection(true)
+        controls.constructionGroup:OnSelection(true)
+        --import(UIUtil.GetLayoutFilename('construction')).OnSelection(true)
         --controls.constructionGroup:Hide()
     end
 
