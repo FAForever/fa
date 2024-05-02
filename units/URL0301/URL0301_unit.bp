@@ -42,6 +42,7 @@ UnitBlueprint{
         "MOBILE",
         "OVERLAYDIRECTFIRE",
         "OVERLAYOMNI",
+        "OVERLAYCOUNTERINTEL",
         "PATROLHELPER",
         "PRODUCTSC1",
         "RECLAIM",
@@ -49,6 +50,7 @@ UnitBlueprint{
         "SELECTABLE",
         "SHOWQUEUE",
         "SUBCOMMANDER",
+        "STEALTHFIELD",
         "TECH3",
         "USEBUILDPRESETS",
         "VISIBLETORECON",
@@ -71,6 +73,7 @@ UnitBlueprint{
             "<LOC ability_engineeringsuite>Engineering Suite",
             "<LOC ability_notcap>Not Capturable",
             "<LOC ability_omni>Omni Sensor",
+            "<LOC ability_stealthfield> Stealth Field",
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationWalk = "/units/url0301/url0301_awalk01.sca",
@@ -266,6 +269,8 @@ UnitBlueprint{
         },
     },
     Enhancements = {
+
+        -- Back Slot
         CloakingGenerator = {
             BuildCostEnergy = 382200,
             BuildCostMass = 5000,
@@ -274,7 +279,6 @@ UnitBlueprint{
             MaintenanceConsumptionPerSecondEnergy = 3500,
             Name = "<LOC enhancements_0089>Personal Cloaking Generator",
             NewHealth = 15000,
-            Prerequisite = "StealthGenerator",
             Slot = "Back",
             UpgradeUnitAmbientBones = { "URL0301" },
         },
@@ -286,12 +290,58 @@ UnitBlueprint{
             Name = "<LOC enhancements_0090>Remove Personal Cloaking Generator",
             Prerequisite = "CloakingGenerator",
             RemoveEnhancements = {
-                "StealthGenerator",
                 "CloakingGenerator",
                 "CloakingGeneratorRemove",
             },
             Slot = "Back",
         },
+        NaniteMissileSystem = {
+            BuildCostEnergy = 20000,
+            BuildCostMass = 800,
+            BuildTime = 3000,
+            Icon = "nms",
+            Name = "<LOC enhancements_0095>Nanite Missile System",
+            Slot = "Back",
+            UpgradeUnitAmbientBones = { "URL0301" },
+        },
+        NaniteMissileSystemRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "nms",
+            Name = "<LOC enhancements_0096>Remove Nanite Missile System",
+            Prerequisite = "NaniteMissileSystem",
+            RemoveEnhancements = {
+                "NaniteMissileSystem",
+                "NaniteMissileSystemRemove",
+            },
+            Slot = "Back",
+        },
+        SelfRepairSystem = {
+            BuildCostEnergy = 103500,
+            BuildCostMass = 2200,
+            BuildTime = 6000,
+            Icon = "srs",
+            Name = "<LOC enhancements_0099>Nano-Repair System",
+            NewRegenRate = 375,
+            Slot = "Back",
+            UpgradeUnitAmbientBones = { "URL0301" },
+        },
+        SelfRepairSystemRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "srs",
+            Name = "<LOC enhancements_0100>Remove Nano-Repair System",
+            Prerequisite = "SelfRepairSystem",
+            RemoveEnhancements = {
+                "SelfRepairSystem",
+                "SelfRepairSystemRemove",
+            },
+            Slot = "Back",
+        },
+
+        -- Left Slot
         EMPCharge = {
             BuildCostEnergy = 60000,
             BuildCostMass = 1000,
@@ -314,6 +364,31 @@ UnitBlueprint{
             },
             Slot = "LCH",
         },
+        Switchback = {
+            BuildCostEnergy = 51100,
+            BuildCostMass = 800,
+            BuildTime = 4200,
+            Icon = "ses",
+            Name = "<LOC enhancements_0109>Rapid Fabricator",
+            NewBuildRate = 98,
+            Slot = "LCH",
+            UpgradeUnitAmbientBones = { "URL0301" },
+        },
+        SwitchbackRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "ses",
+            Name = "<LOC enhancements_0110>Remove Rapid Fabricator",
+            Prerequisite = "Switchback",
+            RemoveEnhancements = {
+                "Switchback",
+                "SwitchbackRemove",
+            },
+            Slot = "LCH",
+        },
+
+        -- Right Slot
         FocusConvertor = {
             BuildCostEnergy = 24000,
             BuildCostMass = 800,
@@ -337,28 +412,6 @@ UnitBlueprint{
                 "FocusConvertorRemove",
             },
             Slot = "RCH",
-        },
-        NaniteMissileSystem = {
-            BuildCostEnergy = 20000,
-            BuildCostMass = 800,
-            BuildTime = 3000,
-            Icon = "nms",
-            Name = "<LOC enhancements_0095>Nanite Missile System",
-            Slot = "Back",
-            UpgradeUnitAmbientBones = { "URL0301" },
-        },
-        NaniteMissileSystemRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "nms",
-            Name = "<LOC enhancements_0096>Remove Nanite Missile System",
-            Prerequisite = "NaniteMissileSystem",
-            RemoveEnhancements = {
-                "NaniteMissileSystem",
-                "NaniteMissileSystemRemove",
-            },
-            Slot = "Back",
         },
         ResourceAllocation = {
             BuildCostEnergy = 90000,
@@ -384,29 +437,7 @@ UnitBlueprint{
             },
             Slot = "RCH",
         },
-        SelfRepairSystem = {
-            BuildCostEnergy = 103500,
-            BuildCostMass = 2200,
-            BuildTime = 6000,
-            Icon = "srs",
-            Name = "<LOC enhancements_0099>Nano-Repair System",
-            NewRegenRate = 375,
-            Slot = "Back",
-            UpgradeUnitAmbientBones = { "URL0301" },
-        },
-        SelfRepairSystemRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "srs",
-            Name = "<LOC enhancements_0100>Remove Nano-Repair System",
-            Prerequisite = "SelfRepairSystem",
-            RemoveEnhancements = {
-                "SelfRepairSystem",
-                "SelfRepairSystemRemove",
-            },
-            Slot = "Back",
-        },
+
         Slots = {
             Back = {
                 name = "<LOC _Back>",
@@ -423,52 +454,6 @@ UnitBlueprint{
                 x = -10,
                 y = 10,
             },
-        },
-        StealthGenerator = {
-            BuildCostEnergy = 7400,
-            BuildCostMass = 400,
-            BuildTime = 1800,
-            Icon = "sfs",
-            MaintenanceConsumptionPerSecondEnergy = 100,
-            Name = "<LOC enhancements_0101>Personal Stealth Generator",
-            Slot = "Back",
-            UpgradeUnitAmbientBones = { "URL0301" },
-        },
-        StealthGeneratorRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "sfs",
-            Name = "<LOC enhancements_0102>Remove Personal Stealth Generator",
-            Prerequisite = "StealthGenerator",
-            RemoveEnhancements = {
-                "StealthGenerator",
-                "StealthGeneratorRemove",
-            },
-            Slot = "Back",
-        },
-        Switchback = {
-            BuildCostEnergy = 51100,
-            BuildCostMass = 800,
-            BuildTime = 4200,
-            Icon = "ses",
-            Name = "<LOC enhancements_0109>Rapid Fabricator",
-            NewBuildRate = 98,
-            Slot = "LCH",
-            UpgradeUnitAmbientBones = { "URL0301" },
-        },
-        SwitchbackRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "ses",
-            Name = "<LOC enhancements_0110>Remove Rapid Fabricator",
-            Prerequisite = "Switchback",
-            RemoveEnhancements = {
-                "Switchback",
-                "SwitchbackRemove",
-            },
-            Slot = "LCH",
         },
     },
     General = {
@@ -504,13 +489,19 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
+        ToggleCaps = {
+            RULEUTC_StealthToggle = true,
+        },
     },
     Intel = {
-        ActiveIntel = { Omni = true },
+        ActiveIntel = { 
+            Omni = true,
+            RadarStealthField = true,
+        },
         Cloak = true,
         FreeIntel = false,
         OmniRadius = 16,
-        RadarStealth = true,
+        RadarStealthFieldRadius = 10,
         ReactivateTime = 2,
         SonarStealth = true,
         VisionRadius = 26,
@@ -556,13 +547,6 @@ UnitBlueprint{
     Transport = {
         CanFireFromTransport = false,
         TransportClass = 3,
-    },
-    Veteran = {
-        Level1 = 25,
-        Level2 = 50,
-        Level3 = 75,
-        Level4 = 100,
-        Level5 = 125,
     },
     Weapon = {
         {
