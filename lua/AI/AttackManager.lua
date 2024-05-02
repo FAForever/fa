@@ -290,16 +290,12 @@ AttackManager = ClassSimple {
                         tempPlatoon.PlatoonData = {}
                     end
                     tempPlatoon.PlatoonData.PlatoonName = v.PlatoonName
-                    --LOG('*AM DEBUG: AM Master Platoon Formed, Builder Named: ', repr(v.BuilderName))
-                    --LOG('*AI DEBUG: ARMY ', repr(self:GetArmyIndex()),': AM Master Platoon formed - ',repr(v.BuilderName))
                     if v.AIThread then
                         tempPlatoon:ForkAIThread(import(v.AIThread[1])[v.AIThread[2]])
-                        --LOG('*AM DEBUG: AM Master Platoon using AI Thread: ', repr(v.AIThread[2]), ' Builder named: ', repr(v.BuilderName))
                     end
                     if v.DestroyCallbacks then
                         for dcbNum, destroyCallback in v.DestroyCallbacks do
                             tempPlatoon:AddDestroyCallback(import(destroyCallback[1])[destroyCallback[2]])
-                            --LOG('*AM DEBUG: AM Master Platoon adding destroy callback: ', destroyCallback[2], ' Builder named: ', repr(v.BuilderName))
                         end
                     end
                     if v.FormCallbacks then
@@ -309,7 +305,6 @@ AttackManager = ClassSimple {
                             else
                                 self.Trash:Add(ForkThread(import(callback[1])[callback[2]], tempPlatoon))
                             end
-                            --LOG('*AM DEBUG: AM Master Platoon Form callback: ', repr(callback[2]), ' Builder Named: ', repr(v.BuilderName))
                         end
                     end
                 end

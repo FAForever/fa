@@ -115,7 +115,7 @@ UnitBlueprint {
         BuildCostEnergy = 34000,
         BuildCostMass = 1510,
         BuildRate = 120,
-        BuildTime = 4000,
+        BuildTime = 3200,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zeb9602',
@@ -178,7 +178,6 @@ UnitBlueprint {
     LifeBarOffset = 2.15,
     LifeBarSize = 4.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -189,8 +188,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
+        MaxGroundVariation = 1.1,
         MotionType = 'RULEUMT_None',
         RaisedPlatforms = {
 
@@ -317,24 +315,13 @@ UnitBlueprint {
             0,
         },
         RollOffPoints = {
-            {
-                UnitSpin = 0,
-                X = 0,
-                Y = 0,
-                Z = 3,
-            },
-            {
-                UnitSpin = -90,
-                X = -3,
-                Y = 0,
-                Z = 0,
-            },
+            { UnitSpin = 0,     X = 0,	   Y = 0,     Z = 3 },
+            { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -0.045,
     SelectionSizeX = 3.2,

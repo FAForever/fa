@@ -405,16 +405,17 @@ float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, f
 {
     if (waterDepth > 0) {
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
-        float4 waterColor = tex1D(WaterRampSampler, waterDepth);
         float3 up = float3(0,1,0);
-        // To simplify, we assume that the light enters vertically into the water,
         // this is the length that the light travels underwater back to the camera
-        float oneOverCosV = 1 / max(abs(dot(up, normalize(viewDirection))), 0.0001);
-        // light gets absorbed exponentially
-        float waterAbsorption = 1 - saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+        float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
+        // Light gets absorbed exponentially,
+        // to simplify, we assume that the light enters vertically into the water.
+        // We need to multiply by 2 to reach 98% absorption as the waterDepth can't go over 1.
+        float waterAbsorption = 1 - saturate(exp(-waterDepth * 2 * (1 + oneOverCosV)));
         // darken the color first to simulate the light absorption on the way in and out
         color *= 1 - waterAbsorption * opacity;
         // lerp in the watercolor to simulate the scattered light from the dirty water
+        float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
         color = lerp(color, waterColor.rgb, waterAbsorption * opacity);
     }
     return color;
@@ -958,8 +959,7 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     albedo.rgb = light * ( albedo.rgb + specular.rgb );
 
     float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
-    float4 water = tex1D(WaterRampSampler,waterDepth);
-    albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
+    albedo.rgb = ApplyWaterColor(pixel.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
@@ -1771,34 +1771,34 @@ technique LowFidelityLighting
 /* # Blending techniques # */
 
 float splatLerp(float t1, float t2, float t2height, float opacity, uniform float blurriness) {
-    float height1 = 1 + blurriness;
-    float height2 = t2height + opacity;
+    float height1 = 1;
+    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.2) {
-    float height1 = 1 + blurriness;
-    float height2 = t2height + opacity;
+float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.06) {
+    float height1 = 1;
+    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.2) {
-    float height1 = 1 + blurriness;
-    float height2 = t2height + opacity;
+float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.06) {
+    float height1 = 1;
+    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
     // These factors are to make low opacity normal maps more visible,
     // as we notice small changes to the albedo maps more easily.
     // The value of 0.5 is just eyeballed.
-    float factor1modified = pow(factor1 / (factor1 + factor2), 0.5);
-    float factor2modified = pow(factor2 / (factor1 + factor2), 0.5);
+    float factor1modified = pow(factor1 / (factor1 + factor2), 0.6);
+    float factor2modified = pow(factor2 / (factor1 + factor2), 0.6);
     // UDN blending
     return normalize(float3((n1.xy * factor1modified + n2.xy * factor2modified), n1.z));
 }
@@ -1806,9 +1806,13 @@ float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uni
 /* # Sample a 2D 2x2 texture atlas # */
 /* To prevent bleeding from the neighboring tiles, we need to work with padding */
 float4 atlas2D(sampler2D s, float2 uv, uniform float2 offset) {
+    // We need to manually provide the derivatives to prevent seams.
+    // See https://forum.unity.com/threads/tiling-textures-within-an-atlas-by-wrapping-uvs-within-frag-shader-getting-artifacts.535793/
+    float2 uv_ddx = ddx(uv) / 4;
+    float2 uv_ddy = ddy(uv) / 4;
     uv.x = frac(uv.x) / 4 + offset.x + 0.125;
     uv.y = frac(uv.y) / 4 + offset.y + 0.125;
-    return tex2D(s, uv);
+    return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
 }
 
 float3 sampleNormal(sampler2D s, float2 position, uniform float2 scale, float mask) {
@@ -1826,11 +1830,11 @@ float4 sampleAlbedo(sampler2D s, float2 position, uniform float2 scale, uniform 
     float4 albedoRotated = tex2D(s, mul(position, rotationMatrix) * scale);
     // store roughness in albedo alpha so we get the roughness splatting for free
     if (firstBatch) {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).y;
-        albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position, rotationMatrix) * scale, offset).y;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).y;
+        albedoRotated.a = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * scale, offset).y;
     } else {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).w;
-        albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position, rotationMatrix) * scale, offset).w;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).w;
+        albedoRotated.a = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * scale, offset).w;
     }
     return splatLerp(albedo, albedoRotated, 0.5, mask, 0.03);
 }
@@ -1839,24 +1843,24 @@ float4 sampleAlbedo(sampler2D s, float2 position, uniform float2 scale, uniform 
     float4 albedo = tex2D(s, position * scale);
     // store roughness in albedo alpha so we get the roughness splatting for free
     if (firstBatch) {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).y;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).y;
     } else {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).w;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).w;
     }
     return albedo;
 }
 
 float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 farScale, uniform float2 offset, uniform bool firstBatch, float mask) {
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
-    float2 heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).xz;
-    float2 heightNearRotated = atlas2D(Stratum7AlbedoSampler, mul(position, rotationMatrix) * nearScale, offset).xz;
+    float2 heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).xz;
+    float2 heightNearRotated = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * nearScale, offset).xz;
     float heightFar;
     if (firstBatch) {
         heightNear.x = splatLerp(heightNear.x, heightNearRotated.x, 0.5, mask, 0.03);
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).x;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).x;
     } else {
         heightNear.x = splatLerp(heightNear.y, heightNearRotated.y, 0.5, mask, 0.03);
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).z;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).z;
     }
     return (heightNear.x + heightFar) / 2;
 }
@@ -1865,11 +1869,11 @@ float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 far
     float heightNear;
     float heightFar;
     if (firstBatch) {
-        heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).x;
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).x;
+        heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).x;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).x;
     } else {
-        heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).z;
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).z;
+        heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).z;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).z;
     }
     return (heightNear + heightFar) / 2;
 }
@@ -1880,15 +1884,15 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
     float heightNearYZ;
     float heightFarYZ;
     if (firstBatch) {
-        heightNearXZ = atlas2D(Stratum7AlbedoSampler, position.xz * nearscale, offset).x;
-        heightFarXZ = atlas2D(Stratum7AlbedoSampler, position.xz * farscale, offset).x;
-        heightNearYZ = atlas2D(Stratum7AlbedoSampler, position.yz * nearscale, offset).x;
-        heightFarYZ = atlas2D(Stratum7AlbedoSampler, position.yz * farscale, offset).x;
+        heightNearXZ = atlas2D(Stratum7NormalSampler, position.xz * nearscale, offset).x;
+        heightFarXZ = atlas2D(Stratum7NormalSampler, position.xz * farscale, offset).x;
+        heightNearYZ = atlas2D(Stratum7NormalSampler, position.yz * nearscale, offset).x;
+        heightFarYZ = atlas2D(Stratum7NormalSampler, position.yz * farscale, offset).x;
     } else {
-        heightNearXZ = atlas2D(Stratum7AlbedoSampler, position.xz * nearscale, offset).z;
-        heightFarXZ = atlas2D(Stratum7AlbedoSampler, position.xz * farscale, offset).z;
-        heightNearYZ = atlas2D(Stratum7AlbedoSampler, position.yz * nearscale, offset).z;
-        heightFarYZ = atlas2D(Stratum7AlbedoSampler, position.yz * farscale, offset).z;
+        heightNearXZ = atlas2D(Stratum7NormalSampler, position.xz * nearscale, offset).z;
+        heightFarXZ = atlas2D(Stratum7NormalSampler, position.xz * farscale, offset).z;
+        heightNearYZ = atlas2D(Stratum7NormalSampler, position.yz * nearscale, offset).z;
+        heightFarYZ = atlas2D(Stratum7NormalSampler, position.yz * farscale, offset).z;
     }
     return (heightNearYZ + heightFarYZ) / 2 * blendWeights.x + (heightNearXZ + heightFarXZ) / 2 * blendWeights.y;
 }
@@ -1910,14 +1914,15 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B          sampling direction  | X               Y               Z               unused       |
-// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
 //  ----
 // The normal map scales are controlled by the albedo scales to ensure that they use the same values.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 // Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
-// SpecularColor.r is used for the scaling of the sampling direction texture
+// SpecularColor.r is used to control the blurriness of the texture splatting
+// SpecularColor.g is used for the scaling of the sampling direction texture
 
 float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 {
@@ -1928,7 +1933,7 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
-    float rotationMask = tex2D(Stratum6AlbedoSampler, position.xy / (SpecularColor.r + 0.01)).w;
+    float rotationMask = tex2D(Stratum6AlbedoSampler, position.xy / (SpecularColor.g + 0.01)).w;
 
     float3 lowerNormal    = sampleNormal(LowerNormalSampler,    position.xy, LowerAlbedoTile.xy,    rotationMask);
     float3 stratum0Normal = sampleNormal(Stratum0NormalSampler, position.xy, Stratum0AlbedoTile.xy, rotationMask);
@@ -1953,13 +1958,13 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float stratum3Height =  blendHeight(position, blendWeights, inV.nearScales.ww, inV.farScales.ww, float2(0.0, 0.0), false);
 
     float3 normal = lowerNormal;
-    normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x);
-    normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y);
-    normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z);
-    normal = splatBlendNormal(normal, stratum3Normal, stratum3Height, mask0.w);
-    normal = splatBlendNormal(normal, stratum4Normal, stratum4Height, mask1.x);
-    normal = splatBlendNormal(normal, stratum5Normal, stratum5Height, mask1.y);
-    normal = splatBlendNormal(normal, stratum6Normal, stratum6Height, mask1.z);
+    normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum3Normal, stratum3Height, mask0.w, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum4Normal, stratum4Height, mask1.x, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum5Normal, stratum5Height, mask1.y, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum6Normal, stratum6Height, mask1.z, SpecularColor.r);
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
@@ -1976,7 +1981,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
-    float rotationMask = tex2D(Stratum6AlbedoSampler, position.xy / (SpecularColor.r + 0.01)).w;
+    float rotationMask = tex2D(Stratum6AlbedoSampler, position.xy / (SpecularColor.g + 0.01)).w;
 
     // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true,  rotationMask);
@@ -2002,14 +2007,14 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float stratum3Height = blendHeight(position, blendWeights, inV.nearScales.ww, inV.farScales.ww, float2(0.0, 0.0), false);
 
     float4 albedo = lowerAlbedo;
-    albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x);
-    albedo = splatLerp(albedo, stratum1Albedo, stratum1Height, mask0.y);
-    albedo = splatLerp(albedo, stratum2Albedo, stratum2Height, mask0.z);
-    albedo = splatLerp(albedo, stratum3albedo, stratum3Height, mask0.w);
-    albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x);
-    albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y);
-    albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z);
-    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum1Albedo, stratum1Height, mask0.y, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum2Albedo, stratum2Height, mask0.z, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum3albedo, stratum3Height, mask0.w, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
+    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0
@@ -2020,37 +2025,37 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
-    // SpecularColor.gba, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
-    // Candidates for configurable values are the rotation matrix and the blending blurriness
+    // SpecularColor.ba, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
+    // Candidates for configurable values are the rotation matrix values
 }
 
-technique TerrainPBRNormals
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RG )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
-    }
-}
-
-technique TerrainPBR <
-    string usage = "composite";
-    string normals = "TerrainPBRNormals";
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(true);
-        // If we use ps_3_0 we lose the distance fog
-        PixelShader = compile ps_2_a TerrainPBRAlbedoPS();
-    }
-}
+//technique TerrainPBRNormals
+//{
+//    pass P0
+//    {
+//        AlphaState( AlphaBlend_Disable_Write_RG )
+//        DepthState( Depth_Enable )
+//
+//        VertexShader = compile vs_1_1 TerrainVS(false);
+//        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
+//    }
+//}
+//
+//technique TerrainPBR <
+//    string usage = "composite";
+//    string normals = "TerrainPBRNormals";
+//>
+//{
+//    pass P0
+//    {
+//        AlphaState( AlphaBlend_Disable_Write_RGBA )
+//        DepthState( Depth_Enable )
+//
+//        VertexShader = compile vs_1_1 TerrainVS(true);
+//        // If we use ps_3_0 we lose the distance fog
+//        PixelShader = compile ps_2_a TerrainPBRAlbedoPS();
+//    }
+//}
 
 // Terrain0XX for shaders that are pretty regular
 // Terrain1XX for shaders using roughness maps
@@ -2530,7 +2535,7 @@ technique Terrain053 <
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | unused   roughness L-S2       unused      roughness S3-S6    | macrotexture R  macrotexture G  macrotexture B  transparency |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
 //  ----
@@ -2603,7 +2608,7 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo,stratum4Albedo,mask1.x);
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
-    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0
@@ -2690,13 +2695,14 @@ technique Terrain151 <
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
 //  ----
 // The normal map scales are controlled by the albedo scales to ensure that they use the same values.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 // Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
+// SpecularColor.r is used to control the blurriness of the texture splatting
 
 float4 Terrain301NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
@@ -2728,13 +2734,13 @@ float4 Terrain301NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float stratum6Height = sampleHeight(position.xy, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
     float3 normal = lowerNormal;
-    normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x);
-    normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y);
-    normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z);
-    normal = splatBlendNormal(normal, stratum3Normal, stratum3Height, mask0.w);
-    normal = splatBlendNormal(normal, stratum4Normal, stratum4Height, mask1.x);
-    normal = splatBlendNormal(normal, stratum5Normal, stratum5Height, mask1.y);
-    normal = splatBlendNormal(normal, stratum6Normal, stratum6Height, mask1.z);
+    normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum3Normal, stratum3Height, mask0.w, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum4Normal, stratum4Height, mask1.x, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum5Normal, stratum5Height, mask1.y, SpecularColor.r);
+    normal = splatBlendNormal(normal, stratum6Normal, stratum6Height, mask1.z, SpecularColor.r);
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
@@ -2774,14 +2780,14 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float stratum6Height = sampleHeight(position.xy, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
     float4 albedo = lowerAlbedo;
-    albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x);
-    albedo = splatLerp(albedo, stratum1Albedo, stratum1Height, mask0.y);
-    albedo = splatLerp(albedo, stratum2Albedo, stratum2Height, mask0.z);
-    albedo = splatLerp(albedo, stratum3Albedo, stratum3Height, mask0.w);
-    albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x);
-    albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y);
-    albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z);
-    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum1Albedo, stratum1Height, mask0.y, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum2Albedo, stratum2Height, mask0.z, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum3Albedo, stratum3Height, mask0.w, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
+    albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
+    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0

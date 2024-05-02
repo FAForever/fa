@@ -1,12 +1,6 @@
 UnitBlueprint{
     Description = "<LOC urb0101_desc>Land Factory",
-    AI = {
-        TargetBones = {
-            "URB0101",
-            "B07",
-            "B08",
-        },
-    },
+    AI = { },
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0101_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'URB',        Cue = 'URB0101_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -109,7 +103,7 @@ UnitBlueprint{
             BuildAttachBone = "Attachpoint",
             BuildEffectBones = {
                 "Arm01_Muzzle",
-                "Arm02_Muzzle",
+                "Arm06_Muzzle",
             },
         },
         CommandCaps = {
@@ -139,7 +133,6 @@ UnitBlueprint{
     LifeBarOffset = 2.15,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -150,8 +143,7 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
+        MaxGroundVariation = 1.1,
         MotionType = "RULEUMT_None",
         RaisedPlatforms = {
             --X,     Z,     height -- Offsets from center
@@ -179,7 +171,6 @@ UnitBlueprint{
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
-        TurnRate = 0,
     },
     SelectionSizeX = 3.25,
     SelectionSizeZ = 3,

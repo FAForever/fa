@@ -1,7 +1,10 @@
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
+---@class Sinker : Projectile
 Sinker = ClassProjectile(Projectile) {
+
+    ---@param self Sinker    
     OnCreate = function(self)
         Projectile.OnCreate(self)
         self:SetVizToFocusPlayer('Never')
@@ -12,6 +15,11 @@ Sinker = ClassProjectile(Projectile) {
 
     --- Start the sinking after the given delay for the given entity/bone.
     -- Invokes sunkCallback when the unit reaches the bottom of the ocean.
+    ---@param self Sinker
+    ---@param delay number
+    ---@param targEntity Prop|Unit
+    ---@param targBone Bone
+    ---@param sunkCallback any
     Start = function(self, delay, targEntity, targBone, sunkCallback)
         self.callback = sunkCallback
         if delay > 0 then
@@ -32,6 +40,9 @@ Sinker = ClassProjectile(Projectile) {
         end
     end,
 
+    ---@param self Sinker
+    ---@param targetEntity Prop|Unit
+    ---@param targetBone Bone
     StartSinking = function(self, targetEntity, targetBone)
         local pos = targetEntity:GetPosition(targetBone)
         local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
@@ -52,12 +63,16 @@ Sinker = ClassProjectile(Projectile) {
     end,
 
     --- Destroy the sinking unit when it hits the bottom of the ocean.
+    ---@param self Sinker
+    ---@param targetType string
+    ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
+        -- 'Underwater' is impacted when sinking off map for a long time.
+        if targetType == 'Terrain' or targetType == 'Underwater' then
             self:Destroy()
             if self.callback then
                 ForkThread(self.callback)
-            end    
+            end
         end
     end,
 }

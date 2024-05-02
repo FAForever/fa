@@ -1,14 +1,12 @@
-UnitBlueprint{
+UnitBlueprint {
     Description = "<LOC xrb2308_desc>Torpedo Ambushing System",
-    AI = {
-        TargetBones = { "Turret_Barrel" },
-    },
     Audio = {
-        DeathExplosion = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
-        Deploy         = Sound { Bank = 'XRB',        Cue = 'XRB2308_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
-        Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
-        DoneBeingBuilt = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',          LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Gun',          LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy',
+            LodCutoff = 'UnitMove_LodCutoff' },
+        Deploy         = Sound { Bank = 'XRB', Cue = 'XRB2308_Activate', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Huge', LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01', LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Gun', LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 130,
     Categories = {
@@ -116,16 +114,15 @@ UnitBlueprint{
     },
     Intel = {
         RadarStealth = false,
-        SonarRadius = 42,
+        SonarRadius = 40,
         SonarStealth = false,
         VisionRadius = 20,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.4,
     LifeBarSize = 2.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -136,15 +133,12 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SinkSpeed = 0.5,
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -0.5,
         SkirtSizeX = 3,
         SkirtSizeZ = 3,
-        TurnRate = 0,
     },
     SelectionSizeX = 1.8,
     SelectionSizeZ = 1.6,

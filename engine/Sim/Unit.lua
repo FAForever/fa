@@ -331,7 +331,7 @@ end
 
 --- makes the unit's bone invisible
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:HideBone(bone, affectChildren)
 end
 
@@ -355,7 +355,7 @@ end
 function Unit:IsMobile()
 end
 
---- returns true if the unit is moving or not
+--- Returns true if the position has changed with respect to the previous simulation tick
 ---@return boolean
 function Unit:IsMoving()
 end
@@ -604,7 +604,7 @@ function Unit:SetRegenRate(rate)
 end
 
 --- sets the script bit
----@param bit number
+---@param bit number|string
 ---@param state boolean
 function Unit:SetScriptBit(bit, state)
 end
@@ -660,7 +660,7 @@ end
 --- makes the unit's bone visible, and if `affectChildren` is true, all child bones as well
 --- (this is almost always what you want)
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:ShowBone(bone, affectChildren)
 end
 

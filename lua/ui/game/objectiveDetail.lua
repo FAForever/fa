@@ -615,8 +615,11 @@ function Refresh()
         for i, v in mapinfo.Options do
             if not invalidOptions[i] then
                 local tablestr = 'globalOpts'
-                if i == 'TeamLock' or i == 'TeamSpawn' then
-                    tablestr = 'teamOptions'
+                for _, to in lobbyoptions['teamOptions'] do
+                    if to.key == i then
+                        tablestr = 'teamOptions'
+                        break
+                    end
                 end
                 if ExtractStrings(i, v, tablestr) then
                     ObjectiveLogData[index] = ExtractStrings(i, v, tablestr)

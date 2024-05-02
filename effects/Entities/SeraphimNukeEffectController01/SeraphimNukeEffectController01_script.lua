@@ -13,8 +13,11 @@ local SIFExperimentalStrategicMissileEffect04 = '/effects/Entities/SIFExperiment
 local SIFExperimentalStrategicMissileEffect05 = '/effects/Entities/SIFExperimentalStrategicMissileEffect05/SIFExperimentalStrategicMissileEffect05_proj.bp'
 local SIFExperimentalStrategicMissileEffect06 = '/effects/Entities/SIFExperimentalStrategicMissileEffect06/SIFExperimentalStrategicMissileEffect06_proj.bp'
 
+---@class SeraphimNukeEffectController01 : NullShell
 SeraphimNukeEffectController01 = Class(NullShell) {
+
     -- Create inner explosion plasma
+    ---@param self SeraphimNukeEffectController01
     CreateEffectInnerPlasma = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 12
@@ -39,6 +42,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
     end,
 
     -- Create random wavy electricity lines
+    ---@param self SeraphimNukeEffectController01
     CreateEffectElectricity = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 7
@@ -62,6 +66,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self SeraphimNukeEffectController01
     EffectThread = function(self)
         self:ForkThread(self.CreateEffectInnerPlasma)
         self:ForkThread(self.CreateEffectElectricity)

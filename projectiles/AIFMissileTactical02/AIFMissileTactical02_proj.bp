@@ -2,12 +2,12 @@ ProjectileBlueprint {
     Audio = {
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'AEON_Expl_Med_Impact',
+            Cue = 'AEON_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_AEON',
+            Cue = 'AEON_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -51,12 +51,13 @@ ProjectileBlueprint {
         MaxSpeed = 30,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
+        TrackTargetGroundFuzziness = 0.5,
         TrackTarget = true,
         TurnRate = 15,
         UseGravity = false,
         VelocityAlign = true,
 
-        MaxZigZag = 5,
+        MaxZigZag = 4,
         ZigZagFrequency = 0.2,
     },
 }

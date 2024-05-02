@@ -78,10 +78,10 @@ XSL0101 = ClassUnit(SWalkingLandUnit) {
                     Duration = -1,
                     Affects = {
                         VisionRadius = {
-                            Mult = 0.6,
+                            Mult = 0.8,
                         },
                         RadarRadius = {
-                            Mult = 0.6,
+                            Mult = 0.8,
                         },
                     },
                 }
@@ -96,6 +96,9 @@ XSL0101 = ClassUnit(SWalkingLandUnit) {
         self.CloakThread = nil
     end,
 
+    ---@param self XSL0101
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         if new == 'Stopped' then
             KillThread(self.CloakThread)

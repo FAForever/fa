@@ -29,6 +29,7 @@ ProjectileBlueprint {
             Type = 'Small01',
         },
         StrategicIconSize = 2,
+        NoGenericScorchSplats = true
     },
     General = {
         Category = 'Bomb',

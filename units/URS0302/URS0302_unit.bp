@@ -4,9 +4,11 @@ UnitBlueprint{
         AttackAngle = 60,
         GuardReturnRadius = 15,
         TargetBones = {
-            "URS0302",
             "Back_Wake",
-            "Front_Left_Wake",
+            "Back_Turret",
+            "Back_Turret_AA",
+            "Front_Turret",
+            "Front_Turret_AA",
             "Front_Right_Wake",
         },
     },
@@ -20,6 +22,8 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "ANTIMISSILE",
+        "WEAKANTIAIR",
+        "WEAKANTINAVY",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -155,17 +159,16 @@ UnitBlueprint{
         UnitName = "<LOC urs0302_name>Galaxy Class",
     },
     Intel = {
-        RadarRadius = 50,
+        RadarRadius = 48,
         SonarRadius = 20,
         VisionRadius = 50,
-        WaterVisionRadius = 50,
+        WaterVisionRadius = 48,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 5.75,
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -181,7 +184,6 @@ UnitBlueprint{
         MaxSpeed = 3.2,
         MaxSpeedReverse = 3,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -379,7 +381,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.2,
+            RateOfFire = 1.25,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -444,7 +446,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.2,
+            RateOfFire = 1.25,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",

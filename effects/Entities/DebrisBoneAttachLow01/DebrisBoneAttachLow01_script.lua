@@ -1,4 +1,6 @@
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
+
+---@class DebrisBoneAttachHigh01 : GenericDebris
 DebrisBoneAttachLow01 = ClassDummyProjectile(GenericDebris) {
     FxUnitHitScale = 0.25,
     FxUnderWaterHitScale = 0.25,

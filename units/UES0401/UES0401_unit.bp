@@ -8,8 +8,6 @@ UnitBlueprint{
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
-            "Front_Left_Projectile02",
-            "Front_Right_Projectile02",
             "Attachpoint01",
             "Attachpoint03",
             "Attachpoint06",
@@ -38,9 +36,9 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CARRIER",
+        "CQUEMOV",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INTELLIGENCE",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -255,7 +253,7 @@ UnitBlueprint{
         UnitName = "<LOC ues0401_name>Atlantis",
     },
     Intel = {
-        RadarRadius = 250,
+        RadarRadius = 256,
         SonarRadius = 252,
         VisionRadius = 100,
         WaterVisionRadius = 100,
@@ -264,8 +262,7 @@ UnitBlueprint{
     LifeBarOffset = 10.5,
     LifeBarSize = 6,
     Physics = {
-        BackUpDistance = 15,
-        BankingSlope = 0,
+        BackUpDistance = 30,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -285,7 +282,6 @@ UnitBlueprint{
         MeshExtentsX = 2.5,
         MeshExtentsY = 2,
         MeshExtentsZ = 20,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -5.5,

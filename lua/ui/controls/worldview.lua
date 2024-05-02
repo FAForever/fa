@@ -17,7 +17,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
-
+local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -32,6 +32,9 @@ local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
 local weaponsCached = { }
+
+---@class Renderable : Destroyable
+---@field OnRender fun(self:Renderable, worldView:WorldView)
 
 ---@class WorldViewDecalData
 ---@field texture string
@@ -211,6 +214,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
+---@field Renderables table<string, Renderable>
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
@@ -240,6 +244,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self.CursorOverride = false
 
         self.Trash = TrashBag()
+
+        self.Renderables = {}
+
     end,
 
     ---@param self WorldView
@@ -269,9 +276,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     SetDefaultSelectTolerance = function(self)
         local tolerance
         if SessionIsReplay() then
-            tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_replay')
+            tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_replay
         else 
-            tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_regular')
+            tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_regular
         end
 
         if tolerance != self.SelectionTolerance then
@@ -284,7 +291,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     --- Sets the selection tolerance to make it easier to reclaim
     ---@param self any
     SetReclaimSelectTolerance = function(self)
-        local tolerance = Prefs.GetFromCurrentProfile('options.selection_threshold_reclaim')
+        local tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_reclaim
 
         if tolerance != self.SelectionTolerance then
             -- LOG('Tolerance set to: ' .. tolerance)
@@ -309,7 +316,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     --- Checks and toggles the ignore mode which only processes move and attack move commands
     ---@param self WorldView
     CheckIgnoreMode = function(self)
-        return IsKeyDown(KeyCodeCtrl) and (not IsKeyDown(KeyCodeShift)) and Prefs.GetFromCurrentProfile('options.commands_ignore_mode') == 'on' -- shift key
+        return IsKeyDown(KeyCodeCtrl) and (not IsKeyDown(KeyCodeShift)) and Prefs.GetFieldFromCurrentProfile('options').commands_ignore_mode == 'on' -- shift key
     end,
 
     --- Returns true if the reclaim command can be applied
@@ -330,7 +337,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         local selection = GetSelectedUnits()
         local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
         local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc and not in command mode
-        local holdAltToAttackMove = Prefs.GetFromCurrentProfile('options.alt_to_force_attack_move')
+        local holdAltToAttackMove = Prefs.GetFieldFromCurrentProfile('options').alt_to_force_attack_move
 
         -- process precedence hierarchy
         ---@type CommandCap | 'CommandHighlight'
@@ -380,6 +387,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- clean up previous cursor
         if not (self.CursorLastEvent == event) and self[self.CursorLastEvent] then
             self[self.CursorLastEvent](self, self.CursorLastIdentifier, false, false)
+            self.CursorTrash:Destroy()
         end
 
         -- attempt to create a new cursor
@@ -445,7 +453,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 self.Cursor[3] = nil
                 self.Cursor[4] = nil
                 self.Cursor[5] = nil
-
                 GetCursor():Reset()
             end
         end
@@ -532,7 +539,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
 
         -- if via prefs then we always show the splash indicator
-        local viaPrefs = Prefs.GetFromCurrentProfile('options.cursor_splash_damage') == 'on'
+        local viaPrefs = Prefs.GetFieldFromCurrentProfile('options').cursor_splash_damage == 'on'
         if viaPrefs then
             self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
 
@@ -617,6 +624,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
+                CommandMode.GetCommandMode()[2].reticle = TeleportReticle(self)
             end
         end
     end,
@@ -914,7 +922,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
         if  event.Type == 'ButtonPress' and
             event.Modifiers.Middle and
-            Prefs.GetFromCurrentProfile('options.gui_template_rotator') ~= 0
+            Prefs.GetFieldFromCurrentProfile('options').gui_template_rotator ~= 0
         then
             local template = GetActiveBuildTemplate()
             if template and not table.empty(template) then
@@ -1343,11 +1351,11 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self._order = order or 5
         self._registered = true
         WorldViewMgr.RegisterWorldView(self)
-        if Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode") != nil then
-            self:SetCartographic(Prefs.GetFromCurrentProfile(cameraName.."_cartographic_mode"))
+        if Prefs.GetFieldFromCurrentProfile(cameraName.."_cartographic_mode") != nil then
+            self:SetCartographic(Prefs.GetFieldFromCurrentProfile(cameraName.."_cartographic_mode"))
         end
-        if Prefs.GetFromCurrentProfile(cameraName.."_resource_icons") != nil then
-            self:EnableResourceRendering(Prefs.GetFromCurrentProfile(cameraName.."_resource_icons"))
+        if Prefs.GetFieldFromCurrentProfile(cameraName.."_resource_icons") != nil then
+            self:EnableResourceRendering(Prefs.GetFieldFromCurrentProfile(cameraName.."_resource_icons"))
         end
         if GetCamera(self._cameraName) then
             GetCamera(self._cameraName):SetMaxZoomMult(import("/lua/ui/game/gamemain.lua").defaultZoom)
@@ -1357,4 +1365,54 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     OnIconsVisible = function(self, areIconsVisible)
         -- called when strat icons are turned on/off
     end,
+
+    ---Add a shape to the draw table, pass an id with no data to remove it
+    ---@param self WorldView
+    ---@param id string -- id for tracking individual shapes
+    ---@param data? table -- data table for shape, pass nil to remove the given id
+    DrawShapeRegistry = function(self, id, data)
+        if data then
+            self:SetCustomRender(true)
+            self.DrawShapesTable[id] = data
+        else
+            self.DrawShapesTable[id] = nil
+        end
+    end,
+
+    --#region Custom Rendering
+
+    --- Register a renderable to render each frame
+    ---@param self WorldView
+    ---@param renderable Renderable
+    ---@param id string
+    RegisterRenderable = function(self, renderable, id)
+        self.Trash:Add(renderable)
+        self.Renderables[id] = renderable
+
+        if not table.empty(self.Renderables) then
+            self:SetCustomRender(true)
+        end
+    end,
+
+    --- Unregister a renderable
+    ---@param self WorldView
+    ---@param id string
+    UnregisterRenderable = function(self, id)
+        self.Renderables[id] = nil
+
+        if table.empty(self.Renderables) then
+            self:SetCustomRender(false)
+        end
+    end,
+
+    --- Is called each frame to render shapes when custom rendering is enabled
+    ---@param self WorldView
+    ---@param delta number
+    OnRenderWorld = function (self, delta)
+        for id, renderable in self.Renderables do
+            renderable:OnRender(delta, delta)
+        end
+    end,
+
+    --#endregion
 }

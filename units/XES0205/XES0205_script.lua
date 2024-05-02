@@ -9,9 +9,13 @@
 ----****************************************************************************
 local TShieldSeaUnit = import("/lua/terranunits.lua").TShieldSeaUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
 ---@class XES0205 : TShieldSeaUnit
 XES0205 = ClassUnit(TShieldSeaUnit, ShieldEffectsComponent) {
+    Weapons = {
+        TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
+    },
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_shipmobile_01_emit.bp',
         '/effects/emitters/terran_shield_generator_shipmobile_02_emit.bp',
@@ -20,7 +24,7 @@ XES0205 = ClassUnit(TShieldSeaUnit, ShieldEffectsComponent) {
     ShieldEffectsBone = 'XES0205',
 
     ---@param self XES0205
-    OnCreate = function(self) -- Are these missng on purpose?
+    OnCreate = function(self)
         TShieldSeaUnit.OnCreate(self)
         ShieldEffectsComponent.OnCreate(self)
     end,

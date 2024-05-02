@@ -5,7 +5,6 @@ UnitBlueprint{
         TargetBones = {
             "Right_Rear_Autocannon_Muzzle",
             "Left_Rear_Autocannon_Muzzle",
-            "Tail_Extent",
             "XSA0402",
             "Left_Front_Autocannon_Muzzle",
             "Right_Front_Autocannon_Muzzle",
@@ -233,7 +232,7 @@ UnitBlueprint{
                 Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
             },
-            FiringRandomness = 3,
+            FiringRandomness = 0,
             FiringTolerance = 6,
             FixBombTrajectory = true,
             Label = "Bomb",

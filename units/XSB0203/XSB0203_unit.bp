@@ -1,5 +1,13 @@
 UnitBlueprint{
     Description = "<LOC xsb0203_desc>Naval Factory HQ",
+    AI = {
+        TargetBones = {
+            'B04',
+            'B03',
+            'B06',
+            'B05'
+        }
+    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0203_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0203_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -85,7 +93,7 @@ UnitBlueprint{
         BuildCostEnergy = 10000,
         BuildCostMass = 2000,
         BuildRate = 90,
-        BuildTime = 3600,
+        BuildTime = 3200,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY SERAPHIM STRUCTURE NAVAL",
@@ -135,7 +143,6 @@ UnitBlueprint{
     LifeBarOffset = 6.5,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -146,11 +153,9 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsX = 5,
         MeshExtentsY = 2,
         MeshExtentsZ = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = 5.1,   Y = 0,     Z = -8 },
@@ -160,7 +165,6 @@ UnitBlueprint{
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -1.6,
     SelectionCenterOffsetZ = -0.14,

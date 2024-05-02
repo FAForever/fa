@@ -1,5 +1,16 @@
-
 local Unit = import("/lua/sim/unit.lua").Unit
+local UnitOnCreate = Unit.OnCreate
+local UnitOnKilled = Unit.OnKilled
+local UnitOnStopBuild = Unit.OnStopBuild
+local UnitOnStartBuild = Unit.OnStartBuild
+local UnitOnFailedToBuild = Unit.OnFailedToBuild
+local UnitOnStartBeingBuilt = Unit.OnStartBeingBuilt
+local UnitOnStopBeingBuilt = Unit.OnStopBeingBuilt
+local UnitStartBeingBuiltEffects = Unit.StartBeingBuiltEffects
+local UnitStopBeingBuiltEffects = Unit.StopBeingBuiltEffects
+local UnitDoTakeDamage = Unit.DoTakeDamage
+local UnitCreateWreckage = Unit.CreateWreckage
+
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -21,6 +32,7 @@ local Rect = Rect
 local WaitTicks = WaitTicks
 local ForkThread = ForkThread
 local FlattenMapRect = FlattenMapRect
+local FlattenGradientMapRect = import('/lua/sim/terrainutils.lua').FlattenGradientMapRect
 local GetTerrainHeight = GetTerrainHeight
 local GetReclaimablesInRect = GetReclaimablesInRect
 local EntityCategoryContains = EntityCategoryContains
@@ -50,6 +62,10 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 ---@field TarmacBag StructureTarmacBag
 ---@field TerrainSlope table            # exists for backwards compatibility
 ---@field FxBlinkingLightsBag table     # exists for backwards compatibility
+---@field DeathAnimManip moho.AnimationManipulator
+---@field OnBeingBuiltEffectsBag TrashBag
+---@field AdjacencyBeamsBag TrashBag
+---@field BuildEffectsBag TrashBag
 StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -64,9 +80,12 @@ StructureUnit = ClassUnit(Unit) {
 
     ---@param self StructureUnit
     OnCreate = function(self)
-        Unit.OnCreate(self)
+        UnitOnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
+
+        -- default to ground fire mode for all structures
+        self:SetFireState(2)
 
         local layer = self.Layer
         local blueprint = self.Blueprint
@@ -200,7 +219,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
-        Unit.OnStartBeingBuilt(self, builder, layer)
+        UnitOnStartBeingBuilt(self, builder, layer)
 
         -- rotate weaponry towards enemy
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
@@ -262,7 +281,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        Unit.OnStopBeingBuilt(self, builder, layer)
+        UnitOnStopBeingBuilt(self, builder, layer)
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
@@ -313,25 +332,24 @@ StructureUnit = ClassUnit(Unit) {
         x1 = MathClamp(MathCeil(x1), 0, sx)
         z1 = MathClamp(MathCeil(z1), 0, sz)
 
-        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
+        FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit
-    ---@param albedo string
-    ---@param normal string
-    ---@param glow string
+    ---@param createAlbedoTarmac boolean
+    ---@param createNormalTarmac boolean
+    ---@param createGlowTarmac boolean
     ---@param orientation? number
     ---@param tarmac? UnitBlueprintTarmac
-    ---@param lifeTime number
-    ---@return boolean
-    CreateTarmac = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+    ---@param lifeTime? number
+    CreateTarmac = function(self, createAlbedoTarmac, createNormalTarmac, createGlowTarmac, orientation, tarmac, lifeTime)
         self.Trash:Add(
             ForkThread(
                 self.CreateTarmacThread,
                 self,
-                albedo,
-                normal,
-                glow, 
+                createAlbedoTarmac,
+                createNormalTarmac,
+                createGlowTarmac, 
                 orientation,
                 tarmac,
                 lifeTime
@@ -340,13 +358,13 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param albedo string
-    ---@param normal string
-    ---@param glow string
+    ---@param createAlbedoTarmac boolean
+    ---@param createNormalTarmac boolean
+    ---@param createGlowTarmac boolean
     ---@param orientation? number
     ---@param tarmac? UnitBlueprintTarmac
-    ---@param lifeTime number
-    CreateTarmacThread = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+    ---@param lifeTime? number
+    CreateTarmacThread = function(self, createAlbedoTarmac, createNormalTarmac, createGlowTarmac, orientation, tarmac, lifeTime)
         -- hold up one tick to allow upgrades to pass the tarmac bag
         WaitTicks(1)
 
@@ -429,7 +447,7 @@ StructureUnit = ClassUnit(Unit) {
         local bag = self.TarmacBag.Decals
 
         -- create albedo tarmac, note that it may have a 2nd texture for specular properties
-        if albedo and tarmac.Albedo then
+        if createAlbedoTarmac and tarmac.Albedo then
             local albedo2 = tarmac.Albedo2
             if albedo2 then
                 albedo2 = albedo2 .. GetTarmac(factionIndex, terrain)
@@ -456,7 +474,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- create normals tarmac, note not the usual normals shader
-        if normal and tarmac.Normal then
+        if createNormalTarmac and tarmac.Normal then
             local handle = CreateDecal(
                 position,
                 orientation,
@@ -478,7 +496,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- create glow tarmacs, not used by the base game
-        if glow and tarmac.Glow then
+        if createGlowTarmac and tarmac.Glow then
             local handle = CreateDecal(
                 position,
                 orientation,
@@ -528,7 +546,7 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param overkillRatio number
+    ---@param overkillRatio number unused
     CreateDestructionEffects = function(self, overkillRatio)
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
             explosion.CreateScalableUnitExplosion(self)
@@ -542,10 +560,10 @@ StructureUnit = ClassUnit(Unit) {
     -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
     ---@param self StructureUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Check for death loop
-        if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
+        if not UnitOnStartBuild(self, unitBeingBuilt, order) then
             return
         end
         self.UnitBeingBuilt = unitBeingBuilt
@@ -594,7 +612,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param builder Unit
     ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
-        Unit.StartBeingBuiltEffects(self, builder, layer)
+        UnitStartBeingBuiltEffects(self, builder, layer)
         local bp = self.Blueprint
         local FactionName = bp.General.FactionName
 
@@ -625,16 +643,16 @@ StructureUnit = ClassUnit(Unit) {
             self:HideLandBones()
         end
 
-        Unit.StopBeingBuiltEffects(self, builder, layer)
+        UnitStopBeingBuiltEffects(self, builder, layer)
     end,
 
-    ---@param self StructureUnit
+    ---@param self StructureUnit unused
     ---@param unitBeingBuilt Unit
     StartUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:HideBone(0, true)
     end,
 
-    ---@param self StructureUnit
+    ---@param self StructureUnit unused
     ---@param unitBeingBuilt Unit
     StopUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:ShowBone(0, true)
@@ -655,7 +673,7 @@ StructureUnit = ClassUnit(Unit) {
             local wep = instigator:GetWeaponByLabel('OverCharge')
             amount = wep.Blueprint.Overcharge.structureDamage
         end
-        Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
+        UnitDoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 
     ---@param self StructureUnit
@@ -671,7 +689,7 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+        UnitOnKilled(self, instigator, type, overkillRatio)
 
         -- re-create tarmac bag, but with a life time
         local bag = self.TarmacBag
@@ -707,7 +725,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param overkillRatio number
     ---@return Wreckage|nil
     CreateWreckage = function(self, overkillRatio)
-        local wreckage = Unit.CreateWreckage(self, overkillRatio)
+        local wreckage = UnitCreateWreckage(self, overkillRatio)
         if wreckage then
             self:CheckRepairersForRebuild(wreckage)
         end
@@ -761,15 +779,19 @@ StructureUnit = ClassUnit(Unit) {
                     local progress = adjacentUnit:GetWorkProgress()
                     if progress < 0.99 then
                         adjacentUnit:StopSiloBuild()
-                        IssueSiloBuildTactical({adjacentUnit})
+                        if EntityCategoryContains(categories.STRATEGIC, adjacentUnit) then
+                            IssueSiloBuildNuke({adjacentUnit})
+                        else
+                            IssueSiloBuildTactical({adjacentUnit})
+                        end
+
                         adjacentUnit:GiveNukeSiloBlocks(progress)
-                        LOG(autoModeEnabled)
                         adjacentUnit:SetAutoMode(autoModeEnabled)
                     end
                 end
             end
         end
-    
+
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
@@ -940,8 +962,8 @@ StructureUnit = ClassUnit(Unit) {
             end
         end,
 
-        OnStopBuild = function(self, unitBuilding)
-            Unit.OnStopBuild(self, unitBuilding)
+        OnStopBuild = function(self, unitBuilding, order)
+            UnitOnStopBuild(self, unitBuilding, order)
             self:EnableDefaultToggleCaps()
 
             if unitBuilding:GetFractionComplete() == 1 then
@@ -953,7 +975,7 @@ StructureUnit = ClassUnit(Unit) {
         end,
 
         OnFailedToBuild = function(self)
-            Unit.OnFailedToBuild(self)
+            UnitOnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
             if self.TarmacBag then
@@ -993,6 +1015,7 @@ StructureUnit = ClassUnit(Unit) {
     OnEnergyStorageStateChange = function(self, state)
     end,
 
+    ---@deprecated
     ---@param self StructureUnit
     DestroyBlinkingLights = function(self)
         for _, v in self.FxBlinkingLightsBag do

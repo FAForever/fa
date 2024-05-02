@@ -5,6 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
+
 local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
@@ -34,5 +35,5 @@ DAA0206 = ClassUnit(AAirUnit) {
 TypeClass = DAA0206
 
 -- Kept for Mod Backwards Compatablity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import('/lua/effecttemplates.lua')
 local EffectUtils = import('/lua/effectutilities.lua')

@@ -94,7 +94,7 @@ Tooltips = {
     },
     transport = {
         title = "<LOC tooltipui0018>Transport",
-        description = "",
+        description = "<LOC tooltipui0019>Left click for transport order. Right click to load into transports.",
         keyID = "transport",
     },
     fire_nuke = {
@@ -642,6 +642,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
+    options_strat_icon_scale = {
+        title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_TITLE>Scale strategic icons",
+        description = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_DESCRIPTION>Increase the size of strategic icons. Also scales the pause and stun icons. Can be useful on monitors with a high pixel density. \r\n\r\n100%: the default scale.\r\n150%: may distort the strategic icons slightly.\r\n200%: does not distort the strategic icons, but the strategic icons can be quite large even on a minotor with a high pixel density. ",
+    },
     options_camera_shake_intensity = {
         title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
         description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
@@ -657,7 +661,12 @@ Tooltips = {
 
     options_alt_to_force_attack_move = {
         title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
-        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>When enabled holding alt will always turn orders into an attack move order"
+        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_DESCRIPTION>When enabled holding alt will always turn orders into an attack move order"
+    },
+
+    options_area_commands_button = {
+        title = "<LOC area_commands_button_title>Button to trigger area commands",
+        description = "<LOC area_commands_button_description>When holding this button you'll trigger area command interface as you issue a command in command mode."
     },
 
     options_assist_to_unpause = {
@@ -666,8 +675,8 @@ Tooltips = {
     },
 
     options_assist_to_copy_command_queue = {
-        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to copy command queue",
-        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
+        title = "<LOC ASSIST_TO_COPY_TITLE>Assist to copy command queue",
+        description = "<LOC ASSIST_TO_COPY_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
     },
 
     options_mp_taunt_head = {
@@ -819,6 +828,10 @@ Tooltips = {
     options_vsync = {
         title = "<LOC OPTIONS_0149>Vertical Sync",
         description = "<LOC OPTIONS_0150>Sync to vertical refresh of monitor",
+    },
+    options_frametime = {
+        title = "<LOC OPTIONS_FRAMETIME_TITLE>Minimum frametime",
+        description = "<LOC OPTIONS_FRAMETIME_DESCRIPTION>Allows you to manipulate the minimum frametime. Incompatible with vertical sync, which is automatically disabled when you move the slider and apply the settings. May introduce image tearing. Option exists to give players a way to try to match the refresh rate of modern monitors. Note that the framerate is often CPU limited and not GPU limited, especially during visually intense fights. A list of values that map to common refresh rates: \r\n\r\n  - 16 = 60hz\r\n  - 10 = 100hz\r\n  - 8 = 120hz\r\n  - 7 = 144hz\r\n  - 6 = 165hz",
     },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
@@ -1756,12 +1769,11 @@ Tooltips = {
         title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
     },
-    -- TODO: rename to `dip_recall_request_yes` and `dip_recall_request_no`
-    dip_recall_request_accept = {
+    dip_recall_request_yes = {
         title = "<LOC tooltipui0732>Yes Vote",
         description = "<LOC tooltipui0733>Vote yes to your team recalling from battle as a defeat.",
     },
-    dip_recall_request_veto = {
+    dip_recall_request_no = {
         title = "<LOC tooltipui0734>No Vote",
         description = "<LOC tooltipui0735>Vote no to your team recalling from battle as a defeat.",
     },

@@ -57,7 +57,9 @@ function DebugThread()
             local distance = State.Distance
             local destination = State.Destination
             if layer and origin and distance and destination then
+                local start = GetSystemTimeSecondsOnlyForProfileUse()
                 local direction, error = NavUtils.DirectionTo(layer, origin, destination, distance)
+                LOG(string.format("NavDirectionTo - %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
                 DrawCircle(destination, 2, '0000FF')
                 if direction then
                     DrawCircle(origin, 2, 'ffffff')

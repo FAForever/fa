@@ -25,6 +25,17 @@ local BlueprintNameToIntel = {
     SonarStealthFieldRadius = 'SonarStealthField',
 }
 
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
+}
+
 local LabelToVeterancyUse = {
     ['DeathWeapon'] = true,
     ['DeathImpact'] = true,
@@ -309,6 +320,12 @@ local function PostProcessUnit(unit)
                         , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeZ = 0.1 * speed
                 end
+
+                if unit.SizeY < 0.5 then
+                    WARN(string.format("Overriding the y axis of collision box of unit ( %s ), it should be atleast 0.5 to guarantee proper functioning gunships"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeY = 0.5
+                end
             end
         end
     end
@@ -548,6 +565,12 @@ local function PostProcessUnit(unit)
     end
 
     --#endregion
+
+    -- Override the default 1 build rate given to units
+    -- so that rollover unit view can work with Mantis.
+    if unit.Economy and not unit.Economy.BuildRate then
+        unit.Economy.BuildRate = 0
+    end
 end
 
 ---@param allBlueprints BlueprintsTable
@@ -585,6 +608,15 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
         efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
         efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
+
+        -- add our select button override
+        if not efBlueprint.General.OrderOverrides then
+            efBlueprint.General.OrderOverrides = {}
+        end
+        efBlueprint.General.OrderOverrides.ExFac = {
+            bitmapId = 'exfacunit',
+            helpText = 'external_factory_unit',
+        }
 
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then
@@ -773,12 +805,48 @@ function PostProcessStatToggles(allBlueprints, units)
     end
 end
 
+---@param unit UnitBlueprint
+function TestIntelValues(unit)
+
+    ---------------------------------------------------------------------------
+    --#region Sanity check for intel values
+
+    -- Intel is visualised as a circle but it works in squares/blocks. You can
+    -- view the intel that a unit produces via a console command 'dbg Radar'.
+    --
+    -- It appears the engine divides the radius by the grid size and floors the
+    -- result. Therefore not all intel values and/or changes are actually 
+    -- meaningful. With this code we check all intel values and point out those
+    -- that are not accurate.
+
+    if unit.Intel then
+        for nameIntel, radius in unit.Intel do
+            local ogrids = BlueprintIntelNameToOgrids[nameIntel]
+            if ogrids then
+                local radiusOnGrid = math.floor(radius / ogrids) * ogrids
+                if radiusOnGrid != radius then
+                    WARN(
+                        string.format(
+                            "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d",
+                            tostring(unit.BlueprintId), radius, nameIntel, ogrids, radiusOnGrid, radiusOnGrid + ogrids
+                            )
+                        )
+                end
+            end
+        end
+    end
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        TestIntelValues(unit)
     end
 
     for _, unit in units do

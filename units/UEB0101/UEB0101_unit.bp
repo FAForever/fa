@@ -2,11 +2,10 @@ UnitBlueprint{
     Description = "<LOC ueb0101_desc>Land Factory",
     AI = {
         TargetBones = {
-            "UEB0101",
-            "Extruder_Right",
-            "Extruder_Left",
             "Foot_Right",
             "Foot_Left",
+            "Pad_Left",
+            "Pad_Right",
         },
     },
     Audio = {
@@ -131,7 +130,6 @@ UnitBlueprint{
     LifeBarOffset = 2.5,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -142,11 +140,10 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 5,
         MeshExtentsY = 4.5,
         MeshExtentsZ = 5.45,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RaisedPlatforms = {
             --X,     Z,     height -- Offsets from center
@@ -174,7 +171,6 @@ UnitBlueprint{
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
-        TurnRate = 0,
     },
     SelectionSizeX = 3.2,
     SelectionSizeZ = 3.3,

@@ -72,7 +72,7 @@ UAL0301 = ClassUnit(CommandUnit) {
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldHeavy' then
-            self.Trash:Add(ForkThread(self.CreateHeavyShield, bp,self))
+            self.Trash:Add(ForkThread(self.CreateHeavyShield, self, bp))
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()

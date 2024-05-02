@@ -23,11 +23,12 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Air grid',
-    TriggersOnBuilding = (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3),
+    TriggersOnUnit = (categories.AIR * categories.TECH3 * categories.FACTORY),
+    TemplateBlueprintId = 'zeb9602',
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        24,
+        24,
         {
             'dummy',
             0,

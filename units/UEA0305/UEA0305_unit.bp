@@ -51,6 +51,7 @@ UnitBlueprint {
         "TECH3",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 1,
@@ -274,7 +275,7 @@ UnitBlueprint {
     SizeSphere = 1.6,
     SizeX = 1,
     SizeY = 0.5,
-    SizeZ = 2,
+    SizeZ = 1.2,
     StrategicIconName = "icon_gunship3_directfire",
     StrategicIconSortPriority = 55,
     Transport = {
@@ -303,6 +304,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Water|Seabed",
                 Land = "Air|Land|Water|Seabed",
+                Water = "Air|Land|Water|Seabed",
             },
             FiringRandomness = 0.3,
             FiringTolerance = 2,
@@ -310,7 +312,7 @@ UnitBlueprint {
             MaxRadius = 25,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 35,
             ProjectileId = "/projectiles/TDFPlasmaHeavy02/TDFPlasmaHeavy02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {
@@ -372,6 +374,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Water",
                 Land = "Air|Land|Water",
+                Water = "Air|Land|Water|Seabed",
             },
             FiringTolerance = 2,
             Label = "AAGun",
@@ -399,7 +402,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.75,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",

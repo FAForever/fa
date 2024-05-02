@@ -75,12 +75,12 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
-
             -- determine navigational label of that unit
-            local position = unit:GetPosition()
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
+
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
@@ -129,6 +129,11 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     if bestBase and bestDefense < threshold then
                         self.LocationToGuard = bestBase.Position
                         local platPos = self:GetPlatoonPosition()
+                        if not platPos then
+                            return
+                        end
+
+
                         local guardPos = unitToGuard:GetPosition()
                         local dx = platPos[1] - guardPos[1]
                         local dz = platPos[3] - guardPos[3]
@@ -160,6 +165,10 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
         
                     if unitToGuard and not unitToGuard.Dead then
                         local platPos = self:GetPlatoonPosition()
+                        if not platPos then
+                            return
+                        end
+
                         local guardPos = unitToGuard:GetPosition()
                         local dx = platPos[1] - guardPos[1]
                         local dz = platPos[3] - guardPos[3]
@@ -204,27 +213,28 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            local cache = { 0, 0, 0 }
             local brain = self:GetBrain()
             if not brain.GridPresence then
                 WARN('GridPresence does not exist, unable to detect conflict line')
             end
 
-            if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
+
+            if not NavUtils.CanPathToCell(self.MovementLayer, position, destination) then
                 self:LogDebug(string.format('Attack platoon is going to use transport'))
                 self:ChangeState(self.Transporting)
                 return
             end
 
             while not IsDestroyed(self) do
-                -- pick random unit for a position on the grid
-                local units, unitCount = self:GetPlatoonUnits()
-                local origin
-                for _, v in units do
-                    if v and not v.Dead then
-                        origin = v:GetPosition()
-                    end
+                local origin = self:GetPlatoonPosition()
+                if not origin then
+                    return
                 end
+
                 if unitToGuard and not IsDestroyed(unitToGuard) then
                     destination = unitToGuard:GetPosition()
                 end
@@ -252,6 +262,9 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our current waypoint
                     local dx = position[1] - wx
@@ -509,6 +522,10 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             while not IsDestroyed(self) do
 
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
@@ -523,6 +540,9 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx

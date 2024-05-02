@@ -21,6 +21,9 @@ local UnitTypeOrder = {
     'SHIELD',
 }
 
+---@class AITaskStructureTemplate : AITaskTemplate
+---@field Type 'Upgrading'
+
 ---@class AIPlatoonSimpleStructure : AIPlatoon
 ---@field Base AIBase
 ---@field Brain EasyAIBrain
@@ -174,7 +177,7 @@ DebugAssignToUnits = function(data, units)
         -- trigger the on stop being built event of the brain
         for k = 1, table.getn(units) do
             local unit = units[k]
-            unit.Brain:OnUnitStopBeingBuilt(unit, nil, unit.Layer)
+            unit.Brain:OnStopBeingBuilt(unit, nil, unit.Layer)
         end
     end
 end

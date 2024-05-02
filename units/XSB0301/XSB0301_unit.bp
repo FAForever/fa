@@ -1,13 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xsb0301_desc>Land Factory HQ",
-    AI = {
-        TargetBones = {
-            "Left_Hardpoint01",
-            "Left_Hardpoint02",
-            "Right_Hardpoint01",
-            "Right_Hardpoint02",
-        },
-    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0301_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0301_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -93,7 +85,7 @@ UnitBlueprint{
         BuildCostEnergy = 47400,
         BuildCostMass = 5220,
         BuildRate = 90,
-        BuildTime = 12100,
+        BuildTime = 12000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY SERAPHIM STRUCTURE LAND",
@@ -144,7 +136,6 @@ UnitBlueprint{
     LifeBarOffset = 2,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -155,11 +146,10 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
+        MaxGroundVariation = 1.1,
         MeshExtentsX = 4.5,
         MeshExtentsY = 1.5,
         MeshExtentsZ = 4.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RaisedPlatforms = {
             --X,     Z,     height -- Offsets from center
@@ -187,7 +177,6 @@ UnitBlueprint{
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
-        TurnRate = 0,
     },
     SelectionCenterOffsetZ = 0.22,
     SelectionSizeX = 2.25,
@@ -205,12 +194,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }
