@@ -1230,6 +1230,15 @@ local LayouterAttributeControl = ClassSimple {
         return self
     end;
 
+    --- Shows the control
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@return T
+    Show = function(self)
+        self.layoutControl:Show()
+        return self
+    end;
+
     --- Enables the control's hit test
     ---@generic T : LayouterAttributeControl
     ---@param self T
