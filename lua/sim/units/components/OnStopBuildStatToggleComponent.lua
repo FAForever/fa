@@ -45,6 +45,7 @@ OnStopBuildStatToggleComponent = ClassSimple {
                     -- Bail if we have no toggle data for this stat
                     -- shouldn't happen, but good to check
                     if not toggleData then
+                        WARN('OnStopBuildStatToggleComponent: No toggle data for stat ' .. stat)
                         continue
                     end
                     if toggleData.scriptBitName then

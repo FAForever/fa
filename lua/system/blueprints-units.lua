@@ -706,7 +706,7 @@ function PostProcessStatToggles(allBlueprints, units)
     --OnBuildRULEUTC_CloakToggle
 
     -- these are toggles that we don't want to show up
-    local removeToggles = {
+    local skipToggles = {
         OnBuildRULEUTC_SpecialToggle_charge = true, -- Loyalist EMP self-destruct
         OnBuildRULEUTC_ProductionToggle_overcharge = true, -- Fire Beetle detonate
     }
@@ -748,15 +748,17 @@ function PostProcessStatToggles(allBlueprints, units)
                         override = nil
                     end
                 end
-                scriptBitTogglesHash[toggleCap].stats[stat] = {
-                    stat = stat,
-                    defaultOrder = toggleCap,
-                    override = override,
-                    defaultValue = defaultValues[stat],
-                    scriptBitName = toggleCap,
-                }
-                unit.General.OnStopBeingBuiltStatToggles[stat] = true
-                toggleUnits[unit] = true
+                if not skipToggles[stat] then
+                    scriptBitTogglesHash[toggleCap].stats[stat] = {
+                        stat = stat,
+                        defaultOrder = toggleCap,
+                        override = override,
+                        defaultValue = defaultValues[stat],
+                        scriptBitName = toggleCap,
+                    }
+                    unit.General.OnStopBeingBuiltStatToggles[stat] = true
+                    toggleUnits[unit] = true
+                end
             end
         end
         -- add support for alternative toggles and overrides here
@@ -769,10 +771,8 @@ function PostProcessStatToggles(allBlueprints, units)
     i = 0
     for scriptBitNumber, toggleCap in scriptBitToggles do
         local stats = {}
-        for stat, statData in scriptBitTogglesHash[toggleCap].stats do
-            if not removeToggles[stat] then
-                table.insert(stats, statData)
-            end
+        for _, statData in scriptBitTogglesHash[toggleCap].stats do
+            table.insert(stats, statData)
         end
         table.sort(stats, function(a, b) return a.stat < b.stat end)
         for _, statData in ipairs(stats) do
