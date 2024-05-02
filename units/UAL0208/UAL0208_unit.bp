@@ -185,7 +185,6 @@ UnitBlueprint{
         MeshExtentsX = 1.25,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 0.75,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
         RotateOnSpot = false,
