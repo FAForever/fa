@@ -176,14 +176,6 @@ UnitBlueprint{
     LifeBarOffset = 8.5,
     LifeBarSize = 13,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 25,
         MaxSpeed = 0.5,
         MeshExtentsX = 27,

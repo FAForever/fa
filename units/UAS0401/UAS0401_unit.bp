@@ -230,14 +230,6 @@ UnitBlueprint{
     LifeBarSize = 14,
     Physics = {
         BackUpDistance = 45,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         Elevation = -5,
