@@ -2,6 +2,9 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local UIUtil = import("/lua/ui/uiutil.lua")
 
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Layouter = LayoutHelpers.ReusedLayoutFor
+
 ---@class Button : Bitmap
 ---@field mNormal FileName
 ---@field mActive FileName
@@ -142,7 +145,7 @@ Button = ClassUI(Bitmap) {
         return false
     end,
 
-    OnClick = function(self, modifiers) end
+    OnClick = function(self, modifiers) end,
 
 }
 
@@ -236,4 +239,42 @@ FixableButton = ClassUI(Button) {
     ToggleOverride = function(self)
         self:SetOverrideEnabled(not self:GetOverrideEnabled())
     end
+}
+
+IconButton = Class(Button) {
+
+    SetNewTextures = function(self, normal, active, highlight, disabled, iconEnabled, iconDisabled)
+        Button.SetNewTextures(self, normal, active, highlight, disabled)
+        if iconEnabled and iconDisabled then
+            self.iconEnabled = iconEnabled
+            self.iconDisabled = iconDisabled
+            if not self.icon then
+                self.icon = Bitmap(self)
+                self:Layout()
+            end
+        end
+    end,
+
+    Layout = function(self)
+        if self.icon then
+            Layouter(self.icon)
+                :Texture(self.iconEnabled)
+                :AtCenterIn(self)
+                :DisableHitTest()
+        end
+    end,
+
+    OnEnable = function(self)
+        if self.icon then
+            self.icon:SetTexture(self.iconEnabled)
+        end
+        Button.OnEnable(self)
+    end,
+
+    OnDisable = function(self)
+        if self.icon then
+            self.icon:SetTexture(self.iconDisabled)
+        end
+        Button.OnDisable(self)
+    end,
 }
