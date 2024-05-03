@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local RadioCluster = import('/lua/ui/controls/radiocluster.lua').RadioCluster
+local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Layouter = LayoutHelpers.ReusedLayoutFor
@@ -30,6 +32,12 @@ local TabTexturePrefix = {
     enhancement = '/game/construct-tab_btn/bot_tab_btn_',
 }
 
+local TabCheckboxClasses = {
+    construction = Checkbox,
+    selection = Checkbox,
+    enhancement = Checkbox,
+}
+
 local Textures
 
 local function GetTabTextures(id)
@@ -38,12 +46,37 @@ local function GetTabTextures(id)
         return UIUtil.UIFile(pre..'up_bmp.dds'), UIUtil.UIFile(pre..'sel_bmp.dds'),
             UIUtil.UIFile(pre..'over_bmp.dds'), UIUtil.UIFile(pre..'down_bmp.dds'),
             UIUtil.UIFile(pre..'dis_bmp.dds'), UIUtil.UIFile(pre..'dis_bmp.dds')
-    elseif techFiles[id] then
-        local pre = techFiles[id]
-        return UIUtil.UIFile(pre..'up.dds'), UIUtil.UIFile(pre..'selected.dds'),
-            UIUtil.UIFile(pre..'over.dds'), UIUtil.UIFile(pre..'down.dds'),
-            UIUtil.UIFile(pre..'dis.dds'), UIUtil.UIFile(pre..'dis.dds')
     end
 end
 
-FetchConstructionTabTextures = function
+---@class ConstructionTabCluster : RadioCluster
+ConstructionTabCluster = ClassUI(RadioCluster) {
+
+    __init = function(self, parent, SelectionCallback)
+        RadioCluster.__init(self, parent, TabCheckboxClasses, SelectionCallback)
+    end,
+
+    ---We need to determine our size based on the size of our children, then layout
+    OnLayout = function(self)
+        
+        local maxWidth = 0
+        local totalHeight = 0
+        for key, item in self.items do
+            self.items[key]:SetNewTextures(GetTabTextures(key))
+            maxWidth = math.max(maxWidth, item.Width())
+            totalHeight = totalHeight + item.Height()
+        end
+        LayoutHelpers.SetDimensions(self, maxWidth, totalHeight - 32)
+    end,
+
+    Layout = function(self)
+
+        Layouter(self.items.construction)
+            :AtLeftTopIn(self)
+        Layouter(self.items.selection)
+            :Below(self.items.construction, -16)
+        Layouter(self.items.enhancement)
+            :Below(self.items.selection, -16)
+
+    end,
+}
