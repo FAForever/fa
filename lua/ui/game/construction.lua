@@ -37,7 +37,7 @@ local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
 local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local getEnhancementQueue = EnhancementQueueFile.getEnhancementQueue
-local ConstructionPanel = import("/lua/ui/game/construction/constructionpanel.lua").ConstructionPanel
+local ConstructionPanel = import("/lua/ui/controls/construction/constructionpanel.lua").ConstructionPanel
 
 local modifiedCommandQueue = {}
 local previousModifiedCommandQueue = {}
