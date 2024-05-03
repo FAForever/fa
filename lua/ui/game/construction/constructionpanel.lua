@@ -39,24 +39,29 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 --------------------------------------------------------------------------------
 
--- Putting these textures here for now, need to be moved to somewhere where
--- they can be dynamically updated when the skin changes
-local Textures = {
-    bgMainBody = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
-    bgMainCapL = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
-    bgMainCapL_TechTab = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'),
-    bgMainCapR = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_r.dds'),
+local Textures
 
-    bgTechTabBody = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'),
-    bgTechTabCapR = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'),
-
-    leftBracketLower = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
-    leftBracketUpper = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
-    leftBracketMiddle = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
-    rightBracketLower = UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'),
-    rightBracketUpper = UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'),
-    rightBracketMiddle = UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'),
-}
+-- This stores the textures for the panel in one place, assuming
+-- all construction panels (if there are more than one) will use the same
+-- textures, and allows the textures to be updated if the skin changes.
+local function FetchTextures()
+    Textures = {
+        bgMainBody = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
+        bgMainCapL = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
+        bgMainCapL_TechTab = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'),
+        bgMainCapR = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_r.dds'),
+    
+        bgTechTabBody = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'),
+        bgTechTabCapR = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'),
+    
+        leftBracketLower = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
+        leftBracketUpper = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
+        leftBracketMiddle = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
+        rightBracketLower = UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'),
+        rightBracketUpper = UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'),
+        rightBracketMiddle = UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'),
+    }
+end
 
 ---@class ConstructionPanel: Group
 ---@field bgMainBody Bitmap
@@ -97,6 +102,10 @@ ConstructionPanel = ClassUI(Group) {
     Layout = function(self)
 
         LOG('background.lua/ConstructionPanel:Layout')
+
+        -- Update our textures, either because we haven't yet or the skin has changed
+        FetchTextures()
+        
         -- Left cap bitmap, under the pause/repeat build buttons
         Layouter(self.bgMainCapL)
             :Texture(Textures.bgMainCapL)
