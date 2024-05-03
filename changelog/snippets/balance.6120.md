@@ -1,11 +1,9 @@
-- The Tempest gets a nerf, as it has become too oppressive. The range nerf increases the importance of good micro and allows for more interactions with your opponent.
+- (#6120) The range of the Tempest is nerfed, as it has become too oppressive. The nerf aims to increase the importance of good micro and allows for more interactions with your opponent. The Oblivion cannons of the Omen are tweaked to make microing against it more rewarding. The range of the Summit is lowered to promote closer engagements with other battleships. As a compensation, it regains some of its AoE that FAF removed, which also better matches the strength and size of its cannons.
     - Tempest: Experimental Battleship (UAS0401):
         - MaxRadius: 150 --> 146
-- The Omen is a strong unit and difficult to play against, partly because its Oblivion cannons are hard to dodge. This change attempts to make microing against it more rewarding, while preserving the theme of the unit.
     - Omen Class: T3 Battleship (UAS0302):
         - MaxRadius: 110 --> 112
         - MuzzleVelocity: 50 --> 45
-- The range of the Summit is lowered to promote closer and more interesting engagements with other battleships. As a compensation, it regains some of its AoE that FAF removed, which also better matches the strength and size of its cannons.
     - Summit Class: T3 Battleship (UES0302):
         - MaxRadius: 150 --> 146
         - DamageRadius: 2 --> 2.5
