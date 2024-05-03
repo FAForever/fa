@@ -458,13 +458,6 @@ function OnSelection(empty)
         if controls.constructionGroup:IsHidden() then
             LOG('showing construction group')
             controls.constructionGroup:Show()
-            if not flipFlop then
-                flipFlop = true
-                controls.constructionGroup:TechTabLayout(nil, 500)
-            else
-                flipFlop = false
-                controls.constructionGroup:TechTabLayout()
-            end
         end
     end
 end
