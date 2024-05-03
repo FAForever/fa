@@ -131,7 +131,6 @@
     LifeBarOffset = 0.4,
     LifeBarSize = 0.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -146,7 +145,6 @@
         MaxSpeed = 3.7,
         MaxSpeedReverse = 3.7,
         MaxSteerForce = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = true,
         TurnRadius = 2,

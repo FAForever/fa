@@ -167,7 +167,6 @@ UnitBlueprint {
     LifeBarSize = 1.25,
     Physics = {
         BackUpDistance = 4,
-        BankingSlope = 0,
         LayerChangeOffsetHeight = -0.6,
         LayerTransitionDuration = 2,
         MaxAcceleration = 3.5,
@@ -175,7 +174,6 @@ UnitBlueprint {
         MaxSpeed = 3.5,
         MaxSpeedReverse = 2,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_AmphibiousFloating',
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,

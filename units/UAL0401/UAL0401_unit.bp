@@ -96,54 +96,52 @@ UnitBlueprint{
         },
         MovementEffects = {
             Land = {
-                Effects = {
-                    Footfall = {
-                        Bones = {
-                            {
-                                FootBone = "Right_Footfall",
-                                HipBone = "Right_Leg_B01",
-                                KneeBone = "Right_Leg_B02",
-                                MaxFootFall = -0.25,
-                                Offset = { z = -1 },
-                                StraightLegs = false,
-                                Tread = {
-                                    TreadLifeTime = 8,
-                                    TreadMarks = "collosus_tread_02",
-                                    TreadMarksSizeX = 1.7,
-                                    TreadMarksSizeZ = 1.7,
-                                    TreadOffset = { -0.95, 0, 0.85 },
-                                },
-                                Type = "FootFall01",
+                Footfall = {
+                    Bones = {
+                        {
+                            FootBone = "Right_Footfall",
+                            HipBone = "Right_Leg_B01",
+                            KneeBone = "Right_Leg_B02",
+                            MaxFootFall = -0.25,
+                            Offset = { z = -1 },
+                            StraightLegs = false,
+                            Tread = {
+                                TreadLifeTime = 8,
+                                TreadMarks = "collosus_tread_02",
+                                TreadMarksSizeX = 1.7,
+                                TreadMarksSizeZ = 1.7,
+                                TreadOffset = { -0.95, 0, 0.85 },
                             },
-                            {
-                                FootBone = "Left_Footfall",
-                                HipBone = "Left_Leg_B01",
-                                KneeBone = "Left_Leg_B02",
-                                MaxFootFall = -0.25,
-                                Offset = { z = -1 },
-                                StraightLegs = false,
-                                Tread = {
-                                    TreadLifeTime = 8,
-                                    TreadMarks = "collosus_tread_01",
-                                    TreadMarksSizeX = 1.7,
-                                    TreadMarksSizeZ = 1.7,
-                                    TreadOffset = { 1, 0, 0.85 },
-                                },
-                                Type = "FootFall01",
+                            Type = "FootFall01",
+                        },
+                        {
+                            FootBone = "Left_Footfall",
+                            HipBone = "Left_Leg_B01",
+                            KneeBone = "Left_Leg_B02",
+                            MaxFootFall = -0.25,
+                            Offset = { z = -1 },
+                            StraightLegs = false,
+                            Tread = {
+                                TreadLifeTime = 8,
+                                TreadMarks = "collosus_tread_01",
+                                TreadMarksSizeX = 1.7,
+                                TreadMarksSizeZ = 1.7,
+                                TreadOffset = { 1, 0, 0.85 },
                             },
+                            Type = "FootFall01",
                         },
-                        CameraShake = {
-                            Interval = 0.25,
-                            MaxShakeEpicenter = 0.3,
-                            MinShakeAtRadius = 0,
-                            Radius = 20,
-                        },
-                        Damage = {
-                            Amount = 3500,
-                            DamageFriendly = false,
-                            Radius = 1,
-                            Type = "ExperimentalFootfall",
-                        },
+                    },
+                    CameraShake = {
+                        Interval = 0.25,
+                        MaxShakeEpicenter = 0.3,
+                        MinShakeAtRadius = 0,
+                        Radius = 20,
+                    },
+                    Damage = {
+                        Amount = 3500,
+                        DamageFriendly = false,
+                        Radius = 1,
+                        Type = "ExperimentalFootfall",
                     },
                 },
             },
@@ -182,7 +180,6 @@ UnitBlueprint{
     LifeBarOffset = 1.55,
     LifeBarSize = 3.25,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -201,7 +198,6 @@ UnitBlueprint{
         MeshExtentsX = 2.75,
         MeshExtentsY = 6.75,
         MeshExtentsZ = 3,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

@@ -113,7 +113,6 @@ UnitBlueprint{
     LifeBarSize = 0.65,
     Physics = {
         BackUpDistance = 6,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -131,7 +130,6 @@ UnitBlueprint{
         MeshExtentsX = 0.65,
         MeshExtentsY = 0.35,
         MeshExtentsZ = 0.95,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
