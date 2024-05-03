@@ -22,7 +22,7 @@
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
+local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
 
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Layouter = LayoutHelpers.ReusedLayoutFor
@@ -39,29 +39,22 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 --------------------------------------------------------------------------------
 
-local Textures
+local Textures = {
+    bgMainBody = SkinnableFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
+    bgMainCapL = SkinnableFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
+    bgMainCapL_TechTab = SkinnableFile('/game/construct-panel/construct-panel_bmp_l.dds'),
+    bgMainCapR = SkinnableFile('/game/construct-panel/construct-panel_s_bmp_r.dds'),
 
--- This stores the textures for the panel in one place, assuming
--- all construction panels (if there are more than one) will use the same
--- textures, and allows the textures to be updated if the skin changes.
-local function FetchTextures()
-    Textures = {
-        bgMainBody = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
-        bgMainCapL = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
-        bgMainCapL_TechTab = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_l.dds'),
-        bgMainCapR = UIUtil.UIFile('/game/construct-panel/construct-panel_s_bmp_r.dds'),
-    
-        bgTechTabBody = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m1.dds'),
-        bgTechTabCapR = UIUtil.UIFile('/game/construct-panel/construct-panel_bmp_m2.dds'),
-    
-        leftBracketLower = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
-        leftBracketUpper = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
-        leftBracketMiddle = UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
-        rightBracketLower = UIUtil.UIFile('/game/bracket-right/bracket_bmp_t.dds'),
-        rightBracketUpper = UIUtil.UIFile('/game/bracket-right/bracket_bmp_b.dds'),
-        rightBracketMiddle = UIUtil.UIFile('/game/bracket-right/bracket_bmp_m.dds'),
-    }
-end
+    bgTechTabBody = SkinnableFile('/game/construct-panel/construct-panel_bmp_m1.dds'),
+    bgTechTabCapR = SkinnableFile('/game/construct-panel/construct-panel_bmp_m2.dds'),
+
+    leftBracketLower = SkinnableFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
+    leftBracketUpper = SkinnableFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
+    leftBracketMiddle = SkinnableFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
+    rightBracketLower = SkinnableFile('/game/bracket-right/bracket_bmp_t.dds'),
+    rightBracketUpper = SkinnableFile('/game/bracket-right/bracket_bmp_b.dds'),
+    rightBracketMiddle = SkinnableFile('/game/bracket-right/bracket_bmp_m.dds'),
+}
 
 ---@class ConstructionPanel: Group
 ---@field bgMainBody Bitmap
@@ -102,9 +95,6 @@ ConstructionPanel = ClassUI(Group) {
     Layout = function(self)
 
         LOG('background.lua/ConstructionPanel:Layout')
-
-        -- Update our textures, either because we haven't yet or the skin has changed
-        FetchTextures()
         
         -- Left cap bitmap, under the pause/repeat build buttons
         Layouter(self.bgMainCapL)
