@@ -486,7 +486,7 @@ function UIFile(filespec, checkMods)
 end
 
 --- Returns the filename as a lazy var function to allow triggering of `OnDirty()`
----@param filespec FileName
+---@param filespec FileName|string
 ---@param checkMods? boolean
 ---@return fun(): FileName
 function SkinnableFile(filespec, checkMods)
