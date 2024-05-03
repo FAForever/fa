@@ -39,7 +39,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 --------------------------------------------------------------------------------
 
-local Textures = {
+local textures = {
     bgMainBody = SkinnableFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
     bgMainCapL = SkinnableFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
     bgMainCapL_TechTab = SkinnableFile('/game/construct-panel/construct-panel_bmp_l.dds'),
@@ -98,29 +98,29 @@ ConstructionPanel = ClassUI(Group) {
         
         -- Left cap bitmap, under the pause/repeat build buttons
         Layouter(self.bgMainCapL)
-            :Texture(Textures.bgMainCapL)
+            :Texture(textures.bgMainCapL)
             :AtLeftBottomIn(self, 67, 4)
 
         -- Right cap bitmap, at the rightmost edge of the panel
         Layouter(self.bgMainCapR)
-            :Texture(Textures.bgMainCapR)
+            :Texture(textures.bgMainCapR)
             :AtBottomIn(self.bgMainCapL)
             :AtRightIn(self, 2)
 
         -- Background element that pops up behind the tech level radio buttons
         Layouter(self.bgTechTabBody)
-            :Texture(Textures.bgTechTabBody)
+            :Texture(textures.bgTechTabBody)
             :AnchorToRight(self.bgMainCapL)
             :FillVertically(self.bgMainCapL)
 
         -- Rightside cap for the tech tab background (bgMainCapL is the left cap)
         Layouter(self.bgTechTabCapR)
-            :Texture(Textures.bgTechTabCapR)
+            :Texture(textures.bgTechTabCapR)
             :RightOf(self.bgTechTabBody)
 
         -- Main body of our background
         Layouter(self.bgMainBody)
-            :Texture(Textures.bgMainBody)
+            :Texture(textures.bgMainBody)
             :AnchorToRight(self.bgTechTabCapR)
             :AnchorToLeft(self.bgMainCapR)
             :FillVertically(self.bgMainCapR)
@@ -151,9 +151,9 @@ ConstructionPanel = ClassUI(Group) {
 
             -- Change our left cap texture to the tall tech tab version
             Layouter(self.bgMainCapL)
-                :Texture(Textures.bgMainCapL_TechTab)
+                :Texture(textures.bgMainCapL_TechTab)
                 -- We get taller/wider, so we need to update our size
-                :DimensionsFromTexture(Textures.bgMainCapL_TechTab)
+                :DimensionsFromTexture(textures.bgMainCapL_TechTab)
             -- Set the width of the tech tab background bitmap
             Layouter(self.bgTechTabBody)
                 :Right(techTabAlignTestValue)
@@ -168,9 +168,9 @@ ConstructionPanel = ClassUI(Group) {
             LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo == nil')
             -- Change our left cap texture to the short version
             Layouter(self.bgMainCapL)
-                :Texture(Textures.bgMainCapL)
+                :Texture(textures.bgMainCapL)
                 -- We need to update our size, because we got shorter/narrower
-                :DimensionsFromTexture(Textures.bgMainCapL)
+                :DimensionsFromTexture(textures.bgMainCapL)
             -- Anchor our main background to the left cap, bypassing the tech tab elements
             Layouter(self.bgMainBody)
                 :AnchorToRight(self.bgMainCapL)
@@ -188,34 +188,34 @@ ConstructionPanel = ClassUI(Group) {
         -- aren't handled here. If those tabs end up elsewhere, it's probably appropriate to handle these
         -- brackets there instead of here.
         Layouter(self.leftBracketLower)
-            :Texture(Textures.leftBracketLower)
+            :Texture(textures.leftBracketLower)
             :AtLeftTopIn(self, 4, 21)
             --:AtTopIn(self, 21)
 
         Layouter(self.leftBracketUpper)
-            :Texture(Textures.leftBracketUpper)
+            :Texture(textures.leftBracketUpper)
             :AtLeftIn(self.leftBracketLower)
             :AtBottomIn(self, 2)
 
         Layouter(self.leftBracketMiddle)
-            :Texture(Textures.leftBracketMiddle)
+            :Texture(textures.leftBracketMiddle)
             :AtLeftIn(self.leftBracketLower)
             :Bottom(self.leftBracketUpper.Top)
             :Top(self.leftBracketLower.Bottom)
 
         -- Brackets on the right side. These are with respect to bgMainCapR, so they belong here.
         Layouter(self.rightBracketLower)
-            :Texture(Textures.rightBracketLower)
+            :Texture(textures.rightBracketLower)
             :AtRightIn(self.bgMainCapR, -21)
             :AtTopIn(self.bgMainCapR, -6)
 
         Layouter(self.rightBracketUpper)
-            :Texture(Textures.rightBracketUpper)
+            :Texture(textures.rightBracketUpper)
             :AtRightIn(self.bgMainCapR, -21)
             :AtBottomIn(self.bgMainCapR, -5)
 
         Layouter(self.rightBracketMiddle)
-            :Texture(Textures.rightBracketMiddle)
+            :Texture(textures.rightBracketMiddle)
             :AtRightIn(self.bgMainCapR, -14)
             :Bottom(self.rightBracketUpper.Top)
             :Top(self.rightBracketLower.Bottom)
@@ -225,7 +225,11 @@ ConstructionPanel = ClassUI(Group) {
     ---@param self ConstructionPanel
     ---@param noUnitsSelected boolean
     OnSelection = function(self, noUnitsSelected)
-        if not noUnitsSelected then
+        if noUnitsSelected then
+            if not self:IsHidden() then
+                self:Hide()
+            end
+        else
             if self:IsHidden() then
                 LOG('showing ConstructionPanel')
                 self:Show()
@@ -236,10 +240,6 @@ ConstructionPanel = ClassUI(Group) {
                     self.flipFlop = false
                     self:TechTabLayout()
                 end
-            end
-        else
-            if not self:IsHidden() then
-                self:Hide()
             end
         end
     end,
