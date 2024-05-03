@@ -23,6 +23,8 @@
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ConstructionTabCluster = import('/lua/ui/controls/construction/constructiontabcluster.lua').ConstructionTabCluster
+local TechTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua').TechTabCluster
+local EnhancementTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua').EnhancementTabCluster
 
 local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
 
@@ -71,6 +73,8 @@ local textures = {
 ---@field rightBracketUpper Bitmap
 ---@field rightBracketMiddle Bitmap
 ---@field constructionTabCluster ConstructionTabCluster
+---@field techTabCluster TechTabCluster
+---@field enhancementTabCluster EnhancementTabCluster
 ConstructionPanel = ClassUI(Group) {
 
     __init = function(self, parent)
@@ -90,10 +94,9 @@ ConstructionPanel = ClassUI(Group) {
         self.rightBracketUpper = Bitmap(self)
         self.rightBracketMiddle = Bitmap(self)
 
-        self.constructionTabCluster = ConstructionTabCluster(self)
-
-        --ALERT: test field for toggling displays
-        self.flipFlop = false
+        self.constructionTabCluster = ConstructionTabCluster(self, {Func = self.ConstructionClusterCallback, Args = {self}})
+        self.techTabCluster = TechTabCluster(self, {Func = self.TechClusterCallback, Args = {self}})
+        self.enhancementTabCluster = EnhancementTabCluster(self, {Func = self.EnhancementClusterCallback, Args = {self}})
 
     end,
 
@@ -136,28 +139,54 @@ ConstructionPanel = ClassUI(Group) {
             :AtBottomIn(self.bgMainBody, -11)
             :End()
 
+        Layouter(self.techTabCluster)
+            :RightOf(self.bgMainCapL)
+            :End()
+
+        Layouter(self.enhancementTabCluster)
+            :RightOf(self.bgMainCapL)
+            :End()
+
         -- With no arguments, this will apply the default tech tab layout (no tab visible)
-        self:TechTabLayout()
+        self:MorphLayout('selection')
 
         -- Brackets in a separate function to keep things organized
         self:BracketLayout()
     end,
 
-    ---Morph us into a layout that shows the tech tab, or not
-    ---@param self ConstructionPanel
-    ---@param controlToAlignTo? Control
-    ---@param width? number -- Hard parameter, just for testing
-    TechTabLayout = function(self, controlToAlignTo, width)
-        LOG('background.lua/ConstructionPanel:TechTabLayout')
-        if controlToAlignTo or width then
-            LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo|width != nil')
+    ConstructionClusterCallback = function(self, key)
+        LOG('background.lua/ConstructionPanel:ConstructionClusterCallback(\''..key..'\')')
+        self:MorphLayout(key)
+    end,
 
-            -- This is just for testing, because we don't have a proper tech control to pass yet
-            local techTabAlignTestValue
-            if controlToAlignTo and controlToAlignTo.Right then
-                techTabAlignTestValue = controlToAlignTo.Right
+    TechClusterCallback = function(self, key)
+        LOG('background.lua/ConstructionPanel:TechTabClusterCallback(\''..key..'\')')
+    end,
+
+    EnhancementClusterCallback = function(self, key)
+        LOG('background.lua/ConstructionPanel:EnhancementTabClusterCallback(\''..key..'\')')
+    end,
+
+    ---Morph us into a layout that shows the tech tab, or not, along with the enhancement panel tabs
+    ---@param self ConstructionPanel
+    ---@param key string
+    MorphLayout = function(self, key)
+        --LOG('background.lua/ConstructionPanel:MorphLayout(\''..key..'\')')
+        self.lastKey = key
+        if key == 'construction' or key == 'enhancement' then
+
+            -- Show our tech tab elements and get our width for the tech tab body
+            local techTabBgRight
+            self.bgTechTabBody:Show()
+            self.bgTechTabCapR:Show()
+            if key == 'construction' then
+                self.techTabCluster:Show()
+                self.enhancementTabCluster:Hide()
+                techTabBgRight = self.techTabCluster.Right
             else
-                techTabAlignTestValue = self.bgMainCapL.Right() + width
+                self.techTabCluster:Hide()
+                self.enhancementTabCluster:Show()
+                techTabBgRight = self.enhancementTabCluster.Right
             end
 
             -- Change our left cap texture to the tall tech tab version
@@ -170,7 +199,7 @@ ConstructionPanel = ClassUI(Group) {
                 :AtLeftIn(self, 67)
             -- Set the width of the tech tab background bitmap
             Layouter(self.bgTechTabBody)
-                :Right(techTabAlignTestValue)
+                :Right(techTabBgRight)
             -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
             Layouter(self.bgMainBody)
                 :AnchorToRight(self.bgTechTabCapR)
@@ -178,11 +207,8 @@ ConstructionPanel = ClassUI(Group) {
             Layouter(self.constructionTabCluster)
                 :AnchorToLeft(self.bgMainCapL, -7)
 
-            -- Show our tech tab elements
-            self.bgTechTabBody:Show()
-            self.bgTechTabCapR:Show()
-        else
-            LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo == nil')
+        elseif key == 'selection' then
+            --LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo == nil')
             -- Change our left cap texture to the short version
             Layouter(self.bgMainCapL)
                 :Texture(textures.bgMainCapL)
@@ -199,6 +225,8 @@ ConstructionPanel = ClassUI(Group) {
             -- Hide our tech tab elements
             self.bgTechTabBody:Hide()
             self.bgTechTabCapR:Hide()
+            self.techTabCluster:Hide()
+            self.enhancementTabCluster:Hide()
         end
     end,
 
@@ -246,21 +274,15 @@ ConstructionPanel = ClassUI(Group) {
     ---@param self ConstructionPanel
     ---@param noUnitsSelected boolean
     OnSelection = function(self, noUnitsSelected)
+        LOG('ConstructionPanel:OnSelection('..tostring(noUnitsSelected)..')')
         if noUnitsSelected then
             if not self:IsHidden() then
                 self:Hide()
             end
         else
             if self:IsHidden() then
-                LOG('showing ConstructionPanel')
                 self:Show()
-                if not self.flipFlop then
-                    self.flipFlop = true
-                    self:TechTabLayout(nil, 500)
-                else
-                    self.flipFlop = false
-                    self:TechTabLayout()
-                end
+                self:MorphLayout(self.lastKey or 'selection')
             end
         end
     end,
