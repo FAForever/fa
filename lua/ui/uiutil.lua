@@ -416,7 +416,7 @@ function RotateLayout(direction)
 end
 
 --- Given a path and name relative to the skin path, returns the full path based on the current skin
----@param filespec FileName
+---@param filespec FileName|string
 ---@param checkMods? boolean
 ---@return FileName
 function UIFile(filespec, checkMods)
