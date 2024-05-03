@@ -95,17 +95,17 @@ ConstructionPanel = ClassUI(Group) {
     Layout = function(self)
 
         LOG('background.lua/ConstructionPanel:Layout')
-        
-        -- Left cap bitmap, under the pause/repeat build buttons
-        Layouter(self.bgMainCapL)
-            :Texture(textures.bgMainCapL)
-            :AtLeftBottomIn(self, 67, 4)
 
         -- Right cap bitmap, at the rightmost edge of the panel
         Layouter(self.bgMainCapR)
             :Texture(textures.bgMainCapR)
-            :AtBottomIn(self.bgMainCapL)
-            :AtRightIn(self, 2)
+            :AtRightBottomIn(self, 2, 5)
+
+        -- Left cap bitmap, under the pause/repeat build buttons
+        Layouter(self.bgMainCapL)
+            :Texture(textures.bgMainCapL)
+            :AtLeftIn(self, 67)
+            :AtBottomIn(self.bgMainCapR)
 
         -- Background element that pops up behind the tech level radio buttons
         Layouter(self.bgTechTabBody)
@@ -154,6 +154,8 @@ ConstructionPanel = ClassUI(Group) {
                 :Texture(textures.bgMainCapL_TechTab)
                 -- We get taller/wider, so we need to update our size
                 :DimensionsFromTexture(textures.bgMainCapL_TechTab)
+                -- Textures align differently (ouch) so we also need to adjust our offset
+                :AtBottomIn(self.bgMainCapR, -1)
             -- Set the width of the tech tab background bitmap
             Layouter(self.bgTechTabBody)
                 :Right(techTabAlignTestValue)
@@ -171,6 +173,7 @@ ConstructionPanel = ClassUI(Group) {
                 :Texture(textures.bgMainCapL)
                 -- We need to update our size, because we got shorter/narrower
                 :DimensionsFromTexture(textures.bgMainCapL)
+                :AtBottomIn(self.bgMainCapR)
             -- Anchor our main background to the left cap, bypassing the tech tab elements
             Layouter(self.bgMainBody)
                 :AnchorToRight(self.bgMainCapL)
