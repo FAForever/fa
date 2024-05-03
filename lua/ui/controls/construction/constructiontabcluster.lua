@@ -25,6 +25,13 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Layouter = LayoutHelpers.ReusedLayoutFor
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+
+local textures = {
+    leftBracketLower = SkinnableFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
+    leftBracketUpper = SkinnableFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
+    leftBracketMiddle = SkinnableFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
+}
 
 local TabCheckboxClasses = {
     construction = Checkbox,
@@ -55,11 +62,14 @@ ConstructionTabCluster = ClassUI(RadioCluster) {
 
     __init = function(self, parent, SelectionCallback)
         RadioCluster.__init(self, parent, TabCheckboxClasses, SelectionCallback)
+        self.leftBracketLower = Bitmap(self)
+        self.leftBracketUpper = Bitmap(self)
+        self.leftBracketMiddle = Bitmap(self)
     end,
 
     ---We need to determine our size based on the size of our children, then layout
     OnLayout = function(self)
-        
+
         local maxWidth = 0
         local totalHeight = 0
         for key, item in self.items do
@@ -78,6 +88,21 @@ ConstructionTabCluster = ClassUI(RadioCluster) {
             :Below(self.items.construction, -16)
         Layouter(self.items.enhancement)
             :Below(self.items.selection, -16)
+
+        Layouter(self.leftBracketLower)
+            :Texture(textures.leftBracketLower)
+            :AtLeftTopIn(self, 4, 7)
+
+        Layouter(self.leftBracketUpper)
+            :Texture(textures.leftBracketUpper)
+            :AtLeftIn(self.leftBracketLower)
+            :AtBottomIn(self, 8)
+
+        Layouter(self.leftBracketMiddle)
+            :Texture(textures.leftBracketMiddle)
+            :AtLeftIn(self.leftBracketLower)
+            :Bottom(self.leftBracketUpper.Top)
+            :Top(self.leftBracketLower.Bottom)
 
     end,
 }
