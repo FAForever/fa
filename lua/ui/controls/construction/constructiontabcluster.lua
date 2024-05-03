@@ -22,15 +22,9 @@
 
 local RadioCluster = import('/lua/ui/controls/radiocluster.lua').RadioCluster
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local UIUtil = import('/lua/ui/uiutil.lua')
+local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Layouter = LayoutHelpers.ReusedLayoutFor
-
-local TabTexturePrefix = {
-    construction = '/game/construct-tab_btn/top_tab_btn_',
-    selection = '/game/construct-tab_btn/mid_tab_btn_',
-    enhancement = '/game/construct-tab_btn/bot_tab_btn_',
-}
 
 local TabCheckboxClasses = {
     construction = Checkbox,
@@ -38,14 +32,21 @@ local TabCheckboxClasses = {
     enhancement = Checkbox,
 }
 
-local Textures
+local TabTexturePrefix = {
+    construction = '/game/construct-tab_btn/top_tab_btn_',
+    selection = '/game/construct-tab_btn/mid_tab_btn_',
+    enhancement = '/game/construct-tab_btn/bot_tab_btn_',
+}
 
 local function GetTabTextures(id)
     if TabTexturePrefix[id] then
         local pre = TabTexturePrefix[id]
-        return UIUtil.UIFile(pre..'up_bmp.dds'), UIUtil.UIFile(pre..'sel_bmp.dds'),
-            UIUtil.UIFile(pre..'over_bmp.dds'), UIUtil.UIFile(pre..'down_bmp.dds'),
-            UIUtil.UIFile(pre..'dis_bmp.dds'), UIUtil.UIFile(pre..'dis_bmp.dds')
+        return SkinnableFile(pre..'up_bmp.dds'),
+            SkinnableFile(pre..'sel_bmp.dds'),
+            SkinnableFile(pre..'over_bmp.dds'),
+            SkinnableFile(pre..'down_bmp.dds'),
+            SkinnableFile(pre..'dis_bmp.dds'),
+            SkinnableFile(pre..'dis_bmp.dds')
     end
 end
 
