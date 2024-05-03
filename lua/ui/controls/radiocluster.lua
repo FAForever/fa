@@ -25,6 +25,8 @@ local Group = import('/lua/maui/group.lua').Group
 ---@class RadioCluster : Group
 ---@field items table<string, Checkbox>
 ---@field currentSelection string
+---@field parent Control
+---@field SelectionCallback function -- When a checkbox is selected, this function is called with the parent as the first parameter and the key of the selected checkbox as the second.
 RadioCluster = ClassUI(Group) {
 
     ---@param self RadioCluster
@@ -36,12 +38,14 @@ RadioCluster = ClassUI(Group) {
 
         -- Our callback function for when a checkbox is selected
         self.SelectionCallback = SelectionCallback
+        self.parent = parent
 
         -- Initialize our checkboxes 
         self.items = {}
         for key, CheckboxClass in checkboxes do
             local checkbox = CheckboxClass(self)
             checkbox.key = key
+            checkbox:UseAlphaHitTest(false)
             checkbox.OnClick = function(cbox, eventModifiers)
                 self:OnSelect(cbox.key)
             end
@@ -51,10 +55,12 @@ RadioCluster = ClassUI(Group) {
         self.currentSelection = nil
     end,
 
+    ---@param self RadioCluster
     Layout = function(self)
         -- Override this
     end,
 
+    ---@param self RadioCluster
     OnSelect = function(self, selectedKey)
         LOG('RadioCluster:OnSelect('..selectedKey..')')
         if selectedKey == self.currentSelection then
@@ -62,7 +68,7 @@ RadioCluster = ClassUI(Group) {
         end
         self.currentSelection = selectedKey
         if self.SelectionCallback then
-            self.SelectionCallback.Func(unpack(self.SelectionCallback.Args), selectedKey)
+            self.SelectionCallback(self.parent, selectedKey)
         end
         for key, checkbox in self.items do
             if key ~= selectedKey then

@@ -86,17 +86,16 @@ ConstructionPanel = ClassUI(Group) {
         self.bgTechTabCapR = Bitmap(self)
         self.bgMainBody = Bitmap(self)
 
-        self.leftBracketLower = Bitmap(self)
-        self.leftBracketUpper = Bitmap(self)
-        self.leftBracketMiddle = Bitmap(self)
-
         self.rightBracketLower = Bitmap(self)
         self.rightBracketUpper = Bitmap(self)
         self.rightBracketMiddle = Bitmap(self)
 
-        self.constructionTabCluster = ConstructionTabCluster(self, {Func = self.ConstructionClusterCallback, Args = {self}})
-        self.techTabCluster = TechTabCluster(self, {Func = self.TechClusterCallback, Args = {self}})
-        self.enhancementTabCluster = EnhancementTabCluster(self, {Func = self.EnhancementClusterCallback, Args = {self}})
+        -- These are our functional button groups
+        -- The callback passed to the radio button clusters will be called with 
+        -- the parent (this panel) and selected key as parameters
+        self.constructionTabCluster = ConstructionTabCluster(self, self.ConstructionClusterCallback)
+        self.techTabCluster = TechTabCluster(self, self.TechClusterCallback)
+        self.enhancementTabCluster = EnhancementTabCluster(self, self.EnhancementClusterCallback)
 
     end,
 
@@ -148,7 +147,7 @@ ConstructionPanel = ClassUI(Group) {
             :End()
 
         -- With no arguments, this will apply the default tech tab layout (no tab visible)
-        self:MorphLayout('selection')
+        --self:MorphLayout('selection')
 
         -- Brackets in a separate function to keep things organized
         self:BracketLayout()
@@ -182,11 +181,13 @@ ConstructionPanel = ClassUI(Group) {
             if key == 'construction' then
                 self.techTabCluster:Show()
                 self.enhancementTabCluster:Hide()
-                techTabBgRight = self.techTabCluster.Right
+                --techTabBgRight = self.techTabCluster.Right
+                self.bgTechTabBody.Right:Set(self.techTabCluster.Right)
             else
                 self.techTabCluster:Hide()
                 self.enhancementTabCluster:Show()
-                techTabBgRight = self.enhancementTabCluster.Right
+                --techTabBgRight = self.enhancementTabCluster.Right
+                self.bgTechTabBody.Right:Set(self.enhancementTabCluster.Right)
             end
 
             -- Change our left cap texture to the tall tech tab version
@@ -198,8 +199,8 @@ ConstructionPanel = ClassUI(Group) {
                 :AtBottomIn(self.bgMainCapR, -1)
                 :AtLeftIn(self, 67)
             -- Set the width of the tech tab background bitmap
-            Layouter(self.bgTechTabBody)
-                :Right(techTabBgRight)
+            --Layouter(self.bgTechTabBody)
+            --    :Right(techTabBgRight)
             -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
             Layouter(self.bgMainBody)
                 :AnchorToRight(self.bgTechTabCapR)
@@ -230,29 +231,10 @@ ConstructionPanel = ClassUI(Group) {
         end
     end,
 
-    ---Handles the laying out of brackets on the left and right side of the construction panel
+    ---Handles the laying out of brackets on the sides of the construction panel
     ---@param self ConstructionPanel
     BracketLayout = function(self)
-        -- The left brackets are positioned with respect to the build/select/cargo tab buttons, which
-        -- aren't handled here. If those tabs end up elsewhere, it's probably appropriate to handle these
-        -- brackets there instead of here.
-        Layouter(self.leftBracketLower)
-            :Texture(textures.leftBracketLower)
-            :AtLeftTopIn(self, 4, 21)
-            --:AtTopIn(self, 21)
-
-        Layouter(self.leftBracketUpper)
-            :Texture(textures.leftBracketUpper)
-            :AtLeftIn(self.leftBracketLower)
-            :AtBottomIn(self, 2)
-
-        Layouter(self.leftBracketMiddle)
-            :Texture(textures.leftBracketMiddle)
-            :AtLeftIn(self.leftBracketLower)
-            :Bottom(self.leftBracketUpper.Top)
-            :Top(self.leftBracketLower.Bottom)
-
-        -- Brackets on the right side. These are with respect to bgMainCapR, so they belong here.
+        -- Brackets on the right side
         Layouter(self.rightBracketLower)
             :Texture(textures.rightBracketLower)
             :AtRightIn(self.bgMainCapR, -21)
