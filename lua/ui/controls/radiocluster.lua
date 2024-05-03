@@ -62,7 +62,7 @@ RadioCluster = ClassUI(Group) {
         end
         self.currentSelection = selectedKey
         if self.SelectionCallback then
-            self.SelectionCallback(selectedKey)
+            self.SelectionCallback.Func(unpack(self.SelectionCallback.Args), selectedKey)
         end
         for key, checkbox in self.items do
             if key ~= selectedKey then
