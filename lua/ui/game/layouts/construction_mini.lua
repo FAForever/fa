@@ -399,12 +399,12 @@ function LayoutTabs(controls)
         -- LayoutHelpers.AtBottomIn(controls.minBG, controls.constructionGroup, 5)
     end
 
-    SetupTab(controls.constructionTab)
-    LayoutHelpers.AtLeftTopIn(controls.constructionTab, controls.constructionGroup, 0, 14)
-    SetupTab(controls.selectionTab)
-    LayoutHelpers.Below(controls.selectionTab, controls.constructionTab, -16)
-    SetupTab(controls.enhancementTab)
-    LayoutHelpers.Below(controls.enhancementTab, controls.selectionTab, -16)
+    -- SetupTab(controls.constructionTab)
+    -- LayoutHelpers.AtLeftTopIn(controls.constructionTab, controls.constructionGroup, 0, 14)
+    -- SetupTab(controls.selectionTab)
+    -- LayoutHelpers.Below(controls.selectionTab, controls.constructionTab, -16)
+    -- SetupTab(controls.enhancementTab)
+    -- LayoutHelpers.Below(controls.enhancementTab, controls.selectionTab, -16)
 
 end
 

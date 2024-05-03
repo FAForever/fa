@@ -22,6 +22,8 @@
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local ConstructionTabCluster = import('/lua/ui/controls/construction/constructiontabcluster.lua').ConstructionTabCluster
+
 local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
 
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -68,6 +70,7 @@ local textures = {
 ---@field rightBracketLower Bitmap
 ---@field rightBracketUpper Bitmap
 ---@field rightBracketMiddle Bitmap
+---@field constructionTabCluster ConstructionTabCluster
 ConstructionPanel = ClassUI(Group) {
 
     __init = function(self, parent)
@@ -87,6 +90,8 @@ ConstructionPanel = ClassUI(Group) {
         self.rightBracketUpper = Bitmap(self)
         self.rightBracketMiddle = Bitmap(self)
 
+        self.constructionTabCluster = ConstructionTabCluster(self)
+
         --ALERT: test field for toggling displays
         self.flipFlop = false
 
@@ -104,7 +109,7 @@ ConstructionPanel = ClassUI(Group) {
         -- Left cap bitmap, under the pause/repeat build buttons
         Layouter(self.bgMainCapL)
             :Texture(textures.bgMainCapL)
-            :AtLeftIn(self, 67)
+            :AtLeftIn(self, 69)
             :AtBottomIn(self.bgMainCapR)
 
         -- Background element that pops up behind the tech level radio buttons
@@ -124,6 +129,12 @@ ConstructionPanel = ClassUI(Group) {
             :AnchorToRight(self.bgTechTabCapR)
             :AnchorToLeft(self.bgMainCapR)
             :FillVertically(self.bgMainCapR)
+
+        -- Align the construction tab cluster to the left of the panel
+        Layouter(self.constructionTabCluster)
+            :AnchorToLeft(self.bgMainCapL, -7)
+            :AtBottomIn(self.bgMainBody, -11)
+            :End()
 
         -- With no arguments, this will apply the default tech tab layout (no tab visible)
         self:TechTabLayout()
@@ -156,12 +167,16 @@ ConstructionPanel = ClassUI(Group) {
                 :DimensionsFromTexture(textures.bgMainCapL_TechTab)
                 -- Textures align differently (ouch) so we also need to adjust our offset
                 :AtBottomIn(self.bgMainCapR, -1)
+                :AtLeftIn(self, 67)
             -- Set the width of the tech tab background bitmap
             Layouter(self.bgTechTabBody)
                 :Right(techTabAlignTestValue)
             -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
             Layouter(self.bgMainBody)
                 :AnchorToRight(self.bgTechTabCapR)
+            -- Reanchor the construction tab, because the textures don't align properly otherwise
+            Layouter(self.constructionTabCluster)
+                :AnchorToLeft(self.bgMainCapL, -7)
 
             -- Show our tech tab elements
             self.bgTechTabBody:Show()
@@ -174,10 +189,13 @@ ConstructionPanel = ClassUI(Group) {
                 -- We need to update our size, because we got shorter/narrower
                 :DimensionsFromTexture(textures.bgMainCapL)
                 :AtBottomIn(self.bgMainCapR)
+                :AtLeftIn(self, 69)
             -- Anchor our main background to the left cap, bypassing the tech tab elements
             Layouter(self.bgMainBody)
                 :AnchorToRight(self.bgMainCapL)
-            
+            Layouter(self.constructionTabCluster)
+                :AnchorToLeft(self.bgMainCapL, -5)
+
             -- Hide our tech tab elements
             self.bgTechTabBody:Hide()
             self.bgTechTabCapR:Hide()
