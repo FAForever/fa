@@ -1033,7 +1033,7 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
             for _, effect in telefx do
                 local fx = CreateEmitterAtEntity(teleportDestFxEntity, unitArmy, effect)
                 IEffectOffsetEmitter(fx, 0, offsetY, 0)
-                IEffectScaleEmitter(fx, 0.75)
+                IEffectScaleEmitter(fx, 0.9375)
                 IEffectSetEmitterCurveParam(fx, 'Y_POSITION_CURVE', 0, offsetY * 2) -- To make effects cover entire height of unit
                 IEffectSetEmitterCurveParam(fx, 'ROTATION_RATE_CURVE', 1, 0) -- Small initial rotation, will be faster as charging
                 TableInsert(unit.TeleportDestChargeBag, fx)
@@ -1048,7 +1048,7 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
 
             for _, effect in telefx do
                 local fx = CreateEmitterAtEntity(sphere, unitArmy, effect)
-                IEffectScaleEmitter(fx, 0.01 * unit.TeleportCybranSphereScale)
+                IEffectScaleEmitter(fx, 0.0125 * unit.TeleportCybranSphereScale)
                 TableInsert(unit.TeleportDestChargeBag, fx)
                 TrashBagAdd(effectsBag, fx)
             end
@@ -1057,7 +1057,7 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
             for _, effect in telefx do
                 local fx = CreateEmitterAtEntity(teleportDestFxEntity, unitArmy, effect)
                 IEffectOffsetEmitter(fx, 0, offsetY, 0)
-                IEffectScaleEmitter(fx, 0.01)
+                IEffectScaleEmitter(fx, 0.0125)
                 TableInsert(unit.TeleportDestChargeBag, fx)
                 TrashBagAdd(effectsBag, fx)
             end
@@ -1068,7 +1068,7 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
             for _, effect in telefx do
                 local fx = CreateEmitterAtEntity(teleportDestFxEntity, unitArmy, effect)
                 IEffectOffsetEmitter(fx, 0, offsetY, 0)
-                IEffectScaleEmitter(fx, 0.01)
+                IEffectScaleEmitter(fx, 0.0125)
                 TableInsert(unit.TeleportDestChargeBag, fx)
                 TrashBagAdd(effectsBag, fx)
             end
@@ -1152,7 +1152,7 @@ end
 function TeleportCreateCybranSphere(unit, location, initialScale)
     -- Creates the sphere used by Cybran teleportation effects
     local sx, sy, sz = TeleportGetUnitSizes(unit)
-    local scale = 1.25 * MathMax(sx, sy, sz)
+    local scale = 1.5625 * MathMax(sx, sy, sz)
     unit.TeleportCybranSphereScale = scale
 
     local sphere = Entity()
@@ -1185,7 +1185,7 @@ function TeleportChargingProgress(unit, fraction)
             if unit.TeleportDestChargeBag then
                 local height = -(25 + 100 * fraction)
                 local size = 30 * fraction
-                local scale = 0.75 + 0.5 * MathMax(fraction, 0.01)
+                local scale = 0.9375 + 0.625 * MathMax(fraction, 0.01)
                 for _, fx in unit.TeleportDestChargeBag do
                     IEffectSetEmitterCurveParam(fx, 'ROTATION_RATE_CURVE', height, size)
                     IEffectScaleEmitter(fx, scale)
@@ -1198,7 +1198,7 @@ function TeleportChargingProgress(unit, fraction)
             end
         elseif faction == 'Cybran' then
             -- Increase size of sphere and effects as progressing
-            local scale = MathMax(fraction, 0.01) * (unit.TeleportCybranSphereScale or 5)
+            local scale = fraction * (unit.TeleportCybranSphereScale or 6.25)
             if unit.TeleportCybranSphere then
                 unit.TeleportCybranSphere:SetDrawScale(scale)
             end
@@ -1209,7 +1209,7 @@ function TeleportChargingProgress(unit, fraction)
             end
         elseif unit.TeleportDestChargeBag then
             -- Increase size of effects as progressing
-            local scale = 2 * fraction - MathPow(fraction, 2)
+            local scale = 2.5 * fraction - MathPow(fraction, 2.5)
             for _, fx in unit.TeleportDestChargeBag do
                 IEffectScaleEmitter(fx, scale)
             end

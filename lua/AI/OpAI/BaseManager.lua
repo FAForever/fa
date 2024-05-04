@@ -10,8 +10,10 @@
 
 ---@class MarkerChain: string                   # Name reference to a marker chain as defined in the map
 ---@class Area: string                          # Name reference to a area as defined in the map
----@class Marker: string                        # Name reference to a marker as defined in the map
 ---@class UnitGroup: string                     # Name reference to a unit group as defined in the map
+
+---@class Marker: string                        # Name reference to a marker as defined in the map
+---@field Position Vector                       # A { x, y, z } array-based table
 
 -- types commonly used in repository
 
@@ -1285,7 +1287,7 @@ BaseManager = ClassSimple {
         local unitNames = self.AIBrain.BaseTemplates[addName].UnitNames
         local buildCounter = self.AIBrain.BaseTemplates[addName].BuildCounter
         if not tblUnit then
-            error('*AI DEBUG - Group: ' .. repr(name) .. ' not found for Army: ' .. repr(army), 2)
+            error('*AI DEBUG - Group: ' .. tostring(name) .. ' not found for Army: ' .. tostring(army), 2)
         else
             -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
             for i, unit in tblUnit do

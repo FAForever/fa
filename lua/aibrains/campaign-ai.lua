@@ -176,7 +176,7 @@ AIBrain = Class(StandardBrain) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', tostring(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,
@@ -816,11 +816,11 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param loc Vector
-    ---@return Vector | false
+    ---@param loc string
+    ---@return Vector?
     PBMGetLocationCoords = function(self, loc)
         if not loc then
-            return false
+            return
         end
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
@@ -835,7 +835,6 @@ AIBrain = Class(StandardBrain) {
         elseif self.BuilderManagers[loc] then
             return self.BuilderManagers[loc].FactoryManager:GetLocationCoords()
         end
-        return false
     end,
 
     ---@param self CampaignAIBrain
@@ -918,7 +917,7 @@ AIBrain = Class(StandardBrain) {
     ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
          if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
-            local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType), ') WAS PASSED IN.'
+            local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE ('.. tostring(platoonType) .. ') WAS PASSED IN.'
             error(strng, 2)
             return false
         end

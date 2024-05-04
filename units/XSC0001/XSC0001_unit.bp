@@ -90,7 +90,6 @@ UnitBlueprint {
     LifeBarOffset = 1.1,
     LifeBarSize = 3,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -108,7 +107,6 @@ UnitBlueprint {
         MeshExtentsX = 1,
         MeshExtentsY = 1,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_Land',
         TurnRadius = 0,
         TurnRate = 80,

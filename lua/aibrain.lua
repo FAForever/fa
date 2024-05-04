@@ -24,6 +24,10 @@ local CoroutineYield = coroutine.yield
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
+---@class ScoutLocation
+---@field Position Vector
+---@field TaggedBy Unit
+
 ---@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias HqTech "TECH2" | "TECH3"
@@ -436,7 +440,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
                         -- allow for debugging
                         if not ok then
-                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
                         end
 
                         break
@@ -465,7 +469,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
                         -- allow for debugging
                         if not ok then
-                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
                         end
 
                         break
@@ -547,6 +551,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
+---@field CustomUnits { [string]: EntityId[] }
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
@@ -1211,6 +1216,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     OnRecalled = function(self)
+        -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
         local army = self.Army

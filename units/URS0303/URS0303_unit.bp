@@ -181,7 +181,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -197,7 +196,6 @@ UnitBlueprint{
         MaxSpeed = 3,
         MaxSpeedReverse = 3,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
