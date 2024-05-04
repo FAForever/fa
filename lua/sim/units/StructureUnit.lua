@@ -736,7 +736,7 @@ StructureUnit = ClassUnit(Unit) {
     ---------------------------------------------------------------------------
     --#region Adjacency feature
 
-    -- Called by the engine when a structure is finished building for each adjacent unit
+    -- Called by the engine when a structure in the same army is finished building for each adjacent unit
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     ---@param triggerUnit StructureUnit
