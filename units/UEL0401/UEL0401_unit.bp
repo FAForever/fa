@@ -310,7 +310,6 @@ UnitBlueprint{
         MeshExtentsX = 8,
         MeshExtentsY = 2,
         MeshExtentsZ = 10.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         RotateBodyWhileMoving = false,
         RotateOnSpot = false,

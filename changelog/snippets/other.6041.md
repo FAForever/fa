@@ -1,1 +1,1 @@
-- (#6041, #6055) Clean up the blueprint-files of various structures.
+- (#6041, #6055, #6081) Clean up the blueprint-files of various structures.

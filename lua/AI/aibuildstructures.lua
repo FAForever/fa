@@ -352,8 +352,8 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
     return -- unsuccessful build
 end
 
----@param baseTemplate any
----@param location Vector
+---@param baseTemplate? any
+---@param location? Vector
 ---@return table
 function AIBuildBaseTemplateFromLocation(baseTemplate, location)
     local baseT = {}
