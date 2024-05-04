@@ -2319,7 +2319,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
+        local effects = {
+            --- UEF
+            "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+            "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+            ---"/effects/emitters/destruction_water_splash_plume_01.bp",
+            --- Cybran
+            --- "/effects/emitters/veterancy/cybran_vet_1_v1.bp",
+            --- "/effects/emitters/veterancy/cybran_vet_1_v2-2.bp",
+        }
 
+        for index, effect in effects do
+            CreateEmitterAtEntity(self, self.Army, effect)
+        end
 
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then
