@@ -80,19 +80,19 @@ ConstructionPanel = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        self.bgMainCapL = Bitmap(self)
-        self.bgMainCapR = Bitmap(self)
-        self.bgTechTabBody = Bitmap(self)
-        self.bgTechTabCapR = Bitmap(self)
-        self.bgMainBody = Bitmap(self)
+        self.bgMainCapL = Bitmap(self) -- Left cap bitmap, under the pause/repeat build buttons
+        self.bgMainCapR = Bitmap(self) -- Right cap bitmap, at the rightmost edge of the panel
+        self.bgTechTabBody = Bitmap(self) -- Background element that pops up behind the tech level radio buttons
+        self.bgTechTabCapR = Bitmap(self) -- Rightside cap for the tech tab background (bgMainCapL is the left cap)
+        self.bgMainBody = Bitmap(self) -- Main body of our background
 
-        self.rightBracketLower = Bitmap(self)
+        self.rightBracketLower = Bitmap(self) -- Brackets at the right edge of the panel
         self.rightBracketUpper = Bitmap(self)
         self.rightBracketMiddle = Bitmap(self)
 
         -- These are our functional button groups
-        -- The callback passed to the radio button clusters will be called with 
-        -- the parent (this panel) and selected key as parameters
+        -- The callback passed to these radio button clusters will
+        -- be called with (cluster.parent, selectedKey) as parameters
         self.constructionTabCluster = ConstructionTabCluster(self, self.ConstructionClusterCallback)
         self.techTabCluster = TechTabCluster(self, self.TechClusterCallback)
         self.enhancementTabCluster = EnhancementTabCluster(self, self.EnhancementClusterCallback)
@@ -103,36 +103,31 @@ ConstructionPanel = ClassUI(Group) {
 
         LOG('background.lua/ConstructionPanel:Layout')
 
-        -- Right cap bitmap, at the rightmost edge of the panel
+        -- Initial layout and texture setup
         Layouter(self.bgMainCapR)
             :Texture(textures.bgMainCapR)
             :AtRightBottomIn(self, 2, 5)
 
-        -- Left cap bitmap, under the pause/repeat build buttons
         Layouter(self.bgMainCapL)
             :Texture(textures.bgMainCapL)
             :AtLeftIn(self, 69)
             :AtBottomIn(self.bgMainCapR)
 
-        -- Background element that pops up behind the tech level radio buttons
         Layouter(self.bgTechTabBody)
             :Texture(textures.bgTechTabBody)
             :AnchorToRight(self.bgMainCapL)
             :FillVertically(self.bgMainCapL)
 
-        -- Rightside cap for the tech tab background (bgMainCapL is the left cap)
         Layouter(self.bgTechTabCapR)
             :Texture(textures.bgTechTabCapR)
             :RightOf(self.bgTechTabBody)
 
-        -- Main body of our background
         Layouter(self.bgMainBody)
             :Texture(textures.bgMainBody)
             :AnchorToRight(self.bgTechTabCapR)
             :AnchorToLeft(self.bgMainCapR)
             :FillVertically(self.bgMainCapR)
 
-        -- Align the construction tab cluster to the left of the panel
         Layouter(self.constructionTabCluster)
             :AnchorToLeft(self.bgMainCapL, -7)
             :AtBottomIn(self.bgMainBody, -11)
@@ -146,16 +141,13 @@ ConstructionPanel = ClassUI(Group) {
             :RightOf(self.bgMainCapL)
             :End()
 
-        -- With no arguments, this will apply the default tech tab layout (no tab visible)
-        --self:MorphLayout('selection')
-
         -- Brackets in a separate function to keep things organized
         self:BracketLayout()
     end,
 
     ConstructionClusterCallback = function(self, key)
         LOG('background.lua/ConstructionPanel:ConstructionClusterCallback(\''..key..'\')')
-        self:MorphLayout(key)
+        self:SetLayoutByKey(key)
     end,
 
     TechClusterCallback = function(self, key)
@@ -166,68 +158,49 @@ ConstructionPanel = ClassUI(Group) {
         LOG('background.lua/ConstructionPanel:EnhancementTabClusterCallback(\''..key..'\')')
     end,
 
-    ---Morph us into a layout that shows the tech tab, or not, along with the enhancement panel tabs
+    ---This method morphs our layout to show the tech tab bg (or not), along
+    ---with the enhancement/tech level selection tabs, based on the key passed
     ---@param self ConstructionPanel
     ---@param key string
-    MorphLayout = function(self, key)
-        --LOG('background.lua/ConstructionPanel:MorphLayout(\''..key..'\')')
+    SetLayoutByKey = function(self, key)
+        LOG('background.lua/ConstructionPanel:SetLayoutByKey(\''..key..'\')')
         self.lastKey = key
-        if key == 'construction' or key == 'enhancement' then
-
-            -- Show our tech tab elements and get our width for the tech tab body
-            local techTabBgRight
+        if key == 'construction' or key == 'enhancement' then -- Show our tech tab elements and layout the tech background elements
             self.bgTechTabBody:Show()
             self.bgTechTabCapR:Show()
-            if key == 'construction' then
+            if key == 'construction' then -- we need the tech level selector
                 self.techTabCluster:Show()
                 self.enhancementTabCluster:Hide()
-                --techTabBgRight = self.techTabCluster.Right
                 self.bgTechTabBody.Right:Set(self.techTabCluster.Right)
-            else
+            else -- we need the enhancement slot selector
                 self.techTabCluster:Hide()
                 self.enhancementTabCluster:Show()
-                --techTabBgRight = self.enhancementTabCluster.Right
                 self.bgTechTabBody.Right:Set(self.enhancementTabCluster.Right)
             end
-
-            -- Change our left cap texture to the tall tech tab version
-            Layouter(self.bgMainCapL)
+            Layouter(self.bgMainCapL) -- Change our left cap texture to the tall tech tab version
                 :Texture(textures.bgMainCapL_TechTab)
-                -- We get taller/wider, so we need to update our size
-                :DimensionsFromTexture(textures.bgMainCapL_TechTab)
-                -- Textures align differently (ouch) so we also need to adjust our offset
-                :AtBottomIn(self.bgMainCapR, -1)
+                :DimensionsFromTexture(textures.bgMainCapL_TechTab) -- We get taller/wider, so we need to update our size
+                :AtBottomIn(self.bgMainCapR, -1) -- Textures align differently (ouch) so we also need to adjust our offset
                 :AtLeftIn(self, 67)
-            -- Set the width of the tech tab background bitmap
-            --Layouter(self.bgTechTabBody)
-            --    :Right(techTabBgRight)
-            -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
-            Layouter(self.bgMainBody)
+            Layouter(self.bgMainBody) -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
                 :AnchorToRight(self.bgTechTabCapR)
-            -- Reanchor the construction tab, because the textures don't align properly otherwise
-            Layouter(self.constructionTabCluster)
+            Layouter(self.constructionTabCluster) -- Reanchor the construction tab, because the textures don't align properly otherwise
                 :AnchorToLeft(self.bgMainCapL, -7)
 
-        elseif key == 'selection' then
-            --LOG('background.lua/ConstructionPanel:TechTabLayout{ controlToAlignTo == nil')
-            -- Change our left cap texture to the short version
-            Layouter(self.bgMainCapL)
-                :Texture(textures.bgMainCapL)
-                -- We need to update our size, because we got shorter/narrower
-                :DimensionsFromTexture(textures.bgMainCapL)
-                :AtBottomIn(self.bgMainCapR)
-                :AtLeftIn(self, 69)
-            -- Anchor our main background to the left cap, bypassing the tech tab elements
-            Layouter(self.bgMainBody)
-                :AnchorToRight(self.bgMainCapL)
-            Layouter(self.constructionTabCluster)
-                :AnchorToLeft(self.bgMainCapL, -5)
-
-            -- Hide our tech tab elements
+        elseif key == 'selection' then -- Hide our tech tab elements and layout our background and selector clusters
             self.bgTechTabBody:Hide()
             self.bgTechTabCapR:Hide()
             self.techTabCluster:Hide()
             self.enhancementTabCluster:Hide()
+            Layouter(self.bgMainCapL) -- Change our left cap texture to the short version
+                :Texture(textures.bgMainCapL)
+                :DimensionsFromTexture(textures.bgMainCapL) -- We need to update our size, because we got shorter/narrower
+                :AtBottomIn(self.bgMainCapR)
+                :AtLeftIn(self, 69)
+            Layouter(self.bgMainBody) -- Anchor our main background to the left cap, bypassing the tech tab elements
+                :AnchorToRight(self.bgMainCapL)
+            Layouter(self.constructionTabCluster)
+                :AnchorToLeft(self.bgMainCapL, -5)
         end
     end,
 
@@ -235,17 +208,15 @@ ConstructionPanel = ClassUI(Group) {
     ---@param self ConstructionPanel
     BracketLayout = function(self)
         -- Brackets on the right side
-        Layouter(self.rightBracketLower)
+        Layouter(self.rightBracketLower) -- bottom
             :Texture(textures.rightBracketLower)
             :AtRightIn(self.bgMainCapR, -21)
             :AtTopIn(self.bgMainCapR, -6)
-
-        Layouter(self.rightBracketUpper)
+        Layouter(self.rightBracketUpper) -- upper
             :Texture(textures.rightBracketUpper)
             :AtRightIn(self.bgMainCapR, -21)
             :AtBottomIn(self.bgMainCapR, -5)
-
-        Layouter(self.rightBracketMiddle)
+        Layouter(self.rightBracketMiddle) -- middle that fills the gap
             :Texture(textures.rightBracketMiddle)
             :AtRightIn(self.bgMainCapR, -14)
             :Bottom(self.rightBracketUpper.Top)
@@ -264,7 +235,10 @@ ConstructionPanel = ClassUI(Group) {
         else
             if self:IsHidden() then
                 self:Show()
-                self:MorphLayout(self.lastKey or 'selection')
+                self.techTabCluster:SetSelection(nil)
+                self.enhancementTabCluster:SetSelection(nil)
+                self.constructionTabCluster:SetSelection('construction', true)
+                self.constructionTabCluster:EnableCheckboxes({construction = true, enhancement = true})
             end
         end
     end,
