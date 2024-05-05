@@ -1,0 +1,1 @@
+- (#6156) Mention that `OnAdjacentTo` only works for same-army structures in the annotation comment.
