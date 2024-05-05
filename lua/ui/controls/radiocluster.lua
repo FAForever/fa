@@ -32,12 +32,9 @@ RadioCluster = ClassUI(Group) {
     ---@param self RadioCluster
     ---@param parent Control
     ---@param checkboxes table<string, function> -- A table of checkboxes to create. The key is the name of the checkbox, the value is the Checkbox class.
-    ---@param SelectionCallback function -- A function to call when a checkbox is selected. The key of the selected checkbox is passed as an argument.
-    __init = function(self, parent, checkboxes, SelectionCallback)
+    __init = function(self, parent, checkboxes)
         Group.__init(self, parent)
 
-        -- Our callback function for when a checkbox is selected
-        self.SelectionCallback = SelectionCallback
         self.parent = parent
 
         -- Initialize our checkboxes 
@@ -47,7 +44,7 @@ RadioCluster = ClassUI(Group) {
             checkbox.key = key
             checkbox:UseAlphaHitTest(false)
             checkbox.OnClick = function(cbox, eventModifiers)
-                self:SetSelection(cbox.key)
+                self:SetSelectedCheckbox(cbox.key)
             end
             self.items[key] = checkbox
         end
@@ -57,23 +54,19 @@ RadioCluster = ClassUI(Group) {
 
     ---@param self RadioCluster
     Layout = function(self)
-        -- Override this
+        -- To be overriden by layout of inheriting class
     end,
 
-    ---Sets checkboxes and performs callback when a checkbox is selected
+    ---Sets checkboxes. For the internal state of the radio selector only.
     ---@param self RadioCluster
     ---@param selectedKey? string -- Key of selected checkbox. Pass nil to clear selection.
-    ---@param reset? boolean -- If true, the callback is called even if the selection is the same as the current selection.
-    SetSelection = function(self, selectedKey, reset)
+    SetSelectedCheckbox = function(self, selectedKey)
 
         LOG('RadioCluster:OnSelect('..tostring(selectedKey)..')')
-        if selectedKey == self.lastSelection and not reset then
+        if selectedKey == self.lastSelection then
             return
         end
         self.lastSelection = selectedKey
-        if selectedKey and self.SelectionCallback then
-            self.SelectionCallback(self.parent, selectedKey)
-        end
         for key, checkbox in self.items do
             if key ~= selectedKey then
                 checkbox:SetCheck(false, true)
@@ -81,6 +74,10 @@ RadioCluster = ClassUI(Group) {
                 checkbox:SetCheck(true, true)
             end
         end
+    end,
+
+    GetSelected = function(self)
+        return self.lastSelection
     end,
 
     ---@param self RadioCluster

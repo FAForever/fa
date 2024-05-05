@@ -22,43 +22,42 @@
 
 local RadioCluster = import('/lua/ui/controls/radiocluster.lua').RadioCluster
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Layouter = LayoutHelpers.ReusedLayoutFor
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
-local TechTabCheckboxes = {
-    t1 = Checkbox,
-    t2 = Checkbox,
-    t3 = Checkbox,
-    t4 = Checkbox,
-    templates = Checkbox,
+local EnhancementTabCheckboxClasses = {
+    LCH = Checkbox,
+    RCH = Checkbox,
+    Back = Checkbox,
 }
 
 --This is the function we'll add to our parent and call when we're clicked
-local OnTechTabSelected = function(self, key)
-    LOG('ConstructionPanel:OnTechTabSelection('..key..')')
+local OnEnhancementTabSelected = function(self, key)
+    LOG('ConstructionPanel:OnEnhancementTabSelection('..key..')')
 end
 
----@class TechTabCluster : RadioCluster
-TechTabCluster = ClassUI(RadioCluster) {
+---@class EnhancementTabCluster : RadioCluster
+EnhancementTabCluster = ClassUI(RadioCluster) {
 
     __init = function(self, parent)
-        RadioCluster.__init(self, parent, TechTabCheckboxes)
+        RadioCluster.__init(self, parent, EnhancementTabCheckboxClasses)
 
         parent:AddOnSelectionCallback(self, self.OnSelection)
-        parent.OnTechTabSelected = OnTechTabSelected
+        parent.OnEnhancementTabSelected = OnEnhancementTabSelected
 
-        import('/lua/ui/controls/construction/layouts/bottomMini/techtabcluster.lua').InitLayoutFunctions(self)
+        import('/lua/ui/controls/construction/layouts/bottomMini/enhancementtabcluster.lua').InitLayoutFunctions(self)
     end,
 
     SetSelectedCheckbox = function(self, selectedKey)
         RadioCluster.SetSelectedCheckbox(self, selectedKey)
         -- Only send our results back up to the parent if we're not hidden
-        if not self:IsHidden() then
-            self.parent:OnTechTabSelection(selectedKey)
+        if not self.IsHidden() then
+            self.parent:OnEnhancementTabSelection(selectedKey)
         end
     end,
 
-    ---For when the player has made a new selection and we need to update our construction UI
-    ---param self TechTabCluster
-    ---param data table
     OnSelection = function(self, data)
         LOG('TechTabCluster:OnSelection')
 
@@ -66,6 +65,6 @@ TechTabCluster = ClassUI(RadioCluster) {
         -- (enable/disable whatever tabs we have available based on the selected units)
 
         -- Hardcode for demo. This also updates the layout of the parent.
-        self:SetSelectedCheckbox('t1')
+        self:SetSelectedCheckbox('LCH')
     end,
 }

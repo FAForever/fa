@@ -27,82 +27,45 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Layouter = LayoutHelpers.ReusedLayoutFor
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
-local textures = {
-    leftBracketLower = SkinnableFile('/game/bracket-left-energy/bracket_bmp_t.dds'),
-    leftBracketUpper = SkinnableFile('/game/bracket-left-energy/bracket_bmp_b.dds'),
-    leftBracketMiddle = SkinnableFile('/game/bracket-left-energy/bracket_bmp_m.dds'),
-}
-
-local TabCheckboxClasses = {
+local TabCheckboxes = {
     construction = Checkbox,
     selection = Checkbox,
     enhancement = Checkbox,
 }
 
-local TabTexturePrefix = {
-    construction = '/game/construct-tab_btn/top_tab_btn_',
-    selection = '/game/construct-tab_btn/mid_tab_btn_',
-    enhancement = '/game/construct-tab_btn/bot_tab_btn_',
-}
-
-local function GetTabTextures(id)
-    if TabTexturePrefix[id] then
-        local pre = TabTexturePrefix[id]
-        return SkinnableFile(pre..'up_bmp.dds'),
-            SkinnableFile(pre..'sel_bmp.dds'),
-            SkinnableFile(pre..'over_bmp.dds'),
-            SkinnableFile(pre..'down_bmp.dds'),
-            SkinnableFile(pre..'dis_bmp.dds'),
-            SkinnableFile(pre..'dis_bmp.dds')
-    end
+local OnConstructionTabSelected = function(self, key)
+    LOG('ConstructionPanel:OnConstructionTabSelection('..key..')')
+    -- Apply our new tab layout
+    self:Layout(key)
 end
 
 ---@class ConstructionTabCluster : RadioCluster
 ConstructionTabCluster = ClassUI(RadioCluster) {
 
-    __init = function(self, parent, SelectionCallback)
-        RadioCluster.__init(self, parent, TabCheckboxClasses, SelectionCallback)
-        self.leftBracketLower = Bitmap(self)
-        self.leftBracketUpper = Bitmap(self)
-        self.leftBracketMiddle = Bitmap(self)
+    __init = function(self, parent)
+        RadioCluster.__init(self, parent, TabCheckboxes)
+
+        parent:AddOnSelectionCallback(self, self.OnSelection)
+        parent.OnConstructionTabSelected = OnConstructionTabSelected
+        import('/lua/ui/controls/construction/layouts/bottomMini/constructiontabcluster.lua').InitLayoutFunctions(self)
     end,
 
-    ---We need to determine our size based on the size of our children, then layout
-    OnLayout = function(self)
-
-        local maxWidth = 0
-        local totalHeight = 0
-        for key, item in self.items do
-            self.items[key]:SetNewTextures(GetTabTextures(key))
-            maxWidth = math.max(maxWidth, item.Width())
-            totalHeight = totalHeight + item.Height()
+    SetSelectedCheckbox = function(self, selectedKey)
+        RadioCluster.SetSelectedCheckbox(self, selectedKey)
+        -- Only send our results back up to the parent if we're not hidden
+        if not self:IsHidden() then
+            self.parent:OnConstructionTabSelected(selectedKey)
         end
-        LayoutHelpers.SetDimensions(self, maxWidth, totalHeight - 32)
     end,
 
-    Layout = function(self)
+    OnSelection = function(self, data)
+        LOG('ConstructionTabCluster:OnSelection')
 
-        Layouter(self.items.construction)
-            :AtLeftTopIn(self)
-        Layouter(self.items.selection)
-            :Below(self.items.construction, -16)
-        Layouter(self.items.enhancement)
-            :Below(self.items.selection, -16)
+        -- Process our OnSelectionDataTable here and do stuff
+        -- (enable/disable whatever tabs we have available based on the selected units)
 
-        Layouter(self.leftBracketLower)
-            :Texture(textures.leftBracketLower)
-            :AtLeftTopIn(self, 4, 7)
-
-        Layouter(self.leftBracketUpper)
-            :Texture(textures.leftBracketUpper)
-            :AtLeftIn(self.leftBracketLower)
-            :AtBottomIn(self, 8)
-
-        Layouter(self.leftBracketMiddle)
-            :Texture(textures.leftBracketMiddle)
-            :AtLeftIn(self.leftBracketLower)
-            :Bottom(self.leftBracketUpper.Top)
-            :Top(self.leftBracketLower.Bottom)
-
+        -- Hardcode for demo. This also updates the layout of the parent.
+        self:SetSelectedCheckbox('construction')
     end,
+
 }
