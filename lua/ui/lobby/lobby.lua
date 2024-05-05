@@ -5250,7 +5250,7 @@ local MessageHandlers = {
                     return false
                 end
 
-                if string.len(data.PlayerOptions.PlayerClan) > 3 then
+                if string.len(data.PlayerOptions.PlayerClan) > 6 then
                     return false
                 end
             end
