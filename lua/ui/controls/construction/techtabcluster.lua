@@ -22,37 +22,58 @@
 
 local RadioCluster = import('/lua/ui/controls/radiocluster.lua').RadioCluster
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+local TableGetn = table.getn
+local TableInsert = table.insert
 
-local TechTabCheckboxes = {
-    t1 = Checkbox,
-    t2 = Checkbox,
-    t3 = Checkbox,
-    t4 = Checkbox,
-    templates = Checkbox,
+-- Empty for now, we'll fill it with an ordered list of classes on init
+local TechTabCheckboxes = {}
+
+TabSubSets = {
+    construction = {
+        'tech1',
+        'tech2',
+        'tech3',
+        'tech4',
+        'templates',
+    },
+    enhancement = {
+        'LCH',
+        'RCH',
+        'Back',
+    }
 }
-
---This is the function we'll add to our parent and call when we're clicked
-local OnTechTabSelected = function(self, key)
-    LOG('ConstructionPanel:OnTechTabSelection('..key..')')
-end
 
 ---@class TechTabCluster : RadioCluster
 TechTabCluster = ClassUI(RadioCluster) {
 
     __init = function(self, parent)
-        RadioCluster.__init(self, parent, TechTabCheckboxes)
 
+        -- We''ll need to find the longest subset to use as our max length for setting up the cluster
+        local longestSubset
+        for key, table in TabSubSets do
+            if not longestSubset or TableGetn(table) > TableGetn(longestSubset) then
+                longestSubset = table
+            end
+        end
+
+        -- Right now this is hardcoded to use checkboxes, but flexibility otherwise isn't necessary at this point
+        for i=1,TableGetn(longestSubset) do
+            TableInsert(TechTabCheckboxes, Checkbox)
+        end
+
+        -- Call our RadioCluster constructor with our new list of checkboxes
+        RadioCluster.__init(self, parent, TechTabCheckboxes)
         parent:AddOnSelectionCallback(self, self.OnSelection)
-        parent.OnTechTabSelected = OnTechTabSelected
 
         import('/lua/ui/controls/construction/layouts/bottomMini/techtabcluster.lua').InitLayoutFunctions(self)
+        self:SetSubset(longestSubset)
     end,
 
     SetSelectedCheckbox = function(self, selectedKey)
         RadioCluster.SetSelectedCheckbox(self, selectedKey)
         -- Only send our results back up to the parent if we're not hidden
-        if not self:IsHidden() then
-            self.parent:OnTechTabSelection(selectedKey)
+        if not self:IsHidden() and selectedKey ~= self.parent.LastTechTabKey then
+            self.parent:OnTechTabChanged(selectedKey)
         end
     end,
 
@@ -65,7 +86,22 @@ TechTabCluster = ClassUI(RadioCluster) {
         -- Process our OnSelectionDataTable here and do stuff
         -- (enable/disable whatever tabs we have available based on the selected units)
 
-        -- Hardcode for demo. This also updates the layout of the parent.
-        self:SetSelectedCheckbox('t1')
+        -- Hardcode for demo(?)
+        self:SetSelectedCheckbox(1)
     end,
+
+    ---Set the subset of tabs to display
+    SetSubset = function(self, subset)
+        if type(subset) == 'string' then
+            subset = TabSubSets[subset]
+        end
+        for i, item in self.items do
+            if subset[i] then
+                item.key = subset[i]
+            else
+                item.key = nil
+            end
+        end
+        self:OnLayout()
+    end
 }

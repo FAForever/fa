@@ -33,12 +33,6 @@ local TabCheckboxes = {
     enhancement = Checkbox,
 }
 
-local OnConstructionTabSelected = function(self, key)
-    LOG('ConstructionPanel:OnConstructionTabSelection('..key..')')
-    -- Apply our new tab layout
-    self:Layout(key)
-end
-
 ---@class ConstructionTabCluster : RadioCluster
 ConstructionTabCluster = ClassUI(RadioCluster) {
 
@@ -46,7 +40,6 @@ ConstructionTabCluster = ClassUI(RadioCluster) {
         RadioCluster.__init(self, parent, TabCheckboxes)
 
         parent:AddOnSelectionCallback(self, self.OnSelection)
-        parent.OnConstructionTabSelected = OnConstructionTabSelected
         import('/lua/ui/controls/construction/layouts/bottomMini/constructiontabcluster.lua').InitLayoutFunctions(self)
     end,
 
@@ -54,7 +47,7 @@ ConstructionTabCluster = ClassUI(RadioCluster) {
         RadioCluster.SetSelectedCheckbox(self, selectedKey)
         -- Only send our results back up to the parent if we're not hidden
         if not self:IsHidden() then
-            self.parent:OnConstructionTabSelected(selectedKey)
+            self.parent:OnConstructionTabChanged(selectedKey)
         end
     end,
 

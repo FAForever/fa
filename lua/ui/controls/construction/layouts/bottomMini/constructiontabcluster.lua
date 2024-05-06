@@ -57,7 +57,7 @@ InitLayoutFunctions = function(control)
 end
 
 ---We need to determine our size based on the size of our children, then layout
-local OnLayout = function(self)
+OnLayout = function(self)
 
     if not self.leftBracketLower then self.leftBracketLower = Bitmap(self) end
     if not self.leftBracketUpper then self.leftBracketUpper = Bitmap(self) end
@@ -73,7 +73,7 @@ local OnLayout = function(self)
     LayoutHelpers.SetDimensions(self, maxWidth, totalHeight - 32)
 end
 
-local Layout = function(self)
+Layout = function(self)
 
     Layouter(self.items.construction)
         :AtLeftTopIn(self)

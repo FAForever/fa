@@ -24,7 +24,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ConstructionTabCluster = import('/lua/ui/controls/construction/constructiontabcluster.lua').ConstructionTabCluster
 local TechTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua').TechTabCluster
-local EnhancementTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua').EnhancementTabCluster
+local EnhancementTabCluster = import('/lua/ui/controls/construction/enhancementtabcluster.lua').EnhancementTabCluster
 
 -- We only have one selection, so we only need one of these
 local selectionDataTable = {}
@@ -40,14 +40,14 @@ ConstructionPanel = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
 
+        self.OnSelectionCallbacks = {}
+
         -- These are our functional button groups
         -- The callback passed to these radio button clusters will
         -- be called with (cluster.parent, selectedKey) as parameters
         self.constructionTabCluster = ConstructionTabCluster(self)
         self.techTabCluster = TechTabCluster(self)
-        self.enhancementTabCluster = EnhancementTabCluster(self)
-
-        self.OnSelectionCallbacks = {}
+        --self.enhancementTabCluster = EnhancementTabCluster(self)
 
         -- Right now the specific layout is hardcoded, but that can change obviously
         import('/lua/ui/controls/construction/layouts/bottomMini/constructionpanel.lua').InitLayoutFunctions(self)
@@ -67,14 +67,22 @@ ConstructionPanel = ClassUI(Group) {
     subLayouts = nil, -- Defined by layouter
     ----------------------------------------------------------------------------------------------------------------
 
-    ----------------------------------------------------------------------------------------------------------------
-    -- These methods should only be overriden by their respective sub element, and are shown here for readability
-    PauseToggle = function(self, pause) WARN('ConstructionPanel:PauseToggle called but not overriden!') end,
-    RepeatBuildToggle = function(self, repeatBuild) WARN('ConstructionPanel:RepeatBuildToggle called but not overriden!') end,
-    OnConstructionTabSelected = function(self, key) WARN('ConstructionPanel:OnConstructionTabSelected called but not overriden!') end,
-    OnTechTabSelected = function(self, key) WARN('ConstructionPanel:OnTechTabSelected called but not overriden!') end,
-    OnEnhancementTabSelected = function(self, key) LOG('ConstructionPanel:OnEnhancementTabSelected called but not overriden!') end,
-    ----------------------------------------------------------------------------------------------------------------
+    ---Called by the pause button when it's clicked
+    OnPauseButtonClicked = function(self, pause)
+    end,
+
+    ---Called by the repeat build button when it's clicked
+    OnRepeatBuildButtonClicked = function(self, repeatBuild)
+    end,
+
+    ---Called by the construction tab when a change is made
+    OnConstructionTabChanged = function(self, key)
+        self:Layout(key)
+    end,
+
+    ---Called by the tech/enchancement tab when a change is made
+    OnTechTabChanged = function(self, key)
+    end,
 
     ---A method for any interested elements to get a callback called when selection is changed (UI side, so tables as keys is ok?)
     AddOnSelectionCallback = function(self, element, Callback)
@@ -93,11 +101,10 @@ ConstructionPanel = ClassUI(Group) {
             return
         end
         self:Show()
-        LOG('ConstructionPanel:OnSelection')
         selectionDataTable.noUnitsSelected = noUnitsSelected
         -- We'll assume(!) that OnSelectionCallbacks are only relevant when the panel is shown
         for element, OnSelectionCallback in self.OnSelectionCallbacks do
-            element:OnSelectionCallback(selectionDataTable)
+            OnSelectionCallback(element, selectionDataTable)
         end
     end,
 }

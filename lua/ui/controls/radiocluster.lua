@@ -62,13 +62,20 @@ RadioCluster = ClassUI(Group) {
     ---@param selectedKey? string -- Key of selected checkbox. Pass nil to clear selection.
     SetSelectedCheckbox = function(self, selectedKey)
 
+        -- If we're given an index, convert it to a string key
+        if type(selectedKey) == 'number' then
+            if self.items[selectedKey] then
+                selectedKey = self.items[selectedKey].key
+            end
+        end
+
         LOG('RadioCluster:OnSelect('..tostring(selectedKey)..')')
         if selectedKey == self.lastSelection then
             return
         end
         self.lastSelection = selectedKey
         for key, checkbox in self.items do
-            if key ~= selectedKey then
+            if checkbox.key ~= selectedKey then
                 checkbox:SetCheck(false, true)
             else
                 checkbox:SetCheck(true, true)
@@ -84,8 +91,8 @@ RadioCluster = ClassUI(Group) {
     ---@param keys? table<string, boolean>|boolean -- Hash table of checkboxes to enable. If false, all checkboxes are disabled. If nil, all checkboxes are enabled.
     EnableCheckboxes = function(self, keys)
         if keys then
-            for key, checkbox in self.items do
-                if keys[key] then
+            for _, checkbox in self.items do
+                if keys[checkbox.key] then
                     checkbox:Enable()
                 else
                     checkbox:Disable()

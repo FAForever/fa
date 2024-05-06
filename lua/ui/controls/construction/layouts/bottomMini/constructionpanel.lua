@@ -62,21 +62,7 @@ local textures = {
 ---@field rightBracketMiddle Bitmap
 ---@field subLayouts table<string, function>
 
--- Calling this applies the Layout functions in this file to the given control
--- It adds the OnLayout and Layout functions, and the SubLayout table
-InitLayoutFunctions = function(control)
-    control.OnLayout = OnLayout
-    control.Layout = Layout
-    control.subLayouts = subLayouts
-end
-
-local subLayouts = {
-    construction = ConstructionTabLayout,
-    selection = SelectionTabLayout,
-    enhancement = EnhancementTabLayout
-}
-
-local OnLayout = function(self)
+OnLayout = function(self)
 
     -- Because these are visual elements that don't interact outside
     -- of the layout, we can initialize them here if they are not already
@@ -96,19 +82,15 @@ local OnLayout = function(self)
         WARN('layouts/bottomMini/constructionpanel.lua Layout: ConstructionTabCluster not initialized!')
     end
     
-    if not self.selectionTabCluster then
-        WARN('layouts/bottomMini/constructionpanel.lua Layout: SelectionTabCluster not initialized!')
-    end
-
-    if not self.enhancementTabCluster then
-        WARN('layouts/bottomMini/constructionpanel.lua Layout: EnhancementTabCluster not initialized!')
+    if not self.techTabCluster then
+        WARN('layouts/bottomMini/constructionpanel.lua Layout: TechTabCluster not initialized!')
     end
 end
 
 ---comment
 ---@param self ConstructionPanel
 ---@param key? string -- Pass a key here to apply a layout from the SubLayout table instead (the main layout function is skipped)
-local Layout = function(self, key)
+Layout = function(self, key)
 
     LOG('background.lua/ConstructionPanel:Layout')
 
@@ -167,34 +149,16 @@ local Layout = function(self, key)
     Layouter(self.techTabCluster)
         :RightOf(self.bgMainCapL)
         :End()
-    Layouter(self.enhancementTabCluster)
-        :RightOf(self.bgMainCapL)
-        :End()
 end
 
-local ConstructionTabLayout = function(self)
+TechTabLayout = function(self)
 
     -- Hide and show the elements need/don't need
     self.bgTechTabBody:Show()
     self.bgTechTabCapR:Show()
     self.techTabCluster:Show()
-    self.enhancementTabCluster:Hide()
     self.bgTechTabBody.Right:Set(self.techTabCluster.Right)
 
-    ExpandedTechTabBgLayout(self)
-end
-
-local EnhancementTabLayout = function(self)
-    self.bgTechTabBody:Show()
-    self.bgTechTabBody:Show()
-    self.enhancementTabCluster:Show()
-    self.techTabCluster:Hide()
-    self.bgTechTabBody.Right:Set(self.enhancementTabCluster.Right)
-
-    ExpandedTechTabBgLayout(self)
-end
-
-local ExpandedTechTabBgLayout = function(self)
     Layouter(self.bgMainCapL) -- Change our left cap texture to the tall tech tab version
         :Texture(textures.bgMainCapL_TechTab)
         :DimensionsFromTexture(textures.bgMainCapL_TechTab) -- We get taller/wider, so we need to update our size
@@ -206,11 +170,10 @@ local ExpandedTechTabBgLayout = function(self)
         :AnchorToLeft(self.bgMainCapL, -7)
 end
 
-local SelectionTabLayout = function(self)
+NoTechTabLayout = function(self)
     self.bgTechTabBody:Hide()
     self.bgTechTabCapR:Hide()
     self.techTabCluster:Hide()
-    self.enhancementTabCluster:Hide()
 
     -- This is the inverse of ExpandedTechTabBgLayout, but we only need it once
     Layouter(self.bgMainCapL) -- Change our left cap texture to the short version
@@ -222,4 +185,20 @@ local SelectionTabLayout = function(self)
         :AnchorToRight(self.bgMainCapL)
     Layouter(self.constructionTabCluster)
         :AnchorToLeft(self.bgMainCapL, -5)
+end
+
+local subLayouts = {
+    construction = TechTabLayout,
+    selection = NoTechTabLayout,
+    enhancement = TechTabLayout,
+}
+
+-- Calling this applies the Layout functions in this file to the given control
+-- It adds the OnLayout and Layout functions, and the SubLayout table
+InitLayoutFunctions = function(control)
+
+    control.OnLayout = OnLayout
+    control.Layout = Layout
+    control.subLayouts = subLayouts
+
 end
