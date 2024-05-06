@@ -77,6 +77,12 @@ TechTabCluster = ClassUI(RadioCluster) {
         end
     end,
 
+    Show = function(self)
+        for _, item in self.items do
+            if item.key then item:Show() end
+        end
+    end,
+
     ---For when the player has made a new selection and we need to update our construction UI
     ---param self TechTabCluster
     ---param data table
@@ -94,6 +100,9 @@ TechTabCluster = ClassUI(RadioCluster) {
     SetSubset = function(self, subset)
         if type(subset) == 'string' then
             subset = TabSubSets[subset]
+            if not subset then
+                return
+            end
         end
         for i, item in self.items do
             if subset[i] then

@@ -24,7 +24,6 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ConstructionTabCluster = import('/lua/ui/controls/construction/constructiontabcluster.lua').ConstructionTabCluster
 local TechTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua').TechTabCluster
-local EnhancementTabCluster = import('/lua/ui/controls/construction/enhancementtabcluster.lua').EnhancementTabCluster
 
 -- We only have one selection, so we only need one of these
 local selectionDataTable = {}
@@ -32,7 +31,6 @@ local selectionDataTable = {}
 ---@class ConstructionPanel: Group
 ---@field constructionTabCluster ConstructionTabCluster
 ---@field techTabCluster TechTabCluster
----@field enhancementTabCluster EnhancementTabCluster
 ---@field OnSelectionCallbacks table<Control, function>
 ---@field selectionDataTable table
 ConstructionPanel = ClassUI(Group) {
@@ -47,6 +45,7 @@ ConstructionPanel = ClassUI(Group) {
         -- be called with (cluster.parent, selectedKey) as parameters
         self.constructionTabCluster = ConstructionTabCluster(self)
         self.techTabCluster = TechTabCluster(self)
+        self.selectionDataTable = selectionDataTable
         --self.enhancementTabCluster = EnhancementTabCluster(self)
 
         -- Right now the specific layout is hardcoded, but that can change obviously
@@ -77,6 +76,7 @@ ConstructionPanel = ClassUI(Group) {
 
     ---Called by the construction tab when a change is made
     OnConstructionTabChanged = function(self, key)
+        self.techTabCluster:SetSubset(key)
         self:Layout(key)
     end,
 
@@ -101,10 +101,10 @@ ConstructionPanel = ClassUI(Group) {
             return
         end
         self:Show()
-        selectionDataTable.noUnitsSelected = noUnitsSelected
+        self.selectionDataTable.noUnitsSelected = noUnitsSelected
         -- We'll assume(!) that OnSelectionCallbacks are only relevant when the panel is shown
         for element, OnSelectionCallback in self.OnSelectionCallbacks do
-            OnSelectionCallback(element, selectionDataTable)
+            OnSelectionCallback(element, self.selectionDataTable)
         end
     end,
 }
