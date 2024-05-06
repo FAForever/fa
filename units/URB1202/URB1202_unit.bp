@@ -92,7 +92,6 @@ UnitBlueprint{
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
