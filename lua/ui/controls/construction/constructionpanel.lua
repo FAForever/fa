@@ -87,11 +87,12 @@ ConstructionPanel = ClassUI(Group) {
         LOG('ConstructionPanel:OnPauseButtonChecked('..tostring(pause)..')')
     end,
 
-    ---Called by the combo repeat build/template button when it's clicked
+    ---Called by the combo repeat build button when it's clicked
     OnRepeatBuildButtonChecked = function(self, repeatBuild)
         LOG('ConstructionPanel:OnRepeatBuildButtonChecked('..tostring(repeatBuild)..')')
     end,
 
+    ---Called by the template button when it's clicked
     OnTemplateButtonClicked = function(self, modifiers)
         LOG('ConstructionPanel:OnTemplateButtonClicked()')
     end,
