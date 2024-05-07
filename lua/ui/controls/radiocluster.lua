@@ -62,14 +62,15 @@ RadioCluster = ClassUI(Group) {
     ---@param selectedKey? string -- Key of selected checkbox. Pass nil to clear selection.
     SetSelectedCheckbox = function(self, selectedKey)
 
-        -- If we're given an index, convert it to a string key
+        -- If we're given a numerical index, convert it to a string key
         if type(selectedKey) == 'number' then
             if self.items[selectedKey] then
                 selectedKey = self.items[selectedKey].key
+            else
+                WARN('RadioCluster:SetSelectedCheckbox() - Invalid index: ' .. selectedKey)
             end
         end
 
-        LOG('RadioCluster:OnSelect('..tostring(selectedKey)..')')
         if selectedKey == self.lastSelection then
             return
         end

@@ -87,7 +87,6 @@ TechTabCluster = ClassUI(RadioCluster) {
     ---param self TechTabCluster
     ---param data table
     OnSelection = function(self, data)
-        LOG('TechTabCluster:OnSelection')
 
         -- Process our OnSelectionDataTable here and do stuff
         -- (enable/disable whatever tabs we have available based on the selected units)

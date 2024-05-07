@@ -150,8 +150,6 @@ end
 ---@param key? string -- Pass a key here to apply a layout from the SubLayout table instead (the main layout function is skipped)
 Layout = function(self, key)
 
-    LOG('background.lua/ConstructionPanel:Layout')
-
     -- SubLayout check, will skip if key is nil
     if self.subLayouts and self.subLayouts[key] then
         self.subLayouts[key](self)

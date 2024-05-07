@@ -178,7 +178,6 @@ Checkbox = ClassUI(Bitmap) {
 IconCheckbox = Class(Checkbox) {
 
     SetIconTextures = function(self, iconEnabled, iconDisabled)
-        LOG('IconCheckbox:SetIconTextures('..tostring(iconEnabled)..', '..tostring(iconDisabled)..')')
         if iconEnabled and iconDisabled then
             self.iconEnabled = iconEnabled
             self.iconDisabled = iconDisabled
