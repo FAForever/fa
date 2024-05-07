@@ -37,7 +37,7 @@ local SkinnableFile = import('/lua/ui/uiutil.lua').SkinnableFile
 
 --------------------------------------------------------------------------------
 
-local textures = {
+local bgTextures = {
     bgMainBody = SkinnableFile('/game/construct-panel/construct-panel_bmp_m3.dds'),
     bgMainCapL = SkinnableFile('/game/construct-panel/construct-panel_s_bmp_l.dds'),
     bgMainCapL_TechTab = SkinnableFile('/game/construct-panel/construct-panel_bmp_l.dds'),
@@ -51,6 +51,52 @@ local textures = {
     rightBracketMiddle = SkinnableFile('/game/bracket-right/bracket_bmp_m.dds'),
 }
 
+local buttonTexturePrefix = {
+    mid = '/game/construct-sm_btn/mid_btn_',
+    left = '/game/construct-sm_btn/left_btn_',
+    right = '/game/construct-sm_btn/right_btn_',
+}
+
+local buttonTextures = {
+    middle = {
+        up = SkinnableFile('/game/construct-sm_btn/mid_btn_up.dds'),
+        selected = SkinnableFile('/game/construct-sm_btn/mid_btn_selected.dds'),
+        down = SkinnableFile('/game/construct-sm_btn/mid_btn_over.dds'),
+        over = SkinnableFile('/game/construct-sm_btn/mid_btn_over.dds'),
+        dis = SkinnableFile('/game/construct-sm_btn/mid_btn_dis.dds')
+    },
+    left = {
+        up = SkinnableFile('/game/construct-sm_btn/left_btn_up.dds'),
+        down = SkinnableFile('/game/construct-sm_btn/left_btn_over.dds'),
+        over = SkinnableFile('/game/construct-sm_btn/left_btn_over.dds'),
+        dis = SkinnableFile('/game/construct-sm_btn/left_btn_dis.dds')
+    },
+    right = {
+        up = SkinnableFile('/game/construct-sm_btn/right_btn_up.dds'),
+        down = SkinnableFile('/game/construct-sm_btn/right_btn_over.dds'),
+        over = SkinnableFile('/game/construct-sm_btn/right_btn_over.dds'),
+        dis = SkinnableFile('/game/construct-sm_btn/right_btn_dis.dds')
+    },
+}
+
+local iconTextures = {
+    repeatBuild = '/game/construct-sm_btn/infinite_',
+    pause = '/game/construct-sm_btn/pause_',
+    template = '/game/construct-sm_btn/template_',
+    back = '/game/construct-sm_btn/back_',
+    forward = '/game/construct-sm_btn/forward_',
+    skipBack = '/game/construct-sm_btn/rewind_',
+    skipForward = '/game/construct-sm_btn/fforward_',
+}
+
+local GetIconTextures = function(iconId)
+    if iconTextures[iconId] then
+        local pre = iconTextures[iconId]
+        return SkinnableFile(pre..'on.dds'),
+            SkinnableFile(pre..'off.dds')
+    end
+end
+
 ---@class ConstructionPanel
 ---@field bgMainBody Bitmap
 ---@field bgMainCapL Bitmap
@@ -61,6 +107,18 @@ local textures = {
 ---@field rightBracketUpper Bitmap
 ---@field rightBracketMiddle Bitmap
 ---@field subLayouts table<string, function>
+
+local subLayouts
+
+-- Calling this applies the Layout functions in this file to the given control
+-- It adds the OnLayout and Layout functions, and the SubLayout table
+InitLayoutFunctions = function(control)
+
+    control.OnLayout = OnLayout
+    control.Layout = Layout
+    control.subLayouts = subLayouts
+
+end
 
 OnLayout = function(self)
 
@@ -104,50 +162,65 @@ Layout = function(self, key)
 
     -- Initial layout and texture setup
     Layouter(self.bgMainCapR)
-        :Texture(textures.bgMainCapR)
+        :Texture(bgTextures.bgMainCapR)
         :AtRightBottomIn(self, 2, 5)
 
     Layouter(self.bgMainCapL)
-        :Texture(textures.bgMainCapL)
+        :Texture(bgTextures.bgMainCapL)
         :AtLeftIn(self, 69)
         :AtBottomIn(self.bgMainCapR)
 
     Layouter(self.bgTechTabBody)
-        :Texture(textures.bgTechTabBody)
+        :Texture(bgTextures.bgTechTabBody)
         :AnchorToRight(self.bgMainCapL)
         :FillVertically(self.bgMainCapL)
 
     Layouter(self.bgTechTabCapR)
-        :Texture(textures.bgTechTabCapR)
+        :Texture(bgTextures.bgTechTabCapR)
         :RightOf(self.bgTechTabBody)
 
     Layouter(self.bgMainBody)
-        :Texture(textures.bgMainBody)
+        :Texture(bgTextures.bgMainBody)
         :AnchorToRight(self.bgTechTabCapR)
         :AnchorToLeft(self.bgMainCapR)
         :FillVertically(self.bgMainCapR)
 
     -- Brackets on the right side
     Layouter(self.rightBracketLower) -- bottom
-        :Texture(textures.rightBracketLower)
+        :Texture(bgTextures.rightBracketLower)
         :AtRightIn(self.bgMainCapR, -21)
         :AtTopIn(self.bgMainCapR, -6)
     Layouter(self.rightBracketUpper) -- upper
-        :Texture(textures.rightBracketUpper)
+        :Texture(bgTextures.rightBracketUpper)
         :AtRightIn(self.bgMainCapR, -21)
         :AtBottomIn(self.bgMainCapR, -5)
     Layouter(self.rightBracketMiddle) -- middle that fills the gap
-        :Texture(textures.rightBracketMiddle)
+        :Texture(bgTextures.rightBracketMiddle)
         :AtRightIn(self.bgMainCapR, -14)
         :Bottom(self.rightBracketUpper.Top)
         :Top(self.rightBracketLower.Bottom)
 
+    -- Layout the construction and tech tab selector clusters
     Layouter(self.constructionTabCluster)
         :AnchorToLeft(self.bgMainCapL, -7)
         :AtBottomIn(self.bgMainBody, -11)
         :End()
     Layouter(self.techTabCluster)
         :RightOf(self.bgMainCapL)
+        :End()
+
+    -- Layout the pause and repeat build buttons
+    local txtr = buttonTextures.middle
+    self.repeatBuildTemplateButton:SetNewTextures(txtr.up, txtr.selected, txtr.over, txtr.over, txtr.dis, txtr.dis)
+    self.repeatBuildTemplateButton:SetIconTextures(GetIconTextures('repeatBuild'))
+    Layouter(self.repeatBuildTemplateButton)
+        :AtLeftTopIn(self, 79, 31)
+        :End()
+    
+    self.pauseButton:SetNewTextures(txtr.up, txtr.selected, txtr.over, txtr.over, txtr.dis, txtr.dis)
+    self.pauseButton:SetIconTextures(GetIconTextures('pause'))
+    Layouter(self.pauseButton)
+        :Below(self.repeatBuildTemplateButton, 5)
         :End()
 end
 
@@ -160,8 +233,8 @@ TechTabLayout = function(self)
     self.bgTechTabBody.Right:Set(self.techTabCluster.Right)
 
     Layouter(self.bgMainCapL) -- Change our left cap texture to the tall tech tab version
-        :Texture(textures.bgMainCapL_TechTab)
-        :DimensionsFromTexture(textures.bgMainCapL_TechTab) -- We get taller/wider, so we need to update our size
+        :Texture(bgTextures.bgMainCapL_TechTab)
+        :DimensionsFromTexture(bgTextures.bgMainCapL_TechTab) -- We get taller/wider, so we need to update our size
         :AtBottomIn(self.bgMainCapR, -1) -- Textures align differently (ouch) so we also need to adjust our offset
         :AtLeftIn(self, 67)
     Layouter(self.bgMainBody) -- Anchor the left edge of our main background, to end of the cap, on the right of the tech tab
@@ -177,8 +250,8 @@ NoTechTabLayout = function(self)
 
     -- This is the inverse of ExpandedTechTabBgLayout, but we only need it once
     Layouter(self.bgMainCapL) -- Change our left cap texture to the short version
-        :Texture(textures.bgMainCapL)
-        :DimensionsFromTexture(textures.bgMainCapL) -- We need to update our size, because we got shorter/narrower
+        :Texture(bgTextures.bgMainCapL)
+        :DimensionsFromTexture(bgTextures.bgMainCapL) -- We need to update our size, because we got shorter/narrower
         :AtBottomIn(self.bgMainCapR)
         :AtLeftIn(self, 69)
     Layouter(self.bgMainBody) -- Anchor our main background to the left cap, bypassing the tech tab elements
@@ -187,18 +260,26 @@ NoTechTabLayout = function(self)
         :AnchorToLeft(self.bgMainCapL, -5)
 end
 
-local subLayouts = {
-    construction = TechTabLayout,
-    selection = NoTechTabLayout,
-    enhancement = TechTabLayout,
-}
-
--- Calling this applies the Layout functions in this file to the given control
--- It adds the OnLayout and Layout functions, and the SubLayout table
-InitLayoutFunctions = function(control)
-
-    control.OnLayout = OnLayout
-    control.Layout = Layout
-    control.subLayouts = subLayouts
-
+ConstructionTabLayout = function(self)
+    self.repeatBuildTemplateButton:Enable()
+    self.repeatBuildTemplateButton:SetIconTextures(GetIconTextures('repeatBuild'))
+    TechTabLayout(self)
 end
+
+SelectionTabLayout = function(self)
+    self.repeatBuildTemplateButton:Enable()
+    self.repeatBuildTemplateButton:SetIconTextures(GetIconTextures('template'))
+    NoTechTabLayout(self)
+end
+
+EnhancementTabLayout = function(self)
+    self.repeatBuildTemplateButton:Disable()
+    self.repeatBuildTemplateButton:SetIconTextures()
+    TechTabLayout(self)
+end
+
+subLayouts = {
+    construction = ConstructionTabLayout,
+    selection = SelectionTabLayout,
+    enhancement = EnhancementTabLayout,
+}

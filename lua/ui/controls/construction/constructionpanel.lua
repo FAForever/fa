@@ -22,6 +22,8 @@
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local IconButton = import('/lua/maui/button.lua').IconButton
+local IconCheckbox = import('/lua/maui/checkbox.lua').IconCheckbox
 local ConstructionTabCluster = import('/lua/ui/controls/construction/constructiontabcluster.lua').ConstructionTabCluster
 local TechTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua').TechTabCluster
 
@@ -29,10 +31,12 @@ local TechTabCluster = import('/lua/ui/controls/construction/techtabcluster.lua'
 local selectionDataTable = {}
 
 ---@class ConstructionPanel: Group
----@field constructionTabCluster ConstructionTabCluster
----@field techTabCluster TechTabCluster
 ---@field OnSelectionCallbacks table<Control, function>
 ---@field selectionDataTable table
+---@field constructionTabCluster ConstructionTabCluster
+---@field techTabCluster TechTabCluster
+---@field pauseButton IconCheckbox
+---@field repeatBuildTemplateButton IconCheckbox
 ConstructionPanel = ClassUI(Group) {
 
     __init = function(self, parent)
@@ -46,7 +50,15 @@ ConstructionPanel = ClassUI(Group) {
         self.constructionTabCluster = ConstructionTabCluster(self)
         self.techTabCluster = TechTabCluster(self)
         self.selectionDataTable = selectionDataTable
-        --self.enhancementTabCluster = EnhancementTabCluster(self)
+
+        self.pauseButton = IconCheckbox(self)
+        self.pauseButton.OnCheck = function(checkbox, checked)
+            self:OnPauseButtonChecked(checked)
+        end
+        self.repeatBuildTemplateButton = IconCheckbox(self)
+        self.repeatBuildTemplateButton.OnCheck = function(checkbox, checked)
+            self:OnRepeatBuildTemplateButtonChecked(checked, checkbox.key)
+        end
 
         -- Right now the specific layout is hardcoded, but that can change obviously
         import('/lua/ui/controls/construction/layouts/bottomMini/constructionpanel.lua').InitLayoutFunctions(self)
@@ -67,21 +79,25 @@ ConstructionPanel = ClassUI(Group) {
     ----------------------------------------------------------------------------------------------------------------
 
     ---Called by the pause button when it's clicked
-    OnPauseButtonClicked = function(self, pause)
+    OnPauseButtonChecked = function(self, pause)
+        LOG('ConstructionPanel:OnPauseButtonClicked('..tostring(pause)..')')
     end,
 
     ---Called by the repeat build button when it's clicked
-    OnRepeatBuildButtonClicked = function(self, repeatBuild)
+    OnRepeatBuildTemplateButtonChecked = function(self, repeatBuild)
+        LOG('ConstructionPanel:OnRepeatBuildButtonClicked('..tostring(repeatBuild)..')')
     end,
 
     ---Called by the construction tab when a change is made
     OnConstructionTabChanged = function(self, key)
+        LOG('ConstructionPanel:OnConstructionTabChanged('..tostring(key)..')')
         self.techTabCluster:SetSubset(key)
         self:Layout(key)
     end,
 
     ---Called by the tech/enchancement tab when a change is made
     OnTechTabChanged = function(self, key)
+        LOG('ConstructionPanel:OnTechTabChanged('..tostring(key)..')')
     end,
 
     ---A method for any interested elements to get a callback called when selection is changed (UI side, so tables as keys is ok?)
