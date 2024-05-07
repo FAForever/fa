@@ -56,6 +56,12 @@ function updatePlayerName(line)
         playerClan = ""
     end
 
+    if playerDivision then
+        playerDivision = ' [' .. (playerDivision:gsub("^[^u]", string.upper)) .. ']'
+    else
+        playerDivision = ""
+    end
+
     if playerRating then
         playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
     end

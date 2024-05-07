@@ -215,7 +215,7 @@ local function CheckForLaunch()
     for k,v in gameInfo.PlayerOptions do
         if v.Human and v.PL then
             allRatings[v.PlayerName] = v.PL
-            allDivisions[v.PlayerName]= v.DIV .. v.SUBDIV
+            allDivisions[v.PlayerName]= v.DIV .. ' ' .. v.SUBDIV
             -- Initialize peer launch statuses
             peerLaunchStatuses[v.OwnerID] = false
         end
