@@ -260,19 +260,19 @@ end
 
 ConstructionTabLayout = function(self)
     self.repeatBuildTemplateButton:Enable()
-    self.repeatBuildTemplateButton:SetIconTextures(GetIconTextures('repeatBuild'))
+    self.repeatBuildTemplateButton:SetIconKey('repeatBuild')
     TechTabLayout(self)
 end
 
 SelectionTabLayout = function(self)
     self.repeatBuildTemplateButton:Enable()
-    self.repeatBuildTemplateButton:SetIconTextures(GetIconTextures('template'))
+    self.repeatBuildTemplateButton:SetIconKey('template')
     NoTechTabLayout(self)
 end
 
 EnhancementTabLayout = function(self)
     self.repeatBuildTemplateButton:Disable()
-    self.repeatBuildTemplateButton:SetIconTextures()
+    self.repeatBuildTemplateButton:SetIconKey()
     TechTabLayout(self)
 end
 

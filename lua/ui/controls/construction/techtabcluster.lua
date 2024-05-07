@@ -34,7 +34,7 @@ TabSubSets = {
         'tech2',
         'tech3',
         'tech4',
-        'templates',
+        'template',
     },
     enhancement = {
         'LCH',
