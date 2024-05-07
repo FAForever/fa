@@ -214,13 +214,13 @@ Layout = function(self, key)
     self.repeatBuildTemplateButton:SetNewTextures(txtr.up, txtr.selected, txtr.over, txtr.over, txtr.dis, txtr.dis)
     self.repeatBuildTemplateButton:SetIconTextures(GetIconTextures('repeatBuild'))
     Layouter(self.repeatBuildTemplateButton)
-        :AtLeftTopIn(self, 79, 31)
+        :AtLeftTopIn(self, 77, 27)
         :End()
-    
+
     self.pauseButton:SetNewTextures(txtr.up, txtr.selected, txtr.over, txtr.over, txtr.dis, txtr.dis)
     self.pauseButton:SetIconTextures(GetIconTextures('pause'))
     Layouter(self.pauseButton)
-        :Below(self.repeatBuildTemplateButton, 5)
+        :Below(self.repeatBuildTemplateButton, 1)
         :End()
 end
 
