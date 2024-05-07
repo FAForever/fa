@@ -36,23 +36,25 @@ local TabCheckboxes = {
 ---@class ConstructionTabCluster : RadioCluster
 ConstructionTabCluster = ClassUI(RadioCluster) {
 
-    __init = function(self, parent)
+    __init = function(self, parent, Callback)
         RadioCluster.__init(self, parent, TabCheckboxes)
 
         parent:AddOnSelectionCallback(self, self.OnSelection)
         import('/lua/ui/controls/construction/layouts/bottomMini/constructiontabcluster.lua').InitLayoutFunctions(self)
+        self.Callback = Callback
     end,
 
     SetSelectedCheckbox = function(self, selectedKey)
         RadioCluster.SetSelectedCheckbox(self, selectedKey)
-        -- Only send our results back up to the parent if we're not hidden
-        if not self:IsHidden() then
-            self.parent:OnConstructionTabChanged(selectedKey)
-        end
+        self.Callback(self.parent, selectedKey)
     end,
 
+    --ParentCallback = function(self, selectedKey)
+        --To be overriden by the parent on init
+        --self.parent:OnConstructionTabChanged(selectedKey)
+    --end,
+
     OnSelection = function(self, data)
-        LOG('ConstructionTabCluster:OnSelection')
 
         -- Process our OnSelectionDataTable here and do stuff
         -- (enable/disable whatever tabs we have available based on the selected units)

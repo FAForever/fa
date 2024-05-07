@@ -46,7 +46,7 @@ TabSubSets = {
 ---@class TechTabCluster : RadioCluster
 TechTabCluster = ClassUI(RadioCluster) {
 
-    __init = function(self, parent)
+    __init = function(self, parent, Callback)
 
         -- We''ll need to find the longest subset to use as our max length for setting up the cluster
         local longestSubset
@@ -64,6 +64,7 @@ TechTabCluster = ClassUI(RadioCluster) {
         -- Call our RadioCluster constructor with our new list of checkboxes
         RadioCluster.__init(self, parent, TechTabCheckboxes)
         parent:AddOnSelectionCallback(self, self.OnSelection)
+        self.Callback = Callback
 
         import('/lua/ui/controls/construction/layouts/bottomMini/techtabcluster.lua').InitLayoutFunctions(self)
         self:SetSubset(longestSubset)
@@ -71,10 +72,7 @@ TechTabCluster = ClassUI(RadioCluster) {
 
     SetSelectedCheckbox = function(self, selectedKey)
         RadioCluster.SetSelectedCheckbox(self, selectedKey)
-        -- Only send our results back up to the parent if we're not hidden
-        if not self:IsHidden() and selectedKey ~= self.parent.LastTechTabKey then
-            self.parent:OnTechTabChanged(selectedKey)
-        end
+        self.Callback(self.parent, selectedKey)
     end,
 
     Show = function(self)

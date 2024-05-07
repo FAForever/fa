@@ -32,7 +32,6 @@ local selectionDataTable = {}
 
 ---@class ConstructionPanel: Group
 ---@field OnSelectionCallbacks table<Control, function>
----@field selectionDataTable table
 ---@field constructionTabCluster ConstructionTabCluster
 ---@field techTabCluster TechTabCluster
 ---@field pauseButton IconCheckbox
@@ -47,9 +46,8 @@ ConstructionPanel = ClassUI(Group) {
         -- These are our functional button groups
         -- The callback passed to these radio button clusters will
         -- be called with (cluster.parent, selectedKey) as parameters
-        self.constructionTabCluster = ConstructionTabCluster(self)
-        self.techTabCluster = TechTabCluster(self)
-        self.selectionDataTable = selectionDataTable
+        self.constructionTabCluster = ConstructionTabCluster(self, self.OnConstructionTabChanged)
+        self.techTabCluster = TechTabCluster(self, self.OnTechTabChanged)
 
         self.pauseButton = IconCheckbox(self)
         self.pauseButton.OnCheck = function(checkbox, checked)
@@ -117,10 +115,10 @@ ConstructionPanel = ClassUI(Group) {
             return
         end
         self:Show()
-        self.selectionDataTable.noUnitsSelected = noUnitsSelected
+        selectionDataTable.noUnitsSelected = noUnitsSelected
         -- We'll assume(!) that OnSelectionCallbacks are only relevant when the panel is shown
         for element, OnSelectionCallback in self.OnSelectionCallbacks do
-            OnSelectionCallback(element, self.selectionDataTable)
+            OnSelectionCallback(element, selectionDataTable)
         end
     end,
 }
