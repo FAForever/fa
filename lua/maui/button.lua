@@ -243,22 +243,26 @@ FixableButton = ClassUI(Button) {
 
 IconButton = Class(Button) {
 
-    SetNewTextures = function(self, normal, active, highlight, disabled, iconEnabled, iconDisabled)
-        Button.SetNewTextures(self, normal, active, highlight, disabled)
+    SetIconTextures = function(self, iconEnabled, iconDisabled)
         if iconEnabled and iconDisabled then
             self.iconEnabled = iconEnabled
             self.iconDisabled = iconDisabled
             if not self.icon then
                 self.icon = Bitmap(self)
+                self.icon:SetTexture(self:IsDisabled() and iconDisabled or iconEnabled)
                 self:Layout()
+            else
+                self.icon:SetTexture(self:IsDisabled() and iconDisabled or iconEnabled)
+                self.icon:SetAlpha(1)
             end
+        else
+            self.icon:SetAlpha(0)
         end
     end,
 
     Layout = function(self)
         if self.icon then
             Layouter(self.icon)
-                :Texture(self.iconEnabled)
                 :AtCenterIn(self)
                 :DisableHitTest()
         end
