@@ -46,6 +46,7 @@ local created = false
 
 function updatePlayerName(line)
     local playerName = line.name:GetText()
+    local playerDivision = sessionInfo.Options.Divisions[playerName]
     local playerRating = sessionInfo.Options.Ratings[playerName] or 0
     local playerClan = sessionInfo.Options.ClanTags[playerName]
 
@@ -59,7 +60,11 @@ function updatePlayerName(line)
         playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
     end
 
-    line.name:SetText(playerClan .. playerName .. playerRating)
+    if sessionInfo.Options.Divisions then
+        line.name:SetText(playerClan .. playerName .. playerDivision)
+    else
+        line.name:SetText(playerClan .. playerName .. playerRating)
+    end
 end
 
 function armyGroupHeight()
