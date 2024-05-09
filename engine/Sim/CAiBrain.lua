@@ -195,8 +195,27 @@ end
 -- @param defaultValue Ff the stat doesn't exists, it creates it and returns this value.
 -- @return Number.
 
+---@alias AIBrainBlueprintStatEconomy
+--- | 'Economy_TotalProduced_Energy'
+--- | 'Economy_TotalConsumed_Energy'
+--- | 'Economy_Income_Energy' 
+--- | 'Economy_Output_Energy' 
+--- | 'Economy_Stored_Energy' 
+--- | 'Economy_Reclaimed_Energy'
+--- | 'Economy_MaxStorage_Energy'
+--- | 'Economy_PeakStorage_Energy'
+--- | 'Economy_TotalProduced_Mass'
+--- | 'Economy_TotalConsumed_Mass'
+--- | 'Economy_Income_Mass'
+--- | 'Economy_Output_Mass'
+--- | 'Economy_Stored_Mass'
+--- | 'Economy_Reclaimed_Mass'
+--- | 'Economy_MaxStorage_Mass'
+--- | 'Economy_PeakStorage_Mass'
+
 --- Returns the statistic of the army, if it doesn't exist it creates it and returns the default value
----@param statName string
+---@see CAiBrain:GetBlueprintStat(...) for army related statistics
+---@param statName AIBrainBlueprintStatEconomy
 ---@param defaultValue number | string | table
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
@@ -212,10 +231,29 @@ end
 function CAiBrain:GetAvailableFactories(location, radius)
 end
 
+---@alias AIBrainBlueprintStatUnits 
+--- | 'Units_History'
+--- | 'Units_Killed'
+--- | 'Units_BeingBuilt' 
+--- | 'Units_Active' 
+--- | 'Units_TotalDamageDealt' 
+--- | 'Units_TotalDamageReceive'
+
+---@alias AIBrainBlueprintStatEnemies
+--- | 'Enemies_Killed'
+--- | 'Enemies_MassValue_Destroyed'
+--- | 'Enemies_EnergyValue_Destroyed' 
+--- | 'Enemies_Commanders_Destroyed' 
+
+---@alias AIBrainBlueprintStatDamage
+--- | 'DamageStats_TotalDamageReceived'
+--- | 'DamageStats_TotalDamageDealt'
+
 --- Return a blueprint stat filtered by category.
--- @param statName String, name of the stats to get, example: "Enemies_Killed".
--- @param category Unit's category, example: categories.TECH2 .
--- @return Number.
+---@see CAiBrain:GetArmyStat(...) for army related statistics
+---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage
+---@param category EntityCategory 's category, example: categories.TECH2 .
+---@return number
 function CAiBrain:GetBlueprintStat(statName, category)
 end
 

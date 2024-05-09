@@ -308,8 +308,6 @@ function GenerateClusterCoords( xStart, zStart, xEnd, zEnd, numClusters )
         clusterDensityMap[quadrant] = clusterDensityMap[quadrant] + 1
     end
 
-    --LOG( repr( divisions ), repr( clusterDensityMap ) )
-
     -- Generate a coordinate for any divisions that have only one cluster
     for i = 1, 4 do
         if clusterDensityMap[i] == 1 then

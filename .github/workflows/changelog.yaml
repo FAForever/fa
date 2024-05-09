@@ -1,0 +1,29 @@
+name: Create changelog
+
+on: 
+  workflow_dispatch:
+  push:
+  
+jobs:
+  bundle:
+    name: Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            changelog/snippets
+            
+      - name: Create the changelog
+        working-directory: changelog/snippets   # script assumes it is in this directory
+        run: |
+          ./combine.sh
+          
+      - name: Add the changelog as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: |
+            changelog/snippets/changelog.md
+

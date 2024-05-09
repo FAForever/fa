@@ -42,7 +42,7 @@ local NavUtils = import("/lua/sim/navutils.lua")
 
 local AIRTRANSPORTS = categories.AIR * categories.TRANSPORTFOCUS
 local ENGINEERS = categories.ENGINEER
-local TransportDialog = true
+local TransportDialog = false
 
 -- this function will create the TransportPool platoon and put the reference to it in the brain
 function CreateTransportPool( aiBrain )
@@ -88,7 +88,7 @@ function AssignTransportToPool( unit, aiBrain )
     -- if the unit is not already in the transport Pool --
 	if not unit.Dead and (not unit.PlatoonHandle != aiBrain.TransportPool) then
         if TransportDialog then
-            LOG("*AI DEBUG TRANSPORT "..repr(unit.PlatoonHandle.BuilderName).." Transport "..unit.EntityId.." starts assigning to Transport Pool" )
+            LOG("*AI DEBUG TRANSPORT "..tostring(unit.PlatoonHandle.BuilderName).." Transport "..unit.EntityId.." starts assigning to Transport Pool" )
         end
 		IssueToUnitClearCommands(unit)
 		-- if not in need of repair or fuel -- 
@@ -111,7 +111,7 @@ function AssignTransportToPool( unit, aiBrain )
     unit.Assigning = false    
     
     if TransportDialog then
-        LOG("*AI DEBUG TRANSPORT "..repr(unit.PlatoonHandle.BuilderName).." Transport "..unit.EntityId.." now available to Transport Pool" )
+        LOG("*AI DEBUG TRANSPORT "..tostring(unit.PlatoonHandle.BuilderName).." Transport "..unit.EntityId.." now available to Transport Pool" )
     end
 
 end
@@ -591,7 +591,7 @@ function GetTransports( platoon, aiBrain)
 				end
 			else
                 if TransportDialog then
-                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." transport "..transport.EntityId.." rejected -  In Use "..repr(transport.InUse).." - Assigning "..repr(transport.Assigning).." - BeingBuilt "..repr(IsBeingBuilt(transport)).." or Low Fuel/Health")
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." transport "..transport.EntityId.." rejected -  In Use "..tostring(transport.InUse).." - Assigning "..tostring(transport.Assigning).." - BeingBuilt "..tostring(IsBeingBuilt(transport)).." or Low Fuel/Health")
                 end
                 if not transport.Dead then
                     ForkThread( ReturnTransportsToPool, aiBrain, {transport}, true )
@@ -715,7 +715,7 @@ function GetTransports( platoon, aiBrain)
 		if not transportplatoon or counter < 1 then
             if TransportDialog then
                 if not transportplatoon then
-                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." transport platoon dead after assignmnet "..repr(transportplatoon))
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." transport platoon dead after assignmnet "..tostring(transportplatoon))
                 else
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." unit platoon dead after assignment ")
                 end
@@ -777,7 +777,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
             continue
         end
         if not v.Dead and TransportDialog then
-            LOG("*AI DEBUG "..aiBrain.Nickname.." transport "..v.EntityId.." "..v:GetBlueprint().Description.." Returning to Pool  InUse is "..repr(v.InUse) )
+            LOG("*AI DEBUG "..aiBrain.Nickname.." transport "..v.EntityId.." "..v:GetBlueprint().Description.." Returning to Pool  InUse is "..tostring(v.InUse) )
         end
         if v.WatchLoadingThread then
             KillThread( v.WatchLoadingThread)
@@ -1792,7 +1792,11 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			unitsdead = false
 			loading = true
 			-- here is where we issue the Load command to the transport --
-			safecall("Unable to IssueTransportLoad units are "..repr(units), IssueTransportLoad, newunits, transport )
+			local ok, msg = pcall(IssueTransportLoad, {u}, transport )
+			if not ok then
+				LOG("Unable to IssueTransportLoad to: " .. repr(u.Blueprint.BlueprintId))
+			end
+
 			break
 		end
 	end
