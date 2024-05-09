@@ -39,6 +39,8 @@
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
 ---@field Audio WeaponBlueprintAudio
+--- How many times a unit tries to attack the ground with this weapon before moving on to the next ground attack order. Defaults to 3
+---@field AttackGroundTries?
 --- if the unit has no issued commands and has a weapon that has `AutoInitiateAttackCommand` set,
 --- then if it finds a suitable target it will issue an attack command to go after the target
 ---@field AutoInitiateAttackCommand? boolean
