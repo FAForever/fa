@@ -133,7 +133,6 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'sea',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFrom = 'zeb9503',
         UpgradesFromBase = 'ueb0103',

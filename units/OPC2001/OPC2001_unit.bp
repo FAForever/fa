@@ -48,7 +48,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Cybran',
-        TechLevel = 'RULEUTL_Basic',
     },
     Interface = {
         HelpText = '<LOC opc2001_help>OpC2 Temple',

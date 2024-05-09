@@ -162,7 +162,6 @@ UnitBlueprint {
         FactionName = 'Cybran',
         Icon = 'sea',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFromBase = 'urb0103',
         UpgradesFrom = 'zrb9503',

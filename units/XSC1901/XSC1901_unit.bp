@@ -128,7 +128,6 @@ UnitBlueprint {
         },
         FactionName = 'Seraphim',
         Icon = 'land',
-        TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
     Interface = {

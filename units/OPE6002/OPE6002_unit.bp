@@ -47,7 +47,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Cybran',
-        TechLevel = 'RULEUTL_Basic',
     },
     Interface = {
         HelpText = '<LOC ope6002_help>Black Sun Cannon',

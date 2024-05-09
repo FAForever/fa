@@ -63,7 +63,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC opc5007_name>',
         UnitWeight = 1,
     },

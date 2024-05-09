@@ -98,7 +98,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
     Interface = {

@@ -47,7 +47,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Cybran',
-        TechLevel = 'RULEUTL_Basic',
     },
     Intel = {
         VisionRadius = 16,

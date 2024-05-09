@@ -63,7 +63,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC ope2001_name>UEF Civilian Center',
         UnitWeight = 1,
     },

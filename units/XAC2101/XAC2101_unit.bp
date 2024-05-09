@@ -163,7 +163,6 @@ UnitBlueprint {
         },
         FactionName = 'Aeon',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
             RULEUTC_ShieldToggle = true,
         },

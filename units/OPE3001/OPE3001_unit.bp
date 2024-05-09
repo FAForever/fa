@@ -62,7 +62,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC ope3001_name>Arnold\'s Black Box',
         UnitWeight = 1,
     },

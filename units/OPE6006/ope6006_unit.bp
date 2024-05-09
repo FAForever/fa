@@ -84,7 +84,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
             RULEUTC_SpecialToggle = true,
         },

@@ -158,7 +158,6 @@ UnitBlueprint {
         FactionName = 'Aeon',
         Icon = 'air',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
         UnitWeight = 1,
         UpgradesFromBase = 'uab0102',
         UpgradesFrom = 'zab9502',

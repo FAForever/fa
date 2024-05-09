@@ -151,7 +151,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
             RULEUTC_SpecialToggle = true,
         },

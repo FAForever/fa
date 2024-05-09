@@ -92,7 +92,6 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 6,
-        TechLevel = 'RULEUTL_Basic',
         ToggleCaps = {
             RULEUTC_WeaponToggle = false,
         },

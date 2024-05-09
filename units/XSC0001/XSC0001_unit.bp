@@ -79,7 +79,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Seraphim',
-        TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xsc0001>Seraphim Test Unit',
         UnitWeight = 1,
     },

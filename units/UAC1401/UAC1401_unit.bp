@@ -127,7 +127,6 @@ UnitBlueprint {
         Icon = 'land',
         FactionName = 'Aeon',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
     Interface = {
