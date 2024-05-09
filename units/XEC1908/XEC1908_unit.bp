@@ -112,7 +112,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xec1908_help>UEF Blacksun Remains --1',

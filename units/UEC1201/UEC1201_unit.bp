@@ -112,7 +112,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC uec1201_help>UEF Science Lab',

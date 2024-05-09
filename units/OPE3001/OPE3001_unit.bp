@@ -61,7 +61,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         UnitName = '<LOC ope3001_name>Arnold\'s Black Box',
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 2,

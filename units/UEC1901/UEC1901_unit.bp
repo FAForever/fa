@@ -152,7 +152,6 @@ UnitBlueprint {
         ToggleCaps = {
             RULEUTC_SpecialToggle = true,
         },
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC uec1901_help>UEF Black Sun',

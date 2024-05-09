@@ -112,7 +112,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Aeon',
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 20,

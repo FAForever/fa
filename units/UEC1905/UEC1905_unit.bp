@@ -96,7 +96,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC uec1905_help>UEF Black Sun Crane',

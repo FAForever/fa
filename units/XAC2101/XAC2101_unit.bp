@@ -164,7 +164,6 @@ UnitBlueprint {
         ToggleCaps = {
             RULEUTC_ShieldToggle = true,
         },
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 20,

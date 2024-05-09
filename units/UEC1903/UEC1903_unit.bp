@@ -101,7 +101,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC uec1903_help>UEF Black Sun Support',

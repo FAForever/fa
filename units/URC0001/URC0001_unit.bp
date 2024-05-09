@@ -113,7 +113,6 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 18,

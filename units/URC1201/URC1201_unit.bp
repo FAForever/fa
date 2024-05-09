@@ -112,7 +112,6 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC urc1201_help>Cybran Civilian Structure',

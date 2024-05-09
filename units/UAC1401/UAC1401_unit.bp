@@ -125,7 +125,6 @@ UnitBlueprint {
         Icon = 'land',
         FactionName = 'Aeon',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC uac1401_help>Aeon Civilian Structure',

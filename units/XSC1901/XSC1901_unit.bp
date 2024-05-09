@@ -126,7 +126,6 @@ UnitBlueprint {
         },
         FactionName = 'Seraphim',
         Icon = 'land',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xsc1901_help>Seraphim Quantum Rift Archway',

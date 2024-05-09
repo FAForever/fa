@@ -97,7 +97,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 0,

@@ -98,7 +98,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Seraphim',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xsc1101_help>Seraphim Civilian Structure',

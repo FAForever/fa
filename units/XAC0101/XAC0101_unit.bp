@@ -105,7 +105,6 @@ UnitBlueprint {
         },
         FactionName = 'Aeon',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xac0101_help>Aeon Boat',

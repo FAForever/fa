@@ -85,7 +85,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Cybran',
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 18,

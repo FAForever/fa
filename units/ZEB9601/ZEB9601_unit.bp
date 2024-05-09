@@ -123,7 +123,6 @@ UnitBlueprint {
         FactionName = "UEF",
         Icon = "land",
         SelectionPriority = 5,
-        UnitWeight = 1,
         UpgradesFrom = "zeb9501",
         UpgradesFromBase = "ueb0101",
     },

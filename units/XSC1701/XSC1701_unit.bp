@@ -113,7 +113,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xsc1701_help>Seraphim Barracks',

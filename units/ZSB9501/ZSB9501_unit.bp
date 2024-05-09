@@ -135,7 +135,6 @@ UnitBlueprint {
         Icon = 'land',
         SelectionPriority = 5,
         UnitName = '<LOC zsb9501_name>Hethiya',
-        UnitWeight = 1,
         UpgradesFrom = 'xsb0101',
         UpgradesFromBase = 'xsb0101',
         UpgradesTo = 'zsb9601',

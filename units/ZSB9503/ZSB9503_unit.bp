@@ -174,7 +174,6 @@ UnitBlueprint {
         Icon = 'sea',
         SelectionPriority = 5,
         UnitName = '<LOC zsb9503_name>Uosiya',
-        UnitWeight = 1,
         UpgradesFrom = 'xsb0103',
         UpgradesFromBase = 'xsb0103',
         UpgradesTo = 'zsb9603',

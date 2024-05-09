@@ -115,7 +115,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 18,

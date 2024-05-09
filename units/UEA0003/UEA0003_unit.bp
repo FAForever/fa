@@ -176,7 +176,6 @@ UnitBlueprint {
             RULEUTC_WeaponToggle = true,
         },
         UnitName = '<LOC uea0003_name>C-D3 "Rover-3"',
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 12,

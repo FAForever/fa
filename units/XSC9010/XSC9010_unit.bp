@@ -78,7 +78,6 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'land',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Intel = {
         JamRadius = {

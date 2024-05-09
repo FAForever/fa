@@ -62,7 +62,6 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         UnitName = '<LOC ope2002_name>UEF Research Facility',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC ope2002_help>UEF Research Facility',

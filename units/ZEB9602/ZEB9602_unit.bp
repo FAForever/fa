@@ -161,7 +161,6 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'air',
         SelectionPriority = 5,
-        UnitWeight = 1,
         UpgradesFrom = 'zeb9502',
         UpgradesFromBase = 'ueb0102',
     },

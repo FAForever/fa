@@ -94,7 +94,6 @@ UnitBlueprint {
             RULEUTC_WeaponToggle = false,
         },
         UnitName = 'zxa0001 dummy drone',
-        UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 0,

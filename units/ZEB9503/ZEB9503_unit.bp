@@ -165,7 +165,6 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'sea',
         SelectionPriority = 5,
-        UnitWeight = 1,
         UpgradesFrom = 'ueb0103',
         UpgradesFromBase = 'ueb0103',
         UpgradesTo = 'zeb9603',

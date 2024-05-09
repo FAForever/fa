@@ -86,7 +86,6 @@ UnitBlueprint {
             RULEUTC_SpecialToggle = true,
         },
         UnitName = '<LOC uec1901_name>UEF Black Sun',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC uec1901_help>UEF Black Sun',

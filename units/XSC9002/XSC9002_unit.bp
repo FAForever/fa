@@ -76,7 +76,6 @@ UnitBlueprint {
         },
         FactionName = 'Seraphim',
         SelectionPriority = 5,
-        UnitWeight = 1,
     },
     Intel = {
         JamRadius = {

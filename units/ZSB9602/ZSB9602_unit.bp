@@ -169,7 +169,6 @@ UnitBlueprint {
         Icon = 'air',
         SelectionPriority = 5,
         UnitName = '<LOC zsb9602_name>Ia-iya',
-        UnitWeight = 1,
         UpgradesFrom = 'zsb9502',
         UpgradesFromBase = 'xsb0102',
     },

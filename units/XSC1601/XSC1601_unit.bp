@@ -113,7 +113,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Seraphim',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xsc1601_help>Seraphim Hydroponics Bay',

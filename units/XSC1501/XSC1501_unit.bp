@@ -121,7 +121,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Seraphim',
-        UnitWeight = 1,
     },
     Interface = {
         HelpText = '<LOC xsc1501_help>Seraphim Manufacturing Building',
