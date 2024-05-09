@@ -168,7 +168,6 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'air',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'ueb0102',
         UpgradesFromBase = 'ueb0102',

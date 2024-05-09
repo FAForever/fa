@@ -136,7 +136,6 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC zsb9501_name>Hethiya',
         UnitWeight = 1,
         UpgradesFrom = 'xsb0101',

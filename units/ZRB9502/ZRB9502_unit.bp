@@ -174,7 +174,6 @@ UnitBlueprint {
         FactionName = 'Cybran',
         Icon = 'air',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
         UpgradesFrom = 'urb0102',
         UpgradesFromBase = 'urb0102',

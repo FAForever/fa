@@ -54,7 +54,6 @@ UnitBlueprint {
             RULEUCC_Stop = true,
         },
         SelectionPriority = 6,
-        TechLevel = 'RULEUTL_Experimental',
         UnitName = 'Mobile Factory',
         UnitWeight = 1,
     },

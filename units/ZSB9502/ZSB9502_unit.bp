@@ -175,7 +175,6 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'air',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC zsb9502_name>Ia-iya',
         UnitWeight = 1,
         UpgradesFrom = 'xsb0102',

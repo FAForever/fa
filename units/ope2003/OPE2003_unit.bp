@@ -71,7 +71,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'UEF',
-        TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
     },
     Intel = {

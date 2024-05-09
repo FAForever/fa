@@ -115,7 +115,6 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
     },
     Intel = {

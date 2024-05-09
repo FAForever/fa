@@ -175,7 +175,6 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'sea',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
         UnitName = '<LOC zsb9503_name>Uosiya',
         UnitWeight = 1,
         UpgradesFrom = 'xsb0103',

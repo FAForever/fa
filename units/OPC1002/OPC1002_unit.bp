@@ -87,7 +87,6 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         FactionName = 'Cybran',
-        TechLevel = 'RULEUTL_Advanced',
         UnitWeight = 1,
     },
     Intel = {
