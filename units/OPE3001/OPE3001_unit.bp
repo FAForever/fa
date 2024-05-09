@@ -45,7 +45,6 @@ UnitBlueprint {
         BuildTime = 50,
     },
     General = {
-        Category = 'Defense',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

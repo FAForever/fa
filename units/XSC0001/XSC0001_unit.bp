@@ -62,7 +62,6 @@ UnitBlueprint {
         SizeZ = 3,
     },
     General = {
-        Category = 'Defense',
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = false,
