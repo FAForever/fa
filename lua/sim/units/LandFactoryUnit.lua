@@ -22,5 +22,47 @@
 
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
 
+local AssistOverrideThread = function(unit, rollOffPoint, assistTarget)
+    WaitTicks(1)
+    if unit:IsDead() then
+        return
+    end
+    IssueToUnitClearCommands(unit)
+    IssueToUnitMove(unit, rollOffPoint)
+    IssueGuard({unit}, assistTarget)
+end
+
 ---@class LandFactoryUnit : FactoryUnit
-LandFactoryUnit = ClassUnit(FactoryUnit) {}
+LandFactoryUnit = ClassUnit(FactoryUnit) {
+
+        OnStopBuild = function(self, unitBeingBuilt, order)
+            local guardTarget = self:GetGuardedUnit()
+            if guardTarget then
+                LOG('We are guarding something!')
+                if EntityCategoryContains(categories.FACTORY * categories.AIR, guardTarget) then
+                    LOG('We are guarding an air factory!')
+                    if not EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
+                        unitBeingBuilt.autoLoadTarget = guardTarget
+                    end
+                end
+            end
+            FactoryUnit.OnStopBuild(self, unitBeingBuilt, order)
+        end,
+
+        RollOffUnit = function(self)
+            LOG('Rolling off unit')
+
+            local unitBeingBuilt = self.UnitBeingBuilt
+            local autoLoadTarget = unitBeingBuilt.autoLoadTarget
+            if autoLoadTarget then
+                LOG('We have an autoLoad target')
+                local rollOffPoint, spin = self.RollOffPoint, 0
+                unitBeingBuilt.autoLoadTarget = nil
+                spin, rollOffPoint.x, rollOffPoint.y, rollOffPoint.z = self:CalculateRollOffPoint(autoLoadTarget:GetPosition())
+                --unitBeingBuilt:SetRotation(spin)
+                ForkThread(AssistOverrideThread, unitBeingBuilt, rollOffPoint, autoLoadTarget)
+            else
+                FactoryUnit.RollOffUnit(self)
+            end
+        end,
+}

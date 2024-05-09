@@ -252,7 +252,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
-    CalculateRollOffPoint = function(self)
+    ---@param targetPosOverride Vector -- An override for the rally position if we're doing something special
+    CalculateRollOffPoint = function(self, targetPosOverride)
         local px, py, pz = self:GetPositionXYZ()
 
         -- check if we have roll of points set
@@ -278,7 +279,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- check if we have a rally point set
-        if not rally then
+        if targetPosOverride then
+            rally = targetPosOverride
+        elseif not rally then
             return 0, px, py, pz
         end
 
