@@ -32,7 +32,6 @@ UnitBlueprint {
         BuildCostMass = 0,
     },
     General = {
-        Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

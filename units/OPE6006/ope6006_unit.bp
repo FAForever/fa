@@ -68,7 +68,6 @@ UnitBlueprint {
     },
     General = {
         Category = 'Defense',
-        Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

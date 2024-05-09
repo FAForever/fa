@@ -55,7 +55,6 @@ UnitBlueprint {
     },
     General = {
         Category = 'Civilian Truck',
-        Classification = 'RULEUC_MilitaryVehicle',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,

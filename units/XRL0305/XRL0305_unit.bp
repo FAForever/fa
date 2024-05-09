@@ -106,7 +106,6 @@ UnitBlueprint{
         TeleportTimeMod = 0.01,
     },
     General = {
-        Classification = "RULEUMT_Amphibious",
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,

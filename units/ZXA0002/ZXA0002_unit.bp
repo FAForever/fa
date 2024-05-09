@@ -44,7 +44,6 @@ UnitBlueprint {
     General = {
         CapCost = 0,
         Category = '',
-        Classification = 'RULEUC_Factory',
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,

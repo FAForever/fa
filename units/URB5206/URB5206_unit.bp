@@ -26,7 +26,6 @@ UnitBlueprint {
     },
     General = {
         Category = 'Intelligence',
-        Classification = 'RULEUC_MiscSupport',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

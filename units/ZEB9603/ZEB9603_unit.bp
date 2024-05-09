@@ -113,7 +113,6 @@ UnitBlueprint {
             },
         },
         Category = 'Factory',
-        Classification = 'RULEUC_Factory',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

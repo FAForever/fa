@@ -85,7 +85,6 @@ UnitBlueprint {
     },
     General = {
         Category = 'Utility',
-        Classification = 'RULEUC_MilitaryAircraft',
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
