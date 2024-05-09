@@ -98,7 +98,6 @@ UnitBlueprint {
         BuildCostMass = 158,
     },
     General = {
-        Category = 'Civilian Truck',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,

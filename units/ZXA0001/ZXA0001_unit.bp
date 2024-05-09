@@ -62,7 +62,6 @@ UnitBlueprint {
     },
     General = {
         CapCost = 0,
-        Category = 'Utility',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

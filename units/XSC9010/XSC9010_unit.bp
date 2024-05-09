@@ -61,7 +61,6 @@ UnitBlueprint {
         SizeZ = 0,
     },
     General = {
-        Category = 'Direct Fire',
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = false,

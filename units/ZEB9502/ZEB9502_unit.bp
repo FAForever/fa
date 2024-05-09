@@ -147,7 +147,6 @@ UnitBlueprint {
                 'Muzzle02',
             },
         },
-        Category = 'Factory',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,

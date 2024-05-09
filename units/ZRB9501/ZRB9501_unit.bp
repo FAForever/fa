@@ -113,7 +113,6 @@ UnitBlueprint {
                 'Arm03_Muzzle',
             },
         },
-        Category = 'Factory',
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,

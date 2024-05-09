@@ -43,7 +43,6 @@ UnitBlueprint {
     },
     General = {
         CapCost = 0,
-        Category = '',
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,

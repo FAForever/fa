@@ -84,7 +84,6 @@ UnitBlueprint {
         BuildTime = 320,
     },
     General = {
-        Category = 'Utility',
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
