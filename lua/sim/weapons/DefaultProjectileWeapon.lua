@@ -884,7 +884,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
-            if not (IsDestroyed(unit) or IsDestroyed(self)) then
+            if not (IsDestroyed(unit) or IsDestroyed(self)) and not bp.NeedToComputeBombDrop then
                 if bp.TargetResetWhenReady then
 
                     -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
