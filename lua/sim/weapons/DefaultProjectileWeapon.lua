@@ -1110,8 +1110,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
-            local hasTarget = self:WeaponHasTarget()
-
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
                 self.CurrentRackSalvoNumber = 1
@@ -1119,7 +1117,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile or not hasTarget then
+                elseif countedProjectile then
                     if bp.WeaponUnpacks then
                         ChangeState(self, self.WeaponPackingState)
                     else
@@ -1128,7 +1126,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
                 end
-            elseif countedProjectile or not hasTarget then
+            elseif countedProjectile then
                 if bp.WeaponUnpacks then
                     ChangeState(self, self.WeaponPackingState)
                 else
