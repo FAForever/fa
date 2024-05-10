@@ -334,6 +334,7 @@ Weapon = ClassWeapon(WeaponMethods) {
 
     ---@param self Weapon
     OnLostTarget = function(self)
+        LOG("weapon.lua:losttarget")
         local animator = self.unit.Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
