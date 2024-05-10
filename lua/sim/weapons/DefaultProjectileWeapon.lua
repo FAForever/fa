@@ -655,6 +655,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Includes the manual selection of a new target, and the issuing of a move order
     ---@param self DefaultProjectileWeapon
     OnLostTarget = function(self)
+        LOG("Default OnLostTarget")
         -- Issue 43
         -- Tell the owner this weapon has lost the target
         local unit = self.unit
