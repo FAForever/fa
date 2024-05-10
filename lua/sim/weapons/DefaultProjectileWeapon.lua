@@ -1138,7 +1138,17 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            self.HaltFireOrdered = true
+            -- Override the default OnLostTarget but not inherited ones
+            local baseOnLostTarget = self.__base.OnLostTarget
+            if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
+                baseOnLostTarget(self)
+            else
+                Weapon.OnLostTarget(self)
+
+                if self.Blueprint.WeaponUnpacks then
+                    ChangeState(self, self.WeaponPackingState)
+                end
+            end
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
