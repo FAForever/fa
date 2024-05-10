@@ -22,9 +22,14 @@
 
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
 
+---Because the rally point orders are applied after 1 tick, we need
+---to wait 1 tick before clearing them and adding our own
+---@param unit Unit
+---@param rollOffPoint Vector
+---@param assistTarget Unit
 local AssistOverrideThread = function(unit, rollOffPoint, assistTarget)
     WaitTicks(1)
-    if unit:IsDead() then
+    if unit.Dead or assistTarget.Dead then
         return
     end
     IssueToUnitClearCommands(unit)
@@ -35,12 +40,13 @@ end
 ---@class LandFactoryUnit : FactoryUnit
 LandFactoryUnit = ClassUnit(FactoryUnit) {
 
+        ---@param self LandFactoryUnit
+        ---@param unitBeingBuilt Unit
+        ---@param order string
         OnStopBuild = function(self, unitBeingBuilt, order)
             local guardTarget = self:GetGuardedUnit()
             if guardTarget then
-                LOG('We are guarding something!')
                 if EntityCategoryContains(categories.FACTORY * categories.AIR, guardTarget) then
-                    LOG('We are guarding an air factory!')
                     if not EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
                         unitBeingBuilt.autoLoadTarget = guardTarget
                     end
@@ -49,17 +55,21 @@ LandFactoryUnit = ClassUnit(FactoryUnit) {
             FactoryUnit.OnStopBuild(self, unitBeingBuilt, order)
         end,
 
+        ---We need to override our roll off function to point directly to
+        ---the location of the factory we are assisting, not its rally point
+        ---@param self LandFactoryUnit
         RollOffUnit = function(self)
-            LOG('Rolling off unit')
 
             local unitBeingBuilt = self.UnitBeingBuilt
+            if not unitBeingBuilt then
+                return
+            end
+
             local autoLoadTarget = unitBeingBuilt.autoLoadTarget
             if autoLoadTarget then
-                LOG('We have an autoLoad target')
-                local rollOffPoint, spin = self.RollOffPoint, 0
+                local rollOffPoint = self.RollOffPoint
                 unitBeingBuilt.autoLoadTarget = nil
-                spin, rollOffPoint.x, rollOffPoint.y, rollOffPoint.z = self:CalculateRollOffPoint(autoLoadTarget:GetPosition())
-                --unitBeingBuilt:SetRotation(spin)
+                _, rollOffPoint.x, rollOffPoint.y, rollOffPoint.z = self:CalculateRollOffPoint(autoLoadTarget:GetPosition())
                 ForkThread(AssistOverrideThread, unitBeingBuilt, rollOffPoint, autoLoadTarget)
             else
                 FactoryUnit.RollOffUnit(self)
