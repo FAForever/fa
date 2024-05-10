@@ -1135,13 +1135,22 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
+            -- Override the default OnLostTarget to run inherited OnLostTarget classes or to avoid killing the firing cycle thread by changing states
             local baseOnLostTarget = self.__base.OnLostTarget
             if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
                 baseOnLostTarget(self)
             else
                 Weapon.OnLostTarget(self)
-                if self.Blueprint.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
+
+                -- it's usually okay for a salvo to continue firing unless MuzzleVelocityReduceDistance is present, which requires a target to always exist
+                -- or else the projectile will fire at a very high speed, so we need to pack up/idle in that case
+                local bp = self.Blueprint
+                if bp.MuzzleVelocityReduceDistance then
+                    if bp.WeaponUnpacks then
+                        ChangeState(self, self.WeaponPackingState)
+                    else
+                        ChangeState(self, self.IdleState)
+                    end
                 end
             end
         end,
