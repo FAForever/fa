@@ -899,7 +899,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                     -- wait reload time + 2 seconds, then force the weapon to recheck its target
                     WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
-                    self:ResetTarget()
+                    self:ResetTarget() -- this breaks AttackGroundTries for bombers
                 end
             end
         end,
