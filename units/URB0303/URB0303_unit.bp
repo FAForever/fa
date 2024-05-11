@@ -44,7 +44,6 @@ UnitBlueprint{
         Health = 17000,
         MaxHealth = 17000,
         RegenRate = 60,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Display = {

@@ -89,7 +89,6 @@ UnitBlueprint{
             ShieldVerticalOffset = -1,
             TransportShield = true,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 18,
     },
     Display = {

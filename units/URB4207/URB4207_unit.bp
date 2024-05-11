@@ -48,7 +48,6 @@ UnitBlueprint{
             ShieldSize = 40,
             ShieldVerticalOffset = -6,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Display = {

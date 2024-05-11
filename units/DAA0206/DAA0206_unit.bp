@@ -56,7 +56,6 @@ UnitBlueprint{
         Health = 90,
         MaxHealth = 90,
         RegenRate = 0,
-        SubThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_suicideweapon>Suicide Weapon" },

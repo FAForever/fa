@@ -33,7 +33,6 @@ UnitBlueprint{
         MaxHealth = 800,
         RegenRate = 0,
         SkipDynamicThreatCalculations = true,
-        SubThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_hover>Hover" },

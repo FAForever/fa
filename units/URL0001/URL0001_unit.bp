@@ -69,7 +69,6 @@ UnitBlueprint{
         MaxHealth = 10000,
         RegenRate = 18,
         SkipDynamicThreatCalculations = true,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 45,
     },
     Display = {

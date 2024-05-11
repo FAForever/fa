@@ -69,7 +69,6 @@ UnitBlueprint {
             ShieldSize = 130,
             ShieldVerticalOffset = -40,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Description = '<LOC xac2101_desc>Aeon Palace',
