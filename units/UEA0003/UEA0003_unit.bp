@@ -81,6 +81,7 @@ UnitBlueprint {
         'AIR',
         'TECH3',
         'POD',
+        'CONSTRUCTION',
         'REPAIR',
         'RECLAIM',
         'PATROLHELPER',
@@ -88,6 +89,7 @@ UnitBlueprint {
         'CAPTURE',
         'VISIBLETORECON',
         'RECLAIMABLE',
+        'SHOWQUEUE',
     },
     CollisionOffsetY = -0.5,
     Defense = {

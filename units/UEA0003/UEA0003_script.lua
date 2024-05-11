@@ -24,6 +24,21 @@ UEA0003 = ClassUnit(TConstructionUnit) {
         end
     end,
 
+    OnAttachedToTransport = function(self, transport, bone)
+        self.guardCache = self:GetGuards()
+        IssueClearCommands(self.guardCache)
+        IssueGuard(self.guardCache, self:GetParent())
+        TConstructionUnit.OnAttachedToTransport(self, transport, bone)
+    end,
+
+    OnDetachedFromTransport = function(self, transport, bone)
+        TConstructionUnit.OnDetachedFromTransport(self, transport, bone)
+        if self.guardCache then
+            IssueClearCommands(self.guardCache)
+            IssueGuard(self.guardCache, self)
+        end
+    end,
+
     SetParent = function(self, parent, podName)
         self.Parent = parent
         self.Pod = podName
