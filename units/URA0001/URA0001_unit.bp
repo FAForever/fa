@@ -37,8 +37,6 @@ UnitBlueprint {
         EconomyThreatLevel = 0,
         Health = 30,
         MaxHealth = 30,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Description = '<LOC ura0001_desc>Build Bot Effect',

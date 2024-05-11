@@ -26,8 +26,6 @@ UnitBlueprint {
         EconomyThreatLevel = 1,
         Health = 100000,
         MaxHealth = 100000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Description = 'Dummy Drone',

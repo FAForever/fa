@@ -64,8 +64,6 @@ UnitBlueprint{
         EconomyThreatLevel = 0,
         Health = 295,
         MaxHealth = 295,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
     Display = {
