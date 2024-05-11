@@ -25,7 +25,6 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 2500,
         MaxHealth = 2500,
         SurfaceThreatLevel = 12,

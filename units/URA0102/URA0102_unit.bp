@@ -61,7 +61,6 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 5.33,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 280,
         MaxHealth = 280,
         SurfaceThreatLevel = 0,

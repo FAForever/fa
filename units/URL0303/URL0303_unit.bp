@@ -32,7 +32,6 @@ UnitBlueprint {
             RedirectRateOfFire = 1,
         },
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 3000,
         MaxHealth = 3000,
         SurfaceThreatLevel = 21,

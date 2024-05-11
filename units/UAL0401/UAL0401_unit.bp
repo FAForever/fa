@@ -45,7 +45,6 @@ UnitBlueprint{
     CollisionOffsetZ = 0.1,
     Defense = {
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 99999,
         MaxHealth = 99999,
         RegenRate = 10,
