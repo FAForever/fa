@@ -62,7 +62,6 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Commander",
         EconomyThreatLevel = 626,
         Health = 10000,

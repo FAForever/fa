@@ -55,7 +55,6 @@ UnitBlueprint{
         "SNIPEMODE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 1208,
         Health = 19000,

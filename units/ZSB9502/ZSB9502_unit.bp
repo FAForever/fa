@@ -64,7 +64,6 @@ UnitBlueprint {
     },
     CollisionOffsetY = 0,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 16,
         Health = 3500,

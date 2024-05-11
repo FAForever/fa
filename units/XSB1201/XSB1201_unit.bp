@@ -30,7 +30,6 @@ UnitBlueprint{
         "VOLATILE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 74,
         Health = 2400,

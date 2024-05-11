@@ -41,7 +41,6 @@ UnitBlueprint{
         "WEAKANTINAVY",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 235,
         Health = 25000,

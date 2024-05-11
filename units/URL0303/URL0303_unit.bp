@@ -26,7 +26,6 @@ UnitBlueprint {
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         AntiMissile = {
             AttachBone = "Turret_Muzzle",
             Radius = 5,

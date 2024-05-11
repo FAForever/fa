@@ -63,7 +63,6 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 34,
         Health = 8000,
