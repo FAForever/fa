@@ -84,6 +84,12 @@ UEL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UEL0301
+    ---@return Unit[] pods
+    GetPods = function(self)
+        return {self.Pod}
+    end,
+
+    ---@param self UEL0301
     ---@param bone Bone
     ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)

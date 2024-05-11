@@ -125,6 +125,15 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
         self:OnLayerChange(layer, 'None')
     end,
 
+    -- Check for any assisting units and make sure they are assisting the new construction
+    ---@param self MobileUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        Unit.OnStartBuild(self, unitBeingBuilt, order)
+        self:CheckAssistersFocus()
+    end,
+
     ---@param self MobileUnit
     ---@param new string
     ---@param old string

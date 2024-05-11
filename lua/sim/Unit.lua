@@ -2719,7 +2719,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     --- the assisting unit to perform the same task as the unit it is assisting.
     ---@param self Unit
     CheckAssistFocus = function(self)
-
         --- Given engineer A that is assisting engineer B in doing some task. This function fixes the following situations:
         ---
         --- - (1) Engineer B is damaged. Engineer B starts the construction of a structure. Engineer A is repairing 
@@ -2748,26 +2747,84 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
 
             local cmd
+            local resetAssist = false
             if guarded:IsUnitState('Reclaiming') then
                 cmd = IssueReclaim
             elseif guarded:IsUnitState('Building') then
-                cmd = IssueRepair
+                if guarded:GetHealth() == guarded:GetMaxHealth() then
+                    resetAssist = true
+                else
+                    cmd = IssueRepair
+                end
             end
 
             if cmd then
                 IssueToUnitClearCommands(self)
                 cmd({self}, focus)
                 IssueGuard({self}, guarded)
+            elseif resetAssist then
+                IssueToUnitClearCommands(self)
+                IssueGuard({self}, guarded)
             end
         end
     end,
 
+    --- This function is called when a unit with assisting engineers starts a new
+    --- construction task and forces the assisting engineers to assist with the new task.
+    --- (much more efficient to do this in a group as well, instead of called for each assister)
     ---@param self Unit
     CheckAssistersFocus = function(self)
-        for _, u in self:GetGuards() do
-            if u:IsUnitState('Repairing') and not EntityCategoryContains(categories.INSIGNIFICANTUNIT, u) then
-                u:CheckAssistFocus()
+        local focus = self:GetFocusUnit()
+        if not focus then
+            return
+        end
+
+        -- Pods without orders don't show up in GetGuards, so we need to check them separately
+        if EntityCategoryContains(categories.PODSTAGINGPLATFORM, self) then
+            -- Defensive programming
+            if self.GetPods then
+                for _, pod in self:GetPods() do
+                    -- Pods without orders have a silent 'AssistCommander' order (commandType == 29)
+                    -- Can replace magic number with UnitQueueDataToCommand if necessary
+                    if pod:GetCommandQueue()[1].commandType == 29 then
+                        -- This is unfortunately hacky (giving a pod a stop order from the UI produces
+                        -- the behavior we want--build the focus unit without an explicit order--but
+                        -- IssueStop does not for some reason)
+                        IssueRepair({pod}, focus)
+                        IssueToUnitClearCommands(pod)
+                    end
+                end
+            else
+                WARN('CheckAssistersFocus: unit with PODSTAGINGPLATFORM has no GetPods function')
             end
+        end
+
+        local engineers = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
+        if not next(engineers) then
+            return
+        end
+
+        local cmd
+        local resetAssist = false
+        if self:IsUnitState('Reclaiming') then
+            cmd = IssueReclaim
+        elseif self:IsUnitState('Building') or self:IsUnitState('Repairing') then
+            -- Units assisting pods don't assist construction properly, so we do the repair override in that case
+            if self:GetHealth() == self:GetMaxHealth()
+            and not EntityCategoryContains(categories.POD, self) then
+                resetAssist = true
+            else
+                cmd = IssueRepair
+            end
+        end
+
+        if cmd then
+            IssueClearCommands(engineers)
+            cmd(engineers, focus)
+            IssueGuard(engineers, self)
+        elseif resetAssist then
+            IssueClearCommands(engineers)
+            IssueGuard(engineers, self)
         end
     end,
 

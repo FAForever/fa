@@ -216,6 +216,12 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
+    ---@return Unit[] pods
+    GetPods = function(self)
+        return {self.LeftPod, self.RightPod}
+    end,
+
+    ---@param self UEL0001
     ---@param bone Bone
     ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)
