@@ -55,7 +55,6 @@ UnitBlueprint{
         EconomyThreatLevel = 840,
         Health = 22000,
         MaxHealth = 22000,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {

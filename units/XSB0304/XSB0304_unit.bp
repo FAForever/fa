@@ -33,7 +33,6 @@ UnitBlueprint{
         EconomyThreatLevel = 440,
         Health = 10000,
         MaxHealth = 10000,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationDeath = {

@@ -41,7 +41,6 @@ UnitBlueprint{
         EconomyThreatLevel = 560,
         Health = 16000,
         MaxHealth = 16000,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationFinishBuildLand = "/units/ueb0302/ueb0302_aplatform.sca",

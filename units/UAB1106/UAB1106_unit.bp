@@ -31,7 +31,6 @@ UnitBlueprint{
         EconomyThreatLevel = 7,
         Health = 650,
         MaxHealth = 650,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Mesh = {

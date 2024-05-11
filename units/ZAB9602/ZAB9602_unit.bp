@@ -59,7 +59,6 @@ UnitBlueprint {
         EconomyThreatLevel = 34,
         Health = 6400,
         MaxHealth = 6400,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zab9602_desc>Air Factory',
     Display = {

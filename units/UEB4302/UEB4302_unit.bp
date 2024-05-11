@@ -32,7 +32,6 @@ UnitBlueprint{
         EconomyThreatLevel = 2236,
         Health = 3800,
         MaxHealth = 3800,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_stratmissiledef>Strategic Missile Defense" },

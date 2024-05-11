@@ -43,7 +43,6 @@ UnitBlueprint{
         Health = 11000,
         MaxHealth = 11000,
         RegenRate = 40,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },

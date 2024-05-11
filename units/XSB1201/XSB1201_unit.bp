@@ -34,7 +34,6 @@ UnitBlueprint{
         EconomyThreatLevel = 74,
         Health = 2400,
         MaxHealth = 2400,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_deathaoe>Volatile" },

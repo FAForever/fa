@@ -71,7 +71,6 @@ UnitBlueprint {
         EconomyThreatLevel = 12,
         Health = 7000,
         MaxHealth = 7000,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zsb9503_desc>Naval Factory',
     Display = {

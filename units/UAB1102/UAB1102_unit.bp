@@ -31,7 +31,6 @@ UnitBlueprint{
         EconomyThreatLevel = 26,
         Health = 1600,
         MaxHealth = 1600,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationPermOpen = "/Units/UAB1102/UAB1102_Aopen.sca",

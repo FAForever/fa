@@ -31,7 +31,6 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 10,
         MaxHealth = 10,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/drlk005/drlk005_aopen.sca",

@@ -31,7 +31,6 @@ UnitBlueprint{
         EconomyThreatLevel = 518,
         Health = 6750,
         MaxHealth = 6750,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_amphibious>Amphibious" },

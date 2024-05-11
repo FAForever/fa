@@ -35,7 +35,6 @@ UnitBlueprint{
         EconomyThreatLevel = 104,
         Health = 3200,
         MaxHealth = 3200,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },

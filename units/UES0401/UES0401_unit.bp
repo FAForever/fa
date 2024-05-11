@@ -68,7 +68,6 @@ UnitBlueprint{
         Health = 40000,
         MaxHealth = 40000,
         SubThreatLevel = 40,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AINames = {

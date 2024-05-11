@@ -30,7 +30,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 500,
         MaxHealth = 500,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationPermOpen = "/units/xrb3301/xrb3301_aopen.sca",

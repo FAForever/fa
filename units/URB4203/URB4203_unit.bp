@@ -30,7 +30,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 150,
         MaxHealth = 150,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_stealthfield>Stealth Field" },

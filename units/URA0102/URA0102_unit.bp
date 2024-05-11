@@ -63,7 +63,6 @@ UnitBlueprint{
         ArmorType = "Light",
         Health = 280,
         MaxHealth = 280,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_aa>Anti-Air" },

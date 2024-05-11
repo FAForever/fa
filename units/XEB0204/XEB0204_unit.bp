@@ -36,7 +36,6 @@ UnitBlueprint{
         EconomyThreatLevel = 110,
         Health = 2500,
         MaxHealth = 2500,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_engineeringsuite>Engineering Suite" },

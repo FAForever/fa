@@ -40,7 +40,6 @@ UnitBlueprint{
         Health = 1600,
         MaxHealth = 1600,
         SubThreatLevel = 11,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {

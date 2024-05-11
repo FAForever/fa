@@ -40,7 +40,6 @@ UnitBlueprint{
         EconomyThreatLevel = 2000,
         Health = 8000,
         MaxHealth = 8000,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/ueb2401/ueb2401_aopen.sca",

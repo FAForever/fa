@@ -58,7 +58,6 @@ UnitBlueprint {
         ArmorType = 'Light',
         Health = 29,
         MaxHealth = 29,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC xsc9011_desc>Jammer Crystal',
     Display = {

@@ -34,7 +34,6 @@ UnitBlueprint{
         EconomyThreatLevel = 720,
         Health = 21000,
         MaxHealth = 21000,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         BuildAttachBone = "Attachpoint01",

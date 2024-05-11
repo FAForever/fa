@@ -48,7 +48,6 @@ UnitBlueprint{
             ShieldVerticalOffset = -50,
         },
         SubThreatLevel = 9,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_shielddome>Shield Dome" },

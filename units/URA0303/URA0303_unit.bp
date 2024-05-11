@@ -64,7 +64,6 @@ UnitBlueprint{
         ArmorType = "ASF",
         Health = 2225,
         MaxHealth = 2225,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {

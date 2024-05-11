@@ -31,7 +31,6 @@ UnitBlueprint{
         EconomyThreatLevel = 9,
         Health = 800,
         MaxHealth = 800,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         DamageEffects = {

@@ -13,7 +13,6 @@ UnitBlueprint{
         EconomyThreatLevel = 0.1,
         Health = 1,
         MaxHealth = 1,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         MeshBlueprint = "<none>",

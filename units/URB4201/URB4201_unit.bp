@@ -29,7 +29,6 @@ UnitBlueprint{
         ArmorType = "TMD",
         Health = 950,
         MaxHealth = 950,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {

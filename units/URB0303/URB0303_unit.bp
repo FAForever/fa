@@ -43,7 +43,6 @@ UnitBlueprint{
         Health = 17000,
         MaxHealth = 17000,
         RegenRate = 60,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationBuild = '/units/urb0303/urb0303_abuild.sca',

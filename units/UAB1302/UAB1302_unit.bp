@@ -30,7 +30,6 @@ UnitBlueprint{
         EconomyThreatLevel = 505,
         Health = 6500,
         MaxHealth = 6500,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationActivate = "/units/UAB1302/UAB1302_Apump.sca",

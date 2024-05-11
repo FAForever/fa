@@ -40,7 +40,6 @@ UnitBlueprint{
         Health = 6000,
         MaxHealth = 6000,
         RegenRate = 20,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_deathaoe>Volatile" },

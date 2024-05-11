@@ -66,7 +66,6 @@ UnitBlueprint {
         Health = 5500,
         MaxHealth = 5500,
         RegenRate = 20,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zrb9602_desc>Air Factory',
     Display = {

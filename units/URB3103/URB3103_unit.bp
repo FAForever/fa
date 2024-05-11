@@ -17,7 +17,6 @@ UnitBlueprint{
         EconomyThreatLevel = 0.1,
         Health = 1,
         MaxHealth = 1,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/URL0101/URL0101_Aagro.sca",

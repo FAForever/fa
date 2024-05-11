@@ -31,7 +31,6 @@ UnitBlueprint{
         Health = 6250,
         MaxHealth = 6250,
         RegenRate = 20,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/urb1302/urb1302_Apump.sca",

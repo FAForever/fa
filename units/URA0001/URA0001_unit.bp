@@ -35,7 +35,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 30,
         MaxHealth = 30,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC ura0001_desc>Build Bot Effect',
     Display = {

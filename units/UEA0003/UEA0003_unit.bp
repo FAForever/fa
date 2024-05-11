@@ -95,7 +95,6 @@ UnitBlueprint {
         EconomyThreatLevel = 1,
         Health = 50,
         MaxHealth = 50,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC uea0003_desc>Engineering Drone',
     Display = {

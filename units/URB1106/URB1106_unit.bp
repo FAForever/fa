@@ -33,7 +33,6 @@ UnitBlueprint{
         Health = 600,
         MaxHealth = 600,
         RegenRate = 3,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         DamageEffects = {
