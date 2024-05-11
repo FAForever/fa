@@ -38,7 +38,6 @@ UnitBlueprint{
         EconomyThreatLevel = 2,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "CybranShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01b_mesh",

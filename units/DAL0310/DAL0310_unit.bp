@@ -31,7 +31,6 @@ UnitBlueprint{
         EconomyThreatLevel = 1,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
         SkipDynamicThreatCalculations = true,
     },
     Display = {

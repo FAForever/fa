@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1900,
         MaxHealth = 1900,
-        RegenRate = 0,
     },
     Description = '<LOC xsc1401_desc>Seraphim Research Station',
     Display = {

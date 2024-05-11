@@ -34,7 +34,6 @@ UnitBlueprint{
         EconomyThreatLevel = 0,
         Health = 1250,
         MaxHealth = 1250,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "AeonShieldHit01",
             OwnerShieldMesh = "/units/ual0202/ual0202_personalshield_mesh",

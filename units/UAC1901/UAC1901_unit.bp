@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
     },
     Description = '<LOC uac1901_desc>Seraphim Ruins',
     Display = {

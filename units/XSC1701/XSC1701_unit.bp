@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
     },
     Description = '<LOC xsc1701_desc>Seraphim Barracks',
     Display = {

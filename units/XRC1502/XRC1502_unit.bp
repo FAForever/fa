@@ -33,7 +33,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 6400,
         MaxHealth = 6400,
-        RegenRate = 0,
     },
     Description = '<LOC xrc1502_desc>PoW Facility',
     Display = {

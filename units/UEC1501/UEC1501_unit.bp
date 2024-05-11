@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1650,
         MaxHealth = 1650,
-        RegenRate = 0,
     },
     Description = '<LOC uec1501_desc>UEF Manufacturing Facility',
     Display = {

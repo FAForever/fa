@@ -21,7 +21,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 5000,
         MaxHealth = 5000,
-        RegenRate = 0,
     },
     Description = '<LOC opc5008_desc>UEF Prison Facility',
     Display = {

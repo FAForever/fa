@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1900,
         MaxHealth = 1900,
-        RegenRate = 0,
     },
     Description = '<LOC xsc1601_desc>Seraphim Hydroponics Bay',
     Display = {

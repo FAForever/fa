@@ -19,7 +19,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
     },
     Description = '<LOC ope3001_desc>OpE3 Black Box',
     Display = {

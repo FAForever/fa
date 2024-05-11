@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1450,
         MaxHealth = 1450,
-        RegenRate = 0,
     },
     Description = '<LOC uac1501_desc>Aeon Manufacturing Center',
     Display = {

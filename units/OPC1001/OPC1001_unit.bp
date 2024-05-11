@@ -8,7 +8,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 8000,
         MaxHealth = 8000,
-        RegenRate = 0,
     },
     Description = '<LOC opc1001_desc>Symbiont Structure',
     Display = {

@@ -33,7 +33,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 4500,
         MaxHealth = 4500,
-        RegenRate = 0,
     },
     Description = '<LOC xac1401_desc>Science Facility',
     Display = {

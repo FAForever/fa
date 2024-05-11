@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 2000,
         MaxHealth = 2000,
-        RegenRate = 0,
     },
     Description = '<LOC uec1401_desc>UEF Agricultural Center',
     Display = {

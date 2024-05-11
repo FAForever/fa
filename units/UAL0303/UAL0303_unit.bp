@@ -35,7 +35,6 @@ UnitBlueprint{
         EconomyThreatLevel = 113,
         Health = 3600,
         MaxHealth = 3600,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "AeonShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",

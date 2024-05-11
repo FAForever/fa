@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 50000,
         MaxHealth = 50000,
-        RegenRate = 0,
     },
     Description = '<LOC uec1901_desc>UEF Black Sun',
     Display = {
