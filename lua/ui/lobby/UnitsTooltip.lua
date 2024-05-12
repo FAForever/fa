@@ -111,7 +111,7 @@ function Create(parent, bp)
     local column5 = column4 - 90  -- range
     local column6 = column5 - 10
 
-    local text = nil
+    -- Reusable string value
     local value = ''
 
     tooltipHeight = math.max(tooltipUI.title.Height(), 1)
