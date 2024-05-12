@@ -272,50 +272,36 @@ function Create(parent, bp)
 
     local total = UnitsAnalyzer.GetWeaponsTotal(weapons)
     if total.Count > 1 then
-        top  = top + 10
+        top  = top + 10 -- + 10 padding (don't forget dmgtext from before)
 
-        local weaponText = UIUtil.CreateText(tooltipUI, total.Info, fontTextSize, fontTextName)
-        weaponText:SetColor('FFE1DFDF') ----FFE1DFDF
-        LayoutHelpers.AtLeftTopIn(weaponText, tooltipUI, left, top)
-        top  = top + weaponText.Height() + 1
+        local weaponText = Layouter(UIUtil.CreateText(tooltipUI, total.Info, fontTextSize-1, fontTextName)):Color(colorText):AtLeftIn(tooltipUI, left)
+            :AnchorToBottom(furthestDownControl, 10):End()
 
-        value = StringComma(total.Range) .. ' ' --RANGE
-        local rangeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-        rangeText:SetColor('FFF70B0B') ----FFF70B0B
-        LayoutHelpers.AtRightTopIn(rangeText, tooltipUI, column4, top)
-        local rangeIcon = Bitmap(tooltipUI)
-        rangeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds')
-        LayoutHelpers.SetDimensions(rangeIcon, iconSize, iconSize)
-        LayoutHelpers.AtLeftTopIn(rangeIcon, tooltipUI, tooltipWidth-column4, top+1)
+        top  = top + weaponText.Height() + 1 -- all weapons title text + 1 padding
 
-        value = string.format("%0.2f",total.DPM) .. ' '
-        local dpmText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-        dpmText:SetColor('FFF70B0B') ----FFF70B0B
-        LayoutHelpers.AtRightTopIn(dpmText, tooltipUI, column5, top)
-        local dpmIcon = Bitmap(tooltipUI)
-        dpmIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds')
-        LayoutHelpers.SetDimensions(dpmIcon, iconSize, iconSize)
-        LayoutHelpers.AtLeftTopIn(dpmIcon, tooltipUI, tooltipWidth-column5, top+1)
+        value = StringComma(total.Damage)
+        local dmgIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage.dds'):Width(iconSize):Height(iconSize)
+            :AtRightIn(EnergyCostIcon):AnchorToBottom(weaponText, 2):End()
+        local dmgText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dmgIcon, 4):AnchorToBottom(weaponText, 1):End()
 
-        value = StringComma(total.DPS) .. ' '
-        local dpsText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-        dpsText:SetColor('FFF70B0B') ----FFF70B0B
-        LayoutHelpers.AtRightTopIn(dpsText, tooltipUI, column3, top)
-        local dpsIcon = Bitmap(tooltipUI)
-        dpsIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds')
-        LayoutHelpers.SetDimensions(dpsIcon, iconSize, iconSize)
-        LayoutHelpers.AtLeftTopIn(dpsIcon, tooltipUI, tooltipWidth-column3, top+1)
+        furthestDownControl = dmgText
 
-        value = StringComma(total.Damage) .. ' '
-        local dmgText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-        dmgText:SetColor('FFF70B0B') ----FFF70B0B
-        LayoutHelpers.AtRightTopIn(dmgText, tooltipUI, column2, top)
-        local dmgIcon = Bitmap(tooltipUI)
-        dmgIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage.dds')
-        LayoutHelpers.SetDimensions(dmgIcon, iconSize, iconSize)
-        LayoutHelpers.AtLeftTopIn(dmgIcon, tooltipUI, tooltipWidth-column2, top+1)
+        value = StringComma(total.DPS)
+        local dpsIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds'):Width(iconSize):Height(iconSize)
+            :AtRightIn(EnergyProdIcon):AnchorToBottom(weaponText, 2):End()
+        local dpsText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dpsIcon, 4):AnchorToBottom(weaponText, 1):End()
+        
+        value = StringComma(total.Range)
+        local rangeIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds'):Width(iconSize):Height(iconSize)
+            :AtRightIn(ShieldIcon):AnchorToBottom(weaponText, 2):End()
+        local rangeText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(rangeIcon, 4):AnchorToBottom(weaponText, 1):End()
+        
+        value = string.format("%0.2f", total.DPM)
+        local dpmIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds'):Width(iconSize):Height(iconSize)
+            :AtRightIn(ShieldPerMassIcon):AnchorToBottom(weaponText, 2):End()
+        local dpmText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dpmIcon, 4):AnchorToBottom(weaponText, 1):End()
 
-        top  = top + dmgText.Height()
+        top  = top + dmgText.Height() -- + dmgtext height
     end
 
     if bp.Mod then
