@@ -102,7 +102,7 @@ function Create(parent, bp)
     categoriesText:SetText( table.concat(UnitsAnalyzer.GetUnitsCategories(bp, false), ', ') )
     categoriesText:SetFont(fontTextName, fontTextSize - 1)
     categoriesText:SetColors('FFFC9038', nil, nil, nil) -- Only the foreground color will be changed, the rest will remain as defaults
-    local textAreaHeight = categoriesText:GetItemCount() * (fontTextSize + PixelScaleFactor) -- +1 px for the text to fit in
+    local textAreaHeight = categoriesText:GetItemCount() * (fontTextSize + 2 /PixelScaleFactor)
     Layouter(categoriesText):Height(textAreaHeight):AtLeftIn(tooltipUI, left):AtTopIn(body, 2):End()
     tooltipUI.Categories = categoriesText
 
@@ -131,7 +131,7 @@ function Create(parent, bp)
         description:SetText(value)
         description:SetFont(fontTextName, fontTextSize-1)
         description:SetColors(colorText, nil, nil, nil)
-        local textAreaHeight = description:GetItemCount() * (fontTextSize + PixelScaleFactor)
+        local textAreaHeight = description:GetItemCount() * (fontTextSize + 2 /PixelScaleFactor)
         Layouter(description):Height(textAreaHeight):AtLeftIn(tooltipUI, 7):AnchorToBottom(categoriesText):End()
         tooltipUI.Descr = description
     end
