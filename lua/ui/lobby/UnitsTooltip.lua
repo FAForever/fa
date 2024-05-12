@@ -47,14 +47,6 @@ local colorMod     = 'FFCB59F7' -- --FFCB59F7
 
 local debugging = false
 
--- convert time in ticks to a string with MM:SS format
-local function stringTime(time)
-    time = time / 60
-    local timeMM =  math.floor(time / 60)
-    local timeSS =  math.floor(math.mod(time, 60))
-    return string.format("%02d:%02d", timeMM, timeSS)
-end
-
 -- initializes value to zero if it is nil
 local function init(value)
     return value > 1 and value or 0
@@ -227,7 +219,7 @@ function Create(parent, bp)
 
     top = top + EnergyCostText.Height() + 2 -- row 3 text height + 2 padding
 
-    value = stringTime(math.floor(eco.BuildTime)) .. ' '
+    value = math.floor(eco.BuildTime)
     BuildTimeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     BuildTimeText:SetColor(colorBuild) ----FFD9D9D9
     LayoutHelpers.AtRightTopIn(BuildTimeText, tooltipUI, column2, top)
