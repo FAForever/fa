@@ -789,7 +789,7 @@ end
 
 function ChatPageUp(mod)
     if GUI.bg:IsHidden() then
-        ForkThread(function() ToggleChat() end)
+        ForkThread(ToggleChat)
     else
         local newTop = GUI.chatContainer.top - mod
         GUI.chatContainer:ScrollSetTop(nil, newTop)
@@ -801,7 +801,7 @@ function ChatPageDown(mod)
     local newTop = GUI.chatContainer.top + mod
     GUI.chatContainer:ScrollSetTop(nil, newTop)
     if GUI.bg:IsHidden() or oldTop == GUI.chatContainer.top then
-        ForkThread(function() ToggleChat() end)
+        ForkThread(ToggleChat)
     end
 end
 

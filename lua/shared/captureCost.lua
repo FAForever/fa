@@ -1,5 +1,5 @@
---**********************************************************************************
---** Copyright (c) 2023 FAForever
+--******************************************************************************************************
+--** Copyright (c) 2024 lL1l1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -18,17 +18,25 @@
 --** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
---**********************************************************************************
+--******************************************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
-local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
+-- All functions in this file (inside /lua/shared) should be:
+-- - pure: they should only use the arguments provided, do not touch any global state.
+-- - sim / ui proof: they should work for both sim code and ui code.
 
---- AEON ARTILLERY PROJECTILES
----@class AMiasmaProjectile : EmitterProjectile
-AMiasmaProjectile = ClassProjectile(EmitterProjectile) {
-    FxTrails = EffectTemplate.AMiasmaMunition01,
-    FxImpactNone = EffectTemplate.AMiasma01,
-    FxImpactLand = EffectTemplate.AMiasmaField01,
-    FxImpactUnit = EffectTemplate.AMiasmaField01,
-    FxImpactProp = EffectTemplate.AMiasmaField01,
-}
+--- Formula to compute the energy and time cost of capturing
+---@param blueprint UnitBlueprint
+---@param number buildRate
+---@return number time
+---@return number energy
+GetBlueprintCaptureCost = function(blueprint, buildRate)
+    local blueprintEconomy = blueprint.Economy
+    
+    local time = ((blueprintEconomy.BuildTime or 10) / buildRate) / 2
+    local energy = blueprintEconomy.BuildCostEnergy or 100
+    if time < 0 then
+        time = 0.1
+    end
+
+    return time, energy
+end

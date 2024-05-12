@@ -1175,25 +1175,28 @@ function OnRolloverHandler(button, state)
     end
 end
 
+---@param unit UserUnit
 function watchForQueueChange(unit)
     if watchingUnit == unit then
         return
     end
-
     updateQueue = false
     watchingUnit = unit
-    ForkThread(function()
-        local threadWatchingUnit = watchingUnit
-        while unit:GetCommandQueue()[1].type ~= 'Script' do
-            WaitSeconds(0.2)
-        end
+    ForkThread(QueueChangeWatchThread, unit)
+end
 
-        local selection = GetSelectedUnits() or {}
-        if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
-            SetSecondaryDisplay(lastDisplayType)
-        end
-        watchingUnit = nil
-    end)
+---@param unit UserUnit
+function QueueChangeWatchThread(unit)
+    local threadWatchingUnit = watchingUnit
+    while unit:GetCommandQueue()[1].type ~= 'Script' do
+        WaitSeconds(0.2)
+    end
+
+    local selection = GetSelectedUnits() or {}
+    if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
+        SetSecondaryDisplay(lastDisplayType)
+    end
+    watchingUnit = nil
 end
 
 function checkBadClean(unit)
