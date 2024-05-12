@@ -146,12 +146,13 @@ function Create(parent, bp)
         value = LOC(UnitDescriptions[baseID])
     end
 
+    local description
     if not value then
         if not bp.Mod then -- show warnings only for not modded units
             WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
         end
     else
-        local description = TextArea(tooltipUI, tooltipWidth-14, 30)
+        description = TextArea(tooltipUI, tooltipWidth-14, 30)
         description:SetText(value)
         description:SetFont(fontTextName, fontTextSize-1)
         description:SetColors(colorText, nil, nil, nil)
@@ -163,23 +164,19 @@ function Create(parent, bp)
         top  = top + 12 -- + categories height + 12 padding
     end
 
-    local perMassLabel = UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)
-    perMassLabel:SetColor(colorText)
-    LayoutHelpers.AtRightTopIn(perMassLabel, tooltipUI, column5-iconSize-5, top)
+    local costLabel = Layouter(UIUtil.CreateText(tooltipUI, 'BUILD COST ', fontTextSize-2, fontTextName)):Color(colorText)
+        :AtRightIn(tooltipUI, column2-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
 
-    local defenseLabel = UIUtil.CreateText(tooltipUI, 'DEFENSE ', fontTextSize-2, fontTextName)
-    defenseLabel:SetColor(colorText)
-    LayoutHelpers.AtRightTopIn(defenseLabel, tooltipUI, column4-iconSize-5, top)
+    local prodLabel = Layouter(UIUtil.CreateText(tooltipUI, 'PRODUCTION ', fontTextSize-2, fontTextName)):Color(colorText)
+        :AtRightIn(tooltipUI, column3-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
 
-    local prodLabel = UIUtil.CreateText(tooltipUI, 'PRODUCTION ', fontTextSize-2, fontTextName)
-    prodLabel:SetColor(colorText)
-    LayoutHelpers.AtRightTopIn(prodLabel, tooltipUI, column3-iconSize-5, top)
+    local defenseLabel = Layouter(UIUtil.CreateText(tooltipUI, 'DEFENSE ', fontTextSize-2, fontTextName)):Color(colorText)
+        :AtRightIn(tooltipUI, column4-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
 
-    local costLabel = UIUtil.CreateText(tooltipUI, 'BUILD COST ', fontTextSize-2, fontTextName)
-    costLabel:SetColor(colorText)
-    LayoutHelpers.AtRightTopIn(costLabel, tooltipUI, column2-iconSize-5, top)
+    local perMassLabel = Layouter(UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)):Color(colorText)
+        :AtRightIn(tooltipUI, column5-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
 
-    top  = top + costLabel.Height()  + 1
+    top  = top + costLabel.Height()  + 1 -- + row 1 height + 1 padding
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
