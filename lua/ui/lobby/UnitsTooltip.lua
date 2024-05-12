@@ -203,47 +203,29 @@ function Create(parent, bp)
 
     top  = top + MassCostText.Height() + 2 -- row 2 text height + 2 padding
 
-    local shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
-    local shieldString = StringComma(math.floor(shieldValue)) .. ' '
-    ShieldText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
-    ShieldText:SetColor(colorDefense) ----FF0BACF7
-    LayoutHelpers.AtRightTopIn(ShieldText, tooltipUI, column4, top)
-    ShieldIcon = Bitmap(tooltipUI)
-    ShieldIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds')
-    LayoutHelpers.SetDimensions(ShieldIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(ShieldIcon, tooltipUI, tooltipWidth-column4, top+2)
-
-    local shieldValue = (shieldValue / eco.BuildCostMass)
-    local shieldString = string.format("%0.2f",shieldValue) .. ' '
-    ShieldPerMassText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
-    ShieldPerMassText:SetColor(colorDefense) ----FF0BACF7
-    LayoutHelpers.AtRightTopIn(ShieldPerMassText, tooltipUI, column5, top)
-    ShieldPerMassIcon = Bitmap(tooltipUI)
-    ShieldPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds')
-    LayoutHelpers.SetDimensions(ShieldPerMassIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(ShieldPerMassIcon, tooltipUI, tooltipWidth-column5, top+2)
+    value = StringComma(math.ceil(eco.BuildCostEnergy))
+    local EnergyCostIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/energy.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(MassCostIcon):AnchorToBottom(MassCostText, 3):End()
+    local EnergyCostText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorEnergy):LeftOf(EnergyCostIcon, 4):AnchorToBottom(MassCostText, 2):End()
 
     value = eco.YieldEnergy
-    value = value > 0 and '+' .. value or value
-    value = StringComma(value) .. ' '
-    EnergyProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    EnergyProdText:SetColor(colorEnergy) ----FFF7B00B
-    LayoutHelpers.AtRightTopIn(EnergyProdText, tooltipUI, column3, top)
-    EnergyProdIcon = Bitmap(tooltipUI)
-    EnergyProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/energy.dds')
-    LayoutHelpers.SetDimensions(EnergyProdIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(EnergyProdIcon, tooltipUI, tooltipWidth-column3, top+2)
+    value = StringComma(value > 0 and '+' .. value or value)
+    local EnergyProdIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/energy.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(MassProdIcon):AnchorToBottom(MassProdText, 3):End()
+    local EnergyProdText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorEnergy):LeftOf(EnergyProdIcon, 4):AnchorToBottom(MassProdText, 2):End()
 
-    value = StringComma(math.ceil(eco.BuildCostEnergy)) .. ' '
-    EnergyCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    EnergyCostText:SetColor(colorEnergy) ----FFF7B00B
-    LayoutHelpers.AtRightTopIn(EnergyCostText, tooltipUI, column2, top)
-    EnergyCostIcon = Bitmap(tooltipUI)
-    EnergyCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/energy.dds')
-    LayoutHelpers.SetDimensions(EnergyCostIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(EnergyCostIcon, tooltipUI, tooltipWidth-column2, top+2)
+    local shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
+    value = StringComma(math.floor(shieldValue))
+    local ShieldIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(HealthIcon):AnchorToBottom(HealthText, 3):End()
+    local ShieldText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(ShieldIcon, 4):AnchorToBottom(HealthText, 2):End()
 
-    top = top + EnergyCostText.Height() + 2
+    value = string.format("%0.2f",(shieldValue / eco.BuildCostMass))
+    local ShieldPerMassIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(HealthPerMassIcon):AnchorToBottom(HealthPerMassText, 3):End()
+    local ShieldPerMassText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(ShieldPerMassIcon, 4):AnchorToBottom(HealthPerMassText, 2):End()
+
+    top = top + EnergyCostText.Height() + 2 -- row 3 text height + 2 padding
 
     value = stringTime(math.floor(eco.BuildTime)) .. ' '
     BuildTimeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
