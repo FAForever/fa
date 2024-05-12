@@ -6,5 +6,5 @@ This folder contains all the assets that are required to generate the [wikipedia
 
 The following tools are required. It is recommended to have them available in the PATH environment variable.
 
-- [Lua 5.4+](https://www.lua.org/ftp/)
-- [ImageMagick](https://imagemagick.org/script/download.php)
+- [Lua 5.4+](https://www.lua.org/ftp/): Required to run the generator
+- [ImageMagick](https://imagemagick.org/script/download.php): Required to convert the (strategic) unit icons from DDS to PNG
