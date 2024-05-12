@@ -76,12 +76,14 @@ function Create(parent, bp)
     local titleString = ''
 
     if bp.Description then
-        titleString = ' ' .. bp.Tech .. ' ' .. LOCF(bp.Description)
-    elseif bp.Name  then
-        titleString = ' ' .. LOCF(bp.Name)
+        titleString = ' ' .. bp.Tech .. ' ' .. LOC(bp.Description)
+    elseif bp.Name then
+        titleString = ' ' .. LOC(bp.Name)
     end
-    if bp.General.UnitName and not bp.CategoriesHash['SUBCOMMANDER'] then
-        titleString = titleString .. ' (' .. LOCF(bp.General.UnitName) .. ')'
+
+    local generalUnitName = LOC(bp.General.UnitName)
+    if generalUnitName and generalUnitName ~= '' and not bp.CategoriesHash['SUBCOMMANDER'] then
+        titleString = titleString .. ' (' .. generalUnitName .. ')'
     end
 
     local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 2, 2):End()
