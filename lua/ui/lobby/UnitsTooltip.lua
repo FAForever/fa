@@ -63,8 +63,8 @@ function Create(parent, bp)
 
     Destroy()
 
-    -- This looks like a border for the entire tooltip when the other backgrounds on top fill it in.
-    tooltipUI = Layouter(Bitmap(parent)):Color(UIUtil.tooltipBorderColor):Over(parent, 10000):Width(tooltipWidth):Height(tooltipHeight):End()
+    -- Acts a border for the entire tooltip when the other backgrounds on top fill it in.
+    tooltipUI = Layouter(Bitmap(parent)):Color(UIUtil.tooltipBorderColor):Over(parent, 10000):Width(tooltipWidth):End()
 
     -- left text margin; leftwards offset from the tooltip border's left edge
     local left = 7
@@ -90,19 +90,12 @@ function Create(parent, bp)
     local titleBg = Layouter(Bitmap(tooltipUI)):Color(UIUtil.tooltipTitleColor):Under(title):AtTopIn(title):AtBottomIn(title, -2):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):End()
     tooltipUI.titleBg = titleBg
 
-    local titleHeight = math.max(tooltipUI.title.Height(), 1) + 4 -- 2 border + title height + 2 titleBg bottom negative padding
-    local top  = titleHeight
-
     -- Serves as the black background of the body of the tooltip
-    local body = Layouter(Bitmap(tooltipUI)):Color('FF080808'):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):Height(300):AnchorToBottom(titleBg):End()
+    local body = Layouter(Bitmap(tooltipUI)):Color('FF080808'):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):AnchorToBottom(titleBg):End()
     tooltipUI.body = body
 
-    top = top + 2 -- + 2 body padding
-
-    -- Reusable string value
+    -- Reusable value from which text will be created
     local value = ''
-
-    tooltipHeight = math.max(tooltipUI.title.Height(), 1)
 
     -- showing bp.Categories because they are more accurate than bp.Display.Abilities
     local categoriesText = TextArea(tooltipUI, tooltipWidth - 2 * left, 30)
@@ -112,9 +105,6 @@ function Create(parent, bp)
     local textAreaHeight = categoriesText:GetItemCount() * (fontTextSize + PixelScaleFactor) -- +1 px for the text to fit in
     Layouter(categoriesText):Height(textAreaHeight):AtLeftIn(tooltipUI, left):AtTopIn(body, 2):End()
     tooltipUI.Categories = categoriesText
-
-    top = top + tooltipUI.Categories.Height()
-    top = top + 8 -- + categories height + 8 padding
 
     local id = bp.ID
     if bp.Type == "UPGRADE" and bp.Icon and bp.SourceID then
@@ -144,9 +134,6 @@ function Create(parent, bp)
         local textAreaHeight = description:GetItemCount() * (fontTextSize + PixelScaleFactor)
         Layouter(description):Height(textAreaHeight):AtLeftIn(tooltipUI, 7):AnchorToBottom(categoriesText):End()
         tooltipUI.Descr = description
-
-        top  = top + tooltipUI.Descr.Height()
-        top  = top + 12 -- + categories height + 12 padding
     end
 
     -- the columns give the right margin of the text so that the numbers can grow leftwards freely
@@ -155,6 +142,7 @@ function Create(parent, bp)
     local column4 = column3 - 90  -- defense/range                      -- 137  -- 420 - 137 = 283
     local column5 = column4 - 90  -- per mass                           -- 47   -- 420 - 47  = 373
 
+    -- Column headers
     local costLabel = Layouter(UIUtil.CreateText(tooltipUI, 'BUILD COST ', fontTextSize-2, fontTextName)):Color(colorText)
         :AtRightIn(tooltipUI, column2-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
 
@@ -167,7 +155,7 @@ function Create(parent, bp)
     local perMassLabel = Layouter(UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)):Color(colorText)
         :AtRightIn(tooltipUI, column5-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
 
-    top  = top + costLabel.Height()  + 1 -- + row 1 height + 1 padding
+    -- Mass/HP row
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
@@ -193,7 +181,7 @@ function Create(parent, bp)
         :AtRightIn(perMassLabel, 5):AnchorToBottom(perMassLabel, 2):End()
     local HealthPerMassText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(HealthPerMassIcon, 4):AnchorToBottom(perMassLabel, 1):End()
 
-    top  = top + MassCostText.Height() + 2 -- row 2 text height + 2 padding
+    -- Energy/Shield row
 
     value = StringComma(math.ceil(eco.BuildCostEnergy))
     local EnergyCostIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/energy.dds'):Width(iconSize):Height(iconSize)
@@ -217,7 +205,7 @@ function Create(parent, bp)
         :AtRightIn(HealthPerMassIcon):AnchorToBottom(HealthPerMassText, 3):End()
     local ShieldPerMassText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(ShieldPerMassIcon, 4):AnchorToBottom(HealthPerMassText, 2):End()
 
-    top = top + EnergyCostText.Height() + 2 -- row 3 text height + 2 padding
+    -- Buildrate/time row
 
     value = StringComma(math.floor(eco.BuildTime))
     local BuildTimeIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/build-time.dds'):Width(iconSize):Height(iconSize)
@@ -229,21 +217,17 @@ function Create(parent, bp)
         :AtRightIn(EnergyProdIcon):AnchorToBottom(EnergyProdText, 3):End()
     local BuildRateText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorBuild):LeftOf(BuildRateIcon, 4):AnchorToBottom(EnergyProdText, 2):End()
 
-    top  = top + BuildTimeText.Height() + 10 -- row 4 text height + 10 padding
+    -- Individual weapon stat rows
 
     local furthestDownControl = BuildRateText
     local weapons = UnitsAnalyzer.GetWeaponsStats(bp)
     for i, weapon in weapons or {} do
-        top = top + 1 -- + 1 padding
-
         local weaponText = Layouter(UIUtil.CreateText(tooltipUI, weapon.Info, fontTextSize-1, fontTextName)):Color(colorText):AtLeftIn(tooltipUI, left)
         if furthestDownControl == BuildRateText then
             weaponText = weaponText:AnchorToBottom(BuildTimeText, 11):End()
         else
             weaponText = weaponText:AnchorToBottom(furthestDownControl, 1):End()
         end
-
-        top = top + weaponText.Height()  + 1 -- + weapon title text height + 1 padding
         
         value = StringComma(weapon.Damage)
         local dmgIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage.dds'):Width(iconSize):Height(iconSize)
@@ -266,18 +250,14 @@ function Create(parent, bp)
         local dpmIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(ShieldPerMassIcon):AnchorToBottom(weaponText, 2):End()
         local dpmText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dpmIcon, 4):AnchorToBottom(weaponText, 1):End()
-
-        top  = top + dmgText.Height() -- + dmgtext Height
     end
+
+    -- Weapon stats summary row
 
     local total = UnitsAnalyzer.GetWeaponsTotal(weapons)
     if total.Count > 1 then
-        top  = top + 10 -- + 10 padding (don't forget dmgtext from before)
-
         local weaponText = Layouter(UIUtil.CreateText(tooltipUI, total.Info, fontTextSize-1, fontTextName)):Color(colorText):AtLeftIn(tooltipUI, left)
             :AnchorToBottom(furthestDownControl, 10):End()
-
-        top  = top + weaponText.Height() + 1 -- all weapons title text + 1 padding
 
         value = StringComma(total.Damage)
         local dmgIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage.dds'):Width(iconSize):Height(iconSize)
@@ -300,18 +280,14 @@ function Create(parent, bp)
         local dpmIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds'):Width(iconSize):Height(iconSize)
             :AtRightIn(ShieldPerMassIcon):AnchorToBottom(weaponText, 2):End()
         local dpmText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDamage):LeftOf(dpmIcon, 4):AnchorToBottom(weaponText, 1):End()
-
-        top  = top + dmgText.Height() -- + dmgtext height
     end
 
-    if bp.Mod then
-        top  = top + 10 -- + 10 padding
+    -- blueprint source rows
 
+    if bp.Mod then
         value = 'MOD: ' .. bp.Mod.name
         local mod = Layouter(UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)):Color(colorMod):AtLeftIn(tooltipUI, left):AnchorToBottom(furthestDownControl, 10):End()
         furthestDownControl = mod
-
-        top  = top + mod.Height() -- + mod height
 
         if debugging and bp.Source then
             value = '' .. bp.Source
@@ -320,9 +296,11 @@ function Create(parent, bp)
         end
     end
 
+    -- Finalize layout
+
     body = Layouter(body):AtBottomIn(furthestDownControl, -8):End()
 
-
+    -- Have to set the top edge position to a value to be able to calculate the overall height
     tooltipUI = Layouter(tooltipUI):AtBottomIn(body, -2):Top(0):ResetHeight():Height(tooltipUI.Height()/PixelScaleFactor):ResetTop()
 
     -- Keep the tooltip on screen
