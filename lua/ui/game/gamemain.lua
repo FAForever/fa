@@ -586,14 +586,14 @@ local cachedSelection = {
 --- Observable to allow mods to do something with a new selection
 ObserveSelection = import("/lua/shared/observable.lua").Create()
 
--- This function is called whenever the set of currently selected units changes
--- See /lua/unit.lua for more information on the lua unit object
--- @param oldSelection: What the selection was before
--- @param newSelection: What the selection is now
--- @param added: Which units were added to the old selection
--- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
+
+---This function is called whenever the set of currently selected units changes
+---@param oldSelection UserUnit[] What the selection was before
+---@param newSelection UserUnit[] What the selection is now
+---@param added UserUnit[]        Which units were added to the old selection
+---@param removed UserUnit[]      Which units where removed from the old selection
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if ignoreSelection then
@@ -711,7 +711,11 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
+---@param newQueue UIBuildQueue
 function OnQueueChanged(newQueue)
+    -- update the Lua representation of the queue
+    UpdateCurrentFactoryForQueueDisplay(newQueue)
+
     if not gameUIHidden then
         import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
@@ -750,6 +754,22 @@ function OnUserPause(pause)
     if Tabs.CanUserPause() then
         if focus == -1 and not SessionIsReplay() then
             return
+        end
+
+        if not SessionIsReplay() then
+            if pause then
+                SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+                    to = 'all',
+                    text = 'Paused the game',
+                    Chat = true,
+                })
+            else
+                SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+                    to = 'all',
+                    text = 'Unpaused the game',
+                    Chat = true,
+                })
+            end
         end
 
         if pause then
@@ -1014,16 +1034,34 @@ function HideNISBars()
     end
 end
 
+---@type table<string, fun(sender: string, data: table)>
 local chatFuncs = {}
 
-function RegisterChatFunc(func, dataTag)
-    table.insert(chatFuncs, {id = dataTag, func = func})
+---@param func fun(sender: string, data: table)
+---@param identifier string
+function RegisterChatFunc(func, identifier)
+    chatFuncs[identifier] = func
 end
 
+--- Called by the engine as (chat) messages are received.
+---@param sender string     # username
+---@param data table        
 function ReceiveChat(sender, data)
-    for i, chatFuncEntry in chatFuncs do
-        if data[chatFuncEntry.id] then
-            chatFuncEntry.func(sender, data)
+    if data.Identifier then
+
+        -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
+
+        local func = chatFuncs[data.Identifier]
+        if func then
+            func(sender, data)
+        end
+    else
+        -- for legacy support we also search through the chat functions the 'old way'
+
+        for identifier, func in chatFuncs do
+            if data[identifier] then
+                func(sender, data)
+            end
         end
     end
 end

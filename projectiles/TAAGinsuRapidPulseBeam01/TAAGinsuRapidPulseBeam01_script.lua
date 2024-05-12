@@ -1,8 +1,6 @@
---
--- UEF Ginsu Rapid Pulse Beam
---
 local TAAGinsuRapidPulseBeamProjectile= import("/lua/terranprojectiles.lua").TAAGinsuRapidPulseBeamProjectile
-TAAGinsuRapidPulseBeam01 = ClassProjectile(TAAGinsuRapidPulseBeamProjectile) {
-}
 
+--- UEF Ginsu Rapid Pulse Beam
+---@class TAAGinsuRapidPulseBeam01: TAAGinsuRapidPulseBeamProjectile
+TAAGinsuRapidPulseBeam01 = ClassProjectile(TAAGinsuRapidPulseBeamProjectile) {}
 TypeClass = TAAGinsuRapidPulseBeam01

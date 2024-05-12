@@ -77,7 +77,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY AEON STRUCTURE NAVAL",
@@ -126,7 +126,6 @@ UnitBlueprint{
     LifeBarOffset = 6.7,
     LifeBarSize = 4.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -137,11 +136,9 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsX = 5,
         MeshExtentsY = 2,
         MeshExtentsZ = 14,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = -6,    Y = 0,     Z = -8 },
@@ -151,7 +148,6 @@ UnitBlueprint{
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionSizeX = 2.5,
     SelectionSizeZ = 8.8,

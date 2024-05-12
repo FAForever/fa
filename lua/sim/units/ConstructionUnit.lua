@@ -1,5 +1,16 @@
 
+
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
+local MobileUnitOnCreate = MobileUnit.OnCreate
+local MobileUnitOnPaused = MobileUnit.OnPaused
+local MobileUnitOnUnpaused = MobileUnit.OnUnpaused
+local MobileUnitStopBuildingEffects = MobileUnit.StopBuildingEffects
+local MobileUnitStartBuildingEffects =  MobileUnit.StartBuildingEffects
+local MobileUnitOnStartBuild = MobileUnit.OnStartBuild
+local MobileUnitOnStopBuild = MobileUnit.OnStopBuild
+local MobileUnitOnFailedToBuild = MobileUnit.OnFailedToBuild
+local MobileUnitOnPrepareArmToBuild = MobileUnit.OnPrepareArmToBuild
+local MobileUnitOnStopBuilderTracking = MobileUnit.OnStopBuilderTracking
 
 ---@class ConstructionUnit : MobileUnit
 ---@field BuildingOpenAnim? FileName
@@ -9,12 +20,14 @@ local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
 ---@field UnitBuildOrder? string
 ---@field Upgrading? boolean
 ---@field BuildArmManipulator moho.AimManipulator
+---@field BuildEffectBones string[]
+---@field BuildEffectsBag TrashBag
 ---@field StoppedBuilding? boolean
 ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     OnCreate = function(self)
-        MobileUnit.OnCreate(self)
+        MobileUnitOnCreate(self)
 
         local bp = self.Blueprint
 
@@ -44,9 +57,9 @@ ConstructionUnit = ClassUnit(MobileUnit) {
     OnPaused = function(self)
         -- When factory is paused take some action
         self:StopUnitAmbientSound('ConstructLoop')
-        MobileUnit.OnPaused(self)
+        MobileUnitOnPaused(self)
         if self.BuildingUnit then
-            MobileUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            MobileUnitStopBuildingEffects(self, self.UnitBeingBuilt)
         end
     end,
 
@@ -54,9 +67,9 @@ ConstructionUnit = ClassUnit(MobileUnit) {
     OnUnpaused = function(self)
         if self.BuildingUnit then
             self:PlayUnitAmbientSound('ConstructLoop')
-            MobileUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
+            MobileUnitStartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
-        MobileUnit.OnUnpaused(self)
+        MobileUnitOnUnpaused(self)
     end,
 
     ---@param self ConstructionUnit
@@ -66,7 +79,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         if unitBeingBuilt.WorkItem.Slot and unitBeingBuilt.WorkProgress == 0 then
             return
         else
-            MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
+            MobileUnitOnStartBuild(self, unitBeingBuilt, order)
         end
 
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
@@ -81,8 +94,8 @@ ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     ---@param unitBeingBuilt Unit
-    OnStopBuild = function(self, unitBeingBuilt)
-        MobileUnit.OnStopBuild(self, unitBeingBuilt)
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        MobileUnitOnStopBuild(self, unitBeingBuilt, order)
         if self.Upgrading then
             NotifyUpgrade(self, unitBeingBuilt)
             self:Destroy()
@@ -102,7 +115,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     OnFailedToBuild = function(self)
-        MobileUnit.OnFailedToBuild(self)
+        MobileUnitOnFailedToBuild(self)
         self:SetImmobile(false)
     end,
 
@@ -112,14 +125,14 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         if self.BuildArmManipulator then
             WaitFor(self.BuildingOpenAnimManip)
             if enable then
-                self.BuildArmManipulator:Enable()
+                self:BuildManipulatorSetEnabled(enable)
             end
         end
     end,
 
     ---@param self ConstructionUnit
     OnPrepareArmToBuild = function(self)
-        MobileUnit.OnPrepareArmToBuild(self)
+        MobileUnitOnPrepareArmToBuild(self)
 
         if self.BuildingOpenAnimManip then
             self.BuildingOpenAnimManip:SetRate(self.Blueprint.Display.AnimationBuildRate or 1)
@@ -141,7 +154,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     OnStopBuilderTracking = function(self)
-        MobileUnit.OnStopBuilderTracking(self)
+        MobileUnitOnStopBuilderTracking(self)
 
         if self.StoppedBuilding then
             self.StoppedBuilding = false

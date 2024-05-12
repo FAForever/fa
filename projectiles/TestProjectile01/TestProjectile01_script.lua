@@ -1,8 +1,7 @@
---
--- TestProjectile
---
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
+--- Test Projectile
+---@class TestProjectile01: Projectile
 TestProjectile01 = ClassProjectile(Projectile)
 {
     BeamName = '/effects/emitters/test_beam_01_emit.bp',
@@ -13,6 +12,7 @@ TestProjectile01 = ClassProjectile(Projectile)
     FxImpactLand = { },
     FxImpactWater = { },
 
+    ---@param self TestProjectile01
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
@@ -30,5 +30,4 @@ TestProjectile01 = ClassProjectile(Projectile)
 
     end,
 }
-
 TypeClass = TestProjectile01

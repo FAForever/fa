@@ -168,7 +168,7 @@ UnitBlueprint{
             Min = 10,
         },
         JammerBlips = 4,
-        OmniRadius = 30,
+        OmniRadius = 28,
         RadarRadius = 96,
         VisionRadius = 64,
     },

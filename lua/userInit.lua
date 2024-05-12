@@ -65,12 +65,16 @@ function WaitSeconds(n)
     end
 end
 
---- Waits the given number of ticks. Always waits at least four frames
+--- Waits the given number of ticks. Always waits at least two frames
 ---@param ticks any
 function WaitTicks(ticks)
+    -- local scope for performance
+    local GameTick = GameTick
+    local WaitFrames = WaitFrames
+
     local start = GameTick()
     repeat
-        WaitFrames(4)
+        WaitFrames(2)
     until (start + ticks) <= GameTick()
 end
 
@@ -111,9 +115,19 @@ end
 
 
 do
-    -- upvalues for security reasons
+    -- upvalue scope for security reasons
+    local tonumber = tonumber
     local lower = string.lower
     local find = string.find
+    local match = string.match
+
+    local TableGetn = table.getn
+
+    local GetFocusArmy = GetFocusArmy
+    local SessionIsReplay = SessionIsReplay
+    local GetSessionClients = GetSessionClients
+
+    local tickstamp = 0
 
     local oldConExecute = ConExecute
 
@@ -124,6 +138,47 @@ do
         -- do not allow network changes
         if find(lower, 'net_') then
             return
+        end
+
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- do a basic check
+        if find(lower, 'setfocusarmy') then
+            if not SessionIsReplay() then
+                local currentFocusArmy = GetFocusArmy()
+                local proposedFocusArmy = tonumber(match(command, '%d+'))
+                if find(command, '-') then
+                    proposedFocusArmy = proposedFocusArmy * -1
+                else
+                    proposedFocusArmy = proposedFocusArmy + 1
+                end
+
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy),
+                        },
+                    }
+                )
+            end
         end
 
         oldConExecute(command)
@@ -140,7 +195,109 @@ do
             return
         end
 
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- do a basic check
+        if find(lower, 'setfocusarmy') then
+            if not (SessionIsReplay()) then
+                local currentFocusArmy = GetFocusArmy()
+                local proposedFocusArmy = tonumber(match(command, '%d+'))
+                if find(command, '-') then
+                    proposedFocusArmy = proposedFocusArmy * -1
+                else
+                    proposedFocusArmy = proposedFocusArmy + 1
+                end
+
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy),
+                        },
+                    }
+                )
+            end
+        end
+
         oldConExecuteSave(command)
+    end
+
+    local oldSimCallback = SimCallback
+
+    ---@param callback SimCallback
+    ---@param addUnitSelection boolean
+    _G.SimCallback = function(callback, addUnitSelection)
+        local clients = GetSessionClients()
+        local localClient = nil
+        for k = 1, TableGetn(clients) do
+            if clients[k]["local"] then
+                localClient = clients[k]
+                break
+            end
+        end
+        local currentFocusArmy = GetFocusArmy()
+
+        -- inform allies about self-destructed units
+        if callback.Func == 'ToggleSelfDestruct' then
+            local selectedUnits = GetSelectedUnits()
+ 
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- inform moderators about pings
+        if callback.Func == 'SpawnPing' then
+            if callback.Args.Marker then
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Created a marker with the text: '%s'", tostring(callback.Args.Name)),
+                        },
+                    }
+                )
+            else
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Created a ping of type '%s'", tostring(callback.Args.Type)),
+                        },
+                    }
+                )
+            end
+        end
+
+        oldSimCallback(callback, addUnitSelection or false)
     end
 
     --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
@@ -246,5 +403,203 @@ do
     _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
         UnitsCache[1] = unit
         IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
+    end
+end
+
+do
+    ---@alias UIBuildQueue UIBuildQueueItem[]
+
+    ---@class UIBuildQueueItem
+    ---@field count number
+    ---@field id UnitId
+
+    ---@type UserUnit | nil
+    local buildQueueOfUnit = nil
+
+    ---@type UIBuildQueue
+    local buildQueue = {}
+
+    local OldClearCurrentFactoryForQueueDisplay = _G.ClearCurrentFactoryForQueueDisplay
+    local OldSetCurrentFactoryForQueueDisplay = _G.SetCurrentFactoryForQueueDisplay
+    local OldDecreaseBuildCountInQueue = _G.DecreaseBuildCountInQueue
+    local OldIncreaseBuildCountInQueue = _G.IncreaseBuildCountInQueue
+
+    --- Clears the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    _G.ClearCurrentFactoryForQueueDisplay = function()
+        buildQueueOfUnit = nil
+        buildQueue = {}
+        OldClearCurrentFactoryForQueueDisplay()
+    end
+
+    --- Defines the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param userUnit UserUnit
+    ---@return UIBuildQueue
+    _G.SetCurrentFactoryForQueueDisplay = function(userUnit)
+        buildQueueOfUnit = userUnit
+        buildQueue = OldSetCurrentFactoryForQueueDisplay(userUnit)
+        return buildQueue
+    end
+
+    --- Retrieve the build queue without changing the global state
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param userUnit UserUnit
+    ---@return UIBuildQueue
+    _G.PeekCurrentFactoryForQueueDisplay = function(userUnit)
+        if IsDestroyed(userUnit) then
+            return {}
+        end
+
+        local oldBuildQueueOfUnit = buildQueueOfUnit
+        local queue = SetCurrentFactoryForQueueDisplay(userUnit)
+
+        if oldBuildQueueOfUnit then
+            SetCurrentFactoryForQueueDisplay(oldBuildQueueOfUnit)
+        else
+            ClearCurrentFactoryForQueueDisplay()
+        end
+
+        return queue
+    end
+
+    --- Update the current command queue. Does not update the internal state of the engine - do not use directly!
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param queue UIBuildQueue
+    _G.UpdateCurrentFactoryForQueueDisplay = function(queue)
+        buildQueue = queue
+    end
+
+    --- Retrieves the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@return UIBuildQueue[]
+    _G.GetCurrentFactoryForQueueDisplay = function()
+        return buildQueue
+    end
+
+    --- Decrease the count at a given location of the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param index number
+    ---@param count number
+    _G.DecreaseBuildCountInQueue = function(index, count)
+        if not buildQueueOfUnit then
+            WARN("Unable to decrease build queue count when no build queue is set")
+            return
+        end
+
+        if table.empty(buildQueue) then
+            WARN("Unable to decrease build queue is empty")
+            return
+        end
+
+        if index < 1 then
+            WARN("Unable to decrease build queue count when index is smaller than 1")
+            return
+        end
+
+        if index > table.getn(buildQueue) then
+            WARN("Unable to decrease build queue count when queue index is larger than the elements in the queue")
+            return
+        end
+
+        return OldDecreaseBuildCountInQueue(index, count)
+    end
+
+    --- Increase the count at a given location of the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param index number
+    ---@param count number
+    _G.IncreaseBuildCountInQueue = function(index, count)
+        if not buildQueueOfUnit then
+            WARN("Unable to increase build queue count when no build queue is set")
+            return
+        end
+
+        if table.empty(buildQueue) then
+            WARN("Unable to increase build queue is empty")
+            return
+        end
+
+        if table.empty(buildQueue) then
+            WARN("Unable to increase build queue count when no build queue is set")
+            return
+        end
+
+        if index < 1 then
+            WARN("Unable to increase build queue count when index is smaller than 1")
+            return
+        end
+
+        if index > table.getn(buildQueue) then
+            WARN("Unable to increase build queue count when queue index is larger than the elements in the queue")
+            return
+        end
+
+        return OldIncreaseBuildCountInQueue(index, count)
+    end
+end
+
+do
+    -- upvalue scope for security reasons
+    local TableGetn = table.getn
+
+    local GameTick = GameTick
+    local GetFocusArmy = GetFocusArmy
+    local SessionIsReplay = SessionIsReplay
+    local SessionRequestPause = SessionRequestPause
+    local SessionGetScenarioInfo = SessionGetScenarioInfo
+    local GetSessionClients = GetSessionClients
+    local oldSetFocusArmy = SetFocusArmy
+    local tickstamp = 0
+
+
+    _G.SetFocusArmy = function(number)
+        -- do a basic check
+        local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
+        if not (SessionIsReplay() or isCheatsEnabled) then
+            local currentFocusArmy = GetFocusArmy()
+            local proposedFocusArmy = number
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format("Is changing focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy),
+                    },
+                }
+            )
+        end
+
+        oldSetFocusArmy(number)
     end
 end

@@ -35,12 +35,12 @@ local TableDeepCopy = table.deepcopy
 ---@field adjacentTo? string    # Legacy name used by the Ozonex editor
 
 ---@class MarkerDataModSupport
----@field Size number           # Field exists for mod support, same as `size` 
----@field Resource boolean      # Field exists for mod support, same as `resource` 
----@field Type string           # Field exists for mod support, same as `type` 
----@field Orientation Vector    # Field exists for mod support, same as `orientation` 
----@field Position Vector       # Field exists for mod support, same as `position` 
----@field Color? Color          # Field exists for mod support, same as `color` 
+---@field Size number           # Field exists for mod support, same as `size`
+---@field Resource boolean      # Field exists for mod support, same as `resource`
+---@field Type string           # Field exists for mod support, same as `type`
+---@field Orientation Vector    # Field exists for mod support, same as `orientation`
+---@field Position Vector       # Field exists for mod support, same as `position`
+---@field Color? Color          # Field exists for mod support, same as `color`
 
 ---@class MarkerData : MarkerDataLegacy, MarkerDataModSupport
 ---@field Name string               # Unique name for marker
@@ -48,7 +48,7 @@ local TableDeepCopy = table.deepcopy
 ---@field NavLabel? number | nil    # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
 ---@class MarkerResource : MarkerData
----@field NavLayer NavLayers 
+---@field NavLayer NavLayers
 ---@field NavLabel number
 -- ---@field Island MarkerIsland
 
@@ -66,10 +66,7 @@ local TableDeepCopy = table.deepcopy
 
 -- easier access to all markers and all chains
 ---@type table<string, MarkerData>
-local AllMarkers = { }
-
----@type table<string, MarkerChain>
-local AllChains = { }
+local CachedMarkers = {}
 
 --- Represents a cache of markers to prevent re-populating tables
 local MarkerCache = {
@@ -154,7 +151,7 @@ end
 
 ---@param type MarkerType
 ---@param markers MarkerData
----@param count number  
+---@param count number
 local function AddToMarkerCache(type, markers, count)
 
     -- post process markers
@@ -165,7 +162,7 @@ local function AddToMarkerCache(type, markers, count)
         BackwardsCompatibility(marker)
 
         -- register marker for quick lookup
-        AllMarkers[marker.Name] =  marker
+        CachedMarkers[marker.Name] = marker
     end
 
     -- add it to the marker cache
@@ -180,16 +177,16 @@ end
 
 ---@param type MarkerType
 ---@param marker MarkerData
-local function AppendTomarkerCache(type, marker)
+local function AppendToMarkerCache(type, marker)
     if not MarkerCache[type] then
-        AddToMarkerCache(type, {marker}, 1)
+        AddToMarkerCache(type, { marker }, 1)
     end
 
     -- add fields for backwards compatibility
     BackwardsCompatibility(marker)
 
     -- register marker for quick lookup
-    AllMarkers[marker.Name] =  marker
+    CachedMarkers[marker.Name] = marker
 
     -- append it to the cache
     local cache = MarkerCache[type]
@@ -197,16 +194,16 @@ local function AppendTomarkerCache(type, marker)
     cache.Markers[cache.Count] = marker
 end
 
----@return MarkerData[]
-function GetAllMarkers()
-    return AllMarkers
+---@return table<string, Marker>
+function GetCachedMarkers()
+    return CachedMarkers
 end
 
 --- Retrieves a single marker on the map.
 ---@param name string
 ---@return MarkerData
 function GetMarker(name)
-    return AllMarkers[name]
+    return CachedMarkers[name] or Scenario.MasterChain._MASTERCHAIN_.Markers[name]
 end
 
 ---@param type MarkerType
@@ -217,7 +214,7 @@ function GetMarkersByType(type)
 
     -- defensive programming
     if not type then
-        return {} , 0
+        return {}, 0
     end
 
     -- check if it is cached and return that
@@ -230,8 +227,8 @@ function GetMarkersByType(type)
     local ms = {}
     local n = 1
 
-    -- find all the relevant markers
-    for k, marker in AllMarkers do
+    -- find all the relevant markers by searching through the original scenario markers
+    for k, marker in Scenario.MasterChain._MASTERCHAIN_.Markers do
         if marker.type == type then
             -- mod support syntax
             marker.Name = marker.Name or k
@@ -260,7 +257,7 @@ function OverwriteMarkerByType(type, markers)
 
     -- defensive programming
     if not type then
-        return {} , 0
+        return {}, 0
     end
 
     local ms = {}
@@ -299,7 +296,7 @@ function GetMarkersInChain(name)
     end
 
     -- check if chain exists
-    local chain = AllChains[name]
+    local chain = Scenario.Chains[name]
     if not chain then
         error('ERROR: Invalid Chain Named- ' .. name, 2)
     end
@@ -409,7 +406,7 @@ function ToggleDebugMarkersByType(type)
                         -- useful for pathing markers
                         if marker.adjacentTo then
                             for _, neighbour in StringSplit(marker.adjacentTo, " ") do
-                                local neighbour = AllMarkers[neighbour]
+                                local neighbour = GetMarker(neighbour)
                                 if neighbour then
                                     DrawLine(marker.Position, neighbour.Position, marker.Color or 'ffffffff')
                                 end
@@ -478,7 +475,7 @@ local DebugChainSuspend = {}
 -- to check for errors. Can be toggled on and off by calling it again.
 ---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
-    
+
     SPEW("Toggled chain to debug: " .. name)
 
     -- get the thread if it exists
@@ -536,12 +533,9 @@ function ToggleDebugChainByName(name)
 end
 
 function Setup()
-    AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
-    AllChains = Scenario.Chains
-
     -- prepare spawn markers
     local armies = table.hash(ListArmies())
-    for k, marker in AllMarkers do
+    for k, marker in Scenario.MasterChain._MASTERCHAIN_.Markers do
         if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
             marker.Position = marker.position
@@ -624,7 +618,7 @@ function Setup()
             }
         end
 
-        AppendTomarkerCache(type, marker)
+        AppendToMarkerCache(type, marker)
     end
 end
 

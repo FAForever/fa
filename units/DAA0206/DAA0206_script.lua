@@ -35,5 +35,5 @@ DAA0206 = ClassUnit(AAirUnit) {
 TypeClass = DAA0206
 
 -- Kept for Mod Backwards Compatablity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import('/lua/effecttemplates.lua')
 local EffectUtils = import('/lua/effectutilities.lua')

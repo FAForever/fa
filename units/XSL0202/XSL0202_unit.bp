@@ -178,7 +178,6 @@ UnitBlueprint{
     LifeBarOffset = 0.2,
     LifeBarSize = 0.95,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -191,12 +190,11 @@ UnitBlueprint{
         MaxAcceleration = 2.6,
         MaxBrake = 2.6,
         MaxSpeed = 2.6,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 2.6,
         MaxSteerForce = 3.1,
         MeshExtentsX = 1,
         MeshExtentsY = 0.5,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         TurnRadius = 2,
@@ -263,7 +261,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",

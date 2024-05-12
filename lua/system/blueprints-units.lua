@@ -25,6 +25,17 @@ local BlueprintNameToIntel = {
     SonarStealthFieldRadius = 'SonarStealthField',
 }
 
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
+}
+
 local LabelToVeterancyUse = {
     ['DeathWeapon'] = true,
     ['DeathImpact'] = true,
@@ -522,6 +533,12 @@ local function PostProcessUnit(unit)
     end
 
     --#endregion
+
+    -- Override the default 1 build rate given to units
+    -- so that rollover unit view can work with Mantis.
+    if unit.Economy and not unit.Economy.BuildRate then
+        unit.Economy.BuildRate = 0
+    end
 end
 
 ---@param allBlueprints BlueprintsTable
@@ -596,7 +613,38 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
 
         -- remove properties of the seed unit
         unit.Categories = table.unhash(unit.CategoriesHash)
-        unit.Economy.BuildRate = 0
+    end
+end
+
+---@param unit UnitBlueprint
+function TestIntelValues(unit)
+
+    ---------------------------------------------------------------------------
+    --#region Sanity check for intel values
+
+    -- Intel is visualised as a circle but it works in squares/blocks. You can
+    -- view the intel that a unit produces via a console command 'dbg Radar'.
+    --
+    -- It appears the engine divides the radius by the grid size and floors the
+    -- result. Therefore not all intel values and/or changes are actually 
+    -- meaningful. With this code we check all intel values and point out those
+    -- that are not accurate.
+
+    if unit.Intel then
+        for nameIntel, radius in unit.Intel do
+            local ogrids = BlueprintIntelNameToOgrids[nameIntel]
+            if ogrids then
+                local radiusOnGrid = math.floor(radius / ogrids) * ogrids
+                if radiusOnGrid != radius then
+                    WARN(
+                        string.format(
+                            "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d",
+                            tostring(unit.BlueprintId), radius, nameIntel, ogrids, radiusOnGrid, radiusOnGrid + ogrids
+                            )
+                        )
+                end
+            end
+        end
     end
 end
 
@@ -606,6 +654,10 @@ end
 function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        TestIntelValues(unit)
     end
 
     for _, unit in units do

@@ -1455,10 +1455,10 @@ end
 
 ---@param attackingUnit Unit
 ---@param targetUnit Unit
----@return boolean
+---@return Unit? targetShield
 function GetClosestShieldProtectingTargetSorian(attackingUnit, targetUnit)
     if not targetUnit or not attackingUnit then
-        return false
+        return
     end
     local blockingList = {}
 
@@ -1479,7 +1479,7 @@ function GetClosestShieldProtectingTargetSorian(attackingUnit, targetUnit)
     end
 
     -- Return the closest blocking shield
-    local closest = false
+    local closest
     local closestDistSq = 999999
     for _, shield in blockingList do
         local shieldPos = shield:GetPosition()

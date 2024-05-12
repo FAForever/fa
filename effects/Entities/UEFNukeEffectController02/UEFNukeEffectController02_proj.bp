@@ -13,7 +13,7 @@ ProjectileBlueprint {
         CollideSurface = false,
         DestroyOnWater = false,
         InitialSpeed = 0,
-        Lifetime = 100,        
+        Lifetime = 100,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         UseGravity = false,

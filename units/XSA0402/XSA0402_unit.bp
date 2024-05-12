@@ -232,7 +232,7 @@ UnitBlueprint{
                 Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
             },
-            FiringRandomness = 3,
+            FiringRandomness = 0,
             FiringTolerance = 6,
             FixBombTrajectory = true,
             Label = "Bomb",

@@ -48,6 +48,7 @@ UnitBlueprint{
         SurfaceThreatLevel = 0,
     },
     Display = {
+        AnimationBuild = '/units/urb0303/urb0303_abuild.sca',
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
             Water = {
@@ -85,7 +86,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY CYBRAN STRUCTURE NAVAL",
@@ -134,7 +135,6 @@ UnitBlueprint{
     LifeBarOffset = 6,
     LifeBarSize = 4.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -145,8 +145,6 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = -3.0,  Y = 0,     Z = -8 },
@@ -156,7 +154,6 @@ UnitBlueprint{
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -0.57,
     SelectionMeshUseTopAmount = 0.15,
