@@ -231,13 +231,13 @@ function Create(parent, bp)
 
     top  = top + BuildTimeText.Height() + 10 -- row 4 text height + 10 padding
 
-    local furthestDownControl
+    local furthestDownControl = BuildRateText
     local weapons = UnitsAnalyzer.GetWeaponsStats(bp)
     for i, weapon in weapons or {} do
         top = top + 1 -- + 1 padding
 
         local weaponText = Layouter(UIUtil.CreateText(tooltipUI, weapon.Info, fontTextSize-1, fontTextName)):Color(colorText):AtLeftIn(tooltipUI, left)
-        if not furthestDownControl then
+        if furthestDownControl == BuildRateText then
             weaponText = weaponText:AnchorToBottom(BuildTimeText, 11):End()
         else
             weaponText = weaponText:AnchorToBottom(furthestDownControl, 1):End()
@@ -320,25 +320,25 @@ function Create(parent, bp)
         end
     end
 
-    LayoutHelpers.SetHeight(tooltipUI.body, top)
+    body = Layouter(body):AtBottomIn(furthestDownControl, -8):End()
 
-    local tooltipHeight = titleHeight
-    tooltipHeight = tooltipHeight + math.max(top, 1) + 2
-    LayoutHelpers.SetDimensions(tooltipUI, tooltipWidth, tooltipHeight)
-    tooltipUI:DisableHitTest(true)
 
-    local frame = GetFrame(0)
-    if parent.Top() - tooltipUI.Height() < 0 then
-        tooltipUI.Top:Set(function() return parent.Bottom() end)
+    tooltipUI = Layouter(tooltipUI):AtBottomIn(body, -2):Top(0):ResetHeight():Height(tooltipUI.Height()/PixelScaleFactor):ResetTop()
+
+    -- Keep the tooltip on screen
+    if parent.Top() - tooltipUI:Get().Height() < 0 then
+        tooltipUI:Top(parent.Bottom)
     else
-        tooltipUI.Bottom:Set(parent.Top)
+        tooltipUI:Bottom(parent.Top)
     end
 
-    if parent.Left() - tooltipUI.Width() < 0 then
-        tooltipUI.Left:Set(function() return parent.Right() end)
+    if parent.Left() - tooltipUI:Get().Width() < 0 then
+        tooltipUI:Left(parent.Right)
     else
-        tooltipUI.Right:Set(parent.Left)
+        tooltipUI:Right(parent.Left)
     end
+
+    tooltipUI = tooltipUI:DisableHitTest(true):End()
 
     -- NOTE keep this code in case of adding tooltip animation
     --if not Prefs.GetOption('tooltips') then return end
