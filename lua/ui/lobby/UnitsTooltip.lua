@@ -305,26 +305,20 @@ function Create(parent, bp)
     end
 
     if bp.Mod then
-        top  = top + 10
+        top  = top + 10 -- + 10 padding
+
         value = 'MOD: ' .. bp.Mod.name
-        local mod = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
-        mod:SetColor(colorMod) ----FFC905DC
-        LayoutHelpers.AtLeftTopIn(mod, tooltipUI, left, top)
-        top  = top + mod.Height()
+        local mod = Layouter(UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)):Color(colorMod):AtLeftIn(tooltipUI, left):AnchorToBottom(furthestDownControl, 10):End()
+        furthestDownControl = mod
+
+        top  = top + mod.Height() -- + mod height
+
         if debugging and bp.Source then
             value = '' .. bp.Source
-            local source = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
-            source:SetColor(colorMod) ----FFC905DC
-            LayoutHelpers.AtLeftTopIn(source, tooltipUI, left, top)
-            top  = top + source.Height()
+            local source = Layouter(UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)):Color(colorMod):AtLeftIn(tooltipUI, left):AnchorToBottom(mod):End()
+            furthestDownControl = source
         end
     end
-
-    --NOTE UI for debugging
-    --local column1 = left
-    --BlueprintText = UIUtil.CreateText(tooltipUI, bp.Source or '', fontValueSize, fontValueName)
-    --BlueprintText:SetColor('FFE4BF0C') ----FFE4BF0C
-    --LayoutHelpers.AtRightTopIn(BlueprintText, tooltipUI, column1, top)
 
     LayoutHelpers.SetHeight(tooltipUI.body, top)
 
