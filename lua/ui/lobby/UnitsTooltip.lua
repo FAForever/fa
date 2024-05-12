@@ -73,19 +73,19 @@ function Create(parent, bp)
     -- This looks like a border for the entire tooltip when the other backgrounds on top fill it in.
     tooltipUI = Layouter(Bitmap(parent)):Color(UIUtil.tooltipBorderColor):Over(parent, 10000):Width(tooltipWidth):Height(tooltipHeight):End()
 
-    local title = ''
+    local titleString = ''
 
     if bp.Description then
-        title = ' ' .. bp.Tech .. ' ' .. LOCF(bp.Description)
+        titleString = ' ' .. bp.Tech .. ' ' .. LOCF(bp.Description)
     elseif bp.Name  then
-        title = ' ' .. LOCF(bp.Name)
+        titleString = ' ' .. LOCF(bp.Name)
     end
     if bp.General.UnitName and not bp.CategoriesHash['SUBCOMMANDER'] then
-        title = title .. ' (' .. LOCF(bp.General.UnitName) .. ')'
+        titleString = titleString .. ' (' .. LOCF(bp.General.UnitName) .. ')'
     end
 
-    tooltipUI.title = UIUtil.CreateText(tooltipUI, title, fontTextSize, UIUtil.bodyFont)
-    LayoutHelpers.AtLeftTopIn(tooltipUI.title, tooltipUI, 2, 2)
+    local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 2, 2):End()
+    tooltipUI.title = title
 
     tooltipUI.titleBg = Bitmap(tooltipUI)
     tooltipUI.titleBg:SetSolidColor(UIUtil.tooltipTitleColor)
