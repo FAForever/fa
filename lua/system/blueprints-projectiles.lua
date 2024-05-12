@@ -35,7 +35,7 @@ local function PostProcessProjectile(projectile)
         if not projectile.DesiredShooterCap then
             projectile.DesiredShooterCap = projectile.Defense.Health or 1
         else
-            if projectile.DesiredShooterCap != (projectile.Defense.Health or 1) then
+            if projectile.DesiredShooterCap ~= (projectile.Defense.Health or 1) then
                 WARN(string.format("Inconsistent shooter cap defined for projectile %s, it should match its health", projectile.BlueprintId))
             end
         end
