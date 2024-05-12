@@ -15,6 +15,7 @@ local Text     = import("/lua/maui/text.lua")
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
 local UnitDescriptions = import("/lua/ui/help/unitdescription.lua").Description
