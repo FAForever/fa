@@ -107,13 +107,6 @@ function Create(parent, bp)
 
     top = top + 2 -- + 2 body padding
 
-    local column1 = left
-    local column2 = tooltipWidth - 100 + left -- damage
-    local column3 = column2 - 100 -- dps
-    local column4 = column3 - 90  -- dpm
-    local column5 = column4 - 90  -- range
-    local column6 = column5 - 10
-
     -- Reusable string value
     local value = ''
 
@@ -163,6 +156,12 @@ function Create(parent, bp)
         top  = top + tooltipUI.Descr.Height()
         top  = top + 12 -- + categories height + 12 padding
     end
+
+    -- the columns give the right margin of the text so that the numbers can grow leftwards freely
+    local column2 = tooltipWidth - 100 + left -- cost/damage            -- 327  -- 420 - 327 = 93
+    local column3 = column2 - 100 -- production/dps                     -- 227  -- 420 - 227 = 193
+    local column4 = column3 - 90  -- defense/range                      -- 137  -- 420 - 137 = 283
+    local column5 = column4 - 90  -- per mass                           -- 47   -- 420 - 47  = 373
 
     local costLabel = Layouter(UIUtil.CreateText(tooltipUI, 'BUILD COST ', fontTextSize-2, fontTextName)):Color(colorText)
         :AtRightIn(tooltipUI, column2-iconSize-5):AnchorToBottom(description or categoriesText, 12):End()
@@ -396,6 +395,7 @@ function Create(parent, bp)
     end
 
     --NOTE UI for debugging
+    --local column1 = left
     --BlueprintText = UIUtil.CreateText(tooltipUI, bp.Source or '', fontValueSize, fontValueName)
     --BlueprintText:SetColor('FFE4BF0C') ----FFE4BF0C
     --LayoutHelpers.AtRightTopIn(BlueprintText, tooltipUI, column1, top)
