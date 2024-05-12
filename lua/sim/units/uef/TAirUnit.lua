@@ -23,4 +23,11 @@
 local AirUnit = import('/lua/defaultunits.lua').AirUnit
 
 ---@class TAirUnit : AirUnit
-TAirUnit = ClassUnit(AirUnit) {}
+TAirUnit = ClassUnit(AirUnit) {
+
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+
+}

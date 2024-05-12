@@ -598,6 +598,8 @@ local VeterancyRegenBuffs = {
 ---@field VetLevel? number
 VeterancyComponent = ClassSimple {
 
+    VeterancyFx = {},
+
     ---@param self VeterancyComponent | Unit
     OnCreate = function(self)
         local blueprint = self.Blueprint
@@ -754,6 +756,17 @@ VeterancyComponent = ClassSimple {
         local maxHealth = blueprint.Defense.MaxHealth
         local mult = blueprint.VeteranHealingMult[nextLevel] or 0.1
         self:AdjustHealth(self, maxHealth * mult)
+
+        -- effects
+
+        local army = self.Army
+        local blueprint = self.Blueprint
+        local sizeX = blueprint.SizeX or 1
+        local sizeZ = blueprint.SizeZ or 1
+        for _, effect in self.VeterancyFx do
+            LOG(effect)
+            CreateEmitterAtEntity(self, army, effect):ScaleEmitter(MathMin(sizeX, sizeZ))
+        end
 
         -- callbacks
 

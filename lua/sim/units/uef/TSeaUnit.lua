@@ -23,4 +23,11 @@
 local SeaUnit = import('/lua/defaultunits.lua').SeaUnit
 
 ---@class TSeaUnit : SeaUnit
-TSeaUnit = ClassUnit(SeaUnit) {}
+TSeaUnit = ClassUnit(SeaUnit) {
+
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+
+}

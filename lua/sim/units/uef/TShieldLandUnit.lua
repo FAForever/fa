@@ -23,4 +23,9 @@
 local ShieldLandUnit = import('/lua/defaultunits.lua').ShieldLandUnit
 
 ---@class TShieldLandUnit : ShieldLandUnit
-TShieldLandUnit = ClassUnit(ShieldLandUnit) {}
+TShieldLandUnit = ClassUnit(ShieldLandUnit) {
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+}

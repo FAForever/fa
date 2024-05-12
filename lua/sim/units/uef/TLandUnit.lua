@@ -23,4 +23,9 @@
 local LandUnit = import('/lua/defaultunits.lua').LandUnit
 
 ---@class TLandUnit : LandUnit
-TLandUnit = ClassUnit(LandUnit) {}
+TLandUnit = ClassUnit(LandUnit) {
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+}

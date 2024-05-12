@@ -1,23 +1,40 @@
-Contributing
-------------
+# Contributing to FAForever
 
-To contribute, please fork this repository and make pull requests to the
-`deploy/fafdevelop` branch.
+Welcome commander to another battlefield filled with technology - the everlasting polishing of Supreme Commander: Forged Alliance Forever!
 
-Use the normal git conventions for commit messages, with the following rules:
- - Subject line shorter than 80 characters
- - No trailing period
- - For non-trivial commits, always include a commit message body, describing the change in detail
- - If there are related issues, reference them in the commit message footer
+Regardless of your faction - everyone is welcome to contribute. To smooth out this process we highly encourage you to read the relevant sections of this document before making your contributions. You can find an overview in the [Table of Contents](#table-of-contents). It will make it easier for your fellow commanders to review it and smooth out the experience for everyone and all factions involved. The community - except for maybe the Cybrans - look forward to your contributions!
 
-We use [git flow](http://nvie.com/posts/a-successful-git-branching-model/) for our branch conventions.
+## Table of Contents
 
-When making _backwards incompatible API changes_, do so with a stub function and put in a logging statement including traceback. This gives time for mod authors to change their code, as well as for us to catch any incompatibilities introduced by the change.
+- [Contributing to FAForever](#contributing-to-faforever)
+  - [Table of Contents](#table-of-contents)
+  - [I have a question](#i-have-a-question)
+  - [I want to contribute](#i-want-to-contribute)
+    - [Reporting bugs](#reporting-bugs)
+    - [Contribute via code](#contribute-via-code)
+    - [Contribute via assets](#contribute-via-assets)
+  - [Related repositories](#related-repositories)
 
-Code convention
----------------
+## I have a question
 
-Please follow the [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide) as
-much as possible.
+The community is available in various channels. For questions we encourage you to join the [FAForever Discord Server](https://discord.gg/mXahVSKGVb). There are separate channels for game development. We'd recommend the offtopic channel. There are various contributors available here to help find an answer to your question.
 
-For file encoding, use UTF-8 and unix-style file endings in the repo (Set core.autocrlf).
+## I want to contribute
+
+### Reporting bugs
+
+A good bug report should make it immediately clear to a maintainer what the perceived bug is and possibly how to reproduce it consistently. The time of maintainers is relatively scarce, a detailed bug report is therefore not only appreciated but it also reduces the overhead of understanding the context of the bug. You can follow these guidelines to create a detailed bug report:
+
+- Find an (preferably easy) approach to reproduce it in a sandboxed environment.
+
+Once you've found a way to reproduce the bug you need to make sure that it is not related to a mod. Disable all your (ui) mods and try to reproduce the bug again. If the bug still occurs then do attach the replay id to your bug report along with a timestamp as to when the bug occurs.
+
+- Open a [new issue on Github](https://github.com/FAForever/fa/issues/new?assignees=&labels=status%3A+novel+issue&projects=&template=bug_report.md&title=) using the bug report template
+
+In the issue you can add a description of the bug and relevant images or videos. You can add the replay id in the description. If you do not have a Github account then we encourage you to create one. Otherwise you can also report the bug on the [FAForever Discord Server](https://discord.gg/mXahVSKGVb).
+
+### Contribute via code
+
+### Contribute via assets
+
+## Related repositories

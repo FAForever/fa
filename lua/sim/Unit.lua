@@ -2329,8 +2329,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             --- "/effects/emitters/veterancy/cybran_vet_1_v2-2.bp",
         }
 
-        for index, effect in effects do
-            CreateEmitterAtEntity(self, self.Army, effect)
+        local army = self.Army
+        local blueprint = self.Blueprint
+        local sizeX = blueprint.SizeX or 1
+        local sizeZ = blueprint.SizeZ or 1
+        for _, effect in effects do
+            CreateEmitterAtEntity(self, army, effect):ScaleEmitter(math.min(sizeX, sizeZ) * 0.5)
         end
 
         -- Create any idle effects on unit

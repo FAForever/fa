@@ -23,4 +23,9 @@
 local HoverLandUnit = import('/lua/defaultunits.lua').HoverLandUnit
 
 ---@class THoverLandUnit : HoverLandUnit
-THoverLandUnit = ClassUnit(HoverLandUnit) {}
+THoverLandUnit = ClassUnit(HoverLandUnit) {
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+}

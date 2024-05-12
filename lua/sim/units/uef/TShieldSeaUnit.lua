@@ -23,4 +23,9 @@
 local ShieldSeaUnit = import('/lua/defaultunits.lua').ShieldSeaUnit
 
 ---@class TShieldSeaUnit : ShieldSeaUnit
-TShieldSeaUnit = ClassUnit(ShieldSeaUnit) {}
+TShieldSeaUnit = ClassUnit(ShieldSeaUnit) {
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+}
