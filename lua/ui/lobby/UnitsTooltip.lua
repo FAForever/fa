@@ -15,6 +15,7 @@ local Text     = import("/lua/maui/text.lua")
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local PixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local UnitsAnalyzer   = import("/lua/ui/lobby/unitsanalyzer.lua")
@@ -73,6 +74,9 @@ function Create(parent, bp)
     -- This looks like a border for the entire tooltip when the other backgrounds on top fill it in.
     tooltipUI = Layouter(Bitmap(parent)):Color(UIUtil.tooltipBorderColor):Over(parent, 10000):Width(tooltipWidth):Height(tooltipHeight):End()
 
+    -- left text margin; leftwards offset from the tooltip border's left edge
+    local left = 7
+
     local titleString = ''
 
     if bp.Description then
@@ -87,7 +91,7 @@ function Create(parent, bp)
     end
 
     -- 2px top/left border, 7px left offset
-    local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 9, 2):End()
+    local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 2 + left, 2):End()
     tooltipUI.title = title
 
     -- AtBottomIn -2 offset for parantheses to appear centered
@@ -96,7 +100,6 @@ function Create(parent, bp)
 
     local titleHeight = math.max(tooltipUI.title.Height(), 1) + 4 -- 2 border + title height + 2 titleBg bottom negative padding
     local top  = titleHeight
-    local left = 7
 
     -- Serves as the black background of the body of the tooltip
     local body = Layouter(Bitmap(tooltipUI)):Color('FF080808'):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):Height(300):AnchorToBottom(titleBg):End()
@@ -117,12 +120,12 @@ function Create(parent, bp)
     tooltipHeight = math.max(tooltipUI.title.Height(), 1)
 
     -- showing bp.Categories because they are more accurate than bp.Display.Abilities
-    local categoriesText = TextArea(tooltipUI, LayoutHelpers.ScaleNumber(tooltipWidth), 30)
+    local categoriesText = TextArea(tooltipUI, tooltipWidth - 2 * left, 30)
     categoriesText:SetText( table.concat(UnitsAnalyzer.GetUnitsCategories(bp, false), ', ') )
     categoriesText:SetFont(fontTextName, fontTextSize - 1)
     categoriesText:SetColors('FFFC9038', nil, nil, nil) -- Only the foreground color will be changed, the rest will remain as defaults
-    local textAreaHeight = categoriesText:GetRowHeight() * categoriesText:GetItemCount()
-    Layouter(categoriesText):Height(textAreaHeight):AtLeftIn(tooltipUI, 7):AtTopIn(body, 2):End()
+    local textAreaHeight = categoriesText:GetItemCount() * (fontTextSize + PixelScaleFactor) -- +1 px for the text to fit in
+    Layouter(categoriesText):Height(textAreaHeight):AtLeftIn(tooltipUI, left):AtTopIn(body, 2):End()
     tooltipUI.Categories = categoriesText
 
     top = top + tooltipUI.Categories.Height()
