@@ -975,39 +975,44 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
+    ---@param self WorldView
+    ---@param ownerIndex integer
+    FlashScoreboardIcon = function(self, ownerIndex)
+        local scoreBoardControls = import("/lua/ui/game/score.lua").controls
+        if not scoreBoardControls.armyLines then
+            return
+        end
+        for _, line in scoreBoardControls.armyLines do
+            if line.armyID == ownerIndex then
+                ForkThread(self.FlashScoreboardIconThread, self, line.faction, 8, 0.4)
+                break
+            end
+        end
+    end,
+
+    ---@param self WorldView
+    ---@param toFlash Control
+    ---@param flashesRemaining integer
+    ---@param flashInterval number
+    FlashScoreboardIconThread = function(self, toFlash, flashesRemaining, flashInterval)
+        -- Flash the icon the appropriate number of times.
+        while flashesRemaining > 0 do
+            toFlash:Hide()
+            WaitSeconds(flashInterval)
+
+            toFlash:Show()
+            WaitSeconds(flashInterval)
+
+            flashesRemaining = flashesRemaining - 1
+        end
+    end,
+
+    ---@param self WorldView
+    ---@param pingData table
     DisplayPing = function(self, pingData)
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
-            -- Zero-based indices FTW...
-            local pingOwnerIndex = pingData.Owner + 1
-
-            -- The faction icon for the pingOwner.
-            local toFlash
-
-            -- Find the UI element we need to flash.
-            local scoreBoardControls = import("/lua/ui/game/score.lua").controls
-            for _, line in scoreBoardControls.armyLines or {} do
-                if line.armyID == pingOwnerIndex then
-                    toFlash = line.faction
-                    break
-                end
-            end
-
-            if toFlash then
-                local flashesRemaining = 8
-                local flashInterval = 0.4
-                ForkThread(function()
-                    -- Flash the icon the appropriate number of times.
-                    while flashesRemaining > 0 do
-                        toFlash:Hide()
-                        WaitSeconds(flashInterval)
-                        toFlash:Show()
-                        WaitSeconds(flashInterval)
-
-                        flashesRemaining = flashesRemaining - 1
-                    end
-                end)
-            end
+            self:FlashScoreboardIcon(pingData.Owner + 1) -- zero-based to one-based
         end
 
         if not self:IsHidden() and pingData.Location then
