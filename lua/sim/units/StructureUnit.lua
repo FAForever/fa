@@ -221,13 +221,15 @@ StructureUnit = ClassUnit(Unit) {
         -- get direction vector, atanify it for angle, then subtract our existing heading if we were spawned in angled
         local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3]) - self:GetHeading()
 
-
+        local stepSize
         local bpFootprint = self.Blueprint.Footprint
-        if bpFootprint.SizeX ~= bpFootprint.SizeY then
-            -- Avoid rotating units with oblong footprints as the pathing and visuals won't match
-            stepSize = 180 * DegToRad
-        elseif EntityCategoryContains(StructureUnitRotateStaticArty, self) then
-            stepSize = 90 * DegToRad
+        if bpFootprint then
+            if bpFootprint.SizeX ~= bpFootprint.SizeZ then
+                -- Avoid rotating units with oblong footprints as the pathing and visuals won't match
+                stepSize = 180 * DegToRad
+            elseif EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+                stepSize = 90 * DegToRad
+            end
         end
 
         if stepSize then
