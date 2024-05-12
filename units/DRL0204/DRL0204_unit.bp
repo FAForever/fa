@@ -152,7 +152,6 @@ UnitBlueprint{
     LifeBarOffset = 0.6,
     LifeBarSize = 0.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -167,7 +166,6 @@ UnitBlueprint{
         MaxSpeed = 3.4,
         MaxSpeedReverse = 0,
         MaxSteerForce = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         TurnRadius = 2,
         TurnRate = 80,
@@ -216,7 +214,7 @@ UnitBlueprint{
             MaxRadius = 37,
             MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 20,
+            MuzzleVelocity = 25,
             ProjectileId = "/projectiles/CDFRocketIridium02/CDFRocketIridium02_proj.bp",
             ProjectileLifetime = 5,
             ProjectilesPerOnFire = 3,
