@@ -93,16 +93,15 @@ function Create(parent, bp)
     local titleBg = Layouter(Bitmap(tooltipUI)):Color(UIUtil.tooltipTitleColor):Under(title):AtTopIn(title):AtBottomIn(title, -2):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):End()
     tooltipUI.titleBg = titleBg
 
-    local titleHeight = math.max(tooltipUI.title.Height(), 1) + 4
+    local titleHeight = math.max(tooltipUI.title.Height(), 1) + 4 -- 2 border + title height + 2 titleBg bottom negative padding
     local top  = titleHeight
     local left = 7
 
-    tooltipUI.body = Bitmap(tooltipUI)
-    tooltipUI.body:SetSolidColor('FF080808') ----FF080808
-    LayoutHelpers.SetDimensions(tooltipUI.body, tooltipWidth-4, 300)
-    LayoutHelpers.AtLeftTopIn(tooltipUI.body, tooltipUI, 2, top)
+    -- Serves as the black background of the body of the tooltip
+    local body = Layouter(Bitmap(tooltipUI)):Color('FF080808'):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):Height(300):AnchorToBottom(titleBg):End()
+    tooltipUI.body = body
 
-    top = top + 2
+    top = top + 2 -- + 2 body padding
 
     local column1 = left
     local column2 = tooltipWidth - 100 + left -- damage
