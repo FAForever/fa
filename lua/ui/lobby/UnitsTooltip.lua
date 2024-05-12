@@ -219,25 +219,17 @@ function Create(parent, bp)
 
     top = top + EnergyCostText.Height() + 2 -- row 3 text height + 2 padding
 
-    value = math.floor(eco.BuildTime)
-    BuildTimeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    BuildTimeText:SetColor(colorBuild) ----FFD9D9D9
-    LayoutHelpers.AtRightTopIn(BuildTimeText, tooltipUI, column2, top)
-    BuildTimeIcon = Bitmap(tooltipUI)
-    BuildTimeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/build-time.dds')
-    LayoutHelpers.SetDimensions(BuildTimeIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(BuildTimeIcon, tooltipUI, tooltipWidth-column2, top+2)
+    value = StringComma(math.floor(eco.BuildTime))
+    local BuildTimeIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/build-time.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(EnergyCostIcon):AnchorToBottom(EnergyCostText, 3):End()
+    local BuildTimeText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorBuild):LeftOf(BuildTimeIcon, 4):AnchorToBottom(EnergyCostText, 2):End()
 
-    value = StringComma(eco.BuildRate).. ' '
-    BuildRateText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    BuildRateText:SetColor(colorBuild) ----FFD9D9D9
-    LayoutHelpers.AtRightTopIn(BuildRateText, tooltipUI, column3, top)
-    BuildRateIcon = Bitmap(tooltipUI)
-    BuildRateIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/build-rate.dds')
-    LayoutHelpers.SetDimensions(BuildRateIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(BuildRateIcon, tooltipUI, tooltipWidth-column3, top+2)
+    value = StringComma(eco.BuildRate)
+    local BuildRateIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/build-rate.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(EnergyProdIcon):AnchorToBottom(EnergyProdText, 3):End()
+    local BuildRateText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorBuild):LeftOf(BuildRateIcon, 4):AnchorToBottom(EnergyProdText, 2):End()
 
-    top  = top + BuildTimeText.Height() + 10
+    top  = top + BuildTimeText.Height() + 10 -- row 4 text height + 10 padding
 
     local weapons = UnitsAnalyzer.GetWeaponsStats(bp)
     for i, weapon in weapons or {} do
