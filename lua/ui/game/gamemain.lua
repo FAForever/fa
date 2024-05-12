@@ -586,14 +586,14 @@ local cachedSelection = {
 --- Observable to allow mods to do something with a new selection
 ObserveSelection = import("/lua/shared/observable.lua").Create()
 
--- This function is called whenever the set of currently selected units changes
--- See /lua/unit.lua for more information on the lua unit object
--- @param oldSelection: What the selection was before
--- @param newSelection: What the selection is now
--- @param added: Which units were added to the old selection
--- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
+
+---This function is called whenever the set of currently selected units changes
+---@param oldSelection UserUnit[] What the selection was before
+---@param newSelection UserUnit[] What the selection is now
+---@param added UserUnit[]        Which units were added to the old selection
+---@param removed UserUnit[]      Which units where removed from the old selection
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if ignoreSelection then
