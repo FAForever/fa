@@ -179,47 +179,29 @@ function Create(parent, bp)
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
-    value = StringComma(eco.BuildCostMass) .. ' '
-    MassCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    MassCostText:SetColor(colorMass) -- --FF2DEC28
-    LayoutHelpers.AtRightTopIn(MassCostText, tooltipUI, column2, top)
-    MassCostIcon = Bitmap(tooltipUI)
-    MassCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
-    LayoutHelpers.SetDimensions(MassCostIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(MassCostIcon, tooltipUI, tooltipWidth-column2, top+2)
+    value = StringComma(eco.BuildCostMass)
+    local MassCostIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/mass.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(costLabel, 5):AnchorToBottom(costLabel, 2):End()
+    local MassCostText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorMass):LeftOf(MassCostIcon, 4):AnchorToBottom(costLabel, 1):End()
 
     value = eco.YieldMass
-    value = value > 0 and '+' .. value or value
-    value = StringComma(value) .. ' '
-    MassProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    MassProdText:SetColor(colorMass)  -- --FF2DEC28
-    LayoutHelpers.AtRightTopIn(MassProdText, tooltipUI, column3, top)
-    MassProdIcon = Bitmap(tooltipUI)
-    MassProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
-    LayoutHelpers.SetDimensions(MassProdIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(MassProdIcon, tooltipUI, tooltipWidth-column3, top+2)
+    value = StringComma(value > 0 and '+' .. value or value)
+    local MassProdIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/mass.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(prodLabel, 5):AnchorToBottom(prodLabel, 2):End()
+    local MassProdText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorMass):LeftOf(MassProdIcon, 4):AnchorToBottom(prodLabel, 1):End()
 
-    local healthValue = init(bp.NewHealth or bp.Defense.Health)
-    local healthString = StringComma(math.floor(healthValue)) .. ' '
-    HealthText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
-    HealthText:SetColor(colorDefense) ----FF0BACF7
-    LayoutHelpers.AtRightTopIn(HealthText, tooltipUI, column4, top)
-    HealthIcon = Bitmap(tooltipUI)
-    HealthIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
-    LayoutHelpers.SetDimensions(HealthIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(HealthIcon, tooltipUI, tooltipWidth-column4, top+2)
+    local healthValue = init(bp.Defense.Health or bp.NewHealth) -- NewHealth is used by enhancements
+    value = StringComma(math.floor(healthValue))
+    local HealthIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(defenseLabel, 5):AnchorToBottom(defenseLabel, 2):End()
+    local HealthText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(HealthIcon, 4):AnchorToBottom(defenseLabel, 1):End()
 
-    local healthValue = (healthValue / eco.BuildCostMass)
-    local healthString = string.format("%0.2f ",healthValue)
-    HealthPerMassText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
-    HealthPerMassText:SetColor(colorDefense) ----FF0BACF7
-    LayoutHelpers.AtRightTopIn(HealthPerMassText, tooltipUI, column5, top)
-    HealthPerMassIcon = Bitmap(tooltipUI)
-    HealthPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
-    LayoutHelpers.SetDimensions(HealthPerMassIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(HealthPerMassIcon, tooltipUI, tooltipWidth-column5, top+2)
+    value = string.format("%0.2f ", (healthValue / eco.BuildCostMass))
+    local HealthPerMassIcon = Layouter(Bitmap(tooltipUI)):Texture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds'):Width(iconSize):Height(iconSize)
+        :AtRightIn(perMassLabel, 5):AnchorToBottom(perMassLabel, 2):End()
+    local HealthPerMassText = Layouter(UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)):Color(colorDefense):LeftOf(HealthPerMassIcon, 4):AnchorToBottom(perMassLabel, 1):End()
 
-    top  = top + MassCostText.Height() + 2
+    top  = top + MassCostText.Height() + 2 -- row 2 text height + 2 padding
 
     local shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
     local shieldString = StringComma(math.floor(shieldValue)) .. ' '
