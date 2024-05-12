@@ -89,14 +89,9 @@ function Create(parent, bp)
     local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 2, 2):End()
     tooltipUI.title = title
 
-    tooltipUI.titleBg = Bitmap(tooltipUI)
-    tooltipUI.titleBg:SetSolidColor(UIUtil.tooltipTitleColor)
-    tooltipUI.titleBg.Depth:Set(function() return tooltipUI.title.Depth() - 1 end)
-    tooltipUI.titleBg.Top:Set(tooltipUI.title.Top)
-    LayoutHelpers.AtBottomIn(tooltipUI.titleBg, tooltipUI.title, -2)
-
-    tooltipUI.titleBg.Left:Set(function() return tooltipUI.title.Left() end)
-    LayoutHelpers.AnchorToLeft(tooltipUI.titleBg, tooltipUI.title, - tooltipWidth + 4)
+    -- AtBottomIn -2 offset for parantheses to appear centered
+    local titleBg = Layouter(Bitmap(tooltipUI)):Color(UIUtil.tooltipTitleColor):Under(title):AtTopIn(title):AtBottomIn(title, -2):AtLeftIn(tooltipUI, 2):AtRightIn(tooltipUI, 2):End()
+    tooltipUI.titleBg = titleBg
 
     local titleHeight = math.max(tooltipUI.title.Height(), 1) + 4
     local top  = titleHeight
