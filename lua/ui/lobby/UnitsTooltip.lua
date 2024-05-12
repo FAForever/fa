@@ -117,20 +117,16 @@ function Create(parent, bp)
     tooltipHeight = math.max(tooltipUI.title.Height(), 1)
 
     -- showing bp.Categories because they are more accurate than bp.Display.Abilities
-    local cats = UnitsAnalyzer.GetUnitsCategories(bp, false)
-    value = table.concat(cats, ', ')
-    --table.print(bp.Display.Abilities, 'Abilities')
-    tooltipUI.Categories = TextArea(tooltipUI, LayoutHelpers.ScaleNumber(tooltipWidth), 30)
-    tooltipUI.Categories:SetText(value)
-    tooltipUI.Categories:SetFont(fontTextName, fontTextSize-1)
-    tooltipUI.Categories:SetColors('FFFC9038', '00000000', UIUtil.fontColor, '00000000') ----FFFC9038
-    local wrapped = Text.WrapText(value, LayoutHelpers.ScaleNumber(tooltipWidth-10), function(value) return tooltipUI.Categories:GetStringAdvance(value) end)
-    local wrappedHeight = (table.getsize(wrapped) or 1) * tooltipHeight
-    tooltipUI.Categories.Height:Set(wrappedHeight)
-    LayoutHelpers.AtLeftTopIn(tooltipUI.Categories, tooltipUI, left, top)
+    local categoriesText = TextArea(tooltipUI, LayoutHelpers.ScaleNumber(tooltipWidth), 30)
+    categoriesText:SetText( table.concat(UnitsAnalyzer.GetUnitsCategories(bp, false), ', ') )
+    categoriesText:SetFont(fontTextName, fontTextSize - 1)
+    categoriesText:SetColors('FFFC9038', nil, nil, nil) -- Only the foreground color will be changed, the rest will remain as defaults
+    local textAreaHeight = categoriesText:GetRowHeight() * categoriesText:GetItemCount()
+    Layouter(categoriesText):Height(textAreaHeight):AtLeftIn(tooltipUI, 7):AtTopIn(body, 2):End()
+    tooltipUI.Categories = categoriesText
 
     top = top + tooltipUI.Categories.Height()
-    top = top + 8
+    top = top + 8 -- + categories height + 8 padding
 
     local id = bp.ID
     if bp.Type == "UPGRADE" and bp.Icon and bp.SourceID then
