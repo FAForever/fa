@@ -76,9 +76,9 @@ function Create(parent, bp)
     local titleString = ''
 
     if bp.Description then
-        titleString = ' ' .. bp.Tech .. ' ' .. LOC(bp.Description)
+        titleString = bp.Tech .. ' ' .. LOC(bp.Description)
     elseif bp.Name then
-        titleString = ' ' .. LOC(bp.Name)
+        titleString = LOC(bp.Name)
     end
 
     local generalUnitName = LOC(bp.General.UnitName)
@@ -86,7 +86,8 @@ function Create(parent, bp)
         titleString = titleString .. ' (' .. generalUnitName .. ')'
     end
 
-    local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 2, 2):End()
+    -- 2px top/left border, 7px left offset
+    local title = Layouter(UIUtil.CreateText(tooltipUI, titleString, fontTextSize, UIUtil.bodyFont)):AtLeftTopIn(tooltipUI, 9, 2):End()
     tooltipUI.title = title
 
     -- AtBottomIn -2 offset for parantheses to appear centered
