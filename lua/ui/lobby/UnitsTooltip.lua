@@ -137,8 +137,9 @@ function Create(parent, bp)
     value = LOC(UnitDescriptions[id]) or LOC(bp.Interface.Help.HelpText)
 
     -- defaulting to description of base units for preset support commanders
-    if not value and bp.CategoriesHash['SUBCOMMANDER'] and string.find(id, "_") then
-        local baseID = StringSplit(id, '_')[1]
+    local underscoreIndex = string.find(id, "_")
+    if not value and bp.CategoriesHash['SUBCOMMANDER'] and underscoreIndex then
+        local baseID = string.sub(id, 1, underscoreIndex - 1)
         value = LOC(UnitDescriptions[baseID])
     end
 
