@@ -151,17 +151,16 @@ function Create(parent, bp)
             WARN('UnitsTooltip cannot find unit description for ' .. bp.ID .. ' blueprint')
         end
     else
-        tooltipUI.Descr = TextArea(tooltipUI, LayoutHelpers.ScaleNumber(tooltipWidth-10), 30)
-        tooltipUI.Descr:SetText(value)
-        tooltipUI.Descr:SetFont(fontTextName, fontTextSize-1)
-        tooltipUI.Descr:SetColors(colorText, '00000000', UIUtil.fontColor, '00000000')
-        local wrapped = Text.WrapText(value, LayoutHelpers.ScaleNumber(tooltipWidth-10), function(value) return tooltipUI.Descr:GetStringAdvance(value) end)
-        local wrappedHeight = (table.getsize(wrapped) or 1) * tooltipHeight
-        tooltipUI.Descr.Height:Set(wrappedHeight)
-        LayoutHelpers.AtLeftTopIn(tooltipUI.Descr, tooltipUI, left, top)
+        local description = TextArea(tooltipUI, tooltipWidth-14, 30)
+        description:SetText(value)
+        description:SetFont(fontTextName, fontTextSize-1)
+        description:SetColors(colorText, nil, nil, nil)
+        local textAreaHeight = description:GetItemCount() * (fontTextSize + PixelScaleFactor)
+        Layouter(description):Height(textAreaHeight):AtLeftIn(tooltipUI, 7):AnchorToBottom(categoriesText):End()
+        tooltipUI.Descr = description
 
         top  = top + tooltipUI.Descr.Height()
-        top  = top + 12
+        top  = top + 12 -- + categories height + 12 padding
     end
 
     local perMassLabel = UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)
