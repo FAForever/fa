@@ -666,7 +666,7 @@ end
 
 --- For internal use by `CreateDiscoveryService()`
 ---@param serviceClass fa-class
----@return DiscoveryService
+---@return UILobbyDiscoveryService
 function InternalCreateDiscoveryService(serviceClass)
 end
 
@@ -704,15 +704,17 @@ end
 function InternalCreateItemList(itemList, parent)
 end
 
+---@alias UILobbyProtocols "UDP" | "TCP" | "None
+
 --- For internal use by `CreateLobbyComm()`
 ---@param lobbyComClass fa-class
----@param protocol string
+---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
----@param playerUID string
----@param natTraversalProvider userdata
----@return LobbyComm
+---@param playerUID? string
+---@param natTraversalProvider? userdata
+---@return UILobbyCommunication
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 

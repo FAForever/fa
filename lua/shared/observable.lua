@@ -10,7 +10,8 @@ local ObservableMeta = {}
 ObservableMeta.__index = ObservableMeta
 
 --- Adds an observer that is updated when the value is subject is set.
--- @param callback A function that receives the value as its first argument.
+---@param callback function A function that receives the value as its first argument.
+---@param name? string Optional name to be able to reference the callback later on
 function ObservableMeta:AddObserver(callback, name)
     if name then
         self.Listeners[name] = callback

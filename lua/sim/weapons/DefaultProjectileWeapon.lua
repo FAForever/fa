@@ -401,13 +401,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
                 self.EconDrain = CreateEconomyEvent(self.unit, nrgReq, 0, time)
                 self.FirstShot = true
-                self.unit:ForkThread(function()
-                    WaitFor(self.EconDrain)
-                    RemoveEconomyEvent(self.unit, self.EconDrain)
-                    self.EconDrain = nil
-                end)
+                self.unit:ForkThread(self.EconomyDrainThread)
             end
         end
+    end,
+
+    ---@param self DefaultProjectileWeapon
+    EconomyDrainThread = function(self)
+        WaitFor(self.EconDrain)
+        RemoveEconomyEvent(self.unit, self.EconDrain)
+        self.EconDrain = nil
     end,
 
     -- Determine how much Energy is required to fire
