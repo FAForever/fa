@@ -180,6 +180,26 @@ function Create(parent, bp)
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
+    value = StringComma(eco.BuildCostMass) .. ' '
+    MassCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    MassCostText:SetColor(colorMass) -- --FF2DEC28
+    LayoutHelpers.AtRightTopIn(MassCostText, tooltipUI, column2, top)
+    MassCostIcon = Bitmap(tooltipUI)
+    MassCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
+    LayoutHelpers.SetDimensions(MassCostIcon, iconSize, iconSize)
+    LayoutHelpers.AtLeftTopIn(MassCostIcon, tooltipUI, tooltipWidth-column2, top+2)
+
+    value = eco.YieldMass
+    value = value > 0 and '+' .. value or value
+    value = StringComma(value) .. ' '
+    MassProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    MassProdText:SetColor(colorMass)  -- --FF2DEC28
+    LayoutHelpers.AtRightTopIn(MassProdText, tooltipUI, column3, top)
+    MassProdIcon = Bitmap(tooltipUI)
+    MassProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
+    LayoutHelpers.SetDimensions(MassProdIcon, iconSize, iconSize)
+    LayoutHelpers.AtLeftTopIn(MassProdIcon, tooltipUI, tooltipWidth-column3, top+2)
+
     local healthValue = init(bp.NewHealth or bp.Defense.Health)
     local healthString = StringComma(math.floor(healthValue)) .. ' '
     HealthText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
@@ -199,26 +219,6 @@ function Create(parent, bp)
     HealthPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
     LayoutHelpers.SetDimensions(HealthPerMassIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(HealthPerMassIcon, tooltipUI, tooltipWidth-column5, top+2)
-
-    value = eco.YieldMass
-    value = value > 0 and '+' .. value or value
-    value = StringComma(value) .. ' '
-    MassProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    MassProdText:SetColor(colorMass)  -- --FF2DEC28
-    LayoutHelpers.AtRightTopIn(MassProdText, tooltipUI, column3, top)
-    MassProdIcon = Bitmap(tooltipUI)
-    MassProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
-    LayoutHelpers.SetDimensions(MassProdIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(MassProdIcon, tooltipUI, tooltipWidth-column3, top+2)
-
-    value = StringComma(eco.BuildCostMass) .. ' '
-    MassCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
-    MassCostText:SetColor(colorMass) -- --FF2DEC28
-    LayoutHelpers.AtRightTopIn(MassCostText, tooltipUI, column2, top)
-    MassCostIcon = Bitmap(tooltipUI)
-    MassCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
-    LayoutHelpers.SetDimensions(MassCostIcon, iconSize, iconSize)
-    LayoutHelpers.AtLeftTopIn(MassCostIcon, tooltipUI, tooltipWidth-column2, top+2)
 
     top  = top + MassCostText.Height() + 2
 
