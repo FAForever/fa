@@ -46,4 +46,4 @@ jobs:
         with:
           name: changelog
           path: |
-            changelog/snippets/changelog.md
+            changelog/snippets/faf-develop.md
