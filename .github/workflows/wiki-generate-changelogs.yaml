@@ -55,7 +55,7 @@ jobs:
           mv -r fa/changelog/*.md fa.wiki/changelog
 
           # copy the changelog for FAF Develop
-          mv "fa/changelog/faf-develop.md" fa.wiki/changelog/snippets/faf-develop.md
+          mv "fa/changelog/faf-develop.md" fa.wiki/changelog/faf-develop.md
 
       - name: Update the wiki
         run: |
