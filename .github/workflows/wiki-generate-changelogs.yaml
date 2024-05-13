@@ -1,0 +1,87 @@
+name: Create changelog
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            changelog/snippets
+
+      - name: Verify the changelog snippets
+        working-directory: changelog/snippets # script assumes it is in this directory
+        run: |
+          ./verify.sh
+
+  bundle:
+    name: Bundle
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    needs: [verify]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            changelog/snippets
+
+      - name: Create the changelog
+        working-directory: changelog/snippets # script assumes it is in this directory
+        shell: bash
+        run: |
+          ./combine.sh
+
+      - name: Add the changelog to the output
+        shell: bash
+        id: changelog
+        run: |
+          echo "changelog=$(cat changelog/snippets/changelog.md)" >> "$GITHUB_OUTPUT"
+
+  update:
+    name: Update wiki
+    runs-on: ubuntu-latest
+    needs: [bundle, verify]
+    steps:
+      - name: Checkout FA repository
+        uses: actions/checkout@v4
+        with:
+          path: fa
+          sparse-checkout: |
+            changelog
+
+      - name: Checkout FA Wiki repository
+        uses: actions/checkout@v4
+        with:
+          repository: faforever/fa.wiki
+          path: fa.wiki
+
+      - name: Copy over assets
+        env:
+          changelog: ${{ needs.bundle.outputs.changelog }}
+        run: |
+          # do not include the snippets
+          rm -rf fa/changelog/snippets
+
+          # copy the changelogs for previous releases
+          cp -r fa/changelog/*.md fa.wiki/changelog/snippets
+
+          # copy the changelog for FAF Develop
+          echo "$changelog" > fa.wiki/changelog/snippets/fafdevelop.md
+
+      - name: Update the wiki
+        run: |
+          cd fa.wiki
+
+          git config user.name "FAForever"
+          git config user.email "administrator@faforever.com"
+
+          git stage .
+          git commit -m "Update changelogs"
+          git push origin HEAD:master
