@@ -1,0 +1,59 @@
+name: FAF Wiki Generator
+
+# not sure if we will use a trigger or if this will be manual? It could trigger on release
+
+jobs:
+
+  prepare-environment:
+    build:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout Brewland Wikigen Repository
+          uses: actions/checkout@v4
+          with:
+            repository: The-Balthazar/BrewWikiGen
+            ref: master
+            path: ./brew-wiki-gen
+
+        - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
+          uses: actions/checkout@v4
+          with:
+            repository: FAForever/fa
+            ref: deploy/fafdevelop
+            path: ./fa
+            sparse: |
+              fa/textures/ui/common/game/strategicicons/*.dds
+              fa/textures/ui/common/icons/units/*.dds
+
+        - name: Checkout FAF Wiki Repository
+          uses: actions/checkout@v4
+          with:
+            repository: FAForever/wiki-pages
+            ref: main
+            path: ./fa-wiki
+
+        - name: Install Lua 5.4
+          uses: leafo/gh-actions-lua@v10
+          with:
+            luaVersion: "5.4"
+
+        - name: Install Image Magick
+          run: |
+            sudo apt-get install -y imagemagick
+
+        # copy strategic and unit icons and convert them to PNGs
+        - name: Convert Icons
+          run: |
+            magick mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
+            magick mogrify -path "fa/textures/ui/common/icons-png" -format png "fa/textures/ui/common/icons/units/*.dds"
+
+        - name: Replace run.lua # tbd
+          uses: canastro/copy-file-action@master
+          with: #source run.lua file
+            source: "placeholder"
+            target: "brew-wiki-gen/Run.lua"
+
+        #push action here somewhere
+        
+
