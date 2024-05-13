@@ -1,0 +1,1 @@
+- (#6178) Allow the Pulsar to be constructed using hotkeys.
