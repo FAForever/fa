@@ -27,7 +27,7 @@ jobs:
             repository: FAForever/fa
             ref: deploy/fafdevelop
             path: ./fa
-            sparse: |
+            sparse-checkout: |
               fa/textures/ui/common/game/strategicicons/*.dds
               fa/textures/ui/common/icons/units/*.dds
 
@@ -35,7 +35,7 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: FAForever/fa.wiki
-            ref: main
+            ref: master
             path: ./fa.wiki
 
         - name: Install Lua 5.4
