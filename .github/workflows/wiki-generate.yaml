@@ -47,15 +47,11 @@ jobs:
           run: |
             sudo apt-get install -y imagemagick
 
-        - name: Install Image Magick
-          run: |
-            sudo find / -name imagemagick
-
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Icons
           run: |
-            /usr/bin/magick mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
-            /usr/bin/magick mogrify -path "fa/textures/ui/common/icons-png" -format png "fa/textures/ui/common/icons/units/*.dds"
+            mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
+            mogrify -path "fa/textures/ui/common/icons-png" -format png "fa/textures/ui/common/icons/units/*.dds"
 
         - name: Replace run.lua # tbd
           uses: canastro/copy-file-action@master
