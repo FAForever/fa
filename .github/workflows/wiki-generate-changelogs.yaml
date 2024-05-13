@@ -52,10 +52,10 @@ jobs:
           mkdir fa.wiki/changelog
 
           # copy the changelogs for previous releases
-          cp -r fa/changelog/*.md fa.wiki/changelog
+          mv -r fa/changelog/*.md fa.wiki/changelog
 
           # copy the changelog for FAF Develop
-          echo "fa/changelog/faf-develop.md" > fa.wiki/changelog/snippets/faf-develop.md
+          mv "fa/changelog/faf-develop.md" fa.wiki/changelog/snippets/faf-develop.md
 
       - name: Update the wiki
         run: |
