@@ -58,10 +58,10 @@ jobs:
               echo "fa.wiki/icons/units does exist."
               mkdir "fa.wiki/icons/units"
             fi
-            ls ./fa/textures/ui/common/game/strategicicons/
+            ls fa/textures/ui/common/game/strategicicons/
 
-            mogrify -path "./fa.wiki/icons/strategicicons" -format png "./fa/textures/ui/common/game/strategicicons/*.dds"
-            mogrify -path "./fa.wiki/icons/units" -format png "./fa/textures/ui/common/icons/units/*.dds"
+            mogrify -path "fa.wiki/icons/strategicicons" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
+            mogrify -path "fa.wiki/icons/units" -format png "fa/textures/ui/common/icons/units/*.dds"
 
         - name: Replace run.lua # tbd
           uses: canastro/copy-file-action@master
