@@ -44,8 +44,9 @@ jobs:
 
       - name: Copy over assets
         run: |
-          # do not include the snippets
+          # do not include the snippets or the template
           rm -rf fa/changelog/snippets
+          rm -rf fa/changelog/template.md
 
           # remove the old changelogs
           rm -rf fa.wiki/changelog
@@ -53,6 +54,9 @@ jobs:
 
           # copy the changelogs for previous releases
           mv fa/changelog/*.md fa.wiki/changelog
+
+          # copy the changelog for FAF Develop
+          mv fa/changelog/snippets/faf-develop.md fa.wiki/changelog/faf-develop.md
 
       - name: Update the wiki
         run: |
