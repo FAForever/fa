@@ -1,11 +1,16 @@
 name: FAF Wiki Generator
 
 # not sure if we will use a trigger or if this will be manual? It could trigger on release
+on:
+  push:
+    branches: 
+      - 'feat/github-wf-icons'
+
+
 
 jobs:
 
   prepare-environment:
-    build:
       runs-on: ubuntu-latest
 
       steps:
@@ -29,9 +34,9 @@ jobs:
         - name: Checkout FAF Wiki Repository
           uses: actions/checkout@v4
           with:
-            repository: FAForever/wiki-pages
+            repository: FAForever/fa.wiki
             ref: main
-            path: ./fa-wiki
+            path: ./fa.wiki
 
         - name: Install Lua 5.4
           uses: leafo/gh-actions-lua@v10
