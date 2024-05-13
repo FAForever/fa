@@ -49,9 +49,14 @@ jobs:
 
         - name: find_magick
           run: |
-            magick_location=$(command -v magick)
-            echo "::set-output name=magick_location::$magick_location"
-            echo "Location of magick command: $magick_location"
+            magick_location=$(which magick || true)
+            if [ -n "$magick_location" ]; then
+              echo "::set-output name=magick_location::$magick_location"
+              echo "Location of magick command: $magick_location"
+            else
+              echo "magick command not found"
+              exit 1
+            fi
 
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Icons
