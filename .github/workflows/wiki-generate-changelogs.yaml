@@ -1,4 +1,4 @@
-name: Create changelog
+name: Wiki - generate changelog
 
 on:
   workflow_dispatch:
@@ -32,17 +32,7 @@ jobs:
           sparse-checkout: |
             changelog/snippets
 
-      - name: Create the changelog
-        working-directory: changelog/snippets # script assumes it is in this directory
-        shell: bash
-        run: |
-          ./combine.sh
 
-      - name: Add the changelog to the output
-        shell: bash
-        id: changelog
-        run: |
-          echo "changelog=$(cat changelog/snippets/changelog.md)" >> "$GITHUB_OUTPUT"
 
   update:
     name: Update wiki
@@ -61,6 +51,12 @@ jobs:
         with:
           repository: faforever/fa.wiki
           path: fa.wiki
+
+      - name: Create the changelog
+        working-directory: fa/changelog/snippets # script assumes it is in this directory
+        shell: bash
+        run: |
+          ./combine.sh
 
       - name: Copy over assets
         env:
