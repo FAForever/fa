@@ -50,8 +50,6 @@ jobs:
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Icons
           run: |
-            magick_location=$(which magick)
-            echo "Location of magick command: $magick_location"
             /usr/bin/magick mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
             /usr/bin/magick mogrify -path "fa/textures/ui/common/icons-png" -format png "fa/textures/ui/common/icons/units/*.dds"
 
