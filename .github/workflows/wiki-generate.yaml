@@ -47,13 +47,19 @@ jobs:
           run: |
             sudo apt-get install -y imagemagick
 
+        - name: find_magick
+          run: |
+            magick_location=$(command -v magick)
+            echo "::set-output name=magick_location::$magick_location"
+            echo "Location of magick command: $magick_location"
+
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Icons
           run: |
             magick_location=$(which magick)
             echo "Location of magick command: $magick_location"
-            magick mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
-            magick mogrify -path "fa/textures/ui/common/icons-png" -format png "fa/textures/ui/common/icons/units/*.dds"
+            ${{ steps.find_magick.outputs.magick_location }} mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
+            ${{ steps.find_magick.outputs.magick_location }} mogrify -path "fa/textures/ui/common/icons-png" -format png "fa/textures/ui/common/icons/units/*.dds"
 
         - name: Replace run.lua # tbd
           uses: canastro/copy-file-action@master
