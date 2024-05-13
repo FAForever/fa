@@ -47,11 +47,15 @@ jobs:
           # do not include the snippets
           rm -rf fa/changelog/snippets
 
+          # remove the old changelogs
+          rm -rf fa.wiki/changelog
+          mkdir fa.wiki/changelog
+
           # copy the changelogs for previous releases
-          cp -r fa/changelog/*.md fa.wiki/changelog/snippets
+          cp -r fa/changelog/*.md fa.wiki/changelog
 
           # copy the changelog for FAF Develop
-          echo "$changelog" > fa.wiki/changelog/snippets/fafdevelop.md
+          echo "fa/changelog/faf-develop.md" > fa.wiki/changelog/snippets/faf-develop.md
 
       - name: Update the wiki
         run: |
