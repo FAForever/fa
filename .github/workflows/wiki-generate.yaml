@@ -42,7 +42,7 @@ jobs:
           run: |
             sudo apt-get install -y imagemagick
 
-        # copy strategic and unit icons and convert them to PNGs
+        # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Icons
           run: |
             magick mogrify -path "fa/textures/ui/common/game/strategicicons-png" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
