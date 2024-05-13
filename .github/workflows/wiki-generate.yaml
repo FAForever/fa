@@ -47,6 +47,10 @@ jobs:
           run: |
             sudo apt-get install -y imagemagick
 
+        - name: Install Image Magick
+          run: |
+            sudo find / -name imagemagick
+
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Icons
           run: |
