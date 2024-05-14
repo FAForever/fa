@@ -187,6 +187,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         proj:SetBallisticAcceleration(-self:CalculateBallisticAcceleration(proj))
     end,
 
+    --- Returns the positive downwards acceleration needed for a projectile to hit its target when travelling at the same speed as the unit launching it (for bombs)
     ---@param self DefaultProjectileWeapon
     ---@param projectile Projectile
     ---@return number
