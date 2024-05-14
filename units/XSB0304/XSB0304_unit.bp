@@ -190,11 +190,6 @@ UnitBlueprint{
     SizeZ = 5,
     StrategicIconName = "icon_structure3_transport",
     StrategicIconSortPriority = 175,
-    Transport = {
-        Class2AttachSize = 1,
-        Class3AttachSize = 1,
-        ClassGenericUpTo = 3,
-    },
     Wreckage = {
         Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
