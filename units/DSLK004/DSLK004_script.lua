@@ -4,17 +4,17 @@
 -- Copyright © 2008 Blade Braver!
 ------------------------------------------------------------------------------
 
-local weapons = import("/lua/seraphimweapons.lua")
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
-local PhasonCollisionBeam2 = weapons.PhasonBeam2
-local PhasonBeam = weapons.PhasonBeam
+
+local SAALightningWeapon = import("/lua/seraphimweapons.lua").SAALightningWeapon
+local LightningSmallSurfaceCollisionBeam = import("/lua/sim/collisionBeams/LightningSmallSurfaceCollisionBeam.lua").LightningSmallSurfaceCollisionBeam
 
 ---@class DSLK004 : SLandUnit
 DSLK004 = ClassUnit(SLandUnit) {
     Weapons = {
-        PhasonBeamAir = ClassWeapon(PhasonBeam) {},
-        PhasonBeamGround = ClassWeapon(PhasonBeam) {
-            BeamType = PhasonCollisionBeam2,
+        PhasonBeamAir = ClassWeapon(SAALightningWeapon){},
+        PhasonBeamGround = ClassWeapon(SAALightningWeapon){
+            BeamType = LightningSmallSurfaceCollisionBeam,
             FxBeamEndPointScale = 0.01,
         },
     },
@@ -33,8 +33,8 @@ DSLK004 = ClassUnit(SLandUnit) {
         end
     end,
 }
-TypeClass = DSLK004
 
+TypeClass = DSLK004
 
 -- kept for backwards compatibility
 local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
