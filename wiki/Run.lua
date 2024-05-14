@@ -21,6 +21,10 @@ local function parse_args(arg)
     return args
 end
 
+for i, v in ipairs(arg) do
+    print(i, v)
+end
+
 local args = parse_args(arg)
 
 print("Output Directory: " .. tostring(args[1]))
