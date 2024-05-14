@@ -7,6 +7,7 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile02
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+
 local MathSqrt = math.sqrt
 local MathPow = math.pow
 local MathPi = math.pi
@@ -83,8 +84,8 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 			for i = 0, numProjectiles - 1 do
 				offsetAngle = angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation)
 				magnitudeVariation = RandomFloat(0.9, 1.1)
-				xVec = vx + math.sin(offsetAngle) * spreadMagnitude * magnitudeVariation
-				zVec = vz + math.cos(offsetAngle) * spreadMagnitude * magnitudeVariation
+				xVec = vx + MathSin(offsetAngle) * spreadMagnitude * magnitudeVariation
+				zVec = vz + MathCos(offsetAngle) * spreadMagnitude * magnitudeVariation
 				self:CreateChildProjectile(bp.FragmentId)
 					:SetVelocity(xVec, vy, zVec)
 					:SetVelocity(bp.InitialSpeed + RandomFloat(-bp.InitialSpeedRange, bp.InitialSpeedRange))
