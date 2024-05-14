@@ -40,8 +40,6 @@ ProjectileBlueprint {
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 20,
-        UseGravity = false,
-        VelocityAlign = true,
-        RealisticOrdinance = true,
+        UseGravity = true,
     },
 }
