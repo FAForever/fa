@@ -59,9 +59,8 @@ jobs:
               mkdir "fa.wiki/icons/units"
             fi
 
-            mogrify -path "fa.wiki/icons/strategicicons" -format png "fa/textures/ui/common/game/strategicicons/*.dds"
-            mogrify -path "fa.wiki/icons/units" -format png "fa/textures/ui/common/icons/units/*.dds"
-            ls fa.wiki/icons/strategicicons
+            mogrify -path "fa.wiki/icons/strategicicons" -format png "fa/textures/ui/common/game/strategicicons/*.dds" -verbose
+            mogrify -path "fa.wiki/icons/units" -format png "fa/textures/ui/common/icons/units/*.dds" -verbose
 
         - name: Replace run.lua # tbd
           uses: canastro/copy-file-action@master
