@@ -25,6 +25,13 @@ for i, v in ipairs(arg) do
     print(i, v)
 end
 
+print("Key and value pairs:")
+for i = 1, #arg do
+    local key, value = arg[i]:match("--([^=]+)=(.*)")
+    print(key, value)
+end
+
+
 local args = parse_args(arg)
 
 print("Output Directory: " .. tostring(args[1]))
