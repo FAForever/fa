@@ -60,12 +60,14 @@ AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShe
         local xVec
         local zVec
         local offsetAngle
-
+        local magnitudeVariation
+	
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
             offsetAngle = angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation)
-            xVec = vx + math.sin(offsetAngle) * spreadMagnitude
-            zVec = vz + math.cos(offsetAngle) * spreadMagnitude
+            magnitudeVariation = RandomFloat(0.9, 1.1)
+            xVec = vx + math.sin(offsetAngle) * spreadMagnitude * magnitudeVariation
+            zVec = vz + math.cos(offsetAngle) * spreadMagnitude * magnitudeVariation
             self:CreateChildProjectile(bp.FragmentId)
                 :SetVelocity(xVec, vy, zVec)
                 :SetVelocity(bp.InitialSpeed + RandomFloat(-bp.InitialSpeedRange, bp.InitialSpeedRange))

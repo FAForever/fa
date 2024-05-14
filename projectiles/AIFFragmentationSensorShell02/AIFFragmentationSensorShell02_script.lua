@@ -53,16 +53,18 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 				local timeToImpact = ((-vy - MathSqrt(MathPow(vy,2) - 2*g*detonationHeight))/g) / vMult
 
 				-- Calculate the new ballistic acceleration
-				ballisticAcceleration = -2 * (bp.DetonateBelowHeight + vy*vMult * timeToImpact) / MathPow(timeToImpact, 2)
+				ballisticAcceleration = -2 * (detonationHeight + vy*vMult * timeToImpact) / MathPow(timeToImpact, 2)
 				spreadMagnitude = bp.FragmentRadius / timeToImpact
 			end
 
 			-- Update our velocity values
-			vx, vy, vz = vx*vMult, vy*vMult, vz*vMult
+			-- There appears to be inevitable decay with child projectiles, so we give a slight vertical lift to compensate
+			vx, vy, vz = vx*vMult, vy*vMult + 2, vz*vMult
 
 			-- One initial projectile following same directional path as the original
 			self:CreateChildProjectile(bp.FragmentId)
 				:SetVelocity(vx, vy, vz)
+				:SetVelocity(bp.InitialSpeed)
 				:SetBallisticAcceleration(ballisticAcceleration).DamageData = self.DamageData
 
 			-- Create several other projectiles in a dispersal pattern
@@ -75,12 +77,14 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 			local xVec
 			local zVec
 			local offsetAngle
+			local magnitudeVariation
 	
 			-- Launch projectiles at semi-random angles away from split location
 			for i = 0, numProjectiles - 1 do
 				offsetAngle = angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation)
-				xVec = vx + math.sin(offsetAngle) * spreadMagnitude
-				zVec = vz + math.cos(offsetAngle) * spreadMagnitude
+				magnitudeVariation = RandomFloat(0.9, 1.1)
+				xVec = vx + math.sin(offsetAngle) * spreadMagnitude * magnitudeVariation
+				zVec = vz + math.cos(offsetAngle) * spreadMagnitude * magnitudeVariation
 				self:CreateChildProjectile(bp.FragmentId)
 					:SetVelocity(xVec, vy, zVec)
 					:SetVelocity(bp.InitialSpeed + RandomFloat(-bp.InitialSpeedRange, bp.InitialSpeedRange))
