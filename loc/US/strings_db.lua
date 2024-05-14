@@ -5943,6 +5943,21 @@ tooltipui0735="Vote no to your team recalling from battle as a defeat."
 tooltipui0736="[Hide/Show] Mass Fabricator Panel"
 tooltipui0737="[Hide/Show] Voting Panel"
 
+-- OnBuild Toggle tooltips
+tooltipui0738 = "Toggle amphibious mode for constructed units"
+tooltipui0739 = "Turn constructed units shields on/off"
+tooltipui0740 = "Toggle sniper mode for constructed units"
+tooltipui0741 = "Toggle constructed units between air and ground weaponry"
+tooltipui0742 = "Turn constructed units radar jamming on/off"
+tooltipui0743 = "Turn constructed units radar on/off"
+tooltipui0744 = "Turn constructed units sonar on/off"
+tooltipui0745 = "Turn constructed units stealth field on/off"
+tooltipui0746 = "Turn constructed units personal stealth field on/off"
+tooltipui0747 = "Turn constructed units cloaking on/off"
+tooltipui0748 = "Construction Options"
+tooltipui0749 = "Options for units constructed by this factory"
+
+
 -- External Factory and Auto-Deploy tooltips
 tooltipui0750 = "Mobile Factory"
 tooltipui0751 = "Select attached factory"

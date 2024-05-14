@@ -44,6 +44,11 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
     end,
 
+    UpdateStat = function(self, stat, value)
+        AircraftCarrier.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)

@@ -1,5 +1,6 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local OnStopBuildStatToggleComponent = import("/lua/sim/units/components/OnStopBuildStatToggleComponent.lua").OnStopBuildStatToggleComponent
 local StructureUnitOnCreate = StructureUnit.OnCreate
 local StructureUnitOnDestroy = StructureUnit.OnDestroy
 local StructureUnitOnPaused = StructureUnit.OnPaused
@@ -31,7 +32,7 @@ local categoriesENGINEER = categories.ENGINEER
 ---@field BuildEffectBones string[]
 ---@field FactoryBuildFailed boolean
 ---@field RollOffPoint Vector
-FactoryUnit = ClassUnit(StructureUnit) {
+FactoryUnit = ClassUnit(StructureUnit, OnStopBuildStatToggleComponent) {
 
     RollOffAnimationRate = 10,
 
@@ -41,6 +42,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     OnCreate = function(self)
         StructureUnitOnCreate(self)
+        OnStopBuildStatToggleComponent.OnCreate(self)
 
         local blueprint = self.Blueprint
 
@@ -128,6 +130,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param order string
     OnStopBuild = function(self, unitBeingBuilt, order)
         StructureUnitOnStopBuild(self, unitBeingBuilt, order)
+        OnStopBuildStatToggleComponent.OnStopBuild(self, unitBeingBuilt)
 
         self.BuildingUnit = false
 

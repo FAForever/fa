@@ -19,12 +19,6 @@ URA0304 = ClassUnit(CAirUnit) {
     ContrailBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},
     ExhaustBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},
     
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
-        --Turns Stealth off when unit is built
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
-    end,
-    
     OnDamage = function(self, instigator, amount, vector, damageType)
         if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return

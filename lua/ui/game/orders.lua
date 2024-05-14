@@ -40,6 +40,10 @@ local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
 local lastOCTime = {}
 
+-- Forward declare our main info tables so functions can access them
+local defaultOrdersTable
+local commonOrders
+
 local function CreateOrderGlow(parent)
     controls.orderGlow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
     LayoutHelpers.AtCenterIn(controls.orderGlow, parent)
@@ -632,6 +636,61 @@ local function StatToggleInitFunction(control, unitList, subCheck)
         local thisUnitStatus = (v:GetStat(control._data.statToggle, 0).Value == 1 and true) or false
         if result == nil then
             result = thisUnitStatus
+        elseif thisUnitStatus ~= result then
+            mixed = true
+            result = true
+            break
+        end
+    end
+    if mixed then
+        control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
+    end
+    if not subCheck then
+        control:SetCheck(result) -- Selected state
+    else
+        return result, mixed -- Return our values so our meta button can do what it likes with them
+    end
+end
+
+local function StatToggleOrderBehavior(self, modifiers, subState)
+    local state
+    if subState ~= nil then
+        state = subState
+    else
+        state = self:IsChecked()
+    end
+    local mixed = false
+    if self._mixedIcon then
+        mixed = true
+        self._mixedIcon:Destroy()
+        self._mixedIcon = nil
+    end
+
+    -- Mixed shields get special behaviour: turn everything on, not off.
+    if mixed then
+        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = true}}, true )
+    else
+        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = not state}}, true)
+    end
+
+    if controls.mouseoverDisplay.text then
+        controls.mouseoverDisplay.text:SetText(self._curHelpText)
+    end
+    if subState == nil then
+        Checkbox.OnClick(self)
+    else
+        return (mixed and true) or (not state)
+    end
+end
+
+local function StatToggleInitFunction(control, unitList, subCheck)
+    local result = nil
+    local mixed = false
+    for i, v in unitList do
+        local thisUnitStatus = (v:GetStat(control._data.statToggle, 0).Value == 1 and true) or false
+        if result == nil then
+            result = thisUnitStatus
         else
             if thisUnitStatus ~= result then
                 mixed = true
@@ -757,6 +816,115 @@ local function CreateBorder(parent)
     return border
 end
 
+local function CreateOnBuildTogglePopup(parent, selected)
+    local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+
+    bg.border = CreateBorder(bg)
+    bg:DisableHitTest(true)
+
+    local function CreateButton(statToggle)
+        local bitmapId = statToggle.override.bitmapId or defaultOrdersTable[statToggle.defaultOrder].bitmapId
+        local checkbox = Checkbox(bg, GetOrderBitmapNames(bitmapId))
+
+        -- apply help text override or use default
+        -- probably need to change all of these to use a special production tooltip
+        checkbox._curHelpText = statToggle.override.helpText or defaultOrdersTable[statToggle.defaultOrder].helpText
+        if TooltipInfo.Tooltips['build_'..checkbox._curHelpText] then
+            checkbox._curHelpText = 'build_'..checkbox._curHelpText
+        end
+
+        -- see if we're mixed
+        local result = nil
+        local mixed = false
+        for i, v in selected do
+            local thisUnitStatus = v:GetStat(statToggle.stat, 0).Value
+            if result == nil then
+                result = thisUnitStatus
+            elseif thisUnitStatus ~= result then
+                mixed = true
+                result = true
+                break
+            end
+        end
+        if mixed then
+            checkbox._mixedIcon = Bitmap(checkbox, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+            LayoutHelpers.AtRightTopIn(checkbox._mixedIcon, checkbox, -2, 2)
+        end
+        checkbox:SetCheck(result > 0 and true or false) -- Selected state
+
+        checkbox.HandleEvent = function(control, event)
+            if event.Type == 'MouseEnter' then
+                CreateMouseoverDisplay(control, control._curHelpText, 1)
+            elseif event.Type == "MouseExit" then
+                if controls.mouseoverDisplay then
+                    controls.mouseoverDisplay:Destroy()
+                    controls.mouseoverDisplay = false
+                end
+            end
+            return Checkbox.HandleEvent(control, event)
+        end
+
+        checkbox.OnCheck = function(self, checked)
+            parent:_OnButtonToggle(statToggle.stat, checked)
+        end
+
+        return checkbox
+    end
+
+    local buttonPadding = 3
+    local i = 1
+    bg.buttons = {}
+    for _, statToggle in parent._data.buildToggles do
+        bg.buttons[i] = CreateButton(statToggle)
+        if i == 1 then
+            LayoutHelpers.AtBottomCenterIn(bg.buttons[i], bg, -8)
+            --LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
+        else
+            LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1], buttonPadding)
+        end
+        i = i + 1
+    end
+
+    bg.Height:Set(function() return table.getsize(bg.buttons) * (bg.buttons[1].Height()+buttonPadding) - 20 end)
+    bg.Width:Set(bg.buttons[1].Width() - 20)
+
+    if UIUtil.currentLayout == 'left' then
+        LayoutHelpers.RightOf(bg, parent, 40)
+    else
+        LayoutHelpers.CenteredAbove(bg, controls.orderButtonGrid:GetItem(parent.col, 1), 20)
+    end
+
+    return bg
+end
+
+local function OnBuildToggleBehavior(self, modifiers)
+    if not self._OnButtonToggle then
+        self._OnButtonToggle = function(self, stat, state)
+            SimCallback( { Func="SetStatByCallback", Args= {[stat] = state}}, true )
+        end
+    end
+    
+    if self._popup then
+        self._popup:Destroy()
+        self._popup = nil
+    else
+        self._popup = CreateOnBuildTogglePopup(self, currentSelection)
+        local function CollapsePopup(event)
+            if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
+                self._popup:Destroy()
+                self._popup = nil
+            end
+        end
+
+        UIMain.AddOnMouseClickedFunc(CollapsePopup)
+
+        self._popup.OnDestroy = function(popup)
+            UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
+            Checkbox.OnDestroy(popup)
+        end
+    end
+end
+
 local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
@@ -785,27 +953,27 @@ local function CreateFirestatePopup(parent, selected)
     end
 
     local i = 1
+    local buttonPadding = 3
     bg.buttons = {}
     for index, state in retaliateStateInfo do
         if index ~= -1 then
             bg.buttons[i] = CreateButton(index, state)
             if i == 1 then
-                LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
-                LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
+                LayoutHelpers.AtBottomCenterIn(bg.buttons[i], bg, -8)
             else
-                LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1])
+                LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1], buttonPadding)
             end
             i = i + 1
         end
     end
 
-    bg.Height:Set(function() return table.getsize(bg.buttons) * bg.buttons[1].Height() end)
-    bg.Width:Set(bg.buttons[1].Width)
+    bg.Height:Set(function() return table.getsize(bg.buttons) * (bg.buttons[1].Height() + buttonPadding) - 20 end)
+    bg.Width:Set(bg.buttons[1].Width() - 20)
 
     if UIUtil.currentLayout == 'left' then
         LayoutHelpers.RightOf(bg, parent, 40)
     else
-        LayoutHelpers.Above(bg, parent, 20)
+        LayoutHelpers.CenteredAbove(bg, parent, 20)
     end
 
     return bg
@@ -825,21 +993,21 @@ local function RetaliateOrderBehavior(self, modifiers)
     if self._popup then
         self._popup:Destroy()
         self._popup = nil
-    else
-        self._popup = CreateFirestatePopup(self, self._toggleState)
-        local function CollapsePopup(event)
-            if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
-                self._popup:Destroy()
-                self._popup = nil
-            end
+        return
+    end
+    self._popup = CreateFirestatePopup(self, self._toggleState)
+    local function CollapsePopup(event)
+        if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
+            self._popup:Destroy()
+            self._popup = nil
         end
+    end
 
-        UIMain.AddOnMouseClickedFunc(CollapsePopup)
+    UIMain.AddOnMouseClickedFunc(CollapsePopup)
 
-        self._popup.OnDestroy = function(self)
-            UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
-            Checkbox.OnDestroy(self)
-        end
+    self._popup.OnDestroy = function(self)
+        UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
+        Checkbox.OnDestroy(self)
     end
 end
 
@@ -1106,11 +1274,11 @@ end
 ---      the function should have this declaration: function(checkbox, unitList)
 --- extraInfo is used for storing any extra information required in setting up the button
 
-local defaultOrdersTable = {
+defaultOrdersTable = {
     -- Common rules
     AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
     RULEUCC_Move = {                helpText = "move",              bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior},
-    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit},
+    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior,         initialStateFunc = AttackOrderInit},
     RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
     RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
     RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},
@@ -1121,8 +1289,8 @@ local defaultOrdersTable = {
     RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",        bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
     RULEUCC_Script = {              helpText = "special_action",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = StandardOrderBehavior},
     RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = TransportOrderBehavior},
-    RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
-    RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
+    RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior,       ButtonTextFunc = NukeBtnText},
+    RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior,       ButtonTextFunc = TacticalBtnText},
     RULEUCC_Teleport = {            helpText = "teleport",          bitmapId = 'teleport',              preferredSlot = 10, behavior = StandardOrderBehavior},
     RULEUCC_Ferry = {               helpText = "ferry",             bitmapId = 'ferry',                 preferredSlot = 10, behavior = StandardOrderBehavior},
     RULEUCC_Sacrifice = {           helpText = "sacrifice",         bitmapId = 'sacrifice',             preferredSlot = 10, behavior = StandardOrderBehavior},
@@ -1135,7 +1303,8 @@ local defaultOrdersTable = {
     DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
     DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
-    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
+    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10, behavior = ExternalFactoryBehavior},
+    OnBuildToggle = {               helpText = "prod_options",      bitmapId = "prod-options",          preferredSlot = 14, behavior = OnBuildToggleBehavior},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1157,7 +1326,7 @@ local specialOrdersTable = {
 }
 
 -- This is a used as a set
-local commonOrders = {
+commonOrders = {
     RULEUCC_Move = true,
     RULEUCC_Attack = true,
     RULEUCC_Patrol = true,
@@ -1291,10 +1460,10 @@ local function AddOrder(orderInfo, slot, batchMode)
 
     -- Calculate row and column, remove old item, add new checkbox
     local cols, rows = controls.orderButtonGrid:GetDimensions()
-    local row = math.ceil(slot / cols)
-    local col = math.mod(slot - 1, cols) + 1
-    controls.orderButtonGrid:DestroyItem(col, row, batchMode)
-    controls.orderButtonGrid:SetItem(checkbox, col, row, batchMode)
+    checkbox.row = math.ceil(slot / cols)
+    checkbox.col = math.mod(slot - 1, cols) + 1
+    controls.orderButtonGrid:DestroyItem(checkbox.col, checkbox.row, batchMode)
+    controls.orderButtonGrid:SetItem(checkbox, checkbox.col, checkbox.row, batchMode)
 
     -- Handle Hotbuild labels
     if orderKeys[orderInfo.helpText] then
@@ -1368,28 +1537,20 @@ function AddAbilityButtons(standardOrdersTable, availableOrders, units)
     end
 end
 
--- Creates the buttons for the alt orders, placing them as possible
-local function CreateAltOrders(availableOrders, availableToggles, units)
-    -- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
-    -- to determine where they go by using preferred slots
-    AddAbilityButtons(standardOrdersTable, availableOrders, units)
-
-    local assistingUnitList = {}
-
-    --- Pods
-    local podUnits = {}
+function DronePreCheck(availableOrders, units, assistingUnitList)
     local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
     local pods = EntityCategoryFilterDown(categories.POD, units)
     if not table.empty(units) and (not table.empty(podStagingPlatforms) or not table.empty(pods)) then
+        assistingUnitList.podUnits = {}
         local assistingUnits = {}
         if not table.empty(pods) then
             for _, pod in pods do
                 table.insert(assistingUnits, pod:GetCreator())
             end
-            podUnits['DroneL'] = pods
+            assistingUnitList.podUnits['DroneL'] = pods
         elseif not table.empty(podStagingPlatforms) then
             assistingUnits = GetAssistingUnitsList(podStagingPlatforms)
-            podUnits['DroneL'] = assistingUnits
+            assistingUnitList.podUnits['DroneL'] = assistingUnits
         end
 
         
@@ -1400,8 +1561,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 if table.getn(assistingUnits) > 1 then
                     table.insert(availableOrders, 'DroneR')
                     assistingUnitList['DroneR'] = {assistingUnits[2]}
-                    podUnits['DroneL'] = {assistingUnits[1]}
-                    podUnits['DroneR'] = {assistingUnits[2]}
+                    assistingUnitList.podUnits['DroneL'] = {assistingUnits[1]}
+                    assistingUnitList.podUnits['DroneR'] = {assistingUnits[2]}
                 end
             else
                 table.insert(availableOrders, 'DroneL')
@@ -1409,8 +1570,9 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
         end
     end
+end
 
-    --- External factories
+function ExternalFactoryPreCheck(availableOrders, units, assistingUnitList)
     local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, units)
     if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
         -- make sure we've selected all external factories, or all external factory units
@@ -1426,6 +1588,72 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 table.insert(availableOrders, 'ExFac')
             end
         end
+    end
+end
+
+function OnBuildTogglePreCheck(availableOrders, units, assistingUnitList)
+    local factories = EntityCategoryFilterDown(categories.FACTORY, units)
+    if not table.empty(factories) and table.getn(factories) == table.getn(units) then
+        
+        -- get a list of factory blueprints and populate our first set of build toggles
+        local bps = {}
+        local availableBuildToggles
+        for _, factory in factories do
+            local bp = factory:GetBlueprint()
+            if bp.General.StatToggles then
+                if not availableBuildToggles then
+                    availableBuildToggles = bp.General.StatToggles
+                else
+                    bps[bp] = true
+                end
+            end
+        end
+
+        if not availableBuildToggles then
+            return
+        end
+
+        -- find the build toggles they have in common
+        
+        for stat, toggleData in availableBuildToggles do
+            if not toggleData.onStopBuild then
+                availableBuildToggles[stat] = nil
+            end
+            for bp, _ in bps do
+                if not bp.General.StatToggles[stat] then
+                    availableBuildToggles[stat] = nil
+                end
+            end
+        end
+
+        if not table.empty(availableBuildToggles) then
+            standardOrdersTable['OnBuildToggle'].buildToggles = {}
+            for _, statData in availableBuildToggles do
+                table.insert(standardOrdersTable['OnBuildToggle'].buildToggles, statData)
+            end
+            table.sort(standardOrdersTable['OnBuildToggle'].buildToggles, function(a, b)
+                return a.index < b.index
+            end)
+            table.insert(availableOrders, 'OnBuildToggle')
+        end
+    end
+end
+
+local altPreCheckFunctions = {
+    Drone = DronePreCheck,
+    ExternalFactory = ExternalFactoryPreCheck,
+    OnBuildToggle = OnBuildTogglePreCheck,
+}
+
+-- Creates the buttons for the alt orders, placing them as possible
+local function CreateAltOrders(availableOrders, availableToggles, units)
+    -- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
+    -- to determine where they go by using preferred slots
+    AddAbilityButtons(standardOrdersTable, availableOrders, units)
+
+    local assistingUnitList = {}
+    for _, fn in altPreCheckFunctions do
+        fn(availableOrders, units, assistingUnitList)
     end
 
     -- Determine what slots to put alt orders
@@ -1528,8 +1756,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 orderCheckbox._unit = assistingUnitList[availOrder]
             end
 
-            if podUnits[availOrder] then
-                orderCheckbox._pod = podUnits[availOrder]
+            if assistingUnitList.podUnits[availOrder] then
+                orderCheckbox._pod = assistingUnitList.podUnits[availOrder]
             end
 
             if orderInfo.initialStateFunc then

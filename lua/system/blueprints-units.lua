@@ -122,6 +122,38 @@ local function DetermineWeaponCategory(weapon)
     return nil
 end
 
+-- We need this because the EntityCategory functions are not available
+--- Returns if the builder can build the unit
+---@param builder UnitBlueprint
+---@param unit UnitBlueprint
+---@return boolean
+local function CanBuild(builder, unit)
+    if not builder.Economy.BuildableCategory then
+        return false
+    end
+    for _, buildableCategory in builder.Economy.BuildableCategory do
+        local flag = true
+        local subCats = {}
+        for str in string.gmatch(buildableCategory, "([^ ]+)") do
+            table.insert(subCats, str)
+        end
+        if not table.empty(subCats) then
+            for _, subCat in subCats do
+                if not unit.CategoriesHash[subCat] then
+                    flag = false
+                    break
+                end
+            end
+        elseif not unit.CategoriesHash[buildableCategory] then
+            flag = false
+        end
+        if flag then
+            return true
+        end
+    end
+    return false
+end
+
 --- Post process a unit
 ---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
@@ -611,8 +643,165 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
             unit.General.StatToggles.AutoDeploy = true
         end
 
-        -- remove properties of the seed unit
-        unit.Categories = table.unhash(unit.CategoriesHash)
+        -- don't remove any properties of the seed unit, we want the build rate to display properly
+        -- in unitview
+        -- we can touch this up later if it messes up the AI
+    end
+end
+
+local function Lookup(t, keys)
+    for _, k in ipairs(keys) do
+        t = t[k]
+        if not t then
+            return nil
+        end
+    end
+    return t
+end
+
+function PostProcessStatToggles(allBlueprints, units)
+
+    -- unit.General.StatToggles are toggles we expect to be modified by the player through the UI via SetStatByCallback
+    -- All other toggles (such as unit.General.OnStopBeingBuiltStatToggles) are toggles that live
+    -- only in the blueprint so they can be checked under certain conditions (like the unit being built)
+
+    local prefix = 'OnBuild'
+    local scriptBitToggles = {
+        'RULEUTC_ShieldToggle',
+        'RULEUTC_WeaponToggle',
+        'RULEUTC_JammingToggle',
+        'RULEUTC_IntelToggle',
+        'RULEUTC_ProductionToggle',
+        'RULEUTC_StealthToggle',
+        'RULEUTC_GenericToggle',
+        'RULEUTC_SpecialToggle',
+        'RULEUTC_CloakToggle',
+    }
+
+    -- these override minor variations (bubble vs. personal shield, etc.)
+    -- back to their default
+    local overrideUnOverrides = {
+        ['shield-dome'] = 'shield',
+        ['shield-personal'] = 'shield',
+        ['jamming'] = 'jamming',
+    }
+
+    -- These are all the variations that then show up from default units:
+    --OnBuildRULEUTC_IntelToggle_vision
+    --OnBuildRULEUTC_IntelToggle_skry-toggle
+    --OnBuildRULEUTC_JammingToggle
+    --OnBuildRULEUTC_WeaponToggle_amphibious
+    --OnBuildRULEUTC_IntelToggle_sonar
+    --OnBuildRULEUTC_SpecialToggle_charge
+    --OnBuildRULEUTC_SpecialToggle
+    --OnBuildRULEUTC_IntelToggle_omni
+    --OnBuildRULEUTC_WeaponToggle_toggle-weapon,
+    --OnBuildRULEUTC_ProductionToggle_overcharge
+    --OnBuildRULEUTC_WeaponToggle_dronerebuild
+    --OnBuildRULEUTC_ProductionToggle_area-assist
+    --OnBuildRULEUTC_IntelToggle_radar
+    --OnBuildRULEUTC_ShieldToggle
+    --OnBuildRULEUTC_ProductionToggle
+    --OnBuildRULEUTC_StealthToggle
+    --OnBuildRULEUTC_CloakToggle
+
+    -- these are toggles that we don't want to show up
+    local skipToggles = {
+        OnBuildRULEUTC_SpecialToggle_charge = true, -- Loyalist EMP self-destruct
+        OnBuildRULEUTC_ProductionToggle_overcharge = true, -- Fire Beetle detonate
+    }
+
+    -- Default values that will be applied to a builder whenever it is constructed
+    -- For some (like shields) 1 is active
+    -- while for others (like cloak and jamming) 0 is active (god knows why)
+    local defaultValues = {
+        OnBuildRULEUTC_JammingToggle = 1,
+        OnBuildRULEUTC_ShieldToggle = 1,
+        OnBuildRULEUTC_CloakToggle = 1,
+        OnBuildRULEUTC_WeaponToggle_amphibious = 1,
+        ['OnBuildRULEUTC_StealthToggle_stealth-field'] = 1,
+        ['OnBuildRULEUTC_StealthToggle_stealth-personal'] = 1,
+    }
+
+    -- we'll need to save the order of the script bits so they can be sorted according to their scriptBit prefix
+    local scriptBitTogglesHash = {}
+    for index, toggle in ipairs(scriptBitToggles) do
+        scriptBitTogglesHash[toggle] = {index = index, stats = {}}
+    end
+
+    -- we'll be able to sort additional toggles alphabetically, with no need to track the script bit order
+    local additionalToggles = {}
+
+    -- first, we need  list of all units with script bit toggles
+    -- also, we'll add any toggles and overrides we find to the sublists in scriptBitTogglesHash
+    local toggleUnits = {}
+    for _, unit in units do
+        if unit.General.ToggleCaps and type(unit.General.ToggleCaps) == 'table' then
+            unit.General.OnStopBeingBuiltStatToggles = {}
+            for toggleCap, _ in unit.General.ToggleCaps do
+                local override = Lookup(unit.General, {'OrderOverrides', toggleCap})
+                local stat = prefix..toggleCap
+                if override and override.bitmapId then
+                    if not overrideUnOverrides[override.bitmapId] then
+                        stat = stat..'_'..override.bitmapId
+                    else
+                        override = nil
+                    end
+                end
+                if not skipToggles[stat] then
+                    scriptBitTogglesHash[toggleCap].stats[stat] = {
+                        stat = stat,
+                        defaultOrder = toggleCap,
+                        override = override,
+                        defaultValue = defaultValues[stat],
+                        scriptBitName = toggleCap,
+                    }
+                    unit.General.OnStopBeingBuiltStatToggles[stat] = true
+                    toggleUnits[unit] = true
+                end
+            end
+        end
+        -- add support for alternative toggles and overrides here
+    end
+
+    local statToggles = {}
+
+    -- sort the sub arrays and convert them to a single hash table
+    -- keep our index for sorting, and bitmap Id for later display
+    i = 0
+    for scriptBitNumber, toggleCap in scriptBitToggles do
+        local stats = {}
+        for _, statData in scriptBitTogglesHash[toggleCap].stats do
+            table.insert(stats, statData)
+        end
+        table.sort(stats, function(a, b) return a.stat < b.stat end)
+        for _, statData in ipairs(stats) do
+            i = i + 1
+            statData.index = i
+            statData.scriptBitNumber = scriptBitNumber - 1
+            statToggles[statData.stat] = statData
+        end
+    end
+
+    for _, unit in units do
+        if unit.CategoriesHash['FACTORY'] then
+            if not unit.Economy.BuildableCategory then
+                continue
+            end
+            for toggleUnit, _ in toggleUnits do
+                if CanBuild(unit, toggleUnit) then
+                    if not unit.General.StatToggles then
+                        unit.General.StatToggles = {}
+                    end
+                    for stat, _ in toggleUnit.General.OnStopBeingBuiltStatToggles do
+                        if statToggles[stat] then
+                            unit.General.StatToggles[stat] = statToggles[stat]
+                            unit.General.StatToggles[stat].onStopBuild = true
+                        end
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -665,4 +854,7 @@ function PostProcessUnits(allBlueprints, units)
             PostProcessUnitWithExternalFactory(allBlueprints, unit)
         end
     end
+
+    PostProcessStatToggles(allBlueprints, units)
+
 end

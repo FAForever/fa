@@ -18,10 +18,5 @@ XRA0305 = ClassUnit(CAirUnit) {
         Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
         Disintegrator01 = ClassWeapon(CDFLaserDisintegratorWeapon) {},
     },
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
-        self:SetMaintenanceConsumptionActive()
-    end,
 }
 TypeClass = XRA0305

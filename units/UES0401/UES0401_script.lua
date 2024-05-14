@@ -50,6 +50,11 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         end
     end,
 
+    UpdateStat = function (self, stat, value)
+        AircraftCarrier.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then

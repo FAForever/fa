@@ -887,6 +887,7 @@ ExternalFactoryComponent = ClassSimple {
         self.ExternalFactory:SetCreator(self)
         self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
+        self.ExternalFactory:InitBuildToggles()
         self.Trash:Add(self.ExternalFactory)
     end,
 
@@ -915,10 +916,16 @@ ExternalFactoryComponent = ClassSimple {
         end
     end,
 
-    ---@param self Unit | ExternalFactoryComponent
-    ---@param instigator Unit unused
-    ---@param type string unused
-    ---@param overkillRatio number unused
+    UpdateStat = function(self, stat, value, stop)
+        if stop then return end
+        -- Check if it's a stat toggle before sending it along
+        if self.ExternalFactory
+        and self.Blueprint.General.StatToggles
+        and self.Blueprint.General.StatToggles[stat] then
+            self.ExternalFactory:UpdateStat(stat, value, true)
+        end
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
