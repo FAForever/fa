@@ -1,4 +1,4 @@
-name: FAF Wiki Generator
+name: FAF Wiki Generator for unit icons
 
 # not sure if we will use a trigger or if this will be manual? It could trigger on release
 on:
