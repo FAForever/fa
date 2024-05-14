@@ -57,6 +57,10 @@ jobs:
 
             mogrify -path "fa.wiki/icons/strategicicons" -format png "fa/textures/ui/common/game/strategicicons/*.dds" -verbose
 
+        - name: Convert Strategic Icons
+          run: |
+            ls "fa/wiki"
+
         - name: Replace run.lua # tbd
           uses: canastro/copy-file-action@master
           with: #source run.lua file
