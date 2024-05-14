@@ -31,11 +31,11 @@ print("Output Directory: " .. tostring(args[1]))
 print("Wiki Generator Directory: " .. tostring(args[2]))
 
 -- Overwrite default values if provided as command-line arguments
-if args.OutputDirectory then
-    OutputDirectory = args.OutputDirectory
+if args["OutputDirectory"] then
+    OutputDirectory = args["OutputDirectory"]
 end
-if args.WikiGeneratorDirectory then
-    WikiGeneratorDirectory = args.WikiGeneratorDirectory
+if args["WikiGeneratorDirectory"] then
+    WikiGeneratorDirectory = args["WikiGeneratorDirectory"]
 end
 
 print("Output Directory: " .. OutputDirectory)
