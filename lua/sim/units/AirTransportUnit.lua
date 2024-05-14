@@ -32,6 +32,7 @@ local VertUnloadFactor = 1.5
 
 ---@class AirTransport: AirUnit, BaseTransport
 ---@field slots table<Bone, Unit>
+---@field GroundImpacted boolean
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param self AirTransport
     OnCreate = function(self)
@@ -114,25 +115,28 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 
     ---@param self AirTransport
-    ---@param instigator? Unit
+    ---@param instigator Unit
     ---@param damageType? DamageType
     ---@param excessDamageRatio? number
     Kill = function(self, instigator, damageType, excessDamageRatio)
-        -- needs to be defined
+        -- handle the cargo killing
+        -- skip for transports inside other transports, as our KillCargo will have
+        -- already been recursively called from the parent transports KillCargo call
+        if damageType ~= "TransportDamage" then
+            self:KillCargo(instigator)
+        end
+        -- these need to be defined for certain behaviors (like ctrl-k) to function
         damageType = damageType or "Normal"
-        excessDamageRatio = excessDamageRatio or 0
-
-        self:FlagCargo(not instigator or not IsUnit(instigator))
+        excessDamageRatio =  excessDamageRatio or 0
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 
-    -- Override OnImpact to kill all cargo
+    -- Override OnImpact to dispense with our cargo
     ---@param self AirTransport
-    ---@param with AirTransport
+    ---@param with ImpactType
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
-
-        self:KillCrashedCargo()
+        self:ImpactCargo()
         AirUnitOnImpact(self, with)
     end,
 
@@ -142,43 +146,6 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         AirUnitOnStorageChange(self, loading)
         for k, v in self:GetCargo() do
             v:OnStorageChange(loading)
-        end
-    end,
-
-    -- Flags cargo that it's been killed while in a transport
-    ---@param self AirTransport
-    ---@param suicide boolean
-    FlagCargo = function(self, suicide)
-        if self.Dead then return end -- Bail out early from overkill damage when already dead to avoid crashing
-
-        if not suicide then -- If the transport is self destructed, let its contents be self destructed separately
-            self:SaveCargoMass()
-        end
-        self.cargo = {}
-        local cargo = self:GetCargo()
-        for _, unit in cargo or {} do
-            if EntityCategoryContains(categories.TRANSPORTATION, unit) then -- Kill the contents of a transport in a transport, however that happened
-                local unitCargo = unit:GetCargo()
-                for k, subUnit in unitCargo do
-                    subUnit:Kill()
-                end
-            end
-            if not EntityCategoryContains(categories.COMMAND, unit) then
-                unit.killedInTransport = true
-                table.insert(self.cargo, unit)
-            end
-        end
-    end,
-
-    ---@param self BaseTransport
-    KillCrashedCargo = function(self)
-        if self:BeenDestroyed() then return end
-
-        for _, unit in self.cargo or {} do
-            if not unit:BeenDestroyed() then
-                unit.DeathWeaponEnabled = false -- Units at this point have no weapons for some reason. Trying to fire one crashes the game.
-                unit:OnKilled(nil, '', 0)
-            end
         end
     end,
 }

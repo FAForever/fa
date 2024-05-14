@@ -87,7 +87,7 @@ local AeonT3Land = {
     ['E'] = 'ual0309',
     ['O'] = 'ual0303',
     ['R'] = 'ual0304',
-	['N'] = 'dalk003',
+    ['N'] = 'dalk003',
 }
 
 local AeonT1Air = {
@@ -368,7 +368,8 @@ local CybranT3Land = {
     ['E'] = 'url0309',
     ['O'] = 'url0303',
     ['R'] = 'url0304',
-	['N'] = 'drlk001',
+    ['N'] = 'drlk001',
+    ['D'] = 'srl0310',
 }
 
 local CybranT1Air = {
@@ -509,7 +510,7 @@ local SeraphimT3Land = {
     ['R'] = 'xsl0304',
     ['S'] = 'xsl0305',
     ['V'] = 'xsl0307',
-	['N'] = 'dslk004',
+    ['N'] = 'dslk004',
 }
 
 local SeraphimT1Air = {

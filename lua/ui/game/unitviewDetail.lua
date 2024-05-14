@@ -12,6 +12,8 @@ local armorDefinition = import("/lua/armordefinition.lua").armordefinition
 
 local controls = import("/lua/ui/controls.lua").Get()
 
+local MathFloor = math.floor
+
 View = controls.View or false
 MapView = controls.MapView or false
 ViewState = "full"
@@ -44,7 +46,7 @@ function GetTechLevelString(bp)
 end
 
 function FormatTime(seconds)
-    return string.format("%02d:%02d", math.floor(seconds / 60), math.mod(seconds, 60))
+    return string.format("%02d:%02d", MathFloor(seconds / 60), math.mod(seconds, 60))
 end
 
 function GetAbilityList(bp)
@@ -565,7 +567,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 Damage = math.max(Damage, info.DamageToShields)
                             end
                             if info.BeamLifetime > 0 then
-                                Damage = Damage * (MATH_IRound(10 * info.BeamLifetime) + 1)
+                                Damage = Damage * (1 + MathFloor(MATH_IRound(info.BeamLifetime)/(info.BeamCollisionDelay+0.1)))
                             else
                                 Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
                                 local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
