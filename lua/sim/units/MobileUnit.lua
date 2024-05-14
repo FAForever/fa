@@ -95,7 +95,8 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        -- This unit was in a transport and should create a wreck on crash
+        -- Skips a single OnKilled call
+        -- currently used by transports with external storage, so that death effects can be applied later from OnImpact
         if self.killedInTransport then
             self.killedInTransport = false
         else

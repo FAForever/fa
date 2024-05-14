@@ -34,7 +34,7 @@ OverchargeProjectile = ClassSimple {
 
     ---@param self OverchargeProjectile | moho.projectile_methods
     OnCreate = function(self)
-        self.Army = self.Army
+        self.Army = self:GetArmy()
 
         if not OCProjectiles[self.Army] then
             OCProjectiles[self.Army] = 0

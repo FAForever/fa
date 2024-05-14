@@ -86,6 +86,9 @@ XEA0306 = ClassUnit(AirTransport) {
         AirTransport.OnDamage(self, instigator, amount, vector, damageType)
     end,
 
+    ---@param self XEA0306
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then

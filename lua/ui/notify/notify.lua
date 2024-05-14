@@ -80,8 +80,6 @@ function setupStartDisables()
         state = false
     end
     customMessagesDisabled = state
-
-    Prefs.SavePreferences()
 end
 
 -- This function is called from chat.lua when a player receives a message from another player flagged as Notify = true. Generated below.
@@ -160,7 +158,6 @@ function toggleNotifyPermanent(bool)
     end
 
     Prefs.SetToCurrentProfile('Notify_all_disabled', bool)
-    Prefs.SavePreferences()
 end
 
 -- This function is used to toggle ALL ASPECTS of notify functionality, but only for the current session
@@ -195,7 +192,6 @@ function toggleCategoryChat(category)
 
     local flag = 'Notify_' .. category .. '_disabled'
     Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
-    Prefs.SavePreferences()
 end
 
 -- Toggles between allowing custom messages or showing the defaults instead

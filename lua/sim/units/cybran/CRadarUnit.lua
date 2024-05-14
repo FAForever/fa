@@ -50,13 +50,22 @@ local RotatorSetAccel = moho.RotateManipulator.SetAccel
 ---@field Dish3Rotator moho.RotateManipulator
 CRadarUnit = ClassUnit(RadarUnit) {
 
+    ---@param self CRadarUnit
     OnCreate = function(self)
         RadarUnitOnCreate(self)
 
         local trash = self.Trash
-        self.Dish1Rotator = TrashBagAdd(trash, CreateRotator(self, 'Dish01', 'x'))
-        self.Dish2Rotator = TrashBagAdd(trash, CreateRotator(self, 'Dish02', 'x'))
-        self.Dish3Rotator = TrashBagAdd(trash, CreateRotator(self, 'Dish03', 'x'))
+        if self:IsValidBone('Dish01') then
+            self.Dish1Rotator = TrashBagAdd(trash, CreateRotator(self, 'Dish01', 'x'))
+        end
+
+        if self:IsValidBone('Dish02') then
+            self.Dish2Rotator = TrashBagAdd(trash, CreateRotator(self, 'Dish02', 'x'))
+        end
+
+        if self:IsValidBone('Dish03') then
+            self.Dish3Rotator = TrashBagAdd(trash, CreateRotator(self, 'Dish03', 'x'))
+        end
     end,
 
     ---@param self CRadarUnit
@@ -64,9 +73,20 @@ CRadarUnit = ClassUnit(RadarUnit) {
     OnIntelDisabled = function(self, intel)
         RadarUnitOnIntelDisabled(self, intel)
 
-        RotatorSetTargetSpeed(self.Dish1Rotator, 0)
-        RotatorSetTargetSpeed(self.Dish2Rotator, 0)
-        RotatorSetTargetSpeed(self.Dish3Rotator, 0)
+        local dish1 = self.Dish1Rotator
+        if dish1 then
+            RotatorSetTargetSpeed(dish1, 0)
+        end
+
+        local dish2 = self.Dish2Rotator
+        if dish2 then
+            RotatorSetTargetSpeed(dish2, 0)
+        end
+
+        local dish3 = self.Dish3Rotator
+        if dish3 then
+            RotatorSetTargetSpeed(dish3, 0)
+        end
 
         local thread = self.Thread1
         if (thread) then
@@ -95,16 +115,19 @@ CRadarUnit = ClassUnit(RadarUnit) {
         local trash = self.Trash
         local dishBehavior = self.DishBehavior
 
-        if not self.Thread1 then
-            self.Thread1 = TrashBagAdd(trash, ForkThread(dishBehavior, self, self.Dish1Rotator, 1, 0.4))
+        local dish1 = self.Dish1Rotator
+        if dish1 and not self.Thread1 then
+            self.Thread1 = TrashBagAdd(trash, ForkThread(dishBehavior, self, dish1, 1, 0.4))
         end
 
-        if not self.Thread2 then
-            self.Thread2 = TrashBagAdd(trash, ForkThread(dishBehavior, self, self.Dish2Rotator, 21, 0.5))
+        local dish2 = self.Dish2Rotator
+        if dish2 and not self.Thread2 then
+            self.Thread2 = TrashBagAdd(trash, ForkThread(dishBehavior, self, dish2, 21, 0.5))
         end
 
-        if not self.Thread3 then
-            self.Thread3 = TrashBagAdd(trash, ForkThread(dishBehavior, self, self.Dish3Rotator, 51, 0.6))
+        local dish3 = self.Dish3Rotator
+        if dish3 and not self.Thread3 then
+            self.Thread3 = TrashBagAdd(trash, ForkThread(dishBehavior, self, dish3, 51, 0.6))
         end
     end,
 

@@ -1,4 +1,16 @@
 local Unit = import("/lua/sim/unit.lua").Unit
+local UnitOnCreate = Unit.OnCreate
+local UnitOnKilled = Unit.OnKilled
+local UnitOnStopBuild = Unit.OnStopBuild
+local UnitOnStartBuild = Unit.OnStartBuild
+local UnitOnFailedToBuild = Unit.OnFailedToBuild
+local UnitOnStartBeingBuilt = Unit.OnStartBeingBuilt
+local UnitOnStopBeingBuilt = Unit.OnStopBeingBuilt
+local UnitStartBeingBuiltEffects = Unit.StartBeingBuiltEffects
+local UnitStopBeingBuiltEffects = Unit.StopBeingBuiltEffects
+local UnitDoTakeDamage = Unit.DoTakeDamage
+local UnitCreateWreckage = Unit.CreateWreckage
+
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -20,6 +32,7 @@ local Rect = Rect
 local WaitTicks = WaitTicks
 local ForkThread = ForkThread
 local FlattenMapRect = FlattenMapRect
+local FlattenGradientMapRect = import('/lua/sim/terrainutils.lua').FlattenGradientMapRect
 local GetTerrainHeight = GetTerrainHeight
 local GetReclaimablesInRect = GetReclaimablesInRect
 local EntityCategoryContains = EntityCategoryContains
@@ -29,6 +42,11 @@ local MathClamp = math.clamp
 local MathMax = math.max
 local MathFloor = math.floor
 local MathCeil = math.ceil
+local MathSin = math.sin
+local MathCos = math.cos
+local DegToRad = math.pi/180
+local unpack = unpack
+local MathAtan2 = math.atan2
 
 local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
@@ -40,9 +58,12 @@ local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 ---@field OwnedByEntity EntityId
 
 -- compute once and store as upvalue for performance
+-- Enemy units that are searched for when rotating structures
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
+-- Structures that rotate towards the enemy: PD, AA, Torp launchers, Artillery, and TMD (except Volcano)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR + categories.ANTINAVY + categories.ARTILLERY + (categories.ANTIMISSILE - categories.SILO - categories.uab4201))
+-- Structures that rotate in 90 degree steps: T2/T3/T4 Artillery
+local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
@@ -67,7 +88,7 @@ StructureUnit = ClassUnit(Unit) {
 
     ---@param self StructureUnit
     OnCreate = function(self)
-        Unit.OnCreate(self)
+        UnitOnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
 
@@ -117,6 +138,11 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
+        -- rotate weapon structures towards enemy
+        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
+            self:RotateTowardsEnemy()
+        end
+
         -- create decal below structure
         if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
@@ -139,7 +165,7 @@ StructureUnit = ClassUnit(Unit) {
         end
     end,
 
-    --- Rotates the structure towards the enemy, primarily used for point defenses
+    --- Rotates the structure towards the enemy or map center
     ---@param self StructureUnit
     RotateTowardsEnemy = function(self)
 
@@ -156,62 +182,80 @@ StructureUnit = ClassUnit(Unit) {
             threat = -1,
         }
 
-        -- determine radius
-        local radius = 40
-        local weapons = self.Blueprint.Weapon
-        if weapons then
-            for k, weapon in weapons do
-                if weapon.MaxRadius and weapon.MaxRadius > radius then
-                    radius = 1.1 * weapon.MaxRadius
+        -- find targets in range unless a static arty
+        if not EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+            -- determine radius
+            local radius = 40
+            local weapons = self.Blueprint.Weapon
+            if weapons then
+                for k, weapon in weapons do
+                    if weapon.MaxRadius and 1.1 * weapon.MaxRadius > radius then
+                        radius = 1.1 * weapon.MaxRadius
+                    end
                 end
             end
-        end
 
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
-        local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
+            local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
+            local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
-        if units then
-            for _, u in units do
-                local blip = u:GetBlip(self.Army)
-                if blip then
+            if units then
+                for _, u in units do
+                    local blip = u:GetBlip(self.Army)
+                    if blip then
 
-                    -- check if we've got it on radar and whether it is identified by army in question
-                    local radar = blip:IsOnRadar(self.Army)
-                    local identified = blip:IsSeenEver(self.Army)
-                    if radar or identified then
-                        local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
-                        if threat >= target.threat then
-                            target.location = u:GetPosition()
-                            target.threat = threat
+                        -- check if we've got it on radar and whether it is identified by army in question
+                        local radar = blip:IsOnRadar(self.Army)
+                        local identified = blip:IsSeenEver(self.Army)
+                        if radar or identified then
+                            local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
+                            if threat >= target.threat then
+                                target.location = u:GetPosition()
+                                target.threat = threat
+                            end
                         end
                     end
                 end
             end
         end
 
-        -- get direction vector, atanify it for angle
-        local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
-        local degrees = rad * (180 / math.pi)
+        -- get direction vector, atanify it for angle, then subtract our existing heading if we were spawned in angled
+        local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3]) - self:GetHeading()
 
-        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = MathFloor((degrees + 90) / 180) * 180
+        local stepSize
+        local bpFootprint = self.Blueprint.Footprint
+        if bpFootprint then
+            if bpFootprint.SizeX ~= bpFootprint.SizeZ then
+                -- Avoid rotating units with oblong footprints as the pathing and visuals won't match
+                stepSize = 180 * DegToRad
+            elseif EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+                stepSize = 90 * DegToRad
+            end
         end
 
-        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
-        rotator:SetPrecedence(1)
-        self.Trash:Add(rotator)
+        if stepSize then
+            rad = MathFloor((rad + 45 * DegToRad) / (90 * DegToRad)) * 90 * DegToRad
+        end
+
+        -- rotation quaternion {cos, 0, sin, 0}
+        local cos = MathCos(rad/2)
+        local sin = MathSin(rad/2)
+
+        -- quatRotate * quatOrient
+        local rhs1, rhs2, rhs3, rhs4 = unpack(self:GetOrientation())
+        rhs1, rhs2, rhs3, rhs4 = 
+            cos * rhs1 - sin * rhs3,
+            cos * rhs2 + sin * rhs4,
+            cos * rhs3 + sin * rhs1,
+            cos * rhs4 - sin * rhs2
+
+        self:SetOrientation({rhs1, rhs2, rhs3, rhs4}, true)
     end,
 
     ---@param self StructureUnit
     ---@param builder Unit
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
-        Unit.OnStartBeingBuilt(self, builder, layer)
-
-        -- rotate weaponry towards enemy
-        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
-            self:RotateTowardsEnemy()
-        end
+        UnitOnStartBeingBuilt(self, builder, layer)
 
         -- procedure to remove props that do not obstruct the building
         local blueprint = self.Blueprint
@@ -268,7 +312,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        Unit.OnStopBeingBuilt(self, builder, layer)
+        UnitOnStopBeingBuilt(self, builder, layer)
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
@@ -319,25 +363,24 @@ StructureUnit = ClassUnit(Unit) {
         x1 = MathClamp(MathCeil(x1), 0, sx)
         z1 = MathClamp(MathCeil(z1), 0, sz)
 
-        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
+        FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit
-    ---@param albedo string
-    ---@param normal string
-    ---@param glow string
+    ---@param createAlbedoTarmac boolean
+    ---@param createNormalTarmac boolean
+    ---@param createGlowTarmac boolean
     ---@param orientation? number
     ---@param tarmac? UnitBlueprintTarmac
-    ---@param lifeTime number
-    ---@return boolean
-    CreateTarmac = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+    ---@param lifeTime? number
+    CreateTarmac = function(self, createAlbedoTarmac, createNormalTarmac, createGlowTarmac, orientation, tarmac, lifeTime)
         self.Trash:Add(
             ForkThread(
                 self.CreateTarmacThread,
                 self,
-                albedo,
-                normal,
-                glow, 
+                createAlbedoTarmac,
+                createNormalTarmac,
+                createGlowTarmac, 
                 orientation,
                 tarmac,
                 lifeTime
@@ -346,13 +389,13 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param albedo string
-    ---@param normal string
-    ---@param glow string
+    ---@param createAlbedoTarmac boolean
+    ---@param createNormalTarmac boolean
+    ---@param createGlowTarmac boolean
     ---@param orientation? number
     ---@param tarmac? UnitBlueprintTarmac
-    ---@param lifeTime number
-    CreateTarmacThread = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+    ---@param lifeTime? number
+    CreateTarmacThread = function(self, createAlbedoTarmac, createNormalTarmac, createGlowTarmac, orientation, tarmac, lifeTime)
         -- hold up one tick to allow upgrades to pass the tarmac bag
         WaitTicks(1)
 
@@ -435,7 +478,7 @@ StructureUnit = ClassUnit(Unit) {
         local bag = self.TarmacBag.Decals
 
         -- create albedo tarmac, note that it may have a 2nd texture for specular properties
-        if albedo and tarmac.Albedo then
+        if createAlbedoTarmac and tarmac.Albedo then
             local albedo2 = tarmac.Albedo2
             if albedo2 then
                 albedo2 = albedo2 .. GetTarmac(factionIndex, terrain)
@@ -462,7 +505,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- create normals tarmac, note not the usual normals shader
-        if normal and tarmac.Normal then
+        if createNormalTarmac and tarmac.Normal then
             local handle = CreateDecal(
                 position,
                 orientation,
@@ -484,7 +527,7 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- create glow tarmacs, not used by the base game
-        if glow and tarmac.Glow then
+        if createGlowTarmac and tarmac.Glow then
             local handle = CreateDecal(
                 position,
                 orientation,
@@ -551,7 +594,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Check for death loop
-        if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
+        if not UnitOnStartBuild(self, unitBeingBuilt, order) then
             return
         end
         self.UnitBeingBuilt = unitBeingBuilt
@@ -600,7 +643,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param builder Unit
     ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
-        Unit.StartBeingBuiltEffects(self, builder, layer)
+        UnitStartBeingBuiltEffects(self, builder, layer)
         local bp = self.Blueprint
         local FactionName = bp.General.FactionName
 
@@ -631,7 +674,7 @@ StructureUnit = ClassUnit(Unit) {
             self:HideLandBones()
         end
 
-        Unit.StopBeingBuiltEffects(self, builder, layer)
+        UnitStopBeingBuiltEffects(self, builder, layer)
     end,
 
     ---@param self StructureUnit unused
@@ -661,7 +704,7 @@ StructureUnit = ClassUnit(Unit) {
             local wep = instigator:GetWeaponByLabel('OverCharge')
             amount = wep.Blueprint.Overcharge.structureDamage
         end
-        Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
+        UnitDoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 
     ---@param self StructureUnit
@@ -677,7 +720,7 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
-        Unit.OnKilled(self, instigator, type, overkillRatio)
+        UnitOnKilled(self, instigator, type, overkillRatio)
 
         -- re-create tarmac bag, but with a life time
         local bag = self.TarmacBag
@@ -713,7 +756,7 @@ StructureUnit = ClassUnit(Unit) {
     ---@param overkillRatio number
     ---@return Wreckage|nil
     CreateWreckage = function(self, overkillRatio)
-        local wreckage = Unit.CreateWreckage(self, overkillRatio)
+        local wreckage = UnitCreateWreckage(self, overkillRatio)
         if wreckage then
             self:CheckRepairersForRebuild(wreckage)
         end
@@ -724,7 +767,7 @@ StructureUnit = ClassUnit(Unit) {
     ---------------------------------------------------------------------------
     --#region Adjacency feature
 
-    -- Called by the engine when a structure is finished building for each adjacent unit
+    -- Called by the engine when a structure in the same army is finished building for each adjacent unit
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     ---@param triggerUnit StructureUnit
@@ -767,15 +810,19 @@ StructureUnit = ClassUnit(Unit) {
                     local progress = adjacentUnit:GetWorkProgress()
                     if progress < 0.99 then
                         adjacentUnit:StopSiloBuild()
-                        IssueSiloBuildTactical({adjacentUnit})
+                        if EntityCategoryContains(categories.STRATEGIC, adjacentUnit) then
+                            IssueSiloBuildNuke({adjacentUnit})
+                        else
+                            IssueSiloBuildTactical({adjacentUnit})
+                        end
+
                         adjacentUnit:GiveNukeSiloBlocks(progress)
-                        LOG(autoModeEnabled)
                         adjacentUnit:SetAutoMode(autoModeEnabled)
                     end
                 end
             end
         end
-    
+
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
@@ -946,8 +993,8 @@ StructureUnit = ClassUnit(Unit) {
             end
         end,
 
-        OnStopBuild = function(self, unitBuilding)
-            Unit.OnStopBuild(self, unitBuilding)
+        OnStopBuild = function(self, unitBuilding, order)
+            UnitOnStopBuild(self, unitBuilding, order)
             self:EnableDefaultToggleCaps()
 
             if unitBuilding:GetFractionComplete() == 1 then
@@ -959,7 +1006,7 @@ StructureUnit = ClassUnit(Unit) {
         end,
 
         OnFailedToBuild = function(self)
-            Unit.OnFailedToBuild(self)
+            UnitOnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
             if self.TarmacBag then
@@ -999,6 +1046,7 @@ StructureUnit = ClassUnit(Unit) {
     OnEnergyStorageStateChange = function(self, state)
     end,
 
+    ---@deprecated
     ---@param self StructureUnit
     DestroyBlinkingLights = function(self)
         for _, v in self.FxBlinkingLightsBag do

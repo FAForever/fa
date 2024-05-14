@@ -57,7 +57,7 @@ function DebugThread()
             local layer = State.Layer
             if layer and origin then
                 local start = GetSystemTimeSecondsOnlyForProfileUse()
-                local positions = NavUtils.GetPositionsInRadius(layer, origin, 75, 16, cache)
+                local positions = NavUtils.GetDetailedPositionsInRadius(layer, origin, 75, 4, cache)
                 SPEW(string.format("Time taken: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
                 if positions then
                     for k, position in positions do

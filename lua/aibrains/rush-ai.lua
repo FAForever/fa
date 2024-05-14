@@ -248,7 +248,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', tostring(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,
@@ -524,7 +524,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
             BuilderHandles = {},
             Position = position,
-            BaseType = MarkerUtilities.GetMarker(baseName).Name or 'Main',
+            BaseType = MarkerUtilities.GetMarker(baseName).Type or 'MAIN',
             Layer = baseLayer,
         }
 

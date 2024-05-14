@@ -22,12 +22,11 @@
 
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
 local MobileUnitOnStopBeingBuilt = MobileUnit.OnStopBeingBuilt
+
 ---@class SeaUnit : MobileUnit
 SeaUnit = ClassUnit(MobileUnit) {
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
-    PlayEndestructionEffects = false,
-    CollidedBones = 0,
 
     ---@param self SeaUnit
     ---@param builder Unit

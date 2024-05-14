@@ -1470,7 +1470,7 @@ function EngineersAssistFactories(platoon, locationType)
         end
     end
     if not location then
-        error('*SCENARIO PLATOON AI ERROR: No LocationType found for StartBaseEngineerThread, location named- '..repr(locationType), 2)
+        error('*SCENARIO PLATOON AI ERROR: No LocationType found for StartBaseEngineerThread, location named- '..tostring(locationType), 2)
     end
 
     -- Find engineers

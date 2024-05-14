@@ -84,7 +84,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 720,
         BuildCostMass = 80,
-        BuildRate = 14.08,
+        BuildRate = 13,
         BuildTime = 80,
         BuildableCategory = { "uab3201" },
         MaintenanceConsumptionPerSecondEnergy = 20,
@@ -127,7 +127,7 @@ UnitBlueprint{
         UpgradesTo = "uab3201",
     },
     Intel = {
-        RadarRadius = 115,
+        RadarRadius = 116,
         ReactivateTime = 2,
         ShowIntelOnSelect = true,
         VisionRadius = 20,
@@ -136,7 +136,6 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -147,17 +146,14 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
         MeshExtentsX = 1.25,
         MeshExtentsY = 2,
         MeshExtentsZ = 1.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -0.5,
         SkirtSizeX = 2,
         SkirtSizeZ = 2,
-        TurnRate = 0,
     },
     SelectionSizeX = 0.75,
     SelectionSizeZ = 0.75,

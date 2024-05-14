@@ -449,7 +449,7 @@ local GrowthChevronBlock = {
 
 local LightAttackNaval = categories.LIGHTBOAT
 local FrigateNaval = categories.FRIGATE
-local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.NUKESUB * categories.ANTINAVY - categories.NUKE)
+local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.TECH3 * categories.SUBMERSIBLE * categories.ANTINAVY * categories.NAVAL - categories.NUKE)
 local DestroyerNaval = categories.DESTROYER
 local CruiserNaval = categories.CRUISER
 local BattleshipNaval = categories.BATTLESHIP
@@ -1640,7 +1640,7 @@ function CategorizeUnits(formationUnits)
                     unitsList[type].FootprintCounts[fs] = (unitsList[type].FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG: Unit ' .. repr(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
+                        LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
                     unitsList[type].UnitTotal = unitsList[type].UnitTotal + 1
                     identified = true
