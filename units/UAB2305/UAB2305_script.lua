@@ -44,14 +44,14 @@ UAB2305 = ClassUnit(AStructureUnit) {
     end,
 
     PlayArmSounds = function(self)
-        local bp = self.Blueprint
-        if bp.Audio.Open and bp.Audio.Activate then
+        local activateSound = self.Blueprint.Audio.Activate
+        if activateSound then
             WaitTicks(48)
-            self:PlaySound(bp.Audio.Activate)
+            self:PlaySound(activateSound)
             WaitTicks(38)
-            self:PlaySound(bp.Audio.Activate)
+            self:PlaySound(activateSound)
             WaitTicks(39)
-            self:PlaySound(bp.Audio.Activate)
+            self:PlaySound(activateSound)
         end
     end,
 }
