@@ -43,10 +43,8 @@ ProjectileBlueprint {
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
         LeadTarget = false,
-        MaxZigZag = 0,
         TurnRate = 360,
         VelocityAlign = true,
-        ZigZagFrequency = 0,
         Fragments = 6,
         FragmentId = '/projectiles/AIFFragmentationSensorShell03/AIFFragmentationSensorShell03_proj.bp'
     },
