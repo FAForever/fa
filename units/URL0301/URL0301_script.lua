@@ -41,7 +41,7 @@ URL0301 = ClassUnit(CCommandUnit) {
         NMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
 
-    -- Creation
+    ---@param self URL0301
     OnCreate = function(self)
         CCommandUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -57,30 +57,31 @@ URL0301 = ClassUnit(CCommandUnit) {
         self.IntelButtonSet = true
     end,
 
+    ---@param self URL0301
     __init = function(self)
         CCommandUnit.__init(self, 'RightDisintegrator')
     end,
 
+    ---@param self URL0301
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         CCommandUnit.OnStopBeingBuilt(self, builder, layer)
         self:BuildManipulatorSetEnabled(false)
         self:SetMaintenanceConsumptionInactive()
-        self:DisableUnitIntel('Enhancement', 'RadarStealth')
-        self:DisableUnitIntel('Enhancement', 'SonarStealth')
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
     end,
 
-    -- Enhancements
+    ---@param self URL0301
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         CCommandUnit.CreateEnhancement(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         if enh == 'CloakingGenerator' then
-            self:RemoveToggleCap('RULEUTC_StealthToggle')
             self:AddToggleCap('RULEUTC_CloakToggle')
-            self.StealthEnh = false
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranSCUCloakBonus'] then
@@ -104,28 +105,11 @@ URL0301 = ClassUnit(CCommandUnit) {
             Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
             self:DisableUnitIntel('Enhancement', 'Cloak')
-            self.StealthEnh = false
             self.CloakEnh = false
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
             end
-        elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_StealthToggle')
-            if self.IntelEffectsBag then
-                EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
-                self.IntelEffectsBag = nil
-            end
-            self.CloakEnh = false
-            self.StealthEnh = true
-            self:EnableUnitIntel('Enhancement', 'RadarStealth')
-            self:EnableUnitIntel('Enhancement', 'SonarStealth')
-        elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_StealthToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = false
-            self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
             self:ShowBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', true)
@@ -252,6 +236,8 @@ URL0301 = ClassUnit(CCommandUnit) {
         },
     },
 
+    ---@param self URL0301
+    ---@param intel string
     OnIntelEnabled = function(self, intel)
         CCommandUnit.OnIntelEnabled(self, intel)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
@@ -262,17 +248,11 @@ URL0301 = ClassUnit(CCommandUnit) {
                 self.IntelEffectsBag = {}
                 self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-        elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
-            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy
-                or 0)
-            self:SetMaintenanceConsumptionActive()
-            if not self.IntelEffectsBag then
-                self.IntelEffectsBag = {}
-                self:CreateTerrainTypeEffects(self.IntelEffects.Field, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
-            end
         end
     end,
 
+    ---@param self URL0301
+    ---@param intel string
     OnIntelDisabled = function(self, intel)
         CCommandUnit.OnIntelDisabled(self, intel)
         if self.IntelEffectsBag then
@@ -281,10 +261,7 @@ URL0301 = ClassUnit(CCommandUnit) {
         end
         if self.CloakEnh and not self:IsIntelEnabled('Cloak') then
             self:SetMaintenanceConsumptionInactive()
-        elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
-            self:SetMaintenanceConsumptionInactive()
         end
     end,
 }
-
 TypeClass = URL0301
