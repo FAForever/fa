@@ -1895,7 +1895,7 @@ end
 
 function ToggleUnitPauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:ToggleCheck(false)
+        controls.extraBtn2:OnCheck(true)
     else
         SetPaused(sortedOptions.selection, true)
     end
@@ -1903,7 +1903,7 @@ end
 
 function ToggleUnitUnpauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:OnCheck(true)
+        controls.extraBtn2:OnCheck(false)
     else
         SetPaused(sortedOptions.selection, false)
     end
