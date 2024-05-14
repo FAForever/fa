@@ -176,8 +176,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:CheckBallisticAcceleration(proj)
         end
 
-        proj:SetBallisticAcceleration(-4.75)
-
         return proj
     end;
 
