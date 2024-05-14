@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC ual0301_desc>Support Armored Command Unit",
+    Description = "<LOC ual0301_desc>Support Command Unit",
     AI = {
         GuardScanRadius = 26,
     },
@@ -58,7 +58,7 @@ UnitBlueprint{
         EconomyThreatLevel = 968,
         Health = 12000,
         MaxHealth = 12000,
-        RegenRate = 12,
+        RegenRate = 14,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 30,
     },
@@ -187,10 +187,10 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 26000,
-        BuildCostMass = 2000,
+        BuildCostEnergy = 27950,
+        BuildCostMass = 2150,
         BuildRate = 40,
-        BuildTime = 14400,
+        BuildTime = 14500,
         BuildableCategory = { "BUILTBYTIER3ENGINEER AEON" },
         MaxBuildDistance = 10,
         NaturalProducer = true,
@@ -198,8 +198,6 @@ UnitBlueprint{
         ProductionPerSecondMass = 1,
         SacrificeEnergyMult = 0.9,
         SacrificeMassMult = 0.9,
-        StorageEnergy = 500,
-        StorageMass = 275,
         TeleportEnergyMod = 5.16,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
@@ -208,23 +206,11 @@ UnitBlueprint{
     EnhancementPresets = {
         Engineer = {
             Description = "<LOC ual0301_Engineer_desc>SACU (Engineer preset)",
-            BuildIconSortPriority = 20,
+            BuildIconSortPriority = 5,
             Enhancements = { "EngineeringFocusingModule" },
             HelpText = "<LOC ual0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the rapid replicator enhancement.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_Engineer_name>SACU (Engineer preset)",
-        },
-        NanoCombat = {
-            Description = "<LOC ual0301_NanoCombat_desc>SACU (Nano Combatant preset)",
-            BuildIconSortPriority = 25,
-            Enhancements = {
-                "StabilitySuppressant",
-                "SystemIntegrityCompensator",
-            },
-            HelpText = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)",
-            SelectionPriority = 1,
         },
         RAS = {
             Description = "<LOC ual0301_RAS_desc>SACU (RAS preset)",
@@ -234,22 +220,30 @@ UnitBlueprint{
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_RAS_name>SACU (RAS preset)",
         },
-        Rambo = {
-            Description = "<LOC ual0301_Rambo_desc>SACU (Rambo preset)",
-            BuildIconSortPriority = 35,
+        SimpleCombat = {
+            Description = "<LOC ual0301_SimpleCombat_desc>SACU (Combatant preset)",
+            BuildIconSortPriority = 15,
+            Enhancements = { "StabilitySuppressant" },
+            HelpText = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
+            SortCategory = "SORTOTHER",
+            UnitName = "<LOC ual0301_SimpleCombat_name>SACU (Combatant preset)",
+            SelectionPriority = 1,
+        },
+        NanoCombat = {
+            Description = "<LOC ual0301_NanoCombat_desc>SACU (Nano Combatant preset)",
+            BuildIconSortPriority = 20,
             Enhancements = {
                 "StabilitySuppressant",
-                "Shield",
-                "ShieldHeavy",
+                "SystemIntegrityCompensator",
             },
-            HelpText = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
+            HelpText = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC ual0301_Rambo_name>SACU (Rambo preset)",
+            UnitName = "<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)",
             SelectionPriority = 1,
         },
         ShieldCombat = {
             Description = "<LOC ual0301_ShieldCombat_desc>SACU (Shield Combatant preset)",
-            BuildIconSortPriority = 30,
+            BuildIconSortPriority = 25,
             Enhancements = {
                 "StabilitySuppressant",
                 "Shield",
@@ -259,13 +253,17 @@ UnitBlueprint{
             UnitName = "<LOC ual0301_ShieldCombat_name>SACU (Shield Combatant preset)",
             SelectionPriority = 1,
         },
-        SimpleCombat = {
-            Description = "<LOC ual0301_SimpleCombat_desc>SACU (Combatant preset)",
-            BuildIconSortPriority = 15,
-            Enhancements = { "StabilitySuppressant" },
-            HelpText = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
+        Rambo = {
+            Description = "<LOC ual0301_Rambo_desc>SACU (Rambo preset)",
+            BuildIconSortPriority = 30,
+            Enhancements = {
+                "StabilitySuppressant",
+                "Shield",
+                "ShieldHeavy",
+            },
+            HelpText = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC ual0301_SimpleCombat_name>SACU (Combatant preset)",
+            UnitName = "<LOC ual0301_Rambo_name>SACU (Rambo preset)",
             SelectionPriority = 1,
         },
     },
@@ -600,13 +598,6 @@ UnitBlueprint{
         CanFireFromTransport = false,
         TransportClass = 3,
     },
-    Veteran = {
-        Level1 = 25,
-        Level2 = 50,
-        Level3 = 75,
-        Level4 = 100,
-        Level5 = 125,
-    },
     Weapon = {
         {
             AboveWaterFireOnly = true,
@@ -725,9 +716,11 @@ UnitBlueprint{
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = false,
+            Seabed = true,
             Sub = false,
             Water = false,
         },
     },
 }
+
+--TODO: Add Mini Chrono Dampener

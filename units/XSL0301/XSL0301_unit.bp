@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC xsl0301_desc>Support Armored Command Unit",
+    Description = "<LOC xsl0301_desc>Support Command Unit",
     AI = {
         GuardScanRadius = 26,
         InitialAutoMode = true,
@@ -934,3 +934,6 @@ UnitBlueprint{
         },
     },
 }
+
+
+--TODO: Add small regen field to the SCU
