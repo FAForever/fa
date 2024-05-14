@@ -52,7 +52,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UEL0301
     ---@param unitBeingBuilt Unit
-    ---@param order string # unused
+    ---@param order? string # unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -198,3 +198,9 @@ UEL0301 = ClassUnit(CommandUnit) {
 }
 
 TypeClass = UEL0301
+
+--#region Kept for Mod Support
+local Shield = import("/lua/shield.lua").Shield
+
+
+--#endregion
