@@ -25,7 +25,7 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: FAForever/fa
-            ref: deploy/fafdevelop
+            ref: feat/github-wf-icons
             path: ./fa
             sparse-checkout: |
               wiki
