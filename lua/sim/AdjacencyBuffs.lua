@@ -199,7 +199,7 @@
 ---| "T1MassStorageMassProductionSize20"
 
 
--- local AdjBuffFuncs = import("/lua/sim/adjacencybufffunctions.lua")
+local AdjBuffFuncs = import("/lua/sim/adjacencybufffunctions.lua")
 
 local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
     T1PowerGenerator={
@@ -245,33 +245,33 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
 
 adj.Hydrocarbon = adj.T2PowerGenerator
 
--- for a, buffs in pairs(adj) do
---     _G[a .. 'AdjacencyBuffs'] = {}
---     for t, sizes in buffs do
---         for i, add in sizes do
---             local size = i * 4
---             local display_name = a .. t
---             local name = display_name .. 'Size' .. size
---             local category = 'STRUCTURE SIZE' .. size
+for a, buffs in pairs(adj) do
+    _G[a .. 'AdjacencyBuffs'] = {}
+    for t, sizes in pairs(buffs) do
+        for i, add in pairs(sizes) do
+            local size = i * 4
+            local display_name = a .. t
+            local name = display_name .. 'Size' .. size
+            local category = 'STRUCTURE SIZE' .. size
 
---             if t == 'RateOfFire' and size == 4 then
---                 category = category .. ' ARTILLERY'
---             end
+            if t == 'RateOfFire' and size == 4 then
+                category = category .. ' ARTILLERY'
+            end
 
---             BuffBlueprint {
---                 Name = name,
---                 DisplayName = display_name,
---                 BuffType = string.upper(t) .. 'BONUS',
---                 Stacks = 'ALWAYS',
---                 Duration = -1,
---                 EntityCategory = category,
---                 BuffCheckFunction = AdjBuffFuncs[t .. 'BuffCheck'],
---                 OnBuffAffect = AdjBuffFuncs.DefaultBuffAffect,
---                 OnBuffRemove = AdjBuffFuncs.DefaultBuffRemove,
---                 Affects = {[t]={Add=add}},
---             }
+            BuffBlueprint {
+                Name = name,
+                DisplayName = display_name,
+                BuffType = string.upper(t) .. 'BONUS',
+                Stacks = 'ALWAYS',
+                Duration = -1,
+                EntityCategory = category,
+                BuffCheckFunction = AdjBuffFuncs[t .. 'BuffCheck'],
+                OnBuffAffect = AdjBuffFuncs.DefaultBuffAffect,
+                OnBuffRemove = AdjBuffFuncs.DefaultBuffRemove,
+                Affects = {[t]={Add=add}},
+            }
 
---             table.insert(_G[a .. 'AdjacencyBuffs'], name)
---         end
---     end
--- end
+            table.insert(_G[a .. 'AdjacencyBuffs'], name)
+        end
+    end
+end
