@@ -61,7 +61,6 @@ UnitBlueprint{
     Intel = { VisionRadius = 0 },
     LifeBarHeight = 0.075,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -72,14 +71,11 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = 0,
         SkirtOffsetZ = 0,
         SkirtSizeX = 1,
         SkirtSizeZ = 1,
-        TurnRate = 0,
     },
     SelectionThickness = 0.2,
     CollisionOffsetY = -0.25,

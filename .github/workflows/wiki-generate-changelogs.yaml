@@ -1,0 +1,66 @@
+name: Wiki - generate changelog
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            changelog/snippets
+
+      - name: Verify the changelog snippets
+        working-directory: changelog/snippets # script assumes it is in this directory
+        run: |
+          ./verify.sh
+  update:
+    name: Update wiki
+    runs-on: ubuntu-latest
+    needs: [verify]
+    steps:
+      - name: Checkout FA repository
+        uses: actions/checkout@v4
+        with:
+          path: fa
+          sparse-checkout: |
+            changelog
+
+      - name: Checkout FA Wiki repository
+        uses: actions/checkout@v4
+        with:
+          repository: faforever/fa.wiki
+          path: fa.wiki
+
+      - name: Create the changelog
+        working-directory: fa/changelog/snippets # script assumes it is in this directory
+        shell: bash
+        run: |
+          ./combine.sh
+
+      - name: Copy over assets
+        run: |
+          # do not include the snippets
+          rm -rf fa/changelog/snippets
+
+          # remove the old changelogs
+          rm -rf fa.wiki/changelog
+          mkdir fa.wiki/changelog
+
+          # copy the changelogs for previous releases
+          mv fa/changelog/*.md fa.wiki/changelog
+
+      - name: Update the wiki
+        run: |
+          cd fa.wiki
+
+          git config user.name "FAForever"
+          git config user.email "administrator@faforever.com"
+
+          git stage .
+          git commit -m "Update changelogs"
+          git push origin HEAD:master
