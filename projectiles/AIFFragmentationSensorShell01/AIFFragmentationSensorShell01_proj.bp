@@ -47,6 +47,6 @@ ProjectileBlueprint {
         VelocityAlign = true,
         Fragments = 6,
         FragmentId = '/projectiles/AIFFragmentationSensorShell02/AIFFragmentationSensorShell02_proj.bp',
-        FragmentRadius = 10,
+        FragmentRadius = 7,
     },
 }
