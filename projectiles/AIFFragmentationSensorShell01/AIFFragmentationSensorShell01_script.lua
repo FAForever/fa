@@ -8,6 +8,10 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local MathPow = math.pow
+local MathSqrt = math.sqrt
+
+-- Gravitational constant
+local g = -4.9
 
 ---@class AIFFragmentationSensorShell01 : AArtilleryFragmentationSensorShellProjectile
 AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
@@ -24,28 +28,25 @@ AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShe
             CreateEmitterAtBone( self, -1, self.Army, v )
         end
 
+        local detonationHeight = bp.DetonateBelowHeight
         local vx, vy, vz = self:GetVelocity()
-        LOG('vx: '..vx..' vy: '..vy..' vz: '..vz)
-        LOG('Current speed: '..self:GetCurrentSpeed())
-        LOG('DetonateBelowHeight: '..bp.DetonateBelowHeight)
-        local vMult = bp.InitialSpeed/(self:GetCurrentSpeed()*10)
-        LOG('vMult: '..vMult)
+        -- Normalize our velocity to ogrids/second
+        vx, vy, vz = vx*10, vy*10, vz*10
+        local vMult = bp.InitialSpeed/(10 * self:GetCurrentSpeed())
 
-        -- We'll implicitly calculate our remaining horizontal distance on
-        -- the assumption that our initial trajectory was accurate, then
-        -- calculate our new desired ballistic acceleration to reach the target.
-        local rangeToTarget = math.sqrt(4.75/(2*bp.DetonateBelowHeight)) * VDist2(0,0,vx*10,vz*10)
-        LOG('Range to target: '..rangeToTarget)
-        local newTimeToImpact = rangeToTarget / VDist2(0,0,vx*vMult,vz*vMult)
-        LOG('New time to impact: '..newTimeToImpact)
-        LOG('New vertical speed: '..vy*vMult)
-        local newBallisticAcceleration = - (2 * (bp.DetonateBelowHeight + vy*vMult*10)) / MathPow(newTimeToImpact, 2)
-        LOG('New ballistic acceleration: '..newBallisticAcceleration)
+        -- Time to impact (with our reduced speed) is calculated using the quadratic formula and vMult.
+        local timeToImpact = ((-vy - MathSqrt(MathPow(vy,2) - 2*g*detonationHeight))/g) / vMult
+
+        -- Calculate the new ballistic acceleration
+        local ballisticAcceleration = -2 * (detonationHeight + vy*vMult * timeToImpact) / MathPow(timeToImpact, 2)
+
+        -- Update our velocity values to their new lower values 
+        vx, vy, vz = vx*vMult, vy*vMult, vz*vMult
 
 		-- One initial projectile following same directional path as the original
         self:CreateChildProjectile(bp.FragmentId)
-            :SetVelocity(vx*vMult*10, vy*vMult*10, vz*vMult*10)
-            :SetBallisticAcceleration(newBallisticAcceleration).DamageData = self.DamageData
+            :SetVelocity(vx, vy, vz)
+            :SetBallisticAcceleration(ballisticAcceleration).DamageData = self.DamageData
 
 		-- Create several other projectiles in a dispersal pattern
         local numProjectiles = bp.Fragments - 1
@@ -54,18 +55,21 @@ AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShe
 
         -- Randomization of the spread
         local angleVariation = angle * 8 -- Adjusts angle variance spread
-        local spreadMul = 0.8 -- Adjusts the width of the dispersal        
+        local spreadMagnitude = bp.FragmentRadius / timeToImpact -- Adjusts the width of the dispersal
 
         local xVec
         local zVec
+        local offsetAngle
 
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            offsetAngle = angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation)
+            xVec = vx + math.sin(offsetAngle) * spreadMagnitude
+            zVec = vz + math.cos(offsetAngle) * spreadMagnitude
             self:CreateChildProjectile(bp.FragmentId)
-                :SetVelocity(xVec*vMult, vy*vMult, zVec*vMult)
-                :SetBallisticAcceleration(newBallisticAcceleration).DamageData = self.DamageData
+                :SetVelocity(xVec, vy, zVec)
+                :SetVelocity(bp.InitialSpeed + RandomFloat(-bp.InitialSpeedRange, bp.InitialSpeedRange))
+                :SetBallisticAcceleration(ballisticAcceleration).DamageData = self.DamageData
         end
 
         self:Destroy()
