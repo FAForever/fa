@@ -38,10 +38,12 @@ XSL0301 = ClassUnit(CommandUnit) {
         },
     },
 
+    ---@param self XSL0301
     __init = function(self)
         CommandUnit.__init(self, 'LightChronatronCannon')
     end,
 
+    ---@param self XSL0301
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -51,16 +53,24 @@ XSL0301 = ClassUnit(CommandUnit) {
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
     end,
 
+    ---@param self XSL0301
+    ---@param builder Unit
+    ---@param layer string
     StartBeingBuiltEffects = function(self, builder, layer)
         CommandUnit.StartBeingBuiltEffects(self, builder, layer)
         self.Trash:Add(ForkThread(EffectUtil.CreateSeraphimBuildThread, self, builder, self.OnBeingBuiltEffectsBag, 2))
     end,
 
+    ---@param self XSL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones,
             self.BuildEffectsBag)
     end,
 
+    ---@param self XSL0301
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
