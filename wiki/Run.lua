@@ -54,7 +54,7 @@ EnvironmentData = {
     author = 'Gas Powered Games',
     version = '1.6.6',
     icon = false,
-    location = 'D:/faf-development/fa/',
+    location = FADirectory,
 
     GenerateWikiPages = true,  --Generate pages for env blueprints
     RebuildBlueprints = true,  --Rebuild env blueprints
