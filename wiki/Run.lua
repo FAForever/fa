@@ -34,6 +34,11 @@ end
 
 local args = parse_args(arg)
 
+print("Key and value pairs in args:")
+for i, v in ipairs(args) do
+    print(i, v)
+end
+
 print("Output Directory: " .. tostring(args[1]))
 print("Wiki Generator Directory: " .. tostring(args[2]))
 
