@@ -28,6 +28,7 @@ jobs:
             ref: deploy/fafdevelop
             path: ./fa
             sparse-checkout: |
+              wiki
               textures/ui/common/game/strategicicons
               textures/ui/common/icons/units
 
