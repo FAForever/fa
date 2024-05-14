@@ -194,7 +194,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     CalculateBallisticAcceleration = function(self, projectile)
         local launcher = projectile:GetLauncher()
         if not launcher then -- fail-fast
-            return 4.75
+            return 4.9 -- Return the default gravity value if some calculations fail
         end
 
         local UnitGetVelocity = UnitGetVelocity
@@ -226,7 +226,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if self.Blueprint.MuzzleSalvoSize <= 1 then
                 -- do the calculation but skip any cache or salvo logic
                 if not targetPos then
-                    return 4.75
+                    return 4.9
                 end
                 if target and not target.IsProp then
                     targetVelX, _, targetVelZ = UnitGetVelocity(target)
@@ -234,7 +234,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
                 if distVel == 0 then
-                    return 4.75
+                    return 4.9
                 end
                 local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
                 do
@@ -244,14 +244,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
                 end
                 if distPos == 0 then
-                    return 4.75
+                    return 4.9
                 end
                 local time = distPos / distVel
                 projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
                 return 200 * projPosY / (time * time)
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
-                    lastAccel = 4.75,
+                    lastAccel = 4.9,
                     targetPos = targetPos,
                 }
                 if target then
@@ -284,19 +284,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local GetSurfaceHeight = GetSurfaceHeight
             local MathSqrt = math.sqrt
             local spread = self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
-            -- nominal acceleration is 4.75; however, bomb clusters adjust the time it takes to land
+            -- default gravitational acceleration is 4.9; however, bomb clusters adjust the time it takes to land
             -- so we convert the acceleration to time to add the spread and convert back:
             -- h = unitY - surfaceY         =>  h2 = 0.5 * (unitY - surfaceHeight(unitX, unitZ))
-            -- t = sqrt(2 h / a) + spread   =>  t = sqrt(4 / 4.75 * h2) + spread
+            -- t = sqrt(2 h / a) + spread   =>  t = sqrt(4 / 4.9 * h2) + spread
             -- a = 0.5 h / t^2              =>  a = h2 / t^2
             local halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX, projPosZ))
-            if halfHeight < 0.01 then return 4.75 end
-            local time = MathSqrt(0.842105263158 * halfHeight) + spread
+            if halfHeight < 0.01 then return 4.9 end
+            local time = MathSqrt(0.816326530612 * halfHeight) + spread
 
             -- now that we know roughly when we'll land, we can find a better guess for where
             -- we'll land, and thus guess the true falling height better as well
             halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX + time * projVelX, projPosX + time * projVelX))
-            time = MathSqrt(0.842105263158 * halfHeight) + spread
+            time = MathSqrt(0.816326530612 * halfHeight) + spread
 
             local acc = halfHeight / (time * time)
             data.lastAccel = acc
@@ -307,8 +307,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
         local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
-            data.lastAccel = 4.75
-            return 4.75
+            data.lastAccel = 4.9
+            return 4.9
         end
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
@@ -325,8 +325,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local time = distPos / distVel
         local adjustedTime = time + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
         if adjustedTime == 0 then
-            data.lastAccel = 4.75
-            return 4.75
+            data.lastAccel = 4.9
+            return 4.9
         end
 
         -- If we have a target, targetPos may have updated now.
