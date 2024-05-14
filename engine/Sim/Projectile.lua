@@ -90,7 +90,7 @@ end
 function Projectile:SetAcceleration(accel)
 end
 
---- Define the ballistic acceleration value, increases velocity in the current direction.
+--- Set the vertical (gravitational) acceleration of the projectile. Default is -4.9, which is expected by the engine's weapon targeting and firing
 ---@param accel number
 function Projectile:SetBallisticAcceleration(accel)
 end
