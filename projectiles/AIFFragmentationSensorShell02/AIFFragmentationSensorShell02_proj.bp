@@ -39,7 +39,7 @@ ProjectileBlueprint {
     Physics = {
         DestroyOnWater = true,
         DetonateBelowHeight = 24,
-        InitialSpeed = 14.6,
+        InitialSpeed = 12,
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
         LeadTarget = false,
