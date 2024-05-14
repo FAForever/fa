@@ -15,22 +15,12 @@ local function parse_args(arg)
     for i = 1, #arg do
         local key, value = arg[i]:match("--([^=]+)=(.*)")
         if key and value then
+            key = key:gsub("^%-+", "")  -- Remove leading '-' characters
             args[key] = value
         end
     end
     return args
 end
-
-for i, v in ipairs(arg) do
-    print(i, v)
-end
-
-print("Key and value pairs:")
-for i = 1, #arg do
-    local key, value = arg[i]:match("--([^=]+)=(.*)")
-    print(key, value)
-end
-
 
 local args = parse_args(arg)
 
