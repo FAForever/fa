@@ -8,6 +8,7 @@
 --[[ ---------------------------------------------------------------------- ]]--
 local OutputDirectory = "D:/faf-development/fa.wiki/"
 local WikiGeneratorDirectory = "D:/faf-development/BrewWikiGen/"
+local FADirectory = "D:/faf-development/fa/"
 
 -- This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required
 local function parse_args(arg)
@@ -39,9 +40,14 @@ end
 if args["WikiGeneratorDirectory"] then
     WikiGeneratorDirectory = args["WikiGeneratorDirectory"]
 end
+if args["FADirectory"] then
+    FADirectory = args["FADirectory"]
+end
 
-print("Output Directory: " .. OutputDirectory)
-print("Wiki Generator Directory: " .. WikiGeneratorDirectory)
+print("Directories being used")
+print("Output Directory: " ..OutputDirectory)
+print("Wiki Generator Directory: " ..WikiGeneratorDirectory)
+print("FA Directory: " ..FADirectory)
 
 EnvironmentData = {
     name = 'Forged Alliance Forever',
@@ -54,8 +60,8 @@ EnvironmentData = {
     RebuildBlueprints = true,  --Rebuild env blueprints
     RunSanityChecks = false,   --Sanity check env bps
 
-    Lua = 'D:/faf-development/fa/',
-    LOC = 'D:/faf-development/fa/',
+    Lua = FADirectory,
+    LOC = FADirectory,
     -- ExtraData = '',
 
     PreModBlueprints = {},
@@ -80,7 +86,7 @@ WikiOptions = {
     BuildListSaysModUnits = true,
 
     OnlineRepoUnitPageBlueprintLink = 'https://github.com/FAForever/fa/',
-    LocalRepuUnitPageBlueprintLink = 'D:/faf-development/fa/',
+    LocalRepuUnitPageBlueprintLink = FADirectory,
 }
 
 RebuildBlueprintOptions = {

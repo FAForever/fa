@@ -66,7 +66,7 @@ jobs:
 
         - name: Execute lua run
           run: |
-            lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/"
+            lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/" --FADirectory="fa/"
 
         - name: Store the game version
           id: gameVersionJSON # but it is a string here!
