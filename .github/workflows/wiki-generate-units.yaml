@@ -25,7 +25,7 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: FAForever/fa
-            ref: deploy/fafdevelop
+            ref: feat/github-wf-icons
             path: ./fa
             sparse-checkout: |
               wiki
@@ -61,12 +61,12 @@ jobs:
         - name: Replace run.lua # tbd
           uses: canastro/copy-file-action@master
           with: #source run.lua file
-            source: "placeholder"
+            source: "fa/wiki/Run.lua"
             target: "brew-wiki-gen/Run.lua"
 
         - name: Execute lua run
           run: |
-            lua brew-wiki-gen/Run.lua
+            lua brew-wiki-gen/Run.lua --OutputDirectory=fa.wiki/ --WikiGeneratorDirectory=brew-wiki-gen/
 
         - name: Store the game version
           id: gameVersionJSON # but it is a string here!
