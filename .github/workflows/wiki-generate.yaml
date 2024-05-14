@@ -28,8 +28,8 @@ jobs:
             ref: deploy/fafdevelop
             path: ./fa
             sparse-checkout: |
-              fa/textures/ui/common/game/strategicicons
-              fa/textures/ui/common/icons/units
+              textures/ui/common/game/strategicicons
+              textures/ui/common/icons/units
 
         - name: Checkout FAF Wiki Repository
           uses: actions/checkout@v4
