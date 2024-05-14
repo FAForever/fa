@@ -660,19 +660,21 @@ function OnCommandGraphShow(bool)
 
     CommandGraphActive = bool
     if CommandGraphActive then
-        ForkThread(function()
-            local keydown
-            while CommandGraphActive do
-                keydown = IsKeyDown('Control')
-                if keydown ~= view.ShowingReclaim then -- state has changed
-                    ShowReclaim(keydown)
-                end
-                WaitSeconds(.1)
-            end
-
-            ShowReclaim(false)
-        end)
+        ForkThread(OnCommandGraphShowThread, view)
     else
         CommandGraphActive = false -- above coroutine runs until now
     end
+end
+
+function OnCommandGraphShowThread(view)
+    local keydown
+    while CommandGraphActive do
+        keydown = IsKeyDown('Control')
+        if keydown ~= view.ShowingReclaim then -- state has changed
+            ShowReclaim(keydown)
+        end
+        WaitSeconds(0.1)
+    end
+
+    ShowReclaim(false)
 end

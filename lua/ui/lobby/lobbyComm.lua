@@ -47,21 +47,36 @@ function GetDefaultPlayerOptions(playerName)
     }
 end
 
----@class DiscoveryService : moho.discovery_service_methods
-DiscoveryService = ClassUI(moho.discovery_service_methods) {
+---@class UILobbyDiscoveryService : moho.discovery_service_methods
+DiscoveryService = Class(moho.discovery_service_methods) {
+
+    --- Called by the engine to remove a lobby from the list of lobbies
+    ---@param self UILobbyDiscoveryService
+    ---@param index number
     RemoveGame = function(self, index)
         LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')
     end,
+
+    --- Called by the engine when a new lobby is found
+    ---@param self UILobbyDiscoveryService
+    ---@param index number
+    ---@param gameConfig UILobbydDiscoveryInfo
     GameFound = function(self, index, gameConfig)
         LOG('DiscoveryService.GameFound(' .. tostring(index) .. ')')
         LOG(repr(gameConfig))
     end,
+
+    --- Called by the engine when a lobby is updated
+    ---@param self UILobbyDiscoveryService
+    ---@param index number
+    ---@param gameConfig UILobbydDiscoveryInfo
     GameUpdated = function(self, index, gameConfig)
         LOG('DiscoveryService.GameUpdated(' .. tostring(index) .. ')')
         LOG(repr(gameConfig))
     end,
 }
 
+---@return UILobbyDiscoveryService
 function CreateDiscoveryService()
     local service = InternalCreateDiscoveryService(DiscoveryService)
     LOG('*** DISC CREATE: ', service)
@@ -69,37 +84,74 @@ function CreateDiscoveryService()
 end
 
 --- Will have other fields attached to it, depending on `Type`
----@class CommunicationData
----@field SenderID number
----@field Type string
+---@class CommunicationData : table
+---@field SenderID number       # provided by the engine
+---@field Type string           # type of message
 
----@class LobbyComm : moho.lobby_methods
-LobbyComm = ClassUI(moho.lobby_methods) {
+---@class UILobbyCommunication : moho.lobby_methods
+LobbyComm = Class(moho.lobby_methods) {
 
-    --  General events you should override
+    ---------------------------------------------------------------------------
+    --#region Events that should be overridden
+
+    ---@param self UILobbyCommunication
     Hosting = function(self) end,
+
+    ---@param self UILobbyCommunication
+    ---@param reason string
     ConnectionFailed = function(self, reason) end,
-    ConnectionToHostEstablished = function(self, ourID, hostID) end,
-    GameLaunched = function(self) end,
+
+    ---@param self UILobbyCommunication
+    ---@param localId number
+    ---@param hostId number
+    ConnectionToHostEstablished = function(self, localId, hostId) end,
+
+    ---@param self UILobbyCommunication
+    ---@param reason string
     Ejected = function(self, reason) end,
+
+    ---@param self UILobbyCommunication
+    ---@param text string
     SystemMessage = function(self, text)
         LOG('System: ' .. text)
     end,
+
+    ---@param self UILobbyCommunication
+    ---@param data CommunicationData
     DataReceived = function(self, data)  end,
+
+    ---@param self UILobbyCommunication
     GameConfigRequested = function(self) end,
+
+    ---@param self UILobbyCommunication
+    ---@param peerName string
+    ---@param uid string
     PeerDisconnected = function(self, peerName, uid)
         LOG('Peer Disconnected : (name=' .. peerName .. ', uid=' .. uid .. ')')
     end,
+
+    ---@param self UILobbyCommunication
+    GameLaunched = function(self) end,
+
+    ---@param self UILobbyCommunication
+    ---@param reasonKey string
     LaunchFailed = function(self, reasonKey) end,
 
+    --#endregion
 
-    ---@param self LobbyComm
+    ---@param self UILobbyCommunication
     LaunchGame = function(self, info)
         SavePreferences()
         moho.lobby_methods.LaunchGame(self, info)
     end,
 }
 
+---@param protocol UILobbyProtocols
+---@param localport number
+---@param localPlayerName string
+---@param localPlayerUID? string
+---@param natTraversalProvider? userdata
+---@return UILobbyCommunication
 function CreateLobbyComm(protocol, localport, localPlayerName, localPlayerUID, natTraversalProvider)
     return InternalCreateLobby(LobbyComm, protocol, localport, maxConnections, localPlayerName, localPlayerUID, natTraversalProvider)
 end

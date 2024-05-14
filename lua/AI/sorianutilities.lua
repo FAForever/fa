@@ -414,7 +414,7 @@ end
 --- Finds a custom engineer built unit to replace a default one.
 ---@param aiBrain AIBrain
 ---@param building Unit
----@param faction string
+---@param faction? string
 ---@param buildingTmpl string
 ---@return boolean|table
 function GetTemplateReplacement(aiBrain, building, faction, buildingTmpl)
@@ -449,7 +449,7 @@ function GetTemplateReplacement(aiBrain, building, faction, buildingTmpl)
 end
 
 ---@param engineer Unit
----@return string|boolean
+---@return string?
 function GetEngineerFaction(engineer)
     if EntityCategoryContains(categories.UEF, engineer) then
         return 'UEF'
@@ -462,7 +462,7 @@ function GetEngineerFaction(engineer)
     elseif EntityCategoryContains(categories.NOMADS, engineer) then
         return 'Nomads'
     else
-        return false
+        return
     end
 end
 

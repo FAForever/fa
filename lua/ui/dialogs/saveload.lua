@@ -98,10 +98,8 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
         end
     end
 
-    local filePicker = FilePicker(panel, fileType, ((not isLoad) or (fileType == "CampaignSave")) , function(control, fileInfo)
-        ForkThread(function()
-            callback(fileInfo, panel, KillDialog)
-        end)
+    local filePicker = FilePicker(panel, fileType, not isLoad or fileType == "CampaignSave", function(control, fileInfo)
+        ForkThread(callback, fileInfo, panel, KillDialog)
     end)
     LayoutHelpers.AtLeftTopIn(filePicker, panel, 43, 118)
     LayoutHelpers.SetDimensions(filePicker, 595, 362)

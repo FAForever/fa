@@ -74,13 +74,15 @@ function table.getsize(t)
 end
 
 --- table.copy(t) returns a shallow copy of t.
+---@overload fun(t: Vector): Vector
 function table.copy(t)
-    if not t then return end -- prevents looping over nil table
-    local r = {}
-    for k,v in t do
-        r[k] = v
+    if t then -- prevents looping over nil table
+        local r = {}
+        for k,v in t do
+            r[k] = v
+        end
+        return r
     end
-    return r
 end
 
 --- table.find(t,val) returns the key for val if it is in t table.

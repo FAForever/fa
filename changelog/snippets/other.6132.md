@@ -1,0 +1,1 @@
+- (#6132) Clean up unused FiringRandomness stat from blueprint of Ahwassa's bomb.
