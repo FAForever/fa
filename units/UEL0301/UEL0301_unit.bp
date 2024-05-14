@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC uel0301_desc>Support Armored Command Unit",
+    Description = "<LOC uel0301_desc>Support Command Unit",
     AI = {
         GuardScanRadius = 26,
         TargetBones = {
@@ -73,6 +73,7 @@ UnitBlueprint{
             "<LOC ability_engineeringsuite>Engineering Suite",
             "<LOC ability_notcap>Not Capturable",
             "<LOC ability_omni>Omni Sensor",
+            "<LOC ability_jamming>Jamming",
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationWalk = "/units/uel0301/uel0301_awalk01.sca",
@@ -177,15 +178,13 @@ UnitBlueprint{
         BuildCostEnergy = 27300,
         BuildCostMass = 2100,
         BuildRate = 40,
-        BuildTime = 14400,
+        BuildTime = 14500,
         BuildableCategory = { "BUILTBYTIER3ENGINEER UEF" },
         MaintenanceConsumptionPerSecondEnergy = 0,
         MaxBuildDistance = 10,
         NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
-        StorageEnergy = 500,
-        StorageMass = 275,
         TeleportEnergyMod = 4,
         TeleportMassMod = 3,
         TeleportTimeMod = 0.0001,
@@ -222,17 +221,6 @@ UnitBlueprint{
             HelpText = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_Engineer_name>SACU (Engineer preset)",
-        },
-        IntelJammer = {
-            Description = "<LOC uel0301_IntelJammer_desc>SACU (Intel Jammer preset)",
-            BuildIconSortPriority = 35,
-            Enhancements = {
-                "RadarJammer",
-                "SensorRangeEnhancer",
-            },
-            HelpText = "<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.",
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_IntelJammer_name>SACU (Intel Jammer preset)",
         },
         RAS = {
             Description = "<LOC uel0301_RAS_desc>SACU (RAS preset)",
@@ -279,33 +267,6 @@ UnitBlueprint{
             RemoveEnhancements = {
                 "Pod",
                 "PodRemove",
-            },
-            Slot = "Back",
-        },
-        RadarJammer = {
-            BuildCostEnergy = 8000,
-            BuildCostMass = 300,
-            BuildTime = 2500,
-            Icon = "rj",
-            MaintenanceConsumptionPerSecondEnergy = 100,
-            Name = "<LOC enhancements_0067>Radar Jammer",
-            NewJammerRadius = 26,
-            ShowBones = { "Jetpack" },
-            Slot = "Back",
-            UpgradeEffectBones = { "Jetpack" },
-            UpgradeUnitAmbientBones = { "UEL0301" },
-        },
-        RadarJammerRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "Jetpack" },
-            Icon = "rj",
-            Name = "<LOC enhancements_0068>Remove Radar Jammer",
-            Prerequisite = "RadarJammer",
-            RemoveEnhancements = {
-                "RadarJammer",
-                "RadarJammerRemove",
             },
             Slot = "Back",
         },
@@ -397,7 +358,7 @@ UnitBlueprint{
             BuildTime = 5040,
             Icon = "acu",
             Name = "<LOC enhancements_0061>Energy Accelerator",
-            NewRateOfFire = 1.82,
+            NewRateOfFire = 1.8,
             NewDamageMod  = 200,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "UEL0301" },
@@ -424,6 +385,7 @@ UnitBlueprint{
             Name = "<LOC enhancements_0071>Enhanced Sensor System",
             NewOmniRadius = 80,
             NewVisionRadius = 45,
+            NewJammerRadius = 26,
             ShowBones = { "SAM" },
             Slot = "LCH",
             UpgradeEffectBones = { "SAM" },
@@ -505,7 +467,6 @@ UnitBlueprint{
             Slot = "RCH",
         },
 
-
         Slots = {
             Back = {
                 name = "<LOC _Back>",
@@ -549,19 +510,29 @@ UnitBlueprint{
         ConstructionBar = true,
         FactionName = "UEF",
         Icon = "amph",
+        OrderOverrides = {
+            RULEUCC_JammingToggle = {
+                bitmapId = "jamming",
+                helpText = "toggle_jamming",
+            },
+        },
+        ToggleCaps = {RULEUCC_JammingToggle = true},
         SelectionPriority = 3,
     },
     Intel = {
-        ActiveIntel = { Omni = true },
+        ActiveIntel = {
+            Omni = true,
+            Jamming = true,
+        },
         FreeIntel = false,
         JamRadius = {
-            Max = 26,
-            Min = 26,
+            Max = 15,
+            Min = 15,
         },
         JammerBlips = 10,
         OmniRadius = 16,
         VisionRadius = 26,
-        WaterVisionRadius = 24,
+        WaterVisionRadius = 26,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.5,
@@ -608,13 +579,6 @@ UnitBlueprint{
         CanFireFromTransport = false,
         ClassSAttachSize = 0,
         TransportClass = 3,
-    },
-    Veteran = {
-        Level1 = 25,
-        Level2 = 50,
-        Level3 = 75,
-        Level4 = 100,
-        Level5 = 125,
     },
     Weapon = {
         {
@@ -685,7 +649,7 @@ UnitBlueprint{
         },
         {
             CollideFriendly = false,
-            Damage = 1000,
+            Damage = 1500,
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = "DeathExplosion",
