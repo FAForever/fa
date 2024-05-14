@@ -41,8 +41,8 @@ AirUnit = ClassUnit(MobileUnit) {
     end,
 
     ---@param self AirUnit
-    ---@param new string
-    ---@param old string
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         MobileUnitOnMotionVertEventChange(self, new, old)
 
@@ -182,36 +182,39 @@ AirUnit = ClassUnit(MobileUnit) {
             (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self))
         then
             self.Dead = true
-            self:CreateUnitAirDestructionEffects(1.0)
-            self:DestroyTopSpeedEffects()
-            self:DestroyBeamExhaust()
-            self.OverKillRatio = overkillRatio
-            self:PlayUnitSound('Killed')
-            self:DoUnitCallbacks('OnKilled')
-            self:DisableShield()
+            -- We want to skip all the visual/audio/shield bounce/death weapon stuff if we're in internal storage
+            if type ~= "TransportDamage" then
+                self:CreateUnitAirDestructionEffects(1.0)
+                self:DestroyTopSpeedEffects()
+                self:DestroyBeamExhaust()
+                self.OverKillRatio = overkillRatio
+                self:PlayUnitSound('Killed')
+                self:DoUnitCallbacks('OnKilled')
+                self:DisableShield()
 
-            -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
-            local bp = self.Blueprint
-            local i = 1
-            for i, numweapons in bp.Weapon do
-                if bp.Weapon[i].Label == 'DeathImpact' then
-                    self.deathWep = bp.Weapon[i]
-                    break
+                -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
+                local bp = self.Blueprint
+                local i = 1
+                for i, numweapons in bp.Weapon do
+                    if bp.Weapon[i].Label == 'DeathImpact' then
+                        self.deathWep = bp.Weapon[i]
+                        break
+                    end
                 end
-            end
 
-            if not self.deathWep or self.deathWep == {} then
-                WARN(string.format('(%s) has no death weapon or the death weapon has an incorrect label!',
-                    tostring(bp.BlueprintId)))
-            else
-                self.DeathCrashDamage = self.deathWep.Damage
-            end
+                if not self.deathWep or self.deathWep == {} then
+                    WARN(string.format('(%s) has no death weapon or the death weapon has an incorrect label!',
+                        tostring(bp.BlueprintId)))
+                else
+                    self.DeathCrashDamage = self.deathWep.Damage
+                end
 
-            -- Create a projectile we'll use to interact with Shields
-            local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
-            self.colliderProj = proj
-            proj:Start(self, 0)
-            self.Trash:Add(proj)
+                -- Create a projectile we'll use to interact with Shields
+                local proj = self:CreateProjectileAtBone('/projectiles/ShieldCollider/ShieldCollider_proj.bp', 0)
+                self.colliderProj = proj
+                proj:Start(self, 0)
+                self.Trash:Add(proj)
+            end
 
             self:VeterancyDispersal()
 
@@ -226,6 +229,11 @@ AirUnit = ClassUnit(MobileUnit) {
             end
 
             self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
+
+            -- If we're in internal storage, we're done, destroy the unit to avoid OnImpact errors
+            if type == "TransportDamage" then
+                self:Destroy()
+            end
         else
             MobileUnitOnKilled(self, instigator, type, overkillRatio)
         end

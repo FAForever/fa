@@ -128,7 +128,6 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -143,7 +142,6 @@ UnitBlueprint{
         MaxSpeed = 3.6,
         MaxSpeedReverse = 3.6,
         MaxSteerForce = 7,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = true,
         TurnRadius = 2,
@@ -226,7 +224,6 @@ UnitBlueprint{
             TurretYawSpeed = 180,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
-            WeaponCategory = "Anti Air",
         },
         {
             AimsStraightOnDisable = false,

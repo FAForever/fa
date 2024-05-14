@@ -163,7 +163,7 @@ UnitBlueprint{
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
-            RULEUCC_Dive = false,
+            RULEUCC_Dive = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Nuke = true,
@@ -192,7 +192,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -212,7 +211,6 @@ UnitBlueprint{
         MeshExtentsX = 1,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 0.45,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 15,
         TurnRate = 50,

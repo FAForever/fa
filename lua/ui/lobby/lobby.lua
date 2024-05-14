@@ -5241,7 +5241,7 @@ local MessageHandlers = {
             end
 
             local charactersInPlayerName = string.len(data.PlayerOptions.PlayerName)
-            if charactersInPlayerName < 3 or charactersInPlayerName > 32 then
+            if charactersInPlayerName < 2 or charactersInPlayerName > 32 then
                 return false
             end
 
@@ -5250,7 +5250,8 @@ local MessageHandlers = {
                     return false
                 end
 
-                if string.len(data.PlayerOptions.PlayerClan) > 3 then
+                -- note: there are strange clan names that use more than 1 byte per character
+                if string.len(data.PlayerOptions.PlayerClan) > 6 then
                     return false
                 end
             end

@@ -143,6 +143,7 @@ float refractionScale = 0.015;
 
 //
 // fresnel parameters
+// both are unused by the shaders
 //
 float fresnelBias = 0.1;
 float fresnelPower = 1.5;
@@ -153,26 +154,26 @@ float skyreflectionAmount = 1.5;
 
 
 //
-// 3 repeat rate for 3 texture layers
+// 4 repeat rates for the 4 wave texture layers
 //
 float4  normalRepeatRate = float4(0.0009, 0.009, 0.05, 0.5);
 
 
 //
-// 3 vectors of normal movements
+// 4 vectors of normal movements
 float2 normal1Movement = float2(0.5, -0.95);
 float2 normal2Movement = float2(0.05, -0.095);
 float2 normal3Movement = float2(0.01, 0.03);
 float2 normal4Movement = float2(0.0005, 0.0009);
-//float2 normal2Movement = float2(0.3, 0.9);
-//float2 normal3Movement = float2(0.03, -0.09);
 
 
 // sun parameters
 float		SunShininess = 50;
 float3		SunDirection = normalize(float3( 0.1 ,   -0.967, 0.253));
 float3		SunColor = normalize(float3( 1.2, 0.7, 0.5 ));
+// unused by the shaders
 float       sunReflectionAmount = 5;
+// unused by the shaders
 float       SunGlow;
 
 ///

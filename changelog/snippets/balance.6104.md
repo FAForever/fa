@@ -1,0 +1,6 @@
+- (#6104) Reduce TML HP and add a Death Weapon
+  - HP: 1500 --> 900
+  - Death Weapon
+    - Damage: 750
+    - AoE (UEF/Aeon/Sera): 2
+    - AoE (Cybran): 3

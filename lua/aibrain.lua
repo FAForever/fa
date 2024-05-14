@@ -24,6 +24,10 @@ local CoroutineYield = coroutine.yield
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
+---@class ScoutLocation
+---@field Position Vector
+---@field TaggedBy Unit
+
 ---@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias HqTech "TECH2" | "TECH3"
@@ -547,6 +551,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
+---@field CustomUnits { [string]: EntityId[] }
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
@@ -766,13 +771,17 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
 
         self.VOTable[string] = true
-        import('/lua/SimSyncUtils.lua').SyncVoice({ Cue = cue, Bank = bank })
+        ForkThread(self.PlayVOSoundThread, self, string, {
+            Cue = cue,
+            Bank = bank
+        })
+    end,
 
-        local timeout = VO['timeout']
-        ForkThread(function()
-            WaitSeconds(timeout)
-            self.VOTable[string] = nil
-        end)
+    PlayVOSoundThread = function(self, key, data)
+        import("/lua/SimSyncUtils.lua").SyncVoice(data)
+        WaitSeconds(self.VOSounds["timeout"])
+
+        self.VOTable[key] = nil
     end,
 
     --- Triggers based on an AiBrain
@@ -1211,6 +1220,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     OnRecalled = function(self)
+        -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
         local army = self.Army

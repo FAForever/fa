@@ -138,7 +138,7 @@ end
 --- points in the template are used.
 ---
 ---@param type          string
----@param structureName filename # blueprint file
+---@param structureName FileName # blueprint file
 ---@param buildingTypes BuildingTemplate[]
 ---@param relative      boolean
 ---@param builder       Unit
@@ -258,7 +258,7 @@ function CAiBrain:GetBlueprintStat(statName, category)
 end
 
 --- Return this brain's current enemy.
--- @return Number, target's army number.
+---@return number -- target army's number
 function CAiBrain:GetCurrentEnemy()
 end
 
@@ -394,7 +394,7 @@ end
 ---@param position Vector
 ---@param radius number in game units
 ---@param restriction boolean
----@param threatType BrainThreatType
+---@param threatType? BrainThreatType
 ---@param armyIndex? number defaults to this brain's index
 ---@return number
 function CAiBrain:GetThreatAtPosition(position, radius, restriction, threatType, armyIndex)

@@ -1,4 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
+local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -396,10 +397,10 @@ IntelComponent = ClassSimple {
 }
 
 local TechToDuration = {
-    TECH1 = 1,
-    TECH2 = 2,
-    TECH3 = 3,
-    EXPERIMENTAL = 6,
+    TECH1 = 1.0,
+    TECH2 = 1.0,
+    TECH3 = 1.0,
+    EXPERIMENTAL = 4,
 }
 
 local TechToLOD = {
@@ -640,8 +641,9 @@ VeterancyComponent = ClassSimple {
 
     --- Disperses the veterancy, expects to be only called once
     ---@param self VeterancyComponent | Unit
-    VeterancyDispersal = function(self)
-        local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
+    ---@param experience? number -- override for amount of experience to be distributed
+    VeterancyDispersal = function(self, experience)
+        local vetWorth = experience or (self:GetFractionComplete() * self:GetTotalMassCost())
         local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
         local vetDamageTaken = self.VetDamageTaken
@@ -867,8 +869,21 @@ ExternalFactoryComponent = ClassSimple {
         -- create the factory somewhere completely unrelated
         local px, py, pz = self:GetPositionXYZ(self.FactoryAttachBone)
 
+        -- the anchor entity prevents the "deploy" command from detaching
+        -- the external factory from the base unit
+        local anchorEntity = Entity({Owner = self})
+        self.Trash:Add(anchorEntity)
+        anchorEntity:AttachTo(self, self.FactoryAttachBone)
+
+        -- the anchor unit has the "CARRIER" category, which prevents the
+        -- external factory from being highlighted or selected with the cursor, but
+        -- doesn't prevent selecting it with the exFac button
+        local anchorUnit = CreateUnitHPR('ZXA0003', self.Army, px, py, pz, 0, 0, 0)
+        self.Trash:Add(anchorUnit)
+        anchorUnit:AttachTo(anchorEntity, -1)
+
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, px, py, pz, 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
+        self.ExternalFactory:AttachTo(anchorUnit, -1)
         self.ExternalFactory:SetCreator(self)
         self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)

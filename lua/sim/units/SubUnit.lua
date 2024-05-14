@@ -29,8 +29,8 @@ SubUnit = ClassUnit(MobileUnit) {
     end,
 
     ---@param self Unit
-    ---@param new string
-    ---@param old string
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         MobileUnitOnMotionVertEventChange(self, new, old)
 
