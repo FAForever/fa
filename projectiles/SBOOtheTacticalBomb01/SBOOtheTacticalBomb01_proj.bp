@@ -42,6 +42,7 @@ ProjectileBlueprint {
         DestroyOnWater = true,
         MaxSpeed = 17,
         RealisticOrdinance = true,
+        UseGravity = true,
         TrackTarget = false,
         VelocityAlign = true,
     },
