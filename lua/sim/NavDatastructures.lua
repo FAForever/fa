@@ -61,7 +61,7 @@ Stack = ClassSimple {
 }
 
 ---@class NavHeap
----@field Heap NavSection[]
+---@field Heap NavPathingData[]
 ---@field HeapSize number
 NavHeap = ClassSimple {
 
@@ -83,7 +83,7 @@ NavHeap = ClassSimple {
     end,
 
     ---@param self NavHeap
-    ---@return NavSection?
+    ---@return NavPathingData?
     ExtractMin = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -175,7 +175,7 @@ NavHeap = ClassSimple {
     end,
 
     ---@param self NavHeap
-    ---@param element NavSection
+    ---@param element NavPathingData
     Insert = function(self, element)
         self.HeapSize = self.HeapSize + 1
         self.Heap[self.HeapSize] = element

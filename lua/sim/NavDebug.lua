@@ -152,7 +152,7 @@ function ScanOver(mouse, layer)
             end
         end
 
-        -- local points, n = NavUtils.DirectionsFrom(layer, mouse, 45, 16)
+        -- local points, n = NavUtils.DirectionsFrom(layer, mouse, 45)
         -- if points then
         --     for k = 1, n do 
         --         DrawCircle(points[k], 5, 'ffffff')
@@ -267,9 +267,7 @@ function Scan()
                 end
 
                 if PathToState.Origin and PathToState.Destination then
-                    local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination
-                        ,
-                        ArmyBrains[1])
+                    local path, n, label = NavUtils.DetailedPathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination)
 
                     if not path then
                         DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')

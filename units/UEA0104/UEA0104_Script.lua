@@ -70,8 +70,9 @@ UEA0104 = ClassUnit(AirTransport) {
     end,
 
     ---@param self UEA0104
-    ---@param new any
-    ---@param old any
+
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then

@@ -19,6 +19,7 @@ UnitBlueprint{
     Categories = {
         "AIRSTAGINGPLATFORM",
         "ANTIAIR",
+        "ANTIMISSILE",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
         "INDIRECTFIRE",
@@ -181,7 +182,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -200,7 +200,6 @@ UnitBlueprint{
         MeshExtentsX = 6.5,
         MeshExtentsY = 4.5,
         MeshExtentsZ = 17,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -247,7 +246,7 @@ UnitBlueprint{
             MinRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissile03/SIFLaanseTacticalMissile03_proj.bp",
             ProjectileLifetime = 60,
             RackBones = {

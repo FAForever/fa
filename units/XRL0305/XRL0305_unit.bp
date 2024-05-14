@@ -10,8 +10,8 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "AMPHIBIOUS",
-        "ANTIMISSILE",
         "ANTINAVY",
+        "ANTITORPEDO", 
         "BOT",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -127,13 +127,12 @@ UnitBlueprint{
     },
     Intel = {
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -149,7 +148,6 @@ UnitBlueprint{
         MaxSpeed = 2.4,
         MaxSpeedReverse = 2.4,
         MaxSteerForce = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         RotateOnSpot = false,
         StandUpright = true,
@@ -301,7 +299,7 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             EffectiveRadius = 29,
-            FireTargetLayerCapsTable = { Seabed = "Sub|Water|Seabed" },
+            FireTargetLayerCapsTable = { Seabed = "Water" },
             FiringTolerance = 2,
             Label = "AntiTorpedo",
             MaxRadius = 34,

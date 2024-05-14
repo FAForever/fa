@@ -7,14 +7,76 @@ local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 scoreData = {interval = historyInterval, current = ArmyScore, history = {}, focusArmyIndex = 0}
 
--- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
+-- Some of these values pre-existed and are used in other places, that's why their naming is not consistent. Mainly in `hotstats.lua` `info_dialog` table
+-- The 'kills', 'built', and 'loss' stats for each category are updated for each human army during the game
+-- and synced to 'Sync.Score' if the user is an observer, in a replay, or score is enabled.
 local categoriesToCollect = {
     land = categories.LAND,
     air = categories.AIR,
     naval = categories.NAVAL,
     cdr = categories.COMMAND,
     experimental = categories.EXPERIMENTAL,
-    structures = categories.STRUCTURE
+    structures = categories.STRUCTURE,
+}
+
+-- Format specifications for achievements: https://github.com/FAForever/fa/issues/5813
+-- Example JSON with all the expected fields: https://github.com/FAForever/server/blob/665454a5d8a2d97a1b512f89bcadef7a25343e6a/tests/data/game_stats_simple_win.json#L38
+-- Unit categories used in achievements: `def _category_stats` in https://github.com/FAForever/server/blob/develop/server/stats/game_stats_service.py
+-- Unit IDs used for unit categories: https://github.com/FAForever/server/blob/develop/server/stats/unit.py
+-- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game
+local categoriesForAchievements = {
+    transportation = categories.TRANSPORTATION, 
+    sacu = categories.SUBCOMMANDER,
+
+    -- Tracked by FAF server events but doesn't increment any achievements. We do need to include them
+    -- or the achievements do not update as a whole.
+    engineer = categories.ENGINEER,
+    tech1 = categories.TECH1,
+    tech2 = categories.TECH2,
+    tech3 = categories.TECH3,
+}
+
+-- The stats for these units are checked for each army at the end of the game
+-- They can have custom stats on top of the 3 standard ones.
+local unitIdsForAchievements = {
+    -- ACUs
+    -- lowest_health custom stat
+    'ual0001', -- AEON_ACU
+    'url0001', -- CYBRAN_ACU
+    'uel0001', -- UEF_ACU
+    'xsl0001', -- SERAPHIM_ACU
+
+    -- ASFs
+    'uaa0303', -- CORONA
+    'ura0303', -- GEMINI
+    'uea0303', -- WASP
+    'xsa0303', -- IAZYNE
+
+    -- Experimentals
+    -- Aeon
+    'xab1401', -- PARAGON
+    'uaa0310', -- CZAR
+    'ual0401', -- GALACTIC_COLOSSUS
+    'uas0401', -- TEMPEST
+    'xab2307', -- SALVATION
+    -- UEF
+    'ueb2401', -- MAVOR
+    'uel0401', -- FATBOY
+    'xeb2402', -- NOVAX_CENTER
+    'ues0401', -- ATLANTIS
+    -- Cybran
+    'ura0401', -- SOUL_RIPPER
+    'url0401', -- SCATHIS
+    'url0402', -- MONKEYLORD
+    'xrl0403', -- MEGALITH
+    -- Sera
+    'xsb2401', -- YOLONA_OSS
+    'xsa0402', -- AHWASSA
+    'xsl0401', -- YTHOTHA
+
+    -- Other units
+    'daa0206', -- MERCY
+    'xrl0302', -- FIRE_BEETLE
 }
 
 ---@param brain AIBrain
@@ -250,10 +312,39 @@ local function ScoreThread()
     end
 end
 
+local function GameOverScore()
+    for index, brain in ArmyBrains do
+
+        if ArmyIsCivilian(index) then continue end
+
+        local Score = ArmyScore[index]
+
+        for categoryName, category in categoriesForAchievements do
+            Score.units[categoryName] = {kills = 0, built = 0, lost = 0}
+            Score.units[categoryName]['kills'] = brain:GetBlueprintStat("Enemies_Killed", category)
+            Score.units[categoryName]['built'] = brain:GetBlueprintStat("Units_History", category)
+            Score.units[categoryName]['lost'] = brain:GetBlueprintStat("Units_Killed", category)
+        end
+        
+        Score.blueprints = {}
+        local allStats = brain:GetUnitStats()
+        for _, unitId in unitIdsForAchievements do
+            local unitStats = allStats[unitId]
+            if unitStats then
+                if not unitStats['kills'] then unitStats['kills'] = 0 end
+                if not unitStats['built'] then unitStats['built'] = 0 end
+                if not unitStats['lost'] then unitStats['lost'] = 0 end
+                Score.blueprints[unitId] = unitStats
+            end
+        end
+    end
+end
+
 function init()
     ForkThread(ScoreThread)
     table.insert(GameOverListeners, function()
         GameIsOver = true
+        GameOverScore()
         Sync.ScoreAccum = scoreData
         Sync.StatsToSend = ArmyScore
     end)

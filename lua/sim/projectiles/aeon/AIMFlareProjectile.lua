@@ -20,8 +20,12 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
+local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local EffectTemplate = import("/lua/effecttemplates.lua")
+
+local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
+local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
+local EmitterProjectileOnDestroy = EmitterProjectile.OnDestroy
 
 -- upvalue scope for performance
 local IsEnemy = IsEnemy
@@ -32,6 +36,7 @@ local FlareCategories = categories.TACTICAL + categories.MISSILE
 
 --- AEON FLARE PROJECTILES
 ---@class AIMFlareProjectile : EmitterProjectile
+---@field RedirectedMissiles number
 AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     FxTrails = EffectTemplate.AAntiMissileFlare,
     FxTrailScale = 1.0,
@@ -46,18 +51,58 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     FxNoneHitScale = 0.4,
     DestroyOnImpact = false,
 
+    ---@param self AIMFlareProjectile
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
+        EmitterProjectileOnCreate(self, inWater)
+        self.RedirectedMissiles = 0
+
+        -- missiles that hit the flare are immediately neutralized
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+
+        -- Create several flares of different sizes. A collision check is done when an entity enters the
+        -- collision box of another entity. As long as the entity remains inside no additional checks
+        -- are done. Therefore we create several flares of different sizes to catch missiles that are
+        -- far out and close by.
+
+        local flareSpecs = {
+            Radius = 10,
+            Owner = self,
+            Category = "MISSILE TACTICAL",
+        }
+
+        local trash = self.Trash
+        for k = 1, 3 do
+            flareSpecs.Radius = 8 + k * 5
+            trash:Add(Flare(flareSpecs))
+        end
+    end,
+
+    ---@param self AIMFlareProjectile
+    OnDestroy = function(self)
+        EmitterProjectileOnDestroy(self)
+
+        -- create a pretty flash depending on the number of missiles we redirected
+        local redirectedMissiles = self.RedirectedMissiles
+        if redirectedMissiles > 0 then
+            CreateLightParticleIntel(self, -1, self.Army, redirectedMissiles, 5, 'glow_02', 'ramp_blue_22')
+        end
+    end,
+
     ---@param self AIMAntiMissile01
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        -- nullify damage amount when it hits the flare. We do this to prevent projectiles 
-        -- damaging the unit that fired the flare, as if it 'encapsulates' the damage
+        -- flat out destroy the tactical missile when we get in contact with it
         if EntityCategoryContains(FlareCategories, other) and
             IsEnemy(self.Army, other.Army)
         then
-            other.DamageData.DamageAmount = 0
+            -- destroy the other projectile
+            Damage(self.Launcher, other:GetPosition(), other, 200, "Normal")
         end
 
         return true
     end,
+
+
 }

@@ -62,6 +62,9 @@ UEA0107 = ClassUnit(AirTransport) {
             TrashBagAdd(trash,ForkThread(self.ExpandThread, self))
         end,
 
+        ---@param self UEA0107
+        ---@param new VerticalMovementState
+        ---@param old VerticalMovementState
         OnMotionVertEventChange = function(self, new, old)
             AirTransport.OnMotionVertEventChange(self, new, old)
             if (new == 'Down') then

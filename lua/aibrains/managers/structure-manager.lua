@@ -20,11 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
-
 local TableGetSize = table.getsize
 
-local WeakValues = { __mode = 'v' }
+local WeakValueTable = { __mode = 'v' }
 
 ---@class AIStructureManagerDebugInfo
 ---@field Structures { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
@@ -43,29 +41,30 @@ local WeakValues = { __mode = 'v' }
 ---@field TECH3 number
 ---@field EXPERIMENTAL number
 
----@class AIStructureManager : AIBuilderManager
+---@class AIStructureManager
 ---@field DebugInfo AIStructureManagerDebugInfo
 ---@field Structures AIStructureManagerReferences
 ---@field StructuresBeingBuilt AIStructureManagerReferences
 ---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks
 ---@field StructureBeingBuiltCount AIStructureManagerCounts     # Recomputed every 10 ticks
 ---@field GeneratedThreat { Surface: number, Air: number, Economy: number, Sub: number }
-AIStructureManager = Class(BuilderManager) {
+AIStructureManager = ClassSimple {
 
     ManagerName = "StructureManager",
 
     ---@param self AIStructureManager
     ---@param brain AIBrain
     ---@param base AIBase
-    Create = function(self, brain, base, locationType)
-        BuilderManager.Create(self, brain, base, locationType)
-        self.Identifier = 'AIStructureManager at ' .. locationType
+    Create = function(self, brain, base)
+        self.Brain = brain
+        self.Base = base
+        self.Trash = TrashBag()
 
         self.Structures = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
         }
 
         self.StructureCount = {
@@ -76,10 +75,10 @@ AIStructureManager = Class(BuilderManager) {
         }
 
         self.StructuresBeingBuilt = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
         }
 
         self.StructureBeingBuiltCount = {
@@ -226,7 +225,7 @@ AIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -240,7 +239,7 @@ AIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -264,7 +263,7 @@ AIStructureManager = Class(BuilderManager) {
     --- Called by a unit as it is destroyed
     ---@param self AIStructureManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -275,34 +274,34 @@ AIStructureManager = Class(BuilderManager) {
     end,
 
     --- Called by a unit as it starts building
-    ---@param self BuilderManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
     end,
 
     --- Called by a unit as it stops building
-    ---@param self BuilderManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
     end,
 
     --------------------------------------------------------------------------------------------
     -- unit interface
 
-    --- Add a unit, similar to calling `OnUnitStopBeingBuilt`
+    --- Add a unit, similar to calling `OnStopBeingBuilt`
     ---@param self AIStructureManager
     ---@param unit Unit
     AddUnit = function(self, unit)
-        self:OnUnitStopBeingBuilt(unit, nil, unit.Layer)
+        self:OnStopBeingBuilt(unit, nil, unit.Layer)
     end,
 
-    --- Remove a unit, similar to calling `OnUnitDestroyed`
+    --- Remove a unit, similar to calling `OnUnitDestroy`
     ---@param self AIStructureManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
-        self:OnUnitDestroyed(unit)
+        self:OnUnitDestroy(unit)
     end,
 
     ---------------------------------------------------------------------------

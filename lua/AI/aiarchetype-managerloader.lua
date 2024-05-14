@@ -79,7 +79,7 @@ function SetupMainBase(aiBrain)
         ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality = baseType
     end
 
-    LOG('*AI DEBUG: ARMY ', repr(aiBrain:GetArmyIndex()), ': Initiating Archetype using ' .. base)
+    LOG('*AI DEBUG: ARMY ', tostring(aiBrain:GetArmyIndex()), ': Initiating Archetype using ' .. base)
     AIAddBuilderTable.AddGlobalBaseTemplate(aiBrain, 'MAIN', base)
     aiBrain:ForceManagerSort()
 end

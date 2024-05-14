@@ -603,7 +603,8 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
     if (surfaceElevation > 0) {
         // we need this switch to make it consistent with the terrain shader coloration
         if (IsExperimentalShader()) {
-            float scaledDepth = (-depth / (surfaceElevation - abyssElevation));
+            // We need to multiply by 2 to match the terrain shader.
+            float scaledDepth = (-depth / (surfaceElevation - abyssElevation)) * 2;
             float3 up = float3(0,1,0);
             // this is the length that the light travels underwater back to the camera
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);

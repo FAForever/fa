@@ -400,8 +400,8 @@ Weapon = ClassWeapon(WeaponMethods) {
     end,
 
     ---@param self Weapon
-    ---@param new any
-    ---@param old any
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
     end,
 
@@ -700,6 +700,31 @@ Weapon = ClassWeapon(WeaponMethods) {
                 return
             end
             self:SetEnabled(enable)
+        end
+    end,
+
+    ---@param self Weapon
+    ---@param rateOfFire number
+    DisabledWhileReloadingThread = function(self, rateOfFire)
+
+        -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+        -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
+        -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon.
+
+        local reloadTime = math.floor(10 * rateOfFire) - 1
+        if reloadTime > 4 then
+            if IsDestroyed(self) then
+                return
+            end
+
+            self:SetEnabled(false)
+            WaitTicks(reloadTime)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            self:SetEnabled(true)
         end
     end,
 

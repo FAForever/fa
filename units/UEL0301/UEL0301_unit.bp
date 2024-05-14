@@ -37,7 +37,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYCOUNTERINTEL",
@@ -55,6 +54,7 @@ UnitBlueprint{
         "UEF",
         "USEBUILDPRESETS",
         "VISIBLETORECON",
+        "SNIPEMODE",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -318,7 +318,7 @@ UnitBlueprint{
             BuildCostMass = 380,
             BuildTime = 2500,
             Icon = "ed",
-            Name = "<LOC enhancements_0065>C-D2 Engineering Drone",
+            Name = "<LOC enhancements_0065>C-D3 Engineering Drone",
             Slot = "Back",
             UpgradeEffectBones = { "AttachSpecial01" },
             UpgradeUnitAmbientBones = { "UEL0301" },
@@ -328,7 +328,7 @@ UnitBlueprint{
             BuildCostMass = 1,
             BuildTime = 0.1,
             Icon = "ed",
-            Name = "<LOC enhancements_0066>C-D2 Remove Engineering Drone",
+            Name = "<LOC enhancements_0066>C-D3 Remove Engineering Drone",
             Prerequisite = "Pod",
             RemoveEnhancements = {
                 "Pod",
@@ -552,13 +552,12 @@ UnitBlueprint{
         JammerBlips = 10,
         OmniRadius = 16,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.5,
     LifeBarSize = 0.9,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -577,7 +576,6 @@ UnitBlueprint{
         MeshExtentsX = 0.85,
         MeshExtentsY = 2,
         MeshExtentsZ = 2.4,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -632,7 +630,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
             ProjectileId = "/projectiles/TDFPlasmaHeavy03/TDFPlasmaHeavy03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -651,10 +649,10 @@ UnitBlueprint{
             RateOfFire = 1,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
+                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "MOBILE TECH1",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

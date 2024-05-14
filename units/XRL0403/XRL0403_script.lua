@@ -106,7 +106,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
         self:SetCollisionShape(
             'Box',
             self.Blueprint.CollisionOffsetX,
-            self.Blueprint.CollisionOffsetY,
+            0.5 * self.Blueprint.SizeY,
             self.Blueprint.CollisionOffsetZ,
             0.5 * self.Blueprint.SizeX,
             0.5 * self.Blueprint.SizeY,
@@ -120,14 +120,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetCollisionShape('Box',
-            2 * self.Blueprint.CollisionOffsetX,
-            2 * self.Blueprint.CollisionOffsetY,
-            2 * self.Blueprint.CollisionOffsetZ,
-            0.5 * self.Blueprint.SizeX,
-            0.5 * self.Blueprint.SizeY,
-            0.5 * self.Blueprint.SizeZ
-        )
+        self:RevertCollisionShape()
 
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
@@ -159,6 +152,8 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
     end,
 
     ---@param self XRL0403
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 
