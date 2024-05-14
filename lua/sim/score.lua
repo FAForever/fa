@@ -7,8 +7,9 @@ local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 scoreData = {interval = historyInterval, current = ArmyScore, history = {}, focusArmyIndex = 0}
 
--- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
--- The 'kills', 'built', and 'loss' stats for each category are updated for each army during the game and synced to 'Sync.Score'
+-- Some of these values pre-existed and are used in other places, that's why their naming is not consistent. Mainly in `hotstats.lua` `info_dialog` table
+-- The 'kills', 'built', and 'loss' stats for each category are updated for each human army during the game
+-- and synced to 'Sync.Score' if the user is an observer, in a replay, or score is enabled.
 local categoriesToCollect = {
     land = categories.LAND,
     air = categories.AIR,
@@ -19,16 +20,23 @@ local categoriesToCollect = {
 }
 
 -- Format specifications for achievements: https://github.com/FAForever/fa/issues/5813
--- Unit categories used in achievements: https://github.com/FAForever/server/blob/develop/server/stats/game_stats_service.py
+-- Example JSON with all the expected fields: https://github.com/FAForever/server/blob/665454a5d8a2d97a1b512f89bcadef7a25343e6a/tests/data/game_stats_simple_win.json#L38
+-- Unit categories used in achievements: `def _category_stats` in https://github.com/FAForever/server/blob/develop/server/stats/game_stats_service.py
 -- Unit IDs used for unit categories: https://github.com/FAForever/server/blob/develop/server/stats/unit.py
-
--- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game_stats_service
+-- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game
 local categoriesForAchievements = {
     transportation = categories.TRANSPORTATION, 
     sacu = categories.SUBCOMMANDER,
+
+    -- Tracked by FAF server events but doesn't increment any achievements. We do need to include them
+    -- or the achievements do not update as a whole.
+    engineer = categories.ENGINEER,
+    tech1 = categories.TECH1,
+    tech2 = categories.TECH2,
+    tech3 = categories.TECH3,
 }
 
--- The stats for these units are checked for each army at the end of the game.
+-- The stats for these units are checked for each army at the end of the game
 -- They can have custom stats on top of the 3 standard ones.
 local unitIdsForAchievements = {
     -- ACUs

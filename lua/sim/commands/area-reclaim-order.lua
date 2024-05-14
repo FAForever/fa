@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024 Willem 'Jip' Wijnia
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 -- upvalue scope for performance
 local TableGetn = table.getn
+local TableSort = table.sort
 local TableSetn = table.setn
 local TableInsert = table.insert
 local TableRemove = table.remove
@@ -31,12 +32,22 @@ local StringFormat = string.format
 local IssueReclaim = IssueReclaim
 
 ---@type table<EntityId, boolean>
+local distances = { }
+
+---@type table<EntityId, boolean>
 local seen = { }
 
 ---@type Unit[]
 local stack = { }
 
---- Applies a reclaim order to all adjacent units
+---@param a Prop
+---@param b Prop
+---@return boolean
+local lambdaSortProps = function(a, b)
+    return distances[a.EntityId] < distances[b.EntityId]
+end
+
+--- Applies a reclaim order to all adjacent units of the same type
 ---@param units Unit[]
 ---@param target StructureUnit
 ---@param doPrint boolean
@@ -53,9 +64,8 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
 
     local processed = 0
 
-    -- exclude the expansion and faction identifier
+    -- exclude the expansion (u/x) and faction identifier (a/e/s/r)
     local blueprintIdPostfix = string.sub(target.Blueprint.BlueprintId, 2)
-
     while TableGetn(stack) > 0 do
         local current = TableRemove(stack)
         if current != target then
@@ -65,7 +75,7 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
         local adjacentUnits = current.AdjacentUnits
         if adjacentUnits then
             for _, unit in adjacentUnits do
-                if blueprintIdPostfix == string.sub(target.Blueprint.BlueprintId, 2) then
+                if blueprintIdPostfix == string.sub(unit.Blueprint.BlueprintId, 2) then
                     if not seen[unit.EntityId] then
                         seen[unit.EntityId] = true
                         TableInsert(stack, unit)
@@ -81,48 +91,119 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
     end
 end
 
---- Applies a reclaim order to all nearby props
 ---@param units Unit[]
----@param target Prop
+---@param ps Vector
+---@param pe Vector
+---@param width number
 ---@param doPrint boolean
-local function ReclaimNearbyProps (units, target, doPrint)
-    local radius = 1.5
-    if target.IsTreeGroup then
-        radius = 0.1
+function AreaReclaimProps(units, ps, pe, width, doPrint)
+    if TableGetn(units) == 0 then
+        return
     end
 
-    local px, _, pz = target:GetPositionXYZ()
-    local adjacentReclaim = GetReclaimablesInRect(px - radius, pz - radius, px + radius, pz + radius)
+    -- feature: prevent over saturating the command queue
+    local commandQueueCount = TableGetn(units[1]:GetCommandQueue())
+    local maximumCommandsToProcess = 450 - commandQueueCount
+    if maximumCommandsToProcess <= 0 then
+        print(StringFormat("Command queue is saturated"))
+        return
+    end
+
     local processed = 0
 
-    if adjacentReclaim then
-        for k = 1, TableGetn(adjacentReclaim) do
-            local entity = adjacentReclaim[k] --[[@as Prop]]
-            if target != entity and IsProp(entity) and entity.MaxMassReclaim > 0 and (entity.IsTree == target.IsTree) then
+    -- determine the direction from ps to pe
+    local dx = ps[1] - pe[1]
+    local dz = ps[3] - pe[3]
+    local distance = math.sqrt(dx * dx + dz * dz)
+
+    local nx = (1 / distance) * dx
+    local nz = (1 / distance) * dz
+
+    -- orthogonal normalized direction
+    local ox = nz
+    local oz = -nx
+
+    -- determine edge points
+    local ps1 = { ps[1] + width * ox, ps[2], ps[3] + width * oz }
+    local ps2 = { ps[1] - width * ox, ps[2], ps[3] - width * oz }
+
+    local pe1 = { pe[1] + width * ox, pe[2], pe[3] + width * oz }
+    local pe2 = { pe[1] - width * ox, pe[2], pe[3] - width * oz }
+
+    -- determine bounding box
+    local minX = math.min(ps1[1], ps2[1], pe1[1], pe2[1])
+    local minZ = math.min(ps1[3], ps2[3], pe1[3], pe2[3])
+    local maxX = math.max(ps1[1], ps2[1], pe1[1], pe2[1])
+    local maxZ = math.max(ps1[3], ps2[3], pe1[3], pe2[3])
+
+    local reclaim = GetReclaimablesInRect(minX, minZ, maxX, maxZ)
+    if reclaim then
+
+        -- clean up previous iterations
+        for entityId, _ in distances do
+            distances[entityId] = nil
+        end
+
+        -- compute squared distances for sorting
+        for k = 1, TableGetn(reclaim) do
+            local entity = reclaim[k] --[[@as Prop]]
+            local ex, _, ez = entity:GetPositionXYZ()
+            local dx, dz = ps[1] - ex, ps[3] - ez
+            distances[entity.EntityId] = dx * dx + dz * dz
+        end
+
+        -- sort the props by distance
+        TableSort(reclaim, lambdaSortProps)
+
+        -- compute squared distances for filtering
+        for k = 1, TableGetn(reclaim) do
+            local entity = reclaim[k] --[[@as Prop]]
+            local ex, _, ez = entity:GetPositionXYZ()
+
+            -- project onto the line segment
+            -- https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+
+            local pvx = ex - ps[1]
+            local pvz = ez - ps[3]
+            local wvx = pe[1] - ps[1]
+            local wvz = pe[3] - ps[3]
+            local dot = pvx * wvx + pvz * wvz
+            local t = math.max(0, math.min(1, dot / (distance * distance)))
+            local prx = ps[1] + t * wvx
+            local prz = ps[3] + t * wvz
+
+            -- compute squared distance of projected vector
+            local dx = ex - prx
+            local dz = ez - prz
+            distances[entity.EntityId] = dx * dx + dz * dz
+        end
+
+        -- filter the props by distance
+        for k = 1, TableGetn(reclaim) do
+            local entity = reclaim[k] --[[@as Prop]]
+            if IsProp(entity) and
+                entity.MaxMassReclaim > 1 and
+                (not entity.IsTree) and
+                distances[entity.EntityId] <= width * width
+            then
                 IssueReclaim(units, entity)
                 processed = processed + 1
+
+                -- feature: prevent over saturating the command queue
+                if processed > maximumCommandsToProcess then
+                    break
+                end
             end
         end
     end
 
-    if doPrint and processed > 0 and (GetFocusArmy() == GetCurrentCommandSource()) then
-        print(StringFormat("Reclaiming %d nearby props", processed))
-    end
-end
+    if doPrint and (GetFocusArmy() == GetCurrentCommandSource()) then
+        if processed > 0 then
+            print(StringFormat("Reclaiming %d additional props", processed))
+        end
 
---- Applies additional reclaim orders to nearby similar entities that are similar to the target
----@param units Unit[]
----@param target Unit | Prop
----@param doPrint boolean           # if true, prints information about the order
-function AreaReclaimOrder(units, target, doPrint)
-    local unitCount = TableGetn(units)
-    if unitCount == 0 then
-        return
-    end
-
-    if IsUnit(target) and EntityCategoryContains(categories.STRUCTURE, target) then
-        return ReclaimAdjacentUnits(units, target, doPrint)
-    elseif IsProp(target) then
-        return ReclaimNearbyProps(units, target, doPrint)
+        if processed > maximumCommandsToProcess then
+            print(StringFormat("Command queue is saturated"))
+        end
     end
 end

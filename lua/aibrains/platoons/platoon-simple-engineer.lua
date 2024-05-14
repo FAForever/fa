@@ -70,8 +70,6 @@ AIPlatoonEngineerSimple = Class(AIPlatoon) {
             local brain = self.Brain
 
             local task = base:FindEngineerTask(self)
-            LOG("Task found: ")
-            reprsl(task)
             if task then
                 self:ChangeState(self.Building, { Task = task })
                 return

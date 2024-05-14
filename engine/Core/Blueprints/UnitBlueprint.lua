@@ -410,7 +410,9 @@
 --- stunning).
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `TransportShield`.
 ---@field PersonalShield? boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult? number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient
 --- energy. Defaults to `10` in the shield spec.
@@ -655,6 +657,7 @@
 
 ---@class UnitBlueprintTarmac
 ---@field Albedo FileName
+---@field Albedo2 FileName
 ---@field DeathLifetime number
 ---@field FadeOut number
 ---@field Length number
@@ -856,7 +859,9 @@
 ---@field OwnerShieldMesh string
 --- Personal shiled toggle
 ---@field PersonalShield boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient energy. Defaults to 10 in the shield spec.
 ---@field ShieldEnergyDrainRechargeTime number
@@ -1001,7 +1006,7 @@
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
 ---@field JamRadius { Max: number, Min: number }
---- how many blips does a jammer produce
+--- How many blips a jammer produces. Maximum 255
 ---@field JammerBlips number
 --- used by the Soothsayer
 ---@field MaxVisionRadius? number

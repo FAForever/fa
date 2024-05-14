@@ -87,6 +87,18 @@
 ---| "Air"
 ---| "Orbital"
 
+---@alias HorizontalMovementState
+---| 'TopSpeed'
+---| 'Stopped'
+---| 'Stopping'
+---| 'Cruise'
+
+---@alias VerticalMovementState
+---| 'Down'
+---| 'Bottom'
+---| 'Up'
+---| 'Top'
+
 ---@alias WeaponRangeCategory
 ---| "UWRC_Undefined"
 ---| "UWRC_DirectFire"

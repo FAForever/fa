@@ -41,15 +41,19 @@ end
 
 function CallEndGame()
     gameOver = true
-    ForkThread(function()
-        WaitSeconds(2.9)
-        for _, v in GameOverListeners do
-            v()
-        end
-        Sync.GameEnded = true
-        WaitSeconds(0.1)
-        EndGame()
-    end)
+    ForkThread(CallEndGameThread)
+end
+
+function CallEndGameThread()
+    WaitSeconds(2.9)
+
+    for _, v in GameOverListeners do
+        v()
+    end
+    Sync.GameEnded = true
+    WaitSeconds(0.1)
+
+    EndGame()
 end
 
 function CheckVictory(scenarioInfo)

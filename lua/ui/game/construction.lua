@@ -1175,25 +1175,28 @@ function OnRolloverHandler(button, state)
     end
 end
 
+---@param unit UserUnit
 function watchForQueueChange(unit)
     if watchingUnit == unit then
         return
     end
-
     updateQueue = false
     watchingUnit = unit
-    ForkThread(function()
-        local threadWatchingUnit = watchingUnit
-        while unit:GetCommandQueue()[1].type ~= 'Script' do
-            WaitSeconds(0.2)
-        end
+    ForkThread(QueueChangeWatchThread, unit)
+end
 
-        local selection = GetSelectedUnits() or {}
-        if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
-            SetSecondaryDisplay(lastDisplayType)
-        end
-        watchingUnit = nil
-    end)
+---@param unit UserUnit
+function QueueChangeWatchThread(unit)
+    local threadWatchingUnit = watchingUnit
+    while unit:GetCommandQueue()[1].type ~= 'Script' do
+        WaitSeconds(0.2)
+    end
+
+    local selection = GetSelectedUnits() or {}
+    if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
+        SetSecondaryDisplay(lastDisplayType)
+    end
+    watchingUnit = nil
 end
 
 function checkBadClean(unit)
@@ -1892,7 +1895,7 @@ end
 
 function ToggleUnitPauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:ToggleCheck(false)
+        controls.extraBtn2:OnCheck(true)
     else
         SetPaused(sortedOptions.selection, true)
     end
@@ -1900,7 +1903,7 @@ end
 
 function ToggleUnitUnpauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:OnCheck(true)
+        controls.extraBtn2:OnCheck(false)
     else
         SetPaused(sortedOptions.selection, false)
     end

@@ -1,0 +1,1 @@
+- (#6077) Improve the targeting of the Tempest's anti-torpedo weapon.

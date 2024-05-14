@@ -173,15 +173,17 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
             if self:CanOvercharge() then
                 DefaultProjectileWeapon.IdleState.OnGotTarget(self)
             else
-                self:ForkThread(function()
-                    while self.enabled and not self:CanOvercharge() do
-                        WaitSeconds(0.1)
-                    end
+                ForkThread(self.WaitUntilCanOCThread, self)
+            end
+        end,
 
-                    if self.enabled then
-                        self:OnGotTarget()
-                    end
-                end)
+        WaitUntilCanOCThread = function(self)
+            while self.enabled and not self:CanOvercharge() do
+                WaitSeconds(0.1)
+            end
+
+            if self.enabled then
+                self:OnGotTarget()
             end
         end,
 

@@ -51,7 +51,6 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         self.RotatorManipulator:SetTargetSpeed(30)
         if not self.AnimationManipulator then
             local myBlueprint = self:GetBlueprint()
-            --LOG( 'it is ', repr(myBlueprint.Display.AnimationOpen) )
             self.AnimationManipulator = CreateAnimator(self)
             self.AnimationManipulator:PlayAnim(myBlueprint.Display.AnimationOpen)
             self.Trash:Add(self.AnimationManipulator)

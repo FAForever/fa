@@ -94,7 +94,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 12000,
         BuildCostMass = 1000,
-        BuildTime = 750,
+        BuildTime = 1200,
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
     Footprint = {
@@ -147,7 +147,6 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -167,7 +166,6 @@ UnitBlueprint{
         MeshExtentsX = 1.25,
         MeshExtentsY = 2.8,
         MeshExtentsZ = 1.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 5,
         TurnRate = 100,

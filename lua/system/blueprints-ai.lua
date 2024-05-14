@@ -205,7 +205,7 @@ function SetUnitThreatValues(unitBPs)
                 local surfaceMult = 0.1
 
                 -- determines if we apply dps to economic or anti surface threat
-                local weaponIsEconomicThreat = (weapon.DamageType == 'Nuke' or weapon.ArtilleryShieldBlocks) and (not mobileUnit or weapon.MinRadius > 80)
+                local weaponIsEconomicThreat = (weapon.DamageType == 'Nuke' or weapon.ArtilleryShieldBlocks) and (not mobileUnit and weapon.MaxRadius > 150 or weapon.MinRadius > 80)
 
                 -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
@@ -266,16 +266,6 @@ function SetUnitThreatValues(unitBPs)
                     LOG("Unused " .. v .. " " .. cache[v])
                 end
                 cache[v] = nil
-            end
-        end
-
-        -- Sanitise the table
-        for i, v in cache do
-            -- Round appropriately
-            if v < 1 then
-                cache[i] = 0
-            else
-                cache[i] = MathFloor(v + 0.5)
             end
         end
 
