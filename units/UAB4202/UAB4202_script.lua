@@ -10,6 +10,10 @@
 local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UAB4202 : AShieldStructureUnit
 UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
 
@@ -30,10 +34,12 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         AShieldStructureUnit.OnShieldEnabled(self)
         ShieldEffectsComponent.OnShieldEnabled(self)
 
+        local trash = self.Trash
+
         local orbManip1 = self.OrbManip1
         if not orbManip1 then
             orbManip1 = CreateRotator(self, 'Orb', '-x', nil, 0, 45, 45)
-            self.Trash:Add(self.OrbManip1)
+            TrashBagAdd(trash, orbManip1)
             self.OrbManip1 = orbManip1
         else
             orbManip1:SetSpinDown(false)
@@ -43,7 +49,7 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         local orbManip2 = self.OrbManip2 
         if not orbManip2 then
             orbManip2 = CreateRotator(self, 'Orb', 'z', nil, 0, 45, 45)
-            self.Trash:Add(self.OrbManip2)
+            TrashBagAdd(trash, orbManip2)
             self.OrbManip2 = orbManip2
         else
             orbManip2:SetSpinDown(false)
@@ -55,25 +61,14 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         AShieldStructureUnit.OnShieldDisabled(self)
         ShieldEffectsComponent.OnShieldDisabled(self)
 
-        if self.OrbManip1 then
-            self.OrbManip1:SetSpinDown(true)
+        local orbManip1 = self.OrbManip1
+        if orbManip1 then
+            orbManip1:SetSpinDown(true)
         end
 
-        if self.OrbManip2 then
-            self.OrbManip2:SetSpinDown(true)
-        end
-    end,
-
-    OnKilled = function(self, instigator, type, overkillRatio)
-        AShieldStructureUnit.OnKilled(self, instigator, type, overkillRatio)
-        if self.OrbManip1 then
-            self.OrbManip1:Destroy()
-            self.OrbManip1 = nil
-        end
-
-        if self.OrbManip2 then
-            self.OrbManip2:Destroy()
-            self.OrbManip2 = nil
+        local orbManip2 = self.OrbManip2
+        if orbManip2 then
+            orbManip2:SetSpinDown(true)
         end
     end,
 }
