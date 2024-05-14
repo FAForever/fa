@@ -9,6 +9,28 @@
 local OutputDirectory = "D:/faf-development/fa.wiki/"
 local WikiGeneratorDirectory = "D:/faf-development/BrewWikiGen/"
 
+-- This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required
+local function parse_args(arg)
+    local args = {}
+    for i = 1, #arg do
+        local key, value = arg[i]:match("--([^=]+)=(.*)")
+        if key and value then
+            args[key] = value
+        end
+    end
+    return args
+end
+
+local args = parse_args(arg)
+
+-- Overwrite default values if provided as command-line arguments
+if args.OutputDirectory then
+    OutputDirectory = args.OutputDirectory
+end
+if args.WikiGeneratorDirectory then
+    WikiGeneratorDirectory = args.WikiGeneratorDirectory
+end
+
 EnvironmentData = {
     name = 'Forged Alliance Forever',
     author = 'Gas Powered Games',
