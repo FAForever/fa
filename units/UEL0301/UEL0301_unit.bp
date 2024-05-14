@@ -270,6 +270,7 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
+
         Shield = {
             BuildCostEnergy = 100200,
             BuildCostMass = 2000,
@@ -311,6 +312,7 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
+
         ShieldGeneratorField = {
             BuildCostEnergy = 360800,
             BuildCostMass = 3500,
@@ -351,7 +353,9 @@ UnitBlueprint{
             Slot = "Back",
         },
 
-        -- Left Slot
+        -- Left Slot --
+
+        -- Gun Fire Rate and Damage
         AdvancedCoolingUpgrade = {
             BuildCostEnergy = 44700,
             BuildCostMass = 1000,
@@ -377,6 +381,7 @@ UnitBlueprint{
             },
             Slot = "LCH",
         },
+
         SensorRangeEnhancer = {
             BuildCostEnergy = 20000,
             BuildCostMass = 600,
@@ -406,7 +411,9 @@ UnitBlueprint{
             Slot = "LCH",
         },
 
-        -- Right Slot
+        -- Right Slot --
+
+        -- Gun Splash Radius and Range
         HighExplosiveOrdnance = {
             BuildCostEnergy = 30000,
             BuildCostMass = 800,
@@ -439,6 +446,7 @@ UnitBlueprint{
             },
             Slot = "RCH",
         },
+
         ResourceAllocation = {
             BuildCostEnergy = 90000,
             BuildCostMass = 4500,

@@ -616,7 +616,7 @@ UnitBlueprint{
             },
             FiringTolerance = 2,
             Label = "RightReactonCannon",
-            MaxRadius = 30,
+            MaxRadius = 25,
             MinRadius = 1,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,

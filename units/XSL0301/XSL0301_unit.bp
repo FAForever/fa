@@ -382,6 +382,7 @@ UnitBlueprint{
             Name = "<LOC enhancements_0131>Nano-Repair System",
             NewHealth = 14000,
             NewRegenRate = 250,
+            NewDamageMod = 300,
             ShowBones = { "Back_Upgrade" },
             Slot = "LCH",
             UpgradeEffectBones = {
@@ -410,7 +411,9 @@ UnitBlueprint{
             BuildTime = 4200,
             Icon = "efm",
             Name = "<LOC enhancements_0143>Rapid Fabricator",
-            NewBuildRate = 98,
+            NewBuildRate = 80,
+            ProductionPerSecondEnergy = 400,
+            ProductionPerSecondMass = 4,
             Slot = "LCH",
             UpgradeEffectBones = {
                 "Left_Arm_Muzzle",
