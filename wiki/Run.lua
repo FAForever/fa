@@ -34,13 +34,9 @@ end
 
 local args = parse_args(arg)
 
-print("Key and value pairs in args:")
-for i, v in ipairs(args) do
-    print(i, v)
-end
 
-print("Output Directory: " .. tostring(args[1]))
-print("Wiki Generator Directory: " .. tostring(args[2]))
+print("Output Directory: " .. tostring(args["OutputDirectory"]))
+print("Wiki Generator Directory: " .. tostring(args["WikiGeneratorDirectory"]))
 
 -- Overwrite default values if provided as command-line arguments
 if args["OutputDirectory"] then
