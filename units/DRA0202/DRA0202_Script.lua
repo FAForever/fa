@@ -74,7 +74,7 @@ DRA0202 = ClassUnit(CAirUnit) {
     end,
 
     RotateWings = function(self, target)
-        local trash
+        local trash = self.Trash
 
         if not self.LWingRotator then
             self.LWingRotator = CreateRotator(self, 'B01', 'x')
