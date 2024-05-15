@@ -22,16 +22,29 @@
 #** SOFTWARE.
 #******************************************************************************************************
 
-if [ -d "wiki/generated" ]; then
-    if [ -d "wiki/generated/units" ]; then
-        rm -rf "wiki/generated/units"
+# Process named arguments
+while getopts ":w:f:" opt; do
+    case $opt in
+        w) wiki_dir="$OPTARG";;
+        f) fa_dir="$OPTARG";;
+        \?) echo "Invalid option: -$OPTARG" >&2
+            exit 1;;
+        :) echo "Option -$OPTARG requires an argument." >&2
+            exit 1;;
+    esac
+done
+
+if [ -d "$wiki_dir/generated" ]; then
+    if [ -d "$wiki_dir/generated/units" ]; then
+        rm -rf "$wiki_dir/generated/units"
     fi
 else
-    mkdir "wiki/generated"
+    mkdir "$wiki_dir/generated"
 fi
 
-mkdir "wiki/generated/units"
+create_dirs "$generated_dir"
+create_dirs "$units_dir"
 
-magick mogrify -path "wiki/generated/units" -format png "textures/ui/common/icons/units/*.dds"
+mkdir "$wiki_dir/generated/units"
 
-read -p "Press enter to continue"
+mogrify -path "$wiki_dir/generated/units" -format png "$fa_dir/textures/ui/common/icons/units/*.dds"

@@ -22,16 +22,29 @@
 #** SOFTWARE.
 #******************************************************************************************************
 
-if [ -d "wiki/generated" ]; then
-    if [ -d "wiki/generated/strategicicons" ]; then
-        rm -rf "wiki/generated/strategicicons"
+# Process named arguments
+while getopts ":w:f:" opt; do
+    case $opt in
+        w) wiki_dir="$OPTARG";;
+        f) fa_dir="$OPTARG";;
+        \?) echo "Invalid option: -$OPTARG" >&2
+            exit 1;;
+        :) echo "Option -$OPTARG requires an argument." >&2
+            exit 1;;
+    esac
+done
+
+if [ -d "$wiki_dir/generated" ]; then
+    if [ -d "$wiki_dir/generated/strategicicons" ]; then
+        rm -rf "$wiki_dir/generated/strategicicons"
     fi
 else
-    mkdir "wiki/generated"
+    mkdir "$wiki_dir/generated"
 fi
 
-mkdir "wiki/generated/strategicicons"
+create_dirs "$generated_dir"
+create_dirs "$units_dir"
 
-magick mogrify -path "wiki/generated/strategicicons" -format png "textures/ui/common/game/strategicicons/*.dds"
+mkdir "$wiki_dir/generated/strategicicons"
 
-read -p "Press enter to continue"
+mogrify -path "$wiki_dir/generated/strategicicons" -format png "$fa_dir/textures/ui/common/game/strategicicons/*.dds"
