@@ -127,6 +127,18 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         end
     end,
 
+    ---Fixes a bug with external factories where ordering "deploy" will detach the unit under construction
+    ---@param self UEL0401
+    ---@param attachBone string
+    ---@param unit Unit
+    OnTransportDetach = function(self, attachBone, unit)
+        if not self.Dead and not unit.Dead and unit:GetFractionComplete() < 1.0 then
+            unit:AttachBoneTo(-2, self, attachBone)
+        else
+            TMobileFactoryUnit.OnTransportDetach(self, attachBone, unit)
+        end
+    end,
+
     IdleState = State {
         ---@param self UEL0401
         ---@param unitBeingBuilt Unit
