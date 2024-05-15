@@ -30,6 +30,7 @@ jobs:
             sparse-checkout: |
               wiki
               units
+              projectiles
               textures/ui/common/game/strategicicons
               textures/ui/common/icons/units
 
