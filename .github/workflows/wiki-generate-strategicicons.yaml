@@ -41,6 +41,7 @@ jobs:
           run: |
             ls fa
             ls fa/wiki
+            ls $GITHUB_WORKSPACE
             sudo -E "$GITHUB_WORKSPACE/fa/wiki/icons-convert-strategic.sh"
 
         - name: Store the game version
