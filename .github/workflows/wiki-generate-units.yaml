@@ -58,7 +58,7 @@ jobs:
 
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Unit Icons
-          run: fa/wiki/icons-convert-units.sh
+          run: sudo fa/wiki/icons-convert-units.sh
 
         - name: Replace run.lua
           run: |
