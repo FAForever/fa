@@ -474,7 +474,6 @@ UnitBlueprint{
             Slot = "RCH",
         },
 
-
         Slots = {
             Back = {
                 name = "<LOC _Back>",
