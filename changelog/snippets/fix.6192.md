@@ -1,0 +1,1 @@
+(#6192) Removes an erroneous exFac dummy unit structure footprint, and prevents the fatboy from detaching units under construction when "deploy" is ordered.
