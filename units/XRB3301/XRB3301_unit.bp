@@ -1,6 +1,10 @@
 UnitBlueprint{
     Description = "<LOC xrb3301_desc>Perimeter Monitoring System",
     AI = {
+        TargetBones = {
+            "TargetBone03",
+            "TargetBone02",
+        },
         ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 200,
     },

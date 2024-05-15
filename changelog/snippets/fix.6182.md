@@ -1,0 +1,1 @@
+- (#6182) Enable the target bones for the Soothsayer.

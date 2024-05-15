@@ -245,10 +245,10 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
 
 adj.Hydrocarbon = adj.T2PowerGenerator
 
-for a, buffs in adj do
+for a, buffs in pairs(adj) do
     _G[a .. 'AdjacencyBuffs'] = {}
-    for t, sizes in buffs do
-        for i, add in sizes do
+    for t, sizes in pairs(buffs) do
+        for i, add in pairs(sizes) do
             local size = i * 4
             local display_name = a .. t
             local name = display_name .. 'Size' .. size

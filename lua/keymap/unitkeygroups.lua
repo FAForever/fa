@@ -683,6 +683,7 @@ unitkeygroups = {
     },
     ["T3_Shield_Disruptor"] = {
     "dal0310",
+    "srl0310",
     },
     ["T2_Fighter/Bomber"] = {
         "dea0202",
