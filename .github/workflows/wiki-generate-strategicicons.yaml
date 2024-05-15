@@ -29,6 +29,7 @@ jobs:
             path: ./fa
             sparse-checkout: |
               wiki
+              units
               textures/ui/common/game/strategicicons
               textures/ui/common/icons/units
 
