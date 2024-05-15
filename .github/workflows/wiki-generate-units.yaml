@@ -35,7 +35,8 @@ jobs:
               lua/ui/help/tooltips.lua
               lua/sim/AdjacencyBuffs.lua
               lua/system/Blueprints.lua
-              units
+              units/*_unit.bp
+              units/*_LOD0.scm
               projectiles
               textures/ui/common/game/strategicicons
               textures/ui/common/icons/units
