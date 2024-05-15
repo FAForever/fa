@@ -40,7 +40,7 @@ jobs:
         - name: Convert Strategic Icons
           run: |
             ls -l "$GITHUB_WORKSPACE/fa/wiki/"
-            sudo -E bash "$GITHUB_WORKSPACE/fa/wiki/icons-convert-strategic.sh -w fa.wiki -f fa"
+            sudo -E bash "$GITHUB_WORKSPACE/fa/wiki/icons-convert-strategic.sh" -w fa.wiki -f fa
 
         - name: Store the game version
           id: gameVersionJSON # but it is a string here!
