@@ -1,26 +1,18 @@
 name: FAF Wiki Generator for strategic icons
 
-# not sure if we will use a trigger or if this will be manual? It could trigger on release
 on:
-  push:
-    branches: 
-      - 'feat/github-wf-icons'
-
-
+  workflow_dispatch:
 
 jobs:
 
   prepare-environment:
       runs-on: ubuntu-latest
+      defaults:
+        run:
+          shell: bash
 
       steps:
-        - name: Checkout Brewland Wikigen Repository
-          uses: actions/checkout@v4
-          with:
-            repository: The-Balthazar/BrewWikiGen
-            ref: master
-            path: ./brew-wiki-gen
-
+        # Checkout repos, FA repo is sparse checkout as it is quite large
         - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
           uses: actions/checkout@v4
           with:
@@ -28,10 +20,7 @@ jobs:
             ref: feat/github-wf-icons
             path: ./fa
             sparse-checkout: |
-              wiki
-              units
               textures/ui/common/game/strategicicons
-              textures/ui/common/icons/units
 
         - name: Checkout FAF Wiki Repository
           uses: actions/checkout@v4
@@ -40,38 +29,13 @@ jobs:
             ref: master
             path: ./fa.wiki
 
-        - name: Install Lua 5.4
-          uses: leafo/gh-actions-lua@v10
-          with:
-            luaVersion: "5.4"
-
         - name: Install Image Magick
           run: |
             sudo apt-get install -y imagemagick
 
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Strategic Icons
-          run: |
-            if [ ! -d "fa.wiki/icons/strategicicons" ]; then
-              echo ""fa.wiki/icons/strategicicons" does exist."
-              mkdir "fa.wiki/icons/strategicicons"
-            fi
-
-            mogrify -path "fa.wiki/icons/strategicicons" -format png "fa/textures/ui/common/game/strategicicons/*.dds" -verbose
-
-        - name: Convert Strategic Icons
-          run: |
-            ls "fa/wiki"
-
-        - name: Replace run.lua # tbd
-          uses: canastro/copy-file-action@master
-          with: #source run.lua file
-            source: "fa/wiki/Run.lua"
-            target: "brew-wiki-gen/Run.lua"
-
-        - name: Execute lua run
-          run: |
-           lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/" --FADirectory="fa/"
+          run: fa/wiki/icons-convert-strategic.sh
 
         - name: Store the game version
           id: gameVersionJSON # but it is a string here!
@@ -80,12 +44,12 @@ jobs:
               json=`cat ./version.json`
               echo "json=$json" >> $GITHUB_OUTPUT
 
-        #- name: Update Wiki repository # but it is a string here!
-        #  working-directory: fa.wiki
-        #  run: |
-        #      git config user.email "administrator@faforever.com"
-        #      git config user.name "FAForever"
+        - name: Update Wiki repository # but it is a string here!
+          working-directory: fa.wiki
+          run: |
+              git config user.email "administrator@faforever.com"
+              git config user.name "FAForever"
 
-        #      git stage .
-        #      git commit -m "Update generated data to game version ${{ fromJson(steps.gameVersionJSON.outputs.json).version}}"
-        #      git push origin HEAD:master
+              git stage .
+              git commit -m "Update generated data to game version ${{ fromJson(steps.gameVersionJSON.outputs.json).version}}"
+              git push origin HEAD:master

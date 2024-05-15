@@ -1,20 +1,19 @@
 name: FAF Wiki Generator for unit icons
 
-# not sure if we will use a trigger or if this will be manual? It could trigger on release
 on:
-  push:
-    branches: 
-      - 'feat/github-wf-icons'
-
-
+  workflow_dispatch:
 
 jobs:
 
   prepare-environment:
       runs-on: ubuntu-latest
-
+      defaults:
+        run:
+          shell: bash
+      
       steps:
-        - name: Checkout Brewland Wikigen Repository
+        # Checkout repos, FA repo is sparse checkout as it is quite large
+        - name: Checkout Brewlan Wikigen Repository
           uses: actions/checkout@v4
           with:
             repository: The-Balthazar/BrewWikiGen
@@ -27,8 +26,13 @@ jobs:
             repository: relent0r/fa
             ref: feat/github-wf-icons
             path: ./fa
-            sparse-checkout: |
+            sparse-checkout-cone-mode: |
               wiki
+              loc
+              lua/ui/help/unitscription.lua
+              lua/ui/help/tooltips.lua
+              lua/sim/AdjacencyBuffs.lua
+              lua/system/Blueprints.lua
               units
               projectiles
               textures/ui/common/game/strategicicons
@@ -52,19 +56,11 @@ jobs:
 
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Unit Icons
+          run: fa/wiki/icons-convert-units.sh
+
+        - name: Replace run.lua
           run: |
-            if [ ! -d "fa.wiki/icons/units" ]; then
-              echo "fa.wiki/icons/units does exist."
-              mkdir "fa.wiki/icons/units"
-            fi
-
-            mogrify -path "fa.wiki/icons/units" -format png "fa/textures/ui/common/icons/units/*.dds" -verbose
-
-        - name: Replace run.lua # tbd
-          uses: canastro/copy-file-action@master
-          with: #source run.lua file
-            source: "fa/wiki/Run.lua"
-            target: "brew-wiki-gen/Run.lua"
+              sudo mv fa/wiki/Run.lua brew-wiki-gen/Run.lua
 
         - name: Execute lua run
           run: |
