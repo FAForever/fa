@@ -5,7 +5,6 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import("/lua/shield.lua").Shield
 local EffectUtil = import("/lua/effectutilities.lua")
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local TWeapons = import("/lua/terranweapons.lua")
@@ -16,9 +15,7 @@ local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 UEL0301 = ClassUnit(CommandUnit) {
     IntelEffects = {
         {
-            Bones = {
-                'Jetpack',
-            },
+            Bones = { 'Jetpack' },
             Scale = 0.5,
             Type = 'Jammer01',
         },

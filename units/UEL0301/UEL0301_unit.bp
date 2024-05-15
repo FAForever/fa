@@ -57,7 +57,6 @@ UnitBlueprint{
         "SNIPEMODE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 1028,
         Health = 13000,
@@ -190,17 +189,21 @@ UnitBlueprint{
         TeleportTimeMod = 0.0001,
     },
     EnhancementPresets = {
-        BubbleShield = {
-            Description = "<LOC uel0301_BubbleShield_desc>SACU (Shield preset)",
-            BuildIconSortPriority = 30,
-            Enhancements = {
-                "Shield",
-                "ShieldGeneratorField",
-            },
-            HelpText = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
+        Engineer = {
+            Description = "<LOC uel0301_Engineer_desc>SACU (Engineer preset)",
+            BuildIconSortPriority = 5,
+            Enhancements = { "Pod" },
+            HelpText = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_BubbleShield_name>SACU (Shield preset)",
-            SelectionPriority = 1,
+            UnitName = "<LOC uel0301_Engineer_name>SACU (Engineer preset)",
+        },
+        RAS = {
+            Description = "<LOC uel0301_RAS_desc>SACU (RAS preset)",
+            BuildIconSortPriority = 10,
+            Enhancements = { "ResourceAllocation" },
+            HelpText = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
+            SortCategory = "SORTOTHER",
+            UnitName = "<LOC uel0301_RAS_name>SACU (RAS preset)",
         },
         Combat = {
             Description = "<LOC uel0301_Combat_desc>SACU (Combatant preset)",
@@ -214,21 +217,17 @@ UnitBlueprint{
             UnitName = "<LOC uel0301_Combat_name>SACU (Combatant preset)",
             SelectionPriority = 1,
         },
-        Engineer = {
-            Description = "<LOC uel0301_Engineer_desc>SACU (Engineer preset)",
+        BubbleShield = {
+            Description = "<LOC uel0301_BubbleShield_desc>SACU (Shield preset)",
             BuildIconSortPriority = 20,
-            Enhancements = { "Pod" },
-            HelpText = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
+            Enhancements = {
+                "Shield",
+                "ShieldGeneratorField",
+            },
+            HelpText = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
             SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_Engineer_name>SACU (Engineer preset)",
-        },
-        RAS = {
-            Description = "<LOC uel0301_RAS_desc>SACU (RAS preset)",
-            BuildIconSortPriority = 10,
-            Enhancements = { "ResourceAllocation" },
-            HelpText = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_RAS_name>SACU (RAS preset)",
+            UnitName = "<LOC uel0301_BubbleShield_name>SACU (Shield preset)",
+            SelectionPriority = 1,
         },
         Rambo = {
             Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
@@ -474,6 +473,7 @@ UnitBlueprint{
             },
             Slot = "RCH",
         },
+
 
         Slots = {
             Back = {
