@@ -1,7 +1,6 @@
 name: FAF Wiki Generator for strategic icons
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
 

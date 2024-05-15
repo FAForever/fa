@@ -1,7 +1,6 @@
 name: FAF Wiki Generator for unit icons
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
 
