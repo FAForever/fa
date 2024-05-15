@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC xsl0301_desc>Support Command Unit",
+    Description = "<LOC xsl0301_desc>Support Armored Command Unit",
     AI = {
         GuardScanRadius = 26,
         InitialAutoMode = true,
@@ -61,9 +61,9 @@ UnitBlueprint{
         AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 6155,
-        Health = 12500,
-        MaxHealth = 12500,
-        RegenRate = 12,
+        Health = 15500,
+        MaxHealth = 15500,
+        RegenRate = 15,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 527,
     },
@@ -74,7 +74,6 @@ UnitBlueprint{
             "<LOC ability_engineeringsuite>Engineering Suite",
             "<LOC ability_notcap>Not Capturable",
             "<LOC ability_omni>Omni Sensor",
-            "<LOC ability_regenfield> Regen Field",
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationWalk = "/units/XSL0301/XSL0301_AWalk01.sca",
@@ -197,15 +196,17 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 29250,
-        BuildCostMass = 2250,
-        BuildRate = 40,
-        BuildTime = 14500,
+        BuildCostEnergy = 30200,
+        BuildCostMass = 2400,
+        BuildRate = 56,
+        BuildTime = 14400,
         BuildableCategory = { "BUILTBYTIER3ENGINEER SERAPHIM" },
         MaxBuildDistance = 10,
         NaturalProducer = true,
-        ProductionPerSecondEnergy = 100,
-        ProductionPerSecondMass = 1,
+        ProductionPerSecondEnergy = 300,
+        ProductionPerSecondMass = 3,
+        StorageEnergy = 500,
+        StorageMass = 275,
         TeleportEnergyMod = 5.42,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
@@ -280,8 +281,63 @@ UnitBlueprint{
         },
     },
     Enhancements = {
-
-        -- Back Slot
+        DamageStabilization = {
+            BuildCostEnergy = 74300,
+            BuildCostMass = 2300,
+            BuildTime = 5900,
+            Icon = "dss",
+            Name = "<LOC enhancements_0131>Nano-Repair System",
+            NewHealth = 14000,
+            NewRegenRate = 250,
+            ShowBones = { "Back_Upgrade" },
+            Slot = "LCH",
+            UpgradeEffectBones = {
+                "Left_Arm_Muzzle",
+                "Left_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        DamageStabilizationRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "Back_Upgrade" },
+            Icon = "dss",
+            Name = "<LOC enhancements_0132>Remove Nano-Repair System",
+            Prerequisite = "DamageStabilization",
+            RemoveEnhancements = {
+                "DamageStabilization",
+                "DamageStabilizationRemove",
+            },
+            Slot = "LCH",
+        },
+        EngineeringThroughput = {
+            BuildCostEnergy = 47400,
+            BuildCostMass = 450,
+            BuildTime = 4200,
+            Icon = "efm",
+            Name = "<LOC enhancements_0143>Rapid Fabricator",
+            NewBuildRate = 98,
+            Slot = "LCH",
+            UpgradeEffectBones = {
+                "Left_Arm_Muzzle",
+                "Left_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        EngineeringThroughputRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "efm",
+            Name = "<LOC enhancements_0144>Remove Rapid Fabricator",
+            Prerequisite = "EngineeringThroughput",
+            RemoveEnhancements = {
+                "EngineeringThroughput",
+                "EngineeringThroughputRemove",
+            },
+            Slot = "LCH",
+        },
         EnhancedSensors = {
             BuildCostEnergy = 32100,
             BuildCostMass = 650,
@@ -291,7 +347,6 @@ UnitBlueprint{
             NewMaxRadius = 35,
             NewOmniRadius = 60,
             NewVisionRadius = 36,
-            NewDamageMod = 300,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
@@ -336,6 +391,32 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
+        Overcharge = {
+            BuildCostEnergy = 283500,
+            BuildCostMass = 4500,
+            BuildTime = 12600,
+            Icon = "oc",
+            Name = "<LOC enhancements_0139>Overcharge",
+            Slot = "RCH",
+            UpgradeEffectBones = {
+                "Right_Arm_Muzzle",
+                "Right_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        OverchargeRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "oc",
+            Name = "<LOC enhancements_0140>Remove Overcharge",
+            Prerequisite = "Overcharge",
+            RemoveEnhancements = {
+                "Overcharge",
+                "OverchargeRemove",
+            },
+            Slot = "RCH",
+        },
         Shield = {
             BuildCostEnergy = 107500,
             BuildCostMass = 1050,
@@ -344,7 +425,6 @@ UnitBlueprint{
             ImpactEffects = "SeraphimShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 300,
             Name = "<LOC enhancements_0028>Personal Shield Generator",
-            NewDamageMod = 300,
             OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
             PersonalShield = true,
             RegenAssistMult = 10,
@@ -372,95 +452,22 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
-
-        -- Left Slot
-        DamageStabilization = {
-            BuildCostEnergy = 74300,
-            BuildCostMass = 2300,
-            BuildTime = 5900,
-            Icon = "dss",
-            Name = "<LOC enhancements_0131>Nano-Repair System",
-            NewHealth = 14000,
-            NewRegenRate = 250,
-            NewDamageMod = 300,
-            ShowBones = { "Back_Upgrade" },
-            Slot = "LCH",
-            UpgradeEffectBones = {
-                "Left_Arm_Muzzle",
-                "Left_Arm_Barrel",
+        Slots = {
+            Back = {
+                name = "<LOC _Back>",
+                x = -13,
+                y = -8,
             },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        DamageStabilizationRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "Back_Upgrade" },
-            Icon = "dss",
-            Name = "<LOC enhancements_0132>Remove Nano-Repair System",
-            Prerequisite = "DamageStabilization",
-            RemoveEnhancements = {
-                "DamageStabilization",
-                "DamageStabilizationRemove",
+            LCH = {
+                name = "<LOC _LCH>",
+                x = 60,
+                y = 50,
             },
-            Slot = "LCH",
-        },
-        EngineeringThroughput = {
-            BuildCostEnergy = 47400,
-            BuildCostMass = 450,
-            BuildTime = 4200,
-            Icon = "efm",
-            Name = "<LOC enhancements_0143>Rapid Fabricator",
-            NewBuildRate = 80,
-            ProductionPerSecondEnergy = 400,
-            ProductionPerSecondMass = 4,
-            Slot = "LCH",
-            UpgradeEffectBones = {
-                "Left_Arm_Muzzle",
-                "Left_Arm_Barrel",
+            RCH = {
+                name = "<LOC _RCH>",
+                x = -16,
+                y = 50,
             },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        EngineeringThroughputRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "efm",
-            Name = "<LOC enhancements_0144>Remove Rapid Fabricator",
-            Prerequisite = "EngineeringThroughput",
-            RemoveEnhancements = {
-                "EngineeringThroughput",
-                "EngineeringThroughputRemove",
-            },
-            Slot = "LCH",
-        },
-
-        -- Right Slot
-        Overcharge = {
-            BuildCostEnergy = 283500,
-            BuildCostMass = 4500,
-            BuildTime = 12600,
-            Icon = "oc",
-            Name = "<LOC enhancements_0139>Overcharge",
-            Slot = "RCH",
-            UpgradeEffectBones = {
-                "Right_Arm_Muzzle",
-                "Right_Arm_Barrel",
-            },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        OverchargeRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "oc",
-            Name = "<LOC enhancements_0140>Remove Overcharge",
-            Prerequisite = "Overcharge",
-            RemoveEnhancements = {
-                "Overcharge",
-                "OverchargeRemove",
-            },
-            Slot = "RCH",
         },
         Teleporter = {
             BuildCostEnergy = 1500000,
@@ -490,24 +497,6 @@ UnitBlueprint{
                 "TeleporterRemove",
             },
             Slot = "RCH",
-        },
-
-        Slots = {
-            Back = {
-                name = "<LOC _Back>",
-                x = -13,
-                y = -8,
-            },
-            LCH = {
-                name = "<LOC _LCH>",
-                x = 60,
-                y = 50,
-            },
-            RCH = {
-                name = "<LOC _RCH>",
-                x = -16,
-                y = 50,
-            },
         },
     },
     General = {
@@ -555,6 +544,7 @@ UnitBlueprint{
     LifeBarOffset = 0.4,
     LifeBarSize = 0.9,
     Physics = {
+        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -573,6 +563,7 @@ UnitBlueprint{
         MeshExtentsX = 1.25,
         MeshExtentsY = 1.9,
         MeshExtentsZ = 1.75,
+        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -607,7 +598,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 100,
+            Damage = 400,
             DamageType = "Normal",
             DisplayName = "Light Chronotron Cannon",
             FireTargetLayerCapsTable = {
@@ -929,12 +920,9 @@ UnitBlueprint{
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true,
+            Seabed = false,
             Sub = false,
             Water = false,
         },
     },
 }
-
-
---TODO: Add small regen field to the SCU
