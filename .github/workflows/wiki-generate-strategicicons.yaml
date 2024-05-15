@@ -22,6 +22,7 @@ jobs:
             ref: feat/github-wf-icons
             path: ./fa
             sparse-checkout: |
+              wiki
               textures/ui/common/game/strategicicons
 
         - name: Checkout FAF Wiki Repository
