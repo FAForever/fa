@@ -42,9 +42,6 @@ else
     mkdir "$wiki_dir/generated"
 fi
 
-create_dirs "$generated_dir"
-create_dirs "$units_dir"
-
 mkdir "$wiki_dir/generated/strategicicons"
 
 mogrify -path "$wiki_dir/generated/strategicicons" -format png "$fa_dir/textures/ui/common/game/strategicicons/*.dds"

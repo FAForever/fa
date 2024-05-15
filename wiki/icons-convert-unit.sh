@@ -42,9 +42,6 @@ else
     mkdir "$wiki_dir/generated"
 fi
 
-create_dirs "$generated_dir"
-create_dirs "$units_dir"
-
 mkdir "$wiki_dir/generated/units"
 
 mogrify -path "$wiki_dir/generated/units" -format png "$fa_dir/textures/ui/common/icons/units/*.dds"
