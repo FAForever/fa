@@ -59,6 +59,7 @@ jobs:
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Unit Icons
           run: |
+            ls -l $GITHUB_WORKSPACE/fa/wiki
             sudo -E bash "$GITHUB_WORKSPACE/fa/wiki/icons-convert-units.sh" -w fa.wiki -f fa
 
         - name: Replace run.lua
