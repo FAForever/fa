@@ -36,7 +36,7 @@ if args["FADirectory"] then
     FADirectory = args["FADirectory"]
 end
 
-print("Directories being used")
+print("Directories set")
 print("Output Directory: " ..OutputDirectory)
 print("Wiki Generator Directory: " ..WikiGeneratorDirectory)
 print("FA Directory: " ..FADirectory)
