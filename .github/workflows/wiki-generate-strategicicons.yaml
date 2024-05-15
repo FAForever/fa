@@ -40,7 +40,7 @@ jobs:
         - name: Convert Strategic Icons
           run: |
             ls fa
-            la fa/wiki
+            ls fa/wiki
             sudo -E fa/wiki/icons-convert-strategic.sh
 
         - name: Store the game version
