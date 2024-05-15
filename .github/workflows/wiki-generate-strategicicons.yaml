@@ -1,6 +1,9 @@
 name: FAF Wiki Generator for strategic icons
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - 'feat/github-wf-icons'
 
 jobs:
 
