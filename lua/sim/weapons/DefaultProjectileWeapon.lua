@@ -881,6 +881,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
+            -- Bombers should not have their targets reset since they take a large path much longer than their reload time.
             if not (IsDestroyed(unit) or IsDestroyed(self)) and not bp.NeedToComputeBombDrop then
                 if bp.TargetResetWhenReady then
 
@@ -893,13 +894,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     self:ResetTarget()
                 else
 
-                    -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
-                    -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
+                    -- attempts to fix weapons being stuck on targets that are outside their current attack radius, but inside
+                    -- the tracking radius. This happens when the weapon acquires a target, but never actually fires and
                     -- therefore the thread of this state is not destroyed
 
-                    -- wait reload time + 2 seconds, then force the weapon to recheck its target
+                    -- wait reload time + 3 seconds, then force the weapon to recheck its target
                     WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
-                    self:ResetTarget() -- this breaks AttackGroundTries for bombers
+                    self:ResetTarget()
                 end
             end
         end,
