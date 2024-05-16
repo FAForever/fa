@@ -22,8 +22,8 @@ local MathClamp = math.clamp
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
 ---@field RecoilManipulators? TrashBag
----@field CurrentSalvoNumber number
----@field CurrentRackSalvoNumber number
+---@field CurrentSalvoNumber number         # Current shot we are on in the current rack
+---@field CurrentRackSalvoNumber number     # Current rack we are on in the current salvo
 ---@field CurrentSalvoData? WeaponSalvoData
 ---@field AdjustedSalvoDelay? number if the weapon blueprint requests a trajectory fix, this is set to the effective duration of the salvo in ticks used to calculate projectile spread
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
