@@ -1146,7 +1146,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 -- it's usually okay for a salvo to continue firing unless MuzzleVelocityReduceDistance is present, which requires a target to always exist
                 -- or else the projectile will fire at a very high speed, so we need to pack up/idle in that case
                 local bp = self.Blueprint
-                if bp.MuzzleVelocityReduceDistance then
+                if bp.MuzzleVelocityReduceDistance > 0 then
                     if bp.WeaponUnpacks then
                         ChangeState(self, self.WeaponPackingState)
                     else
