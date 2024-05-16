@@ -22,26 +22,16 @@
 #** SOFTWARE.
 #******************************************************************************************************
 
-# Process named arguments
-while getopts ":w:f:" opt; do
-    case $opt in
-        w) wiki_dir="$OPTARG";;
-        f) fa_dir="$OPTARG";;
-        \?) echo "Invalid option: -$OPTARG" >&2
-            exit 1;;
-        :) echo "Option -$OPTARG requires an argument." >&2
-            exit 1;;
-    esac
-done
-
-if [ -d "$wiki_dir/generated" ]; then
-    if [ -d "$wiki_dir/generated/strategicicons" ]; then
-        rm -rf "$wiki_dir/generated/strategicicons"
+if [ -d "wiki/generated" ]; then
+    if [ -d "wiki/generated/strategicicons" ]; then
+        rm -rf "wiki/generated/strategicicons"
     fi
 else
-    mkdir "$wiki_dir/generated"
+    mkdir "wiki/generated"
 fi
 
-mkdir "$wiki_dir/generated/strategicicons"
+mkdir "wiki/generated/strategicicons"
 
-mogrify -path "$wiki_dir/generated/strategicicons" -format png "$fa_dir/textures/ui/common/game/strategicicons/*.dds"
+magick mogrify -path "wiki/generated/strategicicons" -format png "textures/ui/common/game/strategicicons/*.dds"
+
+read -p "Press enter to continue"

@@ -38,8 +38,9 @@ jobs:
 
         # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
         - name: Convert Strategic Icons
+          working-directory: $GITHUB_WORKSPACE/fa
           run: |
-            $GITHUB_WORKSPACE/fa/wiki/icons-convert-strategic.sh -w fa.wiki -f fa
+            wiki/icons-convert-strategic.sh
 
         - name: Store the game version
           id: gameVersionJSON # but it is a string here!
