@@ -34,4 +34,4 @@ mkdir "wiki/generated/units"
 
 mogrify -path "wiki/generated/units" -format png "textures/ui/common/icons/units/*.dds"
 
-read -p "Press enter to continue"
+#read -p "Press enter to continue"

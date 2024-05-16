@@ -34,4 +34,4 @@ mkdir "wiki/generated/strategicicons"
 
 mogrify -path "wiki/generated/strategicicons" -format png "textures/ui/common/game/strategicicons/*.dds"
 
-read -p "Press enter to continue"
+#read -p "Press enter to continue"
