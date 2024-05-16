@@ -32,6 +32,6 @@ fi
 
 mkdir "wiki/generated/units"
 
-magick mogrify -path "wiki/generated/units" -format png "textures/ui/common/icons/units/*.dds"
+mogrify -path "wiki/generated/units" -format png "textures/ui/common/icons/units/*.dds"
 
 read -p "Press enter to continue"
