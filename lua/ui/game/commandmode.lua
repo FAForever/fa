@@ -480,67 +480,62 @@ local function OnGuardCopy(guardees, unit)
     end
 end
 
---- Is called when a unit receies a guard / assist order
----@param guardees UserUnit[]
----@param unit UserUnit
-local function OnGuard(guardees, unit)
-    if unit:GetArmy() == GetFocusArmy() then
-        OnGuardUpgrade(guardees, unit)
-        OnGuardUnpause(guardees, unit)
-        OnGuardCopy(guardees, unit)
+function OnReclaimIssued(command)
+    -- Area reclaim dragger, command mode only
+    if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
     end
 end
 
---- Called by the engine when a new command has been issued by the player.
--- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
----@param command UserCommand
----@return boolean
-function OnCommandIssued(command)
-
-    -- Area reclaim dragger, command mode only
-    if command.CommandType == 'Reclaim' and command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
-    end
-
-    -- Area reclaim dragger, command mode only
-    if command.CommandType == 'Attack' and command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
+function OnAttackIssued(command)
+    -- Area attack dragger, command mode only
+    if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
         import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
     end
+end
 
+function OnUpgradeIssued(command)
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
-    if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then
+    if (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then
         if not IsKeyDown('Shift') then
             SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true)
         end
     end
+end
 
-    -- unusual command, where we use the build interface
-    if modeData.callback and command.CommandType == "BuildMobile" and (not command.Units[1]) then
-        modeData.callback(modeData, command)
-        return false
+function OnBuildMobileIssued(command)
+    if not command.Units[1] then
+        if modeData.callback then -- unusual command, where we use the build interface
+            modeData.callback(modeData, command)
+            return true
+        elseif modeData.cheat then -- part of the cheat menu
+            CheatSpawn(command, modeData)
+            command.Units = {}
+            return true
+        end
     end
+    -- add a small animation (just change the 2nd argument to 5 and back)
+    AddCommandFeedbackBlip(
+        {
+            Position = command.Target.Position,
+            BlueprintID = command.Blueprint,
+            TextureName = '/meshes/game/flag02d_albedo.dds',
+            ShaderName = 'CommandFeedback',
+            UniformScale = 1,
+        },
+        0.7
+    )
+end
 
-    -- part of the cheat menu
-    if modeData.cheat and command.CommandType == "BuildMobile" and (not command.Units[1]) then
-        CheatSpawn(command, modeData)
-        command.Units = {}
-        return false
-    end
-
-    -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
-    if not command.Clear then
-        issuedOneCommand = true
-    else
-        EndCommandMode(true)
-    end
-
-    -- called when:
-    -- - a factory-like construction that is not finished is being continued
-    -- - a (finished) unit is being guarded (right clicked)
-    if command.CommandType == 'Guard' and command.Target.EntityId then
-
+function OnGuardIssued(command)
+    if command.Target.EntityId then
         local unit = GetUnitById(command.Target.EntityId)
-        OnGuard(command.Units, unit)
+        local guardees = command.Units
+        if unit:GetArmy() == GetFocusArmy() then
+            OnGuardUpgrade(guardees, unit)
+            OnGuardUnpause(guardees, unit)
+            OnGuardCopy(guardees, unit)
+        end
 
         -- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then
@@ -564,79 +559,85 @@ function OnCommandIssued(command)
             local units = command.Units --[[@as (UserUnit[])]]
             import("/lua/ui/game/hotkeys/capping.lua").AssistToCap(target, units)
         end
+    end
+end
 
-        -- called when:
-        -- - a construction is started
-    elseif command.CommandType == 'BuildMobile' then
-        -- add a small animation (just change the 2nd argument to 5 and back)
-        AddCommandFeedbackBlip(
-            {
-                Position = command.Target.Position,
-                BlueprintID = command.Blueprint,
-                TextureName = '/meshes/game/flag02d_albedo.dds',
-                ShaderName = 'CommandFeedback',
-                UniformScale = 1,
-            },
-            0.7
-        )
-
-        -- called when:
-        -- - a construction is being continued building (for non-factory units)
-        -- - a construction is being repaired
-    elseif command.CommandType == 'Repair' then
-
-        -- see if we can rebuild a structure
-        if command.Target.Type == 'Entity' then -- repair wreck to rebuild
-            local cb = { Func = "Rebuild", Args = { entity = command.Target.EntityId, Clear = command.Clear } }
-            SimCallback(cb, true)
-        end
-
-        -- called when:
-        -- - ?
-    elseif command.CommandType == 'Script' and command.LuaParams.TaskName == 'AttackMove' then
-        local avgPoint = { 0, 0 }
-        for _, unit in command.Units do
-            avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
-            avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
-        end
-        avgPoint[1] = avgPoint[1] / TableGetN(command.Units)
-        avgPoint[2] = avgPoint[2] / TableGetN(command.Units)
-
-        avgPoint[1] = command.Target.Position[1] - avgPoint[1]
-        avgPoint[2] = command.Target.Position[3] - avgPoint[2]
-
-        local rotation = MathAtan(avgPoint[1] / avgPoint[2])
-        rotation = rotation * 180 / MathPi
-        if avgPoint[2] < 0 then
-            rotation = rotation + 180
-        end
-        local cb = { Func = "AttackMove", Args = { Target = command.Target.Position, Rotation = rotation,
-            Clear = command.Clear } }
+function OnRepairIssued(command)
+    -- see if we can rebuild a structure
+    if command.Target.Type == 'Entity' then -- repair wreck to rebuild
+        local cb = { Func = "Rebuild", Args = { entity = command.Target.EntityId, Clear = command.Clear } }
         SimCallback(cb, true)
-        AddDefaultCommandFeedbackBlips(command.Target.Position)
+    end
+end
 
-        -- called when:
-        -- - ?
-    elseif command.Clear == true and command.CommandType ~= 'Stop' and TableGetN(command.Units) == 1 and
-        checkBadClean(command.Units[1]) then
-        watchForQueueChange(command.Units[1])
+function OnScriptIssued(command)
+    if command.LuaParams then
+        if command.LuaParams.TaskName == 'AttackMove' then
+            local avgPoint = { 0, 0 }
+            for _, unit in command.Units do
+                avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
+                avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
+            end
+            avgPoint[1] = avgPoint[1] / TableGetN(command.Units)
+            avgPoint[2] = avgPoint[2] / TableGetN(command.Units)
 
-        -- called when:
-        -- - ?
-    elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
-        EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
+            avgPoint[1] = command.Target.Position[1] - avgPoint[1]
+            avgPoint[2] = command.Target.Position[3] - avgPoint[2]
 
-        -- called when:
-        -- - a generic stop command is issued
-    elseif command.CommandType == 'Stop' then
-        EnhancementQueueFile.clearEnhancements(command.Units)
-
-        -- called when:
-        -- - none of the above applies
-    else
-        if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
-            AddDefaultCommandFeedbackBlips(command.Target.Position)
+            local rotation = MathAtan(avgPoint[1] / avgPoint[2])
+            rotation = rotation * 180 / MathPi
+            if avgPoint[2] < 0 then
+                rotation = rotation + 180
+            end
+            local cb = { Func = "AttackMove", Args = { Target = command.Target.Position, Rotation = rotation,
+                Clear = command.Clear } }
+            SimCallback(cb, true)
+        elseif command.LuaParams.Enhancement then
+            EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
         end
+    end
+end
+
+function OnStopIssued(command)
+    EnhancementQueueFile.clearEnhancements(command.Units)
+end
+
+OnCommandIssuedCallback = {
+    Reclaim = OnReclaimIssued,
+    Attack = OnAttackIssued,
+    Upgrade = OnUpgradeIssued,
+    BuildMobile = OnBuildMobileIssued,
+    Guard = OnGuardIssued,
+    Repair = OnRepairIssued,
+    Script = OnScriptIssued,
+    Stop = OnStopIssued,
+}
+
+--- Called by the engine when a new command has been issued by the player.
+-- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
+---@param command UserCommand
+function OnCommandIssued(command)
+
+    -- If our callback returns true, we skip the rest of our logic
+    if OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command) then
+        return
+    end
+
+    -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
+    if not command.Clear then
+        issuedOneCommand = true
+    else
+        EndCommandMode(true)
+        if command.CommandType ~= 'Stop'
+        and TableGetN(command.Units) == 1
+        and checkBadClean(command.Units[1]) then
+            watchForQueueChange(command.Units[1])
+        end
+    end
+
+    if not AddCommandFeedbackByType(command.Target.Position, command.CommandType) then
+        LOG('Default command blip')
+        AddDefaultCommandFeedbackBlips(command.Target.Position)
     end
 end
 
