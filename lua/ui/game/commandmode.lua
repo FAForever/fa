@@ -532,12 +532,12 @@ end
 
 function OnGuardIssued(command)
     if command.Target.EntityId then
-        local unit = GetUnitById(command.Target.EntityId)
-        local guardees = command.Units
+        local unit = GetUnitById(command.Target.EntityId) ---@cast unit UserUnit
+        local guards = command.Units
         if unit:GetArmy() == GetFocusArmy() then
-            OnGuardUpgrade(guardees, unit)
-            OnGuardUnpause(guardees, unit)
-            OnGuardCopy(guardees, unit)
+            OnGuardUpgrade(guards, unit)
+            OnGuardUnpause(guards, unit)
+            OnGuardCopy(guards, unit)
         end
 
         -- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
