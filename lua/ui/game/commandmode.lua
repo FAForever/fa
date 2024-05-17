@@ -255,9 +255,7 @@ end
 -- @param pos The position of the feedback animation.
 -- @param type The type of feedback animation.
 function AddCommandFeedbackByType(pos, type)
-    if commandMeshResources[type] == nil then
-        return false;
-    else
+    if commandMeshResources[type] then
         AddCommandFeedbackBlip(
             {
                 Position = pos,
@@ -268,9 +266,8 @@ function AddCommandFeedbackByType(pos, type)
             },
             0.7
         )
+        return true
     end
-
-    return true;
 end
 
 --- A helper function for a specific feedback animation.
