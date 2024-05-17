@@ -46,8 +46,8 @@ local MathAtan = math.atan
 --- | 'BuildMobile'
 --- | 'Tactical'
 --- | 'Nuke'
---- | 'TransportReverseLoadUnits' # when you right click a transport
---- | 'TransportLoadUnits' # when you right click a unit with a transport in your selection
+--- | 'TransportReverseLoadUnits' # when you select a transport and right click a unit
+--- | 'TransportLoadUnits' # when you select a unit and right click a transport
 --- | 'TransportUnloadUnits'
 --- | 'TransportUnloadSpecificUnits' # when you click to unload specific units
 --- | 'Ferry'
