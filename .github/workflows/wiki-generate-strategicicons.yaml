@@ -14,7 +14,7 @@ jobs:
           shell: bash
 
       steps:
-        # Checkout repos, FA repo is sparse checkout as it is quite large
+        # Checkout repos
         - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
           uses: actions/checkout@v4
           with:
@@ -24,7 +24,7 @@ jobs:
             sparse-checkout: |
               wiki
               textures/ui/common/game/strategicicons
-
+        # FA repo is sparse checkout as it is quite large and we dont won't to incur higher action minutes for no reason
         - name: Checkout FAF Wiki Repository
           uses: actions/checkout@v4
           with:

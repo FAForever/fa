@@ -21,7 +21,7 @@ jobs:
             repository: The-Balthazar/BrewWikiGen
             ref: master
             path: ./brew-wiki-gen
-
+        # FA repo is sparse checkout as it is quite large and we dont won't to incur higher action minutes for no reason
         - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
           uses: actions/checkout@v4
           with:
