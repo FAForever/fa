@@ -78,6 +78,7 @@ local MathAtan = math.atan
 ---@field LuaParams table
 ---@field Target UserCommandTarget
 ---@field Units UserUnit[]
+---@field SkipBlip? boolean # if we don't have a feedback blip defined, skips the default command blip
 
 ---@class MeshInfo
 ---@field Position Vector
@@ -251,27 +252,8 @@ function InCommandMode()
     return commandMode ~= false
 end
 
---- A helper function to add the correct feedback animation.
--- @param pos The position of the feedback animation.
--- @param type The type of feedback animation.
-function AddCommandFeedbackByType(pos, type)
-    if commandMeshResources[type] then
-        AddCommandFeedbackBlip(
-            {
-                Position = pos,
-                MeshName = commandMeshResources[type][1],
-                TextureName = commandMeshResources[type][2],
-                ShaderName = 'CommandFeedback',
-                UniformScale = 0.125,
-            },
-            0.7
-        )
-        return true
-    end
-end
-
---- A helper function for a specific feedback animation.
--- @param pos The position of the feedback animation.
+---Helper function for a default feedback blip animation
+---@param pos Vector Position of the feedback animation
 function AddDefaultCommandFeedbackBlips(pos)
     AddCommandFeedbackBlip(
         {
@@ -294,6 +276,26 @@ function AddDefaultCommandFeedbackBlips(pos)
         },
         0.75
     )
+end
+
+---Helper function for a feedback blip animation based on the command type
+---@param command UserCommand
+function AddCommandFeedbackByType(command)
+    local meshResource = commandMeshResources[command.CommandType]
+    if meshResource then
+        AddCommandFeedbackBlip(
+            {
+                Position = command.Target.Position,
+                MeshName = meshResource[1],
+                TextureName = meshResource[2],
+                ShaderName = 'CommandFeedback',
+                UniformScale = 0.125,
+            },
+            0.7
+        )
+    elseif not command.SkipBlip then
+        AddDefaultCommandFeedbackBlips(command.Target.Position)
+    end
 end
 
 --- Creates a callback to spawn a unit triggered by the cheat menu.
@@ -514,7 +516,8 @@ function OnBuildMobileIssued(command)
             return true
         end
     end
-    -- add a small animation (just change the 2nd argument to 5 and back)
+    -- We want our command feedback blip to match the blueprint, and we want to skip the default
+    command.SkipBlip = true
     AddCommandFeedbackBlip(
         {
             Position = command.Target.Position,
@@ -618,11 +621,11 @@ OnCommandIssuedCallback = {
 ---@param command UserCommand
 function OnCommandIssued(command)
 
-    -- If our callback returns true, we skip the rest of our logic
-    if OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command) then
+    -- If our callback returns true or we don't have a command type, we skip the rest of our logic
+    if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
+    or command.CommandType == 'None' then
         return
     end
-
     -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
     if not command.Clear then
         issuedOneCommand = true
@@ -635,10 +638,7 @@ function OnCommandIssued(command)
         end
     end
 
-    if not AddCommandFeedbackByType(command.Target.Position, command.CommandType) then
-        LOG('Default command blip')
-        AddDefaultCommandFeedbackBlips(command.Target.Position)
-    end
+    AddCommandFeedbackByType(command)
 end
 
 --- ???
