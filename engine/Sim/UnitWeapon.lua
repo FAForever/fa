@@ -96,8 +96,8 @@ end
 function UnitWeapon:GetCurrentTargetPos()
 end
 
---- Gets the firing clock percent, `0.0` - `1.0`
----@return number
+--- Returns the progress of the engine's firing clock determined by RateOfFire in the weapon blueprint
+---@return number # within [0.0, 1.0]
 function UnitWeapon:GetFireClockPct()
 end
 
@@ -111,8 +111,9 @@ end
 function UnitWeapon:GetProjectileBlueprint()
 end
 
----
----@param label string
+--- Returns true if the given AimManipulator is the weapon's fire control
+---@see SetFireControl
+---@param label string label that was used to create the AimManipulator
 ---@return boolean
 function UnitWeapon:IsFireControl(label)
 end
@@ -131,8 +132,8 @@ end
 function UnitWeapon:SetEnabled(enabled)
 end
 
----
----@param label string
+--- Set which AimManipulator will call OnFire for the weapon when that manipulator has finished tracking
+---@param label string label that was used to create the AimManipulator
 function UnitWeapon:SetFireControl(label)
 end
 
@@ -165,7 +166,8 @@ end
 function UnitWeapon:TransferTarget()
 end
 
----
+--- Returns true if the weapon currently has a target.
+--- This only updates at the end of a tick, so it shouldn't be used in behavior relating to OnLostTarget or OnGotTarget callbacks
 ---@return boolean
 function UnitWeapon:WeaponHasTarget()
 end
