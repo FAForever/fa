@@ -14,6 +14,11 @@ local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
 
+function LOGWeapon(self, string)
+    LOG(("T: %d WeaponId: %s %s"):format(GetGameTick(), tostring(self), string))
+    -- LOG(("T: %d HasTarget? %s"):format(GetGameTick(), self:WeaponHasTarget() and "true" or "false"))
+end
+
 ---@class WeaponSalvoData
 ---@field target? Unit | Prop   if absent, will use `targetPos` instead
 ---@field targetPos Vector      stores the last location upon which we dropped bombs for a target, or the ground fire location
@@ -139,6 +144,18 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 self.AdjustedSalvoDelay = 5 * bp.MuzzleSalvoDelay
             end
         end
+
+        self:ForkThread(function()
+            local lastCond = nil
+            while not self:BeenDestroyed() do
+                local cond = self:CanFire()
+                if cond ~= lastCond then
+                    LOGWeapon(self, "changed CanFire: " .. tostring(cond))
+                    lastCond = cond
+                end
+                WaitTicks(1)
+            end
+        end)
 
         ChangeState(self, self.IdleState)
     end,
@@ -910,6 +927,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
         end,
+
+        OnLostTarget = function(self)
+            -- self.__base.OnLostTarget(self)
+            LOGWeapon(self, self.StateName .. " OnLostTarget")
+        end,
+
+        OnGotTarget = function(self)
+            Weapon.OnGotTarget(self)
+            LOG("T: " .. GetGameTick() .. " " .. self.StateName .. " OnGotTarget")
+        end,
+
+        OnStartTracking = function(self)
+            Weapon.OnStartTracking(self)
+            LOG("T: " .. GetGameTick() .. " " .. self.StateName .. " OnStartTracking")
+        end,
+
+        OnStopTracking = function(self)
+            Weapon.OnStopTracking(self)
+            LOG("T: " .. GetGameTick() .. " " .. self.StateName .. " OnStopTracking")
+        end,
     },
 
     -- This state is for when the weapon is actually in the process of firing
@@ -1050,6 +1087,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
 
                     local proj = self:CreateProjectileAtMuzzle(muzzle)
+                    LOGWeapon(self, string.format("Fired! Shot #%d Rack #%d", self.CurrentSalvoNumber or -1, self.CurrentRackSalvoNumber or -1) )
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
