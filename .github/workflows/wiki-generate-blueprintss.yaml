@@ -38,8 +38,6 @@ jobs:
               units/*_unit.bp
               units/*_LOD0.scm
               projectiles
-              textures/ui/common/game/strategicicons
-              textures/ui/common/icons/units
 
         - name: Checkout FAF Wiki Repository
           uses: actions/checkout@v4
@@ -53,16 +51,6 @@ jobs:
           with:
             luaVersion: "5.4"
 
-        - name: Install Image Magick
-          run: |
-            sudo apt-get install -y imagemagick
-
-        # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
-        - name: Convert Unit Icons
-          working-directory: fa
-          run: |
-            wiki/icons-convert-unit.sh
-
         - name: Replace run.lua
           run: |
               sudo mv fa/wiki/Run.lua brew-wiki-gen/Run.lua
@@ -71,21 +59,28 @@ jobs:
           run: |
             lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/" --FADirectory="fa/"
 
-        - name: Store the game version
-          id: gameVersionJSON # but it is a string here!
-          working-directory: app/data
-          run: |
-              json=`cat ./version.json`
-              echo "json=$json" >> $GITHUB_OUTPUT
+  
+        - name: Upload as artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: Wiki
+            path: fa.wiki
 
-        - name: Update Wiki repository # but it is a string here!
-          working-directory: fa.wiki
-          run: |
-              git config user.email "administrator@faforever.com"
-              git config user.name "FAForever"
+        #- name: Store the game version
+        #  id: gameVersionJSON # but it is a string here!
+        #  working-directory: app/data
+        #  run: |
+        #      json=`cat ./version.json`
+        #      echo "json=$json" >> $GITHUB_OUTPUT
 
-              git stage .
-              git commit -m "Update generated data to game version ${{ fromJson(steps.gameVersionJSON.outputs.json).version}}"
-              git push origin HEAD:master
+        #- name: Update Wiki repository # but it is a string here!
+        #  working-directory: fa.wiki
+        #  run: |
+        #      git config user.email "administrator@faforever.com"
+        #      git config user.name "FAForever"
+
+        #      git stage .
+        #      git commit -m "Update generated data to game version ${{ fromJson(steps.gameVersionJSON.outputs.json).version}}"
+        #      git push origin HEAD:master
         
 
