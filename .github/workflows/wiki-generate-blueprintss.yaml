@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  prepare-environment:
+  generate-blueprints:
       runs-on: ubuntu-latest
       defaults:
         run:

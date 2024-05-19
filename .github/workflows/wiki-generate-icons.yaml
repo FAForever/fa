@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  prepare-environment:
+  generate-icons:
       runs-on: ubuntu-latest
       defaults:
         run:
