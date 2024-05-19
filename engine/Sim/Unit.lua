@@ -122,6 +122,7 @@ function Unit:GetArmorMult(damageTypeName)
 end
 
 --- Returns the tactical attack manager object of this unit
+--- The attacker implementation is unfinished, so using this freezes the sim!
 ---@return Attacker
 function Unit:GetAttacker()
 end

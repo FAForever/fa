@@ -1,5 +1,8 @@
 ---@meta
 
+-- The attacker implementation is unfinished, and using any of these methods freezes the sim!
+
+--- "tactical attack manager object"
 ---@class moho.CAiAttackerImpl_methods
 local CAiAttackerImpl = {}
 
