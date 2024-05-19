@@ -8,7 +8,7 @@ local UnitWeapon = {}
 function UnitWeapon:BeenDestroyed()
 end
 
----
+--- Returns true if the weapon is aiming at the target as allowed by the FiringTolerance blueprint value and the target is within the weapon's range
 ---@return boolean
 function UnitWeapon:CanFire()
 end
@@ -96,7 +96,8 @@ end
 function UnitWeapon:GetCurrentTargetPos()
 end
 
---- Returns the progress of the engine's firing clock determined by RateOfFire in the weapon blueprint
+--- Returns the progress of the engine's firing clock determined by RateOfFire, usually from the blueprint
+---@see ChangeRateOfFire
 ---@return number # within [0.0, 1.0]
 function UnitWeapon:GetFireClockPct()
 end

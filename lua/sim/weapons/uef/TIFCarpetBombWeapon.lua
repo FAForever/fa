@@ -43,6 +43,7 @@ TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
                 -- we don't want to keep updating this location, so remove the target.
                 data.target = nil
             end
+            -- every shot the target position has to be updated to a fixed position so that the bomb projectile bp's `RealisticOrdinance = true` doesn't track the target unit
             self:SetTargetGround(data.targetPos)
         end
         return DefaultProjectileWeaponCreateProjectileAtMuzzle(self, muzzle)
