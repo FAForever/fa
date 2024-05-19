@@ -1,9 +1,7 @@
-name: FAF Wiki Generator for unit icons
+name: FAF Wiki Generator for Blueprints
 
 on:
-  push:
-    branches:
-      - 'feat/github-wf-icons'
+  workflow_dispatch:
 
 jobs:
 
@@ -25,8 +23,8 @@ jobs:
         - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
           uses: actions/checkout@v4
           with:
-            repository: relent0r/fa
-            ref: feat/github-wf-icons
+            repository: FAForever/fa
+            ref: deploy/develop
             path: ./fa
             sparse-checkout-cone-mode: |
               wiki
