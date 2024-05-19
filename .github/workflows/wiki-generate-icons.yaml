@@ -1,0 +1,75 @@
+name: FAF Wiki Generator for strategic icons
+
+on:
+  push:
+    branches:
+      - 'feat/github-wf-icons'
+
+jobs:
+
+  prepare-environment:
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          shell: bash
+
+      steps:
+        # Checkout repos
+
+        # FA repo is sparse checkout as it is quite large and we dont won't to incur higher action minutes for no reason
+        - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
+          uses: actions/checkout@v4
+          with:
+            repository: relent0r/fa
+            ref: feat/github-wf-icons
+            path: ./fa
+            sparse-checkout: |
+              wiki
+              textures/ui/common/game/strategicicons
+              textures/ui/common/icons/units
+
+        - name: Checkout FAF Wiki Repository
+          uses: actions/checkout@v4
+          with:
+            repository: FAForever/fa.wiki
+            ref: master
+            path: ./fa.wiki
+
+        - name: Install Image Magick
+          run: |
+            sudo apt-get install -y imagemagick
+
+        # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
+        - name: Convert Strategic Icons
+          working-directory: fa
+          run: |
+            wiki/icons-convert-strategic.sh
+            wiki/icons-convert-unit.sh
+
+        - name: Move Strategic Icons
+          run: |
+            mv -f fa/wiki/generated/strategicicons/*.png fa.wiki/icons/strategicicons
+            mv -f fa/wiki/generated/units/*.png fa.wiki/icons/units
+
+        - name: Upload as artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: Wiki
+            path: fa.wiki
+      
+        # - name: Store the game version
+        #   id: gameVersionJSON # but it is a string here!
+        #   working-directory: app/data
+        #   run: |
+        #       json=`cat ./version.json`
+        #       echo "json=$json" >> $GITHUB_OUTPUT
+
+        # - name: Update Wiki repository # but it is a string here!
+        #   working-directory: fa.wiki
+        #   run: |
+        #       git config user.email "administrator@faforever.com"
+        #       git config user.name "FAForever"
+
+        #       git stage .
+        #       git commit -m "Update generated data to game version ${{ fromJson(steps.gameVersionJSON.outputs.json).version}}"
+        #       git push origin HEAD:master
