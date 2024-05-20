@@ -14,6 +14,7 @@ local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
 local MATH_IRound = MATH_IRound
+local MathMax = math.max
 
 function LOGWeapon(self, string)
     LOG(("T: %d WeaponId: %s %s"):format(GetGameTick(), tostring(self), string))
@@ -83,6 +84,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             return
         end
 
+        self.CurrentSalvoNumber = 1
         self.CurrentRackSalvoNumber = 1
 
         local rof = self:GetWeaponRoF()
@@ -453,6 +455,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         return self.Blueprint.RateOfFire / (self.AdjRoFMod or 1)
     end,
 
+    ---@param self DefaultProjectileWeapon
+    ---@return number
+    GetFireClockRemainingSeconds = function (self)
+        return (1 - self:GetFireClockPct()) * MATH_IRound(10 / self:GetWeaponRoF())/10
+    end,
+
     -- Effect Functions Section
     -- Play visual effects, animations, recoil etc
 
@@ -761,9 +769,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
             end
             self:StartEconomyDrain()
-            if self.NumRackBones > 1 and self.CurrentRackSalvoNumber > 1 then
-                WaitSeconds(bp.RackReloadTimeout)
-                self:PlayFxRackSalvoReloadSequence()
+            if self.CurrentSalvoNumber > 1 or self.CurrentRackSalvoNumber > 1 then
+                WaitSeconds(MathMax(bp.RackReloadTimeout, bp.RackSalvoReloadTime, self:GetFireClockRemainingSeconds()))
+                self.CurrentSalvoNumber = 1
                 self.CurrentRackSalvoNumber = 1
             end
         end,
@@ -856,6 +864,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        --- used in a thread to bypass the engine's OnFire calls for restarting incomplete weapon salvos
+        ResumeFiring = function(self)
+            while not self:BeenDestroyed() and self.StateName == 'RackSalvoFireReadyState' do
+                if self:CanFire() and self.WeaponCanFire then
+                    self.OnFire(self)
+                end
+                WaitTicks(1)
+            end
+        end,
+
         Main = function(self)
 
             -- We change the state on counted projectiles because we won't get another OnFire call.
@@ -899,7 +917,21 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
-            -- Bombers should not have their targets reset since they take a large path much longer than their reload time.
+            --#region Retargeting salvos
+            -- if we have an incomplete salvo, fork a thread that resumes firing when the weapon is on target, instead of waiting for the engine's OnFire calls
+            -- this allows retargeting in the middle of a salvo
+            local currentSalvoNumber = self.CurrentSalvoNumber
+            local currentRackSalvoNumber = self.CurrentRackSalvoNumber
+
+            if (currentSalvoNumber < self.NumMuzzlesFiring or self.CurrentRackSalvoNumber < self.NumRackFiring)
+                and (currentSalvoNumber > 1 or currentRackSalvoNumber > 1) -- 1 is the start of new salvo
+            then
+                self:ForkThread(self.ResumeFiring, self)
+            end
+            --#endregion
+
+            --#region Fixes for stuck targeting
+            -- Bombers should not have their targets reset since they take a large path much longer than their reload time
             if not (IsDestroyed(unit) or IsDestroyed(self)) and not bp.NeedToComputeBombDrop then
                 if bp.TargetResetWhenReady then
 
@@ -912,15 +944,59 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     self:ResetTarget()
                 else
 
-                    -- attempts to fix weapons being stuck on targets that are outside their current attack radius, but inside
+                    -- attempt to fix weapons being stuck on targets that are outside their current attack radius, but inside
                     -- the tracking radius. This happens when the weapon acquires a target, but never actually fires and
                     -- therefore the thread of this state is not destroyed
 
-                    -- wait reload time + 3 seconds, then force the weapon to recheck its target
-                    WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
-                    self:ResetTarget()
+                    -- wait for after OnFire should have been called to make sure that the weapon is definitely not firing because the target is out of firing range
+                    WaitSeconds( self:GetFireClockRemainingSeconds() + 3 )
+
+                    -- If there are no more targets, exit this state
+                    if not self:WeaponHasTarget() then
+                        if bp.WeaponUnpacks then
+                            ChangeState(self, self.WeaponPackingState)
+                        else
+                            ChangeState(self, self.IdleState)
+                        end
+                        -- end this state's thread
+                        return
+                    end
+
+                    local targetCheckIntervalTicks = MATH_IRound(bp.TargetCheckInterval*10) + 1
+
+                    local currentTargetPos = self:GetCurrentTargetPos()
+                    local currentTargetX, currentTargetZ = currentTargetPos[1], currentTargetPos[3]
+                    local selfPositionX, _, selfPositionZ = self.unit:GetPositionXYZ()
+
+                    local distToTarget = VDist2(selfPositionX, selfPositionZ, currentTargetX, currentTargetZ)
+                    while distToTarget > self:GetMaxRadius() do
+
+                        self:ResetTarget()
+
+                        WaitTicks(targetCheckIntervalTicks)
+
+                        -- If there are no more targets, exit this state
+                        if not self:WeaponHasTarget() then
+                            if bp.WeaponUnpacks then
+                                ChangeState(self, self.WeaponPackingState)
+                            else
+                                ChangeState(self, self.IdleState)
+                            end
+                            -- end this state's thread
+                            return
+                        end
+
+                        currentTargetPos = self:GetCurrentTargetPos()
+                        currentTargetX, currentTargetZ = currentTargetPos[1], currentTargetPos[3]
+                        selfPositionX, _, selfPositionZ = self.unit:GetPositionXYZ()
+
+                        distToTarget = VDist2(selfPositionX, selfPositionZ, currentTargetX, currentTargetZ)
+                    end
+                    
+                    -- Code will reach here if the target moves within range, which will end this state through OnFire
                 end
             end
+            --#endregion
         end,
 
         OnFire = function(self)
@@ -930,23 +1006,27 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            -- self.__base.OnLostTarget(self)
-            LOGWeapon(self, self.StateName .. " OnLostTarget")
+            if self.__base.OnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
+                self.__base.OnLostTarget(self)
+            else
+                -- Override default OnLostTarget to do nothing since the retargeting behavior is handled in the `Main` thread
+                LOGWeapon(self, self.StateName .. " OnLostTarget")
+            end
         end,
 
         OnGotTarget = function(self)
-            Weapon.OnGotTarget(self)
-            LOG("T: " .. GetGameTick() .. " " .. self.StateName .. " OnGotTarget")
+            self.__base.OnGotTarget(self)
+            LOGWeapon(self, self.StateName .. " OnGotTarget")
         end,
 
         OnStartTracking = function(self)
-            Weapon.OnStartTracking(self)
-            LOG("T: " .. GetGameTick() .. " " .. self.StateName .. " OnStartTracking")
+            self.__base.OnStartTracking(self)
+            LOGWeapon(self, self.StateName .. " OnStartTracking")
         end,
 
         OnStopTracking = function(self)
-            Weapon.OnStopTracking(self)
-            LOG("T: " .. GetGameTick() .. " " .. self.StateName .. " OnStopTracking")
+            self.__base.OnStopTracking(self)
+            LOGWeapon(self, self.StateName .. " OnStopTracking")
         end,
     },
 
@@ -1021,6 +1101,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if bp.RackFireTogether then
                 numRackFiring = rackBoneCount
             end
+            self.NumRackFiring = numRackFiring
 
             -- Fork timer counter thread carefully
             if not self:BeenDestroyed() and
@@ -1031,7 +1112,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
 
             -- Most of the time this will only run once, the only time it doesn't is when racks fire together
-            while self.CurrentRackSalvoNumber <= numRackFiring and not self.HaltFireOrdered do
+            while self.CurrentRackSalvoNumber <= numRackFiring do
                 local rack = rackBones[self.CurrentRackSalvoNumber]
                 local muzzleBones = rack.MuzzleBones
                 local muzzleBoneCount = table.getn(muzzleBones)
@@ -1054,11 +1135,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
 
                 local muzzleIndex = 1
-                for i = 1, numMuzzlesFiring do
-                    if self.HaltFireOrdered then
-                        break
-                    end
-                    self.CurrentSalvoNumber = i
+                self.NumMuzzlesFiring = numMuzzlesFiring
+
+                while self.CurrentSalvoNumber <= numMuzzlesFiring do                
                     local muzzle = muzzleBones[muzzleIndex]
                     if rackHideMuzzle then
                         unit:ShowBone(muzzle, true)
@@ -1084,9 +1163,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     if rackHideMuzzle then
                         unit:HideBone(muzzle, true)
                     end
-                    if self.HaltFireOrdered then
-                        break
-                    end
 
                     local proj = self:CreateProjectileAtMuzzle(muzzle)
                     LOGWeapon(self, string.format("Fired! Shot #%d Rack #%d"
@@ -1094,6 +1170,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         , self.CurrentRackSalvoNumber or -1
                         )
                     )
+                    self.CurrentSalvoNumber = self.CurrentSalvoNumber + 1
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
@@ -1132,6 +1209,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
                 end
 
+                self.CurrentSalvoNumber = 1
+
                 self:PlayFxRackReloadSequence()
                 local currentRackSalvoNumber = self.CurrentRackSalvoNumber
                 if currentRackSalvoNumber <= rackBoneCount then
@@ -1145,15 +1224,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:StartEconomyDrain()
             self:OnWeaponFired() -- Used primarily by Overcharge
 
-            -- We can fire again after reaching here
-            self.HaltFireOrdered = false
-
             if bp.DisableWhileReloading then
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
+                self.CurrentSalvoNumber = 1
                 self.CurrentRackSalvoNumber = 1
                 if bp.RackSalvoReloadTime > 0 then
                     ChangeState(self, self.RackSalvoReloadState)
@@ -1180,7 +1257,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            -- Override the default OnLostTarget to run inherited OnLostTarget classes or to avoid killing the firing cycle thread by changing states
+            -- Override the default OnLostTarget to run inherited OnLostTarget classes
             local baseOnLostTarget = self.__base.OnLostTarget
             if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
                 baseOnLostTarget(self)
@@ -1188,15 +1265,32 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 LOGWeapon(self, "FiringState OnLostTarget")
                 Weapon.OnLostTarget(self)
 
-                -- it's usually okay for a salvo to continue firing unless MuzzleVelocityReduceDistance is present, which requires a target to always exist
-                -- or else the projectile will fire at a very high speed, so we need to pack up/idle in that case
+                -- Deal with the rack firing sequence
                 local bp = self.Blueprint
-                if bp.MuzzleVelocityReduceDistance > 0 then
+                if self.CurrentRackSalvoNumber > self.NumRackBones then
+                    self.CurrentSalvoNumber = 1
+                    self.CurrentRackSalvoNumber = 1
+                    if bp.RackSalvoReloadTime > 0 then
+                        ChangeState(self, self.RackSalvoReloadState)
+                    elseif bp.RackSalvoChargeTime > 0 then
+                        ChangeState(self, self.IdleState)
+                    elseif countedProjectile then
+                        if bp.WeaponUnpacks then
+                            ChangeState(self, self.WeaponPackingState)
+                        else
+                            ChangeState(self, self.IdleState)
+                        end
+                    else
+                        ChangeState(self, self.RackSalvoFireReadyState)
+                    end
+                elseif bp.CountedProjectile then
                     if bp.WeaponUnpacks then
                         ChangeState(self, self.WeaponPackingState)
                     else
                         ChangeState(self, self.IdleState)
                     end
+                else
+                    ChangeState(self, self.RackSalvoFireReadyState)
                 end
             end
         end,
@@ -1217,7 +1311,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnHaltFire = function(self)
-            self.HaltFireOrdered = true
+            self.OnLostTarget(self)
         end,
     },
 
