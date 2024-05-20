@@ -965,6 +965,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             local clockTime = math.round(10 * rateOfFire)
             local totalTime = clockTime
+            clockTime = (1 - self:GetFireClockPct()) * totalTime
             while clockTime >= 0 and
                 not self:BeenDestroyed() and
                 not unit.Dead do
