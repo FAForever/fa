@@ -18,7 +18,6 @@ jobs:
         - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
           uses: actions/checkout@v4
           with:
-            repository: FAForever/fa
             path: ./fa
             sparse-checkout: |
               wiki
