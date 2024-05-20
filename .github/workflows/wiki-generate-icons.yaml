@@ -19,7 +19,6 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: FAForever/fa
-            ref: deploy/develop
             path: ./fa
             sparse-checkout: |
               wiki
@@ -30,7 +29,6 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: FAForever/fa.wiki
-            ref: master
             path: ./fa.wiki
 
         - name: Install Image Magick
