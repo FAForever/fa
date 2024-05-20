@@ -27,8 +27,9 @@ while read file; do
       if [ "$file" != "./lua/system/class.lua" ]; then
         if [ "$file" != "./lua/sim/NavGenerator.lua" ]; then
           if [ "$file" != "./wiki/Run.lua" ]; then
-          check_file "$file"
-          (( files_checked++ ))
+            check_file "$file"
+            (( files_checked++ ))
+          fi
         fi
       fi
     fi
