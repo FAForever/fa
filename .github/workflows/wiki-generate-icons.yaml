@@ -1,4 +1,4 @@
-name: FAF Wiki Generator for icons
+name: Wiki - generate unit icons
 
 on:
   workflow_dispatch:

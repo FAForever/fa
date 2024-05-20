@@ -1,4 +1,4 @@
-name: FAF Wiki Generator for Blueprints
+name: Wiki - generate unit pages
 
 on:
   workflow_dispatch:
