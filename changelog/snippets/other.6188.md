@@ -1,1 +1,1 @@
-- (#6188) Create a Github workflow to automate the population of the Wiki
+- (#6188, #6198) Create a Github workflow to automate the population of the Wiki
