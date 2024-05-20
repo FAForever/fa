@@ -313,7 +313,7 @@
 ---@field ToggleWeapon? string
 --- The radius at which the weapon starts tracking the target. This does not mean that the weapon
 --- will fire. The weapon will only fire when a target enters the maxradius. This is a multiplier of
---- the weapon's `MaxRadius`.
+--- the weapon's `MaxRadius`. Weapons do not track targets within the weapon's `MinRadius`.
 ---@field TrackingRadius? number
 --- the second muzzle bone for a turret, used for arms on bots as weapons
 ---@field TurretBoneDualMuzzle? Bone
