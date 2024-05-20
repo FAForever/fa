@@ -13,6 +13,7 @@ local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
+local MATH_IRound = MATH_IRound
 
 function LOGWeapon(self, string)
     LOG(("T: %d WeaponId: %s %s"):format(GetGameTick(), tostring(self), string))
@@ -982,7 +983,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon. Should only be used
             -- for weapons that do not visually track, such as torpedo defenses
 
-            local reloadTime = math.floor(10 * rateOfFire) - 1
+            local reloadTime = MATH_IRound(1 / self:GetWeaponRoF()) - 1
             if reloadTime > 4 then
                 if IsDestroyed(self) then
                     return
