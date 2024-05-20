@@ -32,6 +32,6 @@ fi
 
 mkdir "wiki/generated/strategicicons"
 
-magick mogrify -path "wiki/generated/strategicicons" -format png "textures/ui/common/game/strategicicons/*.dds"
+mogrify -path "wiki/generated/strategicicons" -format png "textures/ui/common/game/strategicicons/*.dds"
 
-read -p "Press enter to continue"
+#read -p "Press enter to continue"
