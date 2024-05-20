@@ -65,11 +65,7 @@ local MathAtan = math.atan
 --- | 'Pause'
 --- | 'Dock'
 --- | 'DetachFromTransport'
-
----@class UserCommandTarget
----@field EntityId? EntityId
----@field Position Vector
----@field Type 'Position' | 'Entity' | 'None'
+--- | 'Repair'
 
 ---@class UserCommand
 ---@field Blueprint UnitId
@@ -79,6 +75,11 @@ local MathAtan = math.atan
 ---@field Target UserCommandTarget
 ---@field Units UserUnit[]
 ---@field SkipBlip? boolean # if we don't have a feedback blip defined, skips the default command blip
+
+---@class UserCommandTarget
+---@field EntityId? EntityId
+---@field Position Vector
+---@field Type 'Position' | 'Entity' | 'None'
 
 ---@class MeshInfo
 ---@field Position Vector
@@ -482,55 +483,8 @@ local function OnGuardCopy(guardees, unit)
     end
 end
 
-function OnReclaimIssued(command)
-    -- Area reclaim dragger, command mode only
-    if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
-    end
-end
-
-function OnAttackIssued(command)
-    -- Area attack dragger, command mode only
-    if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
-        import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
-    end
-end
-
-function OnUpgradeIssued(command)
-    -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
-    if (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then
-        if not IsKeyDown('Shift') then
-            SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true)
-        end
-    end
-end
-
-function OnBuildMobileIssued(command)
-    if not command.Units[1] then
-        if modeData.callback then -- unusual command, where we use the build interface
-            modeData.callback(modeData, command)
-            return true
-        elseif modeData.cheat then -- part of the cheat menu
-            CheatSpawn(command, modeData)
-            command.Units = {}
-            return true
-        end
-    end
-    -- We want our command feedback blip to match the blueprint, and we want to skip the default
-    command.SkipBlip = true
-    AddCommandFeedbackBlip(
-        {
-            Position = command.Target.Position,
-            BlueprintID = command.Blueprint,
-            TextureName = '/meshes/game/flag02d_albedo.dds',
-            ShaderName = 'CommandFeedback',
-            UniformScale = 1,
-        },
-        0.7
-    )
-end
-
-function OnGuardIssued(command)
+---@param command UserCommand
+local function OnGuardIssued(command)
     if command.Target.EntityId then
         local unit = GetUnitById(command.Target.EntityId) ---@cast unit UserUnit
         local guards = command.Units
@@ -565,7 +519,42 @@ function OnGuardIssued(command)
     end
 end
 
-function OnRepairIssued(command)
+---@param command UserCommand
+local function OnBuildMobileIssued(command)
+    if not command.Units[1] then
+        if modeData.callback then -- unusual command, where we use the build interface
+            modeData.callback(modeData, command)
+            return true
+        elseif modeData.cheat then -- part of the cheat menu
+            CheatSpawn(command, modeData)
+            command.Units = {}
+            return true
+        end
+    end
+    -- We want our command feedback blip to match the blueprint, and we want to skip the default
+    command.SkipBlip = true
+    AddCommandFeedbackBlip(
+        {
+            Position = command.Target.Position,
+            BlueprintID = command.Blueprint,
+            TextureName = '/meshes/game/flag02d_albedo.dds',
+            ShaderName = 'CommandFeedback',
+            UniformScale = 1,
+        },
+        0.7
+    )
+end
+
+---@param command UserCommand
+local function OnReclaimIssued(command)
+    -- Area reclaim dragger, command mode only
+    if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
+    end
+end
+
+---@param command UserCommand
+local function OnRepairIssued(command)
     -- see if we can rebuild a structure
     if command.Target.Type == 'Entity' then -- repair wreck to rebuild
         local cb = { Func = "Rebuild", Args = { entity = command.Target.EntityId, Clear = command.Clear } }
@@ -573,7 +562,26 @@ function OnRepairIssued(command)
     end
 end
 
-function OnScriptIssued(command)
+---@param command UserCommand
+local function OnAttackIssued(command)
+    -- Area attack dragger, command mode only
+    if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
+        import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
+    end
+end
+
+---@param command UserCommand
+local function OnUpgradeIssued(command)
+    -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
+    if (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then
+        if not IsKeyDown('Shift') then
+            SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true)
+        end
+    end
+end
+
+---@param command UserCommand
+local function OnScriptIssued(command)
     if command.LuaParams then
         if command.LuaParams.TaskName == 'AttackMove' then
             local avgPoint = { 0, 0 }
@@ -601,19 +609,45 @@ function OnScriptIssued(command)
     end
 end
 
-function OnStopIssued(command)
+---@param command UserCommand
+local function OnStopIssued(command)
     EnhancementQueueFile.clearEnhancements(command.Units)
 end
 
-OnCommandIssuedCallback = {
-    Reclaim = OnReclaimIssued,
-    Attack = OnAttackIssued,
-    Upgrade = OnUpgradeIssued,
-    BuildMobile = OnBuildMobileIssued,
-    Guard = OnGuardIssued,
-    Repair = OnRepairIssued,
-    Script = OnScriptIssued,
+-- Callbacks for different command types, nil values for reference to functions that don't exist yet
+local OnCommandIssuedCallback = {
+    None = nil,
     Stop = OnStopIssued,
+    Reclaim = OnReclaimIssued,
+    Move = nil,
+    Attack = OnAttackIssued,
+    Guard = OnGuardIssued,
+    AggressiveMove = nil,
+    Upgrade = OnUpgradeIssued,
+    Build = nil,
+    BuildMobile = OnBuildMobileIssued,
+    Tactical = nil,
+    Nuke = nil,
+    TransportReverseLoadUnits = nil,
+    TransportLoadUnits = nil,
+    TransportUnloadUnits = nil,
+    TransportUnloadSpecificUnits = nil,
+    Ferry = nil,
+    AssistMove = nil,
+    Script = OnScriptIssued,
+    Capture = nil,
+    FormMove = nil,
+    FormAggressiveMove = nil,
+    OverCharge = nil,
+    FormAttack = nil,
+    Teleport = nil,
+    Patrol = nil,
+    FormPatrol = nil,
+    Sacrifice = nil,
+    Pause = nil,
+    Dock = nil,
+    DetachFromTransport = nil,
+    Repair = OnRepairIssued,
 }
 
 --- Called by the engine when a new command has been issued by the player.
