@@ -95,8 +95,6 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
             RULEUCC_Transport = true,
         },
         FactionName = "Seraphim",

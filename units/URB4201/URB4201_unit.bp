@@ -77,8 +77,6 @@ UnitBlueprint{
     Footprint = { MinWaterDepth = 1 },
     General = {
         CommandCaps = {
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Transport = false,
         },
