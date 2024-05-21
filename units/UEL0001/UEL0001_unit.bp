@@ -649,7 +649,6 @@ UnitBlueprint {
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Overcharge = true,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,

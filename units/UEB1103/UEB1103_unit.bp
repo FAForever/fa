@@ -91,7 +91,6 @@ UnitBlueprint{
             RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Guard = false,
-            RULEUCC_Nuke = false,
             RULEUCC_Pause = true,
             RULEUCC_Transport = false,
         },
