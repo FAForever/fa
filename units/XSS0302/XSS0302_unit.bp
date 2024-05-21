@@ -145,7 +145,6 @@ UnitBlueprint{
             RULEUCC_Nuke = true,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = true,
             RULEUCC_SiloBuildTactical = false,

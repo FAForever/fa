@@ -90,7 +90,6 @@ UnitBlueprint{
             RULEUCC_Move = true,
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,

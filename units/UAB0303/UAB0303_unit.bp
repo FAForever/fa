@@ -108,7 +108,6 @@ UnitBlueprint{
             RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
