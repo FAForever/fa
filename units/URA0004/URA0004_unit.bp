@@ -65,7 +65,6 @@ UnitBlueprint{
         CapCost = 0,
         CommandCaps = {
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Reclaim = true,

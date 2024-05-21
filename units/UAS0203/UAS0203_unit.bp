@@ -164,7 +164,6 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dive = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,

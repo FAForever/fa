@@ -107,7 +107,6 @@ UnitBlueprint {
         Category = 'Factory',
         Classification = 'RULEUC_Factory',
         CommandCaps = {
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Patrol = true,
