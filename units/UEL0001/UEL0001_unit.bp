@@ -656,7 +656,6 @@ UnitBlueprint {
             RULEUCC_Repair = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = false,
-            RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,
             RULEUCC_Tactical = false,
             RULEUCC_Teleport = false,

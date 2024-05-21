@@ -169,7 +169,6 @@ UnitBlueprint{
             RULEUCC_Pause = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = true,
-            RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,
             RULEUCC_Tactical = false,
             RULEUCC_Transport = false,
