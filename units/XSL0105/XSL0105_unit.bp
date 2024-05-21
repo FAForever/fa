@@ -151,7 +151,6 @@ UnitBlueprint{
             YawBone = "Arm_Yaw",
         },
         CommandCaps = {
-            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,

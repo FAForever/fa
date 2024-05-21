@@ -142,7 +142,6 @@ UnitBlueprint{
             YawBone = "Buildpoint_Center",
         },
         CommandCaps = {
-            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,

@@ -117,7 +117,6 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
             RULEUCC_Capture = false,
             RULEUCC_Dock = true,
