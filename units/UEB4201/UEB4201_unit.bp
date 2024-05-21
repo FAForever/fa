@@ -78,7 +78,6 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_RetaliateToggle = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "UEF",

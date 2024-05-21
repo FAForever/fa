@@ -659,7 +659,6 @@ UnitBlueprint {
             RULEUCC_Stop = true,
             RULEUCC_Tactical = false,
             RULEUCC_Teleport = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "amph",

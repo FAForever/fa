@@ -81,7 +81,6 @@ UnitBlueprint{
             RULEUCC_Attack = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "amph",

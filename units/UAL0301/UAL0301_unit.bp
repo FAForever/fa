@@ -524,7 +524,6 @@ UnitBlueprint{
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Sacrifice = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = "Aeon",
