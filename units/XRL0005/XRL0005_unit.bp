@@ -75,7 +75,6 @@ UnitBlueprint{
             RULEUCC_Guard = false,
             RULEUCC_Nuke = false,
             RULEUCC_Pause = false,
-            RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
