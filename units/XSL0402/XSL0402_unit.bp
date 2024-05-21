@@ -91,7 +91,6 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Move = true,
             RULEUCC_Patrol = true,
-
             RULEUCC_Sacrifice = false,
             RULEUCC_Stop = true,
         },

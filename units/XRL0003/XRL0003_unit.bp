@@ -69,7 +69,6 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-
             RULEUCC_Stop = true,
         },
         FactionName = "Cybran",

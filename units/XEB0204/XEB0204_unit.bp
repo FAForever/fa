@@ -111,7 +111,6 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Guard = true,
-
             RULEUCC_Stop = true,
         },
         FactionName = "UEF",
