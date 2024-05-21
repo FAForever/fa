@@ -206,7 +206,6 @@ UnitBlueprint{
             RULEUCC_SiloBuildNuke = true,
             RULEUCC_Stop = true,
             RULEUCC_Tactical = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "sea",

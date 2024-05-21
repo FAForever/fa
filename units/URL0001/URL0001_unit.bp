@@ -578,7 +578,6 @@ UnitBlueprint{
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Teleport = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "amph",

@@ -92,7 +92,6 @@ UnitBlueprint{
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildTactical = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "Cybran",

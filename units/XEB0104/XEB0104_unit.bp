@@ -119,7 +119,6 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Pause = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "land",

@@ -92,7 +92,6 @@ UnitBlueprint{
             RULEUCC_SiloBuildTactical = true,
             RULEUCC_Stop = true,
             RULEUCC_Tactical = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "land",

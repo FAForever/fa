@@ -154,7 +154,6 @@ UnitBlueprint{
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = "Cybran",

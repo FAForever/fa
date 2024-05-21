@@ -113,7 +113,6 @@ UnitBlueprint{
             RULEUCC_Guard = true,
             RULEUCC_Pause = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "land",

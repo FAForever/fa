@@ -90,7 +90,6 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Pause = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "amph",

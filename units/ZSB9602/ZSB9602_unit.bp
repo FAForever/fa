@@ -158,7 +158,6 @@ UnitBlueprint {
             RULEUCC_Pause = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = 'Seraphim',

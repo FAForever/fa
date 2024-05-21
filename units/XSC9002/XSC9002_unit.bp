@@ -65,7 +65,6 @@ UnitBlueprint {
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_Move = true,
-            RULEUCC_Transport = false,
         },
         FactionName = 'Seraphim',
         SelectionPriority = 5,
