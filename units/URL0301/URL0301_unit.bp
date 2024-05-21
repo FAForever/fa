@@ -489,7 +489,6 @@ UnitBlueprint{
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
             RULEUCC_RetaliateToggle = true,
-            RULEUCC_Sacrifice = false,
             RULEUCC_Stop = true,
         },
         ConstructionBar = true,
