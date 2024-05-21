@@ -199,7 +199,6 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
         },
