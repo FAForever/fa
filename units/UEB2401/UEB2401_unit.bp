@@ -89,7 +89,7 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_Pause = false,
+
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
         },

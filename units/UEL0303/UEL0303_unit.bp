@@ -138,7 +138,7 @@ UnitBlueprint{
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Patrol = true,
-            RULEUCC_Pause = false,
+
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
         },
