@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC url0301_desc>Support Command Unit",
+    Description = "<LOC url0301_desc>Support Armored Command Unit",
     AI = {
         GuardScanRadius = 26,
         TargetBones = {
@@ -59,9 +59,9 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Normal",
         EconomyThreatLevel = 1208,
-        Health = 11000,
-        MaxHealth = 11000,
-        RegenRate = 20,
+        Health = 12500,
+        MaxHealth = 12500,
+        RegenRate = 23,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 30,
     },
@@ -177,8 +177,8 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 26650,
-        BuildCostMass = 2050,
+        BuildCostEnergy = 30000,
+        BuildCostMass = 2000,
         BuildRate = 40,
         BuildTime = 14500,
         BuildableCategory = { "BUILTBYTIER3ENGINEER CYBRAN" },
@@ -335,6 +335,7 @@ UnitBlueprint{
             BuildTime = 3600,
             Icon = "emp",
             Name = "<LOC enhancements_0091>EMP Burst",
+            NewDamageMod = 200,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "URL0301" },
         },
@@ -352,12 +353,12 @@ UnitBlueprint{
             Slot = "LCH",
         },
         Switchback = {
-            BuildCostEnergy = 51100,
-            BuildCostMass = 800,
+            BuildCostEnergy = 35000,
+            BuildCostMass = 600,
             BuildTime = 4200,
             Icon = "ses",
             Name = "<LOC enhancements_0109>Rapid Fabricator",
-            NewBuildRate = 98,
+            NewBuildRate = 100,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "URL0301" },
         },
@@ -408,6 +409,7 @@ UnitBlueprint{
             Name = "<LOC enhancements_0097>Resource Allocation System",
             ProductionPerSecondEnergy = 1000,
             ProductionPerSecondMass = 10,
+            NewDeathDamage = 5000,
             Slot = "RCH",
             UpgradeUnitAmbientBones = { "URL0301" },
         },
