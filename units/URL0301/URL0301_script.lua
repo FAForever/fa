@@ -41,6 +41,51 @@ URL0301 = ClassUnit(CCommandUnit) {
         NMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
 
+    IntelEffects = {
+        Cloak = {
+            {
+                Bones = {
+                    'Head',
+                    'Right_Elbow',
+                    'Left_Elbow',
+                    'Right_Arm01',
+                    'Left_Shoulder',
+                    'Torso',
+                    'URL0301',
+                    'Left_Thigh',
+                    'Left_Knee',
+                    'Left_Leg',
+                    'Right_Thigh',
+                    'Right_Knee',
+                    'Right_Leg',
+                },
+                Scale = 1.0,
+                Type = 'Cloak01',
+            },
+        },
+        Field = {
+            {
+                Bones = {
+                    'Head',
+                    'Right_Elbow',
+                    'Left_Elbow',
+                    'Right_Arm01',
+                    'Left_Shoulder',
+                    'Torso',
+                    'URL0301',
+                    'Left_Thigh',
+                    'Left_Knee',
+                    'Left_Leg',
+                    'Right_Thigh',
+                    'Right_Knee',
+                    'Right_Leg',
+                },
+                Scale = 1.6,
+                Type = 'Cloak01',
+            },
+        },
+    },
+
     ---@param self URL0301
     OnCreate = function(self)
         CCommandUnit.OnCreate(self)
@@ -72,6 +117,34 @@ URL0301 = ClassUnit(CCommandUnit) {
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self.LeftArmUpgrade = 'EngineeringArm'
         self.RightArmUpgrade = 'Disintegrator'
+    end,
+
+    ---@param self URL0301
+    ---@param intel string
+    OnIntelEnabled = function(self, intel)
+        CCommandUnit.OnIntelEnabled(self, intel)
+        if self.CloakEnh and self:IsIntelEnabled('Cloak') then
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy
+                or 0)
+            self:SetMaintenanceConsumptionActive()
+            if not self.IntelEffectsBag then
+                self.IntelEffectsBag = {}
+                self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
+            end
+        end
+    end,
+
+    ---@param self URL0301
+    ---@param intel string
+    OnIntelDisabled = function(self, intel)
+        CCommandUnit.OnIntelDisabled(self, intel)
+        if self.IntelEffectsBag then
+            EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+            self.IntelEffectsBag = nil
+        end
+        if self.CloakEnh and not self:IsIntelEnabled('Cloak') then
+            self:SetMaintenanceConsumptionInactive()
+        end
     end,
 
     ---@param self URL0301
@@ -145,12 +218,16 @@ URL0301 = ClassUnit(CCommandUnit) {
             end
         elseif enh == 'ResourceAllocation' then
             local bpEcon = self.Blueprint.Economy
+            local bpWeap = self:GetWeaponByLabel('DeathWeapon')
             self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
             self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+            bpWeap:AddDamageMod(bp.NewDeathDamageMod or 5000)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self.Blueprint.Economy
+            local bpWeap = self:GetWeaponByLabel('DeathWeapon')
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            bpWeap:AddDamageMod(bpWeap.Damage or 2500)
         elseif enh == 'Switchback' then
             self.BuildBotTotal = 4
             if not Buffs['CybranSCUBuildRate'] then
@@ -176,7 +253,7 @@ URL0301 = ClassUnit(CCommandUnit) {
             end
         elseif enh == 'FocusConvertor' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
+            wep:AddDamageMod(bp.NewDamageMod or 400)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh == 'FocusConvertorRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
@@ -188,79 +265,6 @@ URL0301 = ClassUnit(CCommandUnit) {
         elseif enh == 'EMPChargeRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:DisableBuff('STUN')
-        end
-    end,
-
-    IntelEffects = {
-        Cloak = {
-            {
-                Bones = {
-                    'Head',
-                    'Right_Elbow',
-                    'Left_Elbow',
-                    'Right_Arm01',
-                    'Left_Shoulder',
-                    'Torso',
-                    'URL0301',
-                    'Left_Thigh',
-                    'Left_Knee',
-                    'Left_Leg',
-                    'Right_Thigh',
-                    'Right_Knee',
-                    'Right_Leg',
-                },
-                Scale = 1.0,
-                Type = 'Cloak01',
-            },
-        },
-        Field = {
-            {
-                Bones = {
-                    'Head',
-                    'Right_Elbow',
-                    'Left_Elbow',
-                    'Right_Arm01',
-                    'Left_Shoulder',
-                    'Torso',
-                    'URL0301',
-                    'Left_Thigh',
-                    'Left_Knee',
-                    'Left_Leg',
-                    'Right_Thigh',
-                    'Right_Knee',
-                    'Right_Leg',
-                },
-                Scale = 1.6,
-                Type = 'Cloak01',
-            },
-        },
-    },
-
-    ---@param self URL0301
-    ---@param intel string
-    OnIntelEnabled = function(self, intel)
-        CCommandUnit.OnIntelEnabled(self, intel)
-        if self.CloakEnh and self:IsIntelEnabled('Cloak') then
-            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy
-                or 0)
-            self:SetMaintenanceConsumptionActive()
-            if not self.IntelEffectsBag then
-                self.IntelEffectsBag = {}
-                self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
-            end
-        end
-    end,
-
-    ---@param self URL0301
-    ---@param intel string
-    OnIntelDisabled = function(self, intel)
-        CCommandUnit.OnIntelDisabled(self, intel)
-        if self.IntelEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
-            self.IntelEffectsBag = nil
-        end
-        if self.CloakEnh and not self:IsIntelEnabled('Cloak') then
-            self:SetMaintenanceConsumptionInactive()
         end
     end,
 }
