@@ -120,8 +120,6 @@ UnitBlueprint{
             BuildEffectBones = { "Muzzle01" },
         },
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,

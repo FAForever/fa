@@ -97,8 +97,6 @@ UnitBlueprint{
     Footprint = { MinWaterDepth = 1.5 },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
             RULEUCC_Dive = true,
             RULEUCC_Guard = true,
