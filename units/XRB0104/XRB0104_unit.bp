@@ -120,7 +120,6 @@ UnitBlueprint{
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
