@@ -30,14 +30,14 @@ local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 local GetSelectedUnits = GetSelectedUnits
 
 --- Reticle for teleport cost info
----@class UITeleportReticle : UIReticle
----@field ePrefix Text
----@field tPrefix Text
+---@class TeleportReticle : UIReticle
+---@field BuildTimeIcon Bitmap
+---@field EnergyCostIcon Bitmap
 ---@field eText Text
 ---@field tText Text
 TeleportReticle = ClassUI(Reticle) {
 
-    ---@param self UITeleportReticle
+    ---@param self TeleportReticle
     SetLayout = function(self)
         self.BuildTimeIcon = Bitmap(self)
         self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
@@ -57,7 +57,7 @@ TeleportReticle = ClassUI(Reticle) {
         self.eText:SetColor('fff7c70f') -- from economy_mini.lua, same color as the energy stored/storage text
     end,
 
-    ---@param self UITeleportReticle
+    ---@param self TeleportReticle
     ---@param mouseWorldPos Vector
     UpdateDisplay = function(self, mouseWorldPos)
         if self.onMap then

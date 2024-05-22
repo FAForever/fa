@@ -2,7 +2,7 @@
   - Energy Cost: 70000 --> 45000
   - Mass Cost: 2000 --> 1400
   - Build Time: 1700 --> 1500
-  - Sheild
+  - Shield
     - HP: 7000 --> 5000
     - Recharge Time: 60 --> 45
     - Regen Rate: 67 --> 60

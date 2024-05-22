@@ -42,6 +42,11 @@ local MathClamp = math.clamp
 local MathMax = math.max
 local MathFloor = math.floor
 local MathCeil = math.ceil
+local MathSin = math.sin
+local MathCos = math.cos
+local DegToRad = math.pi/180
+local unpack = unpack
+local MathAtan2 = math.atan2
 
 local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
@@ -53,9 +58,12 @@ local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 ---@field OwnedByEntity EntityId
 
 -- compute once and store as upvalue for performance
+-- Enemy units that are searched for when rotating structures
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
+-- Structures that rotate towards the enemy: PD, AA, Torp launchers, Artillery, and TMD (except Volcano)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR + categories.ANTINAVY + categories.ARTILLERY + (categories.ANTIMISSILE - categories.SILO - categories.uab4201))
+-- Structures that rotate in 90 degree steps: T2/T3/T4 Artillery
+local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
@@ -130,6 +138,11 @@ StructureUnit = ClassUnit(Unit) {
             end
         end
 
+        -- rotate weapon structures towards enemy
+        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
+            self:RotateTowardsEnemy()
+        end
+
         -- create decal below structure
         if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
             if self.TarmacBag then
@@ -152,7 +165,7 @@ StructureUnit = ClassUnit(Unit) {
         end
     end,
 
-    --- Rotates the structure towards the enemy, primarily used for point defenses
+    --- Rotates the structure towards the enemy or map center
     ---@param self StructureUnit
     RotateTowardsEnemy = function(self)
 
@@ -169,50 +182,73 @@ StructureUnit = ClassUnit(Unit) {
             threat = -1,
         }
 
-        -- determine radius
-        local radius = 40
-        local weapons = self.Blueprint.Weapon
-        if weapons then
-            for k, weapon in weapons do
-                if weapon.MaxRadius and weapon.MaxRadius > radius then
-                    radius = 1.1 * weapon.MaxRadius
+        -- find targets in range unless a static arty
+        if not EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+            -- determine radius
+            local radius = 40
+            local weapons = self.Blueprint.Weapon
+            if weapons then
+                for k, weapon in weapons do
+                    if weapon.MaxRadius and 1.1 * weapon.MaxRadius > radius then
+                        radius = 1.1 * weapon.MaxRadius
+                    end
                 end
             end
-        end
 
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
-        local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
+            local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
+            local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
-        if units then
-            for _, u in units do
-                local blip = u:GetBlip(self.Army)
-                if blip then
+            if units then
+                for _, u in units do
+                    local blip = u:GetBlip(self.Army)
+                    if blip then
 
-                    -- check if we've got it on radar and whether it is identified by army in question
-                    local radar = blip:IsOnRadar(self.Army)
-                    local identified = blip:IsSeenEver(self.Army)
-                    if radar or identified then
-                        local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
-                        if threat >= target.threat then
-                            target.location = u:GetPosition()
-                            target.threat = threat
+                        -- check if we've got it on radar and whether it is identified by army in question
+                        local radar = blip:IsOnRadar(self.Army)
+                        local identified = blip:IsSeenEver(self.Army)
+                        if radar or identified then
+                            local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
+                            if threat >= target.threat then
+                                target.location = u:GetPosition()
+                                target.threat = threat
+                            end
                         end
                     end
                 end
             end
         end
 
-        -- get direction vector, atanify it for angle
-        local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
-        local degrees = rad * (180 / math.pi)
+        -- get direction vector, atanify it for angle, then subtract our existing heading if we were spawned in angled
+        local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3]) - self:GetHeading()
 
-        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = MathFloor((degrees + 90) / 180) * 180
+        local stepSize
+        local bpFootprint = self.Blueprint.Footprint
+        if bpFootprint then
+            if bpFootprint.SizeX ~= bpFootprint.SizeZ then
+                -- Avoid rotating units with oblong footprints as the pathing and visuals won't match
+                stepSize = 180 * DegToRad
+            elseif EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+                stepSize = 90 * DegToRad
+            end
         end
 
-        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
-        rotator:SetPrecedence(1)
-        self.Trash:Add(rotator)
+        if stepSize then
+            rad = MathFloor((rad + 45 * DegToRad) / (90 * DegToRad)) * 90 * DegToRad
+        end
+
+        -- rotation quaternion {cos, 0, sin, 0}
+        local cos = MathCos(rad/2)
+        local sin = MathSin(rad/2)
+
+        -- quatRotate * quatOrient
+        local rhs1, rhs2, rhs3, rhs4 = unpack(self:GetOrientation())
+        rhs1, rhs2, rhs3, rhs4 = 
+            cos * rhs1 - sin * rhs3,
+            cos * rhs2 + sin * rhs4,
+            cos * rhs3 + sin * rhs1,
+            cos * rhs4 - sin * rhs2
+
+        self:SetOrientation({rhs1, rhs2, rhs3, rhs4}, true)
     end,
 
     ---@param self StructureUnit
@@ -220,11 +256,6 @@ StructureUnit = ClassUnit(Unit) {
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         UnitOnStartBeingBuilt(self, builder, layer)
-
-        -- rotate weaponry towards enemy
-        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
-            self:RotateTowardsEnemy()
-        end
 
         -- procedure to remove props that do not obstruct the building
         local blueprint = self.Blueprint

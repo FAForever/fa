@@ -243,6 +243,7 @@ end
 function MATH_IRound(number)
 end
 
+---@overload fun(s: number, a1: number, b1: number, a2: number, b2: number): number, number
 --- Applies linear interpolation between two values `a` and `b`
 ---@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
 ---@param a number

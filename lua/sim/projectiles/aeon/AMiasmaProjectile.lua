@@ -28,4 +28,7 @@ local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProje
 AMiasmaProjectile = ClassProjectile(EmitterProjectile) {
     FxTrails = EffectTemplate.AMiasmaMunition01,
     FxImpactNone = EffectTemplate.AMiasma01,
+    FxImpactLand = EffectTemplate.AMiasmaField01,
+    FxImpactUnit = EffectTemplate.AMiasmaField01,
+    FxImpactProp = EffectTemplate.AMiasmaField01,
 }

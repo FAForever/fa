@@ -567,7 +567,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 Damage = math.max(Damage, info.DamageToShields)
                             end
                             if info.BeamLifetime > 0 then
-                                Damage = Damage * (1 + MathFloor(MATH_IRound(info.BeamLifetime)/(info.BeamCollisionDelay+0.1)))
+                                Damage = Damage * (1 + MathFloor(MATH_IRound(info.BeamLifetime*10)/(MATH_IRound(info.BeamCollisionDelay*10)+1)))
                             else
                                 Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
                                 local ProjectilePhysics = __blueprints[info.ProjectileId].Physics

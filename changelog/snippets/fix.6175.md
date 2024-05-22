@@ -1,0 +1,4 @@
+- (#6175) Rework the unit manager's unit tooltips using the Layouter with various fixes:
+  - Fix UI Scaling for unit tooltips in the unit manager.
+  - Display buildtime in ticks instead of MM:SS in the unit manager.
+  - Fix empty names appearing as empty parentheses in the unit manager.
