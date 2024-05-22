@@ -1,0 +1,1 @@
+- (#6207) Fix UEF spy plane's jammer blips never reappearing after being seen.
