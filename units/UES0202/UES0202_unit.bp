@@ -145,7 +145,6 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Tactical = false,
         },
         FactionName = "UEF",
         Icon = "sea",

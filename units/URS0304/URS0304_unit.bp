@@ -205,7 +205,6 @@ UnitBlueprint{
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildNuke = true,
             RULEUCC_Stop = true,
-            RULEUCC_Tactical = false,
         },
         FactionName = "Cybran",
         Icon = "sea",
