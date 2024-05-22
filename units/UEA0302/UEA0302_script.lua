@@ -23,6 +23,10 @@ UEA0302 = ClassUnit(TAirUnit) {
 --        },
 --    },
 
+    OnStopBeingBuilt = function(self,builder,layer)
+        TAirUnit.OnStopBeingBuilt(self,builder,layer)
+        self:SetMaintenanceConsumptionActive()
+    end,
 }
 
 TypeClass = UEA0302
