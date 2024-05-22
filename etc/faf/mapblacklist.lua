@@ -1903,4 +1903,5 @@ MapBlacklist = {
     ['aspro_crater.v0001'] = true,
     ['aspro_crater_remastered.v0001'] = true,
     ['12_ultinate_you_shall_not_pass.v0001.zip'] = true,
+    ['fun setons'] = true,
 }
