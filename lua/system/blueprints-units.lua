@@ -338,23 +338,25 @@ local function PostProcessUnit(unit)
         ---@type UnitIntelStatus
         local status = {}
 
-        -- life is good, intel is funded by the government
+        -- all of the unit's intel is free due to a bp flag or 0 maintenance cost
         local allIntelIsFree = false
-        if intelBlueprint.FreeIntel or (
-            not enhancementBlueprints and
-                (
-                (not economyBlueprint) or
-                    (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
-                    economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+        if intelBlueprint.FreeIntel
+            or (
+                not enhancementBlueprints
+                and (
+                    not economyBlueprint
+                    or not economyBlueprint.MaintenanceConsumptionPerSecondEnergy
+                    or economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
                 )
-            ) then
+            )
+        then
             allIntelIsFree = true
             status.AllIntelMaintenanceFree = {}
         end
 
-        -- special case: unit has intel that is considered free
+        -- special case: unit has specific intel types that are considered free
         if intelBlueprint.ActiveIntel then
-            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or {}
+            status.AllIntelMaintenanceFree = {}
             for intel, _ in intelBlueprint.ActiveIntel do
                 status.AllIntelMaintenanceFree[intel] = true
             end
