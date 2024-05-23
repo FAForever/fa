@@ -46,6 +46,109 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         self:SetScriptBit('RULEUTC_WeaponToggle', true)
     end,
 
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self:FocusAssistersOnCurrentTask()
+    end,
+
+    ---@param self TConstructionPodUnit
+    ---@param built Unit
+    ---@param order string
+    OnStopBuild = function(self, built, order)
+        TConstructionUnit.OnStopBuild(self, built, order)
+        -- Check if we finished our build task and clear our cached command if so
+        if self.guardCache and built:GetFractionComplete() == 1 then
+            self.guardCache = nil
+        end
+    end,
+
+    ---@param self TConstructionPodUnit
+    ---@param target Unit|Prop
+    OnStartReclaim = function(self, target)
+        TConstructionUnit.OnStartReclaim(self, target)
+        self:FocusAssistersOnCurrentTask()
+    end,
+
+    ---@param self TConstructionPodUnit
+    ---@param target Unit|Prop
+    OnStopReclaim = function(self, target)
+        TConstructionUnit.OnStopReclaim(self, target)
+        -- Check if we finished our reclaim task and clear our cached commaand if so
+        if self.guardCache and table.empty(target) then
+            self.guardCache = nil
+        end
+    end,
+
+    ---@param self TConstructionPodUnit
+    ---@param unitBeingRepaired Unit
+    OnStartRepair = function(self, unitBeingRepaired)
+        TConstructionUnit.OnStartRepair(self, unitBeingRepaired)
+        self:FocusAssistersOnCurrentTask()
+    end,
+
+    ---@param self TConstructionPodUnit
+    FocusAssistersOnCurrentTask = function(self)
+
+        if self.Dead then
+            return
+        end
+
+        local engineerGuards = self:GetGuards()
+
+        -- Make sure we've got some assisters to work with
+        if not next(engineerGuards) then
+            self.guardCache = nil
+            return
+        end
+
+        -- Make sure we're performing an engineering task
+        if not (self:IsUnitState('Reclaiming')
+        or self:IsUnitState('Building')
+        or self:IsUnitState('Repairing')) then
+            return
+        end
+
+        local command
+        if self:IsUnitState('Reclaiming') then
+            command = IssueReclaim
+        elseif self:IsUnitState('Repairing') or self:IsUnitState('Building') then
+            command = IssueRepair
+        end
+
+        -- We only need to worry about refocusing our guards if we currently have an engineering target
+        local target = self:GetFocusUnit() or self:GetCommandQueue()[1].target
+        if target then
+            IssueClearCommands(engineerGuards)
+            command(engineerGuards, target)
+            IssueGuard(engineerGuards, self)
+            self.guardCache = engineerGuards
+            self.guardCache.target = target
+            self.guardCache.command = command
+        end
+    end,
+
+    ---Override get guards to pick up our assist cache
+    GetGuards = function(self)
+        local guards = oldGetGuards(self)
+        local count = 0
+        if self.guardCache then
+            local firstCommand, secondCommand
+            local target = self.guardCache.target
+            for _, guard in ipairs(self.guardCache) do
+                firstCommand, secondCommand = unpack(guard:GetCommandQueue())
+                if firstCommand.target == target
+                and secondCommand.target == self then
+                    table.insert(guards, guard)
+                    count = count + 1
+                end
+            end
+        end
+        if count > 0 then
+            print(string.format('Found %d cached guards', count))
+        end
+        return guards
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
         self.Parent = nil
