@@ -901,6 +901,9 @@ local function SpawnMenuDummyChanges(all_bps)
                         UniformScale = 0,
                         HideLifebars = true,
                     },
+                    Intel = {
+                        WaterVisionRadius = 0,
+                    },
                     Physics = {
                         SkirtOffsetX = SOffsetX,
                         SkirtOffsetZ = SOffsetZ,
