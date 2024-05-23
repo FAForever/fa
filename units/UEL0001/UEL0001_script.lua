@@ -26,6 +26,8 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0001 : ACUUnit
+---@field LeftPod TConstructionPodUnit
+---@field RightPod TConstructionPodUnit
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
@@ -102,10 +104,12 @@ UEL0001 = ClassUnit(ACUUnit) {
         },
     },
 
+    ---@param self UEL0001
     __init = function(self)
         ACUUnit.__init(self, 'RightZephyr')
     end,
 
+    ---@param self UEL0001
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -127,6 +131,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self UEL0001
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
         if self:BeenDestroyed() then return end
@@ -139,13 +146,34 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:ForkThread(self.GiveInitialResources)
     end,
 
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         if self.Animator then
             self.Animator:SetRate(0)
         end
+        self:RefreshPodFocus()
     end,
 
+    ---@param self UEL0001
+    ---@param unitBeingRepaired Unit
+    OnStartRepair = function(self, unitBeingRepaired)
+        ACUUnit.OnStartRepair(self, unitBeingRepaired)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param target Unit|Prop
+    OnStartReclaim = function(self, target)
+        ACUUnit.OnStartReclaim(self, target)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -156,6 +184,8 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self UEL0001
+    ---@param PodNumber integer
     RebuildPod = function(self, PodNumber)
         if PodNumber == 1 then
             -- Force pod rebuilds to queue up
@@ -199,6 +229,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:RequestRefreshUI()
     end,
 
+    ---@param self UEL0001
+    ---@param pod string
+    ---@param rebuildDrone boolean
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
             if pod == 'LeftPod' then
@@ -213,6 +246,22 @@ UEL0001 = ClassUnit(ACUUnit) {
         else
             self:CreateEnhancement(pod .. 'Remove')
         end
+    end,
+
+    ---Calling this function will pull any pods without explicit orders to our current task
+    ---@param self UEL0001
+    RefreshPodFocus = function(self)
+        for _, pod in self:GetPods() do
+            if not pod.Dead and pod:GetCommandQueue()[1].commandType == 29 then
+                IssueToUnitClearCommands(pod)
+            end
+        end
+    end,
+
+    ---@param self UEL0001
+    ---@return Unit[]? pods
+    GetPods = function(self)
+        return {self.LeftPod, self.RightPod}
     end,
 
     ---@param self UEL0001
@@ -231,6 +280,8 @@ UEL0001 = ClassUnit(ACUUnit) {
         attachee:SetDoNotTarget(false)
     end,
 
+    ---@param self UEL0001
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
