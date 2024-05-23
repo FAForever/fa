@@ -96,14 +96,6 @@ SyncMeta = {
 ---@field AdjEnergyMod? number
 ---@field AdjRoFMod? number
 
----@class UnitCommand
----@field x number
----@field y number
----@field z number
----@field targetId? EntityId
----@field target? Entity
----@field commandType string 
-
 ---@class AIUnitProperties
 ---@field AIPlatoonReference AIPlatoon
 ---@field AIBaseManager LocationType
