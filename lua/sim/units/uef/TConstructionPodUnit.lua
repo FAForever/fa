@@ -1,10 +1,15 @@
 local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
+local oldGetGuards = TConstructionUnit.GetGuards
 
 ---@class TConstructionPodUnit : TConstructionUnit
+---@field Pod string
+---@field Parent Unit
+---@field guardCache table
 ---@field guardDummy Unit
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
 
+    ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
         self.guardDummy = CreateUnitHPR('ZXA0003', self:GetArmy(), 0,0,0,0,0,0)
@@ -12,6 +17,8 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         self.Trash:Add(self.guardDummy)
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param bit number
     OnScriptBitSet = function(self, bit)
         TConstructionUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
@@ -19,6 +26,8 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         end
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param bit number
     OnScriptBitClear = function(self, bit)
         TConstructionUnit.OnScriptBitClear(self, bit)
         if bit == 1 then
@@ -26,6 +35,9 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         end
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param transport Unit
+    ---@param bone number
     OnAttachedToTransport = function(self, transport, bone)
         local guards = self:GetGuards()
         IssueClearCommands(guards)
@@ -33,6 +45,9 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         TConstructionUnit.OnAttachedToTransport(self, transport, bone)
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param transport Unit
+    ---@param bone number
     OnDetachedFromTransport = function(self, transport, bone)
         TConstructionUnit.OnDetachedFromTransport(self, transport, bone)
         local guards = self.guardDummy:GetGuards()
@@ -40,12 +55,18 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         IssueGuard(guards, self)
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param parent Unit
+    ---@param podName string
     SetParent = function(self, parent, podName)
         self.Parent = parent
         self.Pod = podName
         self:SetScriptBit('RULEUTC_WeaponToggle', true)
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
         self:FocusAssistersOnCurrentTask()
@@ -127,7 +148,20 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         end
     end,
 
+    ---Called via hotkey to refocus assisters on our current task
+    ---@param self TConstructionPodUnit
+    RefocusAssisters = function(self)
+        local engineerGuards = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
+        IssueClearCommands(engineerGuards)
+        if self.guardCache then
+            LOG('We have a guard cache')
+            self.guardCache.command(engineerGuards, self.guardCache.target)
+        end
+        IssueGuard(engineerGuards, self)
+    end,
+
     ---Override get guards to pick up our assist cache
+    ---@param self TConstructionPodUnit
     GetGuards = function(self)
         local guards = oldGetGuards(self)
         local count = 0
@@ -149,15 +183,17 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         return guards
     end,
 
+    ---@param self TConstructionPodUnit
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
         self.Parent = nil
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    -- Don't make wreckage
     CreateWreckage = function (self, overkillRatio)
-        overkillRatio = 1.1
-        TConstructionUnit.CreateWreckage(self, overkillRatio)
+        -- Don't make wreckage
     end,
 }
