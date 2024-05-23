@@ -73,6 +73,14 @@ UEL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UEL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        CommandUnit.OnStopBuild(self, unitBeingBuilt, order)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
     ---@param unitBeingRepaired Unit
     OnStartRepair = function(self, unitBeingRepaired)
         CommandUnit.OnStartRepair(self, unitBeingRepaired)
@@ -80,9 +88,23 @@ UEL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UEL0301
+    ---@param unitBeingRepaired Unit
+    OnStopRepair = function(self, unitBeingRepaired)
+        CommandUnit.OnStopRepair(self, unitBeingRepaired)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
     ---@param target Unit|Prop
     OnStartReclaim = function(self, target)
         CommandUnit.OnStartReclaim(self, target)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
+    ---@param target Unit|Prop
+    OnStopReclaim = function(self, target)
+        CommandUnit.OnStopReclaim(self, target)
         self:RefreshPodFocus()
     end,
 
