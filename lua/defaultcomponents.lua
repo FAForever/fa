@@ -124,13 +124,11 @@ IntelComponent = ClassSimple {
                     allIntelFromEnhancements[intel] = true
                 end
 
-                if not (disabler == 'Energy' and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
-                    if not allIntelDisabledByEvent[intel][disabler] then
-                        allIntelDisabledByEvent[intel][disabler] = true
-                        self:DisableIntel(intel)
-                        self:OnIntelDisabled(intel)
-                    end
+                allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
+                if not allIntelDisabledByEvent[intel][disabler] then
+                    allIntelDisabledByEvent[intel][disabler] = true
+                    self:DisableIntel(intel)
+                    self:OnIntelDisabled(intel)
                 end
             end
         end
@@ -207,13 +205,11 @@ IntelComponent = ClassSimple {
                     allIntelFromEnhancements[intel] = true
                 end
 
-                if not (disabler == 'Energy' and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
-                    if allIntelDisabledByEvent[intel][disabler] then
-                        allIntelDisabledByEvent[intel][disabler] = nil
-                        if table.empty(allIntelDisabledByEvent[intel]) then
-                            self:OnIntelRecharge(intel)
-                        end
+                allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
+                if allIntelDisabledByEvent[intel][disabler] then
+                    allIntelDisabledByEvent[intel][disabler] = nil
+                    if table.empty(allIntelDisabledByEvent[intel]) then
+                        self:OnIntelRecharge(intel)
                     end
                 end
             end
