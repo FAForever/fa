@@ -103,8 +103,13 @@ URL0301 = ClassUnit(CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
+            -- remove prerequisites
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
+            self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
+
+            -- remove cloak
             self:DisableUnitIntel('Enhancement', 'Cloak')
-            self.StealthEnh = false
             self.CloakEnh = false
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
@@ -116,7 +121,6 @@ URL0301 = ClassUnit(CCommandUnit) {
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
                 self.IntelEffectsBag = nil
             end
-            self.CloakEnh = false
             self.StealthEnh = true
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
@@ -125,7 +129,6 @@ URL0301 = ClassUnit(CCommandUnit) {
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
-            self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
             self:ShowBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', true)
