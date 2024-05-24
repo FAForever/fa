@@ -92,26 +92,28 @@ IntelComponent = ClassSimple {
 
             -- disable all intel
             if not intel then
-                for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                        if not allIntelDisabledByEvent[i][disabler] then
-                            allIntelDisabledByEvent[i][disabler] = true
-                            self:DisableIntel(i)
-                            self:OnIntelDisabled(i)
-                        end
+                for intel, _ in allIntel do
+                    local allIntelDisablers = allIntelDisabledByEvent[intel]
+                    if not allIntelDisablers then
+                        allIntelDisabledByEvent[intel] = {}
+                    end
+                    if not allIntelDisablers[disabler] then
+                        allIntelDisabledByEvent[intel][disabler] = true
+                        self:DisableIntel(intel)
+                        self:OnIntelDisabled(intel)
                     end
                 end
 
-                if allIntelMaintenanceFree then
-                    for i, _ in allIntelMaintenanceFree do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                            if not allIntelDisabledByEvent[i][disabler] then
-                                allIntelDisabledByEvent[i][disabler] = true
-                                self:DisableIntel(i)
-                                self:OnIntelDisabled(i)
-                            end
+                if disabler ~= 'Energy' and allIntelMaintenanceFree then
+                    for intel, _ in allIntelMaintenanceFree do
+                        local allIntelDisablers = allIntelDisabledByEvent[intel]
+                        if not allIntelDisablers then
+                            allIntelDisabledByEvent[intel] = {}
+                        end
+                        if not allIntelDisablers[disabler] then
+                            allIntelDisabledByEvent[intel][disabler] = true
+                            self:DisableIntel(intel)
+                            self:OnIntelDisabled(intel)
                         end
                     end
                 end
@@ -175,14 +177,12 @@ IntelComponent = ClassSimple {
 
             -- enable all intel
             if not intel then
-                for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                        if allIntelDisabledByEvent[i][disabler] then
-                            allIntelDisabledByEvent[i][disabler] = nil
-                            if table.empty(allIntelDisabledByEvent[i]) then
-                                self:OnIntelRecharge(i)
-                            end
+                for intel, _ in allIntel do
+                    local allIntelDisablers = allIntelDisabledByEvent[intel]
+                    if allIntelDisablers[disabler] then
+                        allIntelDisablers[disabler] = nil
+                        if table.empty(allIntelDisablers) then
+                            self:OnIntelRecharge(intel)
                         end
                     end
                 end
