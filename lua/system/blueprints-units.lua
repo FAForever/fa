@@ -363,11 +363,6 @@ local function PostProcessUnit(unit)
             end
         end
 
-        -- special case: unit has enhancements and therefore can have any intel type
-        if enhancementBlueprints then
-            status.AllIntelFromEnhancements = {}
-        end
-
         -- usual case: find all remaining intel
         status.AllIntel = {}
         for name, value in intelBlueprint do
@@ -385,7 +380,7 @@ local function PostProcessUnit(unit)
         end
 
         -- check if we have any intel
-        if not ( table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints ) then
+        if not ( table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) ) then
             -- cache it
             status.AllIntelDisabledByEvent = {}
             status.AllIntelRecharging = {}

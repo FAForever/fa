@@ -88,7 +88,6 @@ IntelComponent = ClassSimple {
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
-            local allIntelFromEnhancements = status.AllIntelFromEnhancements
 
             -- disable all intel
             if not intel then
@@ -120,14 +119,8 @@ IntelComponent = ClassSimple {
 
             -- disable one intel
             elseif allIntel[intel]
-                or allIntelFromEnhancements[intel]
                 or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
             then
-                -- track what intel types are from enhancements
-                if disabler == 'Enhancement' then
-                    allIntelFromEnhancements[intel] = true
-                end
-
                 local allIntelDisablers = allIntelDisabledByEvent[intel]
                 if not allIntelDisablers then
                     allIntelDisabledByEvent[intel] = {}
@@ -153,7 +146,6 @@ IntelComponent = ClassSimple {
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
-            local allIntelFromEnhancements = status.AllIntelFromEnhancements
 
             -- special case when unit is finished building
             if disabler == 'NotInitialized' then
@@ -187,15 +179,13 @@ IntelComponent = ClassSimple {
                     end
                 end
 
-                if allIntelFromEnhancements then
-                    for i, _ in allIntelFromEnhancements do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                            if allIntelDisabledByEvent[i][disabler] then
-                                allIntelDisabledByEvent[i][disabler] = nil
-                                if table.empty(allIntelDisabledByEvent[i]) then
-                                    self:OnIntelRecharge(i)
-                                end
+                if disabler ~= 'Energy' and allIntelMaintenanceFree then
+                    for intel, _ in allIntelMaintenanceFree do
+                        local allIntelDisablers = allIntelDisabledByEvent[intel]
+                        if allIntelDisablers[disabler] then
+                            allIntelDisablers[disabler] = nil
+                            if table.empty(allIntelDisablers) then
+                                self:OnIntelRecharge(intel)
                             end
                         end
                     end
@@ -203,14 +193,8 @@ IntelComponent = ClassSimple {
 
             -- enable one intel
             elseif allIntel[intel] 
-                or allIntelFromEnhancements[intel]
                 or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
             then
-                -- track what intel types are from enhancements
-                if disabler == 'Enhancement' then
-                    allIntelFromEnhancements[intel] = true
-                end
-
                 local allIntelDisablers = allIntelDisabledByEvent[intel]
                 if allIntelDisablers[disabler] then
                     allIntelDisablers[disabler] = nil

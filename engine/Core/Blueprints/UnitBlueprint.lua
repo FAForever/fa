@@ -987,7 +987,6 @@
 ---@field AllIntel table<IntelType, boolean>
 ---@field AllIntelRecharging table<IntelType, boolean>
 ---@field AllIntelMaintenanceFree table<IntelType, boolean>
----@field AllIntelFromEnhancements table<IntelType, boolean>
 ---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
