@@ -91,7 +91,7 @@ IntelComponent = ClassSimple {
             local allIntelFromEnhancements = status.AllIntelFromEnhancements
             if not intel then
                 for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
+                    if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
                         allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                         if not allIntelDisabledByEvent[i][disabler] then
                             allIntelDisabledByEvent[i][disabler] = true
@@ -103,7 +103,7 @@ IntelComponent = ClassSimple {
 
                 if allIntelMaintenanceFree then
                     for i, _ in allIntelMaintenanceFree do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
+                        if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
                             allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                             if not allIntelDisabledByEvent[i][disabler] then
                                 allIntelDisabledByEvent[i][disabler] = true
@@ -121,7 +121,7 @@ IntelComponent = ClassSimple {
                     allIntelFromEnhancements[intel] = true
                 end
 
-                if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
+                if not (disabler == 'Energy' and allIntelMaintenanceFree[intel]) then
                     allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
                     if not allIntelDisabledByEvent[intel][disabler] then
                         allIntelDisabledByEvent[intel][disabler] = true
@@ -169,7 +169,7 @@ IntelComponent = ClassSimple {
             -- disable all intel
             if not intel then
                 for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
+                    if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
                         allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                         if allIntelDisabledByEvent[i][disabler] then
                             allIntelDisabledByEvent[i][disabler] = nil
@@ -182,7 +182,7 @@ IntelComponent = ClassSimple {
 
                 if allIntelFromEnhancements then
                     for i, _ in allIntelFromEnhancements do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
+                        if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
                             allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
                             if allIntelDisabledByEvent[i][disabler] then
                                 allIntelDisabledByEvent[i][disabler] = nil
@@ -201,7 +201,7 @@ IntelComponent = ClassSimple {
                     allIntelFromEnhancements[intel] = true
                 end
 
-                if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
+                if not (disabler == 'Energy' and allIntelMaintenanceFree[intel]) then
                     allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
                     if allIntelDisabledByEvent[intel][disabler] then
                         allIntelDisabledByEvent[intel][disabler] = nil
