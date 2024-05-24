@@ -355,9 +355,10 @@ local function PostProcessUnit(unit)
         end
 
         -- special case: unit has specific intel types that are considered free
-        if intelBlueprint.ActiveIntel then
+        local activeIntel = intelBlueprint.ActiveIntel
+        if activeIntel then
             status.AllIntelMaintenanceFree = {}
-            for intel, _ in intelBlueprint.ActiveIntel do
+            for intel, _ in activeIntel do
                 status.AllIntelMaintenanceFree[intel] = true
             end
         end
@@ -373,7 +374,7 @@ local function PostProcessUnit(unit)
 
             if value == true or value > 0 then
                 local intel = BlueprintNameToIntel[name]
-                if intel then
+                if intel and not activeIntel[intel] then
                     if allIntelIsFree then
                         status.AllIntelMaintenanceFree[intel] = true
                     else
