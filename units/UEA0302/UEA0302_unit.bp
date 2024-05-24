@@ -129,7 +129,6 @@ UnitBlueprint{
         BuildCostEnergy = 7500,
         BuildCostMass = 195,
         BuildTime = 900,
-        MaintenanceConsumptionPerSecondEnergy = 1,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -163,10 +162,6 @@ UnitBlueprint{
         UnitName = "<LOC uea0302_name>SR90 Blackbird",
     },
     Intel = {
-        ActiveIntel = {
-            Radar = true,
-            Omni = true,
-        },
         JamRadius = {
             Max = 25,
             Min = 10,
