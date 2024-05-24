@@ -23,4 +23,9 @@
 local SubUnit = import('/lua/defaultunits.lua').SubUnit
 
 ---@class TSubUnit : SubUnit
-TSubUnit = ClassUnit(SubUnit) {}
+TSubUnit = ClassUnit(SubUnit) {
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    }
+}

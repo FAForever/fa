@@ -36,6 +36,11 @@ local ForkThread = ForkThread
 ---@field TransformManipulator moho.AnimationManipulator
 TConstructionUnit = ClassUnit(ConstructionUnit) {
 
+    VeterancyFx = {
+        "/effects/emitters/veterancy/uef_vet_1_v2.bp",
+        "/effects/emitters/veterancy/uef_vet_1_v3.bp",
+    },
+
     ---@param self TConstructionUnit
     ---@param builder Unit
     ---@param layer Layer
