@@ -118,7 +118,7 @@ IntelComponent = ClassSimple {
 
             -- disable one intel
             elseif allIntel[intel]
-                or (allIntelFromEnhancements and allIntelFromEnhancements[intel])
+                or allIntelFromEnhancements[intel]
                 or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
             then
                 -- track what intel types are from enhancements
@@ -203,7 +203,7 @@ IntelComponent = ClassSimple {
 
             -- enable one intel
             elseif allIntel[intel] 
-                or (allIntelFromEnhancements and allIntelFromEnhancements[intel])
+                or allIntelFromEnhancements[intel]
                 or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
             then
                 -- track what intel types are from enhancements
