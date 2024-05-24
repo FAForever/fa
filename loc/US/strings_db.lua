@@ -1447,7 +1447,7 @@ Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield 
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
 Unit_Description_0021="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems.\n\n+64 Omni Radius\n+15 Vision Radius"
-Unit_Description_0023="Primary weapon now fires 1.82 times as fast.\n\n+82% Rate of Fire"
+Unit_Description_0023="Primary weapon now fires twice as fast.\n\n+100% Rate of Fire"
 Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range.\n\n+10 Main cannon range\n+2 Main cannon damage radius"
 
 -- UEF -- Land Units
