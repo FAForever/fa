@@ -114,8 +114,11 @@ IntelComponent = ClassSimple {
                     end
                 end
 
-                -- disable one intel
-            elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
+            -- disable one intel
+            elseif allIntel[intel]
+                or (allIntelFromEnhancements and allIntelFromEnhancements[intel])
+                or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
+            then
                 -- special case that requires additional book keeping
                 if disabler == 'Enhancement' then
                     allIntelFromEnhancements[intel] = true
@@ -166,7 +169,7 @@ IntelComponent = ClassSimple {
                 return
             end
 
-            -- disable all intel
+            -- enable all intel
             if not intel then
                 for i, _ in allIntel do
                     if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
@@ -194,8 +197,11 @@ IntelComponent = ClassSimple {
                     end
                 end
 
-                -- disable one intel
-            elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
+            -- enable one intel
+            elseif allIntel[intel] 
+                or (allIntelFromEnhancements and allIntelFromEnhancements[intel])
+                or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
+            then
                 -- special case that requires additional book keeping
                 if disabler == 'Enhancement' then
                     allIntelFromEnhancements[intel] = true
