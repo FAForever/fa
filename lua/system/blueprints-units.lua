@@ -384,7 +384,7 @@ local function PostProcessUnit(unit)
         end
 
         -- check if we have any intel
-        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints) then
+        if not ( table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints ) then
             -- cache it
             status.AllIntelDisabledByEvent = {}
             status.AllIntelRecharging = {}
