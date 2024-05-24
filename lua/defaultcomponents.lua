@@ -74,7 +74,7 @@ IntelComponent = ClassSimple {
     end,
 
     ---@param self IntelComponent | Unit
-    ---@param disabler string
+    ---@param disabler string The reason the intel is disabled. If it's 'Energy', then free intel does not get disabled.
     ---@param intel? IntelType
     DisableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
@@ -84,11 +84,13 @@ IntelComponent = ClassSimple {
             -- prevent recharging from occuring
             self:OnIntelRechargeFailed()
 
-            -- disable all intel
+            -- upvalue for performance
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
             local allIntelFromEnhancements = status.AllIntelFromEnhancements
+
+            -- disable all intel
             if not intel then
                 for i, _ in allIntel do
                     if not (disabler == 'Energy' and allIntelMaintenanceFree[i]) then
@@ -119,7 +121,7 @@ IntelComponent = ClassSimple {
                 or (allIntelFromEnhancements and allIntelFromEnhancements[intel])
                 or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
             then
-                -- special case that requires additional book keeping
+                -- track what intel types are from enhancements
                 if disabler == 'Enhancement' then
                     allIntelFromEnhancements[intel] = true
                 end
@@ -138,13 +140,14 @@ IntelComponent = ClassSimple {
     end,
 
     ---@param self IntelComponent | Unit
-    ---@param disabler string
+    ---@param disabler string The reason the intel is disabled. Intel will not enable if some other disabler is disabling it.
     ---@param intel? IntelType
     EnableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
         if status then
             -- LOG("EnableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
 
+            -- upvalue for performance
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
@@ -203,7 +206,7 @@ IntelComponent = ClassSimple {
                 or (allIntelFromEnhancements and allIntelFromEnhancements[intel])
                 or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
             then
-                -- special case that requires additional book keeping
+                -- track what intel types are from enhancements
                 if disabler == 'Enhancement' then
                     allIntelFromEnhancements[intel] = true
                 end
