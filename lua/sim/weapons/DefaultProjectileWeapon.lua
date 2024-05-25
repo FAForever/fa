@@ -151,7 +151,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             while not self:BeenDestroyed() do
                 local cond = self:CanFire()
                 if cond ~= lastCond then
-                    LOGWeapon(self, "changed CanFire: " .. tostring(cond))
+                    LOGWeapon(self, "changed CanFire to " .. tostring(cond))
                     lastCond = cond
                 end
                 WaitTicks(1)
@@ -1089,7 +1089,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
 
                     local proj = self:CreateProjectileAtMuzzle(muzzle)
-                    LOGWeapon(self, string.format("Fired! Shot #%d Rack #%d", self.CurrentSalvoNumber or -1, self.CurrentRackSalvoNumber or -1) )
+                    LOGWeapon(self, string.format("Fired! Shot #%d Rack #%d"
+                        , self.CurrentSalvoNumber or -1
+                        , self.CurrentRackSalvoNumber or -1
+                        )
+                    )
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
@@ -1181,6 +1185,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
                 baseOnLostTarget(self)
             else
+                LOGWeapon(self, "FiringState OnLostTarget")
                 Weapon.OnLostTarget(self)
 
                 -- it's usually okay for a salvo to continue firing unless MuzzleVelocityReduceDistance is present, which requires a target to always exist
@@ -1196,7 +1201,21 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
-        -- Set a bool so we won't fire if the target reticle is moved
+        OnGotTarget = function(self)
+            self.__base.OnGotTarget(self)
+            LOGWeapon(self, "FiringState OnGotTarget")
+        end,
+
+        OnStartTracking = function(self)
+            self.__base.OnStartTracking(self)
+            LOGWeapon(self, "FiringState OnStartTracking")
+        end,
+
+        OnStopTracking = function(self)
+            self.__base.OnStopTracking(self)
+            LOGWeapon(self, "FiringState OnStopTracking")
+        end,
+
         OnHaltFire = function(self)
             self.HaltFireOrdered = true
         end,
