@@ -54,7 +54,6 @@ URL0301 = ClassUnit(CCommandUnit) {
         if self.Blueprint.General.BuildBones then
             self:SetupBuildBones()
         end
-        self.IntelButtonSet = true
     end,
 
     __init = function(self)

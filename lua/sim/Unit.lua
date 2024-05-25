@@ -495,10 +495,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
-
-        if not self.MaintenanceConsumption then
-            self.ToggledOff = true
-        end
     end,
 
     ---@param self Unit
@@ -543,10 +539,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:PlayUnitAmbientSound('ActiveLoop')
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
-        end
-
-        if self.MaintenanceConsumption then
-            self.ToggledOff = false
         end
     end,
 
