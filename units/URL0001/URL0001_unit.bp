@@ -978,7 +978,6 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Heavy Microwave Laser",
             EnabledByEnhancement = "MicrowaveLaserGenerator",
-            EnergyChargeForFirstShot = false,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
