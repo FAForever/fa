@@ -1041,11 +1041,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Render the fire recharge bar
         ---@param self DefaultProjectileWeapon
         ---@param rateOfFire number
-        RenderClockThread = function(self, rateOfFire)
-            local unit = self.unit
-            local clockTime = math.round(10 * rateOfFire)
-            local totalTime = clockTime
-            clockTime = (1 - self:GetFireClockPct()) * totalTime
+        RenderClockThread = function(self)
+            local totalTime = MATH_IRound(1 / self:GetWeaponRoF())
+            clockTime = self:GetFireClockRemainingSeconds()
             while clockTime >= 0 and
                 not self:BeenDestroyed() and
                 not unit.Dead do
@@ -1106,8 +1104,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- Fork timer counter thread carefully
             if not self:BeenDestroyed() and
                 not unit.Dead then
-                if bp.RenderFireClock and rof > 0 then
-                    self:ForkThread(self.RenderClockThread, 1 / rof)
+                if bp.RenderFireClock then
+                    self:ForkThread(self.RenderClockThread)
                 end
             end
 
