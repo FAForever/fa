@@ -482,7 +482,7 @@ UnitBlueprint {
             MaintenanceConsumptionPerSecondEnergy = 350,
             Mesh = "/effects/entities/Shield01/Shield01_mesh",
             MeshZ = "/effects/entities/Shield01/Shield01z_mesh",
-            Name = "<LOC enhancements_0050>Advanced Shield Generator Field",
+            Name = "<LOC enhancements_0152_faf>Advanced Shield Generator Field",
             Prerequisite = "ShieldGeneratorField",
             ShieldEnergyDrainRechargeTime = 5,
             ShieldEnhancementNumber = 5,
@@ -532,7 +532,7 @@ UnitBlueprint {
             BuildTime = 0.1,
             HideBones = { "Back_Upgrade_B01" },
             Icon = "asf",
-            Name = "<LOC enhancements_0051>Remove Shields",
+            Name = "<LOC enhancements_0153_faf>Remove Advanced Shield Generator Field",
             Prerequisite = "AdvancedShieldGeneratorField",
             RemoveEnhancements = {
                 "AdvancedShieldGeneratorField",
