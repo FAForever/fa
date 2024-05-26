@@ -306,6 +306,21 @@ UEL0001 = ClassUnit(ACUUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
+        elseif enh == 'AdvancedShieldGeneratorField' then
+            self:AddToggleCap('RULEUTC_ShieldToggle')
+            self:DestroyShield()
+            self:ForkThread(
+                function()
+                    WaitTicks(1)
+                    self:CreateShield(bp)
+                    self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+                    self:SetMaintenanceConsumptionActive()
+                end
+            )
+        elseif enh == 'AdvancedShieldGeneratorFieldRemove' then
+            self:DestroyShield()
+            self:SetMaintenanceConsumptionInactive()
+            self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'AdvancedEngineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
