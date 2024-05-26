@@ -476,7 +476,7 @@ UnitBlueprint {
             BuildCostEnergy = 80000,
             BuildCostMass = 1600,
             BuildTime = 2000,
-            Icon = "sgf",
+            Icon = "asf",
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
             MaintenanceConsumptionPerSecondEnergy = 350,
@@ -531,7 +531,7 @@ UnitBlueprint {
             BuildCostMass = 1,
             BuildTime = 0.1,
             HideBones = { "Back_Upgrade_B01" },
-            Icon = "sgf",
+            Icon = "asf",
             Name = "<LOC enhancements_0051>Remove Shields",
             Prerequisite = "AdvancedShieldGeneratorField",
             RemoveEnhancements = {

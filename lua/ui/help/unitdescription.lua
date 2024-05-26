@@ -19,6 +19,7 @@ Description = {
     ['uel0001-srtn'] = "<LOC Unit_Description_0009> Adds a short-range tactical nuke.",
     ['uel0001-pqt'] = "<LOC Unit_Description_0010> Adds teleporter. Requires considerable Energy to activate.",
     ['uel0001-sgf'] = "<LOC Unit_Description_0011> Expands the radius of the ACU's personal shield. Requires Energy to run.",
+    ['uel0001-asf'] = "<LOC Unit_Description_0467_faf> Enhances the protective shield around the ACU. Requires Energy to run.",
     ['uel0001-isb'] = "<LOC Unit_Description_0012> Increases ACU's resource generation.",
     ['uel0001-psg'] = "<LOC Unit_Description_0013> Creates a protective shield around the ACU. Requires Energy to run.",
     ['uel0001-led'] = "<LOC Unit_Description_0014> Engineering Drone acts as a secondary Engineer. Assists the ACU where applicable.",
