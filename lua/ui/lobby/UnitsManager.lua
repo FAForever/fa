@@ -164,6 +164,7 @@ local sortBy = {
         'CloakingGenerator',
         'ShieldHeavy',
         'ShieldGeneratorField',
+        'AdvancedShieldGeneratorField',
         'Shield',
         'RegenAura',
         'AdvancedRegenAura',
