@@ -535,6 +535,7 @@ UnitBlueprint {
             Name = "<LOC enhancements_0153_faf>Remove Advanced Shield Generator Field",
             Prerequisite = "AdvancedShieldGeneratorField",
             RemoveEnhancements = {
+                "ShieldGeneratorField",
                 "AdvancedShieldGeneratorField",
                 "AdvancedShieldGeneratorFieldRemove",
             },
