@@ -1,0 +1,1 @@
+- (#6162) Fix incorrect unit tooltip docking after switching layout in-game (default alt-up/alt-down).
