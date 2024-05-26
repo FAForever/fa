@@ -296,13 +296,17 @@ function GenerateHotbuildModifiers()
                     modifiers[altModKey] =  info.action
                 elseif not shiftModBinding then
                     modifiers[shiftModKey] =  info.action
-                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
+                    WARN(string.format('Alt modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Alt modifier of the Hotbuild action will not work!'
+                        , info.name, key, altModBinding.name, altModKey))
                 elseif not altModBinding then
                     modifiers[altModKey] =  info.action
-                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
+                    WARN(string.format('Shift modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Shift modifier of the Hotbuild action will not work!'
+                        , info.name, key, shiftModBinding.name, shiftModKey))
                 else
-                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
-                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
+                    WARN(string.format('Alt modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Alt modifier of the Hotbuild action will not work!'
+                        , info.name, key, altModBinding.name, altModKey))
+                    WARN(string.format('Shift modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Shift modifier of the Hotbuild action will not work!'
+                        , info.name, key, shiftModBinding.name, shiftModKey))
                 end
             end
         end
