@@ -218,6 +218,15 @@ local function PostProcessUnit(unit)
         end
     end
 
+    -- Build range overlay
+    -- only for engineers, excluding build pods and insignificant units such as Cybran build drones
+    if isEngineer and not (isPod or unit.CategoriesHash['INSIGNIFICANTUNIT']) then
+        if not unit.AI then unit.AI = {} end
+        unit.AI.StagingPlatformScanRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+        table.insert(unit.Categories, 'OVERLAYMISC')
+        unit.CategoriesHash.OVERLAYMISC = true
+    end
+
     -- sanitize air unit footprints
 
     -- value used by formations to determine the distance between other air units. Note
