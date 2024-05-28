@@ -141,7 +141,8 @@
 ---@field GuardReturnRadius number
 --- guard range for the unit, automatically added if absent
 ---@field GuardScanRadius number
---- initial auto mode behaviour for the unit
+--- initial toggle of automatic behaviors (silo building and auto-assist)
+---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
 ---@field NeedUnpack boolean
