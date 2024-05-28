@@ -1057,7 +1057,7 @@ end
 function SetActiveBuildTemplate(template)
 end
 
---- Set if anyone in the list is auto building
+--- Set if anyone in the list is auto building or auto assisting
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
