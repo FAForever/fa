@@ -2,4 +2,4 @@
   - Add the overlay to engineer drones/pods.
   - Correctly display build ranges modded through `ModBlueprints()`.
   - Display the auto assist range of engineer stations instead of their build range.
-    - This is only a -2 displayed range difference without mods, but it will be larger with mods.
+    - This is only a -2 displayed range difference without mods, but it will be a larger difference with mods.
