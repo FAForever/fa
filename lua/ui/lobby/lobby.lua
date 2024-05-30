@@ -4365,7 +4365,7 @@ function CreateUI(maxPlayers)
             ---@see refreshObserverList
             if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
                 if numTeams < 3 then
-                obsIndex = obsIndex - numTeams
+                    obsIndex = obsIndex - numTeams
                 else
                     -- 3+ teams has ratings at the end of the list, don't allow kicking when clicking those rating rows
                     maxObsIndex = maxObsIndex - numTeams
