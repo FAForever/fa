@@ -4351,21 +4351,31 @@ function CreateUI(maxPlayers)
             local teams = {}
             local numTeams = 0
             for i, player in gameInfo.PlayerOptions:pairs() do
-                if not teams[player.Team] and player.Team != 1 then
-                    teams[player.Team] = 1
+                if not teams[player.Team] and player.Team ~= 1 then
+                    teams[player.Team] = true
                     numTeams = numTeams + 1
                 end
             end
-            -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
-            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+
+            -- adjust index by 1 because 0-based (ItemList rows) vs 1-based (Lua array) indexing
             local obsIndex = row + 1
-            if numTeams < 3 then
+            local maxObsIndex = self:GetItemCount()
+
+            -- adjust index by the number of rows taken up by team ratings. 
+            ---@see refreshObserverList
+            if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+                if numTeams < 3 then
                 obsIndex = obsIndex - numTeams
+                else
+                    -- 3+ teams has ratings at the end of the list, don't allow kicking when clicking those rating rows
+                    maxObsIndex = maxObsIndex - numTeams
+                end
             end
             
             -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
             -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
-            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
+            -- and that aren't the rows with team ratings when there are 3 or more teams
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID ~= localPlayerID and obsIndex <= maxObsIndex then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                         "<LOC lobui_0167>Kick Player", function()
                                             SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
