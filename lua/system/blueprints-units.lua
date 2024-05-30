@@ -224,7 +224,8 @@ local function PostProcessUnit(unit)
         -- guarantee that the table exists
         if not unit.AI then unit.AI = {} end
 
-        local overlayRadius = unit.Economy.MaxBuildDistance or 5
+        -- Engine allows building +2 range outside the max distance (or even more for large buildings)
+        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
 
         -- Display auto-assist range for engineer stations instead of max build distance if it is smaller
         if unit.CategoriesHash['ENGINEERSTATION'] then
