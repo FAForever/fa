@@ -62,16 +62,10 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Open'}))
 
     bg = Layouter(Bitmap(frame, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds')))
-        :Height(0):Width(0):Over(frame, 1)
-
-    local textGroup = Group(bg:Get())
-
-    if goalControl == nil then
-        goalControl = textGroup
-    end
-    bg = bg:AtCenterIn(goalControl):End()
-
+        :Height(0):Width(0):Over(frame, 1):AtCenterIn(goalControl):End()
     bg.border = CreateBorder(bg)
+
+    local textGroup = Group(bg)
 
     local text = Layouter(UIUtil.CreateText(textGroup, text, 22, UIUtil.titleFont))
         :AtCenterIn(frame, -250)
@@ -140,9 +134,6 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
         -- fade in the text when the announcement appears
         elseif time > .2 and time < 3 and textAlpha ~= 1 then
             textGroup:SetAlpha(math.min(textAlpha + (delta * 2), 1), true)
-        end
-        if goalControl == textGroup then
-            self:SetAlpha(textGroupAlpha, true)
         end
 
         if time > 3.7 then
