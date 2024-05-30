@@ -219,10 +219,22 @@ local function PostProcessUnit(unit)
     end
 
     -- Build range overlay
-    -- only for engineers, excluding build pods and insignificant units such as Cybran build drones
-    if isEngineer and not (isPod or unit.CategoriesHash['INSIGNIFICANTUNIT']) then
+    -- only for engineers, excluding insignificant units such as Cybran build drones
+    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT']) then
+        -- guarantee that the table exists
         if not unit.AI then unit.AI = {} end
-        unit.AI.StagingPlatformScanRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+
+        local overlayRadius = unit.Economy.MaxBuildDistance or 5
+
+        -- Display auto-assist range for engineer stations instead of max build distance if it is smaller
+        if unit.CategoriesHash['ENGINEERSTATION'] then
+            local guardScanRadius = unit.AI.GuardScanRadius
+            if guardScanRadius < overlayRadius then
+                overlayRadius = guardScanRadius
+            end
+        end
+
+        unit.AI.StagingPlatformScanRadius = overlayRadius
         table.insert(unit.Categories, 'OVERLAYMISC')
         unit.CategoriesHash.OVERLAYMISC = true
     end
