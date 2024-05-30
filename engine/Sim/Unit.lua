@@ -479,7 +479,7 @@ end
 function Unit:SetAccMult(accelMult)
 end
 
---- sets silo auto-build mode
+--- enable silo auto-build or unit auto-assist
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end

@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC uel0111_desc>Mobile Missile Launcher",
-    AI = { InitialAutoMode = true },
+    AI = { },
     Audio = {
         AmbientMove = Sound { Bank = 'UEL',        Cue = 'UEL0111_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'UELDestroy', Cue = 'UEL_Destroy_Med_Land', LodCutoff = 'UnitMove_LodCutoff' },
