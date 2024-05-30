@@ -19,7 +19,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
-local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
+local unitViewLayout = nil -- Holds the current layout, updated by SetLayout().
 local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local Grid = import("/lua/maui/grid.lua").Grid
 local Construction = import("/lua/ui/game/construction.lua")
@@ -739,12 +739,14 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
     unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
     controls.parent = mapGroup
     controls.orderPanel = orderControl
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview')) -- SetLayout() will set this too but let's make sure CreateUI() does not use nil, even though it only sets up an OnFrame function.
     CreateUI()
     SetLayout(UIUtil.currentLayout)
 end
