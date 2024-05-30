@@ -101,6 +101,12 @@ UnitBlueprint{
                     LODCutoff = 600,
                     ShaderName = "UEFNavy",
                 },
+                {
+                    AlbedoName = "ues0302_lod1_albedo.dds",
+                    LODCutoff = 1000,
+                    ShaderName = "UEFNavy",
+                    SpecularName = "ues0302_lod1_specular.dds",
+                }
             },
         },
         MovementEffects = {
