@@ -219,8 +219,8 @@ local function PostProcessUnit(unit)
     end
 
     -- Build range overlay
-    -- only for engineers, excluding insignificant units such as Cybran build drones
-    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT']) then
+    -- only for engineers, excluding insignificant units such as Cybran build drones or air staging that has its own radius set
+    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT'] or unit.CategoriesHash['AIRSTAGINGPLATFORM']) then
         -- guarantee that the table exists
         if not unit.AI then unit.AI = {} end
 
