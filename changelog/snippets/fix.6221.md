@@ -1,0 +1,1 @@
+- (#5759) UEF Tech 1 Airscout and Battleship LOD1 fixes
