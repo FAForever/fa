@@ -139,12 +139,8 @@ local function AssignIcons(units, assignments, identifier)
         for _, info in assignments do
             if info.BlueprintId and info.IconSet then
                 AssignBlueprintId(units, info.BlueprintId, info.IconSet)
-                continue
-            end
-
-            if info.TypeId and info.Iconset then
+            elseif info.TypeId and info.Iconset then
                 AssignTypeId(units, info.TypeId, info.IconSet)
-                continue
             end
         end
     end
@@ -771,85 +767,84 @@ function PreModBlueprints(all_bps)
         ExtractCloakMeshBlueprint(bp)
 
         -- Units with no categories are skipped
-        if not bp.Categories then
-            continue
-        end
+        if bp.Categories then
 
-        -- Construct hash-based categories
-        bp.CategoriesHash = table.hash(bp.Categories)
+            -- Construct hash-based categories
+            bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- Allow to add or delete categories for mods
-        if bp.DelCategories then
-            for _, v in bp.DelCategories do
-                bp.CategoriesHash[v] = false
+            -- Allow to add or delete categories for mods
+            if bp.DelCategories then
+                for _, v in bp.DelCategories do
+                    bp.CategoriesHash[v] = false
+                end
+                bp.DelCategories = nil
             end
-            bp.DelCategories = nil
-        end
 
-        if bp.AddCategories then
-            for _, v in bp.AddCategories do
-                bp.CategoriesHash[v] = true
+            if bp.AddCategories then
+                for _, v in bp.AddCategories do
+                    bp.CategoriesHash[v] = true
+                end
+                bp.AddCategories = nil
             end
-            bp.AddCategories = nil
-        end
 
-        -- Build range overlay
-        if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
-            if not bp.AI then bp.AI = {} end
-            bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
-                bp.CategoriesHash.OVERLAYMISC = true
+            -- Build range overlay
+            if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
+                if not bp.AI then bp.AI = {} end
+                bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
+                if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
+                    bp.CategoriesHash.OVERLAYMISC = true
+                end
             end
-        end
 
-        -- Add common category values for easier lookup
+            -- Add common category values for easier lookup
 
-        -- Add tech category
-        for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
-            if bp.CategoriesHash[category] then
-                bp.TechCategory = category
-                break
+            -- Add tech category
+            for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
+                if bp.CategoriesHash[category] then
+                    bp.TechCategory = category
+                    break
+                end
             end
-        end
 
-        -- Add layer category
-        for _, category in {'LAND', 'AIR', 'NAVAL'} do
-            if bp.CategoriesHash[category] then
-                bp.LayerCategory = category
-                break
+            -- Add layer category
+            for _, category in {'LAND', 'AIR', 'NAVAL'} do
+                if bp.CategoriesHash[category] then
+                    bp.LayerCategory = category
+                    break
+                end
             end
+
+            -- Add faction category
+            bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
+
+            -- Adjust weapon blueprints
+            for i, w in bp.Weapon or {} do
+                -- add in weapon blueprint id
+                local label = w.Label or "Unlabelled"
+                w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
+            end
+
+            -- Hotfix for naval wrecks
+            if bp.CategoriesHash.NAVAL and not bp.Wreckage then
+                bp.Wreckage = {
+                    Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+                    EnergyMult = 0,
+                    HealthMult = 0.9,
+                    MassMult = 0.9,
+                    ReclaimTimeMultiplier = 1,
+                    WreckageLayers = {
+                        Air = false,
+                        Land = false,
+                        Seabed = true,
+                        Sub = true,
+                        Water = true,
+                    },
+                }
+            end
+
+            -- Synchronize hashed categories with actual categories
+            bp.Categories = table.unhash(bp.CategoriesHash)
         end
-
-        -- Add faction category
-        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
-
-        -- Adjust weapon blueprints
-        for i, w in bp.Weapon or {} do
-            -- add in weapon blueprint id
-            local label = w.Label or "Unlabelled"
-            w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
-        end
-
-        -- Hotfix for naval wrecks
-        if bp.CategoriesHash.NAVAL and not bp.Wreckage then
-            bp.Wreckage = {
-                Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-                EnergyMult = 0,
-                HealthMult = 0.9,
-                MassMult = 0.9,
-                ReclaimTimeMultiplier = 1,
-                WreckageLayers = {
-                    Air = false,
-                    Land = false,
-                    Seabed = true,
-                    Sub = true,
-                    Water = true,
-                },
-            }
-        end
-
-        -- Synchronize hashed categories with actual categories
-        bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
     end
@@ -906,6 +901,9 @@ local function SpawnMenuDummyChanges(all_bps)
                         UniformScale = 0,
                         HideLifebars = true,
                     },
+                    Intel = {
+                        WaterVisionRadius = 0,
+                    },
                     Physics = {
                         SkirtOffsetX = SOffsetX,
                         SkirtOffsetZ = SOffsetZ,
@@ -943,30 +941,29 @@ function PostModBlueprints(all_bps)
     
     for _, bp in all_bps.Unit do
         -- skip units without categories
-        if not bp.Categories then
-            continue
-        end
+        if bp.Categories then
+            -- check if blueprint was changed in ModBlueprints(all_bps)
+            if bp.Mod or table.getsize(bp.CategoriesHash) ~= table.getsize(bp.Categories) then
+            bp.CategoriesHash = table.hash(bp.Categories)
+            end
 
-        -- check if blueprint was changed in ModBlueprints(all_bps)
-        if bp.Mod or table.getsize(bp.CategoriesHash) ~= table.getsize(bp.Categories) then
-           bp.CategoriesHash = table.hash(bp.Categories)
-        end
-
-        if bp.CategoriesHash.USEBUILDPRESETS then
-            -- HUSSAR adding logic for finding issues in enhancements table
-            local issues = {}
-            if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
-            if type(bp.Enhancements) ~= 'table' then table.insert(issues, 'no Enhancements table') end
-            if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
-            if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
-            -- check blueprint, if correct info for presets then put this unit on the list to handle later
-            if table.empty(issues) then
-                table.insert(preset_bps, table.deepcopy(bp))
-            else
-                issues = table.concat(issues, ', ')
-                WARN('UnitBlueprint ' .. repr(bp.BlueprintId) .. ' has a category USEBUILDPRESETS but ' .. issues)
+            if bp.CategoriesHash.USEBUILDPRESETS then
+                -- HUSSAR adding logic for finding issues in enhancements table
+                local issues = {}
+                if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
+                if type(bp.Enhancements) ~= 'table' then table.insert(issues, 'no Enhancements table') end
+                if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
+                if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
+                -- check blueprint, if correct info for presets then put this unit on the list to handle later
+                if table.empty(issues) then
+                    table.insert(preset_bps, table.deepcopy(bp))
+                else
+                    issues = table.concat(issues, ', ')
+                    WARN('UnitBlueprint ' .. repr(bp.BlueprintId) .. ' has a category USEBUILDPRESETS but ' .. issues)
+                end
             end
         end
+
         BlueprintLoaderUpdateProgress()
     end
 
@@ -980,7 +977,7 @@ function PostModBlueprints(all_bps)
 
     -- dynamically compute the unit threat values that are used by the AI to make sense
     -- of a units capabilities
-    SetUnitThreatValues(all_bps.Unit)
+    SetThreatValuesOfUnits(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
     ProcessWeapons(all_bps, all_bps.Unit)

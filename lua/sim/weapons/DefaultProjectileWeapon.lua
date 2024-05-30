@@ -402,7 +402,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
                 self.EconDrain = CreateEconomyEvent(self.unit, nrgReq, 0, time)
                 self.FirstShot = true
-                self.unit:ForkThread(self.EconomyDrainThread)
+                ForkThread(self.EconomyDrainThread, self)
             end
         end
     end,

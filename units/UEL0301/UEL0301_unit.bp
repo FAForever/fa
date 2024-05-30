@@ -263,7 +263,7 @@ UnitBlueprint{
             BuildTime = 5040,
             Icon = "acu",
             Name = "<LOC enhancements_0061>Energy Accelerator",
-            NewRateOfFire = 1.82,
+            NewRateOfFire = 2,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "UEL0301" },
         },

@@ -323,10 +323,10 @@ UnitBlueprint{
             MaxRadius = 38,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 13,
+            MuzzleVelocity = 22,
             NotExclusive = true,
             ProjectileId = "/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp",
-            ProjectileLifetime = 2,
+            ProjectileLifetime = 2.4,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {

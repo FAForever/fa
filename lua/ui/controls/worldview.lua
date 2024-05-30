@@ -32,7 +32,7 @@ local KeyCodeAlt = 18
 local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
-local weaponsCached = { }
+local unitsToWeaponsCached = { }
 
 ---@class Renderable : Destroyable
 ---@field OnRender fun(self:Renderable, worldView:WorldView)
@@ -41,52 +41,57 @@ local weaponsCached = { }
 ---@field texture string
 ---@field scale number
 
--- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
--- table from their blueprint. Otherwise returns null.
-
---- Returns all weapon blueprints that match the predicate of units with the `SHOWATTACKRETICLE` category set
+--- Returns all unique weapon blueprints that match the predicate, and are from units with the `SHOWATTACKRETICLE` category set
 ---@param predicate function<WeaponBlueprint>
----@return WeaponBlueprint[]
+---@return table<UnitId, WeaponBlueprint[] | false> unitsToWeapons
 local function GetSelectedWeaponsWithReticules(predicate)
     local selectedUnits = GetSelectedUnits()
 
     -- clear out the cache
-    local weapons = weaponsCached
-    for k, other in weapons do
-        weapons[k] = false
+    local unitsToWeapons = unitsToWeaponsCached
+    for k, other in unitsToWeapons do
+        unitsToWeapons[k] = false
     end
 
     -- find valid units
     if selectedUnits then
         for i, u in selectedUnits do
             local bp = u:GetBlueprint()
-            if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
-                for k, v in bp.Weapon do
-                    if predicate(v) then
-                        weapons[bp.BlueprintId] = v
-                        break
+            local bpId = bp.BlueprintId
+            if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not unitsToWeapons[bpId]) then
+                for _, wep in bp.Weapon do
+                    if predicate(wep) then
+                        if not unitsToWeapons[bpId] then
+                            unitsToWeapons[bpId] = { wep }
+                        else
+                            table.insert(unitsToWeapons[bpId], wep)
+                        end
                     end
                 end
             end
         end
     end
 
-    return weapons
+    return unitsToWeapons
 end
 
 --- A generic decal texture / size computation function that uses the damage or spread radius
 ---@param predicate function<WeaponBlueprint>
 ---@return WorldViewDecalData[]
 local function RadiusDecalFunction(predicate)
-    local weapons = GetSelectedWeaponsWithReticules(predicate)
+    local unitsToWeapons = GetSelectedWeaponsWithReticules(predicate)
 
     -- The maximum damage radius of a selected missile weapon.
     local maxRadius = 0
-    for _, w in weapons do
-        if w.FixedSpreadRadius and w.FixedSpreadRadius > maxRadius then
-            maxRadius = w.FixedSpreadRadius
-        elseif w.DamageRadius > maxRadius then
-            maxRadius = w.DamageRadius
+    for _, weapons in unitsToWeapons do
+        if weapons then
+            for _, w in weapons do
+                if w.FixedSpreadRadius and w.FixedSpreadRadius + w.DamageRadius > maxRadius then
+                    maxRadius = w.FixedSpreadRadius + w.DamageRadius
+                elseif w.DamageRadius > maxRadius then
+                    maxRadius = w.DamageRadius
+                end
+            end
         end
     end
 
@@ -105,7 +110,7 @@ end
 --- A decal texture / size computation function for `RULEUCC_Nuke`
 ---@return WorldViewDecalData[]
 local function NukeDecalFunc()
-    local weapons = GetSelectedWeaponsWithReticules(
+    local unitsToWeapons = GetSelectedWeaponsWithReticules(
         function(w)
             return w.NukeWeapon
         end
@@ -113,13 +118,17 @@ local function NukeDecalFunc()
 
     local inner = 0
     local outer = 0
-    for _, w in weapons do
-        if w.NukeOuterRingRadius > outer then
-            outer = w.NukeOuterRingRadius
-        end
+    for _, weapons in unitsToWeapons do
+        if weapons then
+            for _, w in weapons do
+                if w.NukeOuterRingRadius > outer then
+                    outer = w.NukeOuterRingRadius
+                end
 
-        if w.NukeInnerRingRadius > inner then
-            inner = w.NukeInnerRingRadius
+                if w.NukeInnerRingRadius > inner then
+                    inner = w.NukeInnerRingRadius
+                end
+            end
         end
     end
 
@@ -151,7 +160,8 @@ end
 local function AttackDecalFunc(mode)
     return RadiusDecalFunction(
         function(w)
-            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death" and w.WeaponCategory ~= "Anti Air"
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
+                and w.WeaponCategory ~= "Anti Air" and w.DamageType ~= 'Overcharge' and not w.EnabledByEnhancement
         end
 )
 end

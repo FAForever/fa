@@ -442,7 +442,7 @@ local function PostProcessUnit(unit)
             if category then
                 damagePerRangeCategory[category] = damagePerRangeCategory[category] + dps
             else
-                if weapon.WeaponCategory != 'Death' then
+                if weapon.WeaponCategory ~= 'Death' then
                     -- WARN("Invalid weapon on " .. unit.BlueprintId)
                 end
             end
@@ -635,7 +635,7 @@ function TestIntelValues(unit)
             local ogrids = BlueprintIntelNameToOgrids[nameIntel]
             if ogrids then
                 local radiusOnGrid = math.floor(radius / ogrids) * ogrids
-                if radiusOnGrid != radius then
+                if radiusOnGrid ~= radius then
                     WARN(
                         string.format(
                             "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d",

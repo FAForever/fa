@@ -96,14 +96,6 @@ SyncMeta = {
 ---@field AdjEnergyMod? number
 ---@field AdjRoFMod? number
 
----@class UnitCommand
----@field x number
----@field y number
----@field z number
----@field targetId? EntityId
----@field target? Entity
----@field commandType string 
-
 ---@class AIUnitProperties
 ---@field AIPlatoonReference AIPlatoon
 ---@field AIBaseManager LocationType
@@ -853,14 +845,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
-
-        -- Force me to move on to the guard properly when done
-        local guard = self:GetGuardedUnit()
-        if guard then
-            IssueToUnitClearCommands(self)
-            IssueReclaim({self}, target)
-            IssueGuard({self}, guard)
-        end
 
         -- add state to be able to show the amount reclaimed in the UI
         if target.IsProp then
@@ -2773,6 +2757,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 u:CheckAssistFocus()
             end
         end
+    end,
+
+    ---Called via hotkey to refocus any assisting engineers
+    ---@param self Unit
+    RefocusAssisters = function(self)
+        local engineerGuards = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
+        IssueClearCommands(engineerGuards)
+        IssueGuard(engineerGuards, self)
     end,
 
     ---@param self Unit
