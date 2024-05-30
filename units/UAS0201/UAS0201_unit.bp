@@ -11,9 +11,9 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
+        "ANTITORPEDO",
         "ANTINAVY",
         "ANTISUB",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "DESTROYER",
@@ -141,7 +141,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -160,7 +159,6 @@ UnitBlueprint{
         MeshExtentsX = 1.5,
         MeshExtentsY = 2,
         MeshExtentsZ = 6.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 15,
         TurnRate = 50,

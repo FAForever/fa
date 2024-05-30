@@ -1,9 +1,9 @@
 --****************************************************************************
 --**
---**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
+--**  File     :  /units/XSB1303/XSB1303_script.lua
 --**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
 --**
---**  Summary  :  Aeon T3 Mass Fabricator
+--**  Summary  :  Seraphim T3 Mass Fabricator
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
@@ -15,11 +15,12 @@ XSB1303 = ClassUnit(SMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         SMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
-        self.RingManip1 = CreateRotator(self, 'Blades01', 'y', nil, 0, 15, -30)
+        -- 1: Bottom, 2: Middle, 3: Top
+        self.RingManip1 = CreateRotator(self, 'Blades01', '-y', nil, 0, 15, 30)
         self.Trash:Add(self.RingManip1)
         self.RingManip2 = CreateRotator(self, 'Blades02', 'y', nil, 0, 15, 45)
         self.Trash:Add(self.RingManip2)
-        self.RingManip3 = CreateRotator(self, 'Blades03', 'y', nil, 0, 15, -60)
+        self.RingManip3 = CreateRotator(self, 'Blades03', '-y', nil, 0, 15, 60)
         self.Trash:Add(self.RingManip3)
     end,
 
@@ -35,7 +36,7 @@ XSB1303 = ClassUnit(SMassFabricationUnit) {
         self.RingManip1:SetSpinDown(false)
         self.RingManip2:SetSpinDown(false)
         self.RingManip3:SetSpinDown(false)
-    end,false
+    end,
 }
 
 TypeClass = XSB1303

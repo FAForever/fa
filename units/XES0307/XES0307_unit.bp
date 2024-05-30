@@ -20,6 +20,7 @@ UnitBlueprint{
     Categories = {
         "ANTIMISSILE",
         "ANTINAVY",
+        "ANTITORPEDO",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "DIRECTFIRE",
@@ -37,6 +38,7 @@ UnitBlueprint{
         "TECH3",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTINAVY",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -158,7 +160,6 @@ UnitBlueprint{
     LifeBarSize = 3.8,
     Physics = {
         BackUpDistance = 15,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -182,7 +183,6 @@ UnitBlueprint{
         MeshExtentsX = 2.25,
         MeshExtentsY = 2,
         MeshExtentsZ = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 35,

@@ -42,7 +42,6 @@ UnitBlueprint {
         "OVERLAYSONAR",
         "PRODUCTSC1",
         "RECLAIMABLE",
-        "REPAIR",
         "SELECTABLE",
         "SNIPEMODE",
         "TECH2",
@@ -179,7 +178,6 @@ UnitBlueprint {
     LifeBarSize = 1.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -195,7 +193,6 @@ UnitBlueprint {
         MaxSpeed = 4.5,
         MaxSpeedReverse = 4.5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 20,
         TurnRate = 40,
@@ -328,7 +325,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetCheckInterval = 1.0,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",

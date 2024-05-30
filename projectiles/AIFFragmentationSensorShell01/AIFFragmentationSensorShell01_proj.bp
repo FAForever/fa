@@ -39,13 +39,14 @@ ProjectileBlueprint {
     Physics = {
         DestroyOnWater = true,
         DetonateBelowHeight = 45,
-        InitialSpeed = 14.6,
+        InitialSpeed = 16,
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
         LeadTarget = false,
         TurnRate = 360,
         VelocityAlign = true,
         Fragments = 6,
-        FragmentId = '/projectiles/AIFFragmentationSensorShell02/AIFFragmentationSensorShell02_proj.bp'
+        FragmentId = '/projectiles/AIFFragmentationSensorShell02/AIFFragmentationSensorShell02_proj.bp',
+        FragmentRadius = 7,
     },
 }

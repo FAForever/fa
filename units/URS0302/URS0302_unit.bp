@@ -22,6 +22,8 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "ANTIMISSILE",
+        "WEAKANTIAIR",
+        "WEAKANTINAVY",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -167,7 +169,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -183,7 +184,6 @@ UnitBlueprint{
         MaxSpeed = 3.2,
         MaxSpeedReverse = 3,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -381,7 +381,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.2,
+            RateOfFire = 1.25,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -446,7 +446,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.2,
+            RateOfFire = 1.25,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",

@@ -38,7 +38,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -521,7 +520,6 @@ UnitBlueprint{
     LifeBarOffset = 0.4,
     LifeBarSize = 0.9,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -537,7 +535,6 @@ UnitBlueprint{
         MaxSpeed = 2.2,
         MaxSpeedReverse = 0,
         MaxSteerForce = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -627,7 +624,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
             ProjectileId = "/projectiles/CDFLaserDisintegrator03/CDFLaserDisintegrator03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 2.4,
+            ProjectileLifetimeUsesMultiplier = 1.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

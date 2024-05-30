@@ -20,6 +20,7 @@ local UIMain = import("/lua/ui/uimain.lua")
 local Select = import("/lua/ui/game/selection.lua")
 local EnhancementQueue = import("/lua/ui/notify/enhancementqueue.lua")
 local SetWeaponPriorities = import("/lua/keymap/misckeyactions.lua").SetWeaponPriorities
+local LoadIntoTransports = import("/lua/ui/game/hotkeys/load-in-transport.lua").LoadIntoTransports
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
 
@@ -115,31 +116,7 @@ function CreateMouseoverDisplay(parent, ID)
         return
     end
 
-    controls.mouseoverDisplay = Tooltip.CreateExtendedToolTip(parent, text, desc)
-    local Frame = GetFrame(0)
-    controls.mouseoverDisplay.Bottom:Set(parent.Top)
-    if (parent.Left() + (parent.Width() / 2)) - (controls.mouseoverDisplay.Width() / 2) < 0 then
-        controls.mouseoverDisplay.Left:Set(4)
-    elseif (parent.Right() - (parent.Width() / 2)) + (controls.mouseoverDisplay.Width() / 2) > Frame.Right() then
-        controls.mouseoverDisplay.Right:Set(function() return Frame.Right() - 4 end)
-    else
-        LayoutHelpers.AtHorizontalCenterIn(controls.mouseoverDisplay, parent)
-    end
-
-    local alpha = 0.0
-    controls.mouseoverDisplay:SetAlpha(alpha, true)
-    local mdThread = ForkThread(function()
-        WaitSeconds(createDelay)
-        while alpha <= 1.0 do
-            controls.mouseoverDisplay:SetAlpha(alpha, true)
-            alpha = alpha + 0.1
-            WaitSeconds(0.01)
-        end
-    end)
-
-    controls.mouseoverDisplay.OnDestroy = function(self)
-        KillThread(mdThread)
-    end
+    controls.mouseoverDisplay = Tooltip.CreateMouseoverDisplay(parent, {["text"] = text, ["body"] = desc}, nil, true)
 end
 
 local function CreateOrderButtonGrid()
@@ -1093,6 +1070,18 @@ AutoDeployInit = function(self, selection)
     end
 end
 
+local function TransportOrderBehavior(self, modifiers)
+    if modifiers.Left then
+        StandardOrderBehavior(self, modifiers)
+    elseif modifiers.Right then
+        if modifiers.Shift then
+            LoadIntoTransports(false)
+        else
+            LoadIntoTransports(true)
+        end
+    end
+end
+
 ---@alias CommandCap EngineCommandCap
 ---| "AttackMove"
 ---| "DroneL"
@@ -1131,7 +1120,7 @@ local defaultOrdersTable = {
     RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",    bitmapId = 'silo-build-tactical',   preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
     RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",        bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
     RULEUCC_Script = {              helpText = "special_action",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = StandardOrderBehavior},
-    RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = StandardOrderBehavior},
+    RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = TransportOrderBehavior},
     RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
     RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
     RULEUCC_Teleport = {            helpText = "teleport",          bitmapId = 'teleport',              preferredSlot = 10, behavior = StandardOrderBehavior},

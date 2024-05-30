@@ -142,7 +142,6 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
@@ -164,7 +163,6 @@ UnitBlueprint{
     LifeBarSize = 1.1,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -183,7 +181,6 @@ UnitBlueprint{
         MeshExtentsX = 2.25,
         MeshExtentsY = 2,
         MeshExtentsZ = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 10,
         TurnRate = 45,

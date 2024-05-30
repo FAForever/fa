@@ -29,10 +29,8 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
     else
         numUnits = table.getn(aiBrain:GetListOfUnits(testCat, true))
     end
-    if numUnits == numReq then
-        return true
-    end
-    return false
+
+	return numUnits == numReq
 end
 
 ---@param aiBrain AIBrain
@@ -51,10 +49,8 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     else
         numUnits = table.getn(aiBrain:GetListOfUnits(testCat, true))
     end
-    if numUnits > numReq then
-        return true
-    end
-    return false
+
+	return numUnits > numReq
 end
 
 ---@param aiBrain AIBrain
@@ -73,10 +69,7 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     else
         numUnits = table.getn(aiBrain:GetListOfUnits(testCat, true))
     end
-    if numUnits < numReq then
-        return true
-    end
-    return false
+	return numUnits < numReq
 end
 
 ---@param aiBrain AIBrain
@@ -86,10 +79,7 @@ end
 ---@return boolean
 function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
     local numUnits = ScenarioFramework.NumCatUnitsInArea(category, ScenarioUtils.AreaToRect(area), aiBrain)
-    if numUnits < numReq then
-        return true
-    end
-    return false
+	return numUnits < numReq
 end
 
 ---@param aiBrain AIBrain
@@ -101,17 +91,14 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, num)
     if aiBrain.BaseTemplates[baseName].Location == nil then
         return false
     else
-        local unitList = aiBrain:GetUnitsAroundPoint(category,aiBrain.BaseTemplates[baseName].Location,aiBrain.BaseTemplates[baseName].Radius, 'Ally')
+        local unitList = aiBrain:GetUnitsAroundPoint(category, aiBrain.BaseTemplates[baseName].Location,aiBrain.BaseTemplates[baseName].Radius, 'Ally')
         local count = 0
-        for i,unit in unitList do
+        for i, unit in unitList do
             if unit:GetAIBrain() == aiBrain then
                 count = count + 1
             end
         end
-        if count < num then
-            return true
-        end
-        return false
+		return count < num
     end
 end
 
@@ -128,12 +115,8 @@ function HaveLessThanUnitComparison(aiBrain, category1, category2)
     if type(category2) == 'string' then
         testCat2 = ParseEntityCategory(category2)
     end
-    local numUnits1 = aiBrain:GetCurrentUnits(testCat1)
-    local numUnits2 = aiBrain:GetCurrentUnits(testCat2)
-    if numUnits1 < numUnits2 then
-        return true
-    end
-    return false
+	
+    return aiBrain:GetCurrentUnits(testCat1) < aiBrain:GetCurrentUnits(testCat2)
 end
 
 ---@param aiBrain AIBrain
@@ -149,12 +132,8 @@ function HaveGreaterThanUnitComparison(aiBrain, category1, category2)
     if type(category2) == 'string' then
         testCat2 = ParseEntityCategory(category2)
     end
-    local numUnits1 = aiBrain:GetCurrentUnits(testCat1)
-    local numUnits2 = aiBrain:GetCurrentUnits(testCat2)
-    if numUnits1 > numUnits2 then
-        return true
-    end
-    return false
+	
+    return aiBrain:GetCurrentUnits(testCat1) > aiBrain:GetCurrentUnits(testCat2)
 end
 
 ---@param aiBrain AIBrain
@@ -167,12 +146,8 @@ function HaveLessThanVarTableUnitsWithCategory(aiBrain, varName, category)
         testCat = ParseEntityCategory(category)
     end
     local numUnits = aiBrain:GetCurrentUnits(testCat)
-    if ScenarioInfo.VarTable[varName] then
-        if numUnits < ScenarioInfo.VarTable[varName] then
-            return true
-        end
-    end
-    return false
+
+    return ScenarioInfo.VarTable[varName] and (numUnits < ScenarioInfo.VarTable[varName])
 end
 
 ---@param aiBrain AIBrain
@@ -185,12 +160,8 @@ function HaveGreaterThanVarTableUnitsWithCategory(aiBrain, varName, category)
         testCat = ParseEntityCategory(category)
     end
     local numUnits = aiBrain:GetCurrentUnits(testCat)
-    if ScenarioInfo.VarTable[varName] then
-        if numUnits > ScenarioInfo.VarTable[varName] then
-            return true
-        end
-    end
-    return false
+    
+	return ScenarioInfo.VarTable[varName] and (numUnits > ScenarioInfo.VarTable[varName])
 end
 
 ---@param aiBrain AIBrain
@@ -204,12 +175,8 @@ function HaveLessThanVarTableUnitsWithCategoryInArea(aiBrain, varName, category,
         testCat = ParseEntityCategory(category)
     end
     local numUnits = ScenarioFramework.NumCatUnitsInArea(testCat, ScenarioUtils.AreaToRect(area), aiBrain)
-    if ScenarioInfo.VarTable[varName] then
-        if numUnits < ScenarioInfo.VarTable[varName] then
-            return true
-        end
-    end
-    return false
+
+	return ScenarioInfo.VarTable[varName] and (numUnits < ScenarioInfo.VarTable[varName])
 end
 
 ---@param aiBrain AIBrain
@@ -223,12 +190,8 @@ function HaveGreaterThanVarTableUnitsWithCategoryInArea(aiBrain, varName, catego
         testCat = ParseEntityCategory(category)
     end
     local numUnits = ScenarioFramework.NumCatUnitsInArea(testCat, ScenarioUtils.AreaToRect(area), aiBrain)
-    if ScenarioInfo.VarTable[varName] then
-        if numUnits > ScenarioInfo.VarTable[varName] then
-            return true
-        end
-    end
-    return false
+	
+	return ScenarioInfo.VarTable[varName] and (numUnits > ScenarioInfo.VarTable[varName])
 end
 
 ---@param aiBrain AIBrain
@@ -254,16 +217,9 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, con
         numUnits = aiBrain:NumCurrentlyBuilding(cat, cat + categories.CONSTRUCTION)
     end
 
-    if numUnits > numReq then
-        return true
-    end
-    return false
+    return numUnits > numReq
 end
 
----@param aiBrain AIBrain
----@param numunits number
----@param category EntityCategory
----@return boolean
 function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
     --DUNCAN - rewritten, credit to Sorian
     if type(category) == 'string' then
@@ -291,10 +247,7 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
             return false
         end
     end
-    if numunits > numBuilding then
-        return true
-    end
-    return false
+    return numunits > numBuilding
 end
 
 ---@param aiBrain AIBrain
@@ -496,12 +449,8 @@ function HaveUnitsWithCategoryAndAlliance(aiBrain, greater, numReq, category, al
         testCat = ParseEntityCategory(category)
     end
     local numUnits = aiBrain:GetNumUnitsAroundPoint(testCat, Vector(0,0,0), 100000, alliance)
-    if numUnits > numReq and greater then
-        return true
-    elseif numUnits < numReq and not greater then
-        return true
-    end
-    return false
+	
+	return (numUnits > numReq and greater) or (numUnits < numReq and not greater)
 end
 
 ---@param aiBrain AIBrain
@@ -1535,7 +1484,7 @@ function HaveUnitsInCategoryBeingUpgraded(aiBrain, numunits, category, compareTy
             numBuilding = numBuilding + 1
         end
     end
-    --RNGLOG(aiBrain:GetArmyIndex()..' HaveUnitsInCategoryBeingUpgrade ( '..numBuilding..' '..compareType..' '..numunits..' ) --  return '..repr(CompareBody(numBuilding, numunits, compareType))..' ')
+
     return CompareBody(numBuilding, numunits, compareType)
 end
 function HaveLessThanUnitsInCategoryBeingUpgraded(aiBrain, numunits, category)

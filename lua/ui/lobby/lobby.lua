@@ -493,14 +493,7 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
     local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
 
-    -- if they're smaller than 1.0 then the AI doesn't get better; it gets worse!
-    if cheatBuildMultiplier < 0 then
-        cheatBuildMultiplier = 1 / cheatBuildMultiplier
-    end
-
-    if cheatResourceMultiplier < 0 then
-        cheatResourceMultiplier = 1 / cheatResourceMultiplier
-    end
+    
 
     -- compute the rating
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
@@ -5241,7 +5234,7 @@ local MessageHandlers = {
             end
 
             local charactersInPlayerName = string.len(data.PlayerOptions.PlayerName)
-            if charactersInPlayerName < 3 or charactersInPlayerName > 32 then
+            if charactersInPlayerName < 2 or charactersInPlayerName > 32 then
                 return false
             end
 
@@ -5250,7 +5243,8 @@ local MessageHandlers = {
                     return false
                 end
 
-                if string.len(data.PlayerOptions.PlayerClan) > 3 then
+                -- note: there are strange clan names that use more than 1 byte per character
+                if string.len(data.PlayerOptions.PlayerClan) > 6 then
                     return false
                 end
             end

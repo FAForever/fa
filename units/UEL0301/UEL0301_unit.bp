@@ -37,7 +37,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYCOUNTERINTEL",
@@ -264,7 +263,7 @@ UnitBlueprint{
             BuildTime = 5040,
             Icon = "acu",
             Name = "<LOC enhancements_0061>Energy Accelerator",
-            NewRateOfFire = 1.82,
+            NewRateOfFire = 2,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "UEL0301" },
         },
@@ -319,7 +318,7 @@ UnitBlueprint{
             BuildCostMass = 380,
             BuildTime = 2500,
             Icon = "ed",
-            Name = "<LOC enhancements_0065>C-D2 Engineering Drone",
+            Name = "<LOC enhancements_0065>C-D3 Engineering Drone",
             Slot = "Back",
             UpgradeEffectBones = { "AttachSpecial01" },
             UpgradeUnitAmbientBones = { "UEL0301" },
@@ -329,7 +328,7 @@ UnitBlueprint{
             BuildCostMass = 1,
             BuildTime = 0.1,
             Icon = "ed",
-            Name = "<LOC enhancements_0066>C-D2 Remove Engineering Drone",
+            Name = "<LOC enhancements_0066>C-D3 Remove Engineering Drone",
             Prerequisite = "Pod",
             RemoveEnhancements = {
                 "Pod",
@@ -559,7 +558,6 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 0.9,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -578,7 +576,6 @@ UnitBlueprint{
         MeshExtentsX = 0.85,
         MeshExtentsY = 2,
         MeshExtentsZ = 2.4,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -633,7 +630,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
             ProjectileId = "/projectiles/TDFPlasmaHeavy03/TDFPlasmaHeavy03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

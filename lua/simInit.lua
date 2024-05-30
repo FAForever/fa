@@ -322,6 +322,10 @@ function BeginSession()
         Sync.StartPositions = syncStartPositions
     end
 
+    if not Sync.NewPlayableArea then
+        Sync.NewPlayableArea = {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
+    end
+
     -- keep track of user name for LOCs
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
@@ -329,14 +333,7 @@ function BeginSession()
     end
 
     -- add on game over callbacks
-    ForkThread(function()
-        while not IsGameOver() do
-            WaitTicks(1)
-        end
-        for _, v in GameOverListeners do
-            v()
-        end
-    end)
+    ForkThread(GameOverListenerThread)
 
     -- log game time
     ForkThread(GameTimeLogger)
@@ -347,6 +344,15 @@ function BeginSession()
     -- trigger event for brains
     for k, brain in ArmyBrains do
         brain:OnBeginSession()
+    end
+end
+
+function GameOverListenerThread()
+    while not IsGameOver() do
+        WaitTicks(1)
+    end
+    for _, v in GameOverListeners do
+        v()
     end
 end
 
@@ -485,33 +491,38 @@ function BeginSessionCommonArmy(teams)
                 ArmyBrains[i2].Status = 'Defeat'
                 SetArmyOutOfGame(i2)
                 local Units = ArmyBrains[i2]:GetListOfUnits(categories.COMMAND, false, true)
-                ForkThread(function(i, i2, comm)
-                    while true do
-                        if comm then
-                            WaitTicks(1)
-                            if comm:IsUnitState('Busy') then continue end
-                            if comm:IsUnitState('UnSelectable') then continue end
-                            if comm:IsUnitState('BlockCommandQueue') then continue end
-                        end
-                        SetCommandSource(i2 - 1, IsHuman[i2], false)
-                        SetCommandSource(i - 1, IsHuman[i2], true)
-                        SetArmyUnitCap(i, GetArmyUnitCap(i) + GetArmyUnitCap(i2))
-                        Units = ArmyBrains[i2]:GetListOfUnits(categories.ALLUNITS, false, true)
-                        for _, unit in Units do
-                            ChangeUnitArmy(unit, i, true)
-                        end
-                        local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
-                        local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
-                        SetArmyEconomy(i, v1, v2)
-                        if i2 == GetFocusArmy() then
-                            SetFocusArmy(i - 1)
-                        end
-                        break
-                    end
-                end, i, i2, Units[1])
+                ForkThread(MergeArmyPair, i, i2, Units[1], IsHuman[i2])
             end
             break
         end
+    end
+end
+
+---@param into integer
+---@param from integer
+---@param comm Unit
+---@param humanIndex integer
+function MergeArmyPair(into, from, comm, humanIndex)
+    if comm then
+        repeat
+            WaitTicks(1)
+        until
+            not comm:IsUnitState("Busy") and
+            not comm:IsUnitState("UnSelectable") and
+            not comm:IsUnitState("BlockCommandQueue")
+    end
+    SetCommandSource(from - 1, humanIndex, false)
+    SetCommandSource(into - 1, humanIndex, true)
+    SetArmyUnitCap(into, GetArmyUnitCap(into) + GetArmyUnitCap(from))
+    Units = ArmyBrains[from]:GetListOfUnits(categories.ALLUNITS, false, true)
+    for _, unit in Units do
+        ChangeUnitArmy(unit, into, true)
+    end
+    local v1 = ArmyBrains[into]:GetEconomyStored("MASS") + ArmyBrains[from]:GetEconomyStored("MASS")
+    local v2 = ArmyBrains[into]:GetEconomyStored("ENERGY") + ArmyBrains[from]:GetEconomyStored("ENERGY")
+    SetArmyEconomy(into, v1, v2)
+    if from == GetFocusArmy() then
+        SetFocusArmy(into - 1)
     end
 end
 

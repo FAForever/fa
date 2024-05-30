@@ -99,7 +99,6 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
@@ -119,8 +118,6 @@ UnitBlueprint{
     LifeBarOffset = 0.2,
     LifeBarSize = 0.5,
     Physics = {
-        BackUpDistance = 0,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -133,9 +130,8 @@ UnitBlueprint{
         MaxAcceleration = 4.8,
         MaxBrake = 9.6,
         MaxSpeed = 4.8,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 4.8,
         MaxSteerForce = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         TurnRadius = 0,
         TurnRate = 180,

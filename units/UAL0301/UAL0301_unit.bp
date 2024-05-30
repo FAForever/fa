@@ -36,7 +36,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -538,7 +537,8 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 15,
+        TeleportFlatEnergyCost = 75000,
     },
     Intel = {
         FreeIntel = true,
@@ -550,7 +550,6 @@ UnitBlueprint{
     LifeBarOffset = 0.4,
     LifeBarSize = 0.9,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -569,7 +568,6 @@ UnitBlueprint{
         MeshExtentsX = 1.25,
         MeshExtentsY = 1.9,
         MeshExtentsZ = 1.75,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -623,7 +621,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 5,
             ProjectileId = "/projectiles/ADFReactonCannon01/ADFReactonCannon01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -698,6 +696,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Teleport in",
             DummyWeapon = true,
+            EnabledByEnhancement = "Teleporter",
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,

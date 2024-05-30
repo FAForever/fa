@@ -121,7 +121,7 @@ UnitBlueprint{
     LifeBarOffset = 0.8,
     LifeBarSize = 0.75,
     Physics = {
-        BankingSlope = 0,
+        BackUpDistance = 10,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -135,12 +135,11 @@ UnitBlueprint{
         MaxAcceleration = 3.5,
         MaxBrake = 3.5,
         MaxSpeed = 3.5,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 3.5,
         MaxSteerForce = 50,
         MeshExtentsX = 0.75,
         MeshExtentsY = 0.5,
         MeshExtentsZ = 0.8,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
         RotateOnSpot = false,

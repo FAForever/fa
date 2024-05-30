@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC uel0111_desc>Mobile Missile Launcher",
-    AI = { InitialAutoMode = true },
+    AI = { },
     Audio = {
         AmbientMove = Sound { Bank = 'UEL',        Cue = 'UEL0111_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'UELDestroy', Cue = 'UEL_Destroy_Med_Land', LodCutoff = 'UnitMove_LodCutoff' },
@@ -117,8 +117,7 @@ UnitBlueprint{
     LifeBarOffset = 0.45,
     LifeBarSize = 0.75,
     Physics = {
-        BackUpDistance = 4,
-        BankingSlope = 0,
+        BackUpDistance = 8,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -136,8 +135,8 @@ UnitBlueprint{
         MeshExtentsX = 0.75,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 1.35,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
+        RotateOnSpot = false,
         TurnRadius = 0,
         TurnRate = 90,
     },

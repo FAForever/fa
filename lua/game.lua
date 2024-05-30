@@ -41,8 +41,8 @@ VeteranDefault = {
 ---
 --- In order to keep backwards compatibility, there is a new option in the blueprint economy section.
 --- if DifferentialUpgradeCostCalculation is set to true, the base upgrade cost will be subtracted
----@param builder Builder
----@param targetData table
+---@param builder Unit
+---@param targetData UnitBlueprintEconomy
 ---@param upgradeBaseData UnitBlueprintEconomy
 ---@return number time
 ---@return number energy

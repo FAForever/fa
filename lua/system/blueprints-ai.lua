@@ -71,7 +71,7 @@ local function CalculatedDPS(weapon)
         -- Unending beam. Interval is based on collision delay only.
         DamageInterval = 0.1 + (weapon.BeamCollisionDelay or 0)
     elseif weapon.BeamLifetime and weapon.BeamLifetime > 0 then
-        -- Uncontinuous beam. Interval from start to next start.
+        -- Unous beam. Interval from start to next start.
         DamageInterval = DamageInterval + weapon.BeamLifetime
         -- Damage is calculated as a single glob, beam weapons are typically underappreciated
         Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
@@ -80,123 +80,119 @@ local function CalculatedDPS(weapon)
     return (Damage / DamageInterval) or 0
 end
 
----@param unitBPs UnitBlueprint[]
-function SetUnitThreatValues(unitBPs)
-    -- localize for performance
-    local TableFind = TableFind
-    local TableGetn = TableGetn
+---@param bp UnitBlueprint
+function SetThreatValuesOfUnit(bp, cache)
 
-    local MathMax = MathMax
-    local MathFloor = MathFloor
+        -- localize for performance
+        local TableFind = TableFind
+        local TableGetn = TableGetn
+    
+        local MathMax = MathMax
+        local MathFloor = MathFloor
+    
+        local StringFind = StringFind
+    -- used for debugging
+    if ReportIssues then 
+        LOG(tostring(bp.BlueprintId) .. ": " .. tostring(bp.Description))
+    end
 
-    local StringFind = StringFind
-
-    -- re-use for performance
-    local cache = {}
-
-    for id, bp in unitBPs do
-        -- used for debugging
-        if ReportIssues then 
-            LOG(tostring(bp.BlueprintId) .. ": " .. tostring(bp.Description))
+    -- not all units have this table set, an example is a Cybran build bot.
+    if not bp.Defense then
+        if ReportIssues then
+            LOG(tostring(bp.BlueprintId) .. ": has no defense table in blueprint, skipped")
         end
 
-        -- not all units have this table set, an example is a Cybran build bot.
-        if not bp.Defense then
-            if ReportIssues then
-                LOG(tostring(bp.BlueprintId) .. ": has no defense table in blueprint, skipped")
-            end
-            continue
-        end
+        return
+    end
 
-        -- not all units need dynamic threat calculations, such as the commanders
-        if bp.Defense.SkipDynamicThreatCalculations then
-            continue
-        end
+    -- not all units need dynamic threat calculations, such as the commanders
+    if bp.Defense.SkipDynamicThreatCalculations then
+        return
+    end
 
-        --  default to 0
-        cache.AirThreatLevel = 0
-        cache.EconomyThreatLevel = 0
-        cache.SubThreatLevel = 0
-        cache.SurfaceThreatLevel = 0
-        -- These are temporary to be merged into the others after calculations
+    --  default to 0
+    cache.AirThreatLevel = 0
+    cache.EconomyThreatLevel = 0
+    cache.SubThreatLevel = 0
+    cache.SurfaceThreatLevel = 0
+    -- These are temporary to be merged into the others after calculations
+    cache.HealthThreat = 0
+    cache.PersonalShieldThreat = 0
+    cache.UnknownWeaponThreat = 0
+
+    -- define base health and shield values
+    if bp.Defense.MaxHealth then
+        cache.HealthThreat = bp.Defense.MaxHealth * 0.01
+    end
+
+    local mobileUnit = bp.CategoriesHash.MOBILE
+
+    if bp.Defense.Shield then
+        local shield = bp.Defense.Shield                                               -- ShieldProjectionRadius entirely only for the Pillar of Prominence
+        local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
+        local skirtarea = (bp.Physics.SkirtSizeX or 3) * (bp.Physics.SkirtSizeY or 3)                                                              --  added so that transport shields dont count as personal shields.
+        if (bp.Display.Abilities and TableFind(bp.Display.Abilities, '<LOC ability_personalshield>Personal Shield') or shieldarea < skirtarea) and not TableFind(bp.Categories, 'TRANSPORT') then
+            cache.PersonalShieldThreat = (shield.ShieldMaxHealth or 0) * 0.01
+        else
+            cache.EconomyThreatLevel = cache.EconomyThreatLevel + ((shieldarea - skirtarea) * (shield.ShieldMaxHealth or 0) * (shield.ShieldRegenRate or 1)) / 250000000
+        end
+    end
+
+    -- Define eco production values
+    if bp.Economy.ProductionPerSecondMass then
+        -- Mass prod + 5% of health
+        cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondMass * 10 + (cache.HealthThreat + cache.PersonalShieldThreat) * 5
+    end
+
+    if bp.Economy.ProductionPerSecondEnergy then
+        -- Energy prod + 1% of health
+        cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondEnergy * 0.1 + cache.HealthThreat + cache.PersonalShieldThreat
+    end
+
+    -- remove health and shield because they're used
+    if bp.Economy.ProductionPerSecondMass or bp.Economy.ProductionPerSecondEnergy then
         cache.HealthThreat = 0
         cache.PersonalShieldThreat = 0
-        cache.UnknownWeaponThreat = 0
+    end
 
-        -- define base health and shield values
-        if bp.Defense.MaxHealth then
-            cache.HealthThreat = bp.Defense.MaxHealth * 0.01
+    -- calculate for build rates, ignore things that only upgrade
+    if TakeIntoAccountBuildrate(bp) then
+        -- non-mass producing energy production units that can build get off easy on the health calculation. Engineering reactor, we're looking at you
+        if bp.Physics.MotionType == 'RULEUMT_None' then
+            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.BuildRate / (bp.Economy.BuilderDiscountMult or 1) * 2 + (cache.HealthThreat + cache.PersonalShieldThreat) * 2
+        else
+            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.BuildRate + (cache.HealthThreat + cache.PersonalShieldThreat) * 3
         end
+        -- 0 off the personal health values if we alreaady used them
+        cache.HealthThreat = 0
+        cache.PersonalShieldThreat = 0
+    end
 
-        local mobileUnit = bp.CategoriesHash.MOBILE
+    -- calculate for storage values
+    if bp.Economy.StorageMass then
+        cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.StorageMass * 0.001 + cache.HealthThreat + cache.PersonalShieldThreat
+    end
+    if bp.Economy.StorageEnergy then
+        cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.StorageEnergy * 0.001 + cache.HealthThreat + cache.PersonalShieldThreat
+    end
 
-        if bp.Defense.Shield then
-            local shield = bp.Defense.Shield                                               -- ShieldProjectionRadius entirely only for the Pillar of Prominence
-            local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
-            local skirtarea = (bp.Physics.SkirtSizeX or 3) * (bp.Physics.SkirtSizeY or 3)                                                              --  added so that transport shields dont count as personal shields.
-            if (bp.Display.Abilities and TableFind(bp.Display.Abilities, '<LOC ability_personalshield>Personal Shield') or shieldarea < skirtarea) and not TableFind(bp.Categories, 'TRANSPORT') then
-                cache.PersonalShieldThreat = (shield.ShieldMaxHealth or 0) * 0.01
-            else
-                cache.EconomyThreatLevel = cache.EconomyThreatLevel + ((shieldarea - skirtarea) * (shield.ShieldMaxHealth or 0) * (shield.ShieldRegenRate or 1)) / 250000000
-            end
-        end
+    -- remove health and shield because they're used
+    if bp.Economy.StorageMass or bp.Economy.StorageEnergy then
+        cache.HealthThreat = 0
+        cache.PersonalShieldThreat = 0
+    end
 
-        -- Define eco production values
-        if bp.Economy.ProductionPerSecondMass then
-            -- Mass prod + 5% of health
-            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondMass * 10 + (cache.HealthThreat + cache.PersonalShieldThreat) * 5
-        end
+    -- no one really cares about air staging, well maybe a little bit.
+    if bp.Transport.DockingSlots then
+        cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Transport.DockingSlots
+    end
 
-        if bp.Economy.ProductionPerSecondEnergy then
-            -- Energy prod + 1% of health
-            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondEnergy * 0.1 + cache.HealthThreat + cache.PersonalShieldThreat
-        end
+    if bp.Weapon then
+        for _, weapon in bp.Weapon do
 
-        -- remove health and shield because they're used
-        if bp.Economy.ProductionPerSecondMass or bp.Economy.ProductionPerSecondEnergy then
-            cache.HealthThreat = 0
-            cache.PersonalShieldThreat = 0
-        end
-
-        -- calculate for build rates, ignore things that only upgrade
-        if TakeIntoAccountBuildrate(bp) then
-            -- non-mass producing energy production units that can build get off easy on the health calculation. Engineering reactor, we're looking at you
-            if bp.Physics.MotionType == 'RULEUMT_None' then
-                cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.BuildRate / (bp.Economy.BuilderDiscountMult or 1) * 2 + (cache.HealthThreat + cache.PersonalShieldThreat) * 2
-            else
-                cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.BuildRate + (cache.HealthThreat + cache.PersonalShieldThreat) * 3
-            end
-            -- 0 off the personal health values if we alreaady used them
-            cache.HealthThreat = 0
-            cache.PersonalShieldThreat = 0
-        end
-
-        -- calculate for storage values
-        if bp.Economy.StorageMass then
-            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.StorageMass * 0.001 + cache.HealthThreat + cache.PersonalShieldThreat
-        end
-        if bp.Economy.StorageEnergy then
-            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.StorageEnergy * 0.001 + cache.HealthThreat + cache.PersonalShieldThreat
-        end
-
-        -- remove health and shield because they're used
-        if bp.Economy.StorageMass or bp.Economy.StorageEnergy then
-            cache.HealthThreat = 0
-            cache.PersonalShieldThreat = 0
-        end
-
-        -- no one really cares about air staging, well maybe a little bit.
-        if bp.Transport.DockingSlots then
-            cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Transport.DockingSlots
-        end
-
-        if bp.Weapon then
-            for _, weapon in bp.Weapon do
+            if weapon.EnabledByEnhancement then
                 -- skip weapons part of an enhancement
-                if weapon.EnabledByEnhancement then
-                    continue
-                end
-
+            else
                 -- dps of weapon
                 local dps = CalculatedDPS(weapon)
 
@@ -205,7 +201,7 @@ function SetUnitThreatValues(unitBPs)
                 local surfaceMult = 0.1
 
                 -- determines if we apply dps to economic or anti surface threat
-                local weaponIsEconomicThreat = (weapon.DamageType == 'Nuke' or weapon.ArtilleryShieldBlocks) and (not mobileUnit or weapon.MinRadius > 80)
+                local weaponIsEconomicThreat = (weapon.DamageType == 'Nuke' or weapon.ArtilleryShieldBlocks) and (not mobileUnit and weapon.MaxRadius > 150 or weapon.MinRadius > 80)
 
                 -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
@@ -240,48 +236,48 @@ function SetUnitThreatValues(unitBPs)
                 end
             end
         end
+    end
 
-        -- See if it has real threat yet
-        local checkthreat = 0
-        for _, v in { 'AirThreatLevel', 'EconomyThreatLevel', 'SubThreatLevel', 'SurfaceThreatLevel'} do
-            checkthreat = checkthreat + cache[v]
+    -- See if it has real threat yet
+    local checkthreat = 0
+    for _, v in { 'AirThreatLevel', 'EconomyThreatLevel', 'SubThreatLevel', 'SurfaceThreatLevel'} do
+        checkthreat = checkthreat + cache[v]
+    end
+
+    -- Last ditch attempt to give it some threat
+    if checkthreat < 1 then
+        if cache.UnknownWeaponThreat > 0 then
+            -- If we have no idea what it is still, it has threat equal to its unkown weapon DPS.
+            cache.EconomyThreatLevel = cache.UnknownWeaponThreat
+            cache.UnknownWeaponThreat = 0
+        elseif bp.Economy.MaintenanceConsumptionPerSecondEnergy > 0 then
+            -- If we STILL have no idea what it's threat is, and it uses power, its obviously doing something fucky, so we'll use that.
+            cache.EconomyThreatLevel = bp.Economy.MaintenanceConsumptionPerSecondEnergy * 0.0175
         end
+    end
 
-        -- Last ditch attempt to give it some threat
-        if checkthreat < 1 then
-            if cache.UnknownWeaponThreat > 0 then
-                -- If we have no idea what it is still, it has threat equal to its unkown weapon DPS.
-                cache.EconomyThreatLevel = cache.UnknownWeaponThreat
-                cache.UnknownWeaponThreat = 0
-            elseif bp.Economy.MaintenanceConsumptionPerSecondEnergy > 0 then
-                -- If we STILL have no idea what it's threat is, and it uses power, its obviously doing something fucky, so we'll use that.
-                cache.EconomyThreatLevel = bp.Economy.MaintenanceConsumptionPerSecondEnergy * 0.0175
+    -- Get rid of unused threat values
+    for _, v in {'HealthThreat','PersonalShieldThreat', 'UnknownWeaponThreat'} do
+        if cache[v] and cache[v] ~= 0 then
+            if ReportIssues then
+                LOG("Unused " .. v .. " " .. cache[v])
             end
+            cache[v] = nil
         end
+    end
 
-        -- Get rid of unused threat values
-        for _, v in {'HealthThreat','PersonalShieldThreat', 'UnknownWeaponThreat'} do
-            if cache[v] and cache[v] ~= 0 then
-                if ReportIssues then
-                    LOG("Unused " .. v .. " " .. cache[v])
-                end
-                cache[v] = nil
-            end
-        end
+    -- transfer information to blueprint table
+    for k, v in cache do
+        bp.Defense[k] = v
+    end
+end
 
-        -- Sanitise the table
-        for i, v in cache do
-            -- Round appropriately
-            if v < 1 then
-                cache[i] = 0
-            else
-                cache[i] = MathFloor(v + 0.5)
-            end
-        end
+---@param unitBPs UnitBlueprint[]
+function SetThreatValuesOfUnits(unitBPs)
+    -- re-use for performance
+    local cache = {}
 
-        -- transfer information to blueprint table
-        for k, v in cache do
-            bp.Defense[k] = v
-        end
+    for id, bp in unitBPs do
+        SetThreatValuesOfUnit(bp, cache)
     end
 end
