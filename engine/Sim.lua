@@ -334,7 +334,7 @@ end
 --- Creates a manipulator which rotates on a unit's bone
 ---@param object BoneObject
 ---@param bone Bone
----@param axis "x" | "y" | "z"
+---@param axis "x" | "y" | "z" | "-x" | "-y" | "-z"
 ---@param goal? unknown
 ---@param speed? number
 ---@param accel? number
