@@ -23,14 +23,16 @@ name: UnitDB - update unit information
 on:
   workflow_dispatch:
   push:
-    # branches:
-    #   - deploy/faf
+    branches:
+      - deploy/faf
 
 jobs:
   deploy:
     name: Update the UnitDB
     runs-on: ubuntu-latest
     steps:
+        # When using two or more query parameters the URL needs to be enclosed in double quotes, see also:
+        # - https://stackoverflow.com/questions/59749561/how-to-pass-several-parameters-through-curl-in-get-request
       - name: Send request to server to update
         run: |
           curl -v -X GET "https://unitdb.faforever.com/update.php?token=${{secrets.UNITDB_UPGRADE_SECRET}}&version=deploy%2Ffaf"
