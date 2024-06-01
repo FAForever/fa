@@ -31,6 +31,7 @@ jobs:
     uses: FAForever/spooky-db/.github/workflows/build.yaml@master
   deploy:
     name: Deploy the SpookyDB
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       # https://github.com/marketplace/actions/webfactory-ssh-agent
