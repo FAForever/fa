@@ -31,6 +31,9 @@ jobs:
     name: Update the UnitDB
     runs-on: ubuntu-latest
     steps:
+        # All we need to do is send a request to the server to update the blueprint information. You can find the server code here:
+        # - https://github.com/FAForever/UnitDB/blob/master/www/update.php
+
         # When using two or more query parameters the URL needs to be enclosed in double quotes, see also:
         # - https://stackoverflow.com/questions/59749561/how-to-pass-several-parameters-through-curl-in-get-request
       - name: Send request to server to update
