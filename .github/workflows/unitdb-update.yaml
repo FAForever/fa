@@ -31,7 +31,6 @@ jobs:
     name: Update the UnitDB
     runs-on: ubuntu-latest
     steps:
-      - name: Send post request to the server
+      - name: Send request to server to update
         run: |
-            curl --fail-with-body -v -X POST https://unitdb.faforever.com/update.php?version=deploy%2Ffaf&token=${{secrets.UNITDB_UPGRADE_SECRET}}
-    
+          curl --fail-with-body -v -X POST https://unitdb.faforever.com/update.php?token=${{secrets.UNITDB_UPGRADE_SECRET}}&version=deploy/faf
