@@ -27,5 +27,60 @@ on:
     #   - deploy/faf
 
 jobs:
-  update:
-    uses: FAForever/spooky-db/.github/workflows/deploy.yaml@master
+  build:
+    uses: FAForever/spooky-db/.github/workflows/build.yaml@master
+  deploy:
+    name: Deploy the SpookyDB
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/marketplace/actions/webfactory-ssh-agent
+      # https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SPOOKYDB_DEPLOYMENT_KEY }}
+
+      # https://github.com/actions/checkout/tree/v4/
+      - name: Checkout spooky db code
+        uses: actions/checkout@v4
+        with:
+            repository: FAForever/spooky-db
+            path: gh-pages
+            ref: gh-pages  
+    
+      - name: Download recent unit information
+        uses: actions/download-artifact@v4
+        with:
+            name: spookydb-dist
+            path: dist
+
+      - name: Copy
+        run: |
+            # remove old files that have a hash in the name
+            rm -r gh-pages/css/*
+            rm -r gh-pages/data/*
+            rm -r gh-pages/img/*
+            rm -r gh-pages/js/*
+            rm -r gh-pages/views/*
+
+            # copy over new files
+            cp -r dist/* gh-pages/
+
+      - name: Deploy
+        working-directory: gh-pages
+        run: |
+            # Check for any differences between the working directory and the latest commit
+            if git diff --quiet; then
+                echo "No changes to deploy"
+                exit 0
+            fi
+
+            # Configure git
+            git config user.email "administrator@faforever.com"
+            git config user.name "FAForever"
+
+            # Stage, commit and push the changes
+            git stage .
+            git commit -m 'Automated deployment of spooky db'
+            git push origin HEAD:gh-pages
+
+
