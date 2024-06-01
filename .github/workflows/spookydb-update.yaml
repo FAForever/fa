@@ -84,4 +84,3 @@ jobs:
             git commit -m 'Automated deployment of spooky db'
             git push origin HEAD:gh-pages
 
-
