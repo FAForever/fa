@@ -33,4 +33,4 @@ jobs:
     steps:
       - name: Send request to server to update
         run: |
-          curl -v -X GET https://unitdb.faforever.com/update.php?token=${{secrets.UNITDB_UPGRADE_SECRET}}
+          curl -v -X GET "https://unitdb.faforever.com/update.php?token=${{secrets.UNITDB_UPGRADE_SECRET}}&version=deploy%2Ffaf"
