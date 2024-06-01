@@ -34,11 +34,11 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/marketplace/actions/webfactory-ssh-agent
-      # https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SPOOKYDB_DEPLOYMENT_KEY }}
+      # # https://github.com/marketplace/actions/webfactory-ssh-agent
+      # # https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys
+      # - uses: webfactory/ssh-agent@v0.9.0
+      #   with:
+      #     ssh-private-key: ${{ secrets.SPOOKYDB_DEPLOYMENT_KEY }}
 
       # https://github.com/actions/checkout/tree/v4/
       - name: Checkout spooky db code
@@ -47,6 +47,7 @@ jobs:
             repository: FAForever/spooky-db
             path: gh-pages
             ref: gh-pages  
+            ssh-key: ${{ secrets.SPOOKYDB_DEPLOYMENT_KEY }}
     
       - name: Download recent unit information
         uses: actions/download-artifact@v4
