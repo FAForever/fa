@@ -57,6 +57,30 @@ function ParseColor(color)
     return r / 255, g / 255, b / 255
 end
 
+--- Returns the alpha component of a color string if present, `1.0` otherwise.
+---@param color Color
+---@return number alpha
+function GetAlpha(color)
+    color = EnumColors[color] or color
+    if color:sub(7,8) == "" then
+        return 0
+    else
+        return tonumber(color:sub(1,2), 16) / 255
+    end
+end
+
+--- Returns the color with its alpha multiplied by a number
+---@param color Color
+---@param mult number
+---@return Color
+function MultiplyAlpha(color, mult)
+    color = EnumColors[color] or color
+    if color:sub(7, 8) == "" then
+        return string.format("%02X", math.clamp(255 * mult, 0, 255)) .. color:sub(1, 6)
+    else
+        return string.format("%02X", math.clamp(tonumber(color:sub(1, 2), 16) * mult, 0, 255)) .. color:sub(3, 8)
+    end
+end
 
 ----------------------------------------
 -- Color Conversions

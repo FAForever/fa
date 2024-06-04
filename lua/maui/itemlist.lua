@@ -19,6 +19,7 @@ local Control = import("/lua/maui/control.lua").Control
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 local LazyVarCreate = import("/lua/lazyvar.lua").Create
+local MultiplyAlpha = import("/lua/shared/color.lua").MultiplyAlpha
 
 ---@class ItemList : moho.item_list_methods, Control, InternalObject
 ItemList = ClassUI(moho.item_list_methods, Control) {
@@ -38,34 +39,47 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
             self:_internalSetFont()
         end
 
+        self._alpha = LazyVarCreate(1)
+        self._alpha.OnDirty = function(var)
+            local alpha = var()
+            self:SetNewColors(
+                self._fg() ~= 0 and MultiplyAlpha(self._fg(), alpha) or nil,
+                self._bg() ~= 0 and MultiplyAlpha(self._bg(), alpha) or nil,
+                self._sfg() ~= 0 and MultiplyAlpha(self._sfg(), alpha) or nil,
+                self._sbg() ~= 0 and MultiplyAlpha(self._sbg(), alpha) or nil,
+                self._mofg() ~= 0 and MultiplyAlpha(self._mofg(), alpha) or nil,
+                self._mobg() ~= 0 and MultiplyAlpha(self._mobg(), alpha) or nil
+            )
+        end
+
         self._fg = LazyVarCreate()
         self._fg.OnDirty = function(var)
-            self:SetNewColors(var(), nil, nil, nil, nil, nil)
+            self:SetNewColors(MultiplyAlpha(var(), self._alpha()), nil, nil, nil, nil, nil)
         end
 
         self._bg = LazyVarCreate()
         self._bg.OnDirty = function(var)
-            self:SetNewColors(nil, var(), nil, nil, nil, nil)
+            self:SetNewColors(nil, MultiplyAlpha(var(), self._alpha()), nil, nil, nil, nil)
         end
 
         self._sfg = LazyVarCreate()
         self._sfg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, var(), nil, nil, nil)
+            self:SetNewColors(nil, nil, MultiplyAlpha(var(), self._alpha()), nil, nil, nil)
         end
 
         self._sbg = LazyVarCreate()
         self._sbg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, nil, var(), nil, nil)
+            self:SetNewColors(nil, nil, nil, MultiplyAlpha(var(), self._alpha()), nil, nil)
         end
 
         self._mofg = LazyVarCreate()
         self._mofg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, nil, nil, var(), nil)
+            self:SetNewColors(nil, nil, nil, nil, MultiplyAlpha(var(), self._alpha()), nil)
         end
 
         self._mobg = LazyVarCreate()
         self._mobg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, nil, nil, nil, var())
+            self:SetNewColors(nil, nil, nil, nil, nil, MultiplyAlpha(var(), self._alpha()))
         end
     end,
 
@@ -93,6 +107,10 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
         if selected_background and self._sbg then self._sbg:Set(selected_background) end
         if mouseover_foreground and self._mofg then self._mofg:Set(mouseover_foreground) end
         if mouseover_background and self._mobg then self._mobg:Set(mouseover_background) end
+    end,
+
+    SetAlphaOfColors = function(self, alpha)
+        if alpha and self._alpha then self._alpha:Set(alpha) end
     end,
 
     OnDestroy = function(self)
