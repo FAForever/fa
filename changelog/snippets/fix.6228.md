@@ -1,0 +1,1 @@
+- (#6228) Fix a long-standing issue causing several flaks to consistently miss their first shot at specific angles.
