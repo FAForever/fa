@@ -71,7 +71,7 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
 
     local textGroup = Group(bg)
 
-    local text = Layouter(UIUtil.CreateText(textGroup, text, 22, UIUtil.titleFont))
+    local title = Layouter(UIUtil.CreateText(textGroup, text, 22, UIUtil.titleFont))
         :AtCenterIn(frame, -250)
         :DropShadow(true):Color(UIUtil.fontColor)
         :NeedsFrameUpdate(true):End()
@@ -85,15 +85,15 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
         secText:SetTextAlignment(0.5)
         secText:SetColors(UIUtil.fontColor)
         secText:SetAlphaOfColors(0)
-        Layouter(secText):CenteredBelow(text, 10):End()
+        Layouter(secText):CenteredBelow(title, 10):End()
         bg.secText = secText
 
-        Layouter(textGroup):Top(text.Top)
-            :Left(function() return math.min(secText.Left(), text.Left()) end)
-            :Right(function() return math.max(secText.Right(), text.Right()) end)
+        Layouter(textGroup):Top(title.Top)
+            :Left(function() return math.min(secText.Left(), title.Left()) end)
+            :Right(function() return math.max(secText.Right(), title.Right()) end)
             :Bottom(secText.Bottom):End()
     else
-        LayoutHelpers.FillParent(textGroup, text)
+        LayoutHelpers.FillParent(textGroup, title)
     end
     bg:DisableHitTest(true)
 
@@ -139,7 +139,7 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
         end
 
         local textGroupAlpha = textGroup:GetAlpha()
-        local textAlpha = text:GetAlpha()
+        local titleAlpha = title:GetAlpha()
         -- fade out the text at the end of the announcement
         if time > 3 and textGroupAlpha ~= 0 then
             local newAlpha = math.max(textGroupAlpha - (delta * 2), 0)
@@ -148,8 +148,8 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
                 secText:SetAlphaOfColors(newAlpha)
             end
         -- fade in the text when the announcement appears
-        elseif time > .2 and time < 3 and textAlpha ~= 1 then
-            local newAlpha = math.min(textAlpha + (delta * 2), 1)
+        elseif time > .2 and time < 3 and titleAlpha ~= 1 then
+            local newAlpha = math.min(titleAlpha + (delta * 2), 1)
             textGroup:SetAlpha(newAlpha, true)
             if secText then
                 secText:SetAlphaOfColors(newAlpha)
