@@ -19,6 +19,7 @@ local PixelScaleFactor = LayoutHelpers:GetPixelScaleFactor()
 -- self-harm long enough to finish writing this class so we can call this a solved problem and never
 -- look in this file ever again.
 ---@class TextArea : ItemList
+---@field advanceFunction function The advance function for wrapping text.
 TextArea = ClassUI(ItemList) {
 
     ---@param self TextArea
@@ -105,11 +106,18 @@ TextArea = ClassUI(ItemList) {
 
     ---@param self TextArea
     ReflowText = function(self)
-        local wrapped = Text.WrapText(self.text, self.Width(), self.advanceFunction)
+        local width = self.Width()
+        local advanceFunction = self.advanceFunction
+        local alignmentProportion = self._alignmentProportion
+
+        local wrapped = Text.WrapText(self.text, width, advanceFunction)
         local newTextWidth = 0
         -- Replace the old lines with the newly-wrapped ones.
         self:DeleteAllItems()
         for i, line in wrapped do
+            if alignmentProportion then
+                line = Text.AlignText(line, width, advanceFunction, alignmentProportion)
+            end
             self:AddItem(line)
 
             local lineWidth = self.advanceFunction(line)
@@ -123,5 +131,17 @@ TextArea = ClassUI(ItemList) {
     ---@param self TextArea
     FitToText = function(self)
         LayoutHelpers.SetDimensions(self, self:GetTextWidth(), self:GetTextHeight())
-    end
+    end,
+
+    --- Aligns all the text proportionally along the TextArea's width.
+    ---@param self TextArea
+    ---@param alignmentProportion number How far towards the right of the line the text should be aligned. 0.5 for middle alignment, 1.0 for right alignment.
+    SetTextAlignment = function(self, alignmentProportion)
+        self._alignmentProportion = alignmentProportion
+        local width = self.Width()
+        local advanceFunction = self.advanceFunction
+        for i = 0, self:GetItemCount() - 1 do
+            self:ModifyItem(i, Text.AlignText(self:GetItem(i), width, advanceFunction, alignmentProportion))
+        end
+    end,
 }
