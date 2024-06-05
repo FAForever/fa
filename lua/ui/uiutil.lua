@@ -1421,7 +1421,7 @@ end
 
 ---@param primary UnlocalizedString
 ---@param secondary UnlocalizedString
----@param control? Control defaults to duumy control at center of screen 
+---@param control? Control defaults to dummy control at center of screen 
 function CreateAnnouncementStd(primary, secondary, control)
     -- make it originate from the top
     if not control then
