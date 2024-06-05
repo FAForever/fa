@@ -1,4 +1,4 @@
-- (#5895) After receiving several buffs, the Seraphim Tech 3 Submarine Hunter has become too oppressive, especially in larger formations. These changes aim to bring it back in line, while keeping its identity.
+- (#5895) After receiving several buffs, the Seraphim Tech 3 Submarine Hunter has become too oppressive, especially in larger formations. These changes aim to bring it back in line, while preserving its identity.
   - Yathsou: T3 Submarine Hunter (XSS0304):
     - Damage: 290 --> 380
     - RateOfFire: 0.25 --> 0.22

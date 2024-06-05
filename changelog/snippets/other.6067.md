@@ -1,1 +1,1 @@
-- (#6067) Fix a performance issue related to AIs and their transport logic
+- (#6067) Fix a performance issue related to AIs and their transport logic.
