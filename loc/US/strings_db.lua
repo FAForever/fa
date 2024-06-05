@@ -6748,10 +6748,17 @@ urs0304_name="Plan B"
 urs0305_desc="Sonar Platform"
 urs0305_help="Sonar Platform"
 urs0305_name="Flood XR"
+
 usersync_0001="%s wins!"
 usersync_0002="%s has been defeated!"
 usersync_0003="%s receives a draw."
 usersync_0004="Game Over."
+usersync_0005="Disconnect Temporary Share"
+usersync_0006="Disconnect Share"
+usersync_0007="%s\'s units and ACU transferred to you until ACU dies/recalls"
+usersync_0008="%s\'s units and ACU transferred to you until ACU dies"
+usersync_0009="\nShare Condition after: %s"
+
 uvd_0000="Build Cost (Rate)"
 uvd_0002="Yield"
 uvd_0003="Description"
@@ -8214,5 +8221,6 @@ chat_send_type_description="When enabled, enter sends messages to allies and hol
 
 replay_id="Replay id"
 map_version="Map version"
+fullshare_announcement="%s\'s units have been transferred to you"
 
 ChangelogDescriptionIdentifier="description"
