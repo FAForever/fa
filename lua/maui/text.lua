@@ -10,6 +10,7 @@
 
 local Control = import("/lua/maui/control.lua").Control
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class Text : moho.text_methods, Control, InternalObject
 Text = ClassUI(moho.text_methods, Control) {
@@ -20,9 +21,8 @@ Text = ClassUI(moho.text_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
-        self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
+        self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
         self._font._family.OnDirty = function(var)
             self:_internalSetFont()
         end
@@ -30,7 +30,7 @@ Text = ClassUI(moho.text_methods, Control) {
             self:_internalSetFont()
         end
 
-        self._color = LazyVar.Create()
+        self._color = LazyVarCreate()
         self._color.OnDirty = function(var)
             self:SetNewColor(var())
         end

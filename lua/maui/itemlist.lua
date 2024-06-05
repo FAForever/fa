@@ -18,6 +18,7 @@
 local Control = import("/lua/maui/control.lua").Control
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class ItemList : moho.item_list_methods, Control, InternalObject
 ItemList = ClassUI(moho.item_list_methods, Control) {
@@ -28,9 +29,8 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
-        self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
+        self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
         self._font._family.OnDirty = function(var)
             self:_internalSetFont()
         end
@@ -38,32 +38,32 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
             self:_internalSetFont()
         end
 
-        self._fg = LazyVar.Create()
+        self._fg = LazyVarCreate()
         self._fg.OnDirty = function(var)
             self:SetNewColors(var(), nil, nil, nil, nil, nil)
         end
 
-        self._bg = LazyVar.Create()
+        self._bg = LazyVarCreate()
         self._bg.OnDirty = function(var)
             self:SetNewColors(nil, var(), nil, nil, nil, nil)
         end
 
-        self._sfg = LazyVar.Create()
+        self._sfg = LazyVarCreate()
         self._sfg.OnDirty = function(var)
             self:SetNewColors(nil, nil, var(), nil, nil, nil)
         end
 
-        self._sbg = LazyVar.Create()
+        self._sbg = LazyVarCreate()
         self._sbg.OnDirty = function(var)
             self:SetNewColors(nil, nil, nil, var(), nil, nil)
         end
 
-        self._mofg = LazyVar.Create()
+        self._mofg = LazyVarCreate()
         self._mofg.OnDirty = function(var)
             self:SetNewColors(nil, nil, nil, nil, var(), nil)
         end
 
-        self._mobg = LazyVar.Create()
+        self._mobg = LazyVarCreate()
         self._mobg.OnDirty = function(var)
             self:SetNewColors(nil, nil, nil, nil, nil, var())
         end
