@@ -279,27 +279,27 @@ globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_0808>DC ACU Share Conditions",
-        help = "<LOC lobui_0809>Set what happens to a player's ACU when they disconnect.",
+        help = "<LOC lobui_0809>Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes.",
         key = 'DisconnectShareCommanders',
         values = {
             {
-                text = "Explode",
-                help = "<LOC lobui_0810>ACUs explode when their player disconnects. In Assassination, the DC share condition is applied only if they have not been damaged in the last 2 minutes.",
+                text = "<LOC lobui_0810>Explode",
+                help = "<LOC lobui_0811>ACUs explode when their player disconnects.",
                 key = 'Explode',
             },
             {
-                text = "Recall",
-                help = "<LOC lobui_0811>ACUs not damaged in the last 2 minutes are recalled when their player disconnects. In Assassination, the DC share condition is applied only if they have not been damaged in the last 2 minutes.",
+                text = "<LOC lobui_0812>Recall",
+                help = "<LOC lobui_0813>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
                 key = 'Recall',
             },
             {
-                text = "Delayed Recall",
-                help = "Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls. In Assassination, the DC share condition is applied to that player's units when the shared ACU dies or recalls.",
+                text = "<LOC lobui_0814>Delayed Recall",
+                help = "<LOC lobui_0815>Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls.",
                 key = 'RecallDelayed',
             },
             {
-                text = "Permanent",
-                help = "Disconnected ACUs are permanently shared to allies. In Assassination, the DC share condition is applied to that player's units when the shared ACU dies.",
+                text = "<LOC lobui_0816>Permanent",
+                help = "<LOC lobui_0817>Disconnected ACUs are permanently shared to allies.",
                 key = 'Permanent',
             },
         },

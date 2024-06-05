@@ -7742,6 +7742,7 @@ lobui_0781="Teams will be balanced with up to 5%% tolerance of best setup to mak
 lobui_0782="Optimal balance (Mirrored)"
 lobui_0783="Teams will be optimally balanced, mirrored start locations"
 
+-- Share Options
 lobui_0790="Manual Unit Sharing"
 lobui_0791="Are players allowed to manually give units?"
 lobui_0792="Manual unit sharing are allowed"
@@ -7764,10 +7765,17 @@ lobui_0805="This game will be rated if all the criteria for a rated game are met
 lobui_0806="Yes"
 lobui_0807="This game will not be rated."
 
-lobui_0808="Recall Disconnected ACUs"
-lobui_0809="Should disconnecting players' ACUs be recalled, preventing their explosion if they were not damaged in the last 2 minutes?"
-lobui_0810="ACUs explode when their player disconnects."
-lobui_0811="ACUs not damaged in the last 2 minutes are recalled when their player disconnects."
+-- More share options
+lobui_0808="DC ACU Share Conditions"
+lobui_0809="Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes."
+lobui_0810="Explode"
+lobui_0811="ACUs explode when their player disconnects."
+lobui_0812="Recall"
+lobui_0813="ACUs not damaged in the last 2 minutes are recalled when their player disconnects."
+lobui_0814="Delayed Recall"
+lobui_0815="Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls."
+lobui_0816="Permanent"
+lobui_0817="Disconnected ACUs are permanently shared to allies."
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
