@@ -269,3 +269,31 @@ function WrapText(text, lineWidth, advanceFunction)
     end
     return result
 end
+
+--- Returns text aligned proportionally along a line width.
+---@param text string
+---@param lineWidth number
+---@param advanceFunction function
+---@param alignmentProportion number How far towards the right of the line the text should be aligned. 0.5 for middle alignment, 1.0 for right alignment.
+---@return string
+---@overload fun(text: string[], lineWidth: number, advanceFunction: function, alignmentProportion: number): string[]
+function AlignText(text, lineWidth, advanceFunction, alignmentProportion)
+    local spaceWidth = advanceFunction(" ")
+
+    if type(text) == "string" then
+        local textWidth = advanceFunction(text)
+        local spacesToAdd = math.floor((lineWidth - textWidth) / spaceWidth * alignmentProportion)
+        if spacesToAdd > 0 then
+            return string.rep(" ", spacesToAdd) .. text
+        else
+            return text
+        end
+    else
+        -- text is a table of strings
+        local alignedText = {}
+        for i, line in text do
+            alignedText[i] = AlignText(line, lineWidth, advanceFunction, alignmentProportion)
+        end
+        return alignedText
+    end
+end
