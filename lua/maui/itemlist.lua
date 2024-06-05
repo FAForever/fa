@@ -130,6 +130,16 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
         self._mobg = nil
     end,
 
+    ---@param self ItemList
+    ---@return LocalizedString[]
+    GetAllItems = function(self)
+        local items = {}
+        for i = 0, self:GetItemCount() - 1 do
+            items[i] = self:GetItem(i)
+        end
+        return items
+    end,
+
     -- default override methods, event has the whole event so you can get modifiers
     OnClick = function(self, row, event)
         self:SetSelection(row)
@@ -147,4 +157,3 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
     OnMouseoverItem = function(self, row)
     end,
 }
-
