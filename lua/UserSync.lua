@@ -176,12 +176,12 @@ function OnSync()
             if transfer.to == army then 
                 local reason = transfer.reason
 
-                local primary = LOC(transferReasonToAnnouncementTitle[reason])
+                local primary = LOC(transferReasonToAnnouncementTitle[reason] or "<LOC lobui_0742>Full Share")
                 local secondary = LOCF(transferReasonToAnnouncementText[reason] or "<LOC fullshare_announcement>%s\'s units have been transferred to you", other)
 
                 if reason == "DisconnectShareTemporary" or reason == "DisconnectSharePermanent" then
                     local shareOption = SessionGetScenarioInfo().Options.DisconnectShare
-                    secondary = secondary .. LOCF("<LOC usersync_0009>\nShare Condition after: %s", LOC(transferReasonToAnnouncementTitle[shareOption]))
+                    secondary = secondary .. LOCF("<LOC usersync_0009>\nShare Condition after: %s", LOC(transferReasonToAnnouncementTitle[shareOption] or "<LOC lobui_0744>Share Until Death"))
                 end
                 
                 UIUtil.CreateAnnouncementStd(primary, secondary, control)
