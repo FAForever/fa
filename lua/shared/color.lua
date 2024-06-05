@@ -61,7 +61,7 @@ end
 ---@param color Color
 ---@return number alpha
 function GetAlpha(color)
-    color = EnumColors[color] or color
+    color = EnumColors[string.upper(color)] or color
     if color:sub(7,8) == "" then
         return 0
     else
@@ -74,7 +74,7 @@ end
 ---@param mult number
 ---@return Color
 function MultiplyAlpha(color, mult)
-    color = EnumColors[color] or color
+    color = EnumColors[string.upper(color)] or color
     if color:sub(7, 8) == "" then
         return string.format("%02X", math.clamp(255 * mult, 0, 255)) .. color:sub(1, 6)
     else
