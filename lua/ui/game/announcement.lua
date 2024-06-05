@@ -11,15 +11,16 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local MATH_Lerp = MATH_Lerp
 
 local bg = false
 
 --- Create an announcement UI for sending general messages to the user
----@param text string
+---@param text UnlocalizedString # title text
 ---@param goalControl? Control The control where the announcement appears out of.
----@param secondaryText? string
+---@param secondaryText? UnlocalizedString # body text
 ---@param onFinished? function
 function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     local frame = GetFrame(0)
@@ -55,6 +56,9 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
                 CreateAnnouncement(text, goalControl, secondaryText, onFinished)
             end
             self:SetAlpha(newAlpha, true)
+            if bg.secText then
+                bg.secText:SetAlphaOfColors(newAlpha)
+            end
         end
         return
     end
@@ -72,10 +76,18 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
         :DropShadow(true):Color(UIUtil.fontColor)
         :NeedsFrameUpdate(true):End()
 
+    local secText
     if secondaryText then
-        local secText = Layouter(UIUtil.CreateText(textGroup, secondaryText, 18, UIUtil.bodyFont))
-            :DropShadow(true):Color(UIUtil.fontColor)
-            :Below(text, 10):AtHorizontalCenterIn(text):End()
+        secText = TextArea(textGroup, 600, 60)
+        secText:SetFont(UIUtil.bodyFont, 18)
+        secText:SetText(secondaryText)
+        secText:FitToText()
+        secText:SetTextAlignment(0.5)
+        secText:SetColors(UIUtil.fontColor)
+        secText:SetAlphaOfColors(0)
+        Layouter(secText):CenteredBelow(text, 10):End()
+        bg.secText = secText
+
         Layouter(textGroup):Top(text.Top)
             :Left(function() return math.min(secText.Left(), text.Left()) end)
             :Right(function() return math.max(secText.Right(), text.Right()) end)
@@ -130,10 +142,18 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
         local textAlpha = text:GetAlpha()
         -- fade out the text at the end of the announcement
         if time > 3 and textGroupAlpha ~= 0 then
-            textGroup:SetAlpha(math.max(textGroupAlpha - (delta * 2), 0), true)
+            local newAlpha = math.max(textGroupAlpha - (delta * 2), 0)
+            textGroup:SetAlpha(newAlpha, true)
+            if secText then
+                secText:SetAlphaOfColors(newAlpha)
+            end
         -- fade in the text when the announcement appears
         elseif time > .2 and time < 3 and textAlpha ~= 1 then
-            textGroup:SetAlpha(math.min(textAlpha + (delta * 2), 1), true)
+            local newAlpha = math.min(textAlpha + (delta * 2), 1)
+            textGroup:SetAlpha(newAlpha, true)
+            if secText then
+                secText:SetAlphaOfColors(newAlpha)
+            end
         end
 
         if time > 3.7 then
