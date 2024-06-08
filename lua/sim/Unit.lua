@@ -3950,8 +3950,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 duration = 1
             end
 
-            -- for units the energy and mass fields are ignored but they do need to exist or the engine burps
-            return duration, 0, 0
+            -- duration determines both unbuilt and built unit reclaim speed
+            -- energy and mass fields needed for unbuilt units to give back resources when reclaimed
+            return duration, buildEnergyCosts, buildMassCosts
         end
 
         return 0, 0, 0
