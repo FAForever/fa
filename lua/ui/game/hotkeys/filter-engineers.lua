@@ -21,31 +21,26 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-function CalcTableLength(tbl)
-    tbl_size = 0
-    for _ in pairs(tbl) do tbl_size = tbl_size + 1 end
-    return tbl_size
-end
-
+--- Filters your selection to the units of the majority faction in your selection.
 function GetMajorityFaction(units)
-    local faction_categories = {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM}
+    local factionCategories = {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM}
 
-    local units_factions = {}
-    for i, faction_category in faction_categories do
-        table.insert(units_factions,EntityCategoryFilterDown(faction_category, units))
+    local factionsOfUnits = {}
+    for _, factionCategory in factionCategories do
+        table.insert(factionsOfUnits, EntityCategoryFilterDown(factionCategory, units))
     end
 
-    local faction_nr = 0
-    local nr_of_units = 0
-    for i, u in units_factions do
-        nr_of_units_for_that_faction = CalcTableLength(u)
-        if nr_of_units_for_that_faction > nr_of_units then
-            nr_of_units = nr_of_units_for_that_faction
-            faction_nr = i
+    local factionNr = 0
+    local nrOfUnits = 0
+    for i, u in factionsOfUnits do
+        nrOfUnitsForThatFaction = table.getsize(u)
+        if nrOfUnitsForThatFaction > nrOfUnits then
+            nrOfUnits = nrOfUnitsForThatFaction
+            factionNr = i
         end
     end
 
-    return units_factions[faction_nr]
+    return factionsOfUnits[factionNr]
 end
 
 --- Filters your selection to the highest tech of engineers. All other engineers assist one of those engineers.
@@ -56,21 +51,21 @@ function SelectHighestEngineerAndAssist()
 
         local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
         local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
-        local tech3_and_sACUs = EntityCategoryFilterDown((categories.SUBCOMMANDER + categories.TECH3) - categories.COMMAND, selection)
+        local tech3AndSACUs = EntityCategoryFilterDown((categories.SUBCOMMANDER + categories.TECH3) - categories.COMMAND, selection)
 
-        local highest_tech_engies_and_sacus_of_majority_faction = nil
-        if next(tech3_and_sACUs) then
-            highest_tech_engies_and_sacus_of_majority_faction = GetMajorityFaction(tech3_and_sACUs)
+        local highestTechEngiesAndSacusOfMajorityFaction = nil
+        if next(tech3AndSACUs) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3AndSACUs)
         elseif next(tech2) then
-            highest_tech_engies_and_sacus_of_majority_faction = GetMajorityFaction(tech2)
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech2)
         elseif next(tech1) then
-            highest_tech_engies_and_sacus_of_majority_faction = GetMajorityFaction(tech1)
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1)
         else
             -- do nothing
         end
-        if highest_tech_engies_and_sacus_of_majority_faction then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highest_tech_engies_and_sacus_of_majority_faction[1]:GetEntityId() }}, true)
-            SelectUnits(highest_tech_engies_and_sacus_of_majority_faction)
+        if highestTechEngiesAndSacusOfMajorityFaction then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
+            SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
         end
     end
 end
