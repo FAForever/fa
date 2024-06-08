@@ -13,18 +13,19 @@ local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
-local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NullShell = DefaultProjectileFile.NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
+local SplitComponent = import('/lua/sim/projectiles/components/SplitComponent.lua').SplitComponent
+local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
 
 ---  CYBRAN BRACKMAN "HACK PEG-POD" PROJECTILE
 ---@class CDFBrackmanHackPegProjectile01 : MultiPolyTrailProjectile
 CDFBrackmanHackPegProjectile01 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrails = EffectTemplate.CBrackmanCrabPegPodTrails,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrailOffset = 0,
 }
 
@@ -33,7 +34,7 @@ CDFBrackmanHackPegProjectile01 = ClassProjectile(MultiPolyTrailProjectile) {
 CDFBrackmanHackPegProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrails = EffectTemplate.CBrackmanCrabPegTrails,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactLand = EffectTemplate.CBrackmanCrabPegHit01,
     FxTrailOffset = 0,
 }
@@ -73,11 +74,13 @@ CDFProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         EffectTemplate.CProtonCannonPolyTrail,
         '/effects/emitters/default_polytrail_01_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = EffectTemplate.CProtonCannonFXTrail01,
     FxImpactUnit = EffectTemplate.CProtonCannonHit01,
     FxImpactProp = EffectTemplate.CProtonCannonHit01,
     FxImpactLand = EffectTemplate.CProtonCannonHit01,
+    FxImpactWater = EffectTemplate.CProtonCannonHitWater01,
+    FxImpactWaterScale = 0.75,
     FxTrailOffset = 0,
 }
 
@@ -89,7 +92,7 @@ CDFHvyProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         EffectTemplate.CHvyProtonCannonPolyTrail,
         '/effects/emitters/default_polytrail_01_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = EffectTemplate.CHvyProtonCannonFXTrail01,
     FxImpactUnit = EffectTemplate.CHvyProtonCannonHitUnit,
     FxImpactProp = EffectTemplate.CHvyProtonCannonHitUnit,
@@ -241,7 +244,7 @@ CDisintegratorLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/disintegrator_polytrail_05_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxTrails = EffectTemplate.CDisintegratorFxTrails01,
     FxImpactUnit = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactAirUnit = EffectTemplate.CDisintegratorHitAirUnit01,
@@ -258,7 +261,7 @@ CDisintegratorLaserProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/disintegrator_polytrail_05_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxImpactUnit = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactAirUnit = EffectTemplate.CDisintegratorHitAirUnit01,
     FxImpactProp = EffectTemplate.CDisintegratorHitUnit01,
@@ -273,7 +276,7 @@ CElectronBolterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/electron_bolter_trail_02_emit.bp',
         '/effects/emitters/default_polytrail_01_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = {'/effects/emitters/electron_bolter_munition_01_emit.bp',},
     FxImpactUnit = EffectTemplate.CElectronBolterHitUnit01,
     FxImpactProp = EffectTemplate.CElectronBolterHitUnit01,
@@ -287,7 +290,7 @@ CHeavyElectronBolterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/electron_bolter_trail_01_emit.bp',
         '/effects/emitters/default_polytrail_05_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = {'/effects/emitters/electron_bolter_munition_02_emit.bp',},
     FxImpactUnit = EffectTemplate.CElectronBolterHitUnit02,
     FxImpactProp = EffectTemplate.CElectronBolterHitUnit02,
@@ -390,7 +393,7 @@ CLaserLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/cybran_laser_trail_01_emit.bp',
         '/effects/emitters/default_polytrail_02_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactUnit = EffectTemplate.CLaserHitUnit01,
     FxImpactProp = EffectTemplate.CLaserHitUnit01,
     FxImpactLand = EffectTemplate.CLaserHitLand01,
@@ -402,7 +405,7 @@ CHeavyLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/cybran_laser_trail_02_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactUnit = EffectTemplate.CLaserHitUnit01,
     FxImpactProp = EffectTemplate.CLaserHitUnit01,
     FxImpactLand = EffectTemplate.CLaserHitLand01,
@@ -414,7 +417,7 @@ CHeavyLaserProjectile2 = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/hrailgunsd_polytrail_01_emit.bp',
                 '/effects/emitters/default_polytrail_02_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxUnitHitScale = 0.15,
     FxLandHitScale = 0.15,
     FxImpactUnit = EffectTemplate.CBeamHitUnit01,
@@ -546,21 +549,92 @@ CRocketProjectile = ClassProjectile(SingleBeamProjectile) {
 }
 
 ---  CYBRAN ROCKET PROJECILES
----@class CLOATacticalMissileProjectile : SingleBeamProjectile
-CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile) {
+---@class CLOATacticalMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent
+---@field SplitDamage { DamageAmount: number, DamageRadius: number }
+CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_01_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_01_emit.bp',},
     FxTrailOffset = -0.5,
     FxExitWaterEmitter = EffectTemplate.TIFCruiseMissileLaunchExitWater,
+
     FxImpactUnit = EffectTemplate.CMissileLOAHit01,
     FxImpactLand = EffectTemplate.CMissileLOAHit01,
     FxImpactProp = EffectTemplate.CMissileLOAHit01,
-    FxImpactNone = EffectTemplate.CMissileLOAHit01,
+
+    FxImpactNone = EffectTemplate.TMissileKilled01,
+    FxNoneHitScale = 0.6,
+
+    FxOnKilled = EffectTemplate.TMissileKilled01,
+    FxOnKilledScale = 0.6,
+
+    LaunchTicks = 2,
+    LaunchTurnRate = 6,
+    HeightDistanceFactor = 5,
+    MinHeight = 2,
+    FinalBoostAngle = 0,
+
+    ChildCount = 3,
+    ChildProjectileBlueprint = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp',
+
+    DebrisBlueprints = {
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
+    },
+
+    ---@param self CLOATacticalMissileProjectile
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
+        SingleBeamProjectile.OnCreate(self, inWater)
+        
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
+    end,
+
+    ---@param self CLOATacticalMissileProjectile
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SingleBeamProjectile.OnKilled(self, instigator, type, overkillRatio)
+
+        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_11')
+        self:CreateDebris()
+    end,
+
+    ---@param self CLOATacticalMissileProjectile
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        SingleBeamProjectile.OnDamage(self, instigator, amount, vector, damageType)
+
+        if self:GetHealth() <= 0 then
+            self.DamageData.DamageAmount = self.Launcher.Blueprint.SplitDamage.DamageAmount or 0
+            self.DamageData.DamageRadius = self.Launcher.Blueprint.SplitDamage.DamageRadius or 1
+
+            self:OnSplit(true)
+        end
+    end,
+
+    ---@param self CLOATacticalMissileProjectile
+    ---@param targetType string
+    ---@param targetEntity Unit
+    OnImpact = function(self, targetType, targetEntity)
+        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
+
+        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_11')
+        if targetType == 'None' or targetType == 'Air' then
+            self:CreateDebris()
+        end
+    end,
 }
 
 ---  CYBRAN ROCKET PROJECILES
----@class CLOATacticalChildMissileProjectile : SingleBeamProjectile
-CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile) {
+---@class CLOATacticalChildMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, DebrisComponent
+CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_02_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_03_emit.bp',},
     FxTrailOffset = -0.5,
@@ -568,42 +642,59 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile) {
     FxImpactUnit = EffectTemplate.CMissileLOAHit01,
     FxImpactLand = EffectTemplate.CMissileLOAHit01,
     FxImpactProp = EffectTemplate.CMissileLOAHit01,
-    FxImpactNone = EffectTemplate.CMissileLOAHit01,
     FxAirUnitHitScale = 0.375,
     FxLandHitScale = 0.375,
-    FxNoneHitScale = 0.375,
     FxPropHitScale = 0.375,
     FxProjectileHitScale = 0.375,
     FxShieldHitScale = 0.375,
     FxUnitHitScale = 0.375,
     FxWaterHitScale = 0.375,
+
+    FxImpactNone = EffectTemplate.TMissileKilled01,
+    FxNoneHitScale = 0.375,
+
+    FxOnKilled = EffectTemplate.TMissileKilled01,
     FxOnKilledScale = 0.375,
+
+    LaunchTicks = 2,
+    LaunchTurnRate = 6,
+    HeightDistanceFactor = 5,
+    MinHeight = 2,
+    FinalBoostAngle = 0,
+
+    DebrisBlueprints = {
+        '/effects/Entities/TacticalDebris03/TacticalDebris03_proj.bp',
+    },
 
     ---@param self CLOATacticalChildMissileProjectile
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SingleBeamProjectile.OnCreate(self)
+
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
+    end,
+
+    ---@param self CLOATacticalChildMissileProjectile
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SingleBeamProjectile.OnKilled(self, instigator, type, overkillRatio)
+
+        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_11')
+        self:CreateDebris()
     end,
 
     ---@param self CLOATacticalChildMissileProjectile
     ---@param targetType string
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        CreateLightParticle(self, -1, self.Army, 1, 7, 'glow_03', 'ramp_fire_11')
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 
-    ---@param self CLOATacticalChildMissileProjectile
-    ---@param army number
-    ---@param EffectTable table
-    ---@param EffectScale? number
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtEntity(self, army, v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
+        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_11')
+        if targetType == 'None' then
+            self:CreateDebris()
         end
     end,
 }
@@ -615,7 +706,7 @@ CShellAAAutoCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/auto_cannon_trail_01_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactUnit = {'/effects/emitters/auto_cannon_hit_flash_01_emit.bp'},
     FxImpactProp ={'/effects/emitters/auto_cannon_hit_flash_01_emit.bp'},
     FxImpactAirUnit = {'/effects/emitters/auto_cannon_hit_flash_01_emit.bp'},
@@ -737,7 +828,7 @@ CHeavyDisintegratorPulseLaser = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/disintegrator_polytrail_03_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxImpactUnit = EffectTemplate.CHvyDisintegratorHitUnit01,
     FxImpactProp = EffectTemplate.CHvyDisintegratorHitUnit01,
     FxImpactLand = EffectTemplate.CHvyDisintegratorHitLand01,
@@ -752,3 +843,4 @@ CKrilTorpedo = ClassProjectile(OnWaterEntryEmitterProjectile) {}
 local DefaultExplosion = import("/lua/defaultexplosions.lua")
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local MultiBeamProjectile = DefaultProjectileFile.MultiBeamProjectile
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge

@@ -45,7 +45,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -69,7 +68,7 @@ UnitBlueprint{
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
         SubThreatLevel = 0,
-        SurfaceThreatLevel = 765,
+        SurfaceThreatLevel = 45,
     },
     Display = {
         Abilities = {
@@ -101,9 +100,15 @@ UnitBlueprint{
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 175,
+                    LODCutoff = 100,
                     Scrolling = true,
                     ShaderName = "Aeon",
+                },
+                {
+                    AlbedoName = 'ual0001_lod1_albedo.dds',
+                    LODCutoff = 215,
+                    ShaderName = 'Aeon',
+                    SpecularName = 'ual0001_lod1_specteam.dds',
                 },
             },
         },
@@ -218,6 +223,7 @@ UnitBlueprint{
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
+        UseVariableTeleportCosts = true,
     },
     Enhancements = {
         AdvancedEngineering = {
@@ -660,19 +666,19 @@ UnitBlueprint{
         },
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 15,
+        TeleportFlatEnergyCost = 75000,
     },
     Intel = {
         FreeIntel = true,
-        OmniRadius = 26,
+        OmniRadius = 24,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.15,
     LifeBarOffset = 0.5,
     LifeBarSize = 1.25,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -687,7 +693,6 @@ UnitBlueprint{
         MaxSpeed = 1.7,
         MaxSpeedReverse = 0,
         MaxSteerForce = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -809,8 +814,6 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "Overcharge Cannon",
-            EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 7500,
             EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
@@ -890,8 +893,6 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "AutoOvercharge Cannon",
-            EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 7500,
             EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
@@ -956,8 +957,8 @@ UnitBlueprint{
             WeaponUnpacks = false,
         },
         {
-            AboveWaterFireOnly = true,
-            AboveWaterTargetsOnly = true,
+            AboveWaterFireOnly = false,
+            AboveWaterTargetsOnly = false,
             BallisticArc = "RULEUBA_None",
             Buffs = {
                 {
@@ -979,9 +980,9 @@ UnitBlueprint{
             EnergyDrainPerSecond = 200,
             EnergyRequired = 200,
             FireTargetLayerCapsTable = {
-                Land = "Land|Water|Seabed",
-                Seabed = "Land|Water|Seabed",
-                Water = "Land|Water|Seabed",
+                Land = "Land|Water|Sub|Seabed",
+                Seabed = "Land|Water|Sub|Seabed",
+                Water = "Land|Water|Sub|Seabed",
             },
             FiringTolerance = 360,
             Label = "ChronoDampener",
@@ -1036,12 +1037,8 @@ UnitBlueprint{
             MuzzleVelocity = 0,
             NukeInnerRingDamage = 2000,
             NukeInnerRingRadius = 30,
-            NukeInnerRingTicks = 24,
-            NukeInnerRingTotalTime = 0,
             NukeOuterRingDamage = 500,
             NukeOuterRingRadius = 40,
-            NukeOuterRingTicks = 20,
-            NukeOuterRingTotalTime = 0,
             ProjectileId = "/projectiles/AIFQuantumWarhead02/AIFQuantumWarhead02_proj.bp",
             RackBones = {
                 {
@@ -1062,6 +1059,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Teleport in",
             DummyWeapon = true,
+            EnabledByEnhancement = "Teleporter",
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,

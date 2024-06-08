@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC urs0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 40,
-        TargetBones = {
-            "Turret",
-            "URS0203",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'URS',        Cue = 'URS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -91,11 +87,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "urs0203_lod1_albedo.dds",
                     SpecularName = "urs0203_lod1_specteam.dds",
                 },
@@ -192,7 +188,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -209,7 +204,6 @@ UnitBlueprint{
         MaxSpeed = 6,
         MaxSpeedReverse = 6,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,

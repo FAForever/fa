@@ -1,0 +1,1 @@
+- (#6168) Allow various submarines without deck guns to surface again.

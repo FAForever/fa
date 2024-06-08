@@ -59,10 +59,13 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
+---@field IMAPConfig table
 ---@field IntelData? table<string, number>
 ---@field IntelTriggerList table
+---@field InterestList table
 ---@field LayerPref "LAND" | "AIR"
 ---@field Name string
+---@field NumOpponents number
 ---@field Radars table<string, Unit[]>
 ---@field Result? AIResult
 ---@field Sorian boolean
@@ -134,15 +137,17 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these markers to exist
-        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
-        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateNavalAreaMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateRallyPointMarkers()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridDeposits = import("/lua/ai/griddeposits.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
     end,
 
@@ -243,7 +248,7 @@ AIBrain = Class(StandardBrain) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', tostring(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,
@@ -306,10 +311,10 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self BaseAIBrain
     ---@param loc Vector
-    ---@return Vector | false
+    ---@return Vector?
     PBMGetLocationCoords = function(self, loc)
         if not loc then
-            return false
+            return
         end
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
@@ -324,7 +329,7 @@ AIBrain = Class(StandardBrain) {
         elseif self.BuilderManagers[loc] then
             return self.BuilderManagers[loc].FactoryManager:GetLocationCoords()
         end
-        return false
+        return
     end,
 
     ---@param self BaseAIBrain
@@ -790,10 +795,10 @@ AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param position Vector
     ---@param radius number
-    ---@param threshold number
-    ---@return boolean|table
+    ---@param threshold? number
+    ---@return Vector?
     BaseMonitorDistressLocation = function(self, position, radius, threshold)
-        local returnPos = false
+        local returnPos
         local highThreat = false
         local distance
         if self.BaseMonitor.CDRDistress
@@ -1311,7 +1316,7 @@ AIBrain = Class(StandardBrain) {
     ---## Function: GetUntaggedMustScoutArea
     --- Gets an area that has been flagged with the AddScoutArea function that does not have a unit heading to scout it already.
     ---@param self BaseAIBrain
-    ---@return Vector location
+    ---@return ScoutLocation location
     ---@return number index
     GetUntaggedMustScoutArea = function(self)
         -- If any locations have been specifically tagged for scouting
@@ -1706,8 +1711,8 @@ AIBrain = Class(StandardBrain) {
     ---@param unit Unit
     ---@param builder Unit  
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStartBeingBuilt(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnStartBeingBuilt(self, unit, builder, layer)
 
         -- find nearest base
         local nearestBaseIdentifier = builder.AIManagerIdentifier or self:FindNearestBaseIdentifier(unit:GetPosition())
@@ -1716,7 +1721,7 @@ AIBrain = Class(StandardBrain) {
         -- register unit at managers of base
         local managers = self.BuilderManagers[nearestBaseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
+            managers.EngineerManager:OnStartBeingBuilt(unit, builder, layer)
         end
     end,
 
@@ -1725,8 +1730,8 @@ AIBrain = Class(StandardBrain) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnStopBeingBuilt(self, unit, builder, layer)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1736,15 +1741,15 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
+            managers.EngineerManager:OnStopBeingBuilt(unit, builder, layer)
         end
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self BaseAIBrain
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
-        StandardBrain.OnUnitDestroyed(self, unit)
+    OnUnitDestroy = function(self, unit)
+        StandardBrain.OnUnitDestroy(self, unit)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1753,7 +1758,7 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+            managers.EngineerManager:OnStopBeingBuilt(unit)
         end
     end,
 
@@ -1761,8 +1766,8 @@ AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
-        StandardBrain.OnUnitStartBuilding(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
+        StandardBrain.OnUnitStartBuild(self, unit, built)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1771,7 +1776,7 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStartBuilding(unit)
+            managers.EngineerManager:OnUnitStartBuild(unit)
         end
     end,
 
@@ -1779,8 +1784,8 @@ AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
-        StandardBrain.OnUnitStopBuilding(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
+        StandardBrain.OnUnitStopBuild(self, unit, built)
         
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1789,7 +1794,7 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStopBuilding(unit)
+            managers.EngineerManager:OnUnitStopBuild(unit)
         end
     end,
 }

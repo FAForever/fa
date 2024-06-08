@@ -1,4 +1,3 @@
-
 local PlayReclaimEndEffects = import("/lua/effectutilities.lua").PlayReclaimEndEffects
 local GridReclaimInstance = import("/lua/AI/GridReclaim.lua").GridReclaimInstance
 
@@ -67,12 +66,12 @@ Prop = Class(moho.prop_methods) {
 
     end,
 
-    ---@param self Prop 
-    ---@param fn function 
-    ---@param when PropCallbackTypes 
+    ---@param self Prop
+    ---@param fn function
+    ---@param when PropCallbackTypes
     AddPropCallback = function(self, fn, when)
-        self.EventCallbacks = self.EventCallbacks or { }
-        self.EventCallbacks[when] = self.EventCallbacks[when] or { }
+        self.EventCallbacks = self.EventCallbacks or {}
+        self.EventCallbacks[when] = self.EventCallbacks[when] or {}
         TableInsert(self.EventCallbacks[when], fn)
     end,
 
@@ -114,6 +113,11 @@ Prop = Class(moho.prop_methods) {
         self:Destroy()
     end,
 
+    ---@param self Prop
+    BeingReclaimed = function(self)
+    end,
+
+    ---@param self Prop
     ---@param entity Unit
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
@@ -167,7 +171,7 @@ Prop = Class(moho.prop_methods) {
                 local maxHealth = self:GetMaxHealth()
                 if excess < 0 and maxHealth > 0 then
                     self:Kill(instigator, damageType, -excess / maxHealth)
-                else 
+                else
                     self:Kill(instigator, damageType, 0.0)
                 end
             end
@@ -177,7 +181,7 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Set the mass/energy value of this wreck when at full health, and the time coefficient
-    --- that determine how quickly it can be reclaimed. These values are used to set the real reclaim 
+    --- that determine how quickly it can be reclaimed. These values are used to set the real reclaim
     --- values as fractions of the health as the wreck takes damage.
     ---@param self Prop
     ---@param time number
@@ -263,7 +267,7 @@ Prop = Class(moho.prop_methods) {
     ---@return number mass to reclaim
     GetReclaimCosts = function(self, reclaimer)
         local maxMass = self.MaxMassReclaim or 0
-        local maxEnergy = self.MaxEnergyReclaim or  0
+        local maxEnergy = self.MaxEnergyReclaim or 0
         local timeReclaim = self.TimeReclaim or 0
         local maxValue = maxMass
         if maxEnergy > maxValue then
@@ -303,7 +307,8 @@ Prop = Class(moho.prop_methods) {
         local economy = self.Blueprint.Economy
         local time = 1
         if economy then
-            time = economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1
+            time = economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or
+                economy.ReclaimEnergyTimeMultiplier or 1
         end
 
         -- compute directory prefix if it is not set
@@ -317,12 +322,12 @@ Prop = Class(moho.prop_methods) {
         local trimmedBoneName, blueprint, bone, ok, out
 
         -- contains the new props and the expected number of props
-        local props = { }
+        local props = {}
         local count = self:GetBoneCount() - 1
 
         -- compute information of new props
         local compensationMult = 2
-        local time = time / count 
+        local time = time / count
         local mass = (self.MaxMassReclaim * self.ReclaimLeft * compensationMult) / count
         local energy = (self.MaxEnergyReclaim * self.ReclaimLeft * compensationMult) / count
         for ibone = 1, count do
@@ -336,10 +341,10 @@ Prop = Class(moho.prop_methods) {
 
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
-            if ok then 
+            if ok then
                 out:SetMaxReclaimValues(time, mass, energy)
-                props[ibone] = out 
-            else 
+                props[ibone] = out
+            else
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
                 WARN(out)
             end

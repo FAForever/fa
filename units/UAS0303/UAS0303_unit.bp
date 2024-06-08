@@ -8,7 +8,12 @@ UnitBlueprint{
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
-            "UAS0303",
+            "Attachpoint01",
+            "Attachpoint02",
+            "Attachpoint03",
+            "Attachpoint04",
+            "Attachpoint05",
+            "Attachpoint06",
             "Exhaust01",
             "Exhaust02",
         },
@@ -28,7 +33,6 @@ UnitBlueprint{
         "ANTIMISSILE",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
-        "FACTORY",
         "MOBILE",
         "NAVAL",
         "NAVALCARRIER",
@@ -43,6 +47,7 @@ UnitBlueprint{
         "SHOWQUEUE",
         "TECH3",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 60,
@@ -94,11 +99,11 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     Scrolling = true,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0303_lod1_albedo.dds",
                     SpecularName = "uas0303_lod1_specteam.dds",
                 },
@@ -120,7 +125,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 40000,
         BuildCostMass = 4000,
-        BuildRate = 180,
+        BuildRate = 120,
         BuildTime = 12000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE AIR ANTINAVY",
@@ -128,6 +133,12 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY AEON MOBILE AIR ANTIAIR",
             "BUILTBYTIER3FACTORY AEON MOBILE AIR ANTIGROUND",
         },
+    },
+    ExternalFactory = {
+        SelectionSizeX = 4,
+        SelectionSizeZ = 2,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetZ = 8.5,
     },
     Footprint = {
         SizeX = 5,
@@ -171,7 +182,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -190,7 +200,6 @@ UnitBlueprint{
         MeshExtentsX = 6.5,
         MeshExtentsY = 4.5,
         MeshExtentsZ = 17,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -338,22 +347,17 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 30,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Will O Wisp Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 360,
-            Flare = {
-                Category = "MISSILE TACTICAL",
-                OffsetMult = 1.33,
-                Radius = 15,
-                Stack = true,
-            },
             Label = "AntiMissile",
             MaxRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 15,
+            MuzzleVelocity = 18,
             ProjectileId = "/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp",
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 3.5,
             RackBones = {
                 {
                     MuzzleBones = { "Projectile" },
@@ -367,7 +371,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.2,
+            RateOfFire = 0.4,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

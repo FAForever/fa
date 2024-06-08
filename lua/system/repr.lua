@@ -1,404 +1,293 @@
 ---@declare-global
 
--- scope as upvalue for performance
-local sort = table.sort
-local insert = table.insert
-local concat = table.concat
-local getn = table.getn
-local len = string.len
-local getmetatable = getmetatable 
-local format = string.format
+--******************************************************************************************************
+-- MIT LICENSE
+--
+-- Copyright (c) 2022 Enrique García Cota
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a
+-- copy of this software and associated documentation files (the
+-- "Software"), to deal in the Software without restriction, including
+-- without limitation the rights to use, copy, modify, merge, publish,
+-- distribute, sublicense, and/or sell copies of the Software, and to
+-- permit persons to whom the Software is furnished to do so, subject to
+-- the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included
+-- in all copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+-- MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+-- IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+-- CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+-- TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+-- SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+--******************************************************************************************************
+
+---@class DebugInspector
+---@field buf table
+---@field depth integer
+---@field level integer
+---@field ids table<any, integer>
+---@field newline string
+---@field meta boolean
+---@field indent string
+local Inspector = {}
+local Inspector_mt = { __index = Inspector }
+
+---@class DebugInspectOptions
+---@field depth? number
+---@field newline? string
+---@field indent? string
+---@field meta? boolean
+
+-- upvalue scope for performance
+local tostring = tostring
+local rep = string.rep
+local flr = math.floor
+local match = string.match
+local gsub = string.gsub
+local fmt = string.format
+local _rawget = rawget
 local type = type
 
--- easy lookup for a divider
-local divider = "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n"
+local TableSort = table.sort
 
--- keys that we always skip by definition
-local skip = {
-    Blueprint = true , Cache = true, __index = true
+---@param t table
+---@return function
+---@return table
+---@return nil
+local function rawpairs(t)
+    return next, t, nil
+end
+
+---@param str string
+---@return string
+local function smartQuote(str)
+    if match(str, '"') and not match(str, "'") then
+        return "'" .. str .. "'"
+    end
+    return '"' .. gsub(str, '"', '\\"') .. '"'
+end
+
+---@type table<string, boolean>
+local luaKeywords = {
+    ['and'] = true,
+    ['break'] = true,
+    ['do'] = true,
+    ['else'] = true,
+    ['elseif'] = true,
+    ['end'] = true,
+    ['false'] = true,
+    ['for'] = true,
+    ['function'] = true,
+    ['goto'] = true,
+    ['if'] = true,
+    ['in'] = true,
+    ['local'] = true,
+    ['nil'] = true,
+    ['not'] = true,
+    ['or'] = true,
+    ['repeat'] = true,
+    ['return'] = true,
+    ['then'] = true,
+    ['true'] = true,
+    ['until'] = true,
+    ['while'] = true,
 }
 
-local function IsState(t)
-    return (t.__State and true) or false
+---@param str any
+---@return boolean
+local function isIdentifier(str)
+    return type(str) == "string" and
+        not not str:match("^[_%a][_%a%d]*$") and
+        not luaKeywords[str]
 end
 
-local function IsVector(t)
-    return (t.x and t.y and t.z and true) or false 
+---@param k any
+---@param sequenceLength integer
+---@return boolean
+local function isSequenceKey(k, sequenceLength)
+    return type(k) == "number" and
+        flr(k) == k and
+        1 <= (k) and
+        k <= sequenceLength
 end
 
-local function IsUnit(t) 
-    return (t.AddCommandCap and true) or false
-end
+---@type table<string, number>
+local defaultTypeOrders = {
+    ['number'] = 1, ['boolean'] = 2, ['string'] = 3, ['table'] = 4,
+    ['function'] = 5, ['userdata'] = 6, ['thread'] = 7,
+}
 
-local function IsProp(t) 
-    return (t.AddPropCallback and true) or false
-end
+---@param a any
+---@param b any
+---@return boolean
+local function sortKeys(a, b)
+    local ta, tb = type(a), type(b)
 
-local function IsProjectile(t) 
-    return (t.ChangeDetonateBelowHeight and true) or false
-end
 
-local function IsBrain(t)
-    return (t.AssignThreatAtPosition and true) or false
-end
-
-local function IsWeapon(t)
-    return (t.WeaponHasTarget and true) or false
-end
-
-local function IsTrashbag(t)
-    return (t.Add and t.Destroy and t.Empty and true) or false 
-end
-
-local function IsLazyVar(t)
-    return (t.Set and t.SetFunction and t.SetValue and true) or false 
-end
-
-local function _FormatHeader(t)
-
-    if IsVector(t) then 
-        return false 
+    if ta == tb and (ta == 'string' or ta == 'number') then
+        return (a) < (b)
     end
 
-    if IsState(t) then 
-        return format("Printing information of state with identifier: %s\n", tostring(t.__StateIdentifier))
-    elseif IsUnit(t) then 
-        return format("Printing information of unit of type: %s, and with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
-    elseif IsProp(t) then 
-        return format("Printing information of prop of type: %s, and with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
-    elseif IsProjectile(t) then 
-        return format("Printing information of projectile of type: %s, and with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
-    elseif IsBrain(t) then 
-        return format("Printing information of brain of army: %s\n", tostring(t:GetArmyIndex()))
-    elseif IsWeapon(t) then 
-        return format("Printing information of weapon of type: %s and with label: %s, of owner with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.Blueprint.Label), tostring(t.unit.EntityId))
-    elseif IsTrashbag(t) then 
-        return format("Printing information of a Trashbag \n")
-    elseif IsLazyVar(t) then 
-        return format("Printing information of a Lazyvar \n")
-    end
+    local dta = defaultTypeOrders[ta] or 100
+    local dtb = defaultTypeOrders[tb] or 100
 
-    return false
 
+    return dta == dtb and ta < tb or dta < dtb
 end
 
-local function _FormatTable(t)
+---@param t table
+---@return table
+---@return integer
+---@return integer
+local function getKeys(t)
 
-    if IsVector(t) then 
-        return "(Vector { " .. t.x .. ", " .. t.y .. ", " .. t.z .. "})"
+    local seqLen = 1
+    while _rawget(t, seqLen) ~= nil do
+        seqLen = seqLen + 1
     end
+    seqLen = seqLen - 1
 
-    if IsState(t) then 
-        return format("(State)")
-    elseif IsUnit(t) then 
-        return format("(Unit of type: %s, with entity id: %s)",  tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
-    elseif IsProp(t) then 
-        return format("(Prop of type: %s, with entity id: %s)", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
-    elseif IsProjectile(t) then 
-        return format("(Projectile of type: %s, with entity id: %s)", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
-    elseif IsBrain(t) then 
-        return format("(Brain of army: %s)", tostring(t.Army))
-    elseif IsWeapon(t) then 
-        return format("(Weapon)")
-    elseif IsTrashbag(t) then 
-        return format("(Trashbag)")
-    elseif IsLazyVar(t) then 
-        return format("(Lazyvar)")
+    local keys, keysLen = {}, 0
+    for k in rawpairs(t) do
+        if not isSequenceKey(k, seqLen) then
+            keysLen = keysLen + 1
+            keys[keysLen] = k
+        end
     end
-
-    return "(skipped)"
-
+    TableSort(keys, sortKeys)
+    return keys, keysLen, seqLen
 end
 
-local function __reprs(t, offset, seen)
+---@param buf table
+---@param str string
+local function puts(buf, str)
+    buf.n = buf.n + 1
+    buf[buf.n] = str
+end
 
-    -- find all interesting keys
+---@param inspector DebugInspector
+local function tabify(inspector)
+    puts(inspector.buf, inspector.newline .. rep(inspector.indent, inspector.level))
+end
 
-    local otherRefs = { }
-    local ref = { }
-    for k, v in t do 
-
-        -- basic definition of key / value
-        local s = format("%s%s: %s", offset, tostring(k), tostring(v))
-        
+---@param v any
+---@return string
+function Inspector:getId(v)
+    local id = self.ids[v]
+    local ids = self.ids
+    if not id then
         local tv = type(v)
-        if tv == "table" then 
+        id = (ids[tv] or 0) + 1
+        ids[v], ids[tv] = id, id
+    end
+    return tostring(id)
+end
 
-            -- prevent recursion
-            if not seen[v] then 
-                seen[v] = true 
+---@param v any
+function Inspector:putValue(v)
+    local buf = self.buf
+    local tv = type(v)
+    if tv == 'string' then
+        puts(buf, smartQuote(v))
+    elseif tv == 'number' or tv == 'boolean' or tv == 'nil' or
+        tv == 'cdata' or tv == 'ctype' then
+        puts(buf, tostring(v))
+    elseif tv == 'table' and not self.ids[v] then
+        local t = v
 
-                -- simple table
-                if getmetatable(v) == getmetatable({ }) and not skip[k] then 
-                    s = s .. "\n"
-                    insert(ref, s)
-                    local other = __reprs(v, offset .. "   ", seen)
-                    otherRefs[s] = other
-                -- complicated table
-                else 
-                    insert(ref, s)
-                    otherRefs[s] = { format( " %s \n", _FormatTable (v)) }
+        if self.level >= self.depth then
+            puts(buf, string.format("{...} -- %s (%g bytes)", tostring(t), debug.allocatedsize(t)))
+        else
+            local keys, keysLen, seqLen = getKeys(t)
+
+            puts(buf, string.format("{ -- %s (%d bytes)", tostring(t), debug.allocatedsize(t)))
+            self.level = self.level + 1
+
+            for i = 1, seqLen + keysLen do
+                if i > 1 then puts(buf, ',') end
+                if i <= seqLen then
+                    tabify(self)
+                    self:putValue(t[i])
+                else
+                    local k = keys[i - seqLen]
+                    tabify(self)
+                    if isIdentifier(k) then
+                        puts(buf, k)
+                    else
+                        puts(buf, "[")
+                        self:putValue(k)
+                        puts(buf, "]")
+                    end
+                    puts(buf, ' = ')
+                    self:putValue(t[k])
                 end
             end
-        else 
-            s = s .. "\n"
-            insert(ref, s)
-        end
-    end
 
-    -- sort it to make it all easier to read
-
-    table.sort(ref)
-
-    -- finalize it into one large table
-
-    local final = { }
-    for k, v in ref do 
-        insert(final, v)
-        if otherRefs[v] then 
-            for l, vo in otherRefs[v] do 
-                insert(final, vo)
-            end
-        end
-    end
-
-    return final
-end
-
-local function _reprs(t, offset)
-
-    -- retrieve all content
-
-    local content = __reprs(t, offset, { t })
-    local header = _FormatHeader(t)
-
-    -- add some additional headers
-
-    local final = { "\n" }
-    
-    if header then 
-        insert(final, header)
-    end
-
-    for k, v in content do 
-        insert(final, v)
-    end
-
-    -- concat into one large string
-
-    return concat(final)
-end
-
-local function _reprsExt(t, offset)
-
-    local tableContent = __reprs(t, offset, { t })
-    local metaContent = __reprs(getmetatable(t), offset, { getmetatable(t) })
-    local header = _FormatHeader(t)
-    
-    -- add some additional headers
-
-    local final = { "\n" }
-    insert(final, divider)
-    
-    if header then 
-        insert(final, header)
-        insert(final, divider)
-    end
-    
-    insert(final, "Table information: \n")
-
-    for k, v in tableContent do 
-        insert(final, v)
-    end
-
-    insert(final, divider)
-    insert(final, "Metatable information: \n")
-
-    if getn(metaContent) > 0 then
-        for k, v in metaContent do 
-            insert(final, v)
-        end
-    else 
-        insert(final, "   (empty meta table) \n")
-    end
-
-    insert(final, divider)
-    insert(final, " The metatable is shared across all units with the same type. You can inspect the blueprint of a unit by selecting it and using \n")
-    insert(final, " shift + f6 to open the entity window. Requires cheats to be enabled. You can find your own hotkey by searching for 'entity' \n")
-    insert(final, " in the hotkeys menu. \n")
-    insert(final, divider)
-
-    -- concat into one large string
-
-    return concat(final)
-end
-
---- Recursively stringifies a value, kept for backwards compatibility
--- @param t value to print
-function repr(t)
-    return reprs(t)
-end
-
---- Recursively stringifies a value
--- @param t value to print
--- @param extensive include printer of metatable, if applicable
-function reprs(t, extensive)
-    if type(t) == 'table' then 
-        if extensive then 
-            return _reprsExt(t, " - ")
-        else
-            return _reprs(t, " - ")
-        end
-    else 
-        return tostring(t)
-    end
-end
-
---- Recursively stringifies and logs a value
--- @param t value to print
--- @param extensive include printer of metatable, if applicable
-function reprsl(t, extensive)
-    LOG(reprs(t, extensive))
-end
-
---- Backwards compatibility with the old function
-
-local function less(a,b)
-    if type(a) < type(b) then return true end
-    if type(b) < type(a) then return false end
-    if type(a) == 'table' or type(a) == 'function' or type(a) == 'cfunction' then
-        return tostring(a) < tostring(b)
-    else
-        return a<b
-    end
-end
-
-local function get_names(t,maxdepth,result,prefix)
-    for k,v in t do
-        if type(k)=='string' and type(v)!='string' and type(v)!='number' and type(v)!='boolean' then
-            local name = prefix .. k
-            if result[v]==nil or string.len(name) < string.len(result[v]) then
-                result[v] = name
-
-                if type(v)=='table' and maxdepth>0 then
-                    get_names(v,maxdepth-1,result,name .. '.')
+            local mt = getmetatable(t)
+            if self.meta then
+                if type(mt) == 'table' and not table.empty(mt) then
+                    if seqLen + keysLen > 0 then puts(buf, ',') end
+                    tabify(self)
+                    puts(buf, '<metatable> = ')
+                    self:putValue(mt)
                 end
             end
+
+            self.level = self.level - 1
+
+            if keysLen > 0 or (self.meta and type(mt) == 'table' and not table.empty(mt)) then
+                tabify(self)
+            elseif seqLen > 0 then
+                puts(buf, ' ')
+            end
+
+            puts(buf, '}')
         end
+
+    else
+        puts(buf, fmt('<%s %d>', tv, self:getId(v)))
     end
-    return result
 end
 
-local global_names = get_names(_G,2,{},'')
+--- Debugging code to inspect a table. This can be an extensive operation, at no point should this code run outside of a debugging session!
+---@param root any
+---@param options? DebugInspectOptions
+---@return string
+local function inspect(root, options)
+    options = options or {}
 
+    local depth = options.depth or 1
+    local newline = options.newline or '\n'
+    local indent = options.indent or '  '
+    local meta = options.meta or false
 
---
--- Convert obj to an expanded string form. Returns two results. The first has obj expanded on a single line; the
--- second may have obj in multiline form.
---
-local function _repru(obj, indent, width, mindepth, objectstack)
+    ---@type DebugInspector
+    local inspector = setmetatable({
+        buf = { n = 0 },
+        ids = {},
+        depth = depth,
+        meta = meta,
+        level = 0,
+        newline = newline,
+        indent = indent,
+    }, Inspector_mt)
 
-    if mindepth<=0 and global_names[obj] then
-        return global_names[obj], global_names[obj]
+    inspector:putValue(root)
 
-    elseif type(obj) == 'string' then
-        local r = string.format("%q",obj)
-        return r,r
-
-    elseif type(obj) ~= 'table' then
-        local r = tostring(obj)
-        return r,r
-    end
-
-    local s = objectstack
-    local level = 1
-    while s do
-        if obj==s[1] then
-            -- Recursive backreference - return a special marker
-            local r = '*'..level
-            return r,r
-        end
-        s = s[2]
-        level = level+1
-    end
-    objectstack = {obj,objectstack}
-
-    if width <= 0 then
-        local r = tostring(obj)
-        return r,r
-    end
-
-    local keys = {}
-    local r1
-    if getmetatable(obj) == getmetatable {} then
-        r1 = { '{ ' .. tostring(obj) .. " " }
-    else
-        r1 = { '{ ' .. tostring(obj) .. ' <metatable=', tostring(getmetatable(obj)), '>'}
-    end
-    local r2 = { unpack(r1) }
-
-    local index = 1
-    local subindent = indent..'  '
-    local sep1 = ' '
-    local sep2 = '\n'..subindent
-
-    for k in obj do insert(keys,k) end
-    if getn(keys)==0 then
-        return '{ }','{ }'
-    end
-    sort(keys, less)
-
-    for i,k in ipairs(keys) do
-        local prefix
-        if k==index then
-            index = index+1
-            prefix = ''
-        elseif type(k)=='string' then
-            prefix = k .. '='
-        else
-            prefix = '[' .. (_repru(k, subindent, width, mindepth-1, objectstack)) .. ']='
-        end
-
-        local v1,v2 = _repru(obj[k], subindent, width, mindepth-1, objectstack)
-
-        -- format the single-line result
-        insert(r1, sep1)
-        insert(r1, prefix)
-        insert(r1, v1)
-        sep1 = ', '
-
-        -- format the multi-line result
-        insert(r2, sep2)
-        insert(r2, prefix)
-        if len(subindent) + len(prefix) + len(v1) < width then
-            insert(r2, v1)
-        else
-            insert(r2, v2)
-        end
-        sep2 = ',\n'..subindent
-    end
-
-    insert(r1,' }')
-    insert(r2,'\n'..indent..'}')
-
-    r1 = concat(r1)
-    r2 = concat(r2)
-
-    return r1, r2
+    return table.concat(inspector.buf)
 end
 
+-- backwards compatibility for mods
 
---
--- Convert obj to an expanded string form, which can be checked for equality. The optional second
--- arg gives a maximum width; if the repr is wider than this, it will be split into a multi-line
--- form if possible.
---
-function repru(obj, maxwidth, mindepth)
-    maxwidth = maxwidth or 160
-    local r1,r2 = _repru(obj, '', maxwidth, mindepth or 1, nil)
-    if len(r1) <= maxwidth then
-        return r1
-    else
-        return r2
-    end
+repr = inspect
+repru = inspect
+reprs = inspect
+reprsl = function(root, options)
+    local str = inspect(root, options)
+    LOG(str)
+    return str
 end

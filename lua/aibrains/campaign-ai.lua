@@ -6,6 +6,10 @@ local AIBuildUnits = import("/lua/ai/aibuildunits.lua")
 
 -- upvalue scope for performance
 local TableGetn = table.getn
+local TableInsert = table.insert
+local TableRandom = table.random
+local TableEmpty = table.empty
+local TableRemove = table.remove
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 
@@ -176,7 +180,7 @@ AIBrain = Class(StandardBrain) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            WARN('*WARNING: TRIED TO IMPORT PLAN NAME: ' .. tostring(planName) .. ', BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,
@@ -205,7 +209,7 @@ AIBrain = Class(StandardBrain) {
             self.CurrentPlan = bestPlan
         end
         if not self.CurrentPlan then
-            error('*AI ERROR: Invalid plan list for army - '..self.Name, 2)
+            error('*AI ERROR: Invalid plan list for army - ' .. self.Name, 2)
         end
     end,
 
@@ -255,10 +259,9 @@ AIBrain = Class(StandardBrain) {
         self.AttackManager:PauseAttackManager()
     end,
 
-    ---## AI PLATOON MANAGEMENT
-    ---### New PlatoonBuildManager
-    ---This system is meant to be able to give some data about the platoon you want and have them
-    ---built and formed into platoons at will.
+    --- AI PLATOON MANAGEMENT
+    --- SC1's PlatoonBuildManager, used as its base AI even for skirmish, and also for FA's campaign
+    --- This system is meant to be able to give some data about the platoon you want and have them built and formed into platoons at will.
     ---@param self CampaignAIBrain
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
@@ -272,13 +275,13 @@ AIBrain = Class(StandardBrain) {
                     Gate = {},
                 },
                 Locations = {
-                    -- {
-                    --  Location,
-                    --  Radius,
-                    --  LocType, ('MAIN', 'EXPANSION')
-                    --  PrimaryFactories = {Air = X, Land = Y, Sea = Z}
-                    --  UseCenterPoint, - Bool
-                    --}
+					--[[{
+						Location,
+						Radius,
+						LocType, ('MAIN', 'EXPANSION')
+						PrimaryFactories = {Air = X, Land = Y, Sea = Z}
+						UseCenterPoint, - Bool
+                    }]]
                 },
                 PlatoonTypes = {'Air', 'Land', 'Sea', 'Gate'},
                 NeedSort = {
@@ -301,6 +304,10 @@ AIBrain = Class(StandardBrain) {
             end
             self.HasPlatoonList = false
             self:PBMSetEnabled(true)
+			
+			-- Create the global builder table where most of the builder data will be stored, I have no idea why GPG didn't define it here to begin with
+			-- They defined it in self:PBMAddPlatoon() for whatever reason
+			ScenarioInfo.BuilderTable[self.CurrentPlan] = {Air = {}, Sea = {}, Land = {}, Gate = {}}
         end
     end,
 
@@ -346,8 +353,7 @@ AIBrain = Class(StandardBrain) {
     ---@param pltnTable PlatoonTable
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
-            local stng = '*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE.  '
-            error(stng, 1)
+            error('*AI ERROR: INVALID PLATOON LIST IN '.. self.CurrentPlan.. ' - MISSING TEMPLATE', 1)
             return
         end
 
@@ -386,15 +392,15 @@ AIBrain = Class(StandardBrain) {
             end
             local insertTable = {BuilderName = pltnTable.BuilderName, PlatoonHandles = {}, Priority = pltnTable.Priority, LocationType = pltnTable.LocationType, PlatoonTemplate = pltnTable.PlatoonTemplate}
             for i = 1, num do
-                table.insert(insertTable.PlatoonHandles, false)
+                TableInsert(insertTable.PlatoonHandles, false)
             end
 
-            table.insert(self.PBM.Platoons[pltnTable.PlatoonType], insertTable)
+            TableInsert(self.PBM.Platoons[pltnTable.PlatoonType], insertTable)
             self.PBM.NeedSort[pltnTable.PlatoonType] = true
         else
             local insertTable = {BuilderName = pltnTable.BuilderName, PlatoonHandles = {}, Priority = pltnTable.Priority, LocationType = pltnTable.LocationType, PlatoonTemplate = pltnTable.PlatoonTemplate}
             for i = 1, num do
-                table.insert(insertTable.PlatoonHandles, false)
+                TableInsert(insertTable.PlatoonHandles, false)
             end
             local types = {'Air', 'Land', 'Sea'}
             for num, pType in types do
@@ -403,7 +409,7 @@ AIBrain = Class(StandardBrain) {
                 elseif not pltnTable.Inserted then
                     error('AI DEBUG: BUILDER DUPLICATE NAME FOUND - ' .. pltnTable.BuilderName, 2)
                 end
-                table.insert(self.PBM.Platoons[pType], insertTable)
+                TableInsert(self.PBM.Platoons[pType], insertTable)
                 self.PBM.NeedSort[pType] = true
             end
         end
@@ -487,19 +493,19 @@ AIBrain = Class(StandardBrain) {
             local seaFactories = {}
             local gates = {}
             for ek, ev in factories do
-                if EntityCategoryContains(categories.FACTORY * categories.AIR, ev) and self:PBMFactoryLocationCheck(ev, v) then
-                    table.insert(airFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.LAND, ev) and self:PBMFactoryLocationCheck(ev, v) then
-                    table.insert(landFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL, ev) and self:PBMFactoryLocationCheck(ev, v) then
-                    table.insert(seaFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.GATE, ev) and self:PBMFactoryLocationCheck(ev, v) then
-                    table.insert(gates, ev)
+                if EntityCategoryContains(categories.FACTORY * categories.AIR - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                    TableInsert(airFactories, ev)
+                elseif EntityCategoryContains(categories.FACTORY * categories.LAND - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                    TableInsert(landFactories, ev)
+                elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                    TableInsert(seaFactories, ev)
+                elseif EntityCategoryContains(categories.FACTORY * categories.GATE - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                    TableInsert(gates, ev)
                 end
             end
 
             local afac, lfac, sfac, gatefac
-            if not table.empty(airFactories) then
+            if not TableEmpty(airFactories) then
                 if not v.PrimaryFactories.Air or v.PrimaryFactories.Air.Dead
                     or v.PrimaryFactories.Air:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(airFactories, v.PrimaryFactories.Air) then
@@ -509,7 +515,7 @@ AIBrain = Class(StandardBrain) {
                 self:PBMAssistGivenFactory(airFactories, v.PrimaryFactories.Air)
             end
 
-            if not table.empty(landFactories) then
+            if not TableEmpty(landFactories) then
                 if not v.PrimaryFactories.Land or v.PrimaryFactories.Land.Dead
                     or v.PrimaryFactories.Land:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(landFactories, v.PrimaryFactories.Land) then
@@ -519,7 +525,7 @@ AIBrain = Class(StandardBrain) {
                 self:PBMAssistGivenFactory(landFactories, v.PrimaryFactories.Land)
             end
 
-            if not table.empty(seaFactories) then
+            if not TableEmpty(seaFactories) then
                 if not v.PrimaryFactories.Sea or v.PrimaryFactories.Sea.Dead
                     or v.PrimaryFactories.Sea:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(seaFactories, v.PrimaryFactories.Sea) then
@@ -529,7 +535,7 @@ AIBrain = Class(StandardBrain) {
                 self:PBMAssistGivenFactory(seaFactories, v.PrimaryFactories.Sea)
             end
 
-            if not table.empty(gates) then
+            if not TableEmpty(gates) then
                 if not v.PrimaryFactories.Gate or v.PrimaryFactories.Gate.Dead then
                     gatefac = self:PBMGetPrimaryFactory(gates)
                     v.PrimaryFactories.Gate = gatefac
@@ -537,7 +543,7 @@ AIBrain = Class(StandardBrain) {
                 self:PBMAssistGivenFactory(gates, v.PrimaryFactories.Gate)
             end
 
-            if not v.RallyPoint or table.empty(v.RallyPoint) then
+            if not v.RallyPoint or TableEmpty(v.RallyPoint) then
                 self:PBMSetRallyPoint(airFactories, v, nil)
                 self:PBMSetRallyPoint(landFactories, v, nil)
                 self:PBMSetRallyPoint(seaFactories, v, nil, "Naval Rally Point")
@@ -554,7 +560,7 @@ AIBrain = Class(StandardBrain) {
             if not v.Dead and not (v:IsUnitState('Building') or v:IsUnitState('Upgrading')) then
                 local guarded = v:GetGuardedUnit()
                 if not guarded or guarded.EntityId ~= primary.EntityId then
-                    IssueClearCommands({v})
+                    IssueToUnitClearCommands(v)
                     IssueFactoryAssist({v}, primary)
                 end
             end
@@ -568,7 +574,7 @@ AIBrain = Class(StandardBrain) {
     ---@param markerType string
     ---@return boolean
     PBMSetRallyPoint = function(self, factories, location, rallyLoc, markerType)
-        if not table.empty(factories) then
+        if not TableEmpty(factories) then
             local rally
             local position = factories[1]:GetPosition()
             for facNum, facData in factories do
@@ -581,12 +587,9 @@ AIBrain = Class(StandardBrain) {
             position[1] = position[1] / TableGetn(factories)
             position[3] = position[3] / TableGetn(factories)
             if not rallyLoc and not location.UseCenterPoint then
-                local pnt
-                if not markerType then
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
-                else
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3])
-                end
+                -- Get the specified marker type, or fall back to the default 'Rally Point'
+                local pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType or 'Rally Point', position[1], position[3])
+                
                 if pnt and TableGetn(pnt) == 3 then
                     rally = Vector(pnt[1], pnt[2], pnt[3])
                 end
@@ -797,7 +800,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         if not found then
-            table.insert(self.PBM.Locations, spec)
+            TableInsert(self.PBM.Locations, spec)
         else
             error('*AI  ERROR: Attempting to add a build location with a duplicate name: '..spec.LocationType, 2)
             return
@@ -819,11 +822,11 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param loc Vector
-    ---@return Vector | false
+    ---@param loc string
+    ---@return Vector?
     PBMGetLocationCoords = function(self, loc)
         if not loc then
-            return false
+            return
         end
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
@@ -835,10 +838,7 @@ AIBrain = Class(StandardBrain) {
                     return {v.Location[1], height, v.Location[3]}
                 end
             end
-        elseif self.BuilderManagers[loc] then
-            return self.BuilderManagers[loc].FactoryManager:GetLocationCoords()
         end
-        return false
     end,
 
     ---@param self CampaignAIBrain
@@ -854,8 +854,6 @@ AIBrain = Class(StandardBrain) {
                    return v.Radius
                 end
             end
-        elseif self.BuilderManagers[loc] then
-            return self.BuilderManagers[loc].FactoryManager.Radius
         end
         return false
     end,
@@ -886,11 +884,11 @@ AIBrain = Class(StandardBrain) {
             if loc.LocationType == location then
                 local facs = {}
                 for k, v in loc.PrimaryFactories do
-                    table.insert(facs, v)
+                    TableInsert(facs, v)
                     if not v.Dead then
                         for fNum, fac in v:GetGuards() do
                             if EntityCategoryContains(categories.FACTORY, fac) then
-                                table.insert(facs, fac)
+                                TableInsert(facs, fac)
                             end
                         end
                     end
@@ -910,7 +908,7 @@ AIBrain = Class(StandardBrain) {
     PBMRemoveBuildLocation = function(self, loc, locType)
         for k, v in self.PBM.Locations do
             if (loc and v.Location == loc) or (locType and v.LocationType == locType) then
-                table.remove(self.PBM.Locations, k)
+                TableRemove(self.PBM.Locations, k)
             end
         end
     end,
@@ -921,8 +919,7 @@ AIBrain = Class(StandardBrain) {
     ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
          if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
-            local strng = '*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (', repr(platoonType), ') WAS PASSED IN.'
-            error(strng, 2)
+            error('*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (' .. tostring(platoonType) .. ') WAS PASSED IN.', 2)
             return false
         end
         local sortedList = {}
@@ -938,7 +935,7 @@ AIBrain = Class(StandardBrain) {
                 end
             end
             sortedList[i] = value
-            table.remove(self.PBM.Platoons[platoonType], key)
+            TableRemove(self.PBM.Platoons[platoonType], key)
         end
         self.PBM.Platoons[platoonType] = sortedList
         self.PBM.NeedSort[platoonType] = false
@@ -973,7 +970,7 @@ AIBrain = Class(StandardBrain) {
         for _, v in poolPlat:GetPlatoonUnits() do
             if not v.Dead and EntityCategoryContains(categories.FACTORY - categories.MOBILE, v) then
                 if v:IsUnitState('Building') or v:IsUnitState('Upgrading') then
-                    table.insert(poolTransfer, v)
+                    TableInsert(poolTransfer, v)
                 end
             end
         end
@@ -981,7 +978,7 @@ AIBrain = Class(StandardBrain) {
         local busyTransfer = {}
         for _, v in busyPlat:GetPlatoonUnits() do
             if not v.Dead and not v:IsUnitState('Building') and not v:IsUnitState('Upgrading') then
-                table.insert(busyTransfer, v)
+                TableInsert(busyTransfer, v)
             end
         end
 
@@ -1131,7 +1128,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
 
-    -- Main building and forming platoon thread for the Platoon Build Manager
+    --- Main building and forming platoon thread for the Platoon Build Manager
     ---@param self CampaignAIBrain
     PlatoonBuildManagerThread = function(self)
         local personality = self:GetPersonality()
@@ -1148,14 +1145,14 @@ AIBrain = Class(StandardBrain) {
                 self:PBMSetPrimaryFactories()
             end
             local platoonList = self.PBM.Platoons
-            -- clear the cache so we can get fresh new responses!
+            -- Clear the cache so we can get fresh new responses!
             self:PBMClearBuildConditionsCache()
             -- Go through the different types of platoons
             for typek, typev in self.PBM.PlatoonTypes do
                 -- First go through the list of locations and see if we can build stuff there.
                 for k, v in self.PBM.Locations do
                     -- See if we have platoons to build in that type
-                    if not table.empty(platoonList[typev]) then
+                    if not TableEmpty(platoonList[typev]) then
                         -- Sort the list of platoons via priority
                         if self.PBM.NeedSort[typev] then
                             self:PBMSortPlatoonsViaPriority(typev)
@@ -1167,11 +1164,11 @@ AIBrain = Class(StandardBrain) {
                         if v.PrimaryFactories[typev] then
                             local priFac = v.PrimaryFactories[typev]
                             local numBuildOrders = nil
-                            if priFac and not priFac.Dead then
+                            if not priFac.Dead then
                                 numBuildOrders = priFac:GetNumBuildOrders(categories.ALLUNITS)
                                 if numBuildOrders == 0 then
                                     local guards = priFac:GetGuards()
-                                    if guards and not table.empty(guards) then
+                                    if guards and not TableEmpty(guards) then
                                         for kg, vg in guards do
                                             numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
                                             if numBuildOrders == 0 and vg:IsUnitState('Building') then
@@ -1194,38 +1191,37 @@ AIBrain = Class(StandardBrain) {
                                     local globalBuilder = ScenarioInfo.BuilderTable[self.CurrentPlan][typev][vp.BuilderName]
                                     if priorityLevel and (vp.Priority ~= priorityLevel or not self.PBM.RandomSamePriority) then
                                             break
-                                    elseif (not priorityLevel or priorityLevel == vp.Priority)
-                                            and vp.Priority > 0 and globalBuilder.RequiresConstruction and
+                                    elseif (not priorityLevel or priorityLevel == vp.Priority) and vp.Priority > 0 and globalBuilder.RequiresConstruction
                                             -- The location we're looking at is an allowed location
-                                            (vp.LocationType == v.LocationType or not vp.LocationType) and
+                                           and (vp.LocationType == v.LocationType or not vp.LocationType)
                                             -- Make sure there is a handle slot available
-                                            (self:PBMHandleAvailable(vp)) then
+                                           and (self:PBMHandleAvailable(vp)) then
                                         -- Fix up the primary factories to fit the proper table required by CanBuildPlatoon
                                         local suggestedFactories = {v.PrimaryFactories[typev]}
                                         local factories = self:CanBuildPlatoon(vp.PlatoonTemplate, suggestedFactories)
                                         if factories and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex) then
                                             priorityLevel = vp.Priority
                                             for i = 1, self:PBMNumHandlesAvailable(vp) do
-                                                table.insert(possibleTemplates, {Builder = vp, Index = kp, Global = globalBuilder})
+                                                TableInsert(possibleTemplates, {Builder = vp, Index = kp, Global = globalBuilder})
                                             end
                                         end
                                     end
                                 end
                                 if priorityLevel then
-                                    local builderData = possibleTemplates[ Random(1, TableGetn(possibleTemplates)) ]
+                                    local builderData = TableRandom(possibleTemplates)
                                     local vp = builderData.Builder
                                     local kp = builderData.Index
                                     local globalBuilder = builderData.Global
                                     local suggestedFactories = {v.PrimaryFactories[typev]}
                                     local factories = self:CanBuildPlatoon(vp.PlatoonTemplate, suggestedFactories)
                                     vp.BuildTemplate = self:PBMBuildNumFactories(vp.PlatoonTemplate, v, typev, factories)
-                                    local template = vp.BuildTemplate
-                                    local factionIndex = self:GetFactionIndex()
+									local template = vp.BuildTemplate
+									
                                     -- Check all the requirements to build the platoon
                                     -- The Primary Factory can actually build this platoon
                                     -- The platoon build condition has been met
-                                    local ptnSize = personality:GetPlatoonSize()
-                                     -- Finally, build the platoon.
+									local ptnSize = personality:GetPlatoonSize()
+                                    -- Finally, build the platoon.
                                     self:BuildPlatoon(template, factories, ptnSize)
                                     self:PBMSetHandleBuilding(self.PBM.Platoons[typev][kp])
                                     if globalBuilder.GenerateTimeOut then
@@ -1244,14 +1240,14 @@ AIBrain = Class(StandardBrain) {
                         end
                     end
                 end
-                WaitSeconds(.1)
+                WaitTicks(1)
             end
-            -- Do it all over again in 13 seconds.
-            WaitSeconds(self.PBM.BuildCheckInterval or 13)
+            -- Do it all over again in 10 seconds.
+            WaitSeconds(self.PBM.BuildCheckInterval or 10)
         end
     end,
 
-    --- ## Form platoons
+    --- Form platoons
     --- Extracted as it's own function so you can call this to try and form platoons to clean up the pool
     ---@param self CampaignAIBrain
     ---@param requireBuilding boolean `true` = platoon must have `'BUILDING'` has its handle, `false` = it'll form any platoon it can
@@ -1266,7 +1262,7 @@ AIBrain = Class(StandardBrain) {
             numBuildOrders = location.PrimaryFactories[platoonType]:GetNumBuildOrders(categories.ALLUNITS)
             if numBuildOrders == 0 then
                 local guards = location.PrimaryFactories[platoonType]:GetGuards()
-                if guards and not table.empty(guards) then
+                if guards and not TableEmpty(guards) then
                     for kg, vg in guards do
                         numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
                         if numBuildOrders == 0 and vg:IsUnitState('Building') then
@@ -1287,45 +1283,42 @@ AIBrain = Class(StandardBrain) {
             -- or The platoon doesn't have a handle and either doesn't require to be building state or doesn't require construction
             -- all that and passes it's build condition function.
             if vp.Priority > 0 and (requireBuilding and self:PBMCheckHandleBuilding(vp)
-                    and numBuildOrders and numBuildOrders == 0
-                    and (not vp.LocationType or vp.LocationType == location.LocationType))
+					and numBuildOrders and numBuildOrders == 0
+					and (not vp.LocationType or vp.LocationType == location.LocationType))
                     or (((self:PBMHandleAvailable(vp)) and (not requireBuilding or not globalBuilder.RequiresConstruction))
-                    and (not vp.LocationType or vp.LocationType == location.LocationType)
-                    and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex)) then
+					and (not vp.LocationType or vp.LocationType == location.LocationType)
+					and self:PBMCheckBuildConditions(globalBuilder.BuildConditions, armyIndex)) then
                 local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
+				local ptnSize = personality:GetPlatoonSize()
                 local formIt = false
-                local template = vp.BuildTemplate
-                if not template then
-                    template = vp.PlatoonTemplate
-                end
+                local template = vp.BuildTemplate or vp.PlatoonTemplate
 
                 local flipTable = {}
                 local squadNum = 3
-                while squadNum <= table.getn(template) do
+                while squadNum <= TableGetn(template) do
                     if template[squadNum][2] < 0 then
-                        table.insert(flipTable, {Squad = squadNum, Value = template[squadNum][2]})
+                        TableInsert(flipTable, {Squad = squadNum, Value = template[squadNum][2]})
                         template[squadNum][2] = 1
                     end
                     squadNum = squadNum + 1
                 end
-
+				
                 if location.Location and location.Radius and vp.LocationType then
-                    formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), location.Location, location.Radius)
+                    formIt = poolPlatoon:CanFormPlatoon(template, ptnSize, location.Location, location.Radius)
                 elseif not vp.LocationType then
-                    formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize())
+                    formIt = poolPlatoon:CanFormPlatoon(template, ptnSize)
                 end
 
-                local ptnSize = personality:GetPlatoonSize()
                 if formIt then
                     local hndl
                     if location.Location and location.Radius and vp.LocationType then
-                        hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize(), location.Location, location.Radius)
+                        hndl = poolPlatoon:FormPlatoon(template, ptnSize, location.Location, location.Radius)
                         self:PBMStoreHandle(hndl, vp)
                         if vp.PlatoonTimeOutThread then
                             vp.PlatoonTimeOutThread:Destroy()
                         end
                     elseif not vp.LocationType then
-                        hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize())
+                        hndl = poolPlatoon:FormPlatoon(template, ptnSize)
                         self:PBMStoreHandle(hndl, vp)
                         if vp.PlatoonTimeOutThread then
                             vp.PlatoonTimeOutThread:Destroy()
@@ -1334,29 +1327,33 @@ AIBrain = Class(StandardBrain) {
                     hndl.PlanName = template[2]
 
                     -- If we have specific AI, fork that AI thread
-                    local pltn = self.PBM.Platoons[platoonType][kp]
                     if globalBuilder.PlatoonAIFunction then
                         hndl:StopAI()
                         hndl:ForkAIThread(import(globalBuilder.PlatoonAIFunction[1])[globalBuilder.PlatoonAIFunction[2]])
                     end
-
+					
+					-- If we have an AI from "platoon.lua", use that
                     if globalBuilder.PlatoonAIPlan then
                         hndl:SetAIPlan(globalBuilder.PlatoonAIPlan)
                     end
 
                     -- If we have additional threads to fork on the platoon, do that as well.
+					-- Note: These are platoon AI functions from "platoon.lua"
                     if globalBuilder.PlatoonAddPlans then
                         for papk, papv in globalBuilder.PlatoonAddPlans do
                             hndl:ForkThread(hndl[papv])
                         end
                     end
-
+					
+					-- If we have additional functions to fork on the platoon, do that as well
                     if globalBuilder.PlatoonAddFunctions then
                         for pafk, pafv in globalBuilder.PlatoonAddFunctions do
                             hndl:ForkThread(import(pafv[1])[pafv[2]])
                         end
                     end
-
+					
+					-- If we have additional behaviours to fork on the platoon, do that as well
+					-- Note: These are platoon AI functions from "AIBehaviors.lua"
                     if globalBuilder.PlatoonAddBehaviors then
                         for pafk, pafv in globalBuilder.PlatoonAddBehaviors do
                             hndl:ForkThread(Behaviors[pafv])
@@ -1370,16 +1367,16 @@ AIBrain = Class(StandardBrain) {
                             self.PlatoonNameCounter[vp.BuilderName] = 1
                         end
                     end
-
+					
                     hndl:AddDestroyCallback(self.PBMPlatoonDestroyed)
                     hndl.BuilderName = vp.BuilderName
+					
+					-- Set the platoon data
+					-- Also set the platoon to be part of the attack force if specified in the platoon data, used for AttackManager platoon forming
                     if globalBuilder.PlatoonData then
                         hndl:SetPlatoonData(globalBuilder.PlatoonData)
-                        if globalBuilder.PlatoonData.AMPlatoons then
-                            for _, v in globalBuilder.PlatoonData.AMPlatoons do
-                                hndl:SetPartOfAttackForce()
-                                break
-                            end
+                        if globalBuilder.PlatoonData.AMPlatoons and not TableEmpty(globalBuilder.PlatoonData.AMPlatoons) then
+                            hndl:SetPartOfAttackForce()
                         end
                     end
                 end
@@ -1422,7 +1419,7 @@ AIBrain = Class(StandardBrain) {
     PBMBuildNumFactories = function (self, template, location, pType, factory)
         local retTemplate = table.deepcopy(template)
         local assistFacs = factory[1]:GetGuards()
-        table.insert(assistFacs, factory[1])
+        TableInsert(assistFacs, factory[1])
         local facs = {T1 = 0, T2 = 0, T3 = 0}
         for _, v in assistFacs do
             if EntityCategoryContains(categories.TECH3 * categories.FACTORY, v) then
@@ -1436,7 +1433,7 @@ AIBrain = Class(StandardBrain) {
 
         -- Handle any squads with a specified build quantity
         local squad = 3
-        while squad <= table.getn(retTemplate) do
+        while squad <= TableGetn(retTemplate) do
             if retTemplate[squad][2] > 0 then
                 local bp = self:GetUnitBlueprint(retTemplate[squad][1])
                 local buildLevel = AIBuildUnits.UnitBuildCheck(bp)
@@ -1462,16 +1459,16 @@ AIBrain = Class(StandardBrain) {
         -- Handle squads with programatic build quantity
         squad = 3
         local remainingIds = {T1 = {}, T2 = {}, T3 = {}}
-        while squad <= table.getn(retTemplate) do
+        while squad <= TableGetn(retTemplate) do
             if retTemplate[squad][2] < 0 then
-                table.insert(remainingIds['T'..AIBuildUnits.UnitBuildCheck(self:GetUnitBlueprint(retTemplate[squad][1])) ], retTemplate[squad][1])
+                TableInsert(remainingIds['T'..AIBuildUnits.UnitBuildCheck(self:GetUnitBlueprint(retTemplate[squad][1])) ], retTemplate[squad][1])
             end
             squad = squad + 1
         end
         local rTechLevel = 3
         while rTechLevel >= 1 do
             for num, unitId in remainingIds['T'..rTechLevel] do
-                for tempRow = 3, table.getn(retTemplate) do
+                for tempRow = 3, TableGetn(retTemplate) do
                     if retTemplate[tempRow][1] == unitId and retTemplate[tempRow][2] < 0 then
                         retTemplate[tempRow][3] = 0
                         for fTechLevel = rTechLevel, 3 do
@@ -1485,10 +1482,10 @@ AIBrain = Class(StandardBrain) {
         end
 
         -- Remove any IDs with 0 as a build quantity.
-        for i = 1, table.getn(retTemplate) do
+        for i = 1, TableGetn(retTemplate) do
             if i >= 3 then
                 if retTemplate[i][3] == 0 then
-                    table.remove(retTemplate, i)
+                    TableRemove(retTemplate, i)
                 end
             end
         end
@@ -1548,13 +1545,13 @@ AIBrain = Class(StandardBrain) {
         local numFactories = 0
         for ek, ev in factories do
             if EntityCategoryContains(categories.FACTORY * categories.AIR, ev) then
-                table.insert(airFactories, ev)
+                TableInsert(airFactories, ev)
             elseif EntityCategoryContains(categories.FACTORY * categories.LAND, ev) then
-                table.insert(landFactories, ev)
+                TableInsert(landFactories, ev)
             elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL, ev) then
-                table.insert(seaFactories, ev)
+                TableInsert(seaFactories, ev)
             elseif EntityCategoryContains(categories.FACTORY * categories.GATE, ev) then
-                table.insert(gates, ev)
+                TableInsert(gates, ev)
             end
         end
 
@@ -1615,7 +1612,7 @@ AIBrain = Class(StandardBrain) {
             if not v.LookupNumber[index] then
                 local found = false
                 if v[3][1] == "default_brain" then
-                    table.remove(v[3], 1)
+                    TableRemove(v[3], 1)
                 end
 
                 for num, bcData in self.PBM.BuildConditionsTable do
@@ -1641,7 +1638,7 @@ AIBrain = Class(StandardBrain) {
                     if not v.LookupNumber then
                         v.LookupNumber = {}
                     end
-                    table.insert(self.PBM.BuildConditionsTable, v)
+                    TableInsert(self.PBM.BuildConditionsTable, v)
                     v.LookupNumber[index] = TableGetn(self.PBM.BuildConditionsTable)
                 end
             end

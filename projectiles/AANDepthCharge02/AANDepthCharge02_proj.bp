@@ -30,8 +30,8 @@ ProjectileBlueprint {
                 },
             },
         },
-        StrategicIconSize = 1,
-        UniformScale = 0.45,
+        StrategicIconSize = 2,
+        UniformScale = 0.6,
     },
     General = {
         Category = 'Anti Navy',
@@ -40,9 +40,6 @@ ProjectileBlueprint {
     },
     Interface = {
         HelpText = 0,
-    },
-    DoNotCollideList = {
-        'TORPEDO',
     },
     Physics = {
         Acceleration = 0,

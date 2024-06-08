@@ -64,19 +64,21 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
 
     import("/lua/sim/matchstate.lua").CallEndGame() -- We need this here to populate the score screen
 
-    ForkThread(function()
-        WaitSeconds(3) -- Wait for the stats to be synced
-        UnlockInput()
-        EndOperationT {
-            success = success,
-            difficulty = ScenarioInfo.Options.Difficulty,
-            allPrimary = allPrimary,
-            allSecondary = allSecondary,
-            allBonus = allBonus,
-            faction = ScenarioInfo.LocalFaction,
-            opData = opData.operationData
-        }
-    end)
+    ForkThread(EndOperationThread, {
+        success = success,
+        difficulty = ScenarioInfo.Options.Difficulty,
+        allPrimary = allPrimary,
+        allSecondary = allSecondary,
+        allBonus = allBonus,
+        faction = ScenarioInfo.LocalFaction,
+        opData = opData.operationData
+    })
+end
+
+function EndOperationThread(tbl)
+    WaitSeconds(3) -- Wait for the stats to be synced
+    UnlockInput()
+    EndOperationT(tbl)
 end
 
 ---@alias FactionSelectData {Faction: "aeon" | "cybran" | "uef"}
@@ -188,7 +190,7 @@ function OverrideDoDamage(self, instigator, amount, vector, damageType)
             if excess < 0 and maxHealth > 0 then
                 excessDamageRatio = -excess / maxHealth
             end
-            IssueClearCommands({self})
+            IssueToUnitClearCommands(self)
             ForkThread(UnlockAndKillUnitThread, self, instigator, damageType, excessDamageRatio)
         end
     end
@@ -910,12 +912,12 @@ function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, e
     return ACU
 end
 
---- Run teleport effect then delete unit if told to do so
+--- Run teleport effect and then optionally delete the units. The 'CanBeKilled' flag remains false if the unit is not deleted
 ---@param unit Unit
----@param killUnit? boolean
-function FakeTeleportUnit(unit, killUnit)
+---@param destroyUnit? boolean
+function FakeTeleportUnit(unit, destroyUnit)
     IssueStop({unit})
-    IssueClearCommands({unit})
+    IssueToUnitClearCommands(unit)
     unit.CanBeKilled = false
 
     unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
@@ -927,15 +929,15 @@ function FakeTeleportUnit(unit, killUnit)
     unit:PlayUnitSound('GateOut')
     WaitSeconds(1)
 
-    if killUnit then
+    if destroyUnit then
         unit:Destroy()
     end
 end
 
---- Run teleport effect then delete unit if told to do so
+--- Run teleport effect and then optionally delete the units. The 'CanBeKilled' flag remains false if the units are not deleted
 ---@param units Unit
----@param killUnits? boolean
-function FakeTeleportUnits(units, killUnits)
+---@param destroyUnits? boolean
+function FakeTeleportUnits(units, destroyUnits)
     IssueStop(units)
     IssueClearCommands(units)
     local buildingUnits = {}
@@ -966,7 +968,7 @@ function FakeTeleportUnits(units, killUnits)
 
     WaitSeconds(1)
 
-    if killUnits then
+    if destroyUnits then
         for _, unit in units do
             if not IsDestroyed(unit) then
                 unit:Destroy()
@@ -1034,7 +1036,7 @@ end
 function UpgradeUnit(unit)
     local upgradeBP = unit:GetBlueprint().General.UpgradesTo
     IssueStop({unit})
-    IssueClearCommands({unit})
+    IssueToUnitClearCommands(unit)
     IssueUpgrade({unit}, upgradeBP)
 end
 
@@ -1246,8 +1248,8 @@ function SetPlayableArea(rect, voFlag)
     local x1 = rect.x1 - math.mod(rect.x1, 4)
     local y1 = rect.y1 - math.mod(rect.y1, 4)
 
-    LOG(string.format('Debug: SetPlayableArea before round : %s, %s %s, %s', rect.x0, rect.y0, rect.x1, rect.y1))
-    LOG(string.format('Debug: SetPlayableArea after round : %s, %s %s, %s', x0, y0, x1, y1))
+    SPEW(string.format('SetPlayableArea before round : %s, %s %s, %s', rect.x0, rect.y0, rect.x1, rect.y1))
+    SPEW(string.format('SetPlayableArea after round : %s, %s %s, %s', x0, y0, x1, y1))
 
     ScenarioInfo.MapData.PlayableRect = {x0, y0, x1, y1}
     rect.x0 = x0
@@ -2266,6 +2268,7 @@ function AntiOffMapMainThread()
         end
     end
 end
+
 -- This is for bad units who choose to go off map, shame on them
 function MoveOnMapThread(unit)
     unit.OffMapTime = 0
@@ -2293,24 +2296,51 @@ end
 --- Clears a unit's orders and issues a move order to the closest point on the map
 ---@param unit Unit
 function MoveOnMap(unit)
-    local position = unit:GetPosition()
+    local nearestPoint = GetNearestPlayablePoint( unit:GetPosition() )
+
+    IssueToUnitClearCommands(unit)
+    IssueToUnitMove(unit, nearestPoint)
+end
+
+--- Returns the closest point on the map
+---@param position Vector
+---@return Vector
+---@return boolean
+function GetNearestPlayablePoint(position)
+    local px, _, pz = unpack(position)
     local playableArea = ScenarioInfo.PlayableArea
-    local nearestPoint = {position[1], position[2], position[3]}
 
-    if position[1] < playableArea[1] then
-        nearestPoint[1] = playableArea[1] + 5
-    elseif position[1] > playableArea[3] then
-        nearestPoint[1] = playableArea[3] - 5
+    -- keep track whether the point is actually outside the map
+    local isOutside = false
+
+    if px < playableArea[1] then
+        isOutside = true
+        px = playableArea[1] + 5
+    elseif px > playableArea[3] then
+        isOutside = true
+        px = playableArea[3] - 5
     end
 
-    if position[3] < playableArea[2] then
-        nearestPoint[3] = playableArea[2] + 5
-    elseif position[3] > playableArea[4] then
-        nearestPoint[3] = playableArea[4] - 5
+    if pz < playableArea[2] then
+        isOutside = true
+        pz = playableArea[2] + 5
+    elseif pz > playableArea[4] then
+        isOutside = true
+        pz = playableArea[4] - 5
     end
 
-    IssueClearCommands({unit})
-    IssueMove({unit}, nearestPoint)
+    -- if it really is outside the map then we allocate a new vector
+    if isOutside then
+        return {
+            px, 
+            GetTerrainHeight(px, pz),
+            pz
+        }, true
+
+    end
+
+    -- otherwise nothing has changed, so return the existing position
+    return position, false
 end
 
 --- Returns if the unit's army is human

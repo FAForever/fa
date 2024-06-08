@@ -1,4 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
+local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -39,9 +40,14 @@ ShieldEffectsComponent = ClassSimple {
 
 ---@class IntelComponent
 ---@field IntelStatus? UnitIntelStatus
+---@field DetectedByHooks? fun(unit: Unit, army: number)[]
+---@field Blueprint Blueprint
+---@field Brain AIBrain
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
+    ---@param builder Unit unused
+    ---@param layer Layer unused
     OnStopBeingBuilt = function(self, builder, layer)
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then
@@ -68,7 +74,7 @@ IntelComponent = ClassSimple {
     end,
 
     ---@param self IntelComponent | Unit
-    ---@param disabler string
+    ---@param disabler string The reason the intel is disabled. If it's 'Energy', then free intel does not get disabled.
     ---@param intel? IntelType
     DisableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
@@ -78,67 +84,68 @@ IntelComponent = ClassSimple {
             -- prevent recharging from occuring
             self:OnIntelRechargeFailed()
 
-            -- disable all intel
+            -- upvalue for performance
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
-            local allIntelFromEnhancements = status.AllIntelFromEnhancements
+
+            -- disable all intel
             if not intel then
-                for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                        if not allIntelDisabledByEvent[i][disabler] then
-                            allIntelDisabledByEvent[i][disabler] = true
-                            self:DisableIntel(i)
-                            self:OnIntelDisabled(i)
-                        end
+                for intel, _ in allIntel do
+                    local allIntelDisablers = allIntelDisabledByEvent[intel]
+                    if not allIntelDisablers then
+                        allIntelDisabledByEvent[intel] = {}
                     end
-                end
-
-                if allIntelMaintenanceFree then
-                    for i, _ in allIntelMaintenanceFree do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                            if not allIntelDisabledByEvent[i][disabler] then
-                                allIntelDisabledByEvent[i][disabler] = true
-                                self:DisableIntel(i)
-                                self:OnIntelDisabled(i)
-                            end
-                        end
-                    end
-                end
-
-                -- disable one intel
-            elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
-                -- special case that requires additional book keeping
-                if disabler == 'Enhancement' then
-                    allIntelFromEnhancements[intel] = true
-                end
-
-                if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
-                    if not allIntelDisabledByEvent[intel][disabler] then
+                    if not allIntelDisablers[disabler] then
                         allIntelDisabledByEvent[intel][disabler] = true
                         self:DisableIntel(intel)
                         self:OnIntelDisabled(intel)
                     end
+                end
+
+                if disabler ~= 'Energy' and allIntelMaintenanceFree then
+                    for intel, _ in allIntelMaintenanceFree do
+                        local allIntelDisablers = allIntelDisabledByEvent[intel]
+                        if not allIntelDisablers then
+                            allIntelDisabledByEvent[intel] = {}
+                        end
+                        if not allIntelDisablers[disabler] then
+                            allIntelDisabledByEvent[intel][disabler] = true
+                            self:DisableIntel(intel)
+                            self:OnIntelDisabled(intel)
+                        end
+                    end
+                end
+
+            -- disable one intel
+            elseif allIntel[intel]
+                or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
+            then
+                local allIntelDisablers = allIntelDisabledByEvent[intel]
+                if not allIntelDisablers then
+                    allIntelDisabledByEvent[intel] = {}
+                end
+                if not allIntelDisablers[disabler] then
+                    allIntelDisabledByEvent[intel][disabler] = true
+                    self:DisableIntel(intel)
+                    self:OnIntelDisabled(intel)
                 end
             end
         end
     end,
 
     ---@param self IntelComponent | Unit
-    ---@param disabler string
+    ---@param disabler string The reason the intel is disabled. Intel will not enable if some other disabler is disabling it.
     ---@param intel? IntelType
     EnableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
         if status then
             -- LOG("EnableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
 
+            -- upvalue for performance
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
-            local allIntelFromEnhancements = status.AllIntelFromEnhancements
 
             -- special case when unit is finished building
             if disabler == 'NotInitialized' then
@@ -160,48 +167,39 @@ IntelComponent = ClassSimple {
                 return
             end
 
-            -- disable all intel
+            -- enable all intel
             if not intel then
-                for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                        if allIntelDisabledByEvent[i][disabler] then
-                            allIntelDisabledByEvent[i][disabler] = nil
-                            if table.empty(allIntelDisabledByEvent[i]) then
-                                self:OnIntelRecharge(i)
-                            end
-                        end
-                    end
-                end
-
-                if allIntelFromEnhancements then
-                    for i, _ in allIntelFromEnhancements do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                            if allIntelDisabledByEvent[i][disabler] then
-                                allIntelDisabledByEvent[i][disabler] = nil
-                                if table.empty(allIntelDisabledByEvent[i]) then
-                                    self:OnIntelRecharge(i)
-                                end
-                            end
-                        end
-                    end
-                end
-
-                -- disable one intel
-            elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
-                -- special case that requires additional book keeping
-                if disabler == 'Enhancement' then
-                    allIntelFromEnhancements[intel] = true
-                end
-
-                if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
-                    if allIntelDisabledByEvent[intel][disabler] then
-                        allIntelDisabledByEvent[intel][disabler] = nil
-                        if table.empty(allIntelDisabledByEvent[intel]) then
+                for intel, _ in allIntel do
+                    local allIntelDisablers = allIntelDisabledByEvent[intel]
+                    if allIntelDisablers[disabler] then
+                        allIntelDisablers[disabler] = nil
+                        if table.empty(allIntelDisablers) then
                             self:OnIntelRecharge(intel)
                         end
+                    end
+                end
+
+                if disabler ~= 'Energy' and allIntelMaintenanceFree then
+                    for intel, _ in allIntelMaintenanceFree do
+                        local allIntelDisablers = allIntelDisabledByEvent[intel]
+                        if allIntelDisablers[disabler] then
+                            allIntelDisablers[disabler] = nil
+                            if table.empty(allIntelDisablers) then
+                                self:OnIntelRecharge(intel)
+                            end
+                        end
+                    end
+                end
+
+            -- enable one intel
+            elseif allIntel[intel] 
+                or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
+            then
+                local allIntelDisablers = allIntelDisabledByEvent[intel]
+                if allIntelDisablers[disabler] then
+                    allIntelDisablers[disabler] = nil
+                    if table.empty(allIntelDisablers) then
+                        self:OnIntelRecharge(intel)
                     end
                 end
             end
@@ -253,11 +251,20 @@ IntelComponent = ClassSimple {
 
             --- display progress
             for k = 1, ticks do
-                self:SetWorkProgress((k / ticks))
+
+                -- prevent changing work progress when we are doing work (such as an enhancement)
+                if not self.WorkItem then
+                    self:SetWorkProgress((k / ticks))
+                end
+
                 WaitTicks(1)
             end
 
-            self:SetWorkProgress(-1)
+            -- prevent changing work progress when we are doing work (such as an enhancement)
+            if not self.WorkItem then
+                self:SetWorkProgress(-1)
+            end
+
             self:OnIntelRecharged()
         end
     end,
@@ -381,15 +388,13 @@ IntelComponent = ClassSimple {
     end,
 }
 
----@type table<string, number>
 local TechToDuration = {
-    TECH1 = 1,
-    TECH2 = 2,
-    TECH3 = 3,
-    EXPERIMENTAL = 6,
+    TECH1 = 1.0,
+    TECH2 = 1.0,
+    TECH3 = 1.0,
+    EXPERIMENTAL = 4,
 }
 
----@type table<string, number>
 local TechToLOD = {
     TECH1 = 120,
     TECH2 = 140,
@@ -398,9 +403,11 @@ local TechToLOD = {
 }
 
 ---@class TreadComponent
+---@field CrushingSuspend? boolean
+---@field CrushingThread? thread
 ---@field TreadBlueprint UnitBlueprintTreads
 ---@field TreadSuspend? boolean
----@field TreadThreads? table<number, thread>
+---@field TreadThreads? thread[]
 TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
@@ -411,51 +418,61 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
         local treads = self.TreadBlueprint
-        if treads then
-            if treads.ScrollTreads then
-                self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
-            end
+        if not treads then
+            return
+        end
 
-            local treadMarks = treads.TreadMarks
-            local treadType = self.TerrainType.Treads
-            if treadMarks and treadType and treadType ~= 'None' then
-                self:CreateTreads(treadMarks)
-            end
+        if treads.ScrollTreads then
+            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+        end
+        local treadMarks = treads.TreadMarks
+        local treadType = self.TerrainType.Treads
+        if treadMarks and treadType and treadType ~= 'None' then
+            self:CreateTreads(treadMarks)
+        end
+        if treads.Damage then
+            self:StartCrushing(treads.Damage)
         end
     end,
 
     ---@param self Unit | TreadComponent
     DestroyMovementEffects = function(self)
         local treads = self.TreadBlueprint
-        if treads then
-            if treads.ScrollTreads then
-                self:RemoveScroller()
-            end
+        if not treads then
+            return
+        end
 
-            if self.TreadThreads then
-                self.TreadSuspend = true
-            end
+        if treads.ScrollTreads then
+            self:RemoveScroller()
+        end
+        if self.TreadThreads then
+            self.TreadSuspend = true
+        end
+        if self.CrushingThread then
+            self.CrushingSuspend = true
         end
     end,
 
     ---@param self Unit | TreadComponent
-    ---@param treadsBlueprint UnitBlueprintTreadMarks
-    CreateTreads = function(self, treadsBlueprint)
+    ---@param treadMarks UnitBlueprintTreadMarks
+    CreateTreads = function(self, treadMarks)
+        local trash = self.Trash
         local treadThreads = self.TreadThreads
-        if not treadThreads then
-            treadThreads = {}
+        if not IsDestroyed(self) then
+            if not treadThreads then
+                treadThreads = {}
+                self.TreadThreads = treadThreads
 
-            for k, treadBlueprint in treadsBlueprint do
-                local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
-                treadThreads[k] = thread
-                self.Trash:Add(thread)
-            end
-
-            self.TreadThreads = treadThreads
-        else
-            self.TreadSuspend = nil
-            for k, thread in treadThreads do
-                ResumeThread(thread)
+                for k, treadBlueprint in treadMarks do
+                    local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
+                    treadThreads[k] = thread
+                    trash:Add(thread)
+                end
+            else
+                self.TreadSuspend = nil
+                for _, thread in treadThreads do
+                    ResumeThread(thread)
+                end
             end
         end
     end,
@@ -463,37 +480,84 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     ---@param treads UnitBlueprintTreadMarks
     CreateTreadsThread = function(self, treads)
-
-        -- to local scope for performance
+        -- trade memory for performance
+        local IsDestroyed = IsDestroyed
         local WaitTicks = WaitTicks
         local CreateSplatOnBone = CreateSplatOnBone
         local SuspendCurrentThread = SuspendCurrentThread
 
-        local tech = self.Blueprint.TechCategory
-        local sizeX = treads.TreadMarksSizeX
-        local sizeZ = treads.TreadMarksSizeZ
-        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         local treadOffset = treads.TreadOffset
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
-
-        local duration = treads.TreadLifeTime or TechToDuration[tech] or 1
-        local lod = TechToLOD[tech] or 120
+        local sizeX = treads.TreadMarksSizeX
+        local sizeZ = treads.TreadMarksSizeZ
+        local lod = TechToLOD[self.Blueprint.TechCategory] or 120
+        local duration = treads.TreadLifeTime or TechToDuration[self.Blueprint.TechCategory] or 1
         local army = self.Army
 
+        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         -- prevent infinite loops
         if interval < 1 then
             interval = 1
         end
 
         while true do
-            while not self.TreadSuspend do
+            while not (self.TreadSuspend or IsDestroyed(self)) do
                 CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, lod, duration, army)
                 WaitTicks(interval)
             end
 
             SuspendCurrentThread()
-            self.TreadSuspend = nil
+            WaitTicks(1)
+        end
+    end,
+
+    ---@param self Unit | TreadComponent
+    ---@param dmg table
+    StartCrushing = function(self, dmg)
+        if not self.CrushingThread then
+            local thread = ForkThread(self.CreateCrushingThread, self, dmg)
+            self.CrushingThread = thread
+            self.Trash:Add(thread)
+        else
+            self.CrushingSuspend = nil
+            ResumeThread(self.CrushingThread)
+        end
+    end,
+
+    ---@param self Unit | TreadComponent
+    ---@param dmg table
+    CreateCrushingThread = function(self, dmg)
+        -- trade memory for performance
+        local WaitTicks = WaitTicks
+        local DamageArea = DamageArea
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        local bones = dmg.Bones
+        local radius = dmg.Radius
+        local amount = dmg.Amount
+        local type = dmg.Type
+        local damageFriendly = dmg.DamageFriendly
+
+        local interval = 10 * (dmg.PulseInterval or 3)
+        -- prevent infinite loops
+        if interval < 1 then
+            interval = 1
+        end
+
+        while true do
+            while not self.CrushingSuspend do
+                if bones then
+                    for _, bone in bones do
+                        DamageArea(self, self:GetPosition(bone), radius, amount, type, damageFriendly)
+                    end
+                else
+                    DamageArea(self, self:GetPosition(), radius, amount, type, damageFriendly)
+                end
+                WaitTicks(interval)
+            end
+
+            SuspendCurrentThread()
             WaitTicks(1)
         end
     end,
@@ -538,8 +602,8 @@ VeterancyComponent = ClassSimple {
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
-            self:SetStat('VetLevel', self:GetStat('VetLevel', 0).Value)
-            self:SetStat('VetExperience', self:GetStat('VetExperience', 0).Value)
+            self:UpdateStat('VetLevel', 0)
+            self:UpdateStat('VetExperience', 0)
             self.VetExperience = 0
             self.VetLevel = 0
         end
@@ -548,12 +612,16 @@ VeterancyComponent = ClassSimple {
     ---@param self VeterancyComponent | Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector
-    ---@param damageType DamageType
+    ---@param vector Vector unused
+    ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())
         self.VetDamageTaken = self.VetDamageTaken + amount
-        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
+        if instigator and
+            instigator.IsUnit and
+            (not IsDestroyed(instigator)) and
+            IsEnemy(self.Army, instigator.Army)
+        then
             local entityId = instigator.EntityId
             local vetInstigators = self.VetInstigators
             local vetDamage = self.VetDamage
@@ -565,8 +633,9 @@ VeterancyComponent = ClassSimple {
 
     --- Disperses the veterancy, expects to be only called once
     ---@param self VeterancyComponent | Unit
-    VeterancyDispersal = function(self)
-        local vetWorth = self:GetFractionComplete() * self:GetTotalMassCost()
+    ---@param experience? number -- override for amount of experience to be distributed
+    VeterancyDispersal = function(self, experience)
+        local vetWorth = experience or (self:GetFractionComplete() * self:GetTotalMassCost())
         local vetDamage = self.VetDamage
         local vetInstigators = self.VetInstigators
         local vetDamageTaken = self.VetDamageTaken
@@ -596,7 +665,7 @@ VeterancyComponent = ClassSimple {
         if currLevel > 4 then
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateStat('VetExperience', currExperience)
             return
         end
 
@@ -611,7 +680,7 @@ VeterancyComponent = ClassSimple {
 
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateStat('VetExperience', currExperience)
 
             while currLevel < 5 and upperThreshold and upperThreshold <= experience do
                 self:AddVetLevel()
@@ -619,7 +688,7 @@ VeterancyComponent = ClassSimple {
                 upperThreshold = vetThresholds[currLevel + 1]
             end
 
-        -- case where we do have a limit (usual gameplay approach)
+            -- case where we do have a limit (usual gameplay approach)
         else
             if experience > diffThreshold then
                 experience = diffThreshold
@@ -627,7 +696,7 @@ VeterancyComponent = ClassSimple {
 
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateStat('VetExperience', currExperience)
 
             if upperThreshold <= currExperience then
                 self:AddVetLevel()
@@ -645,7 +714,7 @@ VeterancyComponent = ClassSimple {
 
         local nextLevel = self.VetLevel + 1
         self.VetLevel = nextLevel
-        self:SetStat('VetLevel', nextLevel)
+        self:UpdateStat('VetLevel', nextLevel)
 
         -- shared across all units
         Buff.ApplyBuff(self, 'VeterancyMaxHealth' .. nextLevel)
@@ -704,8 +773,9 @@ VeterancyComponent = ClassSimple {
     end,
 
     ---@param self Unit | VeterancyComponent
-    ---@param instigator Unit
-    OnKilledUnit = function (self, unitThatIsDying, experience)
+    ---@param unitThatIsDying Unit
+    ---@param experience? number
+    OnKilledUnit = function(self, unitThatIsDying, experience)
         if not experience then
             return
         end
@@ -749,3 +819,134 @@ VeterancyComponent = ClassSimple {
         return fractionComplete * unitMass * vetMult + cargoMass
     end,
 }
+
+---@class ExternalFactoryComponent
+---@field ExternalFactory ExternalFactoryUnit
+ExternalFactoryComponent = ClassSimple {
+
+    FactoryAttachBone = false,
+    BuildAttachBone = false,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        local blueprint = self.Blueprint
+        if not self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'"
+                , blueprint.BlueprintId))
+        end
+
+        if not self.BuildAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'"
+                , blueprint.BlueprintId))
+        end
+
+        if self.BuildAttachBone == self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'"
+                , blueprint.BlueprintId))
+        end
+
+        if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
+            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category"
+                , blueprint.BlueprintId))
+        end
+
+        local blueprintIdExternalFactory = blueprint.BlueprintId .. 'ef'
+        if not __blueprints[blueprintIdExternalFactory] then
+            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup",
+                blueprint.BlueprintId))
+        end
+
+        -- create the factory somewhere completely unrelated
+        local px, py, pz = self:GetPositionXYZ(self.FactoryAttachBone)
+
+        -- the anchor entity prevents the "deploy" command from detaching
+        -- the external factory from the base unit
+        local anchorEntity = Entity({Owner = self})
+        self.Trash:Add(anchorEntity)
+        anchorEntity:AttachTo(self, self.FactoryAttachBone)
+
+        -- the anchor unit has the "CARRIER" category, which prevents the
+        -- external factory from being highlighted or selected with the cursor, but
+        -- doesn't prevent selecting it with the exFac button
+        local anchorUnit = CreateUnitHPR('ZXA0003', self.Army, px, py, pz, 0, 0, 0)
+        self.Trash:Add(anchorUnit)
+        anchorUnit:AttachTo(anchorEntity, -1)
+
+        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, px, py, pz, 0, 0, 0) --[[@as ExternalFactoryUnit]]
+        self.ExternalFactory:AttachTo(anchorUnit, -1)
+        self.ExternalFactory:SetCreator(self)
+        self:SetCreator(self.ExternalFactory)
+        self.ExternalFactory:SetParent(self)
+        self.Trash:Add(self.ExternalFactory)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnIdle = function(self)
+        if self.ExternalFactory and (not IsDestroyed(self.ExternalFactory)) then
+            self.ExternalFactory:SetBusy(false)
+            self.ExternalFactory:SetBlockCommandQueue(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param new Layer
+    ---@param old Layer unused
+    OnLayerChange = function(self, new, old)
+        if self.ExternalFactory then
+            if new == 'Land' then
+                self.ExternalFactory:RestoreBuildRestrictions()
+                self.ExternalFactory:RequestRefreshUI()
+            elseif new == 'Seabed' then
+                self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
+                self.ExternalFactory:RequestRefreshUI()
+
+                IssueToUnitClearCommands(self.ExternalFactory)
+            end
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param instigator Unit unused
+    ---@param type string unused
+    ---@param overkillRatio number unused
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if not IsDestroyed(self.ExternalFactory) then
+            self.ExternalFactory:SetBusy(true)
+            self.ExternalFactory:SetBlockCommandQueue(true)
+            self.ExternalFactory:Kill()
+        end
+    end,
+
+    -- We need to wait one tick for our unit to "exist" before we can clear its orders
+    -- This prevents order graphs from being drawn from units inside the carrier
+    ---@param self Unit | ExternalFactoryComponent unused
+    ---@param unitBeingBuilt Unit
+    ClearOrdersThread = function(self, unitBeingBuilt)
+        WaitTicks(1)
+        IssueToUnitClearCommands(unitBeingBuilt)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param unitBeingBuilt Unit
+    OnStopBuildWithStorage = function(self, unitBeingBuilt)
+        --local unitBeingBuilt = self.UnitBeingBuilt
+        unitBeingBuilt:DetachFrom(true)
+        self:DetachAll(self.BuildAttachBone)
+
+        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+            unitBeingBuilt:ShowBone(0, true)
+        else
+            self:AddUnitToStorage(unitBeingBuilt)
+            ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
+        end
+
+        self:RequestRefreshUI()
+        ChangeState(self, self.IdleState)
+    end,
+
+}
+
+--- Moved for Backwards Compatibility
+local Entity = import("/lua/sim/entity.lua").Entity

@@ -1,4 +1,12 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'B04',
+            'B03',
+            'B06',
+            'B05'
+        }
+    },
     Audio = {
         Construct = Sound {
             Bank = 'XSB',
@@ -95,13 +103,13 @@ UnitBlueprint {
                 {
                     LODCutoff = 200,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    ShaderName = 'SeraphimNavy',
                 },
                 {
                     AlbedoName = 'zsb9603_lod1_albedo.dds',
                     LODCutoff = 600,
                     LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    ShaderName = 'SeraphimNavy',
                     SpecularName = 'zsb9603_lod1_specteam.dds',
                 },
             },
@@ -113,7 +121,7 @@ UnitBlueprint {
         BuildCostEnergy = 11000,
         BuildCostMass = 2200,
         BuildRate = 150,
-        BuildTime = 3500,
+        BuildTime = 10800,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zsb9603',
@@ -176,7 +184,6 @@ UnitBlueprint {
     LifeBarOffset = 6.7,
     LifeBarSize = 4.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -186,11 +193,9 @@ UnitBlueprint {
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsX = 5,
         MeshExtentsY = 2,
         MeshExtentsZ = 14,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         ComputeRollOffPoint = true,
         RollOffPoints = {
@@ -211,7 +216,6 @@ UnitBlueprint {
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -1.6,
     SelectionCenterOffsetZ = -0.14,

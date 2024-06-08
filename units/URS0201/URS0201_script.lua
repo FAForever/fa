@@ -27,6 +27,9 @@ URS0201 = ClassUnit(CSeaUnit) {
         AntiTorpedoB = ClassWeapon(CIFSmartCharge) {},
     },
 
+    ---@param self URS0201
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         CSeaUnit.OnMotionHorzEventChange(self, new, old)
         if self.Dead then return end
@@ -56,7 +59,7 @@ URS0201 = ClassUnit(CSeaUnit) {
         local bp = self.Blueprint or self:GetBlueprint()
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier or 1)
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
             self:SetSpeedMult(1)

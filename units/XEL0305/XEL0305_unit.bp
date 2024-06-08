@@ -4,7 +4,6 @@ UnitBlueprint{
         TargetBones = {
             "Torso",
             "Turret",
-            "AttachPoint",
         },
     },
     Audio = {
@@ -150,13 +149,12 @@ UnitBlueprint{
     },
     Intel = {
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.35,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -166,15 +164,14 @@ UnitBlueprint{
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        MaxAcceleration = 2.1,
-        MaxBrake = 2.1,
-        MaxSpeed = 2.1,
-        MaxSpeedReverse = 2.1,
+        MaxAcceleration = 2.2,
+        MaxBrake = 2.2,
+        MaxSpeed = 2.2,
+        MaxSpeedReverse = 2.2,
         MaxSteerForce = 10,
         MeshExtentsX = 1.1,
         MeshExtentsY = 1.5,
         MeshExtentsZ = 2.4,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         RotateOnSpot = false,
         StandUpright = true,
@@ -246,9 +243,8 @@ UnitBlueprint{
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
-                "COMMAND",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "TECH1 MOBILE",
+                "STRUCTURE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

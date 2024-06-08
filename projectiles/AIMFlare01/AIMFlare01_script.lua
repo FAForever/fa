@@ -7,7 +7,10 @@
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
 
+---@class AIMFlare01 : AIMFlareProjectile
 AIMFlare01 = ClassProjectile(AIMFlareProjectile) {
+
+    ---@param self AIMFlare01
     OnCreate = function(self)
         AIMFlareProjectile.OnCreate(self)
         self.MyShield = Flare {

@@ -4,15 +4,20 @@
 --  Summary  :  Brackman Hack Peg-Pod
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local CDFBrackmanHackPegProjectile01 = import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile01
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+--- Brackman Hack Peg-Pod
+---@class CIFBrackmanHackPegs01 : CDFBrackmanHackPegProjectile01
 CIFBrackmanHackPegs01 = ClassProjectile(CDFBrackmanHackPegProjectile01) {
-    OnImpact = function(self, TargetType, TargetEntity) 
-        local FxFragEffect = EffectTemplate.CBrackmanCrabPegPodSplit01 
-        local ChildProjectileBP = '/projectiles/CIFBrackmanHackPegs02/CIFBrackmanHackPegs02_proj.bp'  
+
+    ---@param self CIFBrackmanHackPegs01
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
+    OnImpact = function(self, TargetType, TargetEntity)
+        local FxFragEffect = EffectTemplate.CBrackmanCrabPegPodSplit01
+        local ChildProjectileBP = '/projectiles/CIFBrackmanHackPegs02/CIFBrackmanHackPegs02_proj.bp'
         ------ Play split effects
         for k, v in FxFragEffect do
             CreateEmitterAtEntity( self, self.Army, v )
@@ -33,7 +38,7 @@ CIFBrackmanHackPegs01 = ClassProjectile(CDFBrackmanHackPegProjectile01) {
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles -1) do
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul 
+            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             local proj = self:CreateProjectile(ChildProjectileBP, 0, 0.0, 0, xVec, -1.0, zVec):SetCollision(true):SetVelocity(velocity)
             proj.DamageData = self.DamageData
             proj:SetTargetPosition(self:GetCurrentTargetPosition())

@@ -13,6 +13,7 @@ ProjectileBlueprint {
         'CYBRAN',
         'DEFENSE',
         'TECH3',
+        'KILLAIRONCOLLISION'
     },
     Description = 'CYBRAN Anti Nuclear Missile',
     Display = {
@@ -31,9 +32,6 @@ ProjectileBlueprint {
         BuildCostEnergy = 360000,
         BuildCostMass = 3600,
         BuildTime = 259200,
-    },
-    DoNotCollideList = {
-        'AIR',
     },
     General = {
         Category = 'Defense',

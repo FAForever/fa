@@ -3,8 +3,12 @@ UnitBlueprint{
     AI = {
         GuardScanRadius = 40,
         TargetBones = {
-            "Front_Turret",
-            "Back_Turret",
+            "Front_Radar",
+            "Back_Radar",
+            "Back_Wake",
+            "Front_Left_Wake",
+            "Front_Right_Wake",
+            "URS0103"
         },
     },
     Audio = {
@@ -37,6 +41,7 @@ UnitBlueprint{
         "SONAR",
         "TECH1",
         "VISIBLETORECON",
+        "ANTIAIR",
     },
     Defense = {
         AirThreatLevel = 2,
@@ -89,11 +94,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 250,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "urs0103_lod1_albedo.dds",
                     SpecularName = "urs0103_lod1_specteam.dds",
                 },
@@ -155,7 +160,6 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -171,7 +175,6 @@ UnitBlueprint{
         MaxSpeed = 6,
         MaxSpeedReverse = 6,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 10,
         TurnRate = 60,
@@ -230,7 +233,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.36,
+            RateOfFire = 1.428,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {

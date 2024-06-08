@@ -1,15 +1,31 @@
---****************************************************************************
---**  File     :  /lua/sim/AIEngineerManager.lua
---**  Summary  : Manage engineers for a location
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
 
-local AIBuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
--- local AIPlatoonEngineer = import("/lua/aibrains/platoons/platoon-engineer.lua").AIPlatoonEngineer
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local TableGetSize = table.getsize
 
-local WeakValues = { __mode = 'v' }
+local WeakValueTable = { __mode = 'v' }
+
+---@class AIEngineerManagerDebugInfo
 
 ---@class AIEngineerManagerReferences
 ---@field TECH1 table<EntityId, Unit>
@@ -27,42 +43,40 @@ local WeakValues = { __mode = 'v' }
 ---@field SUBCOMMANDER number
 ---@field COMMAND number
 
----@class AIEngineerManagerDebugInfo
-
----@class AIEngineerManager : AIBuilderManager
+---@class AIEngineerManager
 ---@field DebugInfo AIEngineerManagerDebugInfo
 ---@field Engineers AIEngineerManagerReferences
 ---@field EngineersBeingBuilt AIEngineerManagerReferences     
 ---@field EngineerTotalCount number                 # Recomputed every 10 ticks
 ---@field EngineerCount AIEngineerManagerCount      # Recomputed every 10 ticks
-AIEngineerManager = Class(AIBuilderManager) {
+AIEngineerManager = ClassSimple {
 
     ManagerName = "EngineerManager",
 
     ---@param self AIEngineerManager
     ---@param brain AIBrain
     ---@param base AIBase
-    ---@param locationType LocationType
-    Create = function(self, brain, base, locationType)
-        AIBuilderManager.Create(self, brain, base, locationType)
-        self.Identifier = 'AIEngineerManager at ' .. locationType
+    Create = function(self, brain, base)
+        self.Brain = brain
+        self.Base = base
+        self.Trash = TrashBag()
 
         self.Engineers = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
-            SUBCOMMANDER = setmetatable({}, WeakValues),
-            COMMAND = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
+            SUBCOMMANDER = setmetatable({}, WeakValueTable),
+            COMMAND = setmetatable({}, WeakValueTable),
         }
 
         self.EngineersBeingBuilt = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
-            SUBCOMMANDER = setmetatable({}, WeakValues),
-            COMMAND = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
+            SUBCOMMANDER = setmetatable({}, WeakValueTable),
+            COMMAND = setmetatable({}, WeakValueTable),
         }
 
         self.EngineerTotalCount = 0
@@ -75,7 +89,7 @@ AIEngineerManager = Class(AIBuilderManager) {
             COMMAND = 0,
         }
 
-        self.StructuresBeingBuilt = setmetatable({}, WeakValues)
+        self.StructuresBeingBuilt = setmetatable({}, WeakValueTable)
         self.Trash:Add(ForkThread(self.UpdateEngineerThread, self))
     end,
 
@@ -159,7 +173,7 @@ AIEngineerManager = Class(AIBuilderManager) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
             local tech = blueprint.TechCategory
@@ -177,7 +191,7 @@ AIEngineerManager = Class(AIBuilderManager) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
             local tech = blueprint.TechCategory
@@ -194,7 +208,7 @@ AIEngineerManager = Class(AIBuilderManager) {
     --- `Memory complexity: O(1)`
     ---@param self AIEngineerManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
             local tech = blueprint.TechCategory
@@ -209,20 +223,20 @@ AIEngineerManager = Class(AIBuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self AIBuilderManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
         end
     end,
 
     --- Called by a unit as it stops building
-    ---@param self AIBuilderManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
         end
@@ -231,7 +245,7 @@ AIEngineerManager = Class(AIBuilderManager) {
     --------------------------------------------------------------------------------------------
     -- unit interface
 
-    --- Add a unit to the engineer manager, similar to calling `OnUnitStopBeingBuilt`
+    --- Add a unit to the engineer manager, similar to calling `OnStopBeingBuilt`
     --- 
     --- `Time complexity: O(1)`
     --- 
@@ -246,7 +260,7 @@ AIEngineerManager = Class(AIBuilderManager) {
         self.Engineers[tech][id] = unit
     end,
 
-    --- Remove a unit from the engineer manager, similar to calling `OnUnitDestroyed`
+    --- Remove a unit from the engineer manager, similar to calling `OnUnitDestroy`
     --- 
     --- `Complexity: O(1)`
     --- 

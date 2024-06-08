@@ -1,9 +1,9 @@
 ProjectileBlueprint {
     Display = {
-        StrategicIconSize = 0,
+        StrategicIconSize = 1,
     },
     Physics = {
-        CollideEntity = false,
+        CollideEntity = true,
         DestroyOnWater = true,
         TrackTarget = false,
         TurnRate = 360,

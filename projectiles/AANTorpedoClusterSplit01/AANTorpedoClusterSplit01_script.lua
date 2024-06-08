@@ -1,51 +1,78 @@
-------------------------------------------------------------------------------------------------
--- File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
--- Author(s):  Gordon Duclos
--- Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
--------------------------------------------------------------------------------------------------
+--******************************************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
+local ATorpedoClusterOnCreate = ATorpedoCluster.OnCreate
+local ATorpedoClusterOnImpact = ATorpedoCluster.OnImpact
+
+local ATorpedoPolyTrails01 = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01
+
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
+--- Aeon Torpedo Cluster Projectile script, XAA0306
+---@class AANTorpedoClusterSplit01 : ATorpedoCluster
+AANTorpedoClusterSplit01 = ClassProjectile(ATorpedoCluster) {
     CountdownLength = 101,
 
+    ---@param self AANTorpedoClusterSplit01
     OnCreate = function(self)
-        ATorpedoCluster.OnCreate(self)
-        self.HasImpacted = false
-        self.Trash:Add(ForkThread(self.CountdownExplosion,self))
-		CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
-
+        ATorpedoClusterOnCreate(self)
+        self.Trash:Add(ForkThread(self.CountdownExplosion, self))
+        CreateTrail(self, -1, self.Army, ATorpedoPolyTrails01)
     end,
 
+    ---@param self AANTorpedoClusterSplit01
     CountdownExplosion = function(self)
         WaitTicks(self.CountdownLength)
-        if not self.HasImpacted then
-            self:OnImpact('Underwater', nil)
-        end
+        self:OnImpact('Underwater', nil)
     end,
 
     --- Adjusted movement thread to gradually speed up the torpedo. It needs to slowly speed
     --- up to prevent it from hitting the floor in relative undeep water
     ---@param self TANAnglerTorpedo06
     MovementThread = function(self)
-        WaitTicks(1)
+        -- local scope for performance
+        local WaitTicks = WaitTicks
+        local IsDestroyed = IsDestroyed
+        local ProjectileSetAcceleration = self.SetAcceleration
+
         for k = 1, 6 do
-            WaitTicks(1)
+            WaitTicks(2)
             if not IsDestroyed(self) then
-                self:SetAcceleration(k)
+                ProjectileSetAcceleration(self, k)
             else
                 break
             end
         end
     end,
 
+    ---@param self AANTorpedoClusterSplit01
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self.Trash:Add(ForkThread(self.CountdownMovement,self))
+        self.Trash:Add(ForkThread(self.CountdownMovement, self))
     end,
 
+    ---@param self AANTorpedoClusterSplit01
     CountdownMovement = function(self)
         WaitTicks(31)
         self:SetMaxSpeed(0)
@@ -53,13 +80,16 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
         self:SetVelocity(0)
     end,
 
+    ---@param self AANTorpedoClusterSplit01
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
     OnImpact = function(self, TargetType, TargetEntity)
-        local px,_,pz = self:GetPositionXYZ()
-        local marker = VisionMarkerOpti({Owner = self})
-        marker:UpdatePosition(px,pz)
+        local px, _, pz = self:GetPositionXYZ()
+        local marker = VisionMarkerOpti({ Owner = self })
+        marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
-        marker:UpdateIntel(self.Army, 5,'Vision',true)
-        ATorpedoCluster.OnImpact(self, TargetType, TargetEntity)
+        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        ATorpedoClusterOnImpact(self, TargetType, TargetEntity)
     end,
 }
-TypeClass = AANTorpedoCluster01
+TypeClass = AANTorpedoClusterSplit01

@@ -7,6 +7,7 @@ UnitBlueprint{
     BuildIconSortPriority = 190,
     Categories = {
         "AEON",
+        "ANTITORPEDO",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CQUEMOV",
@@ -60,11 +61,11 @@ UnitBlueprint{
                 {
                     LODCutoff = 100,
                     Scrolling = true,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0305_lod1_albedo.dds",
                     SpecularName = "uas0305_lod1_specteam.dds",
                 },
@@ -86,7 +87,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 12000,
         BuildCostMass = 1000,
-        BuildTime = 750,
+        BuildTime = 1200,
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
     Footprint = {
@@ -127,7 +128,7 @@ UnitBlueprint{
     Intel = {
         ReactivateTime = 6,
         ShowIntelOnSelect = true,
-        SonarRadius = 450,
+        SonarRadius = 448,
         VisionRadius = 32,
         WaterVisionRadius = 24,
     },
@@ -135,8 +136,7 @@ UnitBlueprint{
     LifeBarOffset = 0.45,
     LifeBarSize = 1.25,
     Physics = {
-        BackUpDistance = 0,
-        BankingSlope = 0,
+        BackUpDistance = 10,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -150,12 +150,11 @@ UnitBlueprint{
         MaxAcceleration = 4.5,
         MaxBrake = 4.5,
         MaxSpeed = 4.5,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 4.5,
         MaxSteerForce = 5,
         MeshExtentsX = 1.1,
         MeshExtentsY = 2,
         MeshExtentsZ = 1.1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 5,
         TurnRate = 100,
@@ -176,6 +175,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 1,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = { Water = "Water" },
             FiringTolerance = 2,

@@ -5,6 +5,8 @@ UnitBlueprint{
         TargetBones = {
             "point_midhigh",
             "point_midlow",
+            "Radar_B01",
+            "point_spike",
         },
     },
     Audio = {
@@ -16,7 +18,7 @@ UnitBlueprint{
     },
     BuildIconSortPriority = 40,
     Categories = {
-        "BUILTBYEXPERIMENTALSUB",
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "COUNTERINTELLIGENCE",
@@ -34,6 +36,7 @@ UnitBlueprint{
         "STEALTHFIELD",
         "TECH2",
         "VISIBLETORECON",
+        "ANTITORPEDO",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -81,11 +84,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 270,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "xrs0205_lod1_albedo.dds",
                     SpecularName = "xrs0205_lod1_specteam.dds",
                 },
@@ -125,7 +128,6 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
@@ -142,9 +144,9 @@ UnitBlueprint{
         UnitName = "<LOC xrs0205_name>CI:18 Mermaid",
     },
     Intel = {
-        RadarRadius = 60,
+        RadarRadius = 64,
         RadarStealthFieldRadius = 40,
-        SonarRadius = 62,
+        SonarRadius = 60,
         SonarStealthFieldRadius = 40,
         VisionRadius = 32,
     },
@@ -153,7 +155,6 @@ UnitBlueprint{
     LifeBarSize = 1.15,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -172,7 +173,6 @@ UnitBlueprint{
         MeshExtentsX = 0.6,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 1.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 10,
         TurnRate = 55,
@@ -201,8 +201,9 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 6,
             },
+            DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
-            FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
+            FireTargetLayerCapsTable = { Water = "Water" },
             FiringTolerance = 2,
             Label = "AntiTorpedo",
             MaxRadius = 30,
@@ -230,7 +231,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.26,
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

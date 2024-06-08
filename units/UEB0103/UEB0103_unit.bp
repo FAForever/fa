@@ -2,9 +2,11 @@ UnitBlueprint{
     Description = "<LOC ueb0103_desc>Naval Factory",
     AI = {
         TargetBones = {
-            "UEB0103",
-            "Center_Deck",
-            "Center_BottomDeck",
+            "B09",
+            "B10",
+            "B11",
+            "B12",
+            "B13",
         },
     },
     Audio = {
@@ -67,11 +69,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ueb0103_lod1_albedo.dds",
                     SpecularName = "ueb0103_lod1_specteam.dds",
                 },
@@ -127,7 +129,6 @@ UnitBlueprint{
     LifeBarOffset = 4.75,
     LifeBarSize = 4,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -138,11 +139,9 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsX = 6,
         MeshExtentsY = 4,
         MeshExtentsZ = 18,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = -2.5,  Y = 0,     Z = -8 },
@@ -153,7 +152,6 @@ UnitBlueprint{
         SkirtOffsetZ = -1,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionMeshScaleX = 0.3,
     SelectionMeshScaleZ = 0.4,

@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = 'seraphim_expnuke_prelaunch_07',
-	Lifetime = 50.00,
+	Lifetime = 200.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
@@ -113,14 +113,12 @@ EmitterBlueprint {
 		XRange = 50.00,
 		Keys = {
 			{ x=25.000,y=2.500,z=0.500 },
-			{ x=50.000,y=0.750,z=0.250 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 50.00,
 		Keys = {
 			{ x=25.000,y=0.300,z=0.200 },
-			{ x=50.000,y=0.000,z=0.000 },
 		},
 	},
 	InitialRotationCurve = {

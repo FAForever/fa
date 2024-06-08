@@ -212,13 +212,13 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         EnergyActive=       {-0.125,  -0.125,   -0.125,  -0.125,   -0.125},
         EnergyMaintenance=  {-0.125,  -0.125,   -0.125,  -0.125,   -0.125},
         EnergyWeapon=       {-0.05,   -0.05,    -0.05,   -0.05,    -0.05},
-        RateOfFire=         {-0.0625, -0.0625,  -0.0625, -0.0625,  -0.0625},
+        RateOfFire=         {-0.0625, -0.0625,  -0.0625, -0.0625,  -0.025},
     },
     T3PowerGenerator={
-        EnergyActive=       {-0.1875, -0.1875,  -0.1875, -0.1875,  -0.05},
+        EnergyActive=       {-0.1875, -0.1875,  -0.1875, -0.1562,  -0.05},
         EnergyMaintenance=  {-0.1875, -0.1875,  -0.1875, -0.1875,  -0.1875},
         EnergyWeapon=       {-0.075,  -0.075,   -0.075,  -0.075,   -0.075},
-        RateOfFire=         {-0.1,    -0.1,     -0.1,    -0.1,     -0.1},
+        RateOfFire=         {-0.1,    -0.1,     -0.1,    -0.1,     -0.045},
     },
     T1MassExtractor={
         MassActive=         {-0.1, -0.05, -0.0333, -0.075, -0.075},
@@ -245,10 +245,10 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
 
 adj.Hydrocarbon = adj.T2PowerGenerator
 
-for a, buffs in adj do
+for a, buffs in pairs(adj) do
     _G[a .. 'AdjacencyBuffs'] = {}
-    for t, sizes in buffs do
-        for i, add in sizes do
+    for t, sizes in pairs(buffs) do
+        for i, add in pairs(sizes) do
             local size = i * 4
             local display_name = a .. t
             local name = display_name .. 'Size' .. size

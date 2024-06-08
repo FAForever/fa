@@ -72,8 +72,6 @@ UnitBlueprint {
             RULEUCC_Patrol = false,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
             RULEUCC_Transport = false,
         },
         FactionName = 'Seraphim',
@@ -95,7 +93,6 @@ UnitBlueprint {
     LifeBarOffset = 0.6,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -113,7 +110,6 @@ UnitBlueprint {
         MeshExtentsX = 1,
         MeshExtentsY = 1,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         TurnRadius = 0,
         TurnRate = 80,

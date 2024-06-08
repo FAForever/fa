@@ -25,7 +25,7 @@ local CWeapons = import("/lua/cybranweapons.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 local CCannonMolecularWeapon = CWeapons.CCannonMolecularWeapon
-local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
@@ -33,7 +33,7 @@ local Entity = import("/lua/sim/entity.lua").Entity
 
 URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
-        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightRipper = ClassWeapon(CCannonMolecularWeapon) {},
         Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
         MLG = ClassWeapon(CDFHeavyMicrowaveLaserGeneratorCom) {
@@ -110,8 +110,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
-        LOG(enh)
-
         local bp = self.Blueprint.Enhancements[enh]
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
@@ -120,7 +118,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             RemoveUnitEnhancement(self, 'TeleporterRemove')
             self:RemoveCommandCap('RULEUCC_Teleport')
         elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
+            self:AddToggleCap('RULEUTC_StealthToggle')
             self.StealthEnh = true
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
@@ -147,7 +145,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Buff.ApplyBuff(self, 'CybranACUStealthBonus')
             end
         elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = nil
@@ -179,7 +177,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             end
         elseif enh == 'FAF_SelfRepairSystemRemove' then
             -- remove prerequisites
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = nil
@@ -193,6 +191,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             end
         elseif enh == 'CloakingGenerator' then
             if not bp then return end
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
+            self:AddToggleCap('RULEUTC_CloakToggle')
             self.StealthEnh = nil
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')

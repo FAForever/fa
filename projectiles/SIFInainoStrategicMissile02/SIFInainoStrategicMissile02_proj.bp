@@ -28,6 +28,7 @@ ProjectileBlueprint {
         'STRATEGIC',
         'MISSILE',
         'NOSPLASHDAMAGE',
+        'KILLAIRONCOLLISION',
     },
     Defense = {
         Health = 25000,
@@ -57,14 +58,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Missile',
-        EntityCategory = {
-            'SERAPHIM',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-            'MISSILE',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Seraphim',
     },
     Interface = {

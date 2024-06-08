@@ -1,4 +1,5 @@
 UnitBlueprint {
+    Description = '<LOC uea0003_desc>Engineering Drone',
     AI = {
         InitialAutoMode = true,
     },
@@ -79,7 +80,7 @@ UnitBlueprint {
         'UEF',
         'MOBILE',
         'AIR',
-        'TECH1',
+        'TECH3',
         'POD',
         'REPAIR',
         'RECLAIM',
@@ -100,7 +101,6 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uea0003_desc>Engineering Drone',
     Display = {
         Abilities = {
             '<LOC ability_engineeringsuite>Engineering Suite',
@@ -134,8 +134,8 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
-        SizeZ = 1,
+        SizeX = 0,
+        SizeZ = 0,
     },
     General = {
         BuildBones = {
@@ -153,11 +153,10 @@ UnitBlueprint {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
+            RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
@@ -178,7 +177,7 @@ UnitBlueprint {
         ToggleCaps = {
             RULEUTC_WeaponToggle = true,
         },
-        UnitName = '<LOC uea0003_name>C-D2 "Rover"',
+        UnitName = '<LOC uea0003_name>C-D3 "Rover-3"',
         UnitWeight = 1,
     },
     Intel = {

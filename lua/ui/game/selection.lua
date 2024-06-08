@@ -212,7 +212,10 @@ function AddUnitToSelectionSet(name, unit)
     -- bug where name is an index, not a key
     name = tostring(name)
 
-    if Prefs.GetFromCurrentProfile('options.add_to_factory_control_group') == 'On' then
+    if (Prefs.GetFromCurrentProfile('options.add_to_factory_control_group') == 'On') or
+        -- always allow structures through, otherwise upgrades lose their control groups
+        EntityCategoryContains(categories.STRUCTURE, unit)
+    then
 
         -- remove it from existing selection sets
         if Prefs.GetFromCurrentProfile('options.steal_from_other_control_groups') == 'On' then

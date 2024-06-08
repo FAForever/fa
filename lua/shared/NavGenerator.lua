@@ -111,9 +111,9 @@ function LabelToColor(label)
         return 'ff0000'
     end
 
-    local r = string.format("%x", math.mod(math.sin(label) * 256 + 512, 256) ^ 0)
-    local g = string.format("%x", math.mod(math.sin(label + 2) * 256 + 512, 256) ^ 0)
-    local b = string.format("%x", math.mod(math.cos(label) * 256 + 512, 256) ^ 0)
+    local r = string.format("%x", math.floor(math.mod(math.sin(label) * 256 + 512, 256)))
+    local g = string.format("%x", math.floor(math.mod(math.sin(label + 2) * 256 + 512, 256)))
+    local b = string.format("%x", math.floor(math.mod(math.cos(label) * 256 + 512, 256)))
 
     if string.len(r) == 1 then
         r = '0' .. r
@@ -139,7 +139,15 @@ end
 --- | 'Air' 
 --- | 'Naval'
 
----@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
+---@class ThreatFunctions: table
+---@field Land function
+---@field Air function
+---@field Naval function
+---@field AntiSurface function
+---@field AntiSub function
+---@field AntiAir function
+---@field MobileAntiSurface function
+---@field StructureAntiSurface function
 ThreatFunctions = {
     ---@param aibrain AIBrain
     ---@param position Vector

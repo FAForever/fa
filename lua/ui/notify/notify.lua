@@ -80,8 +80,6 @@ function setupStartDisables()
         state = false
     end
     customMessagesDisabled = state
-
-    Prefs.SavePreferences()
 end
 
 -- This function is called from chat.lua when a player receives a message from another player flagged as Notify = true. Generated below.
@@ -134,7 +132,7 @@ function processIncomingMessage(sender, msg)
         elseif trigger == 'completed' then
             local time = msg.data.time
             if time then
-                msg.text = message .. LOC('<LOC notify_done>') .. ' (' .. time .. 's)'
+                msg.text = string.format("%s %s (%.2fs)", message, LOC('<LOC notify_done>'), time)
             else
                 msg.text = message .. LOC('<LOC notify_done>')
             end
@@ -160,7 +158,6 @@ function toggleNotifyPermanent(bool)
     end
 
     Prefs.SetToCurrentProfile('Notify_all_disabled', bool)
-    Prefs.SavePreferences()
 end
 
 -- This function is used to toggle ALL ASPECTS of notify functionality, but only for the current session
@@ -195,7 +192,6 @@ function toggleCategoryChat(category)
 
     local flag = 'Notify_' .. category .. '_disabled'
     Prefs.SetToCurrentProfile(flag, categoriesDisabled[category])
-    Prefs.SavePreferences()
 end
 
 -- Toggles between allowing custom messages or showing the defaults instead
@@ -214,7 +210,7 @@ function round(num, idp)
     if not idp then
         return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     else
-        local mult = 10 ^ (idp or 0)
+        local mult = math.pow(10, (idp or 0))
         return math.floor(num * mult + 0.5) / mult
     end
 end
@@ -301,7 +297,7 @@ function onCompletedEnhancement(id, category, source)
         local data = ACUs[id]
         if data then
             local time = round(GetGameTimeSeconds() - data.startTime, 2)
-            msg.text = messages()[category][source] .. ' done! (' .. time .. 's)'
+            msg.text = string.format("%s %s (%.2fs)", messages()[category][source], LOC('<LOC notify_done>'), time)
             msg.data.time = time
             killWatcher(data)
         end

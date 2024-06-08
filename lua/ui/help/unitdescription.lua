@@ -117,9 +117,9 @@ Description = {
     ['xel0209'] = "<LOC Unit_Description_0315> Tech 2 amphibious construction, repair, capture and reclamation unit. Armed with a Riot Gun and internal radar and jammer.",
     ['xeb0104'] = "<LOC Unit_Description_0446> Houses one flying Drone which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
     ['xeb0204'] = "<LOC Unit_Description_0453> Houses two flying Drones, each of which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
-    ['uea0001'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",
-    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",
-    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units",
+    ['uea0001'] = "<LOC Unit_Description_0457> Flying Drone, which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T1 structures. Vulnerable to any air fighters or anti-air units.",
+    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone, which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T3 structures. Vulnerable to any air fighters or anti-air units.",
+    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone, which can assist, repair, and reclaim any unit. Cannot be ordered to initiate the construction of structures. Vulnerable to any air fighters or anti-air units.",
 
     -- UEF -- Factories HQ
     ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",
@@ -345,7 +345,7 @@ Description = {
     ['ual0301-ras'] = "<LOC Unit_Description_0169> Increases SACU's resource generation.",
     ['ual0301-sp'] = "<LOC Unit_Description_0170> SACU is sacrificed and its Mass is added to a structure. This destroys the SACU.",
     ['ual0301-tsg'] = "<LOC Unit_Description_0171> Creates a protective shield around the SACU.",
-    ['ual0301-htsg'] = "<LOC Unit_Description_0172> Upgrades the SACU's protective shield. Requires Energy to run.",
+    ['ual0301-phtsg'] = "<LOC Unit_Description_0172> Upgrades the SACU's protective shield. Requires Energy to run.",
     ['ual0301-ss'] = "<LOC Unit_Description_0173> Equips the standard SACU's Reacton cannon with area-of-effect damage.",
     ['ual0301-sic'] = "<LOC Unit_Description_0174> Greatly increases the speed at which the SACU repairs itself.",
     ['ual0301-pqt'] = "<LOC Unit_Description_0175> Adds teleporter. Requires considerable Energy to activate.",
@@ -623,5 +623,6 @@ Description = {
     ['drlk001'] = "<LOC Unit_Description_0462> Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
     ['dalk003'] = "<LOC Unit_Description_0463> Mobile Anti-Air unit. Armed with a high-impact projectiles, excellent against enemy gunships or air-fighters.",
     ['dslk004'] = "<LOC Unit_Description_0464> Mobile Anti-Air unit. Armed with a long-range lasers, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
+    ['srl0310'] = "<LOC Unit_Description_srl0310> Mobile support unit. Designed to attack and destroy enemy shields. Weapon system only very briefly stuns enemy units.",
 
 }

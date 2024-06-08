@@ -1,4 +1,4 @@
-UnitBlueprint{
+UnitBlueprint {
     Description = "<LOC uea0203_desc>Gunship",
     AI = { BeaconName = "UEB5102" },
     Air = {
@@ -8,8 +8,8 @@ UnitBlueprint{
         CanFly = true,
         CirclingDirChangeFrequencySec = 1,
         CirclingElevationChangeRatio = 0.25,
-        CirclingRadiusChangeMaxRatio = 0.9,
-        CirclingRadiusChangeMinRatio = 0.6,
+        CirclingRadiusChangeMaxRatio = 0.7,
+        CirclingRadiusChangeMinRatio = 0.5,
         CirclingRadiusVsAirMult = 0.66,
         CirclingTurnMult = 3,
         KLift = 3,
@@ -19,24 +19,26 @@ UnitBlueprint{
         KTurn = 0.8,
         KTurnDamping = 1.5,
         LiftFactor = 7,
-        MaxAirspeed = 12,
+        MaxAirspeed = 13.5,
         MinAirspeed = 3,
         StartTurnDistance = 5,
         TransportHoverHeight = 2,
+        Winged = false,
     },
     Audio = {
-        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',      LodCutoff = 'UnitMove_LodCutoff' },
-        AmbientMove        = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Loop',      LodCutoff = 'UnitMove_LodCutoff' },
-        Destroyed          = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Med',        LodCutoff = 'UnitMove_LodCutoff' },
-        Killed             = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Air_Killed', LodCutoff = 'UnitMove_LodCutoff' },
-        Landing            = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Land',      LodCutoff = 'UnitMove_LodCutoff' },
-        Load               = Sound { Bank = 'UEA',        Cue = 'UEA0104_Unit_Load',      LodCutoff = 'UnitMove_LodCutoff' },
-        Refueling          = Sound { Bank = 'UEA',        Cue = 'UEA_Repair_Refuel',      LodCutoff = 'UnitMove_LodCutoff' },
-        StartMove          = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Start',     LodCutoff = 'UnitMove_LodCutoff' },
-        StopMove           = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Stop',      LodCutoff = 'UnitMove_LodCutoff' },
-        Thruster           = Sound { Bank = 'UEA',        Cue = 'UEA0203_Thruster',       LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
-        Unload             = Sound { Bank = 'UEA',        Cue = 'UEA0104_Unit_Unload',    LodCutoff = 'UnitMove_LodCutoff' },
+        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01', LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove        = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Loop', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed          = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Med', LodCutoff = 'UnitMove_LodCutoff' },
+        Killed             = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Air_Killed',
+            LodCutoff = 'UnitMove_LodCutoff' },
+        Landing            = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Land', LodCutoff = 'UnitMove_LodCutoff' },
+        Load               = Sound { Bank = 'UEA', Cue = 'UEA0104_Unit_Load', LodCutoff = 'UnitMove_LodCutoff' },
+        Refueling          = Sound { Bank = 'UEA', Cue = 'UEA_Repair_Refuel', LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove          = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove           = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Stop', LodCutoff = 'UnitMove_LodCutoff' },
+        Thruster           = Sound { Bank = 'UEA', Cue = 'UEA0203_Thruster', LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection        = Sound { Bank = 'Interface', Cue = 'UEF_Select_Air', LodCutoff = 'UnitMove_LodCutoff' },
+        Unload             = Sound { Bank = 'UEA', Cue = 'UEA0104_Unit_Unload', LodCutoff = 'UnitMove_LodCutoff' },
     },
     AverageDensity = 1,
     BuildIconSortPriority = 30,
@@ -61,8 +63,8 @@ UnitBlueprint{
         AirThreatLevel = 0,
         ArmorType = "Light",
         EconomyThreatLevel = 0,
-        Health = 880,
-        MaxHealth = 880,
+        Health = 700,
+        MaxHealth = 700,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 7,
@@ -97,6 +99,49 @@ UnitBlueprint{
                     },
                 },
             },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = { "Jet_Front" },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = { "Jet_Front" },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+        },
+        IdleEffects = {
+            Air = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Exhaust_Front01",
+                            "Exhaust_Front02",
+                            "Exhaust_Back01",
+                            "Exhaust_Back02",
+                        },
+                        Type = "Hover02",
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Jet_Front",
+                            "Exhaust_Back01",
+                            "Exhaust_Back02",
+                        },
+                        Type = "SeaIdleGunship01",
+                    },
+                },
+            },
         },
         Mesh = {
             IconFadeInZoom = 130,
@@ -128,9 +173,9 @@ UnitBlueprint{
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 4800,
-        BuildCostMass = 240,
-        BuildTime = 1600,
+        BuildCostEnergy = 3840,
+        BuildCostMass = 192,
+        BuildTime = 1280,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -185,15 +230,18 @@ UnitBlueprint{
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.49,
     SizeSphere = 1.6,
-    SizeX = 1,
-    SizeY = 0.5,
-    SizeZ = 1.2,
+    SizeX = 0.8,
+    SizeY = 0.6,
+    SizeZ = 1.0,
     StrategicIconName = "icon_gunship2_directfire",
     StrategicIconSortPriority = 65,
     Transport = {
         AirClass = true,
         Class1Capacity = 1,
         ClassGenericUpTo = 2,
+        SlotsSmall = 1,
+        SlotsMedium = 1,
+        SlotsLarge = 0,
         TransportClass = 1,
     },
     Veteran = {
@@ -212,7 +260,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 16,
             DamageType = "Normal",
             DisplayName = "Hells Fury Riot Gun",
             FireTargetLayerCapsTable = {
@@ -226,7 +274,7 @@ UnitBlueprint{
             MaxRadius = 22,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 80,
             ProjectileId = "/projectiles/TDFRiot01/TDFRiot01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
@@ -244,7 +292,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "ANTIAIR",
                 "GROUNDATTACK",

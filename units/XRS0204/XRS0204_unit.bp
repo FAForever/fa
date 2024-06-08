@@ -2,7 +2,6 @@ UnitBlueprint{
     Description = "<LOC xrs0204_desc>Submarine Killer",
     AI = {
         GuardReturnRadius = 30,
-        TargetBones = { "XRS0204" },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -19,6 +18,7 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",
+        "ANTITORPEDO", 
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -81,11 +81,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "xrs0204_lod1_albedo.dds",
                     SpecularName = "xrs0204_lod1_specteam.dds",
                 },
@@ -146,7 +146,7 @@ UnitBlueprint{
         BuildCostEnergy = 8800,
         BuildCostMass = 1100,
         BuildTime = 4400,
-        MaintenanceConsumptionPerSecondEnergy = 30,
+        MaintenanceConsumptionPerSecondEnergy = 45,
     },
     Footprint = {
         SizeX = 2,
@@ -192,7 +192,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -209,7 +208,6 @@ UnitBlueprint{
         MaxSpeed = 6.5,
         MaxSpeedReverse = 6.5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,
@@ -218,8 +216,8 @@ UnitBlueprint{
     SelectionSizeZ = 1.8,
     SelectionThickness = 0.37,
     CollisionOffsetY = -0.25,
-    SizeX = 0.66,
-    SizeY = 0.5,
+    SizeX = 0.7,
+    SizeY = 0.7,
     SizeZ = 3,
     StrategicIconName = "icon_sub2_antinavy",
     StrategicIconSortPriority = 165,
@@ -302,10 +300,11 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 5,
             },
+            DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             FireTargetLayerCapsTable = {
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 2,
             Label = "AntiTorpedo01",
@@ -333,7 +332,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.05,
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

@@ -1,5 +1,13 @@
 UnitBlueprint{
     Description = "<LOC xsb0303_desc>Naval Factory HQ",
+    AI = {
+        TargetBones = {
+            'B04',
+            'B03',
+            'B06',
+            'B05'
+        }
+    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0303_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0303_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -66,12 +74,12 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                 },
                 {
                     LODCutoff = 600,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                     AlbedoName = "xsb0303_lod1_albedo.dds",
                     SpecularName = "xsb0303_lod1_specteam.dds",
                 },
@@ -83,7 +91,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY SERAPHIM STRUCTURE NAVAL",
@@ -133,7 +141,6 @@ UnitBlueprint{
     LifeBarOffset = 6.7,
     LifeBarSize = 4.75,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -144,11 +151,9 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsX = 5,
         MeshExtentsY = 2,
         MeshExtentsZ = 14,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = 4.5,   Y = 0,     Z = -8 },
@@ -158,7 +163,6 @@ UnitBlueprint{
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -1.6,
     SelectionCenterOffsetZ = -0.14,

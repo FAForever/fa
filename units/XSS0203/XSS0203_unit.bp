@@ -2,12 +2,6 @@ UnitBlueprint{
     Description = "<LOC xss0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 40,
-        TargetBones = {
-            "AntiTorpedo",
-            "Projectile01",
-            "Projectile02",
-            "Turret",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'XSS',            Cue = 'XSS0203_Move_Loop',   LodCutoff = 'UnitMove_LodCutoff' },
@@ -24,6 +18,7 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "ANTINAVY",
+        "ANTITORPEDO",
         "BUILTBYTIER1FACTORY",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
@@ -91,12 +86,12 @@ UnitBlueprint{
                 {
                     LODCutoff = 100,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                 },
                 {
                     LODCutoff = 215,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                     AlbedoName = "xss0203_lod1_albedo.dds",
                     SpecularName = "xss0203_lod1_specteam.dds",
                 },
@@ -186,7 +181,6 @@ UnitBlueprint{
     LifeBarSize = 0.6,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -206,7 +200,6 @@ UnitBlueprint{
         MeshExtentsX = 0.6,
         MeshExtentsY = 0.65,
         MeshExtentsZ = 2.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,
@@ -292,11 +285,12 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             EffectiveRadius = 26,
             FireTargetLayerCapsTable = {
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 0,
             Label = "AntiTorpedo",
@@ -376,7 +370,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             ReTargetOnMiss = true,
             TargetPriorities = {
                 "MOBILE",

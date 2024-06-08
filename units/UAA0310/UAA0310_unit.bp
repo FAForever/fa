@@ -55,10 +55,10 @@ UnitBlueprint{
         "BUILTBYTIER3ENGINEER",
         "CANNOTUSEAIRSTAGING",
         "CARRIER",
+        "CQUEMOV",
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "HIGHALTAIR",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -77,6 +77,8 @@ UnitBlueprint{
         "SNIPEMODE",
         "TARGETCHASER",
         "VISIBLETORECON",
+        "WEAKANTINAVY",
+        "EXTERNALFACTORY"
     },
     Defense = {
         AirThreatLevel = 130,
@@ -139,6 +141,13 @@ UnitBlueprint{
         BuildableCategory = { "BUILTBYTIER3FACTORY AEON MOBILE AIR" },
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
+    ExternalFactory = {
+        SelectionSizeX = 4,
+        SelectionSizeZ = 4,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 2.7,
+        SelectionCenterOffsetZ = -2,
+    },
     Footprint = {
         MaxSlope = 0.25,
         SizeX = 20,
@@ -161,7 +170,7 @@ UnitBlueprint{
             RULEUCC_Transport = true,
         },
         ConstructionBar = true,
-        FactionName = "Aeon",
+    FactionName = "Aeon",
         Icon = "air",
         OrderOverrides = {
             RULEUCC_Transport = {
@@ -174,14 +183,13 @@ UnitBlueprint{
     },
     Intel = {
         RadarRadius = 200,
-        SonarRadius = 150,
+        SonarRadius = 148,
         VisionRadius = 70,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 12,
     LifeBarSize = 20,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = true,
             LAYER_Land = false,
@@ -197,7 +205,6 @@ UnitBlueprint{
         MeshExtentsX = 27,
         MeshExtentsY = 8,
         MeshExtentsZ = 27,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Air",
         SkirtOffsetX = -2,
         SkirtOffsetZ = -2,
@@ -318,7 +325,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -376,7 +383,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -434,7 +441,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -492,7 +499,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",

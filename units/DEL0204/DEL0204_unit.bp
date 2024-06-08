@@ -150,7 +150,6 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -165,7 +164,6 @@ UnitBlueprint{
         MaxSpeed = 2.9,
         MaxSpeedReverse = 0,
         MaxSteerForce = 7,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         StandUpright = true,
         TurnRadius = 0,
@@ -176,13 +174,13 @@ UnitBlueprint{
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.62,
-    SizeX = 0.7,
+    SizeX = 0.9,
     SizeY = 1,
     SizeZ = 1,
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 115,
     Transport = {
-        CanFireFromTransport = false,
+        CanFireFromTransport = true,
         TransportClass = 2,
     },
     Veteran = {
@@ -207,6 +205,7 @@ UnitBlueprint{
             EnergyDrainPerSecond = 0,
             EnergyRequired = 0,
             FireTargetLayerCapsTable = {
+                Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
@@ -274,6 +273,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Heavy Fragmentation Grenade Launcher",
             FireTargetLayerCapsTable = {
+                Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },

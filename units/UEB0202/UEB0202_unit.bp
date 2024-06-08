@@ -5,7 +5,6 @@ UnitBlueprint{
             "Target01",
             "Target02",
             "Target03",
-            "UEB0202",
         },
     },
     Audio = {
@@ -85,7 +84,7 @@ UnitBlueprint{
         BuildCostEnergy = 18000,
         BuildCostMass = 920,
         BuildRate = 40,
-        BuildTime = 2000,
+        BuildTime = 2300,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY UEF STRUCTURE AIR",
@@ -137,7 +136,6 @@ UnitBlueprint{
     LifeBarOffset = 1.65,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -148,8 +146,7 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
+        MaxGroundVariation = 1.1,
         MotionType = "RULEUMT_None",
         RaisedPlatforms = {
             --X,     Z,     height -- Offsets from center
@@ -177,7 +174,6 @@ UnitBlueprint{
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 8,
         SkirtSizeZ = 8,
-        TurnRate = 0,
     },
     SelectionSizeX = 3.2,
     SelectionSizeZ = 3.1,

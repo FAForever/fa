@@ -12,6 +12,70 @@ LOG("Client version: " .. tostring(ClientVersion))
 LOG("Game version: " .. tostring(GameVersion))
 LOG("Game type: " .. tostring(GameType))
 
+-------------------------------------------------------------------------------
+--#region Adjust process affinity and prioritity
+
+-- The rendering thread appears to pin itself to the first computing unit of
+-- a computer. The first computing unit is often also used by othersoftware,
+-- including the OS. Through empirical research the framerate of the game is a
+-- lot more consistent when we do not give it access to the first computing 
+-- unit.
+
+-- That is what this section helps us do. The game functions best when it has
+-- at least four computing units available. If we detect someone has 6 or more
+-- computing units then we take the game off the first compute unit.
+
+-- Note that we can not make the distinction between real computing units and
+-- computing units that originate from technology such as hyperthreading.
+
+local SetProcessPriority = rawget(_G, "SetProcessPriority")
+local GetProcessAffinityMask = rawget(_G, "GetProcessAffinityMask")
+local SetProcessAffinityMask = rawget(_G, "SetProcessAffinityMask")
+
+if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
+
+    -- priority values can be found at:
+    -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
+    local success = SetProcessPriority(0x00000080)
+    if success then
+        LOG("Process - priority set to: 'high'")
+    else
+        LOG("Process - Failed to adjust process priority, this may impact your framerate")
+    end
+
+    -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
+    local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
+    if success then
+        -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
+        -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
+        if systemAffinityMask >= 16777215 then
+            processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
+
+        -- system has 6 (logical) computing units or more, skip first two computing units
+        elseif (systemAffinityMask >= 63) then
+            processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
+        end
+
+        -- update the afinity mask
+        if processAffinityMask != systemAffinityMask then
+            local success = SetProcessAffinityMask(processAffinityMask);
+            if success then
+                LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+            else
+                LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+            end
+        else
+            LOG("Process - Failed to update the process affinity, this may impact your framerate")
+        end
+    else
+        LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
+    end
+else
+    LOG("Process - Failed to find process priority and affinity related functions, this may impact your framerate")
+end
+
+--#endregion
+
 -- upvalued performance
 local StringSub = string.sub
 local StringLower = string.lower
@@ -138,13 +202,6 @@ allowedAssetsScd["editor.scd"] = false      -- Unused
 allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
-
--- typical backwards compatible packages
-local allowedAssetsNxt = { }
-allowedAssetsNxt["kyros.nxt"] = true
-allowedAssetsNxt["advanced strategic icons.nxt"] = true
-allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
-allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
 local soundsBlocked = { }
@@ -570,7 +627,6 @@ else
 end
 
 -- load in .nxt / .nx5 / .scd files that we allow
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
 MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx5', allowedAssetsNxy)
 MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 

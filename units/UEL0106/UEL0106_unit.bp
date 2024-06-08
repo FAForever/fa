@@ -120,7 +120,6 @@ UnitBlueprint{
     LifeBarOffset = 0.1,
     LifeBarSize = 0.45,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -138,7 +137,6 @@ UnitBlueprint{
         MeshExtentsX = 0.45,
         MeshExtentsY = 0.55,
         MeshExtentsZ = 0.35,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         StandUpright = true,
         TurnRadius = 1,
@@ -149,7 +147,7 @@ UnitBlueprint{
     SelectionThickness = 1.2,
     SizeX = 0.7,
     SizeY = 0.7,
-    SizeZ = 0.7,
+    SizeZ = 0.9,
     StrategicIconName = "icon_bot1_directfire",
     StrategicIconSortPriority = 135,
     Transport = { CanFireFromTransport = true },
@@ -203,7 +201,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",

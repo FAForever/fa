@@ -500,11 +500,11 @@ function ColorRGB(r, g, b, a)
     --
     -- multiply by 256 instead of 255 to scale to the nearest integer correctly when truncated, but
     -- make sure we don't end up with 256 as a value by checking for `1.0`
-    r = r == 1.0 and 255 or (256 * r) ^ 0
-    g = g == 1.0 and 255 or (256 * g) ^ 0
-    b = b == 1.0 and 255 or (256 * b) ^ 0
+    r = r == 1.0 and 255 or math.floor(256 * r) 
+    g = g == 1.0 and 255 or math.floor(256 * g)
+    b = b == 1.0 and 255 or math.floor(256 * b)
     if a then
-        a = a == 1.0 and 255 or (256 * a) ^ 0
+        a = a == 1.0 and 255 or math.floor(256 * a)
         return ("%02X%02X%02X%02X"):format(a, r, g, b)
     end
     return ("%02X%02X%02X"):format(r, g, b)
@@ -523,11 +523,11 @@ end
 ---@return Color
 function ColorHSV(hue, sat, val, alpha)
     local r, g, b = HSVtoRGB(hue, sat, val)
-    r = r == 1.0 and 255 or (256 * r) ^ 0
-    g = g == 1.0 and 255 or (256 * g) ^ 0
-    b = b == 1.0 and 255 or (256 * b) ^ 0
+    r = r == 1.0 and 255 or math.floor(256 * r)
+    g = g == 1.0 and 255 or math.floor(256 * g)
+    b = b == 1.0 and 255 or math.floor(256 * b)
     if alpha then
-        alpha = alpha == 1.0 and 255 or (256 * alpha) ^ 0
+        alpha = alpha == 1.0 and 255 or math.floor(256 * alpha)
         return ("%02X%02X%02X%02X"):format(alpha, r, g, b)
     end
     return ("%02X%02X%02X"):format(r, g, b)
@@ -546,11 +546,11 @@ end
 ---@return Color
 function ColorHSL(hue, sat, lit, alpha)
     local r, g, b = HSLtoRGB(hue, sat, lit)
-    r = r == 1.0 and 255 or (256 * r) ^ 0
-    g = g == 1.0 and 255 or (256 * g) ^ 0
-    b = b == 1.0 and 255 or (256 * b) ^ 0
+    r = r == 1.0 and 255 or math.floor(256 * r)
+    g = g == 1.0 and 255 or math.floor(256 * g)
+    b = b == 1.0 and 255 or math.floor(256 * b)
     if alpha then
-        alpha = alpha == 1.0 and 255 or (256 * alpha) ^ 0
+        alpha = alpha == 1.0 and 255 or math.floor(256 * alpha)
         return ("%02X%02X%02X%02X"):format(alpha, r, g, b)
     end
     return ("%02X%02X%02X"):format(r, g, b)
@@ -567,11 +567,11 @@ end
 ---@return number g
 ---@return number b
 function ColorsRGB(r, g, b, a)
-    r = r == 1.0 and 255 or (256 * r) ^ 0
-    g = g == 1.0 and 255 or (256 * g) ^ 0
-    b = b == 1.0 and 255 or (256 * b) ^ 0
+    r = r == 1.0 and 255 or math.floor(256 * r)
+    g = g == 1.0 and 255 or math.floor(256 * g)
+    b = b == 1.0 and 255 or math.floor(256 * b)
     if a then
-        a = a == 1.0 and 255 or (256 * a) ^ 0
+        a = a == 1.0 and 255 or math.floor(256 * a)
         return a, r, g, b
     end
     return r, g, b

@@ -30,35 +30,38 @@ function EnableLoadBalance(enabled, unitThreshold)
     if enabled then
         ScenarioInfo.LoadBalance.UnitThreshold = unitThreshold or 50
     else
-        ForkThread(function()
-            --local timePerGroup = ScenarioInfo.DistributeTime/table.getn(ScenarioInfo.LoadBalance.SpawnGroups)
-
-            --Get time
-            local time = GetSystemTimeSecondsOnlyForProfileUse()
-
-            --Spawn bases
-            while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
-                local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
-                base:SpawnGroup(name, uncapturable, true)
-            end
-
-            --Spawn units
-            while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
-                local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups
-                    , 1))
-                CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
-            end
-
-            --Report time taken
-            LOG("Time to spawn: " .. (GetSystemTimeSecondsOnlyForProfileUse() - time))
-        end)
+        ForkThread(LoadBalanceThread)
     end
 end
 
+function LoadBalanceThread()
+    --local timePerGroup = ScenarioInfo.DistributeTime/table.getn(ScenarioInfo.LoadBalance.SpawnGroups)
+
+    --Get time
+    local time = GetSystemTimeSecondsOnlyForProfileUse()
+
+    --Spawn bases
+    while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
+        local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
+        base:SpawnGroup(name, uncapturable, true)
+    end
+
+    --Spawn units
+    while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
+        local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
+        CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
+    end
+
+    --Report time taken
+    LOG("Time to spawn: " .. (GetSystemTimeSecondsOnlyForProfileUse() - time))
+end
+
+---@deprecated # use marker utilities instead
 function GetMarkers()
     return Scenario.MasterChain._MASTERCHAIN_.Markers
 end
 
+---@deprecated # use marker utilities instead
 ---@param name MarkerChain
 ---@return MarkerChain[]
 function GetMarker(name)
@@ -1073,7 +1076,7 @@ end
 ---@return table|nil
 ---@return Platoon[]|nil
 function CreateArmyGroup(strArmy, strGroup, wreckage, balance)
-    LOG('CreateArmy group ' .. repr(strArmy))
+    LOG('CreateArmy group ' .. tostring(strArmy))
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)

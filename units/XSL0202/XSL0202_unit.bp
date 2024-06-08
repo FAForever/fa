@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xsl0202_desc>Assault Bot",
-    AI = {
-        TargetBones = { "Torso" },
-    },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0202_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Med', LodCutoff = 'UnitMove_LodCutoff' },
@@ -82,6 +79,7 @@ UnitBlueprint{
             },
         },
         AnimationWalk = "/units/xsl0202/xsl0202_Awalk.sca",
+        AnimationWalkRate = 1.5, 
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -180,7 +178,6 @@ UnitBlueprint{
     LifeBarOffset = 0.2,
     LifeBarSize = 0.95,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -193,24 +190,23 @@ UnitBlueprint{
         MaxAcceleration = 2.6,
         MaxBrake = 2.6,
         MaxSpeed = 2.6,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 2.6,
         MaxSteerForce = 3.1,
         MeshExtentsX = 1,
         MeshExtentsY = 0.5,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         TurnRadius = 2,
-        TurnRate = 45,
+        TurnRate = 90,
     },
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     CollisionOffsetZ = -0.05,
-    SizeX = 1.2,
-    SizeY = 1.1,
-    SizeZ = 1.2,
+    SizeX = 1.1,
+    SizeY = 1.2,
+    SizeZ = 1.1,
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },
@@ -265,7 +261,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",

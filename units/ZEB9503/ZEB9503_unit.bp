@@ -1,9 +1,11 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UEB0203',
-            'Center_Deck',
-            'Left_BottomDeck',
+            'B13',
+            'B08',
+            'B09',
+            'B12',
+            'Dock_Cover',
         },
     },
     Audio = {
@@ -100,12 +102,12 @@ UnitBlueprint {
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = 'Unit',
+                    ShaderName = 'UEFNavy',
                 },
                 {
                     AlbedoName = 'zeb9503_lod1_albedo.dds',
                     LODCutoff = 600,
-                    ShaderName = 'Unit',
+                    ShaderName = 'UEFNavy',
                     SpecularName = 'zeb9503_lod1_specteam.dds',
                 },
             },
@@ -118,7 +120,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zeb9503',
@@ -181,7 +183,6 @@ UnitBlueprint {
     LifeBarOffset = 4.75,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -192,8 +193,6 @@ UnitBlueprint {
         },
         CollisionOffsetX = 0,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         ComputeRollOffPoint = true,
         RollOffPoints = {
@@ -214,7 +213,6 @@ UnitBlueprint {
         SkirtOffsetZ = -1,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionMeshScaleX = 0.3,
     SelectionMeshScaleZ = 0.4,

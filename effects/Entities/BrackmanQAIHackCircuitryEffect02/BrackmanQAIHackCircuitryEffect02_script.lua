@@ -6,6 +6,8 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
+--- BrackmanQAIHackCircuitryEffect02, non-damaging
+---@class BrackmanQAIHackCircuitryEffect02 : EmitterProjectile
 BrackmanQAIHackCircuitryEffect02 = Class(EmitterProjectile) {
 	FxImpactTrajectoryAligned = true,
 	FxTrajectoryAligned= true,

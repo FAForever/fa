@@ -3,7 +3,7 @@
 ---@class moho.entity_methods : Destroyable
 local Entity = {}
 
----@alias EntityId number
+---@alias EntityId string
 
 ---@class CollisionExtents
 ---@field Max Vector
@@ -281,9 +281,10 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
----@param instigator? Unit
----@param damageType? DamageType
----@param excessDamageRatio? number
+---@overload fun(): 
+---@param instigator Unit
+---@param damageType DamageType
+---@param excessDamageRatio number
 function Entity:Kill(instigator, damageType, excessDamageRatio)
 end
 

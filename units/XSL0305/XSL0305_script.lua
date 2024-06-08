@@ -8,53 +8,46 @@
 
 local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local SLandUnitOnCreate = SLandUnit.OnCreate
+local SLandUnitOnScriptBitSet = SLandUnit.OnScriptBitSet
+local SLandUnitOnScriptBitClear = SLandUnit.OnScriptBitClear
 
 local SDFSihEnergyRifleNormalMode = SeraphimWeapons.SDFSniperShotNormalMode
 local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
+
 ---@class XSL0305 : SLandUnit
 ---@field TrashSniperFx TrashBag
+---@field IsChangingMoveMode boolean
+---@field IsSniperFiringMode boolean # Whether the sniper mode is active for next shot
 XSL0305 = ClassUnit(SLandUnit) {
     Weapons = {
         -- used for both modes of operation
         MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {
-            -- used to determine the reload time after a shot (the next shot's RoF should be used)
-            ---@param self SDFSniperShotNormalMode
-            GetWeaponRoF = function(self)
-                local baseRoF = self.NextBlueprint.RateOfFire or self.Blueprint.RateOfFire
-                return baseRoF / (self.AdjRoFMod or 1)
-            end,
-
-            RackSalvoFireReadyState = State(SDFSihEnergyRifleNormalMode.RackSalvoFireReadyState) {
-                Main = function(self)
-                    -- it will keep looping through this state - we only want to check the first
-                    -- time (immediately after a shot)
-                    if self.FiredAShot then
-                        self.FiredAShot = nil
-                        local scheduledMode = self.unit.ScheduledForSniperMode
-                        if scheduledMode ~= nil then
-                            self.unit:SetSniperMode(scheduledMode)
-                            self.unit.ScheduledForSniperMode = nil
-                        end
-                    end
-                    SDFSihEnergyRifleNormalMode.RackSalvoFireReadyState.Main(self)
-                end,
-            },
-
             RackSalvoFiringState = State(SDFSihEnergyRifleNormalMode.RackSalvoFiringState) {
                 Main = function(self)
-                    self.FiredAShot = true
+                    local unit = self.unit
+                    if unit.IsSniperFiringMode ~= nil then
+                        unit:ScheduleMovementChange(0, true)
+                        unit:ScheduleMovementChange(1 / self:GetWeaponRoF(), false)
+                    end
                     SDFSihEnergyRifleNormalMode.RackSalvoFiringState.Main(self)
                 end,
-            },
+            }
         },
+
         -- kind of a dummy weapon that carries the data of the sniper mode for the main gun
         SniperGun = ClassWeapon(SDFSihEnergyRifleSniperMode) {},
     },
 
     ---@param self XSL0305
     OnCreate = function(self)
-        SLandUnit.OnCreate(self)
+        SLandUnitOnCreate(self)
+
         self:SetWeaponEnabledByLabel("SniperGun", false)
         self.TrashSniperFx = TrashBag()
     end,
@@ -62,73 +55,84 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param self XSL0305
     ---@param bit integer
     OnScriptBitSet = function(self, bit)
-        SLandUnit.OnScriptBitSet(self, bit)
+        SLandUnitOnScriptBitSet(self, bit)
+
         if bit == 1 then
-            self:ScheduleSniperMode(true)
+            self:SetSniperMode(true)
         end
     end,
 
     ---@param self XSL0305
     ---@param bit integer
     OnScriptBitClear = function(self, bit)
-        SLandUnit.OnScriptBitClear(self, bit)
+        SLandUnitOnScriptBitClear(self, bit)
+
         if bit == 1 then
-            self:ScheduleSniperMode(false)
+            self:SetSniperMode(false)
         end
     end,
 
     ---@param self XSL0305
-    ---@param mode boolean
-    ScheduleSniperMode = function(self, mode)
-        local weapon = self:GetWeaponByLabel("MainGun")
-        -- The engine needs the next rate of fire set before the projectile launches and there
-        -- doesn't seem to be any other time we get before that happens to set it.
-        local nextBp
-        if mode then
-            nextBp = self:GetWeaponByLabel("SniperGun").Blueprint
-        else
-            nextBp = weapon:GetBlueprint()
+    ---@param delaySeconds number
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    ScheduleMovementChange = function(self, delaySeconds, mode)
+        if delaySeconds == 0 then
+            self:SwitchMoveMode(mode)
+        elseif self.IsChangingMoveMode == nil then
+            self.Trash:Add(ForkThread(self.ChangeMoveModeThread, self, delaySeconds, mode))
         end
-        weapon:ChangeRateOfFire(nextBp.RateOfFire)
-        weapon.NextBlueprint = nextBp -- keep around to properly get the RoF of the next shot
+    end,
 
-        if weapon:GetFireClockPct() == 1 then -- idle, ready to switch now
-            self:SetSniperMode(mode)
+    ---@param self XSL0305
+    ---@param delaySeconds number
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    ChangeMoveModeThread = function(self, delaySeconds, mode)
+        self.IsChangingMoveMode = true
+        WaitTicks(10 * delaySeconds + 1)
+        self:SwitchMoveMode(mode)
+        self.IsChangingMoveMode = nil
+    end,
+
+    ---@param self XSL0305
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    SwitchMoveMode = function(self, mode)
+        local blueprintPhysics = self.Blueprint.Physics
+
+        local speedMult = blueprintPhysics.LandSpeedMultiplier or 1 -- left for compatability
+        self.TrashSniperFx:Destroy()
+
+        if mode then
+            speedMult = speedMult * (blueprintPhysics.SniperModeSpeedMultiplier or 0.75)
+            self:SetSpeedMult(speedMult)
+            self.TrashSniperFx:Add(
+                CreateAttachedEmitter(
+                    self, "XSL0305", self.Army,
+                    "/effects/emitters/seraphim_being_built_ambient_01_emit.bp"
+                )
+            )
         else
-            if self.ScheduledForSniperMode ~= nil and self.ScheduledForSniperMode ~= mode then
-                self.ScheduledForSniperMode = nil -- cancel a double toggle
-                weapon.NextBlueprint = nil
-            else
-                self.ScheduledForSniperMode = mode
-            end
+            self:SetSpeedMult(speedMult)
         end
     end,
 
     ---@param self XSL0305
     ---@param mode boolean
     SetSniperMode = function(self, mode)
-        local speedMult = self.Blueprint.Physics.LandSpeedMultiplier or 1 -- left for compatability
         local label
         if mode then
             label = "SniperGun"
-            speedMult = speedMult * (self.Blueprint.Physics.SniperModeSpeedMultiplier or 0.75)
-            if not self.TrashSniperFx[1] then
-                self.TrashSniperFx:Add(CreateAttachedEmitter(self, "XSL0305", self.Army,
-                        "/effects/emitters/seraphim_being_built_ambient_01_emit.bp"))
-            end
+            self.IsSniperFiringMode = true
         else
             label = "MainGun"
-            self.TrashSniperFx:Destroy()
+            self.IsSniperFiringMode = nil
         end
 
-        self:SetSpeedMult(speedMult)
-
         local weapon = self:GetWeaponByLabel("MainGun")
-        local bp = weapon.NextBlueprint or self:GetWeaponByLabel(label):GetBlueprint()
+        local bp = self:GetWeaponByLabel(label):GetBlueprint()
+
         -- a lot of the firing sequence relies on the stored blueprint - we'll store the current
         -- weapon blueprint so that it works
         weapon.Blueprint = bp
-        weapon.NextBlueprint = nil
         weapon.FxMuzzleFlash = self.Weapons[label].FxMuzzleFlash
         weapon.damageTableCache = false
         weapon:ChangeProjectileBlueprint(bp.ProjectileId)
@@ -146,5 +150,5 @@ XSL0305 = ClassUnit(SLandUnit) {
 }
 TypeClass = XSL0305
 
---- Kept for mod support
+--- backwards compatibility with mods
 local EffectUtil = import("/lua/effectutilities.lua")

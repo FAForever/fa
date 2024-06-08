@@ -104,6 +104,17 @@ unitkeygroups = {
 
         "T2_Cruiser",
     },
+    ["Cycle_Templates"] = {
+        "_cycleTemplates", -- Special :)
+
+        "T2_Hover_Tank",
+        "T2_Assault_Tank",
+        "T2_Amphibious_Tank",
+
+        "T2_Gunship",
+
+        "T2_Cruiser",
+    },
     ["EngyStation"] = {
         "Engineering_Station",
 
@@ -672,6 +683,7 @@ unitkeygroups = {
     },
     ["T3_Shield_Disruptor"] = {
     "dal0310",
+    "srl0310",
     },
     ["T2_Fighter/Bomber"] = {
         "dea0202",

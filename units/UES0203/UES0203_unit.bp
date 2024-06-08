@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC ues0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 30,
-        TargetBones = {
-            "Spinner",
-            "UES0203",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'UES',        Cue = 'UES0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -40,6 +36,7 @@ UnitBlueprint{
         "TECH1",
         "UEF",
         "VISIBLETORECON",
+        "WEAKDIRECTFIRE"
     },
     Defense = {
         AirThreatLevel = 0,
@@ -85,11 +82,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0203_lod1_albedo.dds",
                     SpecularName = "ues0203_lod1_specteam.dds",
                 },
@@ -186,7 +183,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -206,7 +202,6 @@ UnitBlueprint{
         MeshExtentsX = 5,
         MeshExtentsY = 0.65,
         MeshExtentsZ = 2.15,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,

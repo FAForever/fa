@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC uas0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 40,
-        TargetBones = {
-            "UAS0203",
-            "upper_target",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'UAS',        Cue = 'UAS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -23,7 +19,6 @@ UnitBlueprint{
     Categories = {
         "AEON",
         "ANTINAVY",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER1FACTORY",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
@@ -92,11 +87,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0203_lod1_albedo.dds",
                     SpecularName = "uas0203_lod1_specteam.dds",
                 },
@@ -196,7 +191,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -216,7 +210,6 @@ UnitBlueprint{
         MeshExtentsX = 0.6,
         MeshExtentsY = 0.65,
         MeshExtentsZ = 2.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,

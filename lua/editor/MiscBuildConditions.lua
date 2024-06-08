@@ -41,39 +41,28 @@ end
 ---@param layerPref string
 ---@return true | nil
 function IsAIBrainLayerPref(aiBrain, layerPref)
-    if layerPref == aiBrain.LayerPref then
-        return true
-    end
+	return layerPref == aiBrain.LayerPref
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumber(aiBrain, num)
-    local missionNumber = ScenarioInfo.MissionNumber
-    if missionNumber and missionNumber == num then
-        return true
-    end
+	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber == num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumberGreaterOrEqual(aiBrain, num)
-    local missionNumber = ScenarioInfo.MissionNumber
-    if missionNumber and missionNumber >= num then
-        return true
-    end
+	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber >= num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumberLessOrEqual(aiBrain, num)
-    local missionNumber = ScenarioInfo.MissionNumber
-    if missionNumber and missionNumber <= num then
-        return true
-    end
+	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber <= num
 end
 
 ---@param aiBrain AIBrain unused
@@ -96,30 +85,21 @@ end
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyEqual(aiBrain, diffLevel)
-    local difficulty = ScenarioInfo.Options.Difficulty
-    if difficulty and difficulty == diffLevel then
-        return true
-    end
+	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty == diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyGreaterOrEqual(aiBrain, diffLevel)
-    local difficulty = ScenarioInfo.Options.Difficulty
-    if difficulty and difficulty >= diffLevel then
-        return true
-    end
+	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty >= diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyLessOrEqual(aiBrain, diffLevel)
-    local difficulty = ScenarioInfo.Options.Difficulty
-    if difficulty and difficulty <= diffLevel then
-        return true
-    end
+	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty <= diffLevel
 end
 
 ---@param aiBrain AIBrain unused
@@ -393,6 +373,20 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
         return false
     end
 
+    return true
+end
+
+function ReclaimEnabledOnBrain(aiBrain)
+    -- this condition won't work without a reference to the reclaim grid
+    if aiBrain.ReclaimFailCounter > 10 then
+        local currentTime = GetGameTimeSeconds()
+        if aiBrain.ReclaimFailTimeStamp + 180 < currentTime then
+            aiBrain.ReclaimFailCounter = 0
+            aiBrain.ReclaimFailTimeStamp = 0
+        else
+            return false
+        end
+    end
     return true
 end
 

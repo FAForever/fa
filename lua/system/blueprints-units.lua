@@ -25,6 +25,17 @@ local BlueprintNameToIntel = {
     SonarStealthFieldRadius = 'SonarStealthField',
 }
 
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
+}
+
 local LabelToVeterancyUse = {
     ['DeathWeapon'] = true,
     ['DeathImpact'] = true,
@@ -130,16 +141,6 @@ local function PostProcessUnit(unit)
 
     unit.CategoriesHash[unit.BlueprintId] = true
 
-    -- create hash tables for quick lookup
-    unit.DoNotCollideListCount = 0
-    unit.DoNotCollideListHash = {}
-    if unit.DoNotCollideList then
-        unit.DoNotCollideListCount = table.getn(unit.DoNotCollideList)
-        for _, category in unit.DoNotCollideList do
-            unit.DoNotCollideListHash[category] = true
-        end
-    end
-
     -- sanitize guard scan radius
 
     -- The guard scan radius is used when:
@@ -156,8 +157,9 @@ local function PostProcessUnit(unit)
     local isLand = unit.CategoriesHash['LAND']
     local isAir = unit.CategoriesHash['AIR']
     local isBomber = unit.CategoriesHash['BOMBER']
-    local isGunship = unit.CategoriesHash['GUNSHIP']
+    local isGunship = unit.CategoriesHash['GROUNDATTACK'] and isAir and (not isBomber)
     local isTransport = unit.CategoriesHash['TRANSPORTATION']
+    local isPod = unit.CategoriesHash['POD']
 
     local isTech1 = unit.CategoriesHash['TECH1']
     local isTech2 = unit.CategoriesHash['TECH2']
@@ -223,6 +225,7 @@ local function PostProcessUnit(unit)
     if isAir and not (
         isExperimental or
             isStructure or
+            isPod or
             (isTransport and not isGunship)-- uef tech 2 gunship is also a transport :)
         ) then
         unit.Footprint = unit.Footprint or {}
@@ -285,6 +288,12 @@ local function PostProcessUnit(unit)
                         , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeZ = 0.1 * speed
                 end
+
+                if unit.SizeY < 0.5 then
+                    WARN(string.format("Overriding the y axis of collision box of unit ( %s ), it should be atleast 0.5 to guarantee proper functioning gunships"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeY = 0.5
+                end
             end
         end
     end
@@ -329,31 +338,29 @@ local function PostProcessUnit(unit)
         ---@type UnitIntelStatus
         local status = {}
 
-        -- life is good, intel is funded by the government
+        -- all of the unit's intel is free due to a bp flag or 0 maintenance cost
         local allIntelIsFree = false
-        if intelBlueprint.FreeIntel or (
-            not enhancementBlueprints and
-                (
-                (not economyBlueprint) or
-                    (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
-                    economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+        if intelBlueprint.FreeIntel
+            or (
+                not enhancementBlueprints
+                and (
+                    not economyBlueprint
+                    or not economyBlueprint.MaintenanceConsumptionPerSecondEnergy
+                    or economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
                 )
-            ) then
+            )
+        then
             allIntelIsFree = true
             status.AllIntelMaintenanceFree = {}
         end
 
-        -- special case: unit has intel that is considered free
-        if intelBlueprint.ActiveIntel then
-            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or {}
-            for intel, _ in intelBlueprint.ActiveIntel do
+        -- special case: unit has specific intel types that are considered free
+        local activeIntel = intelBlueprint.ActiveIntel
+        if activeIntel then
+            status.AllIntelMaintenanceFree = {}
+            for intel, _ in activeIntel do
                 status.AllIntelMaintenanceFree[intel] = true
             end
-        end
-
-        -- special case: unit has enhancements and therefore can have any intel type
-        if enhancementBlueprints then
-            status.AllIntelFromEnhancements = {}
         end
 
         -- usual case: find all remaining intel
@@ -362,7 +369,7 @@ local function PostProcessUnit(unit)
 
             if value == true or value > 0 then
                 local intel = BlueprintNameToIntel[name]
-                if intel then
+                if intel and not activeIntel[intel] then
                     if allIntelIsFree then
                         status.AllIntelMaintenanceFree[intel] = true
                     else
@@ -373,7 +380,7 @@ local function PostProcessUnit(unit)
         end
 
         -- check if we have any intel
-        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints) then
+        if not ( table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) ) then
             -- cache it
             status.AllIntelDisabledByEvent = {}
             status.AllIntelRecharging = {}
@@ -433,7 +440,7 @@ local function PostProcessUnit(unit)
             if category then
                 damagePerRangeCategory[category] = damagePerRangeCategory[category] + dps
             else
-                if weapon.WeaponCategory != 'Death' then
+                if weapon.WeaponCategory ~= 'Death' then
                     -- WARN("Invalid weapon on " .. unit.BlueprintId)
                 end
             end
@@ -505,12 +512,155 @@ local function PostProcessUnit(unit)
         unit.Interface = unit.Interface or { }
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
+
+    ---------------------------------------------------------------------------
+    --#region (Re) apply the ability to land on water
+
+    -- there was a bug with Rover drones (from the kennel) when they interact
+    -- with naval factories. They would first move towards a 'free build 
+    -- location' when assisting a naval factory. As they can't land on water, 
+    -- that build location could be far away at the shore.
+
+    -- this doesn't fix the problem itself, but it does alleviate it. At least
+    -- the drones do not need to go to the shore anymore, they now look for
+    -- a 'free build location' near the naval factory on water
+
+    if isAir and (isTransport or isGunship or isPod) and (not isExperimental) then
+        table.insert(unit.Categories, "CANLANDONWATER")
+        unit.CategoriesHash["CANLANDONWATER"] = true
+    end
+
+    --#endregion
+
+    -- Override the default 1 build rate given to units
+    -- so that rollover unit view can work with Mantis.
+    if unit.Economy and not unit.Economy.BuildRate then
+        unit.Economy.BuildRate = 0
+    end
+end
+
+---@param allBlueprints BlueprintsTable
+---@param unit UnitBlueprint
+function PostProcessUnitWithExternalFactory(allBlueprints, unit)
+    -- create a new unit that represents the external factory
+    ---@type UnitBlueprint
+    local efBlueprint = table.deepcopy(allBlueprints.Unit["zxa0002"])
+
+    -- not available when reloading using program argument 'EnableDiskWatch'
+    if efBlueprint then
+        local efBlueprintId = string.lower(unit.BlueprintId .. "ef")
+        allBlueprints.Unit[efBlueprintId] = efBlueprint
+
+        -- replace properties of external factory
+        efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
+        efBlueprint.General.Icon = unit.General.Icon
+        efBlueprint.General.FactionName = unit.General.FactionName
+        efBlueprint.General.UnitName = unit.General.UnitName
+        efBlueprint.FactionCategory = unit.FactionCategory
+        efBlueprint.LayerCategory = unit.LayerCategory
+        efBlueprint.BlueprintId = efBlueprintId
+        efBlueprint.BaseBlueprintId = unit.BlueprintId
+        efBlueprint.ScriptClass = 'ExternalFactoryUnit'
+        efBlueprint.ScriptModule = '/lua/defaultunits.lua'
+        efBlueprint.CategoriesHash[unit.FactionCategory] = true
+        efBlueprint.CategoriesHash[unit.LayerCategory] = true
+        efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
+        efBlueprint.SelectionSizeX = unit.ExternalFactory.SelectionSizeX or (0.95 * unit.SelectionSizeX)
+        efBlueprint.SelectionSizeZ = unit.ExternalFactory.SelectionSizeZ or (0.25 * unit.SelectionSizeZ)
+        efBlueprint.SelectionCenterOffsetX = unit.ExternalFactory.SelectionCenterOffsetX or 0
+        efBlueprint.SelectionCenterOffsetY = unit.ExternalFactory.SelectionCenterOffsetY or 0
+        efBlueprint.SelectionCenterOffsetZ = unit.ExternalFactory.SelectionCenterOffsetZ or (0.35 * unit.SelectionSizeZ)
+        efBlueprint.SelectionMeshScaleX = unit.ExternalFactory.SelectionMeshScaleX or 1
+        efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
+        efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
+        efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
+
+        -- add our select button override
+        if not efBlueprint.General.OrderOverrides then
+            efBlueprint.General.OrderOverrides = {}
+        end
+        efBlueprint.General.OrderOverrides.ExFac = {
+            bitmapId = 'exfacunit',
+            helpText = 'external_factory_unit',
+        }
+
+        -- add order overrides to carriers
+        if unit.CategoriesHash['CARRIER'] then
+
+            -- override our transport function to display what we want
+            -- and exhibit new behavior
+            if not unit.General.OrderOverrides then
+                unit.General.OrderOverrides = {}
+            end
+
+            unit.General.OrderOverrides.RULEUCC_Transport = {
+                bitmapId = 'deploy',
+                helpText = 'auto_deploy',
+                behavior = 'AutoDeployBehavior',
+                initialStateFunc = 'AutoDeployInit',
+                statToggle = 'AutoDeploy',
+            }
+
+            -- add the toggle so it can be flipped to begin with
+            -- but add an order override to remove it from our orders table
+            if not unit.General.StatToggles then
+                unit.General.StatToggles = {}
+            end
+            unit.General.StatToggles.AutoDeploy = true
+        end
+
+        -- remove properties of the seed unit
+        unit.Categories = table.unhash(unit.CategoriesHash)
+    end
+end
+
+---@param unit UnitBlueprint
+function TestIntelValues(unit)
+
+    ---------------------------------------------------------------------------
+    --#region Sanity check for intel values
+
+    -- Intel is visualised as a circle but it works in squares/blocks. You can
+    -- view the intel that a unit produces via a console command 'dbg Radar'.
+    --
+    -- It appears the engine divides the radius by the grid size and floors the
+    -- result. Therefore not all intel values and/or changes are actually 
+    -- meaningful. With this code we check all intel values and point out those
+    -- that are not accurate.
+
+    if unit.Intel then
+        for nameIntel, radius in unit.Intel do
+            local ogrids = BlueprintIntelNameToOgrids[nameIntel]
+            if ogrids then
+                local radiusOnGrid = math.floor(radius / ogrids) * ogrids
+                if radiusOnGrid ~= radius then
+                    WARN(
+                        string.format(
+                            "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d",
+                            tostring(unit.BlueprintId), radius, nameIntel, ogrids, radiusOnGrid, radiusOnGrid + ogrids
+                            )
+                        )
+                end
+            end
+        end
+    end
 end
 
 --- Post-processes all units
+---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
-function PostProcessUnits(units)
+function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        TestIntelValues(unit)
+    end
+
+    for _, unit in units do
+        if unit.CategoriesHash['EXTERNALFACTORY'] then
+            PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
     end
 end

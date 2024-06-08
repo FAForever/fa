@@ -2,9 +2,10 @@ UnitBlueprint{
     Description = "<LOC urb0203_desc>Naval Factory HQ",
     AI = {
         TargetBones = {
-            "URB0203",
+            "B03", 
             "B08",
-            "Right_Exhaust01",
+            "B28",
+            "B14",
         },
     },
     Audio = {
@@ -49,6 +50,7 @@ UnitBlueprint{
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/urb0203/urb0203_aupgrade.sca",
+        AnimationBuild = "/units/urb0203/urb0203_aBuild.sca",
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
             Water = {
@@ -66,14 +68,14 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "/units/urb0103/URB0103_Albedo.dds",
                     NormalsName = "/units/urb0103/URB0103_NormalsTS.dds",
                     SpecularName = "/units/urb0103/URB0103_SpecTeam.dds",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "/units/urb0103/URB0103_lod1_Albedo.dds",
                     NormalsName = "/units/urb0103/URB0103_lod1_NormalsTS.dds",
                     SpecularName = "/units/urb0103/URB0103_lod1_SpecTeam.dds",
@@ -86,7 +88,7 @@ UnitBlueprint{
         BuildCostEnergy = 10000,
         BuildCostMass = 2000,
         BuildRate = 90,
-        BuildTime = 3600,
+        BuildTime = 3200,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY CYBRAN MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY CYBRAN STRUCTURE NAVAL",
@@ -135,7 +137,6 @@ UnitBlueprint{
     LifeBarOffset = 6,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -146,8 +147,6 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = -3,    Y = 0,     Z = -8 },
@@ -157,7 +156,6 @@ UnitBlueprint{
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionMeshUseTopAmount = 0.15,
     SelectionSizeX = 2.6,
@@ -165,10 +163,10 @@ UnitBlueprint{
     SelectionThickness = 0.21,
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
+    CollisionOffsetZ = -1,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 10,
+    SizeZ = 13,
     StrategicIconName = "icon_factoryhq2_naval",
     StrategicIconSortPriority = 215,
     Wreckage = {
