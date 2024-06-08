@@ -53,10 +53,6 @@ function SelectHighestEngineerAndAssist()
         local tech2Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH2 - categories.COMMAND, selection)
         local tech1Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH1 - categories.COMMAND, selection)
 
-        reprsl(tech3EngineersAndSACUs)
-        reprsl(tech2Engineers)
-        reprsl(tech1Engineers)
-
         local highestTechEngiesAndSacusOfMajorityFaction = nil
         if next(tech3EngineersAndSACUs) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3EngineersAndSACUs)
