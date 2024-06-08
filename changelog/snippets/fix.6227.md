@@ -1,0 +1,1 @@
+- (#6227) Slightly increase the hitboxes of the Mantis, Sky Slammer, Hoplite and Zthuee to fix them being able to evade beam weapons sometimes.
