@@ -49,17 +49,21 @@ function SelectHighestEngineerAndAssist()
 
     if selection then
 
-        local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
-        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
-        local tech3AndSACUs = EntityCategoryFilterDown((categories.SUBCOMMANDER + categories.TECH3) - categories.COMMAND, selection)
+        local tech3EngineersAndSACUs = EntityCategoryFilterDown((categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - categories.COMMAND, selection)
+        local tech2Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH2 - categories.COMMAND, selection)
+        local tech1Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH1 - categories.COMMAND, selection)
+
+        reprsl(tech3EngineersAndSACUs)
+        reprsl(tech2Engineers)
+        reprsl(tech1Engineers)
 
         local highestTechEngiesAndSacusOfMajorityFaction = nil
-        if next(tech3AndSACUs) then
-            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3AndSACUs)
-        elseif next(tech2) then
-            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech2)
-        elseif next(tech1) then
-            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1)
+        if next(tech3EngineersAndSACUs) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3EngineersAndSACUs)
+        elseif next(tech2Engineers) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech2Engineers)
+        elseif next(tech1Engineers) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
         else
             -- do nothing
         end
