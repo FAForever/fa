@@ -844,17 +844,21 @@ end
 --- Transfer units to the player who killed me
 ---@param self AIBrain
 local function TransferUnitsToKiller(self)
-    local selfIndex = self:GetArmyIndex()
-    local killerIndex = 0
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+
     if units and not table.empty(units) then
+        local killerIndex
+
         if ScenarioInfo.Options.Victory == 'demoralization' then
-            killerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
-            TransferUnitsToBrain(self, { ArmyBrains[killerIndex] }, true, nil, "TransferToKiller")
+            killerIndex = self.CommanderKilledBy
         else
-            killerIndex = ArmyBrains[selfIndex].LastUnitKilledBy or selfIndex
+            killerIndex = self.LastUnitKilledBy
+        end
+
+        if killerIndex then
             TransferUnitsToBrain(self, { ArmyBrains[killerIndex] }, true, nil, "TransferToKiller")
         end
+        -- if not transferred, units will simply be killed
     end
     WaitSeconds(1)
 end
