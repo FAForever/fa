@@ -1,1 +1,1 @@
-- (#6202) Increase the Energy Maintenance Cost from 30 > 45 for the Cybran T2 Sub (Barracuda). This change makes it more of a choice to enable the stealth on the barracuda, similar to how it is for the Cybran ASF.
+- (#6202) Increase the energy maintenance cost of the Barracuda (Cybran T2 Sub) from 30 to 45. This makes it more of a choice to enable the stealth, similar to how it is for the Cybran ASF.
