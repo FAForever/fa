@@ -49,9 +49,13 @@ end
 ---@param cache? Vector[]
 ---@return Vector[]
 function ComputeAttackLocations(count, radius, cx, cy, cz, cache)
+
+    -- Originates from:
+    -- https://stackoverflow.com/questions/28567166/uniformly-distribute-x-points-inside-a-circle
+
     cache = cache or {}
 
-    local b = MathRound(2 * MathSqrt(count))
+    local b = 0
 
     phi = (MathSqrt(5) + 1) / 2 -- golden ratio
 

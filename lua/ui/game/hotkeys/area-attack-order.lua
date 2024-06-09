@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2024 FAForever
 --**
@@ -21,6 +20,10 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local UIRenderableCircle = import('/lua/ui/game/renderable/circle.lua').UIRenderableCircle
+local ComputeAttackLocations = import("/lua/shared/commands/area-attack-order.lua").ComputeAttackLocations
+local UserDecal = import("/lua/user/userdecal.lua").UserDecal
+
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 local MaximumWidth = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
 local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
@@ -30,7 +33,7 @@ local MinimumDistance = 4
 
 ---@param value number
 SetMinimumDistance = function(value)
-    if type(value) != 'number' then
+    if type(value) ~= 'number' then
         error('Expected a number, got ' .. type(value))
     end
 
@@ -42,7 +45,7 @@ local DragKeycode = 'LBUTTON'
 
 ---@param value Keycode
 SetDragKeyCode = function(value)
-    if type(value) != 'string' then
+    if type(value) ~= 'string' then
         error('Expected a string, got ' .. type(value))
     end
 
@@ -64,7 +67,8 @@ AreaAttackOrder = function(command)
 
     local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
-    RadialDragger(
+    ---@type UIRadialDragger
+    local dragger = RadialDragger(
         worldView,
         AreaReclaimOrderCallback,
         DragKeycode,
@@ -73,4 +77,45 @@ AreaAttackOrder = function(command)
         MaximumDistance
     )
 
+    local subDecals = {}
+    for k = 1, table.getn(command.Units) do
+        local unit = command.Units[k]
+        local unitBlueprint = unit:GetBlueprint()
+        local unitBlueprintDamageRadius = 12
+
+        local decal = UserDecal()
+        decal:SetTexture("/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds")
+        decal:SetScale({ 1, 1, 1 })
+        decal:SetPosition({0, 0, 0})
+        subDecals[k] = dragger.Trash:Add(decal)
+    end
+
+    dragger.OnMove = function(self, x, y)
+
+
+        local width = self.Width
+        local view = self.WorldView
+
+        local ps = self.Origin
+        local pe = UnProject(view, { x, y })
+
+        local dx = ps[1] - pe[1]
+        local dz = ps[3] - pe[3]
+        local distance = math.sqrt(dx * dx + dz * dz)
+
+        local targets = ComputeAttackLocations(table.getn(command.Units), distance, command.Target.Position[1],
+            command.Target.Position[2], command.Target.Position[3])
+
+        for k = 1, table.getn(subDecals) do
+            subDecals[k]:SetPosition(targets[k])
+        end
+
+        if distance > self.MinimumDistance then
+            self.ShapeStart:Show()
+            self.ShapeStart.Size = distance
+        else
+            -- try to hide it
+            self.ShapeStart:Hide()
+        end
+    end
 end

@@ -98,7 +98,7 @@ local function RadiusDecalFunction(predicate)
     if maxRadius > 0 then
         return {
             {
-                texture = "/textures/ui/common/game/AreaTargetDecal/weapon_icon_small.dds",
+                texture = "/textures/ui/common/game/AreaTargetDecal/area-damage-white.png",
                 scale = maxRadius * 2
             }
         }
