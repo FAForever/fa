@@ -1,7 +1,6 @@
 UnitBlueprint{
     Description = "<LOC url0111_desc>Mobile Missile Launcher",
     AI = {
-        InitialAutoMode = true,
         TargetBones = { "Launcher" },
     },
     Audio = {

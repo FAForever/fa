@@ -231,11 +231,11 @@ mapFilters = {
             SelectedKey = 1,
             Filters = {
                 function(scenInfo)
-                    if CheckMapIsOfficial(scenInfo) then
-                        return true
-                    end
                     if scenInfo.Outdated then
                         return false
+                    end
+                    if CheckMapIsOfficial(scenInfo) then
+                        return true
                     end
                     local version = scenInfo.map_version or 0
                     for _,comparisionlist in scenarios do

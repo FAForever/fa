@@ -1,1 +1,1 @@
-- (#6154) Improve the treadmarks of the Ythotha
+- (#6154) Improve the treadmarks of the Ythotha.

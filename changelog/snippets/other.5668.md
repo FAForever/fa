@@ -1,1 +1,1 @@
-- (#5668, #6066) Rework Seraphim weapon modules
+- (#5668, #6066) Rework Seraphim weapon modules.

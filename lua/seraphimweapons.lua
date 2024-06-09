@@ -5,6 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------------------------
 
+SAALightningWeapon = import("/lua/sim/weapons/seraphim/SAALightningWeapon.lua").SAALightningWeapon
 SANAnaitTorpedo = import('/lua/sim/weapons/seraphim/SANAnaitTorpedo.lua').SANAnaitTorpedo
 SDFExperimentalPhasonProj = import('/lua/sim/weapons/seraphim/SDFExperimentalPhasonProj.lua').SDFExperimentalPhasonProj
 SDFAireauWeapon = import('/lua/sim/weapons/seraphim/SDFAireauWeapon.lua').SDFAireauWeapon
@@ -52,6 +53,7 @@ SDFHeavyQuarnonCannon = import('/lua/sim/weapons/seraphim/SDFHeavyQuarnonCannon.
 SDFSniperShotNormalMode = import('/lua/sim/weapons/seraphim/SDFSniperShotNormalMode.lua').SDFSniperShotNormalMode
 SDFSniperShotSniperMode = import('/lua/sim/weapons/seraphim/SDFSniperShotSniperMode.lua').SDFSniperShotSniperMode
 SB0OhwalliExperimentalStrategicBombWeapon = import('/lua/sim/weapons/seraphim/SB0OhwalliExperimentalStrategicBombWeapon.lua').SB0OhwalliExperimentalStrategicBombWeapon
+SAALightningWeapon = import("/lua/sim/weapons/seraphim/SAALightningWeapon.lua").SAALightningWeapon
 
 --- Kept Mod Support
 local WeaponFile = import("/lua/sim/defaultweapons.lua")

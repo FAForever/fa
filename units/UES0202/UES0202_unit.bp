@@ -3,7 +3,6 @@ UnitBlueprint{
     AI = {
         AttackAngle = 90,
         GuardReturnRadius = 30,
-        InitialAutoMode = true,
         TargetBones = {
             "UES0202",
             "Back_Wake",

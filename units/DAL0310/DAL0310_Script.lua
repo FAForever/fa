@@ -14,8 +14,10 @@ DAL0310 = ClassUnit(AHoverLandUnit) {
     Weapons = {
         MainGun = ClassWeapon(ADFDisruptorCannonWeapon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
+                local bp = self.Blueprint
+
                 local proj = ADFDisruptorCannonWeapon.CreateProjectileAtMuzzle(self, muzzle)
-                local data = self:GetBlueprint().DamageToShields
+                local data = bp.DamageToShields
                 if proj and not proj:BeenDestroyed() then
                     proj:PassData(data)
                 end

@@ -96,14 +96,6 @@ SyncMeta = {
 ---@field AdjEnergyMod? number
 ---@field AdjRoFMod? number
 
----@class UnitCommand
----@field x number
----@field y number
----@field z number
----@field targetId? EntityId
----@field target? Entity
----@field commandType string 
-
 ---@class AIUnitProperties
 ---@field AIPlatoonReference AIPlatoon
 ---@field AIBaseManager LocationType
@@ -495,10 +487,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
-
-        if not self.MaintenanceConsumption then
-            self.ToggledOff = true
-        end
     end,
 
     ---@param self Unit
@@ -543,10 +531,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:PlayUnitAmbientSound('ActiveLoop')
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
-        end
-
-        if self.MaintenanceConsumption then
-            self.ToggledOff = false
         end
     end,
 
@@ -853,14 +837,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
-
-        -- Force me to move on to the guard properly when done
-        local guard = self:GetGuardedUnit()
-        if guard then
-            IssueToUnitClearCommands(self)
-            IssueReclaim({self}, target)
-            IssueGuard({self}, guard)
-        end
 
         -- add state to be able to show the amount reclaimed in the UI
         if target.IsProp then
@@ -2775,6 +2751,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    ---Called via hotkey to refocus any assisting engineers
+    ---@param self Unit
+    RefocusAssisters = function(self)
+        local engineerGuards = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
+        IssueClearCommands(engineerGuards)
+        IssueGuard(engineerGuards, self)
+    end,
+
     ---@param self Unit
     ---@param built Unit
     ---@param order string
@@ -3966,8 +3950,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 duration = 1
             end
 
-            -- for units the energy and mass fields are ignored but they do need to exist or the engine burps
-            return duration, 0, 0
+            -- duration determines both unbuilt and built unit reclaim speed
+            -- energy and mass fields needed for unbuilt units to give back resources when reclaimed
+            return duration, buildEnergyCosts, buildMassCosts
         end
 
         return 0, 0, 0
