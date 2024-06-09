@@ -184,7 +184,7 @@ function OnSync()
                     secondary = secondary .. LOCF("<LOC usersync_0009>\nShare Condition after: %s", LOC(transferReasonToAnnouncementTitle[shareOption] or "<LOC lobui_0744>Share Until Death"))
                 end
                 
-                UIUtil.CreateAnnouncementStd(primary, secondary, control)
+                UIUtil.CreateAnnouncementStd(primary, secondary, nil)
             end
         end
     end
