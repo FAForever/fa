@@ -703,12 +703,11 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
             end
             if units and not table.empty(units) then
                 local newUnits = TransferUnitsOwnership(units, brain.index, false, true)
-                table.destructiveCat(totalNewUnits, newUnits)
 
-                local givenUnitCount = table.getn(newUnits)
+                -- we might not transfer any newUnits
+                if not table.empty(newUnits) then
+                    table.destructiveCat(totalNewUnits, newUnits)
 
-                -- only show message when we actually gift that player some units
-                if givenUnitCount > 0 then
                     Sync.ArmyTransfer = { {
                         from = self.index, 
                         to = brain.index, 
