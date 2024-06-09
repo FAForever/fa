@@ -924,7 +924,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
 
     -- non-assassination games could have an army abandon without having any commanders
     if not table.empty(sharedCommanders) then
-        -- create a countdown to show when the ACU recalls (similar to timed self-destruct)
+        -- create a countdown to show when the ACU recalls (similar to the one used for timed self-destruct)
         for _, com in sharedCommanders do
             StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
         end
