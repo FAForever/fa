@@ -28,6 +28,8 @@ local JammerManagerBrainComponent = import("/lua/aibrains/components/JammerManag
 local StatManagerBrainComponent = import("/lua/aibrains/components/StatManagerBrainComponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/EnergyManagerBrainComponent.lua").EnergyManagerBrainComponent
 
+local CommanderSafeTime = import("/lua/simutils.lua").CommanderSafeTime
+
 ---@class TriggerSpec
 ---@field Callback function
 ---@field ReconTypes ReconTypes
@@ -494,8 +496,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
                 local commanders = self:GetListOfUnits(categories.COMMAND, false)
                 for _, com in commanders do
-                    -- 2 minutes since last damaged
-                    if com.LastTickDamaged == nil or com.LastTickDamaged + 1200 <= GetGameTick() then
+                    if com.LastTickDamaged == nil or com.LastTickDamaged + CommanderSafeTime <= GetGameTick() then
                         table.insert(safeCommanders, com)
                     end
                 end
@@ -519,7 +520,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                 end
 
                 if shareAcuOption == 'RecallDelayed' then
-                    local shareTime = GetGameTick() + 1200
+                    local shareTime = GetGameTick() + CommanderSafeTime
                     if shareTime < 3000 then
                         shareTime = 3000
                     end

@@ -908,6 +908,10 @@ end
 
 local StartCountdown = StartCountdown -- as defined in SymSync.lua
 
+-- The time in ticks after taking damage that commanders are considered safe and not abusing disconnect rules
+---@see aibrain.lua:AbandonedByPlayer
+CommanderSafeTime = 1200
+
 --- Shares all units including ACUs. When the shared ACUs die or recall after `shareTime`, kills my army according to the given share condition.
 ---@param self AIBrain
 ---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
