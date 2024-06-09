@@ -886,7 +886,7 @@ function KillArmy(self, shareOption)
     elseif shareOption == 'PartialShare' then
         KillSharedUnits(selfIndex, categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER)
         ReturnBorrowedUnits(self)
-        TransferUnitsToHighestBrain(self, BrainCategories.Allies, true, categories.STRUCTURE + categories.ENGINEER, "PartialShare")
+        TransferUnitsToHighestBrain(self, BrainCategories.Allies, true, categories.STRUCTURE + categories.ENGINEER - categories.COMMAND, "PartialShare")
         TransferOwnershipOfBorrowedUnits(BrainCategories.Allies, selfIndex)
     else
         GetBackUnits(selfIndex, BrainCategories.Allies)
