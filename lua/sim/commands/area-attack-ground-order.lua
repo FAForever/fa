@@ -20,22 +20,14 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local ComputeAttackLocations = import("/lua/shared/commands/area-attack-order.lua").ComputeAttackLocations
+
 -- upvalue scope for performance
 local TableGetn = table.getn
-local TableSort = table.sort
-local TableSetn = table.setn
-local TableInsert = table.insert
-local TableRemove = table.remove
 
-local StringFormat = string.format
-
-local IssueReclaim = IssueReclaim
-
-local MathRound = math.round
 local MathSqrt = math.sqrt
-local MathCos = math.cos
-local MathSin = math.sin
-local MathPi = math.pi
+
+local TargetCache = {}
 
 ---@param k number
 ---@param n number
@@ -52,24 +44,15 @@ end
 ---@param units Unit[]
 ---@param target Vector
 ---@param doPrint boolean           # if true, prints information about the order
----@param radius? number
+---@param radius number
 function AreaAttackOrder(units, target, doPrint, radius)
     local unitCount = TableGetn(units)
     if unitCount == 0 then
         return
     end
 
-    local b = MathRound(2 *MathSqrt(unitCount))
-
-    phi = (MathSqrt(5) + 1) / 2 -- golden ratio
+    local targets = ComputeAttackLocations(unitCount, radius, target[1], target[2], target[3], TargetCache)
     for k = 1, unitCount do
-        r = ComputeRadius(k, unitCount, b)
-
-        theta = (2 * MathPi * k) / (phi * phi)
-
-        local tx = target[1] + radius * r * MathCos(theta)
-        local tz = target[3] + radius * r * MathSin(theta)
-        local ty = GetSurfaceHeight(tx, tz)
-        IssueAttack(units, { tx, ty, tz })
+        IssueAttack(units, targets[k])
     end
 end

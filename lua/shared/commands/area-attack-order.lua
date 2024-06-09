@@ -20,5 +20,53 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local MathRound = math.round
+local MathSqrt = math.sqrt
+local MathCos = math.cos
+local MathSin = math.sin
+local MathPi = math.pi
+
 ---@type number
 MaximumRadius = 24
+
+---@param k number
+---@param n number
+---@param b number
+---@return number
+local function ComputeRadius(k, n, b)
+    if k > n - b then
+        return 1 -- put on the boundary
+    else
+        return MathSqrt(k - 1 / 2) / MathSqrt(n - (b + 1) / 2) -- apply square root
+    end
+end
+
+---@param count number
+---@param radius number
+---@param cx number
+---@param cy number
+---@param cz number
+---@param cache? Vector[]
+---@return Vector[]
+function ComputeAttackLocations(count, radius, cx, cy, cz, cache)
+    cache = cache or {}
+
+    local b = MathRound(2 * MathSqrt(count))
+
+    phi = (MathSqrt(5) + 1) / 2 -- golden ratio
+
+    for k = 1, count do
+        r = ComputeRadius(k, count, b)
+
+        theta = (2 * MathPi * k) / (phi * phi)
+
+        local target = cache[k] or {}
+        cache[k] = target
+
+        target[1] = cx + radius * r * MathCos(theta)
+        target[2] = cy
+        target[3] = cz + radius * r * MathSin(theta)
+    end
+
+    return cache
+end
