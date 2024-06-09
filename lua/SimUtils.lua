@@ -97,6 +97,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local fuelRatio = 0
         local activeEnhancements
         local oldowner = unit.oldowner
+        local LastTickDamaged = unit.LastTickDamaged
         local upgradesTo = unit.UpgradesTo
         local defaultBuildRate
         local upgradeBuildTimeComplete
@@ -172,6 +173,11 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         newUnit.oldowner = oldowner
 
         -- A F T E R
+
+        -- for the disconnect ACU share option
+        if LastTickDamaged then
+            newUnit.LastTickDamaged = LastTickDamaged
+        end
 
         newUnit:SetOrientation(orientation, true)
 
@@ -946,6 +952,14 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
         if not oneComAlive and scenarioOptions.Victory == "demoralization" then
             KillArmy(self, scenarioOptions.Share)
             return
+        end
+
+        -- filter out commanders that are not currently safe and should explode
+        local gameTick = GetGameTick()
+        for i, com in sharedCommanders do
+            if com.LastTickDamaged + CommanderSafeTime <= gameTick then
+                sharedCommanders[i] = nil
+            end
         end
 
         -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
