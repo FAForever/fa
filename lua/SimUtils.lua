@@ -922,25 +922,28 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectShareTemporary")
     local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
 
-    -- create a countdown to show when the ACU recalls (similar to timed self-destruct)
-    for _, com in sharedCommanders do
-        StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
-    end
-
-    local oneComAlive = true
-    while GetGameTick() < shareTime and oneComAlive do
-        oneComAlive = false
+    -- non-assassination games could have an army abandon without having any commanders
+    if not table.empty(sharedCommanders) then
+        -- create a countdown to show when the ACU recalls (similar to timed self-destruct)
         for _, com in sharedCommanders do
-            if not com.Dead then
-                oneComAlive = true
-                break
-            end
+            StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
         end
-        WaitTicks(1)
-    end
 
-    -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
-    ForkThread(FakeTeleportUnits, sharedCommanders, true)
+        local oneComAlive = true
+        while GetGameTick() < shareTime and oneComAlive do
+            oneComAlive = false
+            for _, com in sharedCommanders do
+                if not com.Dead then
+                    oneComAlive = true
+                    break
+                end
+            end
+            WaitTicks(1)
+        end
+
+        -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
+        ForkThread(FakeTeleportUnits, sharedCommanders, true)
+    end
     KillArmy(self, shareOption)
 end
 
@@ -953,16 +956,18 @@ function KillArmyOnACUDeath(self, shareOption)
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectSharePermanent")
     local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
 
-    local oneComAlive = true
-    while oneComAlive do
-        oneComAlive = false
-        for _, com in sharedCommanders do
-            if not com.Dead then
-                oneComAlive = true
-                break
+    if not table.empty(sharedCommanders) then
+        local oneComAlive = true
+        while oneComAlive do
+            oneComAlive = false
+            for _, com in sharedCommanders do
+                if not com.Dead then
+                    oneComAlive = true
+                    break
+                end
             end
+            WaitTicks(1)
         end
-        WaitTicks(1)
     end
 
     KillArmy(self, shareOption)
