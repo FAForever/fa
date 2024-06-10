@@ -316,21 +316,23 @@ function CreateQueueGrid(parent)
     controls.queue.bg.rightGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.rightGlowTop.Bottom(), controls.queue.bg.rightGlowBottom.Top()) end)
     controls.queue.bg.rightGlowMiddle.Right:Set(function() return controls.queue.bg.rightGlowTop.Right() end)
 
-    controls.queue.SetThemeTextures = function()
-        controls.queue.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
-        controls.queue.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
+    --- Set textures according to the current theme
+    --- @param - self queue control
+    controls.queue.SetThemeTextures = function(self)
+        self.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
+        self.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
 
-        for id, item in controls.queue.grid.items do
+        for id, item in self.grid.items do
             item:SetTexture(UIUtil.UIFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
         end
     
-        controls.queue.bg.leftGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
-        controls.queue.bg.leftGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
-        controls.queue.bg.leftGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
+        self.bg.leftGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
+        self.bg.leftGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
+        self.bg.leftGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
         
-        controls.queue.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
-        controls.queue.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
-        controls.queue.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
+        self.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
+        self.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
+        self.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
     end
 
     controls.queue.grid.UpdateQueue = function(self, queue)
