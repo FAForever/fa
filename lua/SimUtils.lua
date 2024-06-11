@@ -45,7 +45,7 @@ local sharedUnits = {}
 ---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
     local toBrain = GetArmyBrain(toArmy)
-    if not toBrain or toBrain:IsDefeated() or not units or table.empty(units) then
+    if not toBrain or (not noRestrictions and toBrain:IsDefeated()) or not units or table.empty(units) then
         return
     end
     local categoriesENGINEERSTATION = categories.ENGINEERSTATION
