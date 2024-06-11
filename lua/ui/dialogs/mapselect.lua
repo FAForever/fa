@@ -406,7 +406,9 @@ function LoadScenarios(force)
     return scenarios
 end
 
+---@param row number
 function PreloadMap(row)
+    -- ScenarioInfo in the _Scenario file
     local scen = scenarios[scenarioKeymap[row+1]]
 
     selectedScenario = scen
@@ -424,6 +426,7 @@ function PreloadMap(row)
     end
 
     local saveFile = scen.save
+    -- preview requires save file for marker data
     if DiskGetFileInfo(saveFile) then
         preview:SetScenario(scen)
     else
