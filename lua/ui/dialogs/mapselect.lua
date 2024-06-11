@@ -23,15 +23,10 @@ local scenarios = nil
 local selectedScenario = nil
 local isSinglePlayer = nil
 local description = nil
-local descText = nil
-local posGroup = nil
 local mapList = nil
 local filters = {}
 local filterTitle = nil
 local mapListTitle = nil
-local mapsize = nil
-local mapplayers = nil
-local mapInfo = nil
 local preview = nil
 local selectButton = nil
 
