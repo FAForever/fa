@@ -132,9 +132,9 @@ rm -f "$output"
 # Add the initial header
 cat "$templateHeader" >>"$output"
 
-process_snippets "fix" "$templateFix" "$output"
 process_snippets "balance" "$templateBalance" "$output"
 process_snippets "features" "$templateFeatures" "$output"
+process_snippets "fix" "$templateFix" "$output"
 process_snippets "graphics" "$templateGraphics" "$output"
 process_snippets "ai" "$templateAI" "$output"
 process_snippets "performance" "$templatePerformance" "$output"

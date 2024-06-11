@@ -1,1 +1,1 @@
-- (#5948) When in capture mode, display energy cost and time to capture hovered-over units.
+- (#5948) Display the required energy cost and time to capture a unit when hovering over it while in capture mode.
