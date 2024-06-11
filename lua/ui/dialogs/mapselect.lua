@@ -415,19 +415,32 @@ function PreloadMap(row)
     local scen = scenarios[scenarioKeymap[row+1]]
 
     selectedScenario = scen
+
+    advOptions = scen.options
+    MapUtil.ValidateScenarioOptions(advOptions)
+    RefreshOptions(false)
+    SetDescription(scen)
+
     local mapfile = scen.map
-    if DiskGetFileInfo(mapfile) then
-        advOptions = scen.options
-        MapUtil.ValidateScenarioOptions(advOptions)
-        RefreshOptions(false)
+    if not DiskGetFileInfo(mapfile) then
+        WARN(string.format('Scenario file "%s" expected map file "%s" but it could not be found.', scen.file, mapfile))
+        description:AddItem('WARNING: Map file is missing!')
+        selectButton:Disable()
+    end
+
+    local saveFile = scen.save
+    if DiskGetFileInfo(saveFile) then
         preview:SetScenario(scen)
-        SetDescription(scen)
     else
-        WARN("No scenario map file defined")
-        description:DeleteAllItems()
-        description:AddItem(LOC("<LOC MAPSEL_0000>No description available."))
-        mapplayers:SetText(LOCF("<LOC map_select_0002>NO START SPOTS DEFINED"))
-        mapsize:SetText(LOCF("<LOC map_select_0003>NO MAP SIZE INFORMATION"))
+        WARN(string.format('Scenario file "%s" expected save file "%s" but it could not be found.', scen.file, saveFile))
+        description:AddItem('WARNING: Save file is missing!')
+        selectButton:Disable()
+    end
+
+    local scriptFile = scen.script
+    if not DiskGetFileInfo(scriptFile) then
+        WARN(string.format('Scenario file "%s" expected script file "%s" but it could not be found.', scen.file, scriptFile))
+        description:AddItem('WARNING: Script file is missing!')
         selectButton:Disable()
     end
 end
