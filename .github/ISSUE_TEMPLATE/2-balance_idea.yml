@@ -1,0 +1,37 @@
+name: Balance Idea
+description: Proposing a Balance Idea
+title: '[Balance Idea]: '
+labels: ['area: balance idea']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time in making a Balance Idea Proposal
+
+        Please bare in mind that any Balance Idea's are subject to balance team approval.
+  - type: markdown
+    attributes:
+      value: |
+        Provide a clear & concise description of the proposed change.
+  - type: textarea
+    id: intended
+    attributes:
+      label: Intended Change
+      description: Describe the change
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reasoning
+      description: What is the reason for the change
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What would be the new expected behaviors of the changes that you have proposed
+    validations:
+      required: true
