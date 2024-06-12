@@ -3,6 +3,8 @@ local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 ---@class ACUUnit : CommandUnit
 ---@field LastTickDamaged number
 ACUUnit = ClassUnit(CommandUnit) {
+    LastTickDamaged = 0,
+
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
     ---@param bpShield any

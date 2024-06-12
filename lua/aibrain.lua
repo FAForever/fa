@@ -496,7 +496,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
                 local commanders = self:GetListOfUnits(categories.COMMAND, false)
                 for _, com in commanders do
-                    if com.LastTickDamaged == nil or com.LastTickDamaged + CommanderSafeTime <= GetGameTick() then
+                    if com.LastTickDamaged + CommanderSafeTime <= GetGameTick() then
                         table.insert(safeCommanders, com)
                     end
                 end
