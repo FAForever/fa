@@ -962,6 +962,8 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
         for i, com in sharedCommanders do
             if com.LastTickDamaged + CommanderSafeTime > gameTick then
                 sharedCommanders[i] = nil
+                -- explode unsafe ACUs because KillArmy might not
+                com:Kill()
             end
         end
 
