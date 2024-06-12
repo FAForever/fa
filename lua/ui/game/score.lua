@@ -57,7 +57,7 @@ function updatePlayerName(line)
     end
 
     if playerDivision then
-        playerDivision = ' [' .. (playerDivision:gsub("^[^u]", string.upper)) .. ']'
+        playerDivision = ' [' .. (playerDivision:gsub("^.", string.upper)) .. ']'
     else
         playerDivision = ""
     end
