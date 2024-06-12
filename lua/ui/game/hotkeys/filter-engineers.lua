@@ -27,9 +27,11 @@ local GetFactions = import('/lua/factions.lua').GetFactions
 --- Equivalent to {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM} for the base game.
 function GetFactionCategories()
     local factionCategories = {}
+
     for _, faction in GetFactions() do
         table.insert(factionCategories, categories[faction['Category']])
     end
+
     return factionCategories
 end
 
@@ -37,22 +39,19 @@ local factionCategories = GetFactionCategories()
 
 --- Filters your selection to the units of the majority faction in your selection.
 function GetMajorityFaction(units)
-    local factionsOfUnits = {}
-    for _, factionCategory in factionCategories do
-        table.insert(factionsOfUnits, EntityCategoryFilterDown(factionCategory, units))
-    end
+    local majorityFactionUnits = {}
+    local majorityFactionUnitCount = 0
 
-    local factionNr = 0
-    local nrOfUnits = 0
-    for i, u in factionsOfUnits do
-        nrOfUnitsForThatFaction = table.getsize(u)
-        if nrOfUnitsForThatFaction > nrOfUnits then
-            nrOfUnits = nrOfUnitsForThatFaction
-            factionNr = i
+    for _, factionCategory in factionCategories do
+        local factionUnits = EntityCategoryFilterDown(factionCategory, units)
+        local factionUnitCount = table.getn(factionUnits)
+        if factionUnitCount > majorityFactionUnitCount then
+            majorityFactionUnits = factionUnits
+            majorityFactionUnitCount = factionUnitCount
         end
     end
 
-    return factionsOfUnits[factionNr]
+    return majorityFactionUnits
 end
 
 --- Filters your selection to the highest tech of engineers. All other engineers assist one of those engineers.
