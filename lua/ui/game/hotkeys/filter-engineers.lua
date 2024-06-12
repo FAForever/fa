@@ -78,8 +78,6 @@ function SelectHighestEngineerAndAssist()
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(fieldEngineers)
         elseif next(tech1Engineers) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
-        else
-            -- do nothing
         end
 
         if highestTechEngiesAndSacusOfMajorityFaction then
