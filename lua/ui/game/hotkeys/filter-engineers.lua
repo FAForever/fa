@@ -60,20 +60,24 @@ function SelectHighestEngineerAndAssist()
 
     if selection then
 
-        local tech3EngineersAndSACUs = EntityCategoryFilterDown((categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - categories.COMMAND, selection)
-        local tech2Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH2 - categories.COMMAND, selection)
-        local tech1Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH1 - categories.COMMAND, selection)
+        local tech3EngineersAndSACUs = EntityCategoryFilterDown((categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - categories.COMMAND - categories.FIELDENGINEER, selection)
+        local tech2Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH2 - categories.COMMAND - categories.FIELDENGINEER, selection)
+        local fieldEngineers = EntityCategoryFilterDown(categories.FIELDENGINEER - categories.COMMAND, selection)
+        local tech1Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH1 - categories.COMMAND - categories.FIELDENGINEER, selection)
 
         local highestTechEngiesAndSacusOfMajorityFaction = nil
         if next(tech3EngineersAndSACUs) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3EngineersAndSACUs)
         elseif next(tech2Engineers) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech2Engineers)
+        elseif next(fieldEngineers) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(fieldEngineers)
         elseif next(tech1Engineers) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
         else
             -- do nothing
         end
+
         if highestTechEngiesAndSacusOfMajorityFaction then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
             SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
