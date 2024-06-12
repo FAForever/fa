@@ -24,6 +24,10 @@ local CoroutineYield = coroutine.yield
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
+---@class ScoutLocation
+---@field Position Vector
+---@field TaggedBy Unit
+
 ---@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias HqTech "TECH2" | "TECH3"
@@ -436,7 +440,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
                         -- allow for debugging
                         if not ok then
-                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
                         end
 
                         break
@@ -465,7 +469,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
                         -- allow for debugging
                         if not ok then
-                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
                         end
 
                         break
@@ -547,6 +551,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
+---@field CustomUnits { [string]: EntityId[] }
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
@@ -734,22 +739,11 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     },
 
     ---@param self AIBrain
-    ---@param string string
+    ---@param key string
     ---@param sound SoundHandle
-    PlayVOSound = function(self, string, sound)
-        if not self.VOTable then
-            self.VOTable = {}
-        end
-
-        local VO = self.VOSounds[string]
-        if not VO then
-            WARN('PlayVOSound: ' .. string .. " not found")
-            return
-        end
-
-        if not self.VOTable[string] and VO['obs'] and GetFocusArmy() == -1 and self:GetArmyIndex() == 1 then
-            -- Don't stop sound IF not repeated AND sound is flagged as 'obs' AND i'm observer AND only from PlayerIndex = 1
-        elseif self.VOTable[string] or GetFocusArmy() ~= self:GetArmyIndex() then
+    PlayVOSound = function(self, key, sound)
+        if not self.VOSounds[key] then
+            WARN("PlayVOSound: " .. key .. " not found")
             return
         end
 
@@ -757,22 +751,44 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         if sound then
             cue, bank = GetCueBank(sound)
         else
-            cue, bank = VO['bank'], 'XGG'
+            -- note: what the VO sound table calls a "bank" is actually a "cue"
+            cue, bank = self.VOSounds[key]["bank"], "XGG"
         end
 
         if not (bank and cue) then
-            WARN('PlayVOSound: No valid bank/cue for ' .. string)
+            WARN("PlayVOSound: No valid bank/cue for " .. key)
             return
         end
 
-        self.VOTable[string] = true
-        import('/lua/SimSyncUtils.lua').SyncVoice({ Cue = cue, Bank = bank })
+        ForkThread(self.PlayVOSoundThread, self, key, {
+            Cue = cue,
+            Bank = bank,
+        })
+    end,
 
-        local timeout = VO['timeout']
-        ForkThread(function()
-            WaitSeconds(timeout)
-            self.VOTable[string] = nil
-        end)
+    ---@param self AIBrain
+    ---@param key string
+    ---@param data SoundBlueprint
+    PlayVOSoundThread = function(self, key, data)
+        if not self.VOTable then
+            self.VOTable = {}
+        end
+        if self.VOTable[key] then
+            return
+        end
+        local sound = self.VOSounds[key]
+        local focusArmy = GetFocusArmy()
+        local armyIndex = self:GetArmyIndex()
+        if focusArmy ~= armyIndex and not (focusArmy == -1 and armyIndex == 1 and sound.obs) then
+            return
+        end
+
+        self.VOTable[key] = true
+
+        import("/lua/SimSyncUtils.lua").SyncVoice(data)
+        WaitSeconds(sound.timeout)
+
+        self.VOTable[key] = nil
     end,
 
     --- Triggers based on an AiBrain
@@ -1211,6 +1227,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     OnRecalled = function(self)
+        -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
         local army = self.Army
@@ -1454,7 +1471,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- - OnAssignedFocusEntity
     ---
     --- And events that are purposefully not communicated:
-    --- 
+    ---
     --- - OnDamage
     --- - OnDamageBy
     --- - OnMotionHorzEventChange

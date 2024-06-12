@@ -111,7 +111,14 @@ function getKeyTables()
     local helpIdRelations = {}
     local otherRelations = {}
     local upgradeKey = false
-    local orderKeys = {}
+    local orderKeys = {
+        -- Special assignment for the attack move order because it can't be bound from the user key map
+        -- Keyed the same as the tooltip for the attack move button
+    	["attack_move"] = {
+            ["key"] = 'RMB',
+            ["colour"] = colours[3],
+        }
+    }
 
     -- Get them from the building tab
     for groupName, groupItems in unitkeygroups do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all

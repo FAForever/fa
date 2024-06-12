@@ -51,6 +51,7 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
     ---@param self AANDepthCharge01
     OnEnterWater = function(self)
         ADepthChargeProjectileOnEnterWater(self)
+        self:TrackTarget(true)
         self:SetMaxSpeed(20)
         self:SetVelocity(0)
         self:SetAcceleration(5)

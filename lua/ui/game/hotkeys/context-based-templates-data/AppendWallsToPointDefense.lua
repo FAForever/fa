@@ -23,7 +23,7 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Walls',
-    TriggersOnBuilding = (categories.DIRECTFIRE * categories.TECH1),
+    TriggersOnUnit = (categories.DIRECTFIRE * categories.TECH1),
     TemplateSortingOrder = 100,
     TemplateData = {
         3,

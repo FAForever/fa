@@ -18,11 +18,15 @@ function Projectile:ChangeDetonateBelowHeight(height)
 end
 
 --- Change the amount of zig-zag in degrees per second
+---
+--- You can use `Projectile:GetMaxZigZag()` to retrieve the current zig zag distance.
 ---@param max number
 function Projectile:ChangeMaxZigZag(max)
 end
 
 --- Change the frequency of the zig-zag
+---
+--- You can use `Projectile:GetZigZagFrequency()` to retrieve the current zig zag frequency.
 ---@param freq number
 function Projectile:ChangeZigZagFrequency(freq)
 end
@@ -34,13 +38,34 @@ function Projectile:CreateChildProjectile(blueprint)
 end
 
 --- Returns the speed over ticks instead of over seconds. Multiply by 10 to get the (usually) expected speed value
----@return number 
+---@return number
 function Projectile:GetCurrentSpeed()
 end
 
 --- Returns the position of the current target.
 ---@return Vector
 function Projectile:GetCurrentTargetPosition()
+end
+
+--- Returns the position of the current target as separate coordinates.
+---@return number   # x
+---@return number   # y
+---@return number   # z
+function Projectile:GetCurrentTargetPositionXYZ()
+end
+
+--- Returns the zig zag frequency.
+---
+--- You can use `Projectile:ChangeMaxZigZag(value)` to change the zig zag frequency.
+---@return number
+function Projectile:GetZigZagFrequency()
+end
+
+--- Returns the zig zag distance.
+---
+--- You can use `Projectile:ChangeMaxZigZag(value)` to change the zig zag distance.
+---@return number
+function Projectile:GetMaxZigZag()
 end
 
 --- Returns the entity that is responsible for creating this projectile.
@@ -65,7 +90,7 @@ end
 function Projectile:SetAcceleration(accel)
 end
 
---- Define the ballistic acceleration value, increases velocity in the current direction.
+--- Set the vertical (gravitational) acceleration of the projectile. Default is -4.9, which is expected by the engine's weapon targeting and firing
 ---@param accel number
 function Projectile:SetBallisticAcceleration(accel)
 end
@@ -118,6 +143,12 @@ end
 function Projectile:SetNewTargetGround(location)
 end
 
+---@param x number
+---@param y number
+---@param z number
+function Projectile:SetNewTargetGroundXYZ(x, y, z)
+end
+
 ---
 ---@param svx number
 ---@param svy number
@@ -139,6 +170,7 @@ end
 ---@param velX number
 ---@param velY? number
 ---@param velZ? number
+---@return Projectile
 function Projectile:SetVelocity(velX, velY, velZ)
 end
 

@@ -141,7 +141,8 @@
 ---@field GuardReturnRadius number
 --- guard range for the unit, automatically added if absent
 ---@field GuardScanRadius number
---- initial auto mode behaviour for the unit
+--- initial toggle of automatic behaviors (silo building and auto-assist)
+---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
 ---@field NeedUnpack boolean
@@ -410,7 +411,9 @@
 --- stunning).
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `TransportShield`.
 ---@field PersonalShield? boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult? number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient
 --- energy. Defaults to `10` in the shield spec.
@@ -655,6 +658,7 @@
 
 ---@class UnitBlueprintTarmac
 ---@field Albedo FileName
+---@field Albedo2 FileName
 ---@field DeathLifetime number
 ---@field FadeOut number
 ---@field Length number
@@ -752,7 +756,10 @@
 ---@field TeleportMassMod? number
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
+---@see TeleportDelay For an additional flat delay that also delays teleport FX showing at the destination.
 ---@field TeleportTimeMod? number
+--- Whether to use the new distance-based teleport cost calculation method, or revert to the old unit cost based method.
+---@field UseVariableTeleportCosts? boolean
 
 ---@class UnitBlueprintExternalFactory
 ---@field SelectionSizeX? number
@@ -854,7 +861,9 @@
 ---@field OwnerShieldMesh string
 --- Personal shiled toggle
 ---@field PersonalShield boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient energy. Defaults to 10 in the shield spec.
 ---@field ShieldEnergyDrainRechargeTime number
@@ -940,8 +949,17 @@
 ---@field TarmacGlowDecal? any unused
 --- defines the tech level used for display purposes
 ---@field TechLevel UnitTechLevel
---- if present, makes the "teleport" ability show up in the unit view with the delay of this value
+--- Extra time taken to teleport before other teleport time calculations. Defaults to 0 seconds.
+--- If `UseVariableTeleportCosts` is false, then this also delays teleport FX appearing at the destination.
+--- If `UseVariableTeleportCosts` is true, then destination FX appear after 0.4x the total teleport time.
+---@see TeleportTimeMod For an energy-scaling teleport time that does not delay teleport FX at the destination.
 ---@field TeleportDelay? number
+--- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
+---@field TeleportFlatEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 2.500.000 energy.
+---@field TeleportMaximumEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 50 seconds.
+---@field TeleportMaximumDuration? number
 --- table of toggle capabilities available for this unit
 ---@field ToggleCaps table<ToggleCap, boolean>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
@@ -953,7 +971,7 @@
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
 ---@field UpgradesTo? UnitId
---- the base unit from which all units in this upgrade chain can be upgraded from
+--- the base unit from which all units in this upgrade chain can be upgraded from. If this field is lacking then the unit may refuse to upgrade even when `UpgradesFrom` and `UpgradesTo` are set
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
@@ -974,7 +992,6 @@
 ---@field AllIntel table<IntelType, boolean>
 ---@field AllIntelRecharging table<IntelType, boolean>
 ---@field AllIntelMaintenanceFree table<IntelType, boolean>
----@field AllIntelFromEnhancements table<IntelType, boolean>
 ---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
@@ -992,8 +1009,8 @@
 --- used by the Seraphim T1 air scout for how long the after-death vison remains
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
----@field JamRadius {Max: number, Min: number}
---- how many blips does a jammer produce
+---@field JamRadius { Max: number, Min: number }
+--- How many blips a jammer produces. Maximum 255
 ---@field JammerBlips number
 --- used by the Soothsayer
 ---@field MaxVisionRadius? number
@@ -1022,7 +1039,7 @@
 --- how far our sonar stealth goes
 ---@field SonarStealthFieldRadius number
 --- how far off displace blips
----@field SpoofRadius {Max: number, Min: number}
+---@field SpoofRadius { Max: number, Min: number }
 --- used by the Selen to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
 --- how far the unit can see above water and land
@@ -1056,10 +1073,6 @@
 ---@field BuildRestriction UnitBuildRestriction
 --- acceleration to allow unit to catch up to the target when it starts to drift
 ---@field CatchUpAcc number
---- used by the Loyalist for its charge ability
----@field ChargeAccMult? number
---- used by the Loyalist for its charge ability
----@field ChargeSpeedMult? number
 --- unknown if significant in `Physics`
 ---@field CollisionOffsetX? number
 --- if a naval factory uses the special rolloff point computation
@@ -1097,8 +1110,11 @@
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsX number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsY number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
 --- method of locomotion
@@ -1119,7 +1135,7 @@
 ---@field RotateBodyWhileMoving? boolean
 --- if this unit can try to rotate on the spot
 ---@field RotateOnSpot? boolean
---- threshold for rotate on spot to take effect when moving
+--- threshold speed in ogrids/s for rotate on spot to take effect. defaults to 0.5
 ---@field RotateOnSpotThreshold? number
 --- unknown behavior, used by Spiderbot and Megabot
 ---@field SinkLower? boolean
@@ -1139,9 +1155,10 @@
 ---@field SubSpeedMultiplier? number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
---- turn radius for the unit, in wolrd units
+--- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
+--- and if it results in a faster turn rate than `TurnRate`. Disabled at 0
 ---@field TurnRadius number
---- turn radius for the unit, in degrees per second
+--- turn rate for the unit, in degrees per second. Turning acts improperly when at 0
 ---@field TurnRate number
 --- when present, the speed multiplier is set to this number when entering the water layer
 ---@field WaterSpeedMultiplier? number

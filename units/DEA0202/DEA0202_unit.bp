@@ -166,7 +166,7 @@ UnitBlueprint{
         UnitName = "<LOC dea0202_name>Janus",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

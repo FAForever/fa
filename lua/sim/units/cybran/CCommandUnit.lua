@@ -79,6 +79,7 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
         CConstructionTemplateOnDestroy(self)
     end,
 
+    --- changes cloak toggle behavior to also toggle stealth
     ---@param self CCommandUnit
     ---@param bit number
     OnScriptBitSet = function(self, bit)
@@ -90,9 +91,12 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
             self:DisableUnitIntel('ToggleBit8', 'RadarStealthField')
             self:DisableUnitIntel('ToggleBit8', 'SonarStealth')
             self:DisableUnitIntel('ToggleBit8', 'SonarStealthField')
+        else
+            CommandUnit.OnScriptBitSet(self, bit)
         end
     end,
 
+    --- changes cloak toggle behavior to also toggle stealth
     ---@param self CCommandUnit
     ---@param bit number
     OnScriptBitClear = function(self, bit)
@@ -104,6 +108,8 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
             self:EnableUnitIntel('ToggleBit8', 'RadarStealthField')
             self:EnableUnitIntel('ToggleBit8', 'SonarStealth')
             self:EnableUnitIntel('ToggleBit8', 'SonarStealthField')
+        else
+            CommandUnit.OnScriptBitClear(self, bit)
         end
     end,
 }

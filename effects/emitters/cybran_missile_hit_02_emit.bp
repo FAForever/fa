@@ -7,7 +7,7 @@ EmitterBlueprint {
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
-	AlignRotation = true,
+	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
 	LODCutoff = 150.00,

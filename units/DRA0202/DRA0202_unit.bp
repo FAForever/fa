@@ -155,7 +155,7 @@ UnitBlueprint{
         UnitName = "<LOC dra0202_name>Corsair",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

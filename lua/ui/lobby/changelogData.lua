@@ -1,20 +1,428 @@
-last_version = 3778
-
----@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
-
----@class PatchNotes
----@field version number | string       # Patch version
----@field name PatchNotesType           # Patch type
----@field hasPrettyPatchnotes boolean   # Refers to patchnotes.faforever.com, defaults to false
----@field descriptionFR string[]        # French translation
----@field descriptionRU string[]        # Russian translation
----@field description string[]          # Default changelog in English
+---@type number
+last_version = 3809
 
 ---@type PatchNotes[]
 gamePatches = {
     {
+        version = 3808,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3808 (7th of April, 2024)",
+            "",
+            "A small hotfix because we it appears we finally managed to get achievements working again. ",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3807,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3807 (3th of April, 2024)",
+            "",
+            "Fixes various reported issues and removes the 1st april pranks from the game again.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3806,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3806 (31th of March, 2024)",
+            "",
+            "Fixes various bugs and visual inconsistencies that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3805,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3805 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3804,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3804 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions. The most notable issue is the bug where the fog of war is not ",
+            "removed when a game ends.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3803,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3803 (17th of March, 2024)",
+            "",
+            "Various small fixes for bugs that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3802,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3802 (17th of March, 2024)",
+            "",
+            "Various small fixes for bugs that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3801,
+        name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "# Game Version 3801 (16th of March, 2024)",
+            "",
+            "The first development iteration of 2024 is here!",
+            "",
+            "There's a lot of goodies in this iteration. Most notably this developers iteration is also soaked with various ",
+            "balance changes. From 2024 and onwards we no longer have separate development and balance patches.",
+            "",
+            "The in-game changelog will no longer include all the details of the changes. You can find the complete ",
+            "changelog on Github. You can use the button in the bottom-left corner of this dialog to immediately jump to ",
+            "details of the changes of the selected game version.",
+            "",
+            "With gratitude to all those who took the time to contribute,",
+            "",
+            "Jip",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "One does wonder - how did we jump from game version 3780 to 3801? The answer is simple - we did a whoopsie and ",
+            "pushed game version 3800 instead of 3780 to the FAF Develop game type. Now, it won't update the game type unless ",
+            "the game version is equal or more than 3800. As game version 3800 is already occupied we now have game version 3801.",
+
+        }
+    },
+    {
+        version = 3780,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3779 (11th of January, 2024)",
+            "",
+            "A new year that we can only start with new mechanics that are buggy!",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+            "",
+            "## Bug Fixes",
+            "",
+            "- (582be6d) Fix the Easy AI not working.",
+            "",
+            "We often use the Easy AI as a testing platform.",
+            "",
+            "- (#5854) Fix a bug where Auto Overcharge appears enabled but is actually disabled.",
+            "",
+            "The bug occurs when the ACU attempts to use Auto Overcharge while enhancing. The Auto Overcharge behavior ",
+            "will be turned off but the UI was not updated accordingly. The UI now reflects this behavior. ",
+            "",
+            "- (#5853) Fix a bug when the Billy is redirected by a Loyalist.",
+            "",
+            "The bug would generate an endless loop of explosions.",
+            "",
+            "## Features",
+            "",
+            "- (#5855) Give AI a notion of rating.",
+            "",
+            "The rating shows in the lobby and in-game. The rating adjusts depending on whether it is a cheating AI, ",
+            "the cheating modifiers and the size of the map. ",
+            "",
+            "Note that games with AIs are unrated.",
+            "",
+            "## Other Changes",
+            "",
+            "- (#5840) Improve the English description of various Cybran units",
+            "",
+            "## Contributors",
+            "",
+            "With thanks to the following people who contributed through coding:",
+            "",
+            "- lL1l1",
+            "- Jip",
+            "- Basilisk3",
+            "- Rowey",
+            "- 4z0t",
+        }
+    },
+    {
+        version = 3779,
+        name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "# Game Version 3779 (21th of January, 2024)",
+            "",
+            "A new year combined with new mechanics and behavior/bug fixes!",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Happy holidays to those that celebrate them,",
+            "",
+            "Jip",
+            "",
+            "## Balance",
+            "",
+            "- (#5815) Adjust the target priorities of the Percival",
+            "",
+            "The Percival now prioritizes firing at structures over tech 1 units. Its targeting priorities are now similar to Snipers.",
+            "",
+            "- (#5812, #5823) Enhance tactical missile behavior",
+            "",
+            "Improved the behavior of tactical missiles across the board.",
+            "",
+            "Targeting behavior now considers the full orientation of the unit, enhancing accuracy against units on slopes.",
+            "",
+            "Adjusted zig-zag behavior to reduce last-minute zig-zagging before impact, making Aeon tactical missiles more accurate.",
+            "",
+            "- (#5790) Re-design the Deflector ability of the Loyalist",
+            "",
+            "The deflector weapon of the Loyalist allows it to take ownership of incoming tactical missiles and return them to the unit that ",
+            "fired it. With the new implementation the missiles that are send back have switched army and can therefore be intercepted by ",
+            "Tactical Missile Defenses (TMDs) and shields.",
+            "",
+            "The deflector weapon can now deflect the Billy again.",
+            "",
+            "The deflector weapon is unable to deflect tactical missiles that are incoming from directly above the Loyalist.",
+            "",
+            "- (#5794) The Cybran Cruiser is now equipped with a Deflector instead of a Zapper.",
+            "",
+            "The deflector weapon is unable to deflect tactical missiles that are incoming from directly above the Cybran Cruiser.",
+            "",
+            "- (#5794) The Cybran Aircraft Carrier is now equipped with a Deflector instead of a Zapper.",
+            "",
+            "The deflector weapon is unable to deflect tactical missiles that are incoming from directly above the Cybran Aircraft Carrier.",
+            "",
+            "- (#5806) Modify the economy behavior of the Scry ability of the Eye of Rhianne.",
+            "",
+            "Now behaves similarly to other economy-consuming abilities.",
+            "",
+            "- (#5667) Adjust the movement behavior of the Seraphim sniper",
+            "",
+            "The movement reduction of the sniper mode is now only applied when the main weapon is on cooldown. This reduces the amount of ",
+            "micro that is required to use the sniper.",
+            "",
+            "- (#5805) Buff standard resource allocation of Seraphim SACUs",
+            "",
+            "Increased standard resource production to 3 mass/second and 200 energy/second for Seraphim SACUs.",
+            "",
+            "The Seraphim faction lacks a Resource Allocation Subsystem (RAS) for the SACU. We understand that players may feel ",
+            "disadvantaged when playing Seraphim in the very-late game phase where RAS SACUs can play an important role. With these changes, ",
+            "we preserve the faction diversity while providing the Seraphim faction with an alternative approach to generate mobile ",
+            "resources.",
+            "",
+            "This is an experimental change that is subject to future tweaks.",
+            "",
+            "- (#5795) Reduce the collision shape of landed air units.",
+            "",
+            "Landed air units now have a smaller collision shape, matching the size of the mesh.",
+            "",
+            "- (#5785) Fix projectiles being unable to impact the water surface.",
+            "",
+            "Notable for UEF tech 2 Destroyer projectiles and various tactical missiles.",
+            "",
+            "- (#5827) Allow SACUs to have the COMMAND target priority.",
+            "",
+            "Allows SACUs to target an ACU while moving in snipe mode.",
+            "",
+            "- (#5834) Fix a bug with the salvo of the tech 3 submarine.",
+            "",
+            "Corrected a bug reducing damage per second to 327 instead of 363.",
+            "",
+            "- (#5834) Fix Aeon anti-torpedo defenses firing two anti-torpedoes at a single torpedo.",
+            "",
+            "The Aeon Destroyer and Submarine hunter are now better at defending against torpedo's.",
+            "",
+            "- (#5836) Fix intel ranges being inaccurate",
+            "",
+            "This is a complicated but interesting change. For the player, intel is visualized as a perfect circle. However, for the engine, ",
+            "intel is processed in a grid. The grid is coarse - the size of a cell for vision is 2 walls, and for all other types of ",
+            "(counter) intel, it is 4 walls.",
+            "",
+            "This has consequences. Imagine four units with a radar radius of 28, 29, 30, and 31. Visually, it appears that the last unit ",
+            "with a radar radius of 31 provides more intel than the unit with a radar radius of 28. For the engine, however, because the ",
+            "size of a cell in the intel grid is 4 walls large, it doesn't matter - the units with 29, 30, and 31 radar range provide as ",
+            "much intel as the unit with 28 radar range.",
+            "",
+            "With these changes, we reviewed all intel radii to ensure the value aligns with the value that the intel grid actually applies. ",
+            "As a result, the intel radius of units may appear smaller, but for the engine, they are the same. Therefore, the intel radii ",
+            "that you see now are more accurate.",
+            "",
+            "An extensive test suite is also introduced to keep the intel ranges of units accurate as time passes.",
+            "",
+            "- (#61) Increase the intel update frequency from 3 seconds to 0.5 seconds",
+            "",
+            "In the average case, intel would only update every 3 seconds (or 30 ticks). With thanks to an assembly patch, intel now updates ",
+            "every 0.5 seconds (or 5 ticks). This impacts not just what you see as a player but also how quickly the weapons of your units ",
+            "may react to blips that suddenly pop up in their range.",
+            "",
+            "- (#5836) Revert of the 15% global vision range increase as introduced by game version 3761",
+            "",
+            "The vision range of various units was increased because of the slow update frequency of intel. With thanks to the assembly ",
+            "patch, the update frequency of intel is increased with 600%, and therefore, we're reverting the global vision range increase.",
+            "",
+            "- (#5848) Remove the friendly fire of the Ravager.",
+            "",
+            "- (#5789) Adjust the behavior of the Billy.",
+            "",
+            "The Billy no longer explodes in the first 2.5 seconds of its lifespan. The damage of the Billy no longer pierces shields, ",
+            "reversing an accidental change.",
+            "",
+            "## Bug Fixes",
+            "",
+            "- (4c9b6b) Fix a bug that only triggers in the Nomads featured mod.",
+            "",
+            "- (#5818) Reduce the maximum attack radius of the Aeon Tactical Missile Defense (TMD).",
+            "",
+            "The Volcano could try to intercept missiles that it would never be able to. Given that TMDs try not to overshoot their target,",
+            "the behavior would cause other TMDs to ignore the missile.",
+            "",
+            "- (6f3244) Fix a bug for the AI where the threat-based pathing would return an incorrect result.",
+            "",
+            "- (#5809) Fix a bug for the AI where it would confuse the type of expansions, overspending significantly because of it.",
+            "",
+            "- (#5804) Fix the Shard being able to evade beams.",
+            "",
+            "- (#5795) Fix air units losing essentially all water vision once they have landed once.",
+            "",
+            "- (#5820) Fix a bug where the assist-to-upgrade feature would not pause the structure due to network lag.",
+            "",
+            "- (#5831) Fix a bug that would break achievement progression.",
+            "",
+            "- (#5829) Fix a bug when the Salem makes landfall.",
+            "",
+            "- (#5841) Fix a bug where units on the sea floor would not have the mass value of their wreckages reduced.",
+            "",
+            "- (460fcda) Fix a bug where players would be able to cheat units in co-op when playing alone.",
+            "",
+            "- (#5817) Fix a bug where the shared armies lobby option does not take into account random spawn positions.",
+            "",
+            "As a result, the 'shared' armies would be scattered across the map.",
+            "",
+            "## Features",
+            "",
+            "- (#5821) Add additional context-based templates",
+            "",
+            "Involves templates for the Soothsayer, the Eye of Rhianne, and the Salvation.",
+            "",
+            "- (#5820) Add additional assist-to effects",
+            "",
+            "You can now assist a tech 2 mass extractor with some adjacency to start an upgrade to tech 3.",
+            "You can now assist a radar to start an upgrade. Requires some adjacency for a tech 2 radar.",
+            "",
+            "You can enable/disable the behavior at the 'Commands' header of the 'Gameplay' tab of the game options.",
+            "",
+            "- (#5832) Wrecks now warp back onto the map when units crash outside of the map",
+            "",
+            "## Other Changes",
+            "",
+            "- (#5826) Show decimals of the damage radius of weapons.",
+            "",
+            "- (#5816) Show decimals of the build rate of units.",
+            "",
+            "As an example, the build rate of a tech 3 engineer would previously show as '32' while it is actually '32.5'.",
+            "",
+            "- (#5736) Fix the intel hotkey not showing for the Scry ability.",
+            "",
+            "- (#5802) Add a silo hatch animation to the UEF ACU when it fires a missile.",
+            "",
+            "There's a standard reload time that applies. This is most notable for the Billy. The hatch animation acts as a rough indication ",
+            "for this reload time.",
+            "",
+            "- (#5811) Clarify the distinction between user-created templates and context-based templates.",
+            "",
+            "- (#5828) Fix various English descriptions of units.",
+            "",
+            "- (#5830) Rework the frames per second counter to update less frequently",
+            "",
+            "It now updates four times per second. The frame counter is moved from the left side to the right side of the screen.",
+            "",
+            "## Contributors",
+            "",
+            "With thanks to the following people who contributed through coding:",
+            "",
+            "- lL1l1",
+            "- Jip",
+            "- Basilisk3",
+            "- KionX",
+            "- Relent0r",
+            "",
+            "With thanks to the following people who contributed through binary patches:",
+            "",
+            "- Hdt80bro",
+            "",
+            "And, last but certainly not least - with thanks to those that took part in constructive discussions:",
+            "",
+            "- Apofenas",
+            "- Deribus",
+            "- HintHunter",
+            "- Eternal",
+            "- Balthazar",
+            "- hdt80bro",
+            
+        }
+    },
+    {
         version = 3778,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game Version 3778 (31th of December, 2023)",
             "",
@@ -107,6 +515,8 @@ gamePatches = {
     {
         version = 3777,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3777 (24th of December, 2023)",
             "",
@@ -276,6 +686,8 @@ gamePatches = {
     {
         version = 3776,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3776 (30th of November, 2023)",
             "",
@@ -383,6 +795,7 @@ gamePatches = {
         version = 3775,
         name = "Balance patch",
         hasPrettyPatchnotes = true,
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3775 (19th of November, 2023) ",
             "",
@@ -403,6 +816,8 @@ gamePatches = {
     {
         version = 3774,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3774 (15th of November, 2023)",
             "",
@@ -462,6 +877,8 @@ gamePatches = {
     {
         version = 3773,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3773 (4th of November, 2023)",
             "",
@@ -511,6 +928,8 @@ gamePatches = {
     {
         version = 3772,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3772 (2th of November, 2023)",
             "",
@@ -607,6 +1026,8 @@ gamePatches = {
     {
         version = 3771,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3771 (29th of October, 2023)",
             "",
@@ -805,6 +1226,8 @@ gamePatches = {
     {
         version = 3769,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3769 (24th of September, 2023)",
             "",
@@ -845,6 +1268,8 @@ gamePatches = {
     {
         version = 3767,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3767 (17th of September, 2023)",
             "",
@@ -904,6 +1329,8 @@ gamePatches = {
     {
         version = 3766,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3766 (9th of September, 2023)",
             "",
@@ -982,6 +1409,8 @@ gamePatches = {
     {
         version = 3765,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3765 (2nd of September, 2023)",
             "",
@@ -1144,6 +1573,8 @@ gamePatches = {
     {
         version = 3764,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "See the patch notes of 3762 and 3758 for the full patch notes.",
             "",
@@ -1234,6 +1665,8 @@ gamePatches = {
     {
         version = 3763,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "See the patch notes of 3762 and 3758 for the full patch notes.",
             "",
@@ -1276,6 +1709,8 @@ gamePatches = {
     {
         version = 3762,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "See the patch notes of 3762 and 3758 for the full patch notes.",
@@ -1358,6 +1793,8 @@ gamePatches = {
     {
         version = 3761,
         name = "Balance patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "The main objective of this patch is to enhance the viability of a diverse range of strategies by ",
             "boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize ",
@@ -1411,6 +1848,8 @@ gamePatches = {
     {
         version = 3760,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "See the patch notes of 3758 for all the details of the second development iteration.",
             "",
@@ -1454,6 +1893,8 @@ gamePatches = {
     {
         version = 3758,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "There are a lot of goodies in this iteration! The changelog format has been adjusted to make it easier to read.",
             "It now contains less detailed information and more general descriptions. Additionally, the in-game changelog",
@@ -1747,6 +2188,8 @@ gamePatches = {
     {
         version = 3757,
         name = 'Balance patch',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3757 (20th of May, 2023)",
             "",
@@ -1785,6 +2228,8 @@ gamePatches = {
     {
         version = 3756,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "Hopefully this is the last hotfix for now. Includes various fixes of recent and longstanding bugs.",
@@ -1841,6 +2286,8 @@ gamePatches = {
     {
         version = 3755,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "See the patch notes of 3751 for the full patch notes.",
@@ -1857,6 +2304,8 @@ gamePatches = {
     {
         version = 3754,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "See the patch notes of 3751 for the full patch notes.",
             "",
@@ -1967,6 +2416,8 @@ gamePatches = {
     {
         version = 3753,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "# Game version 3753 (25th of February, 2022)",
@@ -1993,6 +2444,8 @@ gamePatches = {
     {
         version = 3752,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "# Game version 3752 (25th of February, 2022)",
@@ -2012,6 +2465,8 @@ gamePatches = {
     {
         version = 3751,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3751 (25th of February, 2022)",
             "",
@@ -2410,6 +2865,7 @@ gamePatches = {
     {
         version = 3750,
         name = "Balance patch",
+        hasPrettyGithubRelease = true,
         hasPrettyPatchnotes = true,
         description = {
             "## Land",
@@ -2907,6 +3363,8 @@ gamePatches = {
     {
         version = 3749,
         name = 'Developers patch',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "Happy holidays everyone!",
@@ -2939,6 +3397,8 @@ gamePatches = {
     {
         version = 3748,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "## Bug fixes",
@@ -2957,6 +3417,8 @@ gamePatches = {
     {
         version = 3747,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "## Features",
@@ -3046,6 +3508,8 @@ gamePatches = {
     {
         version = 3746,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "# Game version 3746 (6th of November, 2022)",
@@ -3115,6 +3579,8 @@ gamePatches = {
     {
         version = 3745,
         name = 'Developers patch',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "# Game version 3745 (6th of November, 2022)",
@@ -3514,6 +3980,8 @@ gamePatches = {
     {
         version = 3744,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should",
             "now work as intended again.",
@@ -3536,6 +4004,8 @@ gamePatches = {
     {
         version = 3743,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "There's an issue with tactical and strategic defenses not working when Nomads is enabled. This is due to",
             "changes to the base game done by patch 3741 that guarantees SMDs to function properly when there are",
@@ -3568,6 +4038,8 @@ gamePatches = {
     {
         version = 3742,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3742 (21st of August, 2022)",
             "",
@@ -3584,6 +4056,8 @@ gamePatches = {
     {
         version = 3741,
         name = 'Developers patch',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "# Game version 3741 (21st of August, 2022)",
             "",
@@ -3915,6 +4389,8 @@ gamePatches = {
     {
         version = 3740,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "## Bug fixes",
             "",
@@ -3960,6 +4436,8 @@ gamePatches = {
     {
         version = 3739,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         descriptionFR = {
             "## Correction de Bug",
             "",
@@ -3991,6 +4469,8 @@ gamePatches = {
     {
         version = 3738,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         descriptionFR = {
 
             "Note de patch 3738 (19 juin 2022)",
@@ -4666,6 +5146,8 @@ gamePatches = {
     {
         version = 3737,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             " ### Features",
             "",
@@ -4749,6 +5231,8 @@ gamePatches = {
     {
         version = 3736,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Features",
             "",
@@ -4827,6 +5311,8 @@ gamePatches = {
     {
         version = 3735,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Bug fixes",
             "",
@@ -4863,6 +5349,8 @@ gamePatches = {
     {
         version = 3734,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Bug fixes",
             "",
@@ -4877,6 +5365,8 @@ gamePatches = {
     {
         version = 3733,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Bug fixes",
             "",
@@ -4890,6 +5380,8 @@ gamePatches = {
     {
         version = 3732,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Features",
             "",
@@ -5223,6 +5715,8 @@ gamePatches = {
     {
         version = 3731,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Features",
             "- Improve scoreboard (#3633)",
@@ -5273,6 +5767,8 @@ gamePatches = {
     {
         version = 3730,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "",
             "Games using the featured mod Nomads will break when playing the Aeon ",
@@ -5300,6 +5796,8 @@ gamePatches = {
     {
         version = 3729,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "### Features",
             " - (#3615) Happy Christmas (in advance) ^_^",
@@ -5318,6 +5816,8 @@ gamePatches = {
     {
         version = 3729,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             "A quick FAQ:",
             "- I lost all my mods, where did they go?",
@@ -5553,6 +6053,8 @@ gamePatches = {
     {
         version = 3727,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             '  **Bugs** ',
             '  - (#3571) Fix tree groups when they split',
@@ -5570,6 +6072,8 @@ gamePatches = {
     {
         version = 3726,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             '**Bugs** ',
             '- (#3565) Reverts changes to the buff mechanic',
@@ -5586,6 +6090,7 @@ gamePatches = {
         version = 3725,
         name = "Balance patch",
         hasPrettyPatchnotes = true,
+        hasPrettyGithubRelease = true,
         description = {
             '**Land**',
             '- Zthuee',
@@ -5709,6 +6214,8 @@ gamePatches = {
     {
         version = 3724,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             '**Gameplay**',
             ' - (#3450) An alternative approach to loading in custom strategic icons',
@@ -5757,6 +6264,8 @@ gamePatches = {
     {
         version = 3722,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
         description = {
             '**Lobby**',
             'Updated balance patchnotes link',

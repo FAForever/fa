@@ -1,0 +1,90 @@
+# Copyright (c) 2024 Willem 'Jip' Wijnia
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: SpookyDB - update unit information
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - deploy/faf
+
+jobs:
+  build:
+    uses: FAForever/spooky-db/.github/workflows/build.yaml@master
+  deploy:
+    name: Deploy the SpookyDB
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout/tree/v4/
+      - name: Checkout spooky db code
+        uses: actions/checkout@v4
+        with:
+            repository: FAForever/spooky-db
+            path: gh-pages
+            ref: gh-pages  
+            ssh-key: ${{ secrets.SPOOKYDB_DEPLOYMENT_KEY }}
+    
+      # https://github.com/actions/download-artifact/tree/v4/
+      - name: Download recent unit information
+        uses: actions/download-artifact@v4
+        with:
+            name: spookydb-dist
+            path: dist
+
+      # Each file is given a (random) hash pre-pended to the filename to prevent caching
+      # issues. Because of that we first need to remove all existing hashed files as otherwise
+      # they will keep accumulating forever. As much as this fits the narrative of the community
+      # (Forged Alliance >Forever<) it's not what we want here.
+      - name: Copy
+        run: |
+            # remove old files that have a hash in the name
+            rm -r gh-pages/css/*
+            rm -r gh-pages/data/*
+            rm -r gh-pages/img/*
+            rm -r gh-pages/js/*
+            rm -r gh-pages/views/*
+
+            # copy over new files
+            cp -r dist/* gh-pages/
+
+      # By pushing the changes to the gh-pages branch, the changes will be deployed to the
+      # website. The website is hosted on GitHub Pages and is (at the moment of writing) 
+      # available at:
+      # - https://faforever.github.io/spooky-db/
+      - name: Deploy
+        working-directory: gh-pages
+        run: |
+            # Check for any differences between the working directory and the latest commit
+            if git diff --quiet; then
+                echo "No changes to deploy"
+                exit 0
+            fi
+
+            # Configure git
+            git config user.email "administrator@faforever.com"
+            git config user.name "FAForever"
+
+            # Stage, commit and push the changes
+            git stage .
+            git commit -m 'Automated deployment of spooky db'
+            git push origin HEAD:gh-pages
+

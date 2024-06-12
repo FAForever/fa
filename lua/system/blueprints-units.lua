@@ -25,6 +25,17 @@ local BlueprintNameToIntel = {
     SonarStealthFieldRadius = 'SonarStealthField',
 }
 
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
+}
+
 local LabelToVeterancyUse = {
     ['DeathWeapon'] = true,
     ['DeathImpact'] = true,
@@ -327,31 +338,29 @@ local function PostProcessUnit(unit)
         ---@type UnitIntelStatus
         local status = {}
 
-        -- life is good, intel is funded by the government
+        -- all of the unit's intel is free due to a bp flag or 0 maintenance cost
         local allIntelIsFree = false
-        if intelBlueprint.FreeIntel or (
-            not enhancementBlueprints and
-                (
-                (not economyBlueprint) or
-                    (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
-                    economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+        if intelBlueprint.FreeIntel
+            or (
+                not enhancementBlueprints
+                and (
+                    not economyBlueprint
+                    or not economyBlueprint.MaintenanceConsumptionPerSecondEnergy
+                    or economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
                 )
-            ) then
+            )
+        then
             allIntelIsFree = true
             status.AllIntelMaintenanceFree = {}
         end
 
-        -- special case: unit has intel that is considered free
-        if intelBlueprint.ActiveIntel then
-            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or {}
-            for intel, _ in intelBlueprint.ActiveIntel do
+        -- special case: unit has specific intel types that are considered free
+        local activeIntel = intelBlueprint.ActiveIntel
+        if activeIntel then
+            status.AllIntelMaintenanceFree = {}
+            for intel, _ in activeIntel do
                 status.AllIntelMaintenanceFree[intel] = true
             end
-        end
-
-        -- special case: unit has enhancements and therefore can have any intel type
-        if enhancementBlueprints then
-            status.AllIntelFromEnhancements = {}
         end
 
         -- usual case: find all remaining intel
@@ -360,7 +369,7 @@ local function PostProcessUnit(unit)
 
             if value == true or value > 0 then
                 local intel = BlueprintNameToIntel[name]
-                if intel then
+                if intel and not activeIntel[intel] then
                     if allIntelIsFree then
                         status.AllIntelMaintenanceFree[intel] = true
                     else
@@ -371,7 +380,7 @@ local function PostProcessUnit(unit)
         end
 
         -- check if we have any intel
-        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints) then
+        if not ( table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) ) then
             -- cache it
             status.AllIntelDisabledByEvent = {}
             status.AllIntelRecharging = {}
@@ -431,7 +440,7 @@ local function PostProcessUnit(unit)
             if category then
                 damagePerRangeCategory[category] = damagePerRangeCategory[category] + dps
             else
-                if weapon.WeaponCategory != 'Death' then
+                if weapon.WeaponCategory ~= 'Death' then
                     -- WARN("Invalid weapon on " .. unit.BlueprintId)
                 end
             end
@@ -605,12 +614,48 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
     end
 end
 
+---@param unit UnitBlueprint
+function TestIntelValues(unit)
+
+    ---------------------------------------------------------------------------
+    --#region Sanity check for intel values
+
+    -- Intel is visualised as a circle but it works in squares/blocks. You can
+    -- view the intel that a unit produces via a console command 'dbg Radar'.
+    --
+    -- It appears the engine divides the radius by the grid size and floors the
+    -- result. Therefore not all intel values and/or changes are actually 
+    -- meaningful. With this code we check all intel values and point out those
+    -- that are not accurate.
+
+    if unit.Intel then
+        for nameIntel, radius in unit.Intel do
+            local ogrids = BlueprintIntelNameToOgrids[nameIntel]
+            if ogrids then
+                local radiusOnGrid = math.floor(radius / ogrids) * ogrids
+                if radiusOnGrid ~= radius then
+                    WARN(
+                        string.format(
+                            "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d",
+                            tostring(unit.BlueprintId), radius, nameIntel, ogrids, radiusOnGrid, radiusOnGrid + ogrids
+                            )
+                        )
+                end
+            end
+        end
+    end
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        TestIntelValues(unit)
     end
 
     for _, unit in units do

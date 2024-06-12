@@ -281,9 +281,10 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
----@param instigator? Unit
----@param damageType? DamageType
----@param excessDamageRatio? number
+---@overload fun(): 
+---@param instigator Unit
+---@param damageType DamageType
+---@param excessDamageRatio number
 function Entity:Kill(instigator, damageType, excessDamageRatio)
 end
 

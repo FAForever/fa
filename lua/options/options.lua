@@ -660,6 +660,32 @@ options = {
                 },
             },
 
+            -- {
+            --     title = '<LOC OPTIONS_0323>Area commands',
+            --     type = 'header',
+
+            --     -- these are expected everywhere
+            --     default = '',
+            --     key = '',
+            -- },
+
+            -- {
+            --     title = "<LOC area_commands_key>Key to trigger area commands",
+            --     key = 'area_commands_key',
+            --     type = 'toggle',
+            --     default = "no-key",
+            --     set = function(key, value, startup)
+            --         import("/lua/ui/game/hotkeys/area-reclaim-order.lua").SetDragKeyCode(value)
+            --     end,
+            --     custom = {
+            --         states = {
+            --             { text = "<LOC _Nokey>No key required", key = "no-key" },
+            --             { text = "<LOC _Alt>Alt", key = "ALT" },
+            --             { text = "<LOC _Control>Control", key = "CONTROL" },
+            --         },
+            --     },
+            -- },
+
             {
                 title = '<LOC OPTIONS_0322>Selection',
                 type = 'header',
@@ -893,6 +919,26 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 0 },
                         { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC options_show_player_names_title>Show Player Names",
+                key = 'options_show_player_names',
+                type = 'toggle',
+                default = 'on',
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/ArmiesTable.lua").OptionShowPlayerNames = value
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC options_show_player_names_allies_only>Allies only", key = 'allies-only' },
+                        -- { text = "<LOC _Off>", key = 'off' },
                     },
                 },
             },

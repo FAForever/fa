@@ -36,10 +36,12 @@ UnitBlueprint{
         "RECLAIMABLE",
         "SELECTABLE",
         "SNIPEMODE",
+        "SHOWATTACKRETICLE",
         "SONAR",
         "TECH1",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 1,
@@ -151,6 +153,10 @@ UnitBlueprint{
         UnitName = "<LOC ues0103_name>Thunderhead Class",
     },
     Intel = {
+        ActiveIntel = {
+            Radar = true,
+            Sonar = true,
+        },
         JamRadius = {
             Max = 70,
             Min = 70,
@@ -166,7 +172,6 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -185,7 +190,6 @@ UnitBlueprint{
         MeshExtentsX = 0.85,
         MeshExtentsY = 1.55,
         MeshExtentsZ = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 10,
         TurnRate = 60,

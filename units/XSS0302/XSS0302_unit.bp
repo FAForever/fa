@@ -159,17 +159,16 @@ UnitBlueprint{
         UnitName = "<LOC xss0302_name>Hauthuum",
     },
     Intel = {
-        RadarRadius = 50,
+        RadarRadius = 48,
         SonarRadius = 20,
         VisionRadius = 50,
-        WaterVisionRadius = 50,
+        WaterVisionRadius = 48,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 7.5,
     LifeBarSize = 4,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -188,7 +187,6 @@ UnitBlueprint{
         MeshExtentsX = 3.25,
         MeshExtentsY = 5,
         MeshExtentsZ = 15,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,

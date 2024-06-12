@@ -1,4 +1,5 @@
 UnitBlueprint {
+    Description = '<LOC uea0001_desc>Engineering Drone',
     AI = {
         InitialAutoMode = true,
     },
@@ -100,7 +101,6 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uea0001_desc>Engineering Drone',
     Display = {
         Abilities = {
             '<LOC ability_engineeringsuite>Engineering Suite',
@@ -154,7 +154,6 @@ UnitBlueprint {
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },

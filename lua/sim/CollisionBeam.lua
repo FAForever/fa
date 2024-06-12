@@ -14,6 +14,10 @@
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+-- terrain interaction
+local GetTerrainType = GetTerrainType
+local DefaultTerrainType = GetTerrainType(-1, -1)
+
 ---@class CollisionBeam : moho.CollisionBeamEntity
 ---@field Trash TrashBag
 CollisionBeam = Class(moho.CollisionBeamEntity) {
@@ -218,14 +222,17 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     UpdateTerrainCollisionEffects = function(self, TargetType)
         local pos = self:GetPosition(1)
         local TerrainType = nil
+        local TerrainImpactType = self.TerrainImpactType
 
-        if self.TerrainImpactType ~= 'Default' then
+        if TerrainImpactType ~= 'Default' then
             TerrainType = GetTerrainType(pos.x,pos.z)
         else
-            TerrainType = GetTerrainType(-1, -1)
+            TerrainType = DefaultTerrainType
         end
 
-        local TerrainEffects = TerrainType.FXImpact[TargetType][self.TerrainImpactType] or nil
+        local TerrainEffects = TerrainType.FXImpact[TargetType][TerrainImpactType]
+                            or DefaultTerrainType.FXImpact[TargetType][TerrainImpactType]
+                            or nil
 
         if TerrainEffects and (self.LastTerrainType ~= TerrainType) then
             self:DestroyTerrainEffects()

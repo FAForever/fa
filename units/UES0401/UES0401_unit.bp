@@ -253,7 +253,7 @@ UnitBlueprint{
         UnitName = "<LOC ues0401_name>Atlantis",
     },
     Intel = {
-        RadarRadius = 250,
+        RadarRadius = 256,
         SonarRadius = 252,
         VisionRadius = 100,
         WaterVisionRadius = 100,
@@ -263,7 +263,6 @@ UnitBlueprint{
     LifeBarSize = 6,
     Physics = {
         BackUpDistance = 30,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -283,7 +282,6 @@ UnitBlueprint{
         MeshExtentsX = 2.5,
         MeshExtentsY = 2,
         MeshExtentsZ = 20,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -5.5,

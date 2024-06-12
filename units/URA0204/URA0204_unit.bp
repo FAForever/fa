@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ura0204_desc>Torpedo Bomber",
-    AI = {
-        GuardReturnRadius = 125,
-    },
+    AI = { GuardReturnRadius = 125 },
     Air = {
         AutoLandTime = 1,
         BankFactor = 4,
@@ -167,7 +165,7 @@ UnitBlueprint{
         UnitName = "<LOC ura0204_name>Cormorant",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -218,7 +216,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 30,
+            Damage = 37.5,
             DamageRadius = 0,
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
@@ -236,7 +234,7 @@ UnitBlueprint{
             MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.2,
-            MuzzleSalvoSize = 5,
+            MuzzleSalvoSize = 4,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/CANTorpedoNanite03/CANTorpedoNanite03_proj.bp",
             ProjectileLifetime = 20,

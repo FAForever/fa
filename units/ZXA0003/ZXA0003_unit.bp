@@ -1,0 +1,47 @@
+UnitBlueprint{
+    Categories = {
+        "DUMMYUNIT",
+        "INSIGNIFICANTUNIT",
+        "INVULNERABLE",
+        "UNSELECTABLE",
+        "UNSPAWNABLE",
+        "UNTARGETABLE",
+        "CARRIER",
+    },
+    Defense = {
+        Health = 30,
+        MaxHealth = 30,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 2000,
+            LODs = {
+                {
+                    ShaderName = 'Unit',
+                    MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
+                    AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
+                    NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
+                    SpecularName = '/Units/UEA0001/UEA0001_SpecTeam.dds',
+                },
+            },
+        },
+        UniformScale = 0.12,
+    },
+    Economy = {
+        BuildCostEnergy = 0,
+        BuildCostMass = 0,
+        BuildTime = 0,
+    },
+    General = {
+        CapCost = 0,
+        Category = '',
+        SelectionPriority = 3,
+    },
+    Intel = { VisionRadius = 0 },
+    Physics = {
+        MotionType = "RULEUMT_None",
+    },
+    SizeX = 0,
+    SizeY = 0,
+    SizeZ = 0,
+}
