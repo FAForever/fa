@@ -16,37 +16,43 @@ end
 --- Does not appear to function
 ---@deprecated
 ---@return boolean
-function ReconBlip:IsKnownFake()
+function ReconBlip:IsKnownFake(army)
 end
 
 ---
+---@param army number
 ---@return boolean
-function ReconBlip:IsMaybeDead()
+function ReconBlip:IsMaybeDead(army)
 end
 
 ---
+---@param army number
 ---@return boolean
-function ReconBlip:IsOnOmni()
+function ReconBlip:IsOnOmni(army)
 end
 
 ---
+---@param army number
 ---@return boolean
-function ReconBlip:IsOnRadar()
+function ReconBlip:IsOnRadar(army)
 end
 
 ---
+---@param army number
 ---@return boolean
-function ReconBlip:IsOnSonar()
+function ReconBlip:IsOnSonar(army)
 end
 
 ---
+---@param army number
 ---@return boolean
-function ReconBlip:IsSeenEver()
+function ReconBlip:IsSeenEver(army)
 end
 
 ---
+---@param army number
 ---@return boolean
-function ReconBlip:IsSeenNow()
+function ReconBlip:IsSeenNow(army)
 end
 
 return ReconBlip

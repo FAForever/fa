@@ -49,7 +49,7 @@ ProjectileBlueprint {
         Lifetime = 10,
         MaxSpeed = 15,
         StayUnderwater = true,
-        TrackTarget = false,
+        TrackTarget = true,
         TurnRate = 200,
         UseGravity = false,
         VelocityAlign = true,

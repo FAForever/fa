@@ -66,7 +66,7 @@
 ---@field LeadTarget boolean
 --- Whether projectiles should try to stay underwater. Applies only to tracking projectiles.
 ---@field StayUnderwater boolean
---- if the projectile is initially affected by gravity
+--- if the projectile is initially affected by gravity (-4.9 ogrids/second/second)
 ---@field UseGravity boolean
 --- projectile will detonate when going above this height above ground
 ---@field DetonateAboveHeight number
@@ -133,7 +133,11 @@
 ---@field MaxZigZag number
 --- frequency of zig-zag directional changes, in seconds
 ---@field ZigZagFrequency number
---- realistic free fall ordinance type weapon
+--- When true and weapon muzzle velocity is 0, the projectile's horizontal velocity is set in the direction of the target with the speed of the weapon firing the projectile.
+--- Used for realistic free fall ordinance type weapons like bombs
 ---@field RealisticOrdinance boolean
 --- bombs that always drop stright down
 ---@field StraightDownOrdinance boolean
+--- for projectiles that spawn spreads of sub-projectiles, how large the impact radius should be
+---@field FragmentRadius number
+---@field OnLostTargetLifetime? number

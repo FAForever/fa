@@ -16,6 +16,7 @@ UnitBlueprint{
         "BUILTBYTIER3FACTORY",
         "DEFENSE",
         "DEFENSIVEBOAT",
+        "DUMMYGSRWEAPON",
         "MOBILE",
         "NAVAL",
         "PRODUCTFA",
@@ -25,6 +26,7 @@ UnitBlueprint{
         "TECH2",
         "UEF",
         "VISIBLETORECON",
+        "OVERLAYDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -140,7 +142,6 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_Reclaim = false,
             RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
@@ -162,7 +163,6 @@ UnitBlueprint{
     LifeBarSize = 1.1,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -181,7 +181,6 @@ UnitBlueprint{
         MeshExtentsX = 2.25,
         MeshExtentsY = 2,
         MeshExtentsZ = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 10,
         TurnRate = 45,
@@ -198,9 +197,28 @@ UnitBlueprint{
     Weapon = {
         {
             Damage = 0,
+            DamageFriendly = false,
+            FireTargetLayerCapsTable = {
+                Land = "Land|Water",
+                Water = "Land|Water",
+            },
+            MaxRadius = 54,
+            RackBones = {
+                {
+                    MuzzleBones = { "XES0205" },
+                    RackBone = "XES0205",
+                },
+            },
+            RateOfFire = 0.5,
+            SlavedToBody = false,
+            TargetPriorities = { "ALLUNITS" },
+            TargetRestrictDisallow = "UNTARGETABLE",
+            Turreted = false,
+        },
+        {
+            Damage = 0,
             MaxRadius = 34,
             RangeCategory = "UWRC_DirectFire",
-            WeaponCategory = "Direct Fire Naval",
         },
     },
 }

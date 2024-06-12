@@ -108,15 +108,14 @@ UnitBlueprint{
         UnitName = "<LOC uel0101_name>Snoop",
     },
     Intel = {
-        RadarRadius = 45,
+        RadarRadius = 44,
         VisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.25,
     LifeBarSize = 0.5,
     Physics = {
-        BackUpDistance = 2,
-        BankingSlope = 0,
+        BackUpDistance = 6,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -134,7 +133,6 @@ UnitBlueprint{
         MeshExtentsX = 0.4,
         MeshExtentsY = 0.3,
         MeshExtentsZ = 0.8,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         TurnRadius = 5,
         TurnRate = 90,

@@ -2,7 +2,7 @@ local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
 
 ---@class TacticalDebris02 : GenericDebris
 TacticalDebris02 = ClassDummyProjectile(GenericDebris) {
-    FxTrails = import("/lua/EffectTemplates.lua").TacticalDebrisTrails02,
+    FxTrails = import("/lua/effecttemplates.lua").TacticalDebrisTrails02,
 
     ---@param self BaseGenericDebris
     ---@param targetType string

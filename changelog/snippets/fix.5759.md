@@ -1,0 +1,1 @@
+- (#5759) Fix rotators on Aeon T2 shield never restarting and on T3 Mass Fabricator never stopping.

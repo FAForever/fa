@@ -1175,25 +1175,28 @@ function OnRolloverHandler(button, state)
     end
 end
 
+---@param unit UserUnit
 function watchForQueueChange(unit)
     if watchingUnit == unit then
         return
     end
-
     updateQueue = false
     watchingUnit = unit
-    ForkThread(function()
-        local threadWatchingUnit = watchingUnit
-        while unit:GetCommandQueue()[1].type ~= 'Script' do
-            WaitSeconds(0.2)
-        end
+    ForkThread(QueueChangeWatchThread, unit)
+end
 
-        local selection = GetSelectedUnits() or {}
-        if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
-            SetSecondaryDisplay(lastDisplayType)
-        end
-        watchingUnit = nil
-    end)
+---@param unit UserUnit
+function QueueChangeWatchThread(unit)
+    local threadWatchingUnit = watchingUnit
+    while unit:GetCommandQueue()[1].type ~= 'Script' do
+        WaitSeconds(0.2)
+    end
+
+    local selection = GetSelectedUnits() or {}
+    if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
+        SetSecondaryDisplay(lastDisplayType)
+    end
+    watchingUnit = nil
 end
 
 function checkBadClean(unit)
@@ -1892,7 +1895,7 @@ end
 
 function ToggleUnitPauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:ToggleCheck(false)
+        controls.extraBtn2:OnCheck(true)
     else
         SetPaused(sortedOptions.selection, true)
     end
@@ -1900,7 +1903,7 @@ end
 
 function ToggleUnitUnpauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:OnCheck(true)
+        controls.extraBtn2:OnCheck(false)
     else
         SetPaused(sortedOptions.selection, false)
     end
@@ -2404,7 +2407,7 @@ function SetSecondaryDisplay(type)
         local data = {}
         if type == 'buildQueue' then
             modifiedCommandQueue = table.copy(currentCommandQueue or {})
-            if table.getn(sortedOptions.selection) == 1 then
+            if sortedOptions.selection and table.getn(sortedOptions.selection) == 1 then
                 IntegrateEnhancements()
             end
 
@@ -2430,7 +2433,7 @@ function SetSecondaryDisplay(type)
                 end
             end
 
-            if table.getn(sortedOptions.selection) == 1 and not table.empty(data) then
+            if sortedOptions.selection and table.getn(sortedOptions.selection) == 1 and not table.empty(data) then
                 controls.secondaryProgress:SetNeedsFrameUpdate(true)
             else
                 controls.secondaryProgress:SetNeedsFrameUpdate(false)
@@ -2705,37 +2708,49 @@ function OnSelection(buildableCategories, selection, isOldSelection)
 
                 if currentFaction then
                     sortedOptions.templates = {}
-                    local function ConvertID(BPID)
-                        local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
-                        for k, prefix in prefixes do
-                            local newBPID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
-                            if table.find(buildableUnits, newBPID) then
-                                return newBPID
-                            end
-                        end
-                        return false
-                    end
 
+                    local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
                     for templateIndex, template in templates do
                         local valid = true
-                        local converted = false
                         for _, entry in template.templateData do
                             if type(entry) == 'table' then
-                                if not table.find(buildableUnits, entry[1]) then
 
-                                    entry[1] = ConvertID(entry[1])
-                                    converted = true
-                                    if not table.find(buildableUnits, entry[1]) then
+                                -- check if entry is valid
+                                if not entry[1] then
+                                    valid = false
+                                    break
+                                end
+
+                                -- check if we can build the entry
+                                local converted = false
+                                if not table.find(buildableUnits, entry[1]) then
+                                    for k, prefix in prefixes do
+                                        local convertedId = string.gsub(entry[1], "(%a+)(%d+)", prefix .. "%2")
+                                        if table.find(buildableUnits, convertedId) then
+                                            converted = true
+                                            entry[1] = convertedId
+                                            break
+                                        end
+                                    end
+
+                                    if not converted then
                                         valid = false
                                         break
                                     end
                                 end
                             end
                         end
+
                         if valid then
-                            if converted then
-                                template.icon = ConvertID(template.icon)
+                            -- also try to convert the template icon
+                            for k, prefix in prefixes do
+                                local convertedId = string.gsub(template.icon, "(%a+)(%d+)", prefix .. "%2")
+                                if table.find(buildableUnits, convertedId) then
+                                    template.icon = convertedId
+                                    break
+                                end
                             end
+
                             template.templateID = templateIndex
                             table.insert(sortedOptions.templates, template)
                         end

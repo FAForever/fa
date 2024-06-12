@@ -22,51 +22,52 @@
 
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
----@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
+---@field TemplateData UIBuildTemplate          # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
 ---@field TemplateSortingOrder number           # Lower numbers end up first in the queue
+---@field TemplateBlueprintId BlueprintId       
 ---
 --- By mouse context
----@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the unit the mouse is hovering over matches the categories
+---@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the player is hovering over a unit, a build order for a given unit or a unit in build preview that matches the categories
 ---@field TriggersOnLand? boolean               # When true, includes this template when the mouse is over land and not over a deposit
 ---@field TriggersOnWater? boolean              # When true, includes this template when the mouse is over water and not over a deposit
 ---@field TriggersOnMassDeposit? boolean        # When true, includes this template when the mouse is over a mass deposit
 ---@field TriggersOnHydroDeposit? boolean       # When true, includes this template when the mouse is over a hydrocarbon deposit
 ---
--- By command mode context
----@field TriggersOnBuilding? EntityCategory    # when defined, includes this template when the unit that is being built matches the categories
+-- deprecated
+---@field TriggersOnBuilding? EntityCategory    # when defined, includes this template when the unit that is being built matches the categories. Is deprecated, use TriggersOnUnit instead.
 
 -------------------------------------------------------------------------------
 --#region By mouse context
 
-CapExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/CapExtractorWithStorages.lua").Template
-CapExtractorWithFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/CapExtractorWithFabs.lua").Template
-CapRadarWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapRadarWithPower.lua").Template
-CapT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT2ArtilleryWithPower.lua").Template
-CapT3FabricatorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT3FabricatorWithStorages.lua").Template
-CapT3ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT3ArtilleryWithPower.lua").Template
 PointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/PointDefense.lua").Template
 AirDefenseLand = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseLand.lua").Template
 AirDefenseWater = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseWater.lua").Template
 TorpedoDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/TorpedoDefense.lua").Template
-T1Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Extractor.lua").Template
-T2ExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/T2ExtractorWithStorages.lua").Template
+T3Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/T3Extractor.lua").Template
 T3ExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/T3ExtractorWithStorages.lua").Template
 T3ExtractorWithStoragesAndFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/T3ExtractorWithStoragesAndFabs.lua").Template
 T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydrocarbon.lua").Template
-
+    
 --#endregion
 
 -------------------------------------------------------------------------------
---#region By command mode context
+--#region By (unit) blueprint id
 
-AppendMassStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStorages.lua").Template
-AppendMassStoragesAndFabricators = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesAndFabricators.lua").Template
-AppendPowerGeneratorsToArtillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToArtillery.lua").Template
+AppendExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendExtractorWithStorages.lua").Template
+AppendExtractorWithFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendExtractorWithFabs.lua").Template
+AppendRadarWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendRadarWithPower.lua").Template
+AppendOpticsWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendOpticsWithPower.lua").Template
+AppendT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT2ArtilleryWithPower.lua").Template
+AppendT3FabricatorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT3FabricatorWithStorages.lua").Template
+AppendT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT2ArtilleryWithPower.lua").Template
+AppendT3ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT3ArtilleryWithPower.lua").Template
+AppendSalvationWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendSalvationWithPower.lua").Template
+AppendPowerGeneratorsToT2Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT2Artillery.lua").Template
+AppendPowerGeneratorsToT3Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT3Artillery.lua").Template
+AppendPowerGeneratorsToSalvation = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSalvation.lua").Template
 AppendPowerGeneratorsToEnergyStorage = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEnergyStorage.lua").Template
-AppendPowerGeneratorsToRadar = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToRadar.lua").Template
 AppendPowerGeneratorsToTML = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToTML.lua").Template
 AppendWallsToPointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendWallsToPointDefense.lua").Template
-
 AppendAirGrid = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendAirGrid.lua").Template
 
 --#endregion

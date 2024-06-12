@@ -108,13 +108,13 @@ do
 end
 
 
----@type { [1]: Unit }
+---@type { [1]: moho.unit_methods }
 local UnitsCache = {}
 
 --- Orders a unit to move to a location. See `IssueMove` when you want to apply the order to a group of units.
 ---
 --- This use of this function is **not** compatible with the Steam version of the game.
----@param unit Unit
+---@param unit moho.unit_methods
 ---@param position Vector
 ---@return SimCommand
 IssueToUnitMove = function(unit, position)
@@ -125,7 +125,7 @@ end
 --- Orders a unit to move off a factory build site. See `IssueMoveOffFactory` when you want to apply the order to a group of units.
 ---
 --- This use of this function is **not** compatible with the Steam version of the game.
----@param unit Unit
+---@param unit moho.unit_methods
 ---@param position Vector
 ---@return SimCommand
 IssueToUnitMoveOffFactory = function(unit, position)
@@ -136,9 +136,18 @@ end
 --- Clears out all commands issued on the unit, this happens immediately. See `IssueClearCommands` when you want to apply the order to a group of units.
 ---
 --- This use of this function is **not** compatible with the Steam version of the game.
----@param unit Unit
+---@param unit moho.unit_methods
 ---@return SimCommand
 IssueToUnitClearCommands = function(unit)
     UnitsCache[1] = unit
     return IssueClearCommands(UnitsCache)
+end
+
+--- Issues a unit to stop what it was doing, this happens immediately. See `IssueStop` when you want to apply the order to a group of units.
+---
+--- This use of this function is **not** compatible with the Steam version of the game.
+---@param unit moho.unit_methods
+IssueToUnitStop = function(unit)
+    UnitsCache[1] = unit
+    IssueStop(UnitsCache)
 end

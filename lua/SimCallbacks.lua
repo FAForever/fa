@@ -24,7 +24,7 @@ local TableEmpty = table.empty
 local TableRemove = table.remove
 local TableMerged = table.merged
 
--- upvalue globals for performance
+-- upvalue scope for performance
 local type = type
 local Vector = Vector
 local IsEntity = IsEntity
@@ -32,6 +32,8 @@ local GetEntityById = GetEntityById
 local GetSurfaceHeight = GetSurfaceHeight
 local OkayToMessWithArmy = OkayToMessWithArmy
 local EntityCategoryFilterDown = EntityCategoryFilterDown
+local GetCurrentCommandSource = GetCurrentCommandSource
+local GetSystemTimeSecondsOnlyForProfileUse = GetSystemTimeSecondsOnlyForProfileUse
 
 local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
@@ -55,7 +57,7 @@ function DoCallback(name, data, units)
     if fn then
         fn(data, units)
     else
-        SPEW('No callback named: ' .. repr(name))
+        SPEW('No callback named: ' .. tostring(name))
     end
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
@@ -65,6 +67,8 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
+---@param units Unit[]
+---@return Unit[]
 function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
@@ -93,14 +97,15 @@ end
 Callbacks.SetStatByCallback = function(data, units)
     for stat, value in data do
         if not type(value) == 'boolean' then
-            WARN('SetStatByCallback: received non boolean value ' .. repr(value) .. ' for stat ' .. repr(stat) .. '!')
+            WARN('SetStatByCallback: received non boolean value ' ..
+                tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
             continue
         end
         value = (value and 1) or 0 -- numerize our bool
         for _, u in units or {} do
             if IsEntity(u) and OkayToMessWithArmy(u.Army) then
                 if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
-                    WARN('SetStatByCallback: ' .. repr(stat) .. ' is not a valid stat for this unit!')
+                    WARN('SetStatByCallback: ' .. tostring(stat) .. ' is not a valid stat for this unit!')
                     continue
                 end
                 u:UpdateStat(stat, value)
@@ -128,15 +133,6 @@ Callbacks.PersistFerry = function(data, units)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
-    end
-end
-
-Callbacks.TransportLock = function(data)
-    local units = SecureUnits(data.ids)
-    if not units[1] then return end
-
-    for _, u in units do
-        u:TransportLock(data.lock == true)
     end
 end
 
@@ -239,6 +235,22 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
+---@param unit Unit
+---@param target? Unit
+---@return boolean
+function IsInvalidAssist(unit, target)
+    if target and target.EntityId == unit.EntityId then
+        return true
+    elseif not target or not target:GetGuardedUnit() then
+        return false
+    else
+        return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end
+
+--- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
+---@param data { target: EntityId}
+---@param units any
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -249,16 +261,6 @@ Callbacks.ValidateAssist = function(data, units)
                 return
             end
         end
-    end
-end
-
-function IsInvalidAssist(unit, target)
-    if target and target.EntityId == unit.EntityId then
-        return true
-    elseif not target or not target:GetGuardedUnit() then
-        return false
-    else
-        return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
 end
 
@@ -285,6 +287,28 @@ Callbacks.FlagShield = function(data, units)
         end
     end
 end
+
+-------------------------------------------------------------------------------
+--#region General orders
+
+---@param data { }
+---@param selection Unit[]
+Callbacks.SelfDestruct = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- suppress self destruct in tutorial missions as they screw up the mission
+    if ScenarioInfo.tutorial then
+        return
+    end
+
+    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+end
+
+--#endregion
 
 -------------------------------------------------------------------------------
 --#region Advanced orders
@@ -636,6 +660,149 @@ do
     end
 end
 
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.DischargeShields = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- only apply this to units with shields
+        local shead = 1
+        local unitsWithShields = {}
+        for k = 1, table.getn(selection) do
+            local unit = selection[k]
+            if unit.MyShield then
+                unitsWithShields[shead] = unit
+                shead = shead + 1
+            end
+        end
+
+        if table.empty(unitsWithShields) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/discharge-shields.lua").DischargeShields(unitsWithShields, true)
+    end
+end
+
+do
+
+    local Width = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
+    local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
+
+    ---@param data { Origin: number, Destination: Vector}
+    ---@param selection Unit[]
+    Callbacks.ExtendReclaimOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 19 and lastCommand.target) then
+            return
+        end
+
+        local ps = lastCommand.target:GetPosition()
+        local pe = data.Destination
+        local dx = pe[1] - ps[1]
+        local dz = pe[3] - ps[3]
+        local distance = math.sqrt(dx * dx + dz * dz)
+
+        -- limit the maximum distance
+        if distance > MaximumDistance then
+            pe[1] = (1 / distance) * MaximumDistance * dx + ps[1]
+            pe[3] = (1 / distance) * MaximumDistance * dz + ps[3]
+        end
+
+
+        -- radius = math.min(distance, maximumDistance)
+
+        -- local width = 5
+        -- local ox = nz
+        -- local oz = -nx
+
+        -- DrawCircle(ps, 1, 'ffffff')
+        -- DrawCircle(pe, 1, 'ffffff')
+        -- local ps1 = { ps[1] + width * ox, ps[2], ps[3] + width * oz }
+        -- local ps2 = { ps[1] - width * ox, ps[2], ps[3] - width * oz }
+
+        -- DrawCircle(ps1, 1, 'ffffff')
+        -- DrawCircle(ps2, 1, 'ffffff')
+
+        -- local pe1 = { pe[1] + width * ox, pe[2], pe[3] + width * oz }
+        -- local pe2 = { pe[1] - width * ox, pe[2], pe[3] - width * oz }
+
+        -- DrawCircle(pe1, 1, 'ffffff')
+        -- DrawCircle(pe2, 1, 'ffffff')
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimProps(selection, ps, pe, Width, true)
+        SPEW("Time taken for area reclaim order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
+    end
+
+    ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendAttackOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 10) or lastCommand.target then
+            return
+        end
+
+        local target = lastCommand.target --[[@as Unit | Prop]]
+        
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+        import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection,
+            { lastCommand.x, lastCommand.y, lastCommand.z }, true, data.Radius)
+        SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
+    end
+
+end
 
 --#endregion
 
@@ -645,19 +812,6 @@ end
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
 local PassesAntiCheatCheck = function()
-    -- perform UI checks on sim to prevent cheating
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    -- allow when there is 1 or less players
-    if count <= 1 then
-        return true
-    end
-
     -- allow when cheats are enabled
     return CheatsEnabled()
 end
@@ -1180,6 +1334,22 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
     end
 
     import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Moderator related functionality
+
+---@class CallbackModeratorEventData
+---@field From number
+---@field Message string
+
+---@param data CallbackModeratorEventData
+Callbacks.ModeratorEvent = function(data)
+    -- show up in the game logs
+    local brain = GetArmyBrain(GetCurrentCommandSource())
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
 end
 
 --#endregion

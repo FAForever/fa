@@ -41,8 +41,7 @@ AMiasmaProjectile = import("/lua/sim/projectiles/aeon/AMiasmaProjectile.lua").AM
 AMiasmaProjectile02 = import("/lua/sim/projectiles/aeon/AMiasmaProjectile02.lua").AMiasmaProjectile02
 AMissileAAProjectile = import("/lua/sim/projectiles/aeon/AMissileAAProjectile.lua").AMissileAAProjectile
 AZealot02AAMissileProjectile = import("/lua/sim/projectiles/aeon/AZealot02AAMissileProjectile.lua").AZealot02AAMissileProjectile
-AAALightDisplacementAutocannonMissileProjectile = import("/lua/sim/projectiles/aeon/AAALightDisplacementAutocannonMissileProjectile.lua")
-    .AAALightDisplacementAutocannonMissileProjectile
+AAALightDisplacementAutocannonMissileProjectile = import("/lua/sim/projectiles/aeon/AAALightDisplacementAutocannonMissileProjectile.lua").AAALightDisplacementAutocannonMissileProjectile
 AGuidedMissileProjectile = import("/lua/sim/projectiles/aeon/AGuidedMissileProjectile.lua").AGuidedMissileProjectile
 AMissileCruiseSubProjectile = import("/lua/sim/projectiles/aeon/AMissileCruiseSubProjectile.lua").AMissileCruiseSubProjectile
 AMissileSerpentineProjectile = import("/lua/sim/projectiles/aeon/AMissileSerpentineProjectile.lua").AMissileSerpentineProjectile
@@ -67,13 +66,9 @@ ATemporalFizzAAProjectile = import("/lua/sim/projectiles/aeon/ATemporalFizzAAPro
 ATorpedoShipProjectile = import("/lua/sim/projectiles/aeon/ATorpedoShipProjectile.lua").ATorpedoShipProjectile
 ATorpedoSubProjectile = import("/lua/sim/projectiles/aeon/ATorpedoSubProjectile.lua").ATorpedoSubProjectile
 QuasarAntiTorpedoChargeSubProjectile = import("/lua/sim/projectiles/aeon/QuasarAntiTorpedoChargeSubProjectile.lua").QuasarAntiTorpedoChargeSubProjectile
-AArtilleryFragmentationSensorShellProjectile = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile.lua")
-    .AArtilleryFragmentationSensorShellProjectile
-AArtilleryFragmentationSensorShellProjectile02 = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile02.lua")
-    .AArtilleryFragmentationSensorShellProjectile02
-AArtilleryFragmentationSensorShellProjectile03 = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile03.lua")
-    .AArtilleryFragmentationSensorShellProjectile03
-
+AArtilleryFragmentationSensorShellProjectile = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile.lua").AArtilleryFragmentationSensorShellProjectile
+AArtilleryFragmentationSensorShellProjectile02 = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile02.lua").AArtilleryFragmentationSensorShellProjectile02
+AArtilleryFragmentationSensorShellProjectile03 = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile03.lua").AArtilleryFragmentationSensorShellProjectile03
 ABaseTempProjectile = import("/lua/sim/projectiles/aeon/ABaseTempProjectile.lua").ABaseTempProjectile
 AQuantumAutogun = import("/lua/sim/projectiles/aeon/AQuantumAutogun.lua").AQuantumAutogun
 AHeavyDisruptorCannonShell = import("/lua/sim/projectiles/aeon/AHeavyDisruptorCannonShell.lua").AHeavyDisruptorCannonShell

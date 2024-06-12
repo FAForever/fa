@@ -304,7 +304,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             -- tell attack units to attack
             local attackCommand
-            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4) -- TODO: remove magic numbers'
+            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32) -- TODO: remove magic numbers'
             if not attackOffset then
                 attackCommand = self:AggressiveMoveToLocation(location, 'Attack')
             else
@@ -312,7 +312,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             end
 
             -- tell scout units to patrol for threats
-            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4) -- TODO: remove magic numbers
+            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32) -- TODO: remove magic numbers
             if not scoutOffsets then
                 self:Patrol(location, 'Scout')
             else

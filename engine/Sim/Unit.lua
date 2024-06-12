@@ -52,6 +52,16 @@ local Unit = {}
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
 
+---@class UnitCommand
+---@field _c_object userdata
+---@field blueprintId? string -- For build commands
+---@field commandType integer -- Integer representation of CommandType, see UnitQueueDataToCommand for details
+---@field target? Prop|Unit|Entity -- For commands that target an entity
+---@field targetId? EntityId
+---@field x number -- X coordinate of command target
+---@field y number -- Y coordinate of command target
+---@field z number -- Z coordinate of command target
+
 --- Adds a command cap to the unit
 ---@param category moho.EntityCategory
 function Unit:AddBuildRestriction(category)
@@ -146,7 +156,7 @@ function Unit:GetCargo()
 end
 
 --- Returns table of commands queued up for this unit
----@return { }
+---@return UnitCommand[]
 function Unit:GetCommandQueue()
 end
 
@@ -331,7 +341,7 @@ end
 
 --- makes the unit's bone invisible
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:HideBone(bone, affectChildren)
 end
 
@@ -355,7 +365,7 @@ end
 function Unit:IsMobile()
 end
 
---- returns true if the unit is moving or not
+--- Returns true if the position has changed with respect to the previous simulation tick
 ---@return boolean
 function Unit:IsMoving()
 end
@@ -469,7 +479,7 @@ end
 function Unit:SetAccMult(accelMult)
 end
 
---- sets silo auto-build mode
+--- enable silo auto-build or unit auto-assist
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end
@@ -604,7 +614,7 @@ function Unit:SetRegenRate(rate)
 end
 
 --- sets the script bit
----@param bit number
+---@param bit number|string
 ---@param state boolean
 function Unit:SetScriptBit(bit, state)
 end
@@ -660,7 +670,7 @@ end
 --- makes the unit's bone visible, and if `affectChildren` is true, all child bones as well
 --- (this is almost always what you want)
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:ShowBone(bone, affectChildren)
 end
 

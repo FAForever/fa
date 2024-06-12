@@ -59,6 +59,8 @@ end
 ---@param locationBone string The main build bone where the unit spawns on top of (unused)
 ---@param effectsBag TrashBag The trashbag for effects
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBones, locationBone, effectsBag)
+    WaitTicks(1)
+
     -- -- initialize various info used throughout the function
     local army = builder.Army
     local bp = unitBeingBuilt.Blueprint

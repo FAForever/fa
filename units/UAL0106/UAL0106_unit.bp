@@ -118,7 +118,6 @@ UnitBlueprint{
     LifeBarOffset = 0.1,
     LifeBarSize = 0.45,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = true,
@@ -137,7 +136,6 @@ UnitBlueprint{
         MeshExtentsX = 0.35,
         MeshExtentsY = 0.55,
         MeshExtentsZ = 0.6,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateBodyWhileMoving = true,
         StandUpright = true,
@@ -153,7 +151,7 @@ UnitBlueprint{
     CollisionOffsetY = 0,
     SizeX = 0.7,
     SizeY = 0.7,
-    SizeZ = 0.7,
+    SizeZ = 0.9,
     StrategicIconName = "icon_bot1_directfire",
     StrategicIconSortPriority = 135,
     Transport = { CanFireFromTransport = true },

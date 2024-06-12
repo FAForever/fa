@@ -129,7 +129,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zsb9503',
@@ -192,7 +192,6 @@ UnitBlueprint {
     LifeBarOffset = 6.5,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -202,11 +201,9 @@ UnitBlueprint {
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsX = 5,
         MeshExtentsY = 2,
         MeshExtentsZ = 10,
-        MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
         ComputeRollOffPoint = true,
         RollOffPoints = {
@@ -227,7 +224,6 @@ UnitBlueprint {
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionCenterOffsetX = -1.6,
     SelectionCenterOffsetZ = -0.14,

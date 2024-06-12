@@ -438,7 +438,12 @@ end
 --   }
 --}
 
----@class EngineerBuilder : PlatoonBuilder
+---@class EngineerBuilder : PlatoonBuilder, Unit
+---@field ProcessBuild? thread
+---@field ProcessBuildDone boolean
+---@field EngineerBuildQueue table
+---@field AssistSet boolean
+---@field AssistPlatoon Platoon
 EngineerBuilder = Class(PlatoonBuilder) {
     ---@param self EngineerBuilder
     ---@param brain AIBrain

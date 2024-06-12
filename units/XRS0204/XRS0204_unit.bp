@@ -18,6 +18,7 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",
+        "ANTITORPEDO", 
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -145,7 +146,7 @@ UnitBlueprint{
         BuildCostEnergy = 8800,
         BuildCostMass = 1100,
         BuildTime = 4400,
-        MaintenanceConsumptionPerSecondEnergy = 30,
+        MaintenanceConsumptionPerSecondEnergy = 45,
     },
     Footprint = {
         SizeX = 2,
@@ -191,7 +192,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -208,7 +208,6 @@ UnitBlueprint{
         MaxSpeed = 6.5,
         MaxSpeedReverse = 6.5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,
@@ -304,8 +303,8 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             FireTargetLayerCapsTable = {
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 2,
             Label = "AntiTorpedo01",

@@ -41,6 +41,9 @@ URA0401 = ClassUnit(CAirUnit) {
         self.Trash:Add(self.AnimManip)
     end,
 
+    ---@param self URA0401
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old )
         CAirUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -82,6 +85,9 @@ URA0401 = ClassUnit(CAirUnit) {
         end 
     end,
 
+    ---@param self URA0401
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         CAirUnit.OnMotionVertEventChange(self, new, old)
 

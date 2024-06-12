@@ -52,7 +52,6 @@ function Create(text, buttonText, position)
     end
     
     dlg.OnButtonPressed = function(self, info)
-        LOG('button pressed: ', repr(info))
     end
     
     dialogues[id] = dlg

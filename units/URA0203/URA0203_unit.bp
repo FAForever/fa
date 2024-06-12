@@ -7,8 +7,8 @@ UnitBlueprint{
         CanFly = true,
         CirclingDirChangeFrequencySec = 1,
         CirclingElevationChangeRatio = 0.25,
-        CirclingRadiusChangeMaxRatio = 0.9,
-        CirclingRadiusChangeMinRatio = 0.6,
+        CirclingRadiusChangeMaxRatio = 0.7,
+        CirclingRadiusChangeMinRatio = 0.5,
         CirclingRadiusVsAirMult = 0.66,
         CirclingTurnMult = 3,
         KLift = 3,
@@ -237,6 +237,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Water|Seabed",
                 Land = "Air|Land|Water|Seabed",
+                Water = "Air|Land|Water|Seabed",
             },
             FiringRandomness = 0,
             FiringTolerance = 2,

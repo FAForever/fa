@@ -17,7 +17,6 @@ local TriggerFile = import("/lua/scenariotriggers.lua")
 
 ---@param aiBrain AIBrain
 function AISetEconomyNumbers(aiBrain)
-    --LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     aiEconomy = econ
 end
@@ -25,14 +24,10 @@ end
 ---@param aiBrain AIBrain
 ---@param unitBP UnitBlueprint
 function AIModEconomyNumbers(aiBrain, unitBP)
-    --LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
-    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
-    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGY USE OF UNIT = ', repr(aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy * 0.1))
     aiEconomy.MassTrend = aiEconomy.MassTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
     aiEconomy.MassIncome = aiEconomy.MassIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
     aiEconomy.EnergyTrend = aiEconomy.EnergyTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
     aiEconomy.EnergyIncome = aiEconomy.EnergyIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
-    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
 end
 
 ---@param aiBrain AIBrain
@@ -47,9 +42,8 @@ function AIGetBuilder(aiBrain, techLevel)
     elseif techLevel == 0 then
         builderTechLevel = categories.COMMAND
     end
-    --LOG('*AI DEBUG: AIGETBUILDER FINDING TECH LEVEL ', repr(techLevel))
+
     local builder = aiBrain:FindUnit(builderTechLevel, true)
-    --LOG('*AI DEBUG: AIGETBUILDER RETURNING ', repr(builder))
     return builder
 end
 
@@ -132,12 +126,12 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         local FactionIndexToName = {[1] = 'UEF', [2] = 'AEON', [3] = 'CYBRAN', [4] = 'SERAPHIM', [5] = 'NOMADS' }
         local AIFactionName = FactionIndexToName[factionIndex]
-        SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! AI-faction: '..AIFactionName..', Building Type: '..repr(buildingType)..', engineer-faction: '..repr(builder.Blueprint.FactionCategory))
+        SPEW('*AIExecuteBuildStructure: We cant decide whatToBuild! AI-faction: '..AIFactionName..', Building Type: '..tostring(buildingType)..', engineer-faction: '..tostring(builder.Blueprint.FactionCategory))
         -- Get the UnitId for the actual buildingType
         local BuildUnitWithID
         for Key, Data in buildingTemplate do
             if Data[1] and Data[2] and Data[1] == buildingType then
-                SPEW('*AIExecuteBuildStructure: Found template: '..repr(Data[1])..' - Using UnitID: '..repr(Data[2]))
+                SPEW('*AIExecuteBuildStructure: Found template: '..tostring(Data[1])..' - Using UnitID: '..tostring(Data[2]))
                 BuildUnitWithID = Data[2]
                 break
             end
@@ -145,7 +139,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         -- If we can't find a template, then return
         if not BuildUnitWithID then
             AntiSpamList[buildingType] = true
-            WARN('*AIExecuteBuildStructure: No '..repr(builder.Blueprint.FactionCategory)..' unit found for template: '..repr(buildingType)..'! ')
+            WARN('*AIExecuteBuildStructure: No '..tostring(builder.Blueprint.FactionCategory)..' unit found for template: '..tostring(buildingType)..'! ')
             return false
         end
         -- get the needed tech level to build buildingType
@@ -160,10 +154,10 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- If we can't find a techlevel for the building we want to build, then return
         if not NeedTech then
-            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for BuildUnitWithID: '..repr(BuildUnitWithID))
+            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for BuildUnitWithID: '..tostring(BuildUnitWithID))
             return false
         else
-            SPEW('*AIExecuteBuildStructure: Need engineer with Techlevel ('..NeedTech..') for BuildUnitWithID: '..repr(BuildUnitWithID))
+            SPEW('*AIExecuteBuildStructure: Need engineer with Techlevel ('..NeedTech..') for BuildUnitWithID: '..tostring(BuildUnitWithID))
         end
         -- get the actual tech level from the builder
         local BC = builder:GetBlueprint().CategoriesHash
@@ -176,17 +170,17 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- If we can't find a techlevel for the building we  want to build, return
         if not HasTech then
-            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for engineer: '..repr(builder:GetBlueprint().BlueprintId))
+            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for engineer: '..tostring(builder:GetBlueprint().BlueprintId))
             return false
         else
-            SPEW('*AIExecuteBuildStructure: Engineer ('..repr(builder:GetBlueprint().BlueprintId)..') has Techlevel ('..HasTech..')')
+            SPEW('*AIExecuteBuildStructure: Engineer ('..tostring(builder:GetBlueprint().BlueprintId)..') has Techlevel ('..HasTech..')')
         end
 
         if HasTech < NeedTech then
-            WARN('*AIExecuteBuildStructure: TECH'..HasTech..' Unit "'..BuildUnitWithID..'" is assigned to build TECH'..NeedTech..' buildplatoon! ('..repr(buildingType)..')')
+            WARN('*AIExecuteBuildStructure: TECH'..HasTech..' Unit "'..BuildUnitWithID..'" is assigned to build TECH'..NeedTech..' buildplatoon! ('..tostring(buildingType)..')')
             return false
         else
-            SPEW('*AIExecuteBuildStructure: Engineer with Techlevel ('..HasTech..') can build TECH'..NeedTech..' BuildUnitWithID: '..repr(BuildUnitWithID))
+            SPEW('*AIExecuteBuildStructure: Engineer with Techlevel ('..HasTech..') can build TECH'..NeedTech..' BuildUnitWithID: '..tostring(BuildUnitWithID))
         end
 
         HasFaction = builder.Blueprint.FactionCategory
@@ -195,17 +189,17 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
             WARN('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', ('..HasFaction..') engineers can\'t build ('..NeedFaction..') structures!')
             return false
         else
-            SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..repr(BuildUnitWithID))
+            SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..tostring(BuildUnitWithID))
         end
 
         local IsRestricted = import("/lua/game.lua").IsRestricted
         if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
-            WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.Blueprint.FactionCategory)..' - Unit:'..BuildUnitWithID)
+            WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..tostring(buildingType)..', faction: '..tostring(builder.Blueprint.FactionCategory)..' - Unit:'..BuildUnitWithID)
             AntiSpamList[buildingType] = true
             return false
         end
 
-        WARN('*AIExecuteBuildStructure: DecideWhatToBuild call failed for Building Type: '..repr(buildingType)..', faction: '..repr(builder.Blueprint.FactionCategory)..' - Unit:'..BuildUnitWithID)
+        WARN('*AIExecuteBuildStructure: DecideWhatToBuild call failed for Building Type: '..tostring(buildingType)..', faction: '..tostring(builder.Blueprint.FactionCategory)..' - Unit:'..BuildUnitWithID)
         return false
     end
     -- find a place to build it (ignore enemy locations if it's a resource)
@@ -236,24 +230,24 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
     end
     -- if we have no place to build, then maybe we have a modded/new buildingType. Lets try 'T1LandFactory' as dummy and search for a place to build near base
     if not location and not IsResource(buildingType) and builder.BuilderManagerData and builder.BuilderManagerData.EngineerManager then
-        --LOG('*AIExecuteBuildStructure: Find no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.Blueprint.FactionCategory..') Trying again with T1LandFactory and RandomIter. Searching near base...')
+        --LOG('*AIExecuteBuildStructure: Find no place to Build! - buildingType '..tostring(buildingType)..' - ('..builder.Blueprint.FactionCategory..') Trying again with T1LandFactory and RandomIter. Searching near base...')
         relativeTo = builder.BuilderManagerData.EngineerManager:GetLocationCoords()
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
             location = aiBrain:FindPlaceToBuild('T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
             if location then
-                --LOG('*AIExecuteBuildStructure: Yes! Found a place near base to Build! - buildingType '..repr(buildingType))
+                --LOG('*AIExecuteBuildStructure: Yes! Found a place near base to Build! - buildingType '..tostring(buildingType))
                 break
             end
         end
     end
     -- if we still have no place to build, then maybe we have really no place near the base to build. Lets search near engineer position
     if not location and not IsResource(buildingType) then
-        --LOG('*AIExecuteBuildStructure: Find still no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.Blueprint.FactionCategory..') Trying again with T1LandFactory and RandomIter. Searching near Engineer...')
+        --LOG('*AIExecuteBuildStructure: Find still no place to Build! - buildingType '..tostring(buildingType)..' - ('..builder.Blueprint.FactionCategory..') Trying again with T1LandFactory and RandomIter. Searching near Engineer...')
         relativeTo = builder:GetPosition()
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
             location = aiBrain:FindPlaceToBuild('T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
             if location then
-                --LOG('*AIExecuteBuildStructure: Yes! Found a place near engineer to Build! - buildingType '..repr(buildingType))
+                --LOG('*AIExecuteBuildStructure: Yes! Found a place near engineer to Build! - buildingType '..tostring(buildingType))
                 break
             end
         end
@@ -358,8 +352,8 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
     return -- unsuccessful build
 end
 
----@param baseTemplate any
----@param location Vector
+---@param baseTemplate? any
+---@param location? Vector
 ---@return table
 function AIBuildBaseTemplateFromLocation(baseTemplate, location)
     local baseT = {}
@@ -437,7 +431,6 @@ function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relat
         local location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, template, false, builder, baseLocation[1], baseLocation[3])
         if location then
             if location[1] > 8 and location[1] < ScenarioInfo.size[1] - 8 and location[2] > 8 and location[2] < ScenarioInfo.size[2] - 8 then
-                --LOG('Build '..repr(buildingType)..' at adjacency: '..repr(location) )
                 AddToBuildQueue(aiBrain, builder, whatToBuild, location, false)
                 return true
             end
@@ -512,9 +505,9 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         for templateName, baseData in BaseBuilderTemplates do
             local baseValue = baseData.ExpansionFunction(aiBrain, position, constructionData.NearMarkerType)
             table.insert(baseValues, { Base = templateName, Value = baseValue })
-            --SPEW('*AI DEBUG: AINewExpansionBase(): Scann next Base. baseValue= ' .. repr(baseValue) .. ' ('..repr(templateName)..')')
+            --SPEW('*AI DEBUG: AINewExpansionBase(): Scann next Base. baseValue= ' .. tostring(baseValue) .. ' ('..tostring(templateName)..')')
             if not highPri or baseValue > highPri then
-                --SPEW('*AI DEBUG: AINewExpansionBase(): Possible next Base. baseValue= ' .. repr(baseValue) .. ' ('..repr(templateName)..')')
+                --SPEW('*AI DEBUG: AINewExpansionBase(): Possible next Base. baseValue= ' .. tostring(baseValue) .. ' ('..tostring(templateName)..')')
                 highPri = baseValue
             end
         end
@@ -526,7 +519,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
                 table.insert(validNames, v.Base)
             end
         end
-        --SPEW('*AI DEBUG: AINewExpansionBase(): validNames for Expansions ' .. repr(validNames))
+        --SPEW('*AI DEBUG: AINewExpansionBase(): validNames for Expansions ' .. tostring(validNames))
         local pick = validNames[ Random(1, table.getn(validNames)) ]
 
         -- Error if no pick
@@ -711,7 +704,7 @@ function CreateBuildingTemplate(brain, army, name)
     local tblUnit = ScenarioUtils.AssembleArmyGroup(army, name)
     local factionIndex = brain:GetFactionIndex()
     if not tblUnit then
-        LOG('*ERROR AIBUILDSTRUCTURES - Group: ', repr(name), ' not found for Army: ', repr(army))
+        LOG('*ERROR AIBUILDSTRUCTURES - Group: ', tostring(name), ' not found for Army: ', tostring(army))
     else
         for i,unit in tblUnit do
             for k, unitId in StructureTemplates.RebuildStructuresTemplate[factionIndex] do
@@ -765,7 +758,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
     local template = brain.BaseTemplates[templateName].Template
     local list = brain.BaseTemplates[templateName].List
     if not tblUnit then
-        LOG('*ERROR AIBUILDSTRUCTURES - Group: ', repr(name), ' not found for Army: ', repr(army))
+        LOG('*ERROR AIBUILDSTRUCTURES - Group: ', tostring(name), ' not found for Army: ', tostring(army))
     else
         -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
         for i,unit in tblUnit do

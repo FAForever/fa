@@ -3,6 +3,7 @@
 commandMeshResources = {
 	Move = { '/meshes/game/Move_lod0.scm', '/meshes/game/Move_albedo.dds' },
 	Attack = { '/meshes/game/Attack_lod0.scm', '/meshes/game/Attack_albedo.dds' },
+	AggressiveMove = { '/meshes/game/Attack_lod0.scm', '/meshes/game/Attack_albedo.dds' },
 	Guard = { '/meshes/game/Assist_lod0.scm', '/meshes/game/Assist_albedo.dds' },
 	Capture = { '/meshes/game/Capture_lod0.scm', '/meshes/game/Capture_albedo.dds' },
 	Ferry = { '/meshes/game/Ferry_lod0.scm', '/meshes/game/Ferry_albedo.dds' },

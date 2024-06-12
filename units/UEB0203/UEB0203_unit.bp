@@ -84,7 +84,7 @@ UnitBlueprint{
         BuildCostEnergy = 10000,
         BuildCostMass = 2000,
         BuildRate = 90,
-        BuildTime = 3600,
+        BuildTime = 3200,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY UEF STRUCTURE NAVAL",
@@ -134,7 +134,6 @@ UnitBlueprint{
     LifeBarOffset = 4.75,
     LifeBarSize = 4.5,
     Physics = {
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -145,8 +144,6 @@ UnitBlueprint{
         },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
             { UnitSpin = 180,   X = -2.5,  Y = 0,     Z = -8 },
@@ -157,7 +154,6 @@ UnitBlueprint{
         SkirtOffsetZ = -1,
         SkirtSizeX = 12,
         SkirtSizeZ = 14,
-        TurnRate = 0,
     },
     SelectionMeshScaleX = 0.3,
     SelectionMeshScaleZ = 0.4,

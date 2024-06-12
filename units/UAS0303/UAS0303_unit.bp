@@ -182,7 +182,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
             LAYER_Land = false,
@@ -201,7 +200,6 @@ UnitBlueprint{
         MeshExtentsX = 6.5,
         MeshExtentsY = 4.5,
         MeshExtentsZ = 17,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -353,19 +351,13 @@ UnitBlueprint{
             DisplayName = "Will O Wisp Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 360,
-            Flare = {
-                Category = "MISSILE TACTICAL",
-                OffsetMult = 1.33,
-                Radius = 15,
-                Stack = true,
-            },
             Label = "AntiMissile",
             MaxRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 15,
+            MuzzleVelocity = 18,
             ProjectileId = "/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp",
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 3.5,
             RackBones = {
                 {
                     MuzzleBones = { "Projectile" },
@@ -379,7 +371,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.8,
+            RateOfFire = 0.4,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

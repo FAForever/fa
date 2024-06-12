@@ -26,6 +26,7 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/reclaim_alt_mass.dds'),
     UIUtil.UIFile('/game/unit_view_icons/reclaim_alt_energy.dds'),
 }
+
 function SetLayout()
     local controls = import("/lua/ui/game/unitview.lua").controls
     
@@ -146,7 +147,6 @@ function SetLayout()
     LayoutHelpers.RightOf(controls.ReclaimGroup.EnergyIcon, controls.ReclaimGroup.MassIcon, 5)
 
     LayoutHelpers.Below(controls.ReclaimGroup.MassText, controls.ReclaimGroup.MassIcon, 2)
-
     LayoutHelpers.AtHorizontalCenterIn(controls.ReclaimGroup.MassText, controls.ReclaimGroup.MassIcon, -2)
 
 
