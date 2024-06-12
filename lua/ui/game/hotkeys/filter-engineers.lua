@@ -22,6 +22,10 @@
 --******************************************************************************************************
 
 local GetFactions = import('/lua/factions.lua').GetFactions
+local CategoriesTech3EngineersAndSACUs = (categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - categories.FIELDENGINEER - categories.COMMAND
+local CategoriesTech2Engineers = categories.ENGINEER * categories.TECH2 - categories.FIELDENGINEER - categories.COMMAND
+local CategoriesFieldEngineers = categories.FIELDENGINEER - categories.COMMAND
+local CategoriesTech1Engineers = categories.ENGINEER * categories.TECH1 - categories.FIELDENGINEER - categories.COMMAND
 
 --- Get the faction category for each faction, including custom factions.
 --- Equivalent to {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM} for the base game.
@@ -60,11 +64,10 @@ function SelectHighestEngineerAndAssist()
     local selection = GetSelectedUnits()
 
     if selection then
-
-        local tech3EngineersAndSACUs = EntityCategoryFilterDown((categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - categories.COMMAND - categories.FIELDENGINEER, selection)
-        local tech2Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH2 - categories.COMMAND - categories.FIELDENGINEER, selection)
-        local fieldEngineers = EntityCategoryFilterDown(categories.FIELDENGINEER - categories.COMMAND, selection)
-        local tech1Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH1 - categories.COMMAND - categories.FIELDENGINEER, selection)
+        local tech3EngineersAndSACUs = EntityCategoryFilterDown(CategoriesTech3EngineersAndSACUs, selection)
+        local tech2Engineers = EntityCategoryFilterDown(CategoriesTech2Engineers, selection)
+        local fieldEngineers = EntityCategoryFilterDown(CategoriesFieldEngineers, selection)
+        local tech1Engineers = EntityCategoryFilterDown(CategoriesTech1Engineers, selection)
 
         local highestTechEngiesAndSacusOfMajorityFaction
         if next(tech3EngineersAndSACUs) then
