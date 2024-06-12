@@ -935,6 +935,14 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
     if not table.empty(sharedCommanders) then
         -- create a countdown to show when the ACU recalls (similar to the one used for timed self-destruct)
         for _, com in sharedCommanders do
+            -- don't recall shared ACUs
+            if com.RecallingAfterDefeat then
+                sharedCommanders[i] = nil
+                continue
+            end
+            -- The shared ACUs don't count as keeping the army in the game since they will eventually be removed from the game.
+            -- see MatchState.lua CollectDefeatedBrains
+            com.RecallingAfterDefeat = true
             StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
         end
 
