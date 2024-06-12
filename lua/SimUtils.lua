@@ -960,7 +960,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
         -- filter out commanders that are not currently safe and should explode
         local gameTick = GetGameTick()
         for i, com in sharedCommanders do
-            if com.LastTickDamaged + CommanderSafeTime <= gameTick then
+            if com.LastTickDamaged + CommanderSafeTime > gameTick then
                 sharedCommanders[i] = nil
             end
         end
