@@ -21,10 +21,22 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local GetFactions = import('/lua/factions.lua').GetFactions
+
+--- Get the faction category for each faction, including custom factions.
+--- Equivalent to {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM} for the base game.
+function GetFactionCategories()
+    local factionCategories = {}
+    for _, faction in GetFactions() do
+        table.insert(factionCategories, categories[faction['Category']])
+    end
+    return factionCategories
+end
+
+local factionCategories = GetFactionCategories()
+
 --- Filters your selection to the units of the majority faction in your selection.
 function GetMajorityFaction(units)
-    local factionCategories = {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM}
-
     local factionsOfUnits = {}
     for _, factionCategory in factionCategories do
         table.insert(factionsOfUnits, EntityCategoryFilterDown(factionCategory, units))
