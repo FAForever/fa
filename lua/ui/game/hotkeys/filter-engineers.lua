@@ -37,7 +37,7 @@ end
 
 local factionCategories = GetFactionCategories()
 
---- Filters your selection to the units of the majority faction in your selection.
+--- Filter units down to the of the majority faction among them.
 function GetMajorityFaction(units)
     local majorityFactionUnits = {}
     local majorityFactionUnitCount = 0
@@ -54,7 +54,8 @@ function GetMajorityFaction(units)
     return majorityFactionUnits
 end
 
---- Filters your selection to the highest tech of engineers. All other engineers assist one of those engineers.
+--- Filter your selection to the highest tech engineers of the majority faction for that tech level.
+--- All other units assist one of those engineers.
 function SelectHighestEngineerAndAssist()
     local selection = GetSelectedUnits()
 
@@ -65,7 +66,7 @@ function SelectHighestEngineerAndAssist()
         local fieldEngineers = EntityCategoryFilterDown(categories.FIELDENGINEER - categories.COMMAND, selection)
         local tech1Engineers = EntityCategoryFilterDown(categories.ENGINEER * categories.TECH1 - categories.COMMAND - categories.FIELDENGINEER, selection)
 
-        local highestTechEngiesAndSacusOfMajorityFaction = nil
+        local highestTechEngiesAndSacusOfMajorityFaction
         if next(tech3EngineersAndSACUs) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3EngineersAndSACUs)
         elseif next(tech2Engineers) then
