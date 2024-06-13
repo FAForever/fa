@@ -1,6 +1,5 @@
 name: Contributors template
 description: Template for an extensive description of the issue to solve.
-title: ""
 labels: ["status: novel issue"]
 
 body:
