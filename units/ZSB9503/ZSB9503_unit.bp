@@ -65,7 +65,6 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
