@@ -40,7 +40,6 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'SUPPORTFACTORY',
     },
-    CollisionOffsetX = 0,
     CollisionOffsetY = -1,
     CollisionOffsetZ = 0,
     Defense = {
