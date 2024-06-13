@@ -1,5 +1,5 @@
-name: Unit Improvements
-description: Suggest visual improvements to a unit that belongs to the Cybran faction
+name: Unit Visual Improvements
+description: Suggest visual improvements to a unit
 title: "[Unit Improvements]: "
 labels: ["area: graphics"]
 
