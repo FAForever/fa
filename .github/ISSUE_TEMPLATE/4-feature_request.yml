@@ -1,6 +1,6 @@
 name: Feature request
 description: Create a feature request to discuss with the Game team
-title: " "
+title: "[Feature]: "
 labels: ["status: novel issue"]
 
 body:
