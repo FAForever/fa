@@ -1,7 +1,7 @@
 name: Game Bug Report
 description: Create a report to describe a bug
 title: "[Bug]: "
-labels: ["status: novel issue"]
+labels: ["type: bug"]
 
 body:
   - type: markdown
