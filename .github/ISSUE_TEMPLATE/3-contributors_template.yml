@@ -1,7 +1,7 @@
 name: Contributors template
 description: Template for an extensive description of the issue to solve.
-title: ' '
-labels: ['status: novel issue']
+title: " "
+labels: ["status: novel issue"]
 
 body:
   - type: textarea
@@ -17,7 +17,7 @@ body:
     attributes:
       label: Test Plan
   - type: textarea
-    id: learing
+    id: learning
     attributes:
       label: Learning Goals
   - type: textarea

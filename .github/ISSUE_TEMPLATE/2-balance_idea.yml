@@ -1,13 +1,18 @@
 name: Balance Idea
 description: Proposing a Balance Idea
-title: '[Balance Idea]: '
-labels: ['area: balance idea']
+title: "[Balance Idea]: "
+labels: ["area: balance idea"]
 
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time in making a Balance Idea Proposal
+        Thanks for taking the time in making a Balance Idea Proposal.
+
+        - This repository is maintained by volunteers, it may take a while for them to come back to you.
+        - Remember to include sufficient details and context.
+        - If you have multiple Idea's or suggestions, please submit them in separate issues.
+        - We accept pull request. If you know how to fix it - go ahead!
 
         Please bare in mind that any Balance Idea's are subject to balance team approval.
   - type: markdown

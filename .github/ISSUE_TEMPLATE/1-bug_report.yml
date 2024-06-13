@@ -1,13 +1,20 @@
 name: Game Bug Report
 description: Create a report to describe a bug
-title: '[Bug]: '
-labels: ['status: novel issue']
+title: "[Bug]: "
+labels: ["status: novel issue"]
 
 body:
   - type: markdown
     attributes:
       value: |
-        thank (TODO)
+        Thank you for reporting a bug! This template will help you with creating a report that we can use to understand the bug.
+
+        - This repository is maintained by volunteers, it may take a while for them to come back to you.
+        - Remember to include sufficient details and context.
+        - If you have multiple questions, suggestions, or bugs, please submit them in separate issues.
+        - We accept pull request. If you know how to fix it - go ahead!
+
+        Please provide the following details about the issue you encountered. *Issues that do not provide the information requested in this form will be flagged as **incomplete** & automatically closed.*
   - type: markdown
     attributes:
       value: Provide a clear & concise details about the bug.

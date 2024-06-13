@@ -1,9 +1,18 @@
 name: Feature request
 description: Create a feature request to discuss with the Game team
-title: ' '
-labels: ['status: novel issue']
+title: " "
+labels: ["status: novel issue"]
 
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time in making a Feature Request.
+
+        - This repository is maintained by volunteers, it may take a while for them to come back to you.
+        - Remember to include sufficient details and context.
+        - If you have multiple Idea's or suggestions, please submit them in separate issues.
+        - We accept pull request. If you know how to fix it - go ahead!
   - type: textarea
     id: describe
     attributes:
