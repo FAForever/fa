@@ -653,6 +653,19 @@ Projectile = ClassProjectile(ProjectileMethods) {
                         DamageData.DamageFriendly,
                         DamageData.DamageSelf or false
                     )
+
+                    local damageToShields = DamageData.DamageToShields
+                    if damageToShields then
+                        DamageArea(
+                            instigator,
+                            cachedPosition,
+                            radius,
+                            damageToShields,
+                            "FAF_AntiShield",
+                            DamageData.DamageFriendly,
+                            DamageData.DamageSelf or false
+                        )
+                    end
                 else
                     -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
