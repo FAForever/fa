@@ -40,6 +40,7 @@ local CreateLightParticleIntel = CreateLightParticleIntel
 
 local MathClamp = math.clamp
 local MathMax = math.max
+local MathMin = math.min
 local MathFloor = math.floor
 local MathCeil = math.ceil
 local MathSin = math.sin
@@ -702,7 +703,7 @@ StructureUnit = ClassUnit(Unit) {
 	    -- Handle incoming OC damage
         if damageType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            amount = wep.Blueprint.Overcharge.structureDamage
+            amount = MathMin(amount, wep.Blueprint.Overcharge.structureDamage)
         end
         UnitDoTakeDamage(self, instigator, amount, vector, damageType)
     end,
