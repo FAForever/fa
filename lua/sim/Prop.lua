@@ -148,8 +148,8 @@ Prop = Class(moho.prop_methods) {
     ---@param direction Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, direction, damageType)
-        -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then
+        -- only applies to trees and units
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == "FAF_AntiShield" then
             return
         end
 
