@@ -149,7 +149,6 @@ UnitBlueprint{
             { UnitSpin = 180,   X = -2.5,  Y = 0,     Z = -8 },
             { UnitSpin = 0,     X = -2.5,  Y = 0,     Z = 8 },
         },
-        CollisionOffsetX = 0,
         SkirtOffsetX = -7,
         SkirtOffsetZ = -1,
         SkirtSizeX = 12,
