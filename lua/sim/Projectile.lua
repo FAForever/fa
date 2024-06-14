@@ -696,18 +696,13 @@ Projectile = ClassProjectile(ProjectileMethods) {
             elseif DamageData.DamageAmount and targetEntity then
 
                 local damageToShields = DamageData.DamageToShields
-                local entityShield = targetEntity.MyShield or targetEntity.IsOn and targetEntity
-                if damageToShields and entityShield and entityShield.IsOn() then
-                    local health = entityShield:GetHealth()
-                    if damageToShields > health then
-                        damageToShields = health
-                    end
+                if damageToShields then
                     Damage(
                         instigator,
                         cachedPosition,
-                        entityShield,
+                        targetEntity,
                         damageToShields,
-                        DamageData.DamageType
+                        "FAF_AntiShield"
                     )
                 end
 

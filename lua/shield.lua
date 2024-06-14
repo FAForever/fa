@@ -482,7 +482,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         amount = amount * (self.Owner:GetArmorMult(type))
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
         local finalVal = amount - EntityGetHealth(self)
-        if finalVal < 0 then
+        if finalVal < 0 or type == "FAF_AntiShield" then
             finalVal = 0
         end
         return finalVal
