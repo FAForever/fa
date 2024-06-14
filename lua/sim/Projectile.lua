@@ -6,6 +6,8 @@
 ------------------------------------------------------------------
 
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
+local UnitDoTThread = DefaultDamage.UnitDoTThread
+local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
@@ -627,7 +629,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile
     ---@param instigator Unit
     ---@param DamageData table
-    ---@param targetEntity Unit | Prop
+    ---@param targetEntity Unit | Prop | nil
     ---@param cachedPosition Vector
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
@@ -635,23 +637,27 @@ Projectile = ClassProjectile(ProjectileMethods) {
         cachedPosition = cachedPosition or self:GetPosition()
 
         local damage = DamageData.DamageAmount
-        if damage and damage > 0 then
+        if damage > 0 then
 
-            -- check for radius
+            -- deal damage in a radius
             local radius = DamageData.DamageRadius
-            if radius and radius > 0 then
+            if radius > 0 then
+                local damageType = DamageData.DamageType
+                local damageFriendly =  DamageData.DamageFriendly
+                local damageSelf = DamageData.DamageSelf or false
 
                 -- check for damage-over-time
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                local DoTTime = DamageData.DoTTime
+                if DoTTime <= 0 then
                     -- no damage over time, do radius-based damage
                     DamageArea(
                         instigator,
                         cachedPosition,
                         radius,
                         damage,
-                        DamageData.DamageType,
-                        DamageData.DamageFriendly,
-                        DamageData.DamageSelf or false
+                        damageType,
+                        damageFriendly,
+                        damageSelf
                     )
 
                     local damageToShields = DamageData.DamageToShields
@@ -662,51 +668,43 @@ Projectile = ClassProjectile(ProjectileMethods) {
                             radius,
                             damageToShields,
                             "FAF_AntiShield",
-                            DamageData.DamageFriendly,
-                            DamageData.DamageSelf or false
+                            damageFriendly,
+                            damageSelf
                         )
                     end
                 else
                     -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
+                    local initialDmg = DamageData.InitialDamageAmount
                     if initialDmg > 0 then
-                        if radius > 0 then
-                            DamageArea(
-                                instigator,
-                                cachedPosition,
-                                radius,
-                                initialDmg,
-                                DamageData.DamageType,
-                                DamageData.DamageFriendly,
-                                DamageData.DamageSelf or false
-                            )
-                        elseif targetEntity then
-                            Damage(
-                                instigator,
-                                cachedPosition,
-                                targetEntity,
-                                initialDmg,
-                                DamageData.DamageType
-                            )
-                        end
+                        DamageArea(
+                            instigator,
+                            cachedPosition,
+                            radius,
+                            initialDmg,
+                            damageType,
+                            damageFriendly,
+                            damageSelf
+                        )
                     end
 
                     -- apply damage over time
+                    local DoTPulses = DamageData.DoTPulses or 1
                     ForkThread(
-                        DefaultDamage.AreaDoTThread,
+                        AreaDoTThread,
                         instigator,
                         self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                        DamageData.DoTPulses or 1,
-                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)),
+                        DoTPulses,
+                        (DoTTime / (DoTPulses)),
                         radius,
                         damage,
-                        DamageData.DamageType,
-                        DamageData.DamageFriendly
+                        damageType,
+                        damageFriendly
                     )
                 end
 
-                -- check for entity-specific damage
-            elseif DamageData.DamageAmount and targetEntity then
+            -- damage a single entity
+            elseif targetEntity then
+                local damageType = DamageData.DamageType
 
                 local damageToShields = DamageData.DamageToShields
                 if damageToShields then
@@ -720,40 +718,40 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 end
 
                 -- check for damage-over-time
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                local DoTTime = DamageData.DoTTime
+                if DoTTime <= 0 then
 
                     -- no damage over time, do single target damage
                     Damage(
                         instigator,
                         cachedPosition,
                         targetEntity,
-                        DamageData.DamageAmount,
-                        DamageData.DamageType
+                        damage,
+                        damageType
                     )
                 else
                     -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
-                        if targetEntity then
-                            Damage(
-                                instigator,
-                                cachedPosition,
-                                targetEntity,
-                                initialDmg,
-                                DamageData.DamageType
-                            )
-                        end
+                        Damage(
+                            instigator,
+                            cachedPosition,
+                            targetEntity,
+                            initialDmg,
+                            damageType
+                        )
                     end
 
                     -- apply damage over time
+                    local DoTPulses = DamageData.DoTPulses or 1
                     ForkThread(
-                        DefaultDamage.UnitDoTThread,
+                        UnitDoTThread,
                         instigator,
                         targetEntity,
-                        DamageData.DoTPulses or 1,
-                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)),
+                        DoTPulses,
+                        (DoTTime / (DoTPulses)),
                         damage,
-                        DamageData.DamageType,
+                        damageType,
                         DamageData.DamageFriendly
                     )
                 end
@@ -762,12 +760,13 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- related to strategic missiles
         if self.InnerRing and self.OuterRing then
+            local damageType = DamageData.DamageType or 'Nuke'
             self.InnerRing:DoNukeDamage(
                 self.Launcher,
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
-                DamageData.DamageType or 'Nuke'
+                damageType
             )
 
             self.OuterRing:DoNukeDamage(
@@ -775,7 +774,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
-                DamageData.DamageType or 'Nuke'
+                damageType
             )
         end
     end,
