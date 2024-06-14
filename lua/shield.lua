@@ -477,6 +477,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param type DamageType
     ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
+        if type == "TreeForce" or type == "TreeFire" then
+            return
+        end
+
         local absorbedAmount = self:CalculateModifiedDamage(instigator, amount, type)
         if absorbedAmount < amount then
             -- flag to skip the next damage instance which will be the remainder of the AoE
