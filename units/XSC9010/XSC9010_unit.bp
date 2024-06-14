@@ -27,7 +27,6 @@ UnitBlueprint {
         'UNSELECTABLE',
         'UNTARGETABLE',
     },
-    CollisionOffsetY = 0,
     Defense = {
         ArmorType = 'Normal',
         Health = 5000000,

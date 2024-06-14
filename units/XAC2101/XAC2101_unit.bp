@@ -45,7 +45,6 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
     },
-    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'STRUCTURE',

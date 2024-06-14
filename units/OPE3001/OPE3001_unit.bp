@@ -12,7 +12,6 @@ UnitBlueprint {
         'RECLAIMABLE',
         'RECLAIMFRIENDLY',
     },
-    CollisionOffsetY = 0,
     Defense = {
         ArmorType = 'Normal',
         Health = 1000,

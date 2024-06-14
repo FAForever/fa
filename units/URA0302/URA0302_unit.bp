@@ -188,7 +188,6 @@ UnitBlueprint{
     SelectionSizeX = 1.6,
     SelectionSizeZ = 0.7,
     SelectionThickness = 0.26,
-    CollisionOffsetY = 0,
     SizeSphere = 2.7,
     SizeX = 1.8,
     SizeY = 0.4,
