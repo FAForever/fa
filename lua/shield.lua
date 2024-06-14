@@ -521,14 +521,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- damage correction for overcharge
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            local newAmount = amount
             if self.StaticShield then
-                newAmount = wep.Blueprint.Overcharge.structureDamage
+                amount = wep.Blueprint.Overcharge.structureDamage
             elseif self.CommandShield then
-                newAmount = wep.Blueprint.Overcharge.commandDamage
-            end
-            if newAmount < amount then
-                amount = newAmount
+                amount = wep.Blueprint.Overcharge.commandDamage
             end
         end
 

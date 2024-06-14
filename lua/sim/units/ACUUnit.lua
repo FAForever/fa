@@ -1,5 +1,3 @@
-local MathMin = math.min
-
 local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
@@ -70,7 +68,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            amount = MathMin(amount, wep.Blueprint.Overcharge.commandDamage)
+            amount = wep.Blueprint.Overcharge.commandDamage
         end
 
         CommandUnit.DoTakeDamage(self, instigator, amount, vector, damageType)
