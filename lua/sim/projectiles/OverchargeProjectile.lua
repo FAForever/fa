@@ -68,7 +68,7 @@ OverchargeProjectile = ClassSimple {
         --  Overcharge = {
         --      energyMult = _, -- What proportion of current storage are we allowed to spend?
         --      commandDamage = _, -- Takes effect in ACUUnit DoTakeDamage()
-        --      structureDamage = _, -- Takes effect in StructureUnit DoTakeDamage() & Shield  ApplyDamage()
+        --      structureDamage = _, -- Takes effect in StructureUnit DoTakeDamage() & Shield CalculateModifiedDamage()
         --      maxDamage = _,
         --      minDamage = _,
         --  },

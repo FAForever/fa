@@ -442,20 +442,15 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
-    -- Note, this is called by native code to calculate spillover damage. The
-    -- damage logic will subtract this value from any damage it does to units
-    -- under the shield. The default is to always absorb as much as possible
-    -- but the reason this function exists is to allow flexible implementations
-    -- like shields that only absorb partial damage (like armor).
-    --- How much of incoming damage is absorbed by the shield. Used by the engine to calculate remainder spillover damage
+    --- Calculates how much damage should be dealt to this shield
     ---@param self Shield
     ---@param instigator Unit
     ---@param amount number
-    ---@param type DamageType
-    ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
-    OnGetDamageAbsorption = function(self, instigator, amount, type)
+    ---@param damageType DamageType
+    ---@return number
+    CalculateModifiedDamage = function(self, instigator, amount, damageType)
         -- Allow decoupling the shield from the owner's armor multiplier
-        local absorptionMulti = self.AbsorptionTypeDamageTypeToMulti[type] or self.Owner:GetArmorMult(type)
+        local absorptionMulti = self.AbsorptionTypeDamageTypeToMulti[damageType] or self.Owner:GetArmorMult(damageType)
 
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
@@ -470,6 +465,26 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
+    -- Note, this is called by native code to calculate spillover damage. The
+    -- damage logic will subtract this value from any damage it does to units
+    -- under the shield. The default is to always absorb as much as possible
+    -- but the reason this function exists is to allow flexible implementations
+    -- like shields that only absorb partial damage (like armor).
+    --- How much of incoming AoE damage is absorbed by the shield. Used by the engine to calculate remainder spillover damage.
+    ---@param self Shield
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param type DamageType
+    ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
+    OnGetDamageAbsorption = function(self, instigator, amount, type)
+        local absorbedAmount = self:CalculateModifiedDamage(instigator, amount, type)
+        if absorbedAmount < amount then
+            -- flag to skip the next damage instance which will be the remainder of the AoE
+            self.AbsorbedDamage = true
+        end
+        return absorbedAmount
+    end,
+
     -- Used by PersonalShield and PersonalBubble to pass damage to the Owner Unit
     ---@param self Shield
     ---@param instigator Unit
@@ -477,10 +492,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param type DamageType
     ---@return number overkillDamage
     GetOverkill = function(self, instigator, amount, type)
-        -- Like armor damage, first multiply by armor reduction, then apply handicap
-        -- See SimDamage.cpp (DealDamage function) for how this should work
-        amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self.Army))
+        amount = self:CalculateModifiedDamage(instigator, amount, type)
         local finalVal = amount - EntityGetHealth(self)
         if finalVal < 0 then
             finalVal = 0
@@ -489,37 +501,30 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-
         -- only applies to trees
         if damageType == "TreeForce" or damageType == "TreeFire" then
             return
         end
 
-        -- Only called when a shield is directly impacted, so not for Personal Shields
-        -- This means personal shields never have ApplyDamage called with doOverspill as true
+        -- Personal Shield ApplyDamage is called through Unit.lua:OnDamage without doOverspill
         self:ApplyDamage(instigator, amount, vector, damageType, true)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-
         -- cache information used throughout the function
-
         local tick = GetGameTick()
 
         -- damage correction for overcharge
-
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            if self.StaticShield then -- fixed damage for static shields
-                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
-                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
-            elseif self.CommandShield then --fixed damage for all ACU shields
-                amount = wep:GetBlueprint().Overcharge.commandDamage
+            if self.StaticShield then
+                amount = wep.Blueprint.Overcharge.structureDamage
+            elseif self.CommandShield then
+                amount = wep.Blueprint.Overcharge.commandDamage
             end
         end
 
         -- damage correction for overspill, do not apply to personal shields
-
         if self.ShieldType ~= "Personal" then
 
             local instigatorId = (instigator and instigator.EntityId) or false
@@ -552,10 +557,19 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- do damage logic for shield
 
         if self.Owner ~= instigator then
-            local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
-
-            -- take some damage
-            EntityAdjustHealth(self, instigator, -absorbed)
+            -- true means this damage instance is the remainder of the AoE damage we absorbed, which always comes before the absorbed damage instance
+            -- false means this damage instance is the AoE damage we absorbed
+            -- nil means it isn't AoE damage, and the damage modifiers need to be calculated
+            local absorbedDamage = self.AbsorbedDamage
+            if absorbedDamage == true then
+                self.AbsorbedDamage = false
+                return
+            elseif absorbedDamage == false then
+                self.AbsorbedDamage = nil
+            else
+                amount = self:CalculateModifiedDamage(instigator, amount, dmgType)
+            end
+            EntityAdjustHealth(self, instigator, -amount)
 
             -- check to spawn impact effect
             local r = Random(1, self.Size)
