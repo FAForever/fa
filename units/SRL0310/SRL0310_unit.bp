@@ -223,7 +223,7 @@ UnitBlueprint {
             },
             CollideFriendly = false,
             Damage = 2,
-            DamageToShields = 325,
+            DamageToShields = 323,
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',

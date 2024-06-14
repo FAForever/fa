@@ -174,7 +174,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 5,
             DamageRadius = 0,
-            DamageToShields = 1300,
+            DamageToShields = 1295,
             DamageType = "Normal",
             DisplayName = "Shield Disruptor Cannon",
             FireTargetLayerCapsTable = {
