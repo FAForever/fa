@@ -236,7 +236,7 @@ function DecreaseBuildCountInQueue(queueIndex, count)
 end
 
 ---Deletes a command from the player command queue.
----Each player has an array that holds all commands for all units, the commandID indexes to this array.
+---Each player has an array that holds all commands for all units, the commandID indexes to that array.
 ---Note: this function doesn't receive any units as arguments--you will have to retrieve the commandId by UserUnit:GetCommandQueue()[commandIndex].ID
 ---@param commandId number commandId, from UserUnit:GetCommandQueue()[commandIndex].ID
 function DeleteCommand(commandId)

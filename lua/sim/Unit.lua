@@ -1739,7 +1739,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        local time  = time * 2
+        local time  = time / 2
 
         local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
 
@@ -3950,8 +3950,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 duration = 1
             end
 
-            -- for units the energy and mass fields are ignored but they do need to exist or the engine burps
-            return duration, 0, 0
+            -- duration determines both unbuilt and built unit reclaim speed
+            -- energy and mass fields needed for unbuilt units to give back resources when reclaimed
+            return duration, buildEnergyCosts, buildMassCosts
         end
 
         return 0, 0, 0

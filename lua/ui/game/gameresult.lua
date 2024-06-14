@@ -38,28 +38,23 @@ function DoGameResult(armyIndex, result)
     local armies = GetArmiesTable().armiesTable
     announced[armyIndex] = true
 
-    if (not SessionIsReplay()) and (sessionInfo.Options.CheatsEnabled ~= 'true') then
-        SetFocusArmy(-1)
-    end
-
     -- If it's someone else, announce it and stop.
     if armyIndex ~= GetFocusArmy() then
-        import("/lua/ui/game/score.lua").ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
+        import("/lua/ui/game/score.lua").ArmyAnnounce(armyIndex,
+            LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
         return
     end
 
     local victory = result == 'victory'
     if victory then
-        PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Victory'}))
+        PlaySound(Sound({ Bank = 'Interface', Cue = 'UI_END_Game_Victory' }))
     else
-        PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Fail'}))
+        PlaySound(Sound({ Bank = 'Interface', Cue = 'UI_END_Game_Fail' }))
     end
 
     local tabs = import("/lua/ui/game/tabs.lua")
     tabs.OnGameOver()
     tabs.TabAnnouncement('main', LOC(MyArmyResultStrings[result]))
-    --For disable ping buttons
-    import("/lua/ui/game/multifunction.lua").FocusArmyChanged()
 
     local score = import("/lua/ui/dialogs/score.lua")
     tabs.AddModeText("<LOC _Score>", function()
@@ -71,6 +66,6 @@ function DoGameResult(armyIndex, result)
             "<LOC _No>", nil,
             nil, nil,
             true,
-            {escapeButton = 2, enterButton = 1, worldCover = true})
+            { escapeButton = 2, enterButton = 1, worldCover = true })
     end)
 end
