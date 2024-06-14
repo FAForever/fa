@@ -507,13 +507,12 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local tick = GetGameTick()
 
         -- damage correction for overcharge
-
+        -- These preset damages deal `2 * dmg * absorbMult or armorMult`, currently absorption multiplier is 1x so nothing needs to be done
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
-                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
-                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
-            elseif self.CommandShield then --fixed damage for all ACU shields
+                amount = wep:GetBlueprint().Overcharge.structureDamage
+            elseif self.CommandShield then -- fixed damage for UEF bubble shield
                 amount = wep:GetBlueprint().Overcharge.commandDamage
             end
         end
