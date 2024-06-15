@@ -33,7 +33,7 @@ jobs:
   test:
     uses: ./.github/workflows/test.yaml
   update:
-    name: Update FAF Beta
+    name: Update FAF Beta Balance
     needs: [test]
     runs-on: ubuntu-latest
     steps:

@@ -31,7 +31,7 @@ jobs:
   test:
     uses: ./.github/workflows/test.yaml
   update:
-    name: Update FAF Develop
+    name: Update FAF
     needs: [test]
     runs-on: ubuntu-latest
     environment: deploy/faf
