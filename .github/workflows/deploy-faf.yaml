@@ -20,6 +20,10 @@
 
 name: Deploy to FAF
 
+concurrency:
+  cancel-in-progress: true
+  group: deploy/faf
+
 on:
   workflow_dispatch:
 

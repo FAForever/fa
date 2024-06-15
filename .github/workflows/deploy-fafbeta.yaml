@@ -20,6 +20,10 @@
 
 name: Deploy to FAF Beta Balance
 
+concurrency:
+  cancel-in-progress: true
+  group: deploy/fafbeta
+
 on:
   workflow_dispatch:
   schedule:
