@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: FA - update development deployment branch
+name: Deploy to FAF Develop
 
 on:
   workflow_dispatch:
