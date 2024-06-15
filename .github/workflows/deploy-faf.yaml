@@ -34,6 +34,7 @@ jobs:
     name: Update FAF Develop
     needs: [test]
     runs-on: ubuntu-latest
+    environment: deploy/faf
     steps:
       # https://github.com/actions/checkout/tree/v4/
       - name: Checkout FA repository
