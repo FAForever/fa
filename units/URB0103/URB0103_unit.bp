@@ -56,6 +56,20 @@ UnitBlueprint{
             urb0203 = "/units/urb0103/URB0103_Aupgrade.sca",
             zrb9503 = "/units/urb0103/URB0103_Aupgrade_sup.sca",
         },
+        BlinkingLights = {
+            {
+                BLBone = 'B03',
+                BLOffsetX = 0,
+                BLOffsetY = 0.2,
+                BLOffsetZ = 0,
+                BLScale = 2,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
             Water = {
