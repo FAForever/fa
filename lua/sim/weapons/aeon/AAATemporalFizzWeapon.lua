@@ -27,10 +27,13 @@ local DefaultProjectileWeaponPlayFxRackSalvoChargeSequence = DefaultProjectileWe
 local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class AAATemporalFizzWeapon : DefaultProjectileWeapon
+---@field FxChargeEffects FileName[]
+---@field ChargeEffectMuzzles Bone[]?
 AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeEffects = { '/effects/emitters/temporal_fizz_muzzle_charge_01_emit.bp', },
     FxMuzzleFlash = { '/effects/emitters/temporal_fizz_muzzle_flash_01_emit.bp', },
 
+    --- Creates the charge effects on the model's fake muzzles instead of the real muzzle(s)
     ---@param self AAATemporalFizzWeapon
     PlayFxRackSalvoChargeSequence = function(self)
         DefaultProjectileWeaponPlayFxRackSalvoChargeSequence(self)

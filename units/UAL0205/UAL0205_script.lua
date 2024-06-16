@@ -8,13 +8,15 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
---Below, changed from ALandUnit to AHoverLandUnit
 local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
 local AAATemporalFizzWeapon = import("/lua/aeonweapons.lua").AAATemporalFizzWeapon
 local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 
+-- upvalue for perfomance
+local CreateAttachedEmitter = CreateAttachedEmitter
+local CreateSlaver = CreateSlaver
 
---Below, changed from ALandUnit to AHoverLandUnit
+---@class UAL0205 : AHoverLandUnit, SlowHoverLandUnit
 UAL0205 = ClassUnit(AHoverLandUnit, SlowHover) {
     KickupBones = {},
 
