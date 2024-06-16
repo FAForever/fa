@@ -37,6 +37,41 @@ UnitBlueprint{
         SurfaceThreatLevel = 0,
     },
     Display = {
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 0,
+                BLOffsetZ = 0.75,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 0,
+                BLOffsetZ = -0.75,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0.75,
+                BLOffsetY = 0,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -0.75,
+                BLOffsetY = 0,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         DamageEffects = {
             { Bone = 0,     OffsetX = 0.3,   OffsetY = -0.4,  OffsetZ = 0.2 },
             { Bone = 0,     OffsetX = -0.3,  OffsetY = -0.4,  OffsetZ = 0.2 },

@@ -48,6 +48,20 @@ UnitBlueprint{
     },
     Display = {
         AnimationFinishBuildLand = "/units/ueb0302/ueb0302_aplatform.sca",
+        BlinkingLights = {
+            {
+                BLBone = 'Tower04',
+                BLOffsetX = 0.25,
+                BLOffsetY = 0.07,
+                BLOffsetZ = 0.6,
+                BLScale = 2,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = "Attachpoint",
         Mesh = {
             IconFadeInZoom = 130,
