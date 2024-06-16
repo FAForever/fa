@@ -38,14 +38,16 @@ AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
     PlayFxRackSalvoChargeSequence = function(self)
         DefaultProjectileWeaponPlayFxRackSalvoChargeSequence(self)
 
-        local unit = self.unit
-        local army = unit.Army
         local chargeEffectMuzzles = self.ChargeEffectMuzzles
-        local fxChargeEffects = self.FxChargeEffects
+        if chargeEffectMuzzles then
+            local unit = self.unit
+            local army = unit.Army
+            local fxChargeEffects = self.FxChargeEffects
 
-        for _, v in chargeEffectMuzzles do
-            for i, j in fxChargeEffects do
-                CreateAttachedEmitter(unit, v, army, j)
+            for _, v in chargeEffectMuzzles do
+                for i, j in fxChargeEffects do
+                    CreateAttachedEmitter(unit, v, army, j)
+                end
             end
         end
     end,
