@@ -288,7 +288,7 @@ UnitBlueprint{
         SkirtSizeX = 2,
         SkirtSizeZ = 24,
         TurnRadius = 40,
-        TurnRate = 12,
+        TurnRate = 18,
     },
     SelectionSizeX = 1.62,
     SelectionSizeZ = 11.52,
@@ -312,7 +312,7 @@ UnitBlueprint{
         Level4 = 120,
         Level5 = 150,
     },
-    VeteranMassMult = 0.5,
+    VeteranMassMult = 0.75,
     Weapon = {
         {
             Audio = {
