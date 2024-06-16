@@ -42,6 +42,27 @@ UnitBlueprint{
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/uab0203/uab0203_aopen.sca",
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0.45,
+                BLOffsetY = 4.6,
+                BLOffsetZ = 0.8,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 3.5,
+                BLOffsetY = 3.3,
+                BLOffsetZ = -0.25,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = "Attachpoint01",
         IdleEffects = {
             Water = {
