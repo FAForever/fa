@@ -53,6 +53,19 @@ UnitBlueprint{
         },
         AnimationOpen = "/units/XEB0104/XEB0104_aopen.sca",
         AnimationUpgrade = "/units/XEB0104/XEB0104_aupgrade.sca",
+        BlinkingLights = {
+            {
+                BLBone = 'Light',
+                BLOffsetX = 0,
+                BLOffsetY = 0,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
+        },
         IdleEffects = {
             Land = {
                 Effects = {
