@@ -1,1 +1,1 @@
-- (#6228) Fix a long-standing issue causing several flaks to consistently miss their first shot at specific angles.
+- (#6228) Fix a long-standing issue causing Aeon and Seraphim flaks to fire a free shot (that usually misses) when a target comes into range.
