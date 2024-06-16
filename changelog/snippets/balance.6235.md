@@ -1,9 +1,11 @@
 - (#6235) Tone down the Tempest, as it has become too oppressive and snowballed too quickly. Most importantly, its extremely powerful depth charges now fire once every 6 seconds instead of once every 5 seconds. Additionally, the amount of mass required for it to attain one level of veterancy is increased from 12k to 14.4k.
-    - Oblivion Cannon:
-        - MaxRadius: 150 --> 146
-    - Harmonic Depth Charges:
-        - MaxRadius: 80 --> 70
-        - RateOfFire: 0.2 --> 0.1667
-        - DPS: 420 --> 350
-    - Veterancy:
-        - VeteranMassMult: 0.5 --> 0.6 
+    - Tempest: Experimental Battleship (UAS0401):
+        - Oblivion Cannon Damage: 8000 --> 10000
+        - Oblivion Cannon RateOfFire: 0.1 --> 0.8
+        - Harmonic Depth Charge MaxRadius: 80 --> 70
+        - Harmonic Depth Charge RateOfFire: 0.2 --> 0.1667
+        - Harmonic Depth Charge DPS: 420 --> 350
+        - VeteranMassMult: 0.5 --> 0.75
+    - Atlantis: Experimental Aircraft Carrier (UES0401):
+        - TurnRate: 12 --> 18
+        - VeteranMassMult: 0.5 --> 0.75
