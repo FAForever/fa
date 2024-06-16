@@ -22,10 +22,15 @@ UAL0205 = ClassUnit(AHoverLandUnit, SlowHover) {
         AAGun = ClassWeapon(AAATemporalFizzWeapon) {
             ChargeEffectMuzzles = {'Muzzle_R01', 'Muzzle_L01'},
 
-            PlayFxRackSalvoChargeSequence = function(self)
+            --- Create the charge effects on the model's fake muzzles instead of the real, singular muzzle
+            PlayFxMuzzleChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
-                CreateAttachedEmitter(self.unit, 'Muzzle_R01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
-                CreateAttachedEmitter(self.unit, 'Muzzle_L01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
+
+                local unit = self.unit
+                local army = unit.Army
+
+                CreateAttachedEmitter(unit, 'Muzzle_R01', army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
+                CreateAttachedEmitter(unit, 'Muzzle_L01', army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
         },
     },
