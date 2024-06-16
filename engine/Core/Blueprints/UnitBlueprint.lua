@@ -447,15 +447,15 @@
 
 ---@class UnitBlueprintBlinkingLightsData
 ---@field BLBone Bone
----@field BlOffsetX number
----@field BLOffsetY number
----@field BLOffsetZ number
----@field BLScale number
+---@field BlOffsetX number      # defaults to 0
+---@field BLOffsetY number      # defaults to 0
+---@field BLOffsetZ number      # defaults to 0
+---@field BLScale number        # defaults to 1
 
 ---@class UnitBlueprintBlinkingLightsFx
----@field Green string
----@field Red string
----@field Yellow string
+---@field Green string          # Path to emitter, usually '/effects/emitters/light_green_03_emit.bp'
+---@field Red string            # Path to emitter, usually '/effects/emitters/light_red_03_emit.bp'
+---@field Yellow? string         # Path to emitter, usually '/effects/emitters/light_yellow_02_emit.bp'
 
 ---@class UnitBlueprintDisplay
 --- Used by the Aeon build animation for a custom mercury pool
