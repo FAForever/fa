@@ -3,6 +3,8 @@ local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
 local StructureUnitCreateIdleEffects = StructureUnit.CreateIdleEffects
 local StructureUnitDestroyIdleEffects = StructureUnit.DestroyIdleEffects
+local StructureUnitOnIntelDisabled = StructureUnit.OnIntelDisabled
+local StructureUnitOnIntelEnabled = StructureUnit.OnIntelEnabled
 
 ---@class SonarUnit : StructureUnit
 ---@field TimedSonarEffectsThread? thread
@@ -54,5 +56,17 @@ SonarUnit = ClassUnit(StructureUnit) {
         if timedSonarEffectsThread then
             timedSonarEffectsThread:Destroy()
         end
+    end,
+
+    ---@param self SonarUnit
+    OnIntelDisabled = function(self, intel)
+        StructureUnitOnIntelDisabled(self, intel)
+        self:CreateBlinkingLights('Red')
+    end,
+
+    ---@param self SonarUnit
+    OnIntelEnabled = function(self, intel)
+        StructureUnitOnIntelEnabled(self, intel)
+        self:CreateBlinkingLights('Green')
     end,
 }
