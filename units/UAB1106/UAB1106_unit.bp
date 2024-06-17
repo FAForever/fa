@@ -39,31 +39,10 @@ UnitBlueprint{
     Display = {
         BlinkingLights = {
             {
-                BLBone = 0,
+                BLBone = "B01",
                 BLOffsetX = 0,
-                BLOffsetY = -0.4,
-                BLOffsetZ = 0.2,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 0.4,
-                BLOffsetZ = 0.2,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -0.4,
                 BLOffsetY = 0,
-                BLOffsetZ = 0.2,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 0.4,
-                BLOffsetY = 0,
-                BLOffsetZ = 0.2,
+                BLOffsetZ = 0.775,
                 BLScale = 1,
             },
         },
