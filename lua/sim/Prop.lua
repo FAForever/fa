@@ -269,7 +269,7 @@ Prop = Class(moho.prop_methods) {
         local maxMass = self.MaxMassReclaim or 0
         local maxEnergy = self.MaxEnergyReclaim or 0
         local timeReclaim = self.TimeReclaim or 0
-        local maxValue = maxMass
+        local maxValue = maxMass * 5
         if maxEnergy > maxValue then
             maxValue = maxEnergy
         end

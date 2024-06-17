@@ -325,7 +325,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.769,
+            RateOfFire = 0.833,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -383,7 +383,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.769,
+            RateOfFire = 0.833,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -441,7 +441,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.769,
+            RateOfFire = 0.833,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -499,7 +499,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.769,
+            RateOfFire = 0.833,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -643,7 +643,6 @@ UnitBlueprint{
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0,
-            RackSalvoFiresAfterCharge = true,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
@@ -711,7 +710,6 @@ UnitBlueprint{
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0,
-            RackSalvoFiresAfterCharge = true,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
