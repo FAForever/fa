@@ -21,10 +21,13 @@
 --******************************************************************************************************
 
 local Debug = false
+
+--- Enable debugging functionality for this module.
 function EnableDebugging()
     Debug = true
 end
 
+--- Disable debugging functionality for this module.
 function DisableDebugging()
     Debug = false
 end
