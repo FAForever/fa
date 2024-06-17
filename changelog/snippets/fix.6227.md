@@ -1,1 +1,1 @@
-- (#6227) Slightly increase the hitboxes of the Mantis, Sky Slammer, Hoplite, Ascendant and Zthuee to fix them being able to evade beam weapons sometimes.
+- (#6227) Slightly increase the hitboxes of the Mantis, Sky Slammer, Hoplite, Ascendant, Asylum and Zthuee to fix them being able to evade beam weapons sometimes. Additionally, the Redeemer's excessively tall hitbox has been reduced.
