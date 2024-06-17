@@ -154,7 +154,7 @@ UnitBlueprint{
     SelectionThickness = 0.5,
     CollisionOffsetY = 0,
     SizeX = 1,
-    SizeY = 1.5,
+    SizeY = 1,
     SizeZ = 1.2,
     StrategicIconName = "icon_bot3_antiair",
     StrategicIconSortPriority = 115,
