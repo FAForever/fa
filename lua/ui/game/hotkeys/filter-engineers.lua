@@ -22,10 +22,10 @@
 --******************************************************************************************************
 
 local GetFactions = import('/lua/factions.lua').GetFactions
-local CategoriesTech3EngineersAndSACUs = (categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - categories.FIELDENGINEER - categories.COMMAND
-local CategoriesTech2Engineers = categories.ENGINEER * categories.TECH2 - categories.FIELDENGINEER - categories.COMMAND
+local CategoriesTech3EngineersAndSACUs = (categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - (categories.FIELDENGINEER + categories.COMMAND)
+local CategoriesTech2Engineers = categories.ENGINEER * categories.TECH2 - (categories.FIELDENGINEER + categories.COMMAND)
 local CategoriesFieldEngineers = categories.FIELDENGINEER - categories.COMMAND
-local CategoriesTech1Engineers = categories.ENGINEER * categories.TECH1 - categories.FIELDENGINEER - categories.COMMAND
+local CategoriesTech1Engineers = categories.ENGINEER * categories.TECH1 - (categories.FIELDENGINEER + categories.COMMAND)
 
 --- Get the faction category for each faction, including custom factions.
 --- Equivalent to {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM} for the base game.
