@@ -88,7 +88,7 @@ BlinkingLightsUnitComponent = ClassSimple {
             end
 
             for _, config in blueprintDisplayBlinkingLights do
-                local fx = CreateAttachedEmitter(self, config.BLBone, army, fxbp)
+                local fx = CreateEmitterAtBone(self, config.BLBone, army, fxbp)
                 fx:OffsetEmitter(config.BLOffsetX, config.BLOffsetY, config.BLOffsetZ)
                 fx:ScaleEmitter(config.BLScale)
 
