@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Debug = true
+local Debug = false
 
 --- Enable debugging functionality for this module.
 function EnableDebugging()
