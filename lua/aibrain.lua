@@ -14,6 +14,7 @@ local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
 local HQAIBrainComponent = import("/lua/aibrains/components/HQBrainComponent.lua").HQAIBrainComponent
+local JammerBrainComponent = import("/lua/aibrains/components/JammerBrainComponent.lua").JammerBrainComponent
 
 local CoroutineYield = coroutine.yield
 
@@ -94,78 +95,6 @@ local AIBrainStatisticsComponent = ClassSimple {
     ---@param self AIBrain
     GetUnitStats = function(self)
         return self.UnitStats
-    end,
-}
-
----@class AIBrainJammerComponent
----@field Jammers table<EntityId, Unit>
-local AIBrainJammerComponent = ClassSimple {
-
-    ---@param self HQAIBrainComponent | AIBrain
-    CreateBrainShared = function(self)
-        self.JammerResetTime = 15
-        self.Jammers = {}
-        setmetatable(self.Jammers, { __mode = 'v' })
-        ForkThread(self.JammingToggleThread, self)
-    end,
-
-    --- Adds a unit to a list of all units with jammers
-    ---@param self AIBrain
-    ---@param unit Unit Jammer unit
-    TrackJammer = function(self, unit)
-        self.Jammers[unit.EntityId] = unit
-    end,
-
-    --- Removes a unit to a list of all units with jammers
-    ---@param self AIBrain
-    ---@param unit Unit Jammer unit
-    UntrackJammer = function(self, unit)
-        self.Jammers[unit.EntityId] = nil
-    end,
-
-    --- Creates a thread that interates over all jammer units to reset them when vision is lost on them
-    ---@param self AIBrain
-    JammingToggleThread = function(self)
-        while true do
-            for i, jammer in self.Jammers do
-                if jammer.ResetJammer == 0 then
-                    self:ForkThread(self.JammingFollowUpThread, jammer)
-                    jammer.ResetJammer = -1
-                else
-                    if jammer.ResetJammer > 0 then
-                        jammer.ResetJammer = jammer.ResetJammer - 1
-                    end
-                end
-            end
-            WaitSeconds(1)
-        end
-    end,
-
-    --- Toggles a given unit's jammer
-    ---@param self AIBrain
-    ---@param unit Unit Jammer to be toggled
-    JammingFollowUpThread = function(self, unit)
-        unit:DisableUnitIntel('AutoToggle', 'Jammer')
-        WaitSeconds(1)
-        if not unit:BeenDestroyed() then
-            unit:EnableUnitIntel('AutoToggle', 'Jammer')
-            unit.ResetJammer = -1
-        end
-    end,
-
-    ---@param self AIBrain
-    ---@param blip Blip
-    ---@param reconType ReconTypes
-    ---@param val boolean
-    OnIntelChange = function(self, blip, reconType, val)
-        if reconType == 'LOSNow' or reconType == 'Omni' then
-            if not val then
-                local unit = blip:GetSource()
-                if unit.Blueprint.Intel.JammerBlips > 0 then
-                    unit.ResetJammer = self.JammerResetTime
-                end
-            end
-        end
     end,
 }
 
@@ -430,7 +359,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: HQAIBrainComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
+---@class AIBrain: HQAIBrainComponent, AIBrainStatisticsComponent, JammerBrainComponent, AIBrainEnergyComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -442,7 +371,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
-AIBrain = Class(HQAIBrainComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
+AIBrain = Class(HQAIBrainComponent, AIBrainStatisticsComponent, JammerBrainComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
     Status = 'InProgress',
@@ -504,7 +433,7 @@ AIBrain = Class(HQAIBrainComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         AIBrainEnergyComponent.CreateBrainShared(self)
         HQAIBrainComponent.CreateBrainShared(self)
         AIBrainStatisticsComponent.CreateBrainShared(self)
-        AIBrainJammerComponent.CreateBrainShared(self)
+        JammerBrainComponent.CreateBrainShared(self)
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
