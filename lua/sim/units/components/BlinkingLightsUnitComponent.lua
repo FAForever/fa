@@ -38,8 +38,6 @@ BlinkingLightsUnitComponent = ClassSimple {
         local oldState = self.BlinkingLightsState
         self.BlinkingLightsState = state
 
-        LOG(oldState, state)
-
         if state == 'Yellow' then
             if oldState == 'Green' then
                 self:CreateBlinkingLights('Yellow')
