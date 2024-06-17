@@ -13,6 +13,8 @@ local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUn
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+local HQAIBrainComponent = import("/lua/aibrains/components/HQBrainComponent.lua").HQAIBrainComponent
+
 local CoroutineYield = coroutine.yield
 
 ---@class TriggerSpec
@@ -39,124 +41,12 @@ local CoroutineYield = coroutine.yield
 ---@alias PlatoonType 'Air' | 'Land' | 'Sea'
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
----@class AIBrainHQComponent
----@field HQs table
-local AIBrainHQComponent = ClassSimple {
-
-    ---@param self AIBrainHQComponent | AIBrain
-    CreateBrainShared = function(self)
-        local layers = { "LAND", "AIR", "NAVAL" }
-        local techs = { "TECH2", "TECH3" }
-
-        self.HQs = {}
-        for _, facData in Factions do
-            local faction = facData.Category
-            self.HQs[faction] = {}
-            for _, layer in layers do
-                self.HQs[faction][layer] = {}
-                for _, tech in techs do
-                    self.HQs[faction][layer][tech] = 0
-                end
-            end
-        end
-
-        -- restrict all support factories by default
-        AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
-    end,
-
-    --- Adds a HQ so that the engi mod knows we have it
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
-    AddHQ = function(self, faction, layer, tech)
-        self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
-    end,
-
-    --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
-    RemoveHQ = function(self, faction, layer, tech)
-        self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
-    end,
-
-    --- Completely re evaluates the support factory restrictions of the engi mod
-    ---@param self AIBrain
-    ReEvaluateHQSupportFactoryRestrictions = function(self)
-        local layers = { "AIR", "LAND", "NAVAL" }
-        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
-
-        if categories.NOMADS then
-            table.insert(factions, 'NOMADS')
-        end
-
-        for _, faction in factions do
-            for _, layer in layers do
-                self:SetHQSupportFactoryRestrictions(faction, layer)
-            end
-        end
-    end,
-
-    --- Manages the support factory restrictions of the engi mod
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    SetHQSupportFactoryRestrictions = function(self, faction, layer)
-
-        -- localize for performance
-        local army = self:GetArmyIndex()
-
-        -- the pessimists we are, restrict everything!
-        AddBuildRestriction(army,
-            categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-        AddBuildRestriction(army,
-            categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
-
-        -- lift t2 / t3 support factory restrictions
-        if self.HQs[faction][layer]["TECH3"] > 0 then
-            RemoveBuildRestriction(army,
-                categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-            RemoveBuildRestriction(army,
-                categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
-        end
-
-        -- lift t2 support factory restrictions
-        if self.HQs[faction][layer]["TECH2"] > 0 then
-            RemoveBuildRestriction(army,
-                categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-        end
-    end,
-
-    --- Counts all HQs of specific faction, layer and tech for the engi mod.
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
-    ---@return number
-    CountHQs = function(self, faction, layer, tech)
-        return self.HQs[faction][layer][tech]
-    end,
-
-    --- Counts all HQs of faction and tech, regardless of layer
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param tech HqTech
-    ---@return number
-    CountHQsAllLayers = function(self, faction, tech)
-        local count = self.HQs[faction]["LAND"][tech]
-        count = count + self.HQs[faction]["AIR"][tech]
-        count = count + self.HQs[faction]["NAVAL"][tech]
-        return count
-    end,
-}
 
 ---@class AIBrainStatisticsComponent
 ---@field UnitStats table<UnitId, table<string, number>>
 local AIBrainStatisticsComponent = ClassSimple {
 
-    ---@param self AIBrainHQComponent | AIBrain
+    ---@param self HQAIBrainComponent | AIBrain
     CreateBrainShared = function(self)
         self.UnitStats = {}
     end,
@@ -211,7 +101,7 @@ local AIBrainStatisticsComponent = ClassSimple {
 ---@field Jammers table<EntityId, Unit>
 local AIBrainJammerComponent = ClassSimple {
 
-    ---@param self AIBrainHQComponent | AIBrain
+    ---@param self HQAIBrainComponent | AIBrain
     CreateBrainShared = function(self)
         self.JammerResetTime = 15
         self.Jammers = {}
@@ -540,7 +430,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
+---@class AIBrain: HQAIBrainComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -552,7 +442,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
-AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
+AIBrain = Class(HQAIBrainComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
     Status = 'InProgress',
@@ -612,7 +502,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         self.PingCallbackList = {}
 
         AIBrainEnergyComponent.CreateBrainShared(self)
-        AIBrainHQComponent.CreateBrainShared(self)
+        HQAIBrainComponent.CreateBrainShared(self)
         AIBrainStatisticsComponent.CreateBrainShared(self)
         AIBrainJammerComponent.CreateBrainShared(self)
     end,
