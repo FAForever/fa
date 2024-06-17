@@ -10,4 +10,17 @@ All three branches originate from the `develop` branch, which is the default bra
 
 ## Automated deployments
 
-As of [#6225](https://github.com/FAForever/fa/pull/6225) the branch `deploy/fafdevelop` is updated on a weekly basis by pushing `develop` to it. 
+There are three workflows to help with deployment:
+
+- [FAF game type](./workflows/deploy-faf.yaml)
+- [FAF Beta Balance game type](./workflows/deploy-faf.yaml)
+- [FAF Develop game type](./workflows/deploy-faf.yaml)
+
+The workflows for Beta Balance and Develop trigger periodically. You can review when by evaluating the [cron expression](https://crontab.cronhub.io/). The [API of FAForever](https://github.com/FAForever/faf-java-api/blob/develop/src/main/java/com/faforever/api/deployment/GitHubDeploymentService.java) registers the push to a deployment branch via a webhook. The server creates (and updates) a [deployment status](https://github.com/FAForever/fa/deployments). During that process the server retrieves the game related files, processes it and when everything is fine the new game version will be available in roughly 5 to 10 minutes.
+
+## Related deployments
+
+A push to `deploy/faf` will also trigger secondary deployments:
+
+- [Spooky DB](./workflows/spookydb-update.yaml)
+- [Unit DB](./workflows//unitdb-update.yaml)
