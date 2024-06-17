@@ -102,9 +102,9 @@ AIBrainStorageComponent = ClassSimple {
 
         ---@type AIBrainMassStorageState
         local state = 'EconFullMassStore'
-        if ratio == 0 then
+        if ratio < 0.10 then
             state = 'EconLowMassStore'
-        elseif ratio < 1.0 then
+        elseif ratio < 0.9 then
             state = 'EconMidMassStore'
         end
 
@@ -143,9 +143,9 @@ AIBrainStorageComponent = ClassSimple {
 
         ---@type AIBrainEnergyStorageState
         local state = 'EconFullEnergyStore'
-        if ratio == 0 then
+        if ratio < 0.10 then
             state = 'EconLowEnergyStore'
-        elseif ratio < 1.0 then
+        elseif ratio < 0.9 then
             state = 'EconMidEnergyStore'
         end
 
