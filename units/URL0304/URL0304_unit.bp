@@ -135,7 +135,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 75,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.15,
     SelectionSizeX = 0.8,
     SelectionSizeZ = 0.8,

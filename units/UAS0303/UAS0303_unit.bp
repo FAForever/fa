@@ -137,7 +137,6 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 4,
         SelectionSizeZ = 2,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetZ = 8.5,
     },
     Footprint = {

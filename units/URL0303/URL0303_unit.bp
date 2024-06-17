@@ -173,7 +173,6 @@ UnitBlueprint {
     },
     SecondsBeforeChargeKicksIn = 3,
     SecondsBeforeExplosionWhenCharging = 6,
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.15,
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,

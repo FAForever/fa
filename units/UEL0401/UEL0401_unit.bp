@@ -235,7 +235,6 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 2,
         SelectionSizeZ = 2,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetY = 1.5,
         SelectionCenterOffsetZ = 2.5,
     },
@@ -321,7 +320,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 30,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.3,
     SelectionSizeX = 4,
     SelectionSizeZ = 5.25,
