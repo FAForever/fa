@@ -13,6 +13,8 @@ local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUn
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+local AIBrainStorageComponent = import("/lua/aibrains/components/AIBrainStorageComponent.lua").AIBrainStorageComponent
+
 local CoroutineYield = coroutine.yield
 
 ---@class TriggerSpec
@@ -540,7 +542,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
+---@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, AIBrainStorageComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -552,7 +554,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
-AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
+AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, AIBrainStorageComponent,
     moho.aibrain_methods) {
 
     Status = 'InProgress',
@@ -615,6 +617,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         AIBrainHQComponent.CreateBrainShared(self)
         AIBrainStatisticsComponent.CreateBrainShared(self)
         AIBrainJammerComponent.CreateBrainShared(self)
+        AIBrainStorageComponent.CreateBrainShared(self)
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
