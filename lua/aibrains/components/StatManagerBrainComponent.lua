@@ -20,11 +20,11 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class StatManagementBrainComponent
+---@class StatManagerBrainComponent
 ---@field UnitStats table<UnitId, table<string, number>>
-StatManagementBrainComponent = ClassSimple {
+StatManagerBrainComponent = ClassSimple {
 
-    ---@param self StatManagementBrainComponent | AIBrain
+    ---@param self StatManagerBrainComponent | AIBrain
     CreateBrainShared = function(self)
         self.UnitStats = {}
     end,

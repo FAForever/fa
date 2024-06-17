@@ -20,14 +20,14 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class JammerManagementBrainComponent
+---@class JammerManagerBrainComponent
 ---@field JammerResetTime number
 ---@field Jammers table<EntityId, Unit>
-JammerManagementBrainComponent = ClassSimple {
+JammerManagerBrainComponent = ClassSimple {
 
     JammerResetTime = 15,
 
-    ---@param self JammerManagementBrainComponent | AIBrain
+    ---@param self JammerManagerBrainComponent | AIBrain
     CreateBrainShared = function(self)
         self.Jammers = {}
         setmetatable(self.Jammers, { __mode = 'v' })

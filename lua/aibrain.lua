@@ -12,10 +12,10 @@ local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
-local HQManagementBrainComponent = import("/lua/aibrains/components/HQManagementBrainComponent.lua").HQManagementBrainComponent
-local JammerManagementBrainComponent = import("/lua/aibrains/components/JammerManagementBrainComponent.lua").JammerManagementBrainComponent
-local StatManagementBrainComponent = import("/lua/aibrains/components/StatManagementBrainComponent.lua").StatManagementBrainComponent
-local EnergyManaggementBrainComponent = import("/lua/aibrains/components/EnergyManagementBrainComponent.lua").EnergyManaggementBrainComponent
+local HQManagerBrainComponent = import("/lua/aibrains/components/HQManagerBrainComponent.lua").HQManagerBrainComponent
+local JammerManagerBrainComponent = import("/lua/aibrains/components/JammerManagerBrainComponent.lua").JammerManagerBrainComponent
+local StatManagerBrainComponent = import("/lua/aibrains/components/StatManagerBrainComponent.lua").StatManagerBrainComponent
+local EnergyManagerBrainComponent = import("/lua/aibrains/components/EnergyManagerBrainComponent.lua").EnergyManagerBrainComponent
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -45,7 +45,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: HQManagementBrainComponent, StatManagementBrainComponent, JammerManagementBrainComponent, EnergyManaggementBrainComponent, moho.aibrain_methods
+---@class AIBrain: HQManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -57,7 +57,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
-AIBrain = Class(HQManagementBrainComponent, StatManagementBrainComponent, JammerManagementBrainComponent, EnergyManaggementBrainComponent,
+AIBrain = Class(HQManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent,
     moho.aibrain_methods) {
 
     Status = 'InProgress',
@@ -116,10 +116,10 @@ AIBrain = Class(HQManagementBrainComponent, StatManagementBrainComponent, Jammer
 
         self.PingCallbackList = {}
 
-        EnergyManaggementBrainComponent.CreateBrainShared(self)
-        HQManagementBrainComponent.CreateBrainShared(self)
-        StatManagementBrainComponent.CreateBrainShared(self)
-        JammerManagementBrainComponent.CreateBrainShared(self)
+        EnergyManagerBrainComponent.CreateBrainShared(self)
+        HQManagerBrainComponent.CreateBrainShared(self)
+        StatManagerBrainComponent.CreateBrainShared(self)
+        JammerManagerBrainComponent.CreateBrainShared(self)
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
@@ -230,7 +230,7 @@ AIBrain = Class(HQManagementBrainComponent, StatManagementBrainComponent, Jammer
             end
         end
 
-        JammerManagementBrainComponent.OnIntelChange(self, blip, reconType, val)
+        JammerManagerBrainComponent.OnIntelChange(self, blip, reconType, val)
     end,
 
     -- System for playing VOs to the Player
@@ -300,7 +300,7 @@ AIBrain = Class(HQManagementBrainComponent, StatManagementBrainComponent, Jammer
     ---@param self AIBrain
     ---@param triggerName string
     OnStatsTrigger = function(self, triggerName)
-        EnergyManaggementBrainComponent.OnStatsTrigger(self, triggerName)
+        EnergyManagerBrainComponent.OnStatsTrigger(self, triggerName)
 
         for k, v in self.TriggerList do
             if v.Name == triggerName then
