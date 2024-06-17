@@ -94,9 +94,7 @@ function SelectHighestEngineerAndAssist()
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
         end
 
-        if highestTechEngiesAndSacusOfMajorityFaction and
-            TableGetn(selection) ~= TableGetn(highestTechEngiesAndSacusOfMajorityFaction)
-        then
+        if highestTechEngiesAndSacusOfMajorityFaction then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
             SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
         end
