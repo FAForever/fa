@@ -22,6 +22,7 @@
 --******************************************************************************************************
 
 local GetFactions = import('/lua/factions.lua').GetFactions
+
 local CategoriesTech3EngineersAndSACUs = (categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - (categories.FIELDENGINEER + categories.COMMAND)
 local CategoriesTech2Engineers = categories.ENGINEER * categories.TECH2 - (categories.FIELDENGINEER + categories.COMMAND)
 local CategoriesFieldEngineers = categories.FIELDENGINEER - categories.COMMAND
@@ -42,6 +43,8 @@ end
 local factionCategories = GetFactionCategories()
 
 --- Filter units down to the of the majority faction among them.
+---@param units UserUnit[]
+---@return UserUnit[]
 function GetMajorityFaction(units)
     local majorityFactionUnits = {}
     local majorityFactionUnitCount = 0
@@ -80,7 +83,7 @@ function SelectHighestEngineerAndAssist()
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
         end
 
-        if highestTechEngiesAndSacusOfMajorityFaction then
+        if highestTechEngiesAndSacusOfMajorityFaction and table.getn(selection) ~= table.getn(highestTechEngiesAndSacusOfMajorityFaction) then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
             SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
         end
