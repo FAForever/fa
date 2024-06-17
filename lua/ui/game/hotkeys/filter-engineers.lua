@@ -21,8 +21,19 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- upvalue scope for performance
+local SelectUnits = SelectUnits
+local SimCallback = SimCallback
+local GetSelectedUnits = GetSelectedUnits
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+
+local TableInsert = table.insert
+local TableGetn = table.getn
+local TableEmpty = table.empty
+
 local GetFactions = import('/lua/factions.lua').GetFactions
 
+-- cached for performance
 local CategoriesTech3EngineersAndSACUs = (categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - (categories.FIELDENGINEER + categories.COMMAND)
 local CategoriesTech2Engineers = categories.ENGINEER * categories.TECH2 - (categories.FIELDENGINEER + categories.COMMAND)
 local CategoriesFieldEngineers = categories.FIELDENGINEER - categories.COMMAND
@@ -34,7 +45,7 @@ function GetFactionCategories()
     local factionCategories = {}
 
     for _, faction in GetFactions() do
-        table.insert(factionCategories, categories[faction['Category']])
+        TableInsert(factionCategories, categories[faction['Category']])
     end
 
     return factionCategories
@@ -51,7 +62,7 @@ function GetMajorityFaction(units)
 
     for _, factionCategory in factionCategories do
         local factionUnits = EntityCategoryFilterDown(factionCategory, units)
-        local factionUnitCount = table.getn(factionUnits)
+        local factionUnitCount = TableGetn(factionUnits)
         if factionUnitCount > majorityFactionUnitCount then
             majorityFactionUnits = factionUnits
             majorityFactionUnitCount = factionUnitCount
@@ -73,17 +84,19 @@ function SelectHighestEngineerAndAssist()
         local tech1Engineers = EntityCategoryFilterDown(CategoriesTech1Engineers, selection)
 
         local highestTechEngiesAndSacusOfMajorityFaction
-        if next(tech3EngineersAndSACUs) then
+        if not TableEmpty(tech3EngineersAndSACUs) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3EngineersAndSACUs)
-        elseif next(tech2Engineers) then
+        elseif not TableEmpty(tech2Engineers) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech2Engineers)
-        elseif next(fieldEngineers) then
+        elseif not TableEmpty(fieldEngineers) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(fieldEngineers)
-        elseif next(tech1Engineers) then
+        elseif not TableEmpty(tech1Engineers) then
             highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
         end
 
-        if highestTechEngiesAndSacusOfMajorityFaction and table.getn(selection) ~= table.getn(highestTechEngiesAndSacusOfMajorityFaction) then
+        if highestTechEngiesAndSacusOfMajorityFaction and
+            TableGetn(selection) ~= TableGetn(highestTechEngiesAndSacusOfMajorityFaction)
+        then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
             SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
         end
