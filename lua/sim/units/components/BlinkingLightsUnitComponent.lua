@@ -35,33 +35,35 @@ BlinkingLightsUnitComponent = ClassSimple {
 
     ---@param self BlinkingLightsUnitComponent | StructureUnit
     ChangeBlinkingLights = function(self, state)
-        local bls = self.BlinkingLightsState
+        local oldState = self.BlinkingLightsState
+        self.BlinkingLightsState = state
+
+        LOG(oldState, state)
+
         if state == 'Yellow' then
-            if bls == 'Green' then
+            if oldState == 'Green' then
                 self:CreateBlinkingLights('Yellow')
-                self.BlinkingLightsState = state
             end
         elseif state == 'Green' then
-            if bls == 'Yellow' then
+            if oldState == 'Yellow' then
                 self:CreateBlinkingLights('Green')
-                self.BlinkingLightsState = state
-            elseif bls == 'Red' then
-                local aiBrain = GetArmyBrain(self.Army)
-                local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-                local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-                if curEnergy > 0.11 and curMass > 0.11 then
-                    if self:GetNumBuildOrders(categories.ALLUNITS) == 0 then
-                        self:CreateBlinkingLights('Green')
-                        self.BlinkingLightsState = state
-                    else
-                        self:CreateBlinkingLights('Yellow')
-                        self.BlinkingLightsState = 'Yellow'
-                    end
+            elseif oldState == 'Red' then
+                local brain = self.Brain
+
+                -- remain red if storage is empty
+                if brain.MassStorageState == 'EconLowMassStore' or brain.EnergyStorageState == 'EconLowEnergyStore' then
+                    return
+                end
+
+                if self:GetNumBuildOrders(categories.ALLUNITS) == 0 then
+                    self:CreateBlinkingLights('Green')
+                else
+                    self:CreateBlinkingLights('Yellow')
+                    self.BlinkingLightsState = 'Yellow'
                 end
             end
         elseif state == 'Red' then
             self:CreateBlinkingLights('Red')
-            self.BlinkingLightsState = state
         end
     end,
 
@@ -75,8 +77,6 @@ BlinkingLightsUnitComponent = ClassSimple {
         local blueprintDisplayBlinkingLights = blueprintDisplay.BlinkingLights
         local blueprintDisplayBlinkingLightsFx = blueprintDisplay.BlinkingLightsFx
 
-        reprsl(blueprintDisplayBlinkingLights)
-        reprsl(blueprintDisplayBlinkingLightsFx)
         if blueprintDisplayBlinkingLights and blueprintDisplayBlinkingLightsFx then
 
             local army = self.Army

@@ -498,6 +498,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ---@param state AIBrainMassStorageState
     OnMassStorageStateChange = function(self, state)
+        LOG(state)
         if state == 'EconLowMassStore' then
             self:ChangeBlinkingLights('Red')
         else
@@ -508,6 +509,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ---@param state AIBrainEnergyStorageState
     OnEnergyStorageStateChange = function(self, state)
+        LOG(state)
         if state == 'EconLowEnergyStore' then
             self:ChangeBlinkingLights('Red')
         else
