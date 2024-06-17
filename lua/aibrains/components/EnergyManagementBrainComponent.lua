@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class EnergyBrainComponent
+---@class EnergyManaggementBrainComponent
 ---@field EnergyDepleted boolean
 ---@field EnergyDependingUnits table<EntityId, Unit>
 ---@field EnergyExcessConsumed number
@@ -28,7 +28,7 @@
 ---@field EnergyExcessConverted number
 ---@field EnergyExcessUnitsEnabled table<EntityId, Unit>
 ---@field EnergyExcessUnitsDisabled table<EntityId, Unit>
-local EnergyBrainComponent = ClassSimple {
+EnergyManaggementBrainComponent = ClassSimple {
     CreateBrainShared = function(self)
         -- make sure there is always some storage
         self:GiveStorage('Energy', 100)

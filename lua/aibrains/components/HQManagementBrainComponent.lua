@@ -22,11 +22,11 @@
 
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
----@class HQAIBrainComponent
+---@class HQManagementBrainComponent
 ---@field HQs table
-HQAIBrainComponent = ClassSimple {
+HQManagementBrainComponent = ClassSimple {
 
-    ---@param self HQAIBrainComponent | AIBrain
+    ---@param self HQManagementBrainComponent | AIBrain
     CreateBrainShared = function(self)
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
