@@ -18,18 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: FA - update development deployment branch
+name: Deploy to FAF Beta Balance
+
+concurrency:
+  cancel-in-progress: true
+  group: deploy/fafbeta
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 21 * * 4'
+    - cron: '0 21 1 * *'
 
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
   update:
-    name: Update FAF Develop
+    name: Update FAF Beta Balance
     needs: [test]
     runs-on: ubuntu-latest
     steps:
@@ -40,10 +44,10 @@ jobs:
             repository: FAForever/fa
             ref: develop
 
-      # Update the deploy/fafdevelop branch, we force push here because 
+      # Update the deploy/fafbeta branch, we force push here because 
       # we're not interested in fixing conflicts
-      - name: Update deploy/fafdevelop
+      - name: Update deploy/fafbeta
         run: |
-          git push origin HEAD:deploy/fafdevelop --force
+          git push origin HEAD:deploy/fafbeta --force
 
 
