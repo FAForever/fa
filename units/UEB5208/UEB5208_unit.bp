@@ -32,7 +32,7 @@ UnitBlueprint{
     },
     General = {
         FactionName = "UEF",
-        Icon = "sea",
+        Icon = "land",
         SelectionPriority = 5,
     },
     Intel = {
