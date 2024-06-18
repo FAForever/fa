@@ -12,6 +12,7 @@ local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
+local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
 local FactoryManagerBrainComponent = import("/lua/aibrains/components/FactoryManagerBrainComponent.lua").FactoryManagerBrainComponent
 local JammerManagerBrainComponent = import("/lua/aibrains/components/JammerManagerBrainComponent.lua").JammerManagerBrainComponent
 local StatManagerBrainComponent = import("/lua/aibrains/components/StatManagerBrainComponent.lua").StatManagerBrainComponent
@@ -42,7 +43,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, moho.aibrain_methods
+---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -54,8 +55,8 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
-AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent,
-    moho.aibrain_methods) {
+AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
+    EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
     Status = 'InProgress',
 
@@ -117,6 +118,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         FactoryManagerBrainComponent.CreateBrainShared(self)
         StatManagerBrainComponent.CreateBrainShared(self)
         JammerManagerBrainComponent.CreateBrainShared(self)
+        StorageManagerBrainComponent.CreateBrainShared(self)
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist

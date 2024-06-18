@@ -90,6 +90,27 @@ UnitBlueprint {
             },
         },
         AnimationUpgrade = '/units/zsb9503/zsb9503_aupgrade.sca',
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 1,
+                BLOffsetZ = 2.75,
+                BLScale = 2,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -1,
+                BLOffsetY = 0.75,
+                BLOffsetZ = 2.25,
+                BLScale = 2,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
             Water = {

@@ -42,6 +42,19 @@ UnitBlueprint{
             "<LOC ability_upgradable>Upgradeable",
         },
         AnimationUpgrade = "/units/ueb3101/ueb3101_aupgrade.sca",
+        BlinkingLights = {
+            {
+                BLBone = 'Light',
+                BLOffsetX = 0,
+                BLOffsetY = 0,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
+        },
         DamageEffects = {
             { Bone = 0,     OffsetX = 0,     OffsetY = 2,     OffsetZ = 0 },
         },
