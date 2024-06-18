@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xrl0302_desc>Mobile Bomb",
-    AI = {
-        GuardScanRadius = 30,
-    },
+    AI = { GuardScanRadius = 30 },
     Audio = {
         AmbientMove        = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Loop',        LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed          = Sound { Bank = 'XRL_Weapon', Cue = 'XRL0302_SelfDestructBomb', LodCutoff = 'UnitMove_LodCutoff' },
@@ -173,10 +171,10 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
-            TargetCheckInterval = 0.3,
             FiringTolerance = 180,
             Label = "Suicide",
             MaxRadius = 5,
+            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -204,8 +202,8 @@ UnitBlueprint{
             FiringTolerance = 2,
             IgnoreIfDisabled = true,
             Label = "DeathWeapon",
-            MaxRadius = 5,
             ManualFire = false,
+            MaxRadius = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/CIFEMP01/CIFEMP01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
@@ -216,7 +214,7 @@ UnitBlueprint{
                 },
             },
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SalvoSize = 1,
             SlavedToBody = true,
             TargetRestrictDisallow = "UNTARGETABLE, AIR",

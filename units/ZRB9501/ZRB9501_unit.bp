@@ -1,5 +1,5 @@
-UnitBlueprint {
-    Description = '<LOC zrb9501_desc>Land Factory',
+UnitBlueprint{
+    Description = "<LOC zrb9501_desc>Land Factory",
     AI = {},
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0201_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -11,90 +11,78 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 51,
     Categories = {
-        'PRODUCTSC1',
-        'SELECTABLE',
-        'BUILTBYTIER1FACTORY',
-        'BUILTBYTIER2ENGINEER',
-        'BUILTBYTIER2COMMANDER',
-        'BUILTBYTIER3ENGINEER',
-        'BUILTBYTIER3COMMANDER',
-        'CYBRAN',
-        'STRUCTURE',
-        'LAND',
-        'TECH2',
-        'CONSTRUCTION',
-        'FACTORY',
-        'RALLYPOINT',
-        'DRAGBUILD',
-        'CONSTRUCTIONSORTDOWN',
-        'SIZE16',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'SHOWQUEUE',
-        'SORTCONSTRUCTION',
-        'SUPPORTFACTORY',
+        "BUILTBYTIER1FACTORY",
+        "BUILTBYTIER2COMMANDER",
+        "BUILTBYTIER2ENGINEER",
+        "BUILTBYTIER3COMMANDER",
+        "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
+        "CONSTRUCTIONSORTDOWN",
+        "CYBRAN",
+        "DRAGBUILD",
+        "FACTORY",
+        "LAND",
+        "PRODUCTSC1",
+        "RALLYPOINT",
+        "RECLAIMABLE",
+        "SELECTABLE",
+        "SHOWQUEUE",
+        "SIZE16",
+        "SORTCONSTRUCTION",
+        "STRUCTURE",
+        "SUPPORTFACTORY",
+        "TECH2",
+        "VISIBLETORECON",
     },
     Defense = {
-        ArmorType = 'Structure',
+        ArmorType = "Structure",
         EconomyThreatLevel = 11,
         Health = 2750,
         MaxHealth = 2750,
         RegenRate = 9,
     },
     Display = {
-        Abilities = { '<LOC ability_upgradable>Upgradeable' },
-        AnimationBuild = '/units/zrb9501/zrb9501_abuild.sca',
-        AnimationUpgrade = '/units/zrb9501/zrb9501_aopen.sca',
+        Abilities = { "<LOC ability_upgradable>Upgradeable" },
+        AnimationBuild = "/units/zrb9501/zrb9501_abuild.sca",
+        AnimationUpgrade = "/units/zrb9501/zrb9501_aopen.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 2.05,
-                BLOffsetY = 1.8,
-                BLOffsetZ = -0.35,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -2.05,
-                BLOffsetY = 1.8,
-                BLOffsetZ = -0.35,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = 2.05,  BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -2.05, BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
-        BuildAttachBone = 'Attachpoint',
+        BuildAttachBone = "Attachpoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 200,
-                    AlbedoName = '/units/urb0101/URB0101_Albedo.dds',
-                    NormalsName = '/units/urb0101/URB0101_NormalsTS.dds',
-                    SpecularName = '/units/urb0101/URB0101_SpecTeam.dds',
-                    ShaderName = 'Insect',
+                    ShaderName = "Insect",
+                    AlbedoName = "/units/urb0101/URB0101_Albedo.dds",
+                    NormalsName = "/units/urb0101/URB0101_NormalsTS.dds",
+                    SpecularName = "/units/urb0101/URB0101_SpecTeam.dds",
                 },
                 {
                     LODCutoff = 500,
-                    AlbedoName = '/units/urb0101/URB0101_lod1_Albedo.dds',
-                    NormalsName = '/units/urb0101/URB0101_lod1_NormalsTS.dds',
-                    SpecularName = '/units/urb0101/URB0101_lod1_SpecTeam.dds',
-                    ShaderName = 'Insect',
+                    ShaderName = "Insect",
+                    AlbedoName = "/units/urb0101/URB0101_lod1_Albedo.dds",
+                    NormalsName = "/units/urb0101/URB0101_lod1_NormalsTS.dds",
+                    SpecularName = "/units/urb0101/URB0101_lod1_SpecTeam.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0007',
+        PlaceholderMeshName = "UXB0007",
         SpawnRandomRotation = true,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar12x_cybran_01_albedo',
+                Albedo = "Tarmacs/Tar12x_cybran_01_albedo",
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 12.8,
-                Normal = 'Tarmacs/Tar12x_cybran_01_normals',
+                Normal = "Tarmacs/Tar12x_cybran_01_normals",
                 Orientations = { 0, 90, 180, 270 },
                 RemoveWhenDead = false,
                 Width = 12.8,
@@ -108,12 +96,12 @@ UnitBlueprint {
         BuildRate = 40,
         BuildTime = 1200,
         BuildableCategory = {
-            'BUILTBYTIER2FACTORY CYBRAN MOBILE CONSTRUCTION',
-            'BUILTBYTIER2SUPPORTFACTORY CYBRAN STRUCTURE LAND',
-            'BUILTBYTIER2FACTORY CYBRAN MOBILE LAND',
+            "BUILTBYTIER2FACTORY CYBRAN MOBILE CONSTRUCTION",
+            "BUILTBYTIER2SUPPORTFACTORY CYBRAN STRUCTURE LAND",
+            "BUILTBYTIER2FACTORY CYBRAN MOBILE LAND",
         },
         DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = { 'zrb9501' },
+        RebuildBonusIds = { "zrb9501" },
         StorageEnergy = 0,
         StorageMass = 160,
     },
@@ -123,16 +111,16 @@ UnitBlueprint {
     },
     General = {
         BuildBones = {
-            BuildAttachBone = 'Attachpoint',
+            BuildAttachBone = "Attachpoint",
             BuildEffectBones = {
-                'Arm01_Muzzle',
-                'Arm02_Muzzle',
-                'Arm03_Muzzle',
-                'Arm03_Muzzle',
+                "Arm01_Muzzle",
+                "Arm02_Muzzle",
+                "Arm03_Muzzle",
+                "Arm03_Muzzle",
             },
         },
-        Category = 'Factory',
-        Classification = 'RULEUC_Factory',
+        Category = "Factory",
+        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
@@ -142,14 +130,14 @@ UnitBlueprint {
             RULEUCC_Stop = true,
         },
         ConstructionBar = true,
-        FactionName = 'Cybran',
-        Icon = 'land',
+        FactionName = "Cybran",
+        Icon = "land",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = "RULEUTL_Advanced",
         UnitWeight = 1,
-        UpgradesFrom = 'urb0101',
-        UpgradesFromBase = 'urb0101',
-        UpgradesTo = 'zrb9601',
+        UpgradesFrom = "urb0101",
+        UpgradesFromBase = "urb0101",
+        UpgradesTo = "zrb9601",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
@@ -160,28 +148,28 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         RaisedPlatforms = {
-            --X,    Z,     Height   -- Offsets from center
+            --X,     Z,     height -- Offsets from center
 
-            -1.75,  -1.75,  0.35,   -- Front Left
-            1.75,   -1.75,  0.35,   -- Front Right
-            -1.75,  1.75,   0.35,   -- Bottom Left
-            1.75,   1.75,   0.35,   -- Bottom Right
+            -1.75, -1.75, 0.35,    --Top left
+            1.75,  -1.75, 0.35,    --Top right
+            -1.75, 1.75,  0.35,    --Bottom left
+            1.75,  1.75,  0.35,    --Bottom right
 
-            -2.5,   -1.75,  0,      -- Top Left
-            -1.75,  -1.75,  0.35,   -- Top Right
-            -2.5,   1.75,   0,      -- Bottom Left
-            -1.75,  1.75,   0.35,   -- Bottom Right
+            -2.5,  -1.75, 0,       --Top left
+            -1.75, -1.75, 0.35,    --Top right
+            -2.5,  1.75,  0,       --Bottom left
+            -1.75, 1.75,  0.35,    --Bottom right
 
-            2.5,    -1.75,  0,      -- Top Left
-            1.75,   -1.75,  0.35,   -- Top Right
-            2.5,    1.75,   0,      -- Bottom Left
-            1.75,   1.75,   0.35,   -- Bottom Right
+            2.5,   -1.75, 0,       --Top left
+            1.75,  -1.75, 0.35,    --Top right
+            2.5,   1.75,  0,       --Bottom left
+            1.75,  1.75,  0.35,    --Bottom right
         },
         RollOffPoints = {
-            { UnitSpin = 90,  X = 2.75,  Y = 0, Z = 0.35 },
-            { UnitSpin = -90, X = -2.75, Y = 0, Z = 0.35 },
+            { UnitSpin = 90,    X = 2.75,  Y = 0,     Z = 0.35 },
+            { UnitSpin = -90,   X = -2.75, Y = 0,     Z = 0.35 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
@@ -194,10 +182,10 @@ UnitBlueprint {
     SizeX = 2.9,
     SizeY = 1,
     SizeZ = 4.2,
-    StrategicIconName = 'icon_factory2_land',
+    StrategicIconName = "icon_factory2_land",
     StrategicIconSortPriority = 215,
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,

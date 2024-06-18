@@ -167,7 +167,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.6,
+            RateOfFire = 10/17, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "STRATEGIC MISSILE",
             TargetType = "RULEWTT_Projectile",

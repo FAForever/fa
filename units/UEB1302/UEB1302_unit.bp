@@ -11,8 +11,8 @@ UnitBlueprint{
     Categories = {
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
-        "ECONOMIC",
         "DRAGBUILD",
+        "ECONOMIC",
         "MASSEXTRACTION",
         "MASSPRODUCTION",
         "PRODUCTSC1",
@@ -78,7 +78,7 @@ UnitBlueprint{
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UnitName = "<LOC ueb1302_name>Mass Pump 3",
         UpgradesFrom = "ueb1202",
-        UpgradesFromBase = "ueb1103"
+        UpgradesFromBase = "ueb1103",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,

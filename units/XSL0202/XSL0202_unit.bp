@@ -71,7 +71,7 @@ UnitBlueprint{
             },
         },
         AnimationWalk = "/units/xsl0202/xsl0202_Awalk.sca",
-        AnimationWalkRate = 1.5, 
+        AnimationWalkRate = 1.5,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -245,7 +245,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",

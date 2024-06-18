@@ -145,8 +145,8 @@ UnitBlueprint{
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxGroundVariation = 1.2,
         HorizontalSkirt = true,
+        MaxGroundVariation = 1.2,
         MeshExtentsX = 2.1,
         MeshExtentsY = 1,
         MeshExtentsZ = 2.1,
@@ -230,7 +230,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TurretDualManipulators = false,
             TurretPitch = 0,
@@ -273,7 +273,7 @@ UnitBlueprint{
                 },
             },
             RackRecoilDistance = 0,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Death",

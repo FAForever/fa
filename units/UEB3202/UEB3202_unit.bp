@@ -44,17 +44,11 @@ UnitBlueprint{
         },
         AnimationUpgrade = "/units/ueb3202/ueb3202_aupgrade.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 0.7,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 0.7,   BLOffsetZ = 0,     BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
         },
         IdleEffects = {
             Water = {

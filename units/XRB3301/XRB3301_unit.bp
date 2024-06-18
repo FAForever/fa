@@ -1,12 +1,12 @@
 UnitBlueprint{
     Description = "<LOC xrb3301_desc>Perimeter Monitoring System",
     AI = {
+        ShowAssistRangeOnSelect = true,
+        StagingPlatformScanRadius = 200,
         TargetBones = {
             "TargetBone03",
             "TargetBone02",
         },
-        ShowAssistRangeOnSelect = true,
-        StagingPlatformScanRadius = 200,
     },
     Audio = {
         DeathExplosion = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },

@@ -54,18 +54,12 @@ UnitBlueprint{
         },
         AnimationUpgrade = "/units/xsb0102/xsb0102_aupgrade.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 1.9,
-                BLOffsetZ = -1.45,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 1.9,   BLOffsetZ = -1.45, BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         DamageEffects = {
@@ -173,7 +167,7 @@ UnitBlueprint{
         MeshExtentsZ = 5,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
-            { UnitSpin = 0,     X = 0,	   Y = 0,     Z = 3 },
+            { UnitSpin = 0,     X = 0,     Y = 0,     Z = 3 },
             { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
             { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },

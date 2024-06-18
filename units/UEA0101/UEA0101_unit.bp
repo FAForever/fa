@@ -155,7 +155,7 @@ UnitBlueprint{
         TurnRadius = 100,
         TurnRate = 100,
     },
-SelectionSizeX = 0.36,
+    SelectionSizeX = 0.36,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.8,
     SizeSphere = 2.0,

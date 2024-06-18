@@ -35,8 +35,8 @@ UnitBlueprint{
         "RADAR",
         "RECLAIMABLE",
         "SELECTABLE",
-        "SNIPEMODE",
         "SHOWATTACKRETICLE",
+        "SNIPEMODE",
         "SONAR",
         "TECH1",
         "UEF",
@@ -237,7 +237,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.588,
+            RateOfFire = 10/17, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {
@@ -302,7 +302,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetCheckInterval = 0.6,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",

@@ -1,132 +1,91 @@
-UnitBlueprint {
+UnitBlueprint{
+    Description = "<LOC zrb9602_desc>Air Factory",
     AI = {
         TargetBones = {
-            'ZRB9602',
-            'B08',
+            "ZRB9602",
+            "B08",
         },
     },
     Audio = {
-        Construct = Sound {
-            Bank = 'URB',
-            Cue = 'URB0302_Construct_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ConstructLoop = Sound {
-            Bank = 'URB',
-            Cue = 'URB0302_Construct_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DeathExplosion = Sound {
-            Bank = 'URLDestroy',
-            Cue = 'URB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'URLDestroy',
-            Cue = 'URB_Destroy_Huge',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DoneBeingBuilt = Sound {
-            Bank = 'URB',
-            Cue = 'URB0302_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'Cybran_Select_Factory',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        Construct      = Sound { Bank = 'URB',        Cue = 'URB0302_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'URB',        Cue = 'URB0302_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB0302_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',      LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 51,
     Categories = {
-        'PRODUCTSC1',
-        'SELECTABLE',
-        'BUILTBYTIER2SUPPORTFACTORY',
-        'BUILTBYTIER3ENGINEER',
-        'BUILTBYTIER3COMMANDER',
-        'CYBRAN',
-        'STRUCTURE',
-        'AIR',
-        'TECH3',
-        'CONSTRUCTION',
-        'FACTORY',
-        'RALLYPOINT',
-        'DRAGBUILD',
-        'CONSTRUCTIONSORTDOWN',
-        'SIZE16',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'SHOWQUEUE',
-        'SORTCONSTRUCTION',
-        'SUPPORTFACTORY',
+        "AIR",
+        "BUILTBYTIER2SUPPORTFACTORY",
+        "BUILTBYTIER3COMMANDER",
+        "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
+        "CONSTRUCTIONSORTDOWN",
+        "CYBRAN",
+        "DRAGBUILD",
+        "FACTORY",
+        "PRODUCTSC1",
+        "RALLYPOINT",
+        "RECLAIMABLE",
+        "SELECTABLE",
+        "SHOWQUEUE",
+        "SIZE16",
+        "SORTCONSTRUCTION",
+        "STRUCTURE",
+        "SUPPORTFACTORY",
+        "TECH3",
+        "VISIBLETORECON",
     },
     Defense = {
-        ArmorType = 'Structure',
+        ArmorType = "Structure",
         EconomyThreatLevel = 34,
         Health = 5500,
         MaxHealth = 5500,
         RegenRate = 20,
     },
-    Description = '<LOC zrb9602_desc>Air Factory',
     Display = {
-        AnimationBuild = '/units/zrb9602/zrb9602_abuild.sca',
-        AnimationFinishBuildLand = '/units/zrb9602/zrb9602_aplatform.sca',
+        AnimationBuild = "/units/zrb9602/zrb9602_abuild.sca",
+        AnimationFinishBuildLand = "/units/zrb9602/zrb9602_aplatform.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 1.1,
-                BLOffsetY = 1.4,
-                BLOffsetZ = -1.9,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -1.1,
-                BLOffsetY = 1.4,
-                BLOffsetZ = -1.9,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
-        BuildAttachBone = 'Build_Point',
+        BuildAttachBone = "Build_Point",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    AlbedoName = '/units/urb0102/URB0102_Albedo.dds',
-                    NormalsName = '/units/urb0102/URB0102_NormalsTS.dds',
-                    SpecularName = '/units/urb0102/URB0102_SpecTeam.dds',
                     LODCutoff = 200,
-                    ShaderName = 'Insect',
+                    ShaderName = "Insect",
+                    AlbedoName = "/units/urb0102/URB0102_Albedo.dds",
+                    NormalsName = "/units/urb0102/URB0102_NormalsTS.dds",
+                    SpecularName = "/units/urb0102/URB0102_SpecTeam.dds",
                 },
                 {
-                    AlbedoName = '/units/urb0102/URB0102_lod1_Albedo.dds',
-                    NormalsName = '/units/urb0102/URB0102_lod1_NormalsTS.dds',
-                    SpecularName = '/units/urb0102/URB0102_lod1_SpecTeam.dds',
                     LODCutoff = 500,
-                    ShaderName = 'Insect',
+                    ShaderName = "Insect",
+                    AlbedoName = "/units/urb0102/URB0102_lod1_Albedo.dds",
+                    NormalsName = "/units/urb0102/URB0102_lod1_NormalsTS.dds",
+                    SpecularName = "/units/urb0102/URB0102_lod1_SpecTeam.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0007',
+        PlaceholderMeshName = "UXB0007",
         SpawnRandomRotation = true,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar12x_cybran_01_albedo',
+                Albedo = "Tarmacs/Tar12x_cybran_01_albedo",
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 12.8,
-                Normal = 'Tarmacs/Tar12x_cybran_01_normals',
-                Orientations = {
-                    0,
-                    90,
-                    180,
-                    270,
-                },
+                Normal = "Tarmacs/Tar12x_cybran_01_normals",
+                Orientations = { 0, 90, 180, 270 },
                 RemoveWhenDead = false,
                 Width = 12.8,
             },
@@ -138,16 +97,14 @@ UnitBlueprint {
         BuildCostMass = 1510,
         BuildRate = 120,
         BuildTime = 3200,
-        DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = {
-            'zrb9602',
-        },
         BuildableCategory = {
-            'BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION',
-            'BUILTBYTIER3FACTORY CYBRAN STRUCTURE AIR',
-            'BUILTBYTIER3FACTORY CYBRAN MOBILE AIR',
-            'TRANSPORTBUILTBYTIER3FACTORY CYBRAN MOBILE AIR',
+            "BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION",
+            "BUILTBYTIER3FACTORY CYBRAN STRUCTURE AIR",
+            "BUILTBYTIER3FACTORY CYBRAN MOBILE AIR",
+            "TRANSPORTBUILTBYTIER3FACTORY CYBRAN MOBILE AIR",
         },
+        DifferentialUpgradeCostCalculation = true,
+        RebuildBonusIds = { "zrb9602" },
         StorageEnergy = 0,
         StorageMass = 320,
     },
@@ -157,18 +114,18 @@ UnitBlueprint {
     },
     General = {
         BuildBones = {
-            BuildAttachBone = 'Build_Point',
+            BuildAttachBone = "Build_Point",
             BuildEffectBones = {
-                'Arm01_Muzzle',
-                'Arm02_Muzzle',
-                'Arm03_Muzzle',
-                'Arm04_Muzzle',
-                'Arm05_Muzzle',
-                'Arm06_Muzzle',
+                "Arm01_Muzzle",
+                "Arm02_Muzzle",
+                "Arm03_Muzzle",
+                "Arm04_Muzzle",
+                "Arm05_Muzzle",
+                "Arm06_Muzzle",
             },
         },
-        Category = 'Factory',
-        Classification = 'RULEUC_Factory',
+        Category = "Factory",
+        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -185,20 +142,16 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         ConstructionBar = true,
-        FactionName = 'Cybran',
-        Icon = 'air',
+        FactionName = "Cybran",
+        Icon = "air",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
+        TechLevel = "RULEUTL_Secret",
         UnitWeight = 1,
-        UpgradesFromBase = 'urb0102',
-        UpgradesFrom = 'zrb9502',
+        UpgradesFrom = "zrb9502",
+        UpgradesFromBase = "urb0102",
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC zrb9602_help>Air Factory',
-    },
+    Intel = { VisionRadius = 20 },
+    Interface = { HelpText = "<LOC zrb9602_help>Air Factory" },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2,
     LifeBarSize = 4.5,
@@ -214,130 +167,24 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         RaisedPlatforms = {
+            --X,     Z,     height -- Offsets from center
 
-            -- Platform 1
-            -- TopLeft Offset From Center
-            -1.4,
+            -1.4,  -2,    0.03,    --Top left
+            1.4,   -2,    0.03,    --Top right
+            -1.4,  1.6,   0.03,    --Bottom left
+            1.4,   1.6,   0.03,    --Bottom right
 
-            -- x
-            -2,
+            -2.3,  -2,    0,       --Top left
+            -1.4,  -2,    0.03,    --Top right
+            -2.3,  1.6,   0,       --Bottom left
+            -1.4,  1.6,   0.03,    --Bottom right
 
-            -- z
-            0.03,
-
-            -- height
-            -- TopRight Offset From Center
-            1.4,
-
-            -- x
-            -2,
-
-            -- z
-            0.03,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -1.4,
-
-            -- x
-            1.6,
-
-            -- z
-            0.03,
-
-            -- height
-            -- BottomRight Offset From Center
-            1.4,
-
-            -- x
-            1.6,
-
-            -- z
-            0.03,
-
-            -- height
-            -- Platform 2
-            -- TopLeft Offset From Center
-            -2.3,
-
-            -- x
-            -2,
-
-            -- z
-            0,
-
-            -- height
-            -- TopRight Offset From Center
-            -1.4,
-
-            -- x
-            -2,
-
-            -- z
-            0.03,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -2.3,
-
-            -- x
-            1.6,
-
-            -- z
-            0,
-
-            -- height
-            -- BottomRight Offset From Center
-            -1.4,
-
-            -- x
-            1.6,
-
-            -- z
-            0.03,
-
-            -- height
-            -- Platform 3
-            -- TopLeft Offset From Center
-            1.4,
-
-            -- x
-            -2,
-
-            -- z
-            0.03,
-
-            -- height
-            -- TopRight Offset From Center
-            2.4,
-
-            -- x
-            -2,
-
-            -- z
-            0,
-
-            -- height
-            -- BottomLeft Offset From Center
-            1.4,
-
-            -- x
-            1.6,
-
-            -- z
-            0.03,
-
-            -- height
-            -- BottomRight Offset From Center
-            2.3,
-
-            -- x
-            1.6,
-
-            -- z
-            0,
+            1.4,   -2,    0.03,    --Top left
+            2.4,   -2,    0,       --Top right
+            1.4,   1.6,   0.03,    --Bottom left
+            2.3,   1.6,   0,       --Bottom right
         },
         RollOffPoints = {
             { UnitSpin = 90,    X = 2.75,  Y = 0,     Z = 0.35 },
@@ -351,15 +198,13 @@ UnitBlueprint {
     SelectionSizeX = 3,
     SelectionSizeZ = 3,
     SelectionThickness = 0.33,
-
-    -- height
     SizeX = 3.5,
     SizeY = 0.75,
     SizeZ = 3.5,
-    StrategicIconName = 'icon_factory3_air',
+    StrategicIconName = "icon_factory3_air",
     StrategicIconSortPriority = 210,
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,

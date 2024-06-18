@@ -207,7 +207,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 10,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
             TargetCheckInterval = 999999,

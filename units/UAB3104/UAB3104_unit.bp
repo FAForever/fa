@@ -29,22 +29,16 @@ UnitBlueprint{
         MaxHealth = 100,
     },
     Display = {
-        BlinkingLights = {
-            {
-                BLBone = 'Light',
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
-        },
         Abilities = {
             "<LOC ability_omni>Omni Sensor",
             "<LOC ability_radar>Radar",
+        },
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
         },
         DamageEffects = {
             { Bone = 0,     OffsetX = 0,     OffsetY = 2.75,  OffsetZ = 0 },

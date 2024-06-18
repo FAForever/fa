@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ual0301_desc>Support Armored Command Unit",
-    AI = {
-        GuardScanRadius = 26,
-    },
+    AI = { GuardScanRadius = 26 },
     Audio = {
         CaptureLoop                   = Sound { Bank = 'UAL',         Cue = 'UAL0301_Capture_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         CommanderArrival              = Sound { Bank = 'UAL',         Cue = 'UAL0001_Gate_In',         LodCutoff = 'UnitMove_LodCutoff' },
@@ -46,11 +44,11 @@ UnitBlueprint{
         "REPAIR",
         "SELECTABLE",
         "SHOWQUEUE",
+        "SNIPEMODE",
         "SUBCOMMANDER",
         "TECH3",
         "USEBUILDPRESETS",
         "VISIBLETORECON",
-        "SNIPEMODE",
     },
     Defense = {
         ArmorType = "Normal",
@@ -220,9 +218,9 @@ UnitBlueprint{
                 "SystemIntegrityCompensator",
             },
             HelpText = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
+            SelectionPriority = 1,
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)",
-            SelectionPriority = 1,
         },
         RAS = {
             Description = "<LOC ual0301_RAS_desc>SACU (RAS preset)",
@@ -241,9 +239,9 @@ UnitBlueprint{
                 "ShieldHeavy",
             },
             HelpText = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
+            SelectionPriority = 1,
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_Rambo_name>SACU (Rambo preset)",
-            SelectionPriority = 1,
         },
         ShieldCombat = {
             Description = "<LOC ual0301_ShieldCombat_desc>SACU (Shield Combatant preset)",
@@ -253,18 +251,18 @@ UnitBlueprint{
                 "Shield",
             },
             HelpText = "<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
+            SelectionPriority = 1,
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_ShieldCombat_name>SACU (Shield Combatant preset)",
-            SelectionPriority = 1,
         },
         SimpleCombat = {
             Description = "<LOC ual0301_SimpleCombat_desc>SACU (Combatant preset)",
             BuildIconSortPriority = 15,
             Enhancements = { "StabilitySuppressant" },
             HelpText = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
+            SelectionPriority = 1,
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_SimpleCombat_name>SACU (Combatant preset)",
-            SelectionPriority = 1,
         },
     },
     Enhancements = {
@@ -626,7 +624,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
                 "COMMAND",
@@ -673,7 +671,7 @@ UnitBlueprint{
                 },
             },
             RackRecoilDistance = 0,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Death",
@@ -689,7 +687,7 @@ UnitBlueprint{
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             WeaponCategory = "Teleport",
         },
     },

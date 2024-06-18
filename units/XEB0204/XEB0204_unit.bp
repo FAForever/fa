@@ -41,17 +41,11 @@ UnitBlueprint{
         Abilities = { "<LOC ability_engineeringsuite>Engineering Suite" },
         AnimationOpen = "/units/XEB0204/XEB0204_aopen.sca",
         BlinkingLights = {
-            {
-                BLBone = 'Light',
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
         },
         IdleEffects = {
             Land = {

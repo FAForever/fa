@@ -1,10 +1,10 @@
-UnitBlueprint {
-    Description = '<LOC zsb9501_desc>Land Factory',
+UnitBlueprint{
+    Description = "<LOC zsb9501_desc>Land Factory",
     AI = {
         TargetBones = {
-            'B06',
-            'B01',
-            'Attachpoint',
+            "B06",
+            "B01",
+            "Attachpoint",
         },
     },
     Audio = {
@@ -17,109 +17,85 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 51,
     Categories = {
-        'PRODUCTFA',
-        'SELECTABLE',
-        'BUILTBYTIER1FACTORY',
-        'BUILTBYTIER2ENGINEER',
-        'BUILTBYTIER2COMMANDER',
-        'BUILTBYTIER3ENGINEER',
-        'BUILTBYTIER3COMMANDER',
-        'SERAPHIM',
-        'STRUCTURE',
-        'LAND',
-        'TECH2',
-        'CONSTRUCTION',
-        'FACTORY',
-        'RALLYPOINT',
-        'DRAGBUILD',
-        'CONSTRUCTIONSORTDOWN',
-        'SIZE16',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'SHOWQUEUE',
-        'SORTCONSTRUCTION',
-        'SUPPORTFACTORY',
+        "BUILTBYTIER1FACTORY",
+        "BUILTBYTIER2COMMANDER",
+        "BUILTBYTIER2ENGINEER",
+        "BUILTBYTIER3COMMANDER",
+        "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
+        "CONSTRUCTIONSORTDOWN",
+        "DRAGBUILD",
+        "FACTORY",
+        "LAND",
+        "PRODUCTFA",
+        "RALLYPOINT",
+        "RECLAIMABLE",
+        "SELECTABLE",
+        "SERAPHIM",
+        "SHOWQUEUE",
+        "SIZE16",
+        "SORTCONSTRUCTION",
+        "STRUCTURE",
+        "SUPPORTFACTORY",
+        "TECH2",
+        "VISIBLETORECON",
     },
     Defense = {
-        ArmorType = 'Structure',
+        ArmorType = "Structure",
         EconomyThreatLevel = 11,
         Health = 3500,
         MaxHealth = 3500,
     },
     Display = {
-        Abilities = { '<LOC ability_upgradable>Upgradeable' },
+        Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = '/units/zsb9501/zsb9501_ADeath.sca',
+                Animation = "/units/zsb9501/zsb9501_ADeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
-        AnimationUpgrade = '/units/zsb9501/zsb9501_Aupgrade.sca',
+        AnimationUpgrade = "/units/zsb9501/zsb9501_Aupgrade.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = -1.75,
-                BLOffsetY = 0.15,
-                BLOffsetZ = -1.68,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 1.74,
-                BLOffsetY = 0.15,
-                BLOffsetZ = -1.68,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -1.75,
-                BLOffsetY = 0.15,
-                BLOffsetZ = 1.77,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 1.74,
-                BLOffsetY = 0.15,
-                BLOffsetZ = 1.77,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
-        BuildAttachBone = 'Attachpoint',
+        BuildAttachBone = "Attachpoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 200,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     Scrolling = true,
-                    ShaderName = 'Seraphim',
+                    ShaderName = "Seraphim",
                 },
                 {
                     LODCutoff = 500,
-                    AlbedoName = 'zsb9501_lod1_albedo.dds',
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
-                    SpecularName = 'zsb9501_lod1_specteam.dds',
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
+                    ShaderName = "Seraphim",
+                    AlbedoName = "zsb9501_lod1_albedo.dds",
+                    SpecularName = "zsb9501_lod1_specteam.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0006',
+        PlaceholderMeshName = "UXB0006",
         SpawnRandomRotation = false,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar12x_seraphim_01_albedo',
+                Albedo = "Tarmacs/Tar12x_seraphim_01_albedo",
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 12.8,
-                Normal = 'Tarmacs/Tar12x_seraphim_01_normals',
+                Normal = "Tarmacs/Tar12x_seraphim_01_normals",
                 Orientations = { 0, 90, 180, 270 },
                 RemoveWhenDead = false,
                 Width = 12.8,
@@ -132,13 +108,13 @@ UnitBlueprint {
         BuildCostMass = 580,
         BuildRate = 40,
         BuildTime = 1200,
-        DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = { 'zsb9501' },
         BuildableCategory = {
-            'BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION',
-            'BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE LAND',
-            'BUILTBYTIER2FACTORY SERAPHIM MOBILE LAND',
+            "BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION",
+            "BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE LAND",
+            "BUILTBYTIER2FACTORY SERAPHIM MOBILE LAND",
         },
+        DifferentialUpgradeCostCalculation = true,
+        RebuildBonusIds = { "zsb9501" },
         StorageEnergy = 0,
         StorageMass = 160,
     },
@@ -149,12 +125,12 @@ UnitBlueprint {
     General = {
         BuildBones = {
             BuildEffectBones = {
-                'Muzzle01',
-                'Muzzle02',
+                "Muzzle01",
+                "Muzzle02",
             },
         },
-        Category = 'Factory',
-        Classification = 'RULEUC_Factory',
+        Category = "Factory",
+        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
@@ -164,15 +140,15 @@ UnitBlueprint {
             RULEUCC_Stop = true,
         },
         ConstructionBar = true,
-        FactionName = 'Seraphim',
-        Icon = 'land',
+        FactionName = "Seraphim",
+        Icon = "land",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
-        UnitName = '<LOC zsb9501_name>Hethiya',
+        TechLevel = "RULEUTL_Advanced",
+        UnitName = "<LOC zsb9501_name>Hethiya",
         UnitWeight = 1,
-        UpgradesFrom = 'xsb0101',
-        UpgradesFromBase = 'xsb0101',
-        UpgradesTo = 'zsb9601',
+        UpgradesFrom = "xsb0101",
+        UpgradesFromBase = "xsb0101",
+        UpgradesTo = "zsb9601",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
@@ -186,28 +162,28 @@ UnitBlueprint {
         MeshExtentsX = 4.5,
         MeshExtentsY = 1.25,
         MeshExtentsZ = 4.5,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         RaisedPlatforms = {
-            --X,    Z,     Height   -- Offsets from center
+            --X,     Z,     height -- Offsets from center
 
-            -1.1,   -0.7,   0.65,   -- Front Left
-            1.1,    -0.7,   0.65,   -- Front Right
-            -1.1,   0.6,    0.65,   -- Back Left
-            1.1,    0.6,    0.65,   -- Back Right
+            -1.1,  -0.7,  0.65,    --Top left
+            1.1,   -0.7,  0.65,    --Top right
+            -1.1,  0.6,   0.65,    --Bottom left
+            1.1,   0.6,   0.65,    --Bottom right
 
-            -2,     -0.47,  0,      -- Top Left
-            -1.1,   -0.7,   0.65,   -- Top Right
-            -2,     0.5,    0,      -- Bottom Left
-            -1.1,   0.6,    0.65,   -- Bottom Right
+            -2,    -0.47, 0,       --Top left
+            -1.1,  -0.7,  0.65,    --Top right
+            -2,    0.5,   0,       --Bottom left
+            -1.1,  0.6,   0.65,    --Bottom right
 
-            1.1,    -0.7,   0.65,   -- Top Left
-            2,      -0.47,  0,      -- Top Right
-            1.1,    0.6,    0.65,   -- Bottom Left
-            2,      0.5,    0,      -- Bottom Right
+            1.1,   -0.7,  0.65,    --Top left
+            2,     -0.47, 0,       --Top right
+            1.1,   0.6,   0.65,    --Bottom left
+            2,     0.5,   0,       --Bottom right
         },
         RollOffPoints = {
-            { UnitSpin = 90,  X = 2.75,  Y = 0, Z = 0.35 },
-            { UnitSpin = -90, X = -2.75, Y = 0, Z = 0.35 },
+            { UnitSpin = 90,    X = 2.75,  Y = 0,     Z = 0.35 },
+            { UnitSpin = -90,   X = -2.75, Y = 0,     Z = 0.35 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
@@ -221,10 +197,10 @@ UnitBlueprint {
     SizeX = 3.1,
     SizeY = 0.8,
     SizeZ = 3.6,
-    StrategicIconName = 'icon_factory2_land',
+    StrategicIconName = "icon_factory2_land",
     StrategicIconSortPriority = 215,
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,

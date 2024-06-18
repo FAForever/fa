@@ -33,24 +33,18 @@ UnitBlueprint{
         MaxHealth = 10,
     },
     Display = {
-        BlinkingLights = {
-            {
-                BLBone = 'Light',
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
-        },
         Abilities = {
             "<LOC ability_radar>Radar",
             "<LOC ability_upgradable>Upgradeable",
         },
         AnimationUpgrade = "/units/uab3101/uab3101_aupgrade.sca",
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
+        },
         IdleEffects = {
             Land = {
                 Effects = {

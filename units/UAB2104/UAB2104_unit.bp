@@ -1,9 +1,7 @@
 UnitBlueprint{
     Description = "<LOC uab2104_desc>Anti-Air Turret",
     AI = {
-        TargetBones = {
-            "Turret",
-        },
+        TargetBones = { "Turret" },
     },
     Audio = {
         Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Land', LodCutoff = 'UnitMove_LodCutoff' },
@@ -178,7 +176,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.666,
+            RateOfFire = 10/6, --10/integer interval in ticks
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",

@@ -190,9 +190,9 @@ UnitBlueprint{
         Class1Capacity = 16,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsSmall = 16,
-        SlotsMedium = 8,
         SlotsLarge = 4,
+        SlotsMedium = 8,
+        SlotsSmall = 16,
         TransportClass = 10,
     },
     UseOOBTestZoom = 200,
@@ -245,7 +245,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -313,7 +313,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -378,7 +378,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "HIGHALTAIR, UNTARGETABLE",
             TurretBoneMuzzle = "Center_Turret_Barrel_Muzzle",

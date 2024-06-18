@@ -11,9 +11,9 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
-        "ANTITORPEDO",
         "ANTINAVY",
         "ANTISUB",
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "DESTROYER",
@@ -208,7 +208,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {
@@ -264,7 +264,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -311,7 +311,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -342,9 +342,7 @@ UnitBlueprint{
             ProjectileLifetime = 4,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Projectile02",
-                    },
+                    MuzzleBones = { "Projectile02" },
                     RackBone = "Projectile02",
                 },
             },
@@ -356,7 +354,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.131,
+            RateOfFire = 10/76, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -396,9 +394,7 @@ UnitBlueprint{
             ProjectileLifetime = 4,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Projectile04",
-                    },
+                    MuzzleBones = { "Projectile04" },
                     RackBone = "Projectile04",
                 },
             },
@@ -410,7 +406,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.131,
+            RateOfFire = 10/76, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",

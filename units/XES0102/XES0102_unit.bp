@@ -194,7 +194,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.3,
+            RateOfFire = 10/33, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -226,8 +226,8 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 5,
             },
-            DisplayName = "Smart Charge AntiTorpedo",
             DisableWhileReloading = true,
+            DisplayName = "Smart Charge AntiTorpedo",
             FireTargetLayerCapsTable = { Water = "Water" },
             FiringRandomness = 0,
             FiringTolerance = 15,
@@ -256,7 +256,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

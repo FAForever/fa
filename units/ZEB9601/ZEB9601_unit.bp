@@ -1,43 +1,43 @@
-UnitBlueprint {
+UnitBlueprint{
     Description = "<LOC zeb9601_desc>Suport Land Factory",
     AI = {
         TargetBones = {
-            'Foot_Right',
-            'Foot_Left',
+            "Foot_Right",
+            "Foot_Left",
             "Pad_Left",
             "Pad_Right",
         },
     },
     Audio = {
-        Construct      = Sound { Bank = "UEB",        Cue = "UEB0301_Construct_Start",    LodCutoff = "UnitMove_LodCutoff" },
-        ConstructLoop  = Sound { Bank = "UEB",        Cue = "UEB0301_Construct_Loop",     LodCutoff = "UnitMove_LodCutoff" },
-        DeathExplosion = Sound { Bank = "UELDestroy", Cue = "UEB_Destroy_Lrg_PreDestroy", LodCutoff = "UnitMove_LodCutoff" },
-        Destroyed      = Sound { Bank = "UELDestroy", Cue = "UEB_Destroy_Huge",           LodCutoff = "UnitMove_LodCutoff" },
-        DoneBeingBuilt = Sound { Bank = "UEB",        Cue = "UEB0301_Activate",           LodCutoff = "UnitMove_LodCutoff" },
-        UISelection    = Sound { Bank = "Interface",  Cue = "UEF_Select_Factory",         LodCutoff = "UnitMove_LodCutoff" },
+        Construct      = Sound { Bank = 'UEB',        Cue = 'UEB0301_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'UEB',        Cue = 'UEB0301_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 41,
     Categories = {
-        "PRODUCTSC1",
-        "SELECTABLE",
-        "UEF",
-        "STRUCTURE",
-        "LAND",
-        "TECH3",
         "BUILTBYTIER2SUPPORTFACTORY",
-        "BUILTBYTIER3ENGINEER",
         "BUILTBYTIER3COMMANDER",
+        "BUILTBYTIER3ENGINEER",
         "CONSTRUCTION",
-        "FACTORY",
-        "RALLYPOINT",
-        "DRAGBUILD",
         "CONSTRUCTIONSORTDOWN",
-        "SIZE16",
-        "VISIBLETORECON",
+        "DRAGBUILD",
+        "FACTORY",
+        "LAND",
+        "PRODUCTSC1",
+        "RALLYPOINT",
         "RECLAIMABLE",
+        "SELECTABLE",
         "SHOWQUEUE",
+        "SIZE16",
         "SORTCONSTRUCTION",
+        "STRUCTURE",
         "SUPPORTFACTORY",
+        "TECH3",
+        "UEF",
+        "VISIBLETORECON",
     },
     Defense = {
         ArmorType = "Structure",
@@ -47,32 +47,14 @@ UnitBlueprint {
     },
     Display = {
         BlinkingLights = {
-            {
-                BLBone = 'Foot_Right',
-                BLOffsetX = -0.4,
-                BLOffsetY = 0.8,
-                BLOffsetZ = -0.35,
-                BLScale = 1.5,
-            },
-            {
-                BLBone = 'Foot_Left',
-                BLOffsetX = 0.4,
-                BLOffsetY = 0.8,
-                BLOffsetZ = -0.35,
-                BLScale = 1.5,
-            },
-            {
-                BLBone = 'Control_Tower',
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = 0.5,
-                BLScale = 1.5,
-            },
+            { BLBone = "Foot_Right", BLOffsetX = -0.4,  BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
+            { BLBone = "Foot_Left", BLOffsetX = 0.4,   BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
+            { BLBone = "Control_Tower", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0.5,   BLScale = 1.5 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         Mesh = {
@@ -84,8 +66,8 @@ UnitBlueprint {
                 },
                 {
                     LODCutoff = 500,
-                    AlbedoName = "zeb9601_lod1_albedo.dds",
                     ShaderName = "Unit",
+                    AlbedoName = "zeb9601_lod1_albedo.dds",
                     SpecularName = "zeb9601_lod1_specteam.dds",
                 },
             },
@@ -98,9 +80,7 @@ UnitBlueprint {
                 FadeOut = 150,
                 Length = 12.8,
                 Normal = "Tarmacs/Tar12x_01_normals",
-                Orientations = {
-                    0,
-                },
+                Orientations = { 0 },
                 RemoveWhenDead = false,
                 Width = 12.8,
             },
@@ -119,7 +99,7 @@ UnitBlueprint {
             "BUILTBYLANDTIER3FACTORY UEF MOBILE CONSTRUCTION",
         },
         DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = {"zeb9601"},
+        RebuildBonusIds = { "zeb9601" },
         StorageEnergy = 0,
         StorageMass = 320,
     },
@@ -165,36 +145,36 @@ UnitBlueprint {
         MaxGroundVariation = 1.1,
         MotionType = "RULEUMT_None",
         RaisedPlatforms = {
-            --X,    Z,     Height   -- Offsets from center
+            --X,     Z,     height -- Offsets from center
 
-            -1.1,  -1.6,    0.5,    -- Top Left
-            1.1,   -1.6,    0.5,    -- Top Right
-            -1.1,   1.9,    0.5,    -- Bottom Left
-            1.1,    1.9,    0.5,    -- Bottom Right
+            -1.1,  -1.6,  0.5,     --Top left
+            1.1,   -1.6,  0.5,     --Top right
+            -1.1,  1.9,   0.5,     --Bottom left
+            1.1,   1.9,   0.5,     --Bottom right
 
-            -1.7,   -1.6,   0.45,   -- Top Left
-            -1.1,   -1.6,   0.45,   -- Top Right
-            -1.7,   1.9,    0.45,   -- Bottom Left
-            -1.1,   1.9,    0.45,   -- Bottom Right
+            -1.7,  -1.6,  0.45,    --Top left
+            -1.1,  -1.6,  0.45,    --Top right
+            -1.7,  1.9,   0.45,    --Bottom left
+            -1.1,  1.9,   0.45,    --Bottom right
 
-            1.1,    -1.6,   0.45,   -- Top Left
-            1.7,    -1.6,   0.45,   -- Top Right
-            1.1,    1.9,    0.45,   -- Bottom Left
-            1.7,    1.9,    0.45,   -- Bottom Right
+            1.1,   -1.6,  0.45,    --Top left
+            1.7,   -1.6,  0.45,    --Top right
+            1.1,   1.9,   0.45,    --Bottom left
+            1.7,   1.9,   0.45,    --Bottom right
 
-            -2.5,   -1.6,   0,      -- Top Left
-            -1.7,   -1.6,   0.45,   -- Top Right   
-            -2.5,   1.9,    0,      -- Bottom Left
-            -1.7,   1.9,    0.45,   -- Bottom Right
+            -2.5,  -1.6,  0,       --Top left
+            -1.7,  -1.6,  0.45,    --Top right
+            -2.5,  1.9,   0,       --Bottom left
+            -1.7,  1.9,   0.45,    --Bottom right
 
-            1.7,    -1.6,   0.45,   -- Top Left
-            2.5,    -1.6,   0,      -- Top Right
-            1.7,    1.9,    0.45,   -- Bottom Left
-            2.5,    1.9,    0,      -- Bottom Right
+            1.7,   -1.6,  0.45,    --Top left
+            2.5,   -1.6,  0,       --Top right
+            1.7,   1.9,   0.45,    --Bottom left
+            2.5,   1.9,   0,       --Bottom right
         },
         RollOffPoints = {
-            { UnitSpin = 90,  X = 3,  Y = 0, Z = 0 },
-            { UnitSpin = -90, X = -3, Y = 0, Z = 0 },
+            { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
+            { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

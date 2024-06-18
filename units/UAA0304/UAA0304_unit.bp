@@ -244,7 +244,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.125,
+            RateOfFire = 10/80, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",

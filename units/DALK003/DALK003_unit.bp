@@ -58,10 +58,10 @@ UnitBlueprint{
                     ShaderName = "Aeon",
                 },
                 {
-                    AlbedoName = 'dalk003_lod1_albedo.dds',
                     LODCutoff = 250,
-                    ShaderName = 'Aeon',
-                    SpecularName = 'dalk003_lod1_specteam.dds',
+                    ShaderName = "Aeon",
+                    AlbedoName = "dalk003_lod1_albedo.dds",
+                    SpecularName = "dalk003_lod1_specteam.dds",
                 },
             },
         },
@@ -132,8 +132,8 @@ UnitBlueprint{
         MeshExtentsY = 1.25,
         MeshExtentsZ = 1,
         MotionType = "RULEUMT_Land",
-        StandUpright = true,
         RotateOnSpot = true,
+        StandUpright = true,
         TurnRadius = 5,
         TurnRate = 120,
     },
@@ -171,7 +171,7 @@ UnitBlueprint{
                     RackBone = "Turret",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -218,7 +218,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.1667,
+            RateOfFire = 10/60, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "AIR MOBILE EXPERIMENTAL",

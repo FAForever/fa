@@ -15,7 +15,6 @@ UnitBlueprint{
         "BOT",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
-        "WEAKDIRECTFIRE",
         "LAND",
         "MOBILE",
         "OVERLAYANTIAIR",
@@ -25,6 +24,7 @@ UnitBlueprint{
         "SELECTABLE",
         "TECH3",
         "VISIBLETORECON",
+        "WEAKDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 33,
@@ -55,10 +55,10 @@ UnitBlueprint{
                     ShaderName = "Insect",
                 },
                 {
-                    AlbedoName = 'drlk001_lod1_albedo.dds',
                     LODCutoff = 250,
-                    ShaderName = 'Insect',
-                    SpecularName = 'drlk001_lod1_specteam.dds',
+                    ShaderName = "Insect",
+                    AlbedoName = "drlk001_lod1_albedo.dds",
+                    SpecularName = "drlk001_lod1_specteam.dds",
                 },
             },
         },
@@ -187,7 +187,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             ReTargetOnMiss = true,
             TargetPriorities = {
                 "AIR MOBILE EXPERIMENTAL",
@@ -286,7 +286,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.66667,
+            RateOfFire = 10/6, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -384,7 +384,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.66667,
+            RateOfFire = 10/6, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",

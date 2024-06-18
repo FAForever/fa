@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xrs0204_desc>Submarine Killer",
-    AI = {
-        GuardReturnRadius = 30,
-    },
+    AI = { GuardReturnRadius = 30 },
     Audio = {
         AmbientMove    = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop_UW',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -18,7 +16,7 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",
-        "ANTITORPEDO", 
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -259,7 +257,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
             TargetPriorities = {
@@ -319,7 +317,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.05,
+            RateOfFire = 10/200, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

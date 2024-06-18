@@ -19,6 +19,7 @@ UnitBlueprint{
         "DUMMYGSRWEAPON",
         "MOBILE",
         "NAVAL",
+        "OVERLAYDIRECTFIRE",
         "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
@@ -26,7 +27,6 @@ UnitBlueprint{
         "TECH2",
         "UEF",
         "VISIBLETORECON",
-        "OVERLAYDIRECTFIRE",
     },
     Defense = {
         ArmorType = "Normal",
@@ -197,7 +197,7 @@ UnitBlueprint{
                     RackBone = "XES0205",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",

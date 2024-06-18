@@ -42,8 +42,8 @@ UnitBlueprint{
         SurfaceThreatLevel = 290,
     },
     Display = {
-        Abilities = { 
-            "<LOC ability_manuallaunch>Manual Launch", 
+        Abilities = {
+            "<LOC ability_manuallaunch>Manual Launch",
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationDeath = {
@@ -211,7 +211,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
                 "ALLUNITS",

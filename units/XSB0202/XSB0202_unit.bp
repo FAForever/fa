@@ -53,25 +53,13 @@ UnitBlueprint{
         },
         AnimationUpgrade = "/units/XSB0202/XSB0202_Aupgrade.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 2.75,
-                BLOffsetZ = -1.45,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -2.26,
-                BLOffsetY = 2.4,
-                BLOffsetZ = -1.28,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 2.75,  BLOffsetZ = -1.45, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -2.26, BLOffsetY = 2.4,   BLOffsetZ = -1.28, BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         Mesh = {
@@ -177,7 +165,7 @@ UnitBlueprint{
         MeshExtentsZ = 5.5,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
-            { UnitSpin = 0,     X = 0,	   Y = 0,     Z = 3 },
+            { UnitSpin = 0,     X = 0,     Y = 0,     Z = 3 },
             { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
             { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },

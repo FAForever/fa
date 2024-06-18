@@ -42,25 +42,13 @@ UnitBlueprint{
         AnimationBuild = "/units/urb0201/urb0201_abuild.sca",
         AnimationUpgrade = "/units/urb0201/urb0201_aopen.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 2.05,
-                BLOffsetY = 1.8,
-                BLOffsetZ = -0.35,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -2.05,
-                BLOffsetY = 1.8,
-                BLOffsetZ = -0.35,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = 2.05,  BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -2.05, BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         Mesh = {

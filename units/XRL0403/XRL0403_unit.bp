@@ -1,4 +1,4 @@
-UnitBlueprint {
+UnitBlueprint{
     Description = "<LOC xrl0403_desc>Experimental Megabot",
     AI = {
         TargetBones = {
@@ -15,22 +15,21 @@ UnitBlueprint {
         },
     },
     Audio = {
-        AmbientMove           = Sound { Bank = 'XRL', Cue = 'XRL0403_Move_Loop', LodCutoff = 'UnitMove_LodCutoff' },
-        Construct             = Sound { Bank = 'XRL', Cue = 'XRL0403_Construct_Start', LodCutoff = 'UnitMove_LodCutoff' },
-        ConstructLoop         = Sound { Bank = 'XRL', Cue = 'XRL0403_Construct_Loop', LodCutoff = 'UnitMove_LodCutoff' },
-        Destroyed             = Sound { Bank = 'XRL_Destroy', Cue = 'XRL0403_Death', LodCutoff = 'UnitMove_LodCutoff' },
-        FootFallGeneric       = Sound { Bank = 'XRL', Cue = 'XRL0403_Move_Footfall', LodCutoff = 'UnitMove_LodCutoff' },
-        FootFallGenericSeabed = Sound { Bank = 'XRL', Cue = 'XRL0403_Move_UW_Step', LodCutoff = 'UnitMove_LodCutoff' },
-        StartMove             = Sound { Bank = 'XRL', Cue = 'XRL0403_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
-        StopMove              = Sound { Bank = 'XRL', Cue = 'XRL0403_Move_Stop', LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection           = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Spider',
-            LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove           = Sound { Bank = 'XRL',         Cue = 'XRL0403_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
+        Construct             = Sound { Bank = 'XRL',         Cue = 'XRL0403_Construct_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop         = Sound { Bank = 'XRL',         Cue = 'XRL0403_Construct_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed             = Sound { Bank = 'XRL_Destroy', Cue = 'XRL0403_Death',           LodCutoff = 'UnitMove_LodCutoff' },
+        FootFallGeneric       = Sound { Bank = 'XRL',         Cue = 'XRL0403_Move_Footfall',   LodCutoff = 'UnitMove_LodCutoff' },
+        FootFallGenericSeabed = Sound { Bank = 'XRL',         Cue = 'XRL0403_Move_UW_Step',    LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove             = Sound { Bank = 'XRL',         Cue = 'XRL0403_Move_Start',      LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove              = Sound { Bank = 'XRL',         Cue = 'XRL0403_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection           = Sound { Bank = 'Interface',   Cue = 'Cybran_Select_Spider',    LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildBotTotal = 12,
     BuildIconSortPriority = 30,
     Categories = {
-        "ANTITORPEDO",
         "AMPHIBIOUS",
+        "ANTITORPEDO",
         "BOT",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
@@ -225,8 +224,8 @@ UnitBlueprint {
         MaxSpeed = 2,
         MaxSpeedReverse = 1,
         MotionType = "RULEUMT_Amphibious",
-        SinkLower = true,
         RotateOnSpot = false,
+        SinkLower = true,
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 9,
@@ -259,8 +258,8 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
-                BarrelLoop  = Sound { Bank = 'URS', Cue = 'URS_Turret_Sml_Loop', LodCutoff = 'Weapon_LodCutoff' },
-                BarrelStart = Sound { Bank = 'URS', Cue = 'URS_Turret_Sml_Start', LodCutoff = 'Weapon_LodCutoff' },
+                BarrelLoop  = Sound { Bank = 'URS',        Cue = 'URS_Turret_Sml_Loop',   LodCutoff = 'Weapon_LodCutoff' },
+                BarrelStart = Sound { Bank = 'URS',        Cue = 'URS_Turret_Sml_Start',  LodCutoff = 'Weapon_LodCutoff' },
                 Fire        = Sound { Bank = 'XRL_Weapon', Cue = 'XRL0403_Proton_Cannon', LodCutoff = 'Weapon_LodCutoff' },
             },
             AutoInitiateAttackCommand = false,
@@ -302,7 +301,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.833,
+            RateOfFire = 10/12, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetPriorities = {
@@ -332,8 +331,8 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
-                BarrelLoop  = Sound { Bank = 'URS', Cue = 'URS_Turret_Sml_Loop', LodCutoff = 'Weapon_LodCutoff' },
-                BarrelStart = Sound { Bank = 'URS', Cue = 'URS_Turret_Sml_Start', LodCutoff = 'Weapon_LodCutoff' },
+                BarrelLoop  = Sound { Bank = 'URS',        Cue = 'URS_Turret_Sml_Loop',   LodCutoff = 'Weapon_LodCutoff' },
+                BarrelStart = Sound { Bank = 'URS',        Cue = 'URS_Turret_Sml_Start',  LodCutoff = 'Weapon_LodCutoff' },
                 Fire        = Sound { Bank = 'XRL_Weapon', Cue = 'XRL0403_Proton_Cannon', LodCutoff = 'Weapon_LodCutoff' },
             },
             AutoInitiateAttackCommand = false,
@@ -376,7 +375,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.833,
+            RateOfFire = 10/12, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetPriorities = {
@@ -460,7 +459,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.769,
+            RateOfFire = 10/13, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -516,7 +515,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.13,
+            RateOfFire = 10/77, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
@@ -577,7 +576,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.666,
+            RateOfFire = 10/6, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -643,7 +642,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.03,
+            RateOfFire = 10/333, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 40,
             TargetPriorities = {
