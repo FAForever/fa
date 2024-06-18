@@ -37,14 +37,14 @@ local WeakValueTable = { __mode = 'v' }
 ---@alias AIBrainMassStorageState 'EconLowMassStore' | 'EconMidMassStore' | 'EconFullMassStore'
 ---@alias AIBrainEnergyStorageState 'EconLowEnergyStore' | 'EconMidEnergyStore' | 'EconFullEnergyStore'
 
----@class AIBrainStorageComponent
+---@class StorageManagerBrainComponent
 ---@field MassStorageState AIBrainMassStorageState
 ---@field EnergyStorageState AIBrainEnergyStorageState
 ---@field UnitMassStorage table<EntityId, Unit>
 ---@field UnitEnergyStorage table<EntityId, Unit>
-AIBrainStorageComponent = ClassSimple {
+StorageManagerBrainComponent = ClassSimple {
 
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     CreateBrainShared = function(self)
         self.MassStorageState = 'EconFullMassStore'
         self.EnergyStorageState = 'EconFullEnergyStore'
@@ -55,7 +55,7 @@ AIBrainStorageComponent = ClassSimple {
     end,
 
     --- Register a unit to be able to blink depending on mass state
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     RegisterUnitMassStorage = function(self, unit)
         if not unit.OnMassStorageStateChange then
@@ -68,14 +68,14 @@ AIBrainStorageComponent = ClassSimple {
     end,
 
     --- Register a unit to be able to blink depending on energy state
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     UnregisterUnitMassStorage = function(self, unit)
         self.UnitMassStorage[unit.EntityId] = nil
     end,
 
     --- Register a unit to be able to blink depending on energy state
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     RegisterUnitEnergyStorage = function(self, unit)
         if not unit.OnEnergyStorageStateChange then
@@ -88,14 +88,14 @@ AIBrainStorageComponent = ClassSimple {
     end,
 
     --- Register a unit to be able to blink depending on energy state
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     UnregisterUnitEnergyStorage = function(self, unit)
         self.UnitEnergyStorage[unit.EntityId] = nil
     end,
 
     --- Transforms the stored ratio into a discrete state
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@return AIBrainMassStorageState
     GetMassStorageState = function(self)
         local ratio = self:GetEconomyStoredRatio('MASS')
@@ -111,7 +111,7 @@ AIBrainStorageComponent = ClassSimple {
         return state
     end,
 
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param state AIBrainMassStorageState
     ApplyMassStorageState = function(self, state)
         local state = self:GetMassStorageState()
@@ -136,7 +136,7 @@ AIBrainStorageComponent = ClassSimple {
     end,
 
     --- Transforms the stored ratio into a discrete state
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@return AIBrainEnergyStorageState
     GetEnergyStorageState = function(self)
         local ratio = self:GetEconomyStoredRatio('ENERGY')
@@ -152,7 +152,7 @@ AIBrainStorageComponent = ClassSimple {
         return state
     end,
 
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param state AIBrainEnergyStorageState
     ApplyEnergyStorageState = function(self, state)
         if state ~= self.EnergyStorageState then
@@ -175,7 +175,7 @@ AIBrainStorageComponent = ClassSimple {
         end
     end,
 
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     EconomyStorageThread = function(self)
         local WaitTicks = WaitTicks
 
@@ -193,25 +193,25 @@ AIBrainStorageComponent = ClassSimple {
     ---------------------------------------------------------------------------
     --#region Backwards compatibility
 
-    --- Use `AIBrainStorageComponent:RegisterUnitMassStorage` instead
+    --- Use `StorageManagerBrainComponent:RegisterUnitMassStorage` instead
     ---@deprecated
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     ESRegisterUnitMassStorage = function(self, unit)
         self:RegisterUnitMassStorage(unit)
     end,
 
-    --- Use `AIBrainStorageComponent:RegisterUnitMassStorage` instead
+    --- Use `StorageManagerBrainComponent:RegisterUnitMassStorage` instead
     ---@deprecated
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     ESRegisterUnitEnergyStorage = function(self, unit)
         self:RegisterUnitEnergyStorage(unit)
     end,
 
-    --- Use `AIBrainStorageComponent:UnregisterUnitMassStorage` and/or `AIBrainStorageComponent:UnregisterUnitEnergyStorage` instead
+    --- Use `StorageManagerBrainComponent:UnregisterUnitMassStorage` and/or `StorageManagerBrainComponent:UnregisterUnitEnergyStorage` instead
     ---@deprecated
-    ---@param self AIBrainStorageComponent | AIBrain
+    ---@param self StorageManagerBrainComponent | AIBrain
     ---@param unit StructureUnit
     ESUnregisterUnit = function(self, unit)
         self:UnregisterUnitMassStorage(unit)
