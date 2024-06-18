@@ -39,7 +39,7 @@ local ResearchFactoryLayers = { "LAND", "AIR", "NAVAL" }
 ---@type ResearchFactoryTech[]
 local ResearchFactoryTechs = { "TECH2", "TECH3" }
 
---- Keeps track of and manages the HQ functionality.
+--- Keeps track of and manages the research factory (HQ) functionality.
 ---@class FactoryManagerBrainComponent
 ---@field ResearchFactories table
 FactoryManagerBrainComponent = ClassSimple {
