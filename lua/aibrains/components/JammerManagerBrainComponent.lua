@@ -20,6 +20,12 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local WeakValue = { __mode = 'v' }
+
+-- upvalue scope for performance
+local setmetatable = setmetatable
+local ForkThread = ForkThread
+
 ---@class JammerManagerBrainComponent
 ---@field JammerResetTime number
 ---@field Jammers table<EntityId, Unit>
@@ -29,8 +35,7 @@ JammerManagerBrainComponent = ClassSimple {
 
     ---@param self JammerManagerBrainComponent | AIBrain
     CreateBrainShared = function(self)
-        self.Jammers = {}
-        setmetatable(self.Jammers, { __mode = 'v' })
+        self.Jammers = setmetatable({}, WeakValue)
         ForkThread(self.JammingToggleThread, self)
     end,
 
@@ -52,13 +57,13 @@ JammerManagerBrainComponent = ClassSimple {
     ---@param self AIBrain
     JammingToggleThread = function(self)
         while true do
-            for i, jammer in self.Jammers do
-                if jammer.ResetJammer == 0 then
-                    self:ForkThread(self.JammingFollowUpThread, jammer)
-                    jammer.ResetJammer = -1
+            for _, unitWithJammer in self.Jammers do
+                if unitWithJammer.ResetJammer == 0 then
+                    self.Trash:Add(ForkThread(self.JammingFollowUpThread, self, unitWithJammer))
+                    unitWithJammer.ResetJammer = -1
                 else
-                    if jammer.ResetJammer > 0 then
-                        jammer.ResetJammer = jammer.ResetJammer - 1
+                    if unitWithJammer.ResetJammer > 0 then
+                        unitWithJammer.ResetJammer = unitWithJammer.ResetJammer - 1
                     end
                 end
             end
