@@ -10,14 +10,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 0.1,
         Health = 10,
         MaxHealth = 10,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Mesh = {
@@ -54,14 +49,6 @@ UnitBlueprint{
     LifeBarOffset = 0.05,
     LifeBarSize = 0.75,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = 0,

@@ -27,13 +27,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 50,
         MaxHealth = 50,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -41,6 +37,13 @@ UnitBlueprint{
             "<LOC ability_upgradable>Upgradeable",
         },
         AnimationUpgrade = "/units/urb3201/urb3201_aupgrade.sca",
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
+        },
         IdleEffects = {
             Land = {
                 Effects = {
@@ -97,18 +100,7 @@ UnitBlueprint{
         SizeZ = 1,
     },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_Pause = true },
         FactionName = "Cybran",
         Icon = "land",
         OrderOverrides = {
@@ -133,14 +125,6 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MotionType = "RULEUMT_None",
@@ -164,12 +148,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

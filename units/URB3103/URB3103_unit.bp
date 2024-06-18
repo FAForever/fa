@@ -13,14 +13,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 0.1,
         Health = 1,
         MaxHealth = 1,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/URL0101/URL0101_Aagro.sca",
@@ -49,14 +44,6 @@ UnitBlueprint{
     LifeBarOffset = 0.3,
     LifeBarSize = 0.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = 0,
@@ -79,12 +66,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

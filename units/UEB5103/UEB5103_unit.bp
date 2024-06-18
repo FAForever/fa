@@ -10,14 +10,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 0.1,
         Health = 10,
         MaxHealth = 10,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Mesh = {
@@ -45,7 +40,7 @@ UnitBlueprint{
     },
     General = {
         FactionName = "UEF",
-        Icon = "land",
+        Icon = "amph",
         SelectionPriority = 5,
     },
     Intel = { VisionRadius = 0 },
@@ -54,11 +49,7 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,

@@ -26,14 +26,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 115,
         MaxHealth = 115,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 3.33,
+        SurfaceThreatLevel = 3,
     },
     Display = {
         AnimationDeath = {
@@ -98,16 +94,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "land",
@@ -118,14 +109,6 @@ UnitBlueprint{
     LifeBarOffset = 0.1,
     LifeBarSize = 0.45,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         Elevation = 2,
         MaxAcceleration = 3.8,
@@ -143,12 +126,10 @@ UnitBlueprint{
         TurnRadius = 1,
         TurnRate = 45,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = 0.025,
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
-    CollisionOffsetY = 0,
     SizeX = 0.7,
     SizeY = 0.7,
     SizeZ = 0.9,
@@ -205,7 +186,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "TECH3 MOBILE",
@@ -236,12 +217,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

@@ -35,14 +35,11 @@ UnitBlueprint{
         "VOLATILE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 310,
         Health = 6000,
         MaxHealth = 6000,
         RegenRate = 20,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_deathaoe>Volatile" },
@@ -98,14 +95,6 @@ UnitBlueprint{
     LifeBarOffset = 2.25,
     LifeBarSize = 5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
@@ -142,12 +131,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

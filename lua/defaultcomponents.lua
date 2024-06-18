@@ -588,7 +588,8 @@ local VeterancyRegenBuffs = {
 ---@field VetDamageTaken number
 ---@field VetInstigators table<EntityId, Unit>
 ---@field VetExperience? number
----@field VetLevel? number
+---@field VetLevel? number 
+---@field VetMassKillCredit? number -- bookkeeping number available to the player via stat
 VeterancyComponent = ClassSimple {
 
     ---@param self VeterancyComponent | Unit
@@ -602,10 +603,12 @@ VeterancyComponent = ClassSimple {
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
-            self:UpdateStat('VetLevel', 0)
             self:UpdateStat('VetExperience', 0)
+            self:UpdateStat('VetLevel', 0)
+            self:UpdateStat('VetMassKillCredit', 0)
             self.VetExperience = 0
             self.VetLevel = 0
+            self.VetMassKillCredit = 0
         end
     end,
 
@@ -616,12 +619,12 @@ VeterancyComponent = ClassSimple {
     ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())
-        self.VetDamageTaken = self.VetDamageTaken + amount
         if instigator and
             instigator.IsUnit and
             (not IsDestroyed(instigator)) and
             IsEnemy(self.Army, instigator.Army)
         then
+            self.VetDamageTaken = self.VetDamageTaken + amount
             local entityId = instigator.EntityId
             local vetInstigators = self.VetInstigators
             local vetDamage = self.VetDamage
@@ -656,6 +659,12 @@ VeterancyComponent = ClassSimple {
         if not blueprint.VetEnabled then
             return
         end
+
+        -- VetMassKillCredit is not otherwise used by the vet system, but
+        -- is available for players as a bookkeeping item for total mass
+        -- killed without the level gain limitations on VetExperience
+        self.VetMassKillCredit = self.VetMassKillCredit + experience
+        self:UpdateStat('VetMassKillCredit', self.VetMassKillCredit)
 
         local currExperience = self.VetExperience
         local currLevel = self.VetLevel

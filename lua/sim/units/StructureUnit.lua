@@ -11,6 +11,8 @@ local UnitStopBeingBuiltEffects = Unit.StopBeingBuiltEffects
 local UnitDoTakeDamage = Unit.DoTakeDamage
 local UnitCreateWreckage = Unit.CreateWreckage
 
+local BlinkingLightsUnitComponent = import("/lua/sim/units/components/BlinkingLightsUnitComponent.lua").BlinkingLightsUnitComponent
+
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -65,16 +67,15 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 -- Structures that rotate in 90 degree steps: T2/T3/T4 Artillery
 local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
----@class StructureUnit : Unit
+---@class StructureUnit : Unit, BlinkingLightsUnitComponent
 ---@field AdjacentUnits? Unit[]
 ---@field TarmacBag StructureTarmacBag
 ---@field TerrainSlope table            # exists for backwards compatibility
----@field FxBlinkingLightsBag table     # exists for backwards compatibility
 ---@field DeathAnimManip moho.AnimationManipulator
 ---@field OnBeingBuiltEffectsBag TrashBag
 ---@field AdjacencyBeamsBag TrashBag
 ---@field BuildEffectsBag TrashBag
-StructureUnit = ClassUnit(Unit) {
+StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
     MinWeaponRequiresEnergy = 0,
@@ -89,8 +90,9 @@ StructureUnit = ClassUnit(Unit) {
     ---@param self StructureUnit
     OnCreate = function(self)
         UnitOnCreate(self)
+        BlinkingLightsUnitComponent.OnCreate(self)
+
         self:HideLandBones()
-        self.FxBlinkingLightsBag = { }
 
         -- default to ground fire mode for all structures
         self:SetFireState(2)
@@ -1022,39 +1024,4 @@ StructureUnit = ClassUnit(Unit) {
             ChangeState(self, self.IdleState)
         end,
     },
-
-    ---------------------------------------------------------------------------
-    --#region Deprecated functionality
-
-    ---@deprecated
-    ---@param self StructureUnit
-    ChangeBlinkingLights = function(self)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    CreateBlinkingLights = function(self)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    OnMassStorageStateChange = function(self, state)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    OnEnergyStorageStateChange = function(self, state)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    DestroyBlinkingLights = function(self)
-        for _, v in self.FxBlinkingLightsBag do
-            v:Destroy()
-        end
-        self.FxBlinkingLightsBag = { }
-    end,
-
-    --#endregion
-
 }

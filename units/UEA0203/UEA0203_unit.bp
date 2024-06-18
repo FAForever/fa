@@ -1,4 +1,4 @@
-UnitBlueprint {
+UnitBlueprint{
     Description = "<LOC uea0203_desc>Gunship",
     AI = { BeaconName = "UEB5102" },
     Air = {
@@ -26,19 +26,18 @@ UnitBlueprint {
         Winged = false,
     },
     Audio = {
-        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01', LodCutoff = 'UnitMove_LodCutoff' },
-        AmbientMove        = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Loop', LodCutoff = 'UnitMove_LodCutoff' },
-        Destroyed          = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Med', LodCutoff = 'UnitMove_LodCutoff' },
-        Killed             = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Air_Killed',
-            LodCutoff = 'UnitMove_LodCutoff' },
-        Landing            = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Land', LodCutoff = 'UnitMove_LodCutoff' },
-        Load               = Sound { Bank = 'UEA', Cue = 'UEA0104_Unit_Load', LodCutoff = 'UnitMove_LodCutoff' },
-        Refueling          = Sound { Bank = 'UEA', Cue = 'UEA_Repair_Refuel', LodCutoff = 'UnitMove_LodCutoff' },
-        StartMove          = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
-        StopMove           = Sound { Bank = 'UEA', Cue = 'UEA0203_Move_Stop', LodCutoff = 'UnitMove_LodCutoff' },
-        Thruster           = Sound { Bank = 'UEA', Cue = 'UEA0203_Thruster', LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection        = Sound { Bank = 'Interface', Cue = 'UEF_Select_Air', LodCutoff = 'UnitMove_LodCutoff' },
-        Unload             = Sound { Bank = 'UEA', Cue = 'UEA0104_Unit_Unload', LodCutoff = 'UnitMove_LodCutoff' },
+        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',      LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove        = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Loop',      LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed          = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Med',        LodCutoff = 'UnitMove_LodCutoff' },
+        Killed             = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Air_Killed', LodCutoff = 'UnitMove_LodCutoff' },
+        Landing            = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Land',      LodCutoff = 'UnitMove_LodCutoff' },
+        Load               = Sound { Bank = 'UEA',        Cue = 'UEA0104_Unit_Load',      LodCutoff = 'UnitMove_LodCutoff' },
+        Refueling          = Sound { Bank = 'UEA',        Cue = 'UEA_Repair_Refuel',      LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove          = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Start',     LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove           = Sound { Bank = 'UEA',        Cue = 'UEA0203_Move_Stop',      LodCutoff = 'UnitMove_LodCutoff' },
+        Thruster           = Sound { Bank = 'UEA',        Cue = 'UEA0203_Thruster',       LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
+        Unload             = Sound { Bank = 'UEA',        Cue = 'UEA0104_Unit_Unload',    LodCutoff = 'UnitMove_LodCutoff' },
     },
     AverageDensity = 1,
     BuildIconSortPriority = 30,
@@ -60,62 +59,14 @@ UnitBlueprint {
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 700,
         MaxHealth = 700,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 7,
+        SurfaceThreatLevel = 5,
     },
     Display = {
         Abilities = { "<LOC ability_transport>Transport" },
         ForcedBuildSpin = 0,
-        LayerChangeEffects = {
-            AirLand = {
-                Effects = {
-                    {
-                        Bones = {
-                            "Exhaust_Front01",
-                            "Exhaust_Front02",
-                            "Exhaust_Back01",
-                            "Exhaust_Back02",
-                        },
-                        Type = "Landing01",
-                    },
-                },
-            },
-            LandAir = {
-                Effects = {
-                    {
-                        Bones = {
-                            "Exhaust_Front01",
-                            "Exhaust_Front02",
-                            "Exhaust_Back01",
-                            "Exhaust_Back02",
-                        },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
-            AirWater = {
-                Effects = {
-                    {
-                        Bones = { "Jet_Front" },
-                        Type = "Landing01",
-                    },
-                },
-            },
-            WaterAir = {
-                Effects = {
-                    {
-                        Bones = { "Jet_Front" },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
-        },
         IdleEffects = {
             Air = {
                 Effects = {
@@ -139,6 +90,50 @@ UnitBlueprint {
                             "Exhaust_Back02",
                         },
                         Type = "SeaIdleGunship01",
+                    },
+                },
+            },
+        },
+        LayerChangeEffects = {
+            AirLand = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Exhaust_Front01",
+                            "Exhaust_Front02",
+                            "Exhaust_Back01",
+                            "Exhaust_Back02",
+                        },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = { "Jet_Front" },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            LandAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Exhaust_Front01",
+                            "Exhaust_Front02",
+                            "Exhaust_Back01",
+                            "Exhaust_Back02",
+                        },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = { "Jet_Front" },
+                        Type = "TakeOff01",
                     },
                 },
             },
@@ -186,15 +181,11 @@ UnitBlueprint {
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -208,14 +199,6 @@ UnitBlueprint {
     LifeBarOffset = 0.5,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 10,
         FuelRechargeRate = 5,
         FuelUseTime = 400,
@@ -239,9 +222,9 @@ UnitBlueprint {
         AirClass = true,
         Class1Capacity = 1,
         ClassGenericUpTo = 2,
-        SlotsSmall = 1,
-        SlotsMedium = 1,
         SlotsLarge = 0,
+        SlotsMedium = 1,
+        SlotsSmall = 1,
         TransportClass = 1,
     },
     Veteran = {
@@ -292,7 +275,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "GROUNDATTACK",
@@ -332,7 +315,6 @@ UnitBlueprint {
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

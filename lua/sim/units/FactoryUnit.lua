@@ -167,6 +167,17 @@ FactoryUnit = ClassUnit(StructureUnit) {
                 unit:UpdateBuildRestrictions()
             end
         end
+
+        -- Blinking lights functionality
+        brain:RegisterUnitEnergyStorage(self)
+        brain:RegisterUnitMassStorage(self)
+
+        if brain.MassStorageState == 'EconLowMassStore' or brain.EnergyStorageState == 'EconLowEnergyStore' then
+            self.BlinkingLightsState = 'Red'
+        else
+           self.BlinkingLightsState = 'Green'
+        end
+        self:CreateBlinkingLights()
     end,
 
     ---@param self FactoryUnit
@@ -476,6 +487,32 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
         -- anything else can not upgrade
         return nil
+    end,
+
+    --#endregion
+
+
+    ---------------------------------------------------------------------------
+    --#region Blinking lights functionality
+
+    ---@param self FactoryUnit
+    ---@param state AIBrainMassStorageState
+    OnMassStorageStateChange = function(self, state)
+        if state == 'EconLowMassStore' then
+            self:ChangeBlinkingLights('Red')
+        else
+            self:ChangeBlinkingLights('Green')
+        end
+    end,
+
+    ---@param self FactoryUnit
+    ---@param state AIBrainEnergyStorageState
+    OnEnergyStorageStateChange = function(self, state)
+        if state == 'EconLowEnergyStore' then
+            self:ChangeBlinkingLights('Red')
+        else
+            self:ChangeBlinkingLights('Green')
+        end
     end,
 
     --#endregion

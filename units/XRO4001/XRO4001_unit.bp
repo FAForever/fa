@@ -13,7 +13,6 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
     },
     Display = {
         HideLifebars = true,
@@ -64,7 +63,6 @@ UnitBlueprint{
         TurnRadius = 10,
         TurnRate = 90,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
