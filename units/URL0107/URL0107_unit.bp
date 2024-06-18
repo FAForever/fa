@@ -157,7 +157,7 @@
     SelectionThickness = 0.7,
     SizeX = 0.7,
     SizeY = 0.7,
-    SizeZ = 1,
+    SizeZ = 1.05,
     StrategicIconName = "icon_land1_directfire",
     StrategicIconSortPriority = 135,
     Transport = { CanFireFromTransport = false },
