@@ -34,21 +34,23 @@ local modifiersKeys = {}
 local worldview = import("/lua/ui/game/worldview.lua").viewLeft
 local oldHandleEvent = worldview.HandleEvent
 
-
+---@param selection UserUnit[]
+---@return UserUnit[] | nil
 function TranslateExFacUnits(selection)
-    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)   -- get all selected units with a factory attachment
-    local nonExFacs = nil
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection) -- get all selected units with a factory attachment
     if not table.empty(exFacs) then
-        nonExFacs = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection) -- get all selected Units without a factory attachment
+        ---@type UserUnit[]
+        local nonExFacs = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection) -- get all selected Units without a factory attachment
         for _, exFac in exFacs do
             table.insert(nonExFacs, exFac:GetCreator()) -- for each unit with a factory attachment add the attachment to the list of factories
         end
-        -- in case we've somehow selected both the platform and the factory, only put the fac in once
-        nonExFacs = table.unique(nonExFacs)
-    end
-    return nonExFacs
-end
 
+        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+        return table.unique(nonExFacs)
+    end
+
+    return nil
+end
 
 function initCycleButtons(values)
     local buttonH = 48
