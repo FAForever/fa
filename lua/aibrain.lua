@@ -12,7 +12,7 @@ local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
-local HQManagerBrainComponent = import("/lua/aibrains/components/HQManagerBrainComponent.lua").HQManagerBrainComponent
+local FactoryManagerBrainComponent = import("/lua/aibrains/components/FactoryManagerBrainComponent.lua").FactoryManagerBrainComponent
 local JammerManagerBrainComponent = import("/lua/aibrains/components/JammerManagerBrainComponent.lua").JammerManagerBrainComponent
 local StatManagerBrainComponent = import("/lua/aibrains/components/StatManagerBrainComponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/EnergyManagerBrainComponent.lua").EnergyManagerBrainComponent
@@ -42,7 +42,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: HQManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, moho.aibrain_methods
+---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -54,7 +54,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
-AIBrain = Class(HQManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent,
+AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent,
     moho.aibrain_methods) {
 
     Status = 'InProgress',
@@ -114,7 +114,7 @@ AIBrain = Class(HQManagerBrainComponent, StatManagerBrainComponent, JammerManage
         self.PingCallbackList = {}
 
         EnergyManagerBrainComponent.CreateBrainShared(self)
-        HQManagerBrainComponent.CreateBrainShared(self)
+        FactoryManagerBrainComponent.CreateBrainShared(self)
         StatManagerBrainComponent.CreateBrainShared(self)
         JammerManagerBrainComponent.CreateBrainShared(self)
     end,

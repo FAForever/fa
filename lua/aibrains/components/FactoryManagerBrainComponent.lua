@@ -22,9 +22,9 @@
 
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
----@alias HQTech "TECH2" | "TECH3"
----@alias HQLayer "AIR" | "LAND" | "NAVY"
----@alias HQFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
+---@alias ResearchFactoryTech "TECH2" | "TECH3"
+---@alias ResearchFactoryLayer "AIR" | "LAND" | "NAVY"
+---@alias ResearchFactoryFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
 
 -- upvalue scope for performance
 local categories = categories
@@ -33,15 +33,15 @@ local RemoveBuildRestriction = RemoveBuildRestriction
 
 local MathMax = math.max
 
----@type HQLayer[]
-local HQLayers = { "LAND", "AIR", "NAVAL" }
+---@type ResearchFactoryLayer[]
+local ResearchFactoryLayers = { "LAND", "AIR", "NAVAL" }
 
----@type HQTech[]
-local HQTechs = { "TECH2", "TECH3" }
+---@type ResearchFactoryTech[]
+local ResearchFactoryTechs = { "TECH2", "TECH3" }
 
 --- Keeps track of and manages the HQ functionality.
 ---@class FactoryManagerBrainComponent
----@field HQs table
+---@field ResearchFactories table
 FactoryManagerBrainComponent = ClassSimple {
 
     ---@param self FactoryManagerBrainComponent | AIBrain
@@ -51,9 +51,9 @@ FactoryManagerBrainComponent = ClassSimple {
             local factionCategory = facData.Category
 
             local byFaction = {}
-            for _, layer in HQLayers do
+            for _, layer in ResearchFactoryLayers do
                 local byLayer = {}
-                for _, tech in HQTechs do
+                for _, tech in ResearchFactoryTechs do
                     byLayer[tech] = 0
                 end
                 byFaction[layer] = byLayer
@@ -62,7 +62,7 @@ FactoryManagerBrainComponent = ClassSimple {
             info[factionCategory] = byFaction
         end
 
-        self.HQs = info
+        self.ResearchFactories = info
 
         -- restrict all support factories by default
         AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
@@ -70,11 +70,11 @@ FactoryManagerBrainComponent = ClassSimple {
 
     --- Adds a HQ so that the engi mod knows we have it
     ---@param self FactoryManagerBrainComponent | AIBrain
-    ---@param faction HQFaction
-    ---@param layer HQLayer
-    ---@param tech HQTech
+    ---@param faction ResearchFactoryFaction
+    ---@param layer ResearchFactoryLayer
+    ---@param tech ResearchFactoryTech
     AddHQ = function(self, faction, layer, tech)
-        local byLayer = self.HQs[faction][layer]
+        local byLayer = self.ResearchFactories[faction][layer]
         if not byLayer then
             -- WARN("")
             return
@@ -85,11 +85,11 @@ FactoryManagerBrainComponent = ClassSimple {
 
     --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
     ---@param self FactoryManagerBrainComponent | AIBrain
-    ---@param faction HQFaction
-    ---@param layer HQLayer
-    ---@param tech HQTech
+    ---@param faction ResearchFactoryFaction
+    ---@param layer ResearchFactoryLayer
+    ---@param tech ResearchFactoryTech
     RemoveHQ = function(self, faction, layer, tech)
-        local byLayer = self.HQs[faction][layer]
+        local byLayer = self.ResearchFactories[faction][layer]
         if not byLayer then
             -- WARN("")
             return
@@ -103,7 +103,7 @@ FactoryManagerBrainComponent = ClassSimple {
     ReEvaluateHQSupportFactoryRestrictions = function(self)
         for _, facData in Factions do
             local factionCategory = facData.Category
-            for _, layer in HQLayers do
+            for _, layer in ResearchFactoryLayers do
                 self:SetHQSupportFactoryRestrictions(factionCategory, layer)
             end
         end
@@ -111,13 +111,13 @@ FactoryManagerBrainComponent = ClassSimple {
 
     --- Manages the support factory restrictions of the engi mod
     ---@param self FactoryManagerBrainComponent | AIBrain
-    ---@param faction HQFaction
-    ---@param layer HQLayer
+    ---@param faction ResearchFactoryFaction
+    ---@param layer ResearchFactoryLayer
     SetHQSupportFactoryRestrictions = function(self, faction, layer)
 
         -- localize for performance
         local army = self:GetArmyIndex()
-        local byLayer = self.HQs[faction][layer]
+        local byLayer = self.ResearchFactories[faction][layer]
         if not byLayer then
             -- WARN("")
             return
@@ -146,23 +146,23 @@ FactoryManagerBrainComponent = ClassSimple {
 
     --- Counts all HQs of specific faction, layer and tech for the engi mod.
     ---@param self FactoryManagerBrainComponent | AIBrain
-    ---@param faction HQFaction
-    ---@param layer HQLayer
-    ---@param tech HQTech
+    ---@param faction ResearchFactoryFaction
+    ---@param layer ResearchFactoryLayer
+    ---@param tech ResearchFactoryTech
     ---@return number
     CountHQs = function(self, faction, layer, tech)
-        return self.HQs[faction][layer][tech]
+        return self.ResearchFactories[faction][layer][tech]
     end,
 
     --- Counts all HQs of faction and tech, regardless of layer
     ---@param self FactoryManagerBrainComponent | AIBrain
-    ---@param faction HQFaction
-    ---@param tech HQTech
+    ---@param faction ResearchFactoryFaction
+    ---@param tech ResearchFactoryTech
     ---@return number
     CountHQsAllLayers = function(self, faction, tech)
-        local byFaction = self.HQs[faction]
+        local byFaction = self.ResearchFactories[faction]
         local count = 0
-        for _, layer in HQLayers do
+        for _, layer in ResearchFactoryLayers do
             count = count + byFaction[layer][tech]
         end
 
