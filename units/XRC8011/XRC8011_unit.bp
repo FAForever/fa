@@ -27,7 +27,6 @@ UnitBlueprint {
         'BENIGN',
     },
     CollisionOffsetX = 0.5,
-    CollisionOffsetY = 0,
     CollisionOffsetZ = 1.5,
     Defense = {
         ArmorType = 'Normal',

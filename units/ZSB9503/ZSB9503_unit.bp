@@ -65,7 +65,6 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Structure',
         EconomyThreatLevel = 12,

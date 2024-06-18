@@ -25,9 +25,6 @@ UnitBlueprint {
         'VISIBLETORECON',
         'RECLAIMABLE',
     },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
         Health = 1650,

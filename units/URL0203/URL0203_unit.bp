@@ -142,8 +142,6 @@ UnitBlueprint{
         TurnRate = 90,
         WaterSpeedMultiplier = 0.9,
     },
-    SelectionCenterOffsetX = 0,
-    SelectionCenterOffsetZ = 0,
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.7,

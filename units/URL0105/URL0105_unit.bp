@@ -180,8 +180,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 180,
     },
-    SelectionCenterOffsetX = 0,
-    SelectionCenterOffsetZ = 0,
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,
     SelectionThickness = 0.95,

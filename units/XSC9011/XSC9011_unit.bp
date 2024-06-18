@@ -52,7 +52,6 @@ UnitBlueprint {
         'UNSELECTABLE',
         'UNTARGETABLE',
     },
-    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0.1,
         ArmorType = 'Light',

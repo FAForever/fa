@@ -37,7 +37,6 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'SUPPORTFACTORY',
     },
-    CollisionOffsetY = 0,
     Defense = {
         ArmorType = 'Structure',
         EconomyThreatLevel = 49,

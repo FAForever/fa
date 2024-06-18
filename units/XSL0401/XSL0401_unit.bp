@@ -64,7 +64,6 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 HitBox = {
                     CollisionOffsetX = -0.2,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 1.0,
                     SizeX = 3.2,
                     SizeY = 3.0,
@@ -78,7 +77,6 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 HitBox = {
                     CollisionOffsetX = 2.4,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 1.75,
                     SizeX = 4.2,
                     SizeY = 3.0,

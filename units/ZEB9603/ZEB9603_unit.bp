@@ -40,9 +40,7 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'SUPPORTFACTORY',
     },
-    CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Structure',
         EconomyThreatLevel = 35,
@@ -175,7 +173,6 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = true,
         },
-        CollisionOffsetX = 0,
         DragCoefficient = 0.2,
         MotionType = 'RULEUMT_None',
         ComputeRollOffPoint = true,

@@ -63,8 +63,6 @@ UnitBlueprint{
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 3,
                     SizeX = 2.5,
                     SizeY = 1.0,
@@ -204,7 +202,6 @@ UnitBlueprint{
         TurnRadius = 3,
         TurnRate = 40,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,

@@ -172,7 +172,6 @@ UnitBlueprint{
         SkirtSizeX = 2,
         SkirtSizeZ = 2,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = 0.1,
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.6,
