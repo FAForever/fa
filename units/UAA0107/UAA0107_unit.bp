@@ -59,12 +59,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_transport>Transport" },
@@ -134,14 +130,6 @@ UnitBlueprint{
     LifeBarOffset = 0.45,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 8,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -155,7 +143,6 @@ UnitBlueprint{
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.43,
     CollisionOffsetY = -0.5,
-    CollisionOffsetZ = 0,
     SizeX = 2.2,
     SizeY = 1.4,
     SizeZ = 2.2,

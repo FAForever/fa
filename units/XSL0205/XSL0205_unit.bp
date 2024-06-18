@@ -28,12 +28,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 14,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -155,14 +151,6 @@ UnitBlueprint{
     Physics = {
         BackUpDistance = 8,
         BankingSlope = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         Elevation = 0.25,
         MaxAcceleration = 2.6,
@@ -257,7 +245,7 @@ UnitBlueprint{
             RackFireTogether = false,
             RackRecoilDistance = 0,
             RackReloadTimeout = 0,
-            RackSalvoChargeTime = 0.1,
+            RackSalvoChargeTime = 0,
             RackSalvoFiresAfterCharge = true,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,

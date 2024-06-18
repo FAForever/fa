@@ -53,13 +53,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 848,
         MaxHealth = 848,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 7,
     },
     Display = {
@@ -154,14 +150,6 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 10,
         FuelRechargeRate = 5,
         FuelUseTime = 400,

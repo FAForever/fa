@@ -38,11 +38,9 @@ UnitBlueprint{
         "WEAKANTINAVY"
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         Health = 2000,
         MaxHealth = 2000,
-        RegenRate = 0,
         SubThreatLevel = 4,
         SurfaceThreatLevel = 0.1,
     },
@@ -140,14 +138,6 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         BackUpDistance = 10,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 4.5,

@@ -57,14 +57,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
         SubThreatLevel = 8,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -168,14 +164,6 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         AttackElevation = 6,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,

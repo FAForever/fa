@@ -40,18 +40,28 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 130,
         Health = 4500,
         MaxHealth = 4500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/ueb0103/ueb0103_aupgrade.sca",
+        BlinkingLights = {
+            {
+                BLBone = 'Dock_Cover',
+                BLOffsetX = -0.05,
+                BLOffsetY = 0.5,
+                BLOffsetZ = 0,
+                BLScale = 2,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = "Attachpoint01",
         IdleEffects = {
             Water = {
@@ -140,7 +150,6 @@ UnitBlueprint{
             { UnitSpin = 180,   X = -2.5,  Y = 0,     Z = -8 },
             { UnitSpin = 0,     X = -2.5,  Y = 0,     Z = 8 },
         },
-        CollisionOffsetX = 0,
         SkirtOffsetX = -7,
         SkirtOffsetZ = -1,
         SkirtSizeX = 12,
@@ -153,7 +162,6 @@ UnitBlueprint{
     SelectionSizeZ = 6.9,
     SelectionThickness = 0.26,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     SizeX = 4,
     SizeY = 3,
     SizeZ = 10,

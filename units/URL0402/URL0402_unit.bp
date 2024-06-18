@@ -82,7 +82,6 @@ UnitBlueprint{
                 Animation = "/units/url0402/url0402_A005.sca",
                 HitBox = {
                     CollisionOffsetX = 0.25,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 2.25,
                     SizeX = 2.8,
                     SizeY = 2.8,
@@ -227,14 +226,6 @@ UnitBlueprint{
     LifeBarSize = 6,
     Physics = {
         BackUpDistance = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = true,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -3,
         MaxAcceleration = 2.5,

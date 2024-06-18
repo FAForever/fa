@@ -1,0 +1,56 @@
+name: Pull Request Template
+description: Create a report to FAF Pull Request
+title: " "
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! This template will help you with creating a report that we can use to understand the bug.
+
+        - This repository is maintained by volunteers, it may take a while for them to come back to you.
+        - Remember to include sufficient details and context.
+        - If you have multiple questions, suggestions, or bugs, please submit them in separate issues.
+        - We accept pull request. If you know how to fix it - go ahead!
+
+        Please provide the following details about the issue you encountered. *Issues that do not provide the information requested in this form will be flagged as **incomplete** & automatically closed.*
+
+  - type: textarea
+    id: describe
+    attributes:
+      label: Description of the changes
+      description: A clear and concise description (or visuals) of what the changes imply. If it closes an issue, make sure to mention that.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Test setup for the changes
+      description: A clear and concise set of instructions on how to run the changes. Also allows us to gauge the number of scenario's that you've covered already, the more the merrier.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context about the pull request here.
+    validations:
+      required: false
+
+  - type: checkbox
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context about the pull request here.
+      options:
+        - label: Changes are annotated, including comments where useful
+        - label: Changes are documented in the changelog for the next game version
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Useful Tooling
+          
+          - [GifToScreen](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!

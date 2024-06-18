@@ -28,12 +28,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 4.5,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_aa>Anti-Air" },
@@ -118,14 +114,6 @@ UnitBlueprint{
     LifeBarSize = 0.5,
     Physics = {
         BackUpDistance = 5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 8,

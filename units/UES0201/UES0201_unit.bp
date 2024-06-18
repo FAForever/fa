@@ -48,7 +48,6 @@ UnitBlueprint{
         EconomyThreatLevel = 46,
         Health = 8000,
         MaxHealth = 8000,
-        RegenRate = 0,
         SubThreatLevel = 3,
         SurfaceThreatLevel = 23,
     },
@@ -158,14 +157,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 5,

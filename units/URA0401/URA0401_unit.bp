@@ -74,11 +74,9 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 24,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 75000,
         MaxHealth = 75000,
         RegenRate = 75,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 243,
     },
     Display = {
@@ -192,14 +190,6 @@ UnitBlueprint{
     LifeBarOffset = 3.25,
     LifeBarSize = 6.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         MaxSpeed = 0.5,
         MotionType = "RULEUMT_Air",

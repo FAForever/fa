@@ -28,16 +28,40 @@ UnitBlueprint{
         "VOLATILE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 15,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -0.38,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0.33,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 0.2,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -0.33,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 0.2,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         Abilities = { "<LOC ability_deathaoe>Volatile" },
         Mesh = {
             IconFadeInZoom = 130,
@@ -107,7 +131,6 @@ UnitBlueprint{
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.6,
-    CollisionOffsetY = 0,
     SizeX = 0.8,
     SizeY = 0.4,
     SizeZ = 0.8,

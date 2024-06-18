@@ -32,9 +32,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 2520,
         MaxHealth = 2520,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -190,7 +187,7 @@ UnitBlueprint{
             RackFireTogether = true,
             RackRecoilDistance = 0,
             RackReloadTimeout = 0,
-            RackSalvoChargeTime = 0.1,
+            RackSalvoChargeTime = 0,
             RackSalvoFiresAfterCharge = true,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,

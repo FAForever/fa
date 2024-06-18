@@ -5,8 +5,7 @@ function SyncCameraRequest(data)
     table.insert(Sync.CameraRequests, data)
 end
 
----comment
----@param data any
+---@param data SoundBlueprint
 function SyncVoice(data)
     local Sync = Sync
     Sync.Voice = Sync.Voice or { }

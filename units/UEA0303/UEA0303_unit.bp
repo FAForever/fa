@@ -60,12 +60,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 40,
         ArmorType = "ASF",
-        EconomyThreatLevel = 0,
         Health = 2300,
         MaxHealth = 2300,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_aa>Anti-Air" },
@@ -156,14 +152,6 @@ UnitBlueprint{
     LifeBarOffset = 0.65,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 18,
         FuelRechargeRate = 15,
         FuelUseTime = 1000,
@@ -177,7 +165,6 @@ UnitBlueprint{
     SelectionSizeX = 1.1,
     SelectionSizeZ = 1,
     SelectionThickness = 0.42,
-    CollisionOffsetY = 0,
     SizeSphere = 2.2,
     SizeX = 1,
     SizeY = 0.3,

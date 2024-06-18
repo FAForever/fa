@@ -37,14 +37,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1430,
         MaxHealth = 1430,
-        RegenRate = 0,
         SubThreatLevel = 11,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -146,7 +142,7 @@ UnitBlueprint{
         BuildCostEnergy = 8800,
         BuildCostMass = 1100,
         BuildTime = 4400,
-        MaintenanceConsumptionPerSecondEnergy = 30,
+        MaintenanceConsumptionPerSecondEnergy = 45,
     },
     Footprint = {
         SizeX = 2,
@@ -186,14 +182,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         Elevation = -1.5,

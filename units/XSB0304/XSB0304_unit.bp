@@ -29,14 +29,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 440,
         Health = 10000,
         MaxHealth = 10000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationDeath = {
@@ -46,6 +42,41 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 Weight = 1,
             },
+        },
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = -0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -3,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -3,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 3,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0.9,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 3,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         BuildAttachBone = "Attachpoint",
         DamageEffects = {
@@ -177,7 +208,6 @@ UnitBlueprint{
     SelectionSizeX = 3.75,
     SelectionSizeZ = 3.5,
     SelectionThickness = 0.27,
-    CollisionOffsetZ = 0,
     SizeX = 5,
     SizeY = 1.5,
     SizeZ = 5,

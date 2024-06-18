@@ -57,14 +57,10 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 16,
         Health = 3200,
         MaxHealth = 3200,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zab9502_desc>Air Factory',
     Display = {
@@ -72,6 +68,27 @@ UnitBlueprint {
             '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/zab9502/zab9502_aupgrade.sca',
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 2.75,
+                BLOffsetZ = -1.45,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -2.26,
+                BLOffsetY = 2.4,
+                BLOffsetZ = -1.28,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = 'Attachpoint',
         Mesh = {
             IconFadeInZoom = 130,

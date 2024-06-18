@@ -38,13 +38,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 343,
         Health = 7500,
         MaxHealth = 7500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 6,
     },
     Display = {
@@ -140,14 +137,6 @@ UnitBlueprint{
     LifeBarSize = 4,
     Physics = {
         BackUpDistance = 10,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 3,
@@ -166,7 +155,6 @@ UnitBlueprint{
     SelectionSizeZ = 8,
     SelectionThickness = 0.23,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     SizeX = 2.25,
     SizeY = 2.8,
     SizeZ = 11.5,

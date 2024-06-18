@@ -31,14 +31,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 104,
         Health = 3200,
         MaxHealth = 3200,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
@@ -46,6 +42,20 @@ UnitBlueprint{
         AnimationUpgradeTable = {
             uab0202 = "/units/uab0102/uab0102_aupgrade.sca",
             zab9502 = "/units/uab0102/uab0102_aopen_sup.sca",
+        },
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 1.9,
+                BLOffsetZ = -1.45,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         BuildAttachBone = "Attachpoint",
         DamageEffects = {

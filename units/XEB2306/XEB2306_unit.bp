@@ -26,13 +26,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 750,
         Health = 6500,
         MaxHealth = 6500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 188,
     },
     Display = {
@@ -113,7 +110,6 @@ UnitBlueprint{
     SelectionSizeX = 0.85,
     SelectionSizeZ = 0.85,
     SelectionThickness = 0.48,
-    CollisionOffsetY = 0,
     SizeX = 1.3,
     SizeY = 1.3,
     SizeZ = 1.3,

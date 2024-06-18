@@ -15,7 +15,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 170,
         MaxHealth = 170,
-        RegenRate = 0,
     },
     Description = '<LOC opc2002_desc>Seraphim Tech',
     Display = {
@@ -120,14 +119,6 @@ UnitBlueprint {
     LifeBarSize = 0.5,
     Physics = {
         BankingSlope = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         Elevation = 1,
         MaxAcceleration = 0.38,

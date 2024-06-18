@@ -57,12 +57,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 0.1,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 26,
         MaxHealth = 26,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -148,14 +144,6 @@ UnitBlueprint{
     LifeBarSize = 0.5,
     Physics = {
         BankingSlope = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 16,
         FuelRechargeRate = 5,
         FuelUseTime = 500,
@@ -171,8 +159,6 @@ UnitBlueprint{
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.85,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     SizeSphere = 2.0,
     SizeX = 0.8,
     SizeY = 0.4,

@@ -61,19 +61,37 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 34,
         Health = 5500,
         MaxHealth = 5500,
         RegenRate = 20,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zrb9602_desc>Air Factory',
     Display = {
         AnimationBuild = '/units/zrb9602/zrb9602_abuild.sca',
         AnimationFinishBuildLand = '/units/zrb9602/zrb9602_aplatform.sca',
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 1.1,
+                BLOffsetY = 1.4,
+                BLOffsetZ = -1.9,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -1.1,
+                BLOffsetY = 1.4,
+                BLOffsetZ = -1.9,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = 'Build_Point',
         Mesh = {
             IconFadeInZoom = 130,

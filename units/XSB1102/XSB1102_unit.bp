@@ -29,14 +29,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 27,
         Health = 1700,
         MaxHealth = 1700,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_amphibious>Amphibious" },
@@ -119,7 +115,6 @@ UnitBlueprint{
     SelectionSizeX = 1.75,
     SelectionSizeZ = 1.5,
     SelectionThickness = 0.3,
-    CollisionOffsetY = 0,
     SizeX = 2.5,
     SizeY = 0.5,
     SizeZ = 1.75,

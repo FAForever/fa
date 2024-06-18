@@ -26,14 +26,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 505,
         Health = 6500,
         MaxHealth = 6500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationActivate = "/units/UAB1302/UAB1302_Apump.sca",
@@ -113,7 +109,6 @@ UnitBlueprint{
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.6,
-    CollisionOffsetY = 0,
     SizeX = 0.75,
     SizeY = 1.4,
     SizeZ = 0.75,

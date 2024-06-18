@@ -63,11 +63,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 5.5,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 4000,
         MaxHealth = 4000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 31,
     },
     Display = {
@@ -187,14 +184,6 @@ UnitBlueprint{
     LifeBarOffset = 0.75,
     LifeBarSize = 1.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 18,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,

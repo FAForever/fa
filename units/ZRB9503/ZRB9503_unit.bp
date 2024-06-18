@@ -66,14 +66,11 @@ UnitBlueprint {
     },
     CollisionOffsetY = -1,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 12,
         Health = 5500,
         MaxHealth = 5500,
         RegenRate = 20,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zrb9503_desc>Naval Factory',
     Display = {
@@ -82,6 +79,27 @@ UnitBlueprint {
         },
         AnimationBuild = "/units/urb0203/urb0203_aBuild.sca",
         AnimationUpgrade = '/units/zrb9503/zrb9503_aupgrade.sca',
+        BlinkingLights = {
+            {
+                BLBone = 'B03',
+                BLOffsetX = -0.7,
+                BLOffsetY = 0.2,
+                BLOffsetZ = 0.08,
+                BLScale = 2,
+            },
+            {
+                BLBone = 'B03',
+                BLOffsetX = 0.65,
+                BLOffsetY = 0.2,
+                BLOffsetZ = 0.04,
+                BLScale = 2,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
             Water = {

@@ -25,13 +25,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 650,
         MaxHealth = 650,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 26.5,
     },
     Display = {
@@ -41,8 +37,6 @@ UnitBlueprint{
                 AnimationRateMax = 1.5,
                 AnimationRateMin = 0.5,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 0.2,
                     SizeX = 0.7,
                     SizeY = 1,
@@ -55,8 +49,6 @@ UnitBlueprint{
                 AnimationRateMax = 1.5,
                 AnimationRateMin = 0.5,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.4,
                     SizeX = 0.7,
                     SizeY = 0.4,
@@ -70,7 +62,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.5,
                 HitBox = {
                     CollisionOffsetX = -0.2,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.5,
                     SizeX = 1,
                     SizeY = 0.5,
@@ -145,14 +136,6 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 3.6,
         MaxBrake = 2.9,
@@ -164,7 +147,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 80,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.15,
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.5,

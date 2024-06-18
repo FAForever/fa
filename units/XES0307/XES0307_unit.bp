@@ -41,12 +41,10 @@ UnitBlueprint{
         "WEAKANTINAVY",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 235,
         Health = 25000,
         MaxHealth = 25000,
-        RegenRate = 0,
         SubThreatLevel = 2,
         SurfaceThreatLevel = 39,
     },
@@ -154,14 +152,6 @@ UnitBlueprint{
     LifeBarSize = 3.8,
     Physics = {
         BackUpDistance = 15,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         Footprint = {
@@ -185,7 +175,6 @@ UnitBlueprint{
     SelectionSizeZ = 6.6,
     SelectionThickness = 0.15,
     CollisionOffsetY = -0.375,
-    CollisionOffsetZ = 0,
     SizeX = 2.1,
     SizeY = 2.1,
     SizeZ = 9,

@@ -52,6 +52,16 @@ local Unit = {}
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
 
+---@class UnitCommand
+---@field _c_object userdata
+---@field blueprintId? string -- For build commands
+---@field commandType integer -- Integer representation of CommandType, see UnitQueueDataToCommand for details
+---@field target? Prop|Unit|Entity -- For commands that target an entity
+---@field targetId? EntityId
+---@field x number -- X coordinate of command target
+---@field y number -- Y coordinate of command target
+---@field z number -- Z coordinate of command target
+
 --- Adds a command cap to the unit
 ---@param category moho.EntityCategory
 function Unit:AddBuildRestriction(category)
@@ -146,7 +156,7 @@ function Unit:GetCargo()
 end
 
 --- Returns table of commands queued up for this unit
----@return { }
+---@return UnitCommand[]
 function Unit:GetCommandQueue()
 end
 
@@ -469,7 +479,7 @@ end
 function Unit:SetAccMult(accelMult)
 end
 
---- sets silo auto-build mode
+--- enable silo auto-build or unit auto-assist
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end

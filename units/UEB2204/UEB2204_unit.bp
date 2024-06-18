@@ -33,9 +33,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 2590,
         MaxHealth = 2590,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -187,7 +184,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.255,
+            RateOfFire = 1.25,
             SalvoSize = 2,
             TargetCheckInterval = 1.0,
             TargetPriorities = {

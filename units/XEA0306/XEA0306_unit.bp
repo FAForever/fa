@@ -69,10 +69,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 18,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 4500,
         MaxHealth = 4500,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -89,7 +87,6 @@ UnitBlueprint{
             ShieldVerticalOffset = -1,
             TransportShield = true,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 18,
     },
     Display = {
@@ -251,14 +248,6 @@ UnitBlueprint{
     LifeBarOffset = 3.6,
     LifeBarSize = 2,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 10,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
