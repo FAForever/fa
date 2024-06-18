@@ -100,11 +100,7 @@ UnitBlueprint{
     LifeBarSize = 0.9,
     Physics = {
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,

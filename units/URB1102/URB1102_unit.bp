@@ -86,12 +86,8 @@ UnitBlueprint{
     LifeBarSize = 2.5,
     Physics = {
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
             LAYER_Seabed = true,
-            LAYER_Sub = false,
-            LAYER_Water = false,
         },
         BuildRestriction = "RULEUBR_OnHydrocarbonDeposit",
         DragCoefficient = 0.2,
