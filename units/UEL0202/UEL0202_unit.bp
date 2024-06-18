@@ -27,7 +27,7 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 1500,
         MaxHealth = 1500,
-        SurfaceThreatLevel = 5,
+        SurfaceThreatLevel = 6,
     },
     Display = {
         Mesh = {

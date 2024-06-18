@@ -61,7 +61,7 @@ UnitBlueprint{
         "WEAKANTIAIR",
     },
     Defense = {
-        AirThreatLevel = 3.5,
+        AirThreatLevel = 3,
         ArmorType = "Light",
         Health = 1575,
         MaxHealth = 1575,

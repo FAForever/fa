@@ -27,7 +27,7 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 550,
         MaxHealth = 550,
-        SurfaceThreatLevel = 5.5,
+        SurfaceThreatLevel = 5,
     },
     Display = {
         AnimationDeath = {

@@ -28,7 +28,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 500,
         MaxHealth = 500,
-        ThreatLevel = 0,
     },
     Display = {
         BuildMeshBlueprint = "/props/UEB5101/UEB5101_prop.bp",

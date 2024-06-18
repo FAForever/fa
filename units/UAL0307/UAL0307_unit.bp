@@ -48,7 +48,6 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0.3,
             ShieldVerticalOffset = -3,
         },
-        SurfaceThreatLevel = 9,
     },
     Display = {
         Abilities = {

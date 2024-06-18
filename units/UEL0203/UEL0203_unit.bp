@@ -32,7 +32,7 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 1800,
         MaxHealth = 1800,
-        SurfaceThreatLevel = 9.5,
+        SurfaceThreatLevel = 9,
     },
     Display = {
         Abilities = { "<LOC ability_hover>Hover" },

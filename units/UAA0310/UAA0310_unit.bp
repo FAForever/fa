@@ -81,8 +81,9 @@ UnitBlueprint{
         "WEAKANTINAVY",
     },
     Defense = {
-        AirThreatLevel = 130,
+        AirThreatLevel = 292,
         ArmorType = "Experimental",
+        EconomyThreatLevel = 1380,
         Health = 40000,
         MaxHealth = 40000,
         RegenRate = 15,
@@ -100,8 +101,8 @@ UnitBlueprint{
             ShieldSize = 26,
             ShieldVerticalOffset = -1.25,
         },
-        SubThreatLevel = 30,
-        SurfaceThreatLevel = 500,
+        SubThreatLevel = 8,
+        SurfaceThreatLevel = 333,
     },
     Display = {
         Abilities = {

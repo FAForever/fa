@@ -30,6 +30,7 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
+        EconomyThreatLevel = 20,
         Health = 550,
         MaxHealth = 550,
         Shield = {
@@ -47,7 +48,6 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0.35,
             ShieldVerticalOffset = -50,
         },
-        SubThreatLevel = 9,
     },
     Display = {
         Abilities = { "<LOC ability_shielddome>Shield Dome" },

@@ -27,7 +27,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 500,
         MaxHealth = 500,
-        ThreatLevel = 0,
     },
     Display = {
         DamageEffects = {

@@ -32,7 +32,6 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 29,
         MaxHealth = 29,
-        SurfaceThreatLevel = 0.1,
     },
     Display = {
         Abilities = { "<LOC ability_radar>Radar" },

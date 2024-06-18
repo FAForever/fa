@@ -62,7 +62,7 @@ UnitBlueprint{
         ArmorType = "Light",
         Health = 700,
         MaxHealth = 700,
-        SurfaceThreatLevel = 7,
+        SurfaceThreatLevel = 5,
     },
     Display = {
         Abilities = { "<LOC ability_transport>Transport" },

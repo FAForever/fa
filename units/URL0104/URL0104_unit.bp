@@ -26,7 +26,7 @@ UnitBlueprint{
         "WEAKDIRECTFIRE",
     },
     Defense = {
-        AirThreatLevel = 3.33,
+        AirThreatLevel = 3,
         ArmorType = "Normal",
         Health = 260,
         MaxHealth = 260,

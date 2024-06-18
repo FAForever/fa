@@ -32,10 +32,10 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        EconomyThreatLevel = 79,
+        EconomyThreatLevel = 44,
         Health = 700,
         MaxHealth = 700,
-        SurfaceThreatLevel = 21,
+        SurfaceThreatLevel = 24,
     },
     Display = {
         AnimationDeath = {

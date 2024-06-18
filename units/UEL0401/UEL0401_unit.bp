@@ -65,8 +65,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 16,
+        AirThreatLevel = 11,
         ArmorType = "Experimental",
+        EconomyThreatLevel = 2018,
         Health = 12500,
         MaxHealth = 12500,
         RegenRate = 20,
@@ -85,8 +86,8 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0,
             ShieldVerticalOffset = -7,
         },
-        SubThreatLevel = 40,
-        SurfaceThreatLevel = 380,
+        SubThreatLevel = 8,
+        SurfaceThreatLevel = 250,
     },
     Display = {
         Abilities = {

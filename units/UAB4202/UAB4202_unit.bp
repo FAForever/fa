@@ -32,7 +32,7 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Structure",
-        EconomyThreatLevel = 7,
+        EconomyThreatLevel = 2,
         Health = 150,
         MaxHealth = 150,
         Shield = {

@@ -27,7 +27,6 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        EconomyThreatLevel = 1,
         Health = 800,
         MaxHealth = 800,
         SkipDynamicThreatCalculations = true,

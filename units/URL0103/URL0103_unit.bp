@@ -29,7 +29,7 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 140,
         MaxHealth = 140,
-        SurfaceThreatLevel = 4.5,
+        SurfaceThreatLevel = 4,
     },
     Display = {
         Abilities = { "<LOC ability_stun>EMP Weapon" },

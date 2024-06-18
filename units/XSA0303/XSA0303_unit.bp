@@ -58,7 +58,7 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 41,
+        AirThreatLevel = 51,
         ArmorType = "ASF",
         Health = 2275,
         MaxHealth = 2275,

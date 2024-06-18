@@ -30,10 +30,10 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        EconomyThreatLevel = 11,
+        EconomyThreatLevel = 17,
         Health = 825,
         MaxHealth = 825,
-        SurfaceThreatLevel = 5,
+        SurfaceThreatLevel = 4,
     },
     Display = {
         AnimationOpen = "/units/uel0111/uel0111_aopen01.sca",

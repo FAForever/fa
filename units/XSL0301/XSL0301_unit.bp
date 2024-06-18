@@ -59,11 +59,11 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        EconomyThreatLevel = 6155,
+        EconomyThreatLevel = 1046,
         Health = 15500,
         MaxHealth = 15500,
         RegenRate = 15,
-        SurfaceThreatLevel = 527,
+        SurfaceThreatLevel = 40,
     },
     Display = {
         Abilities = {

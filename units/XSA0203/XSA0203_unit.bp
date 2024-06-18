@@ -56,7 +56,7 @@ UnitBlueprint{
         ArmorType = "Light",
         Health = 1800,
         MaxHealth = 1800,
-        SurfaceThreatLevel = 8,
+        SurfaceThreatLevel = 10,
     },
     Display = {
         LayerChangeEffects = {
