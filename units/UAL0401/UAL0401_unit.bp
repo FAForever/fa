@@ -44,13 +44,10 @@ UnitBlueprint{
     },
     CollisionOffsetZ = 0.1,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 99999,
         MaxHealth = 99999,
         RegenRate = 10,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 250,
     },
     Display = {

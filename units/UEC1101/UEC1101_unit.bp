@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1700,
         MaxHealth = 1700,
-        RegenRate = 0,
     },
     Description = '<LOC uec1101_desc>UEF Residential Building',
     Display = {

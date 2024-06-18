@@ -33,7 +33,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 16000,
         MaxHealth = 16000,
-        RegenRate = 0,
     },
     Description = '<LOC xec8017_desc>UEF Wall Segment',
     Display = {

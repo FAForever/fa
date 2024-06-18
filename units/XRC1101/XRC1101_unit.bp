@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 52000,
         MaxHealth = 52000,
-        RegenRate = 0,
     },
     Description = '<LOC xrc1101_desc>QAI Jamming Station',
     Display = {

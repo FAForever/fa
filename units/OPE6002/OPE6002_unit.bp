@@ -8,7 +8,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
     },
     Description = '<LOC ope6002_desc>Black Sun Cannon',
     Display = {

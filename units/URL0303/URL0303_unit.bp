@@ -26,18 +26,14 @@ UnitBlueprint {
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         AntiMissile = {
             AttachBone = "Turret_Muzzle",
             Radius = 5,
             RedirectRateOfFire = 1,
         },
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 3000,
         MaxHealth = 3000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 21,
     },
     Display = {

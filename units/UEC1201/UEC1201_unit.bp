@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1350,
         MaxHealth = 1350,
-        RegenRate = 0,
     },
     Description = '<LOC uec1201_desc>UEF Science Lab',
     Display = {

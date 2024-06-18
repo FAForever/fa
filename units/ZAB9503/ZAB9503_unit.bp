@@ -57,14 +57,10 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 12,
         Health = 6400,
         MaxHealth = 6400,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zab9503_desc>Naval Factory',
     Display = {

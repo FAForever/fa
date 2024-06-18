@@ -60,7 +60,6 @@ UnitBlueprint{
         ArmorType = "Light",
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
     },
     Display = {
         Abilities = { "<LOC ability_transport>Transport" },

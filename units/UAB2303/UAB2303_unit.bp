@@ -30,13 +30,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 144,
         Health = 2200,
         MaxHealth = 2200,
-        RegenRate = 0,
-        SubThreatLevel = 0,
     },
     Display = {
         AnimationPermOpen = "/units/uab2303/uab2303_aopen.sca",

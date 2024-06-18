@@ -26,14 +26,11 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 493,
         Health = 6250,
         MaxHealth = 6250,
         RegenRate = 20,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/urb1302/urb1302_Apump.sca",

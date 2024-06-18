@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1500,
         MaxHealth = 1500,
-        RegenRate = 0,
     },
     Description = '<LOC uac1101_desc>Aeon Residential Structure',
     Display = {

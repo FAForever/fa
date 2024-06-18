@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 16000,
         MaxHealth = 16000,
-        RegenRate = 0,
     },
     Description = '<LOC xrc8119_desc>Cybran Wall Segment',
     Display = {

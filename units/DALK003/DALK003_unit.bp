@@ -28,12 +28,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 20,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1700,
         MaxHealth = 1700,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_aa>Anti-Air" },

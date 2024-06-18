@@ -8,7 +8,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
     },
     Description = '<LOC ope6004_desc>Black Sun Power',
     Display = {

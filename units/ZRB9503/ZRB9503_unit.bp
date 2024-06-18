@@ -66,14 +66,11 @@ UnitBlueprint {
     },
     CollisionOffsetY = -1,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 12,
         Health = 5500,
         MaxHealth = 5500,
         RegenRate = 20,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC zrb9503_desc>Naval Factory',
     Display = {

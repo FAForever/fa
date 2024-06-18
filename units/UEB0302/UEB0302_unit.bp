@@ -37,14 +37,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 560,
         Health = 16000,
         MaxHealth = 16000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationFinishBuildLand = "/units/ueb0302/ueb0302_aplatform.sca",

@@ -33,7 +33,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 16000,
         MaxHealth = 16000,
-        RegenRate = 0,
     },
     Description = '<LOC xsc8015_desc>Seraphim Wall Segment',
     Display = {

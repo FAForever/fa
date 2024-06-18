@@ -44,14 +44,10 @@ UnitBlueprint {
     CollisionOffsetY = -1,
     CollisionOffsetZ = 0,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 35,
         Health = 16000,
         MaxHealth = 16000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         BlinkingLights = {

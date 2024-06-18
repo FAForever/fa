@@ -31,9 +31,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 2450,
         MaxHealth = 2450,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {

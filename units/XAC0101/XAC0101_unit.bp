@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 5500,
         MaxHealth = 5500,
-        RegenRate = 0,
     },
     Description = '<LOC xac0101_desc>Aeon Boat',
     Display = {
