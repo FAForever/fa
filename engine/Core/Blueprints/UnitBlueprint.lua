@@ -445,6 +445,17 @@
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
 
+---@class UnitBlueprintBlinkingLightsData
+---@field BLBone Bone
+---@field BlOffsetX number      # defaults to 0
+---@field BLOffsetY number      # defaults to 0
+---@field BLOffsetZ number      # defaults to 0
+---@field BLScale number        # defaults to 1
+
+---@class UnitBlueprintBlinkingLightsFx
+---@field Green string          # Path to emitter, usually '/effects/emitters/light_green_03_emit.bp'
+---@field Red string            # Path to emitter, usually '/effects/emitters/light_red_03_emit.bp'
+---@field Yellow? string         # Path to emitter, usually '/effects/emitters/light_yellow_02_emit.bp'
 
 ---@class UnitBlueprintDisplay
 --- Used by the Aeon build animation for a custom mercury pool
@@ -494,6 +505,8 @@
 --- used by UEF and Cybran construction units to animate their hover transition
 ---@field AnimationWater? FileName
 ---@field AttackReticleSize? number unused
+---@field BlinkingLights UnitBlueprintBlinkingLightsData[]
+---@field BlinkingLightsFx UnitBlueprintBlinkingLightsFx
 --- the bone on factories where units are built
 ---@field BuildAttachBone? Bone
 --- used while cloaked

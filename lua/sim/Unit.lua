@@ -1307,12 +1307,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         if self.CanTakeDamage then
-            self:DoOnDamagedCallbacks(instigator)
 
             -- Pass damage to an active personal shield, as personal shields no longer have collisions
-            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
+            local myShield = self.MyShield
+            if myShield.ShieldType == "Personal" and myShield:IsUp() then
+                self:DoOnDamagedCallbacks(instigator)
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
-            else
+            elseif damageType ~= "FAF_AntiShield" then
+                self:DoOnDamagedCallbacks(instigator)
                 self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
@@ -1739,7 +1741,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        local time  = time * 2
+        local time  = time / 2
 
         local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
 

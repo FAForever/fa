@@ -64,13 +64,10 @@ UnitBlueprint{
         "WEAKDIRECTFIRE",
     },
     Defense = {
-        AirThreatLevel = 4.5,
+        AirThreatLevel = 4,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 1625,
         MaxHealth = 1625,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 1,
     },
     Display = {
@@ -146,15 +143,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -169,14 +161,6 @@ UnitBlueprint{
     LifeBarOffset = 4.5,
     LifeBarSize = 3,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 9,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -189,7 +173,6 @@ UnitBlueprint{
     SelectionSizeX = 2.1,
     SelectionSizeZ = 4.5,
     SelectionThickness = 0.23,
-    CollisionOffsetX = 0,
     CollisionOffsetY = -0.25,
     CollisionOffsetZ = 1.5,
     SizeX = 4.5,
@@ -202,12 +185,11 @@ UnitBlueprint{
         Class1Capacity = 16,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsSmall = 16,
-        SlotsMedium = 8,
         SlotsLarge = 4,
+        SlotsMedium = 8,
+        SlotsSmall = 16,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Veteran = {
         Level1 = 3,
         Level2 = 6,
@@ -257,7 +239,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -325,7 +307,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -390,7 +372,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "HIGHALTAIR, UNTARGETABLE",
             TurretBoneMuzzle = "Center_Turret_Barrel_Muzzle",
@@ -426,7 +408,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

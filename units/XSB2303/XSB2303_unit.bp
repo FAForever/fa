@@ -31,13 +31,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 120,
         Health = 2850,
         MaxHealth = 2850,
-        RegenRate = 0,
-        SubThreatLevel = 0,
     },
     Display = {
         AnimationDeath = {
@@ -89,16 +86,8 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "land",
@@ -110,14 +99,6 @@ UnitBlueprint{
     LifeBarOffset = 0.65,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MeshExtentsX = 1.75,
@@ -195,7 +176,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.05,
+            RateOfFire = 10/200, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "EXPERIMENTAL MOBILE UEF ARTILLERY",
@@ -239,12 +220,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

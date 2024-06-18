@@ -37,13 +37,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 6400,
         MaxHealth = 6400,
-        RegenRate = 0,
         SubThreatLevel = 18,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -104,16 +101,8 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "sea",
@@ -131,14 +120,7 @@ UnitBlueprint{
     LifeBarOffset = 0.6,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BuildOnLayerCaps = { LAYER_Water = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MeshExtentsX = 1.65,
@@ -206,7 +188,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SalvoSize = 1,
             TargetPriorities = {
                 "SUBMERSIBLE",
@@ -242,8 +224,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
-            Land = false,
             Seabed = true,
             Sub = true,
             Water = true,
