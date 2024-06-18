@@ -186,7 +186,7 @@ UnitBlueprint {
     SizeX = 1.3,
     SizeY = 1.3,
     SizeZ = 1.8,
-    StrategicIconName = 'icon_land3_missile',
+    StrategicIconName = "icon_land3_antishield",
     StrategicIconSortPriority = 125,
     Transport = {
         TransportClass = 3,
@@ -223,7 +223,7 @@ UnitBlueprint {
             },
             CollideFriendly = false,
             Damage = 2,
-            DamageToShields = 325,
+            DamageToShields = 323,
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',

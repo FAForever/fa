@@ -58,7 +58,7 @@ TeleportCostFunction = function(unit, location)
     end
 
     local dist = VDist3(pos, location)
-    local teleDelay = bp.General.TeleportDelay or 15
+    local teleDelay = bp.General.TeleportDelay or 0
     local teleportFlatEnergyCost = bp.General.TeleportFlatEnergyCost or 75000
     local teleportMaximumEnergyCost = bp.General.TeleportMaximumEnergyCost or 2500000
     local teleportMaximumDuration = bp.General.TeleportMaximumDuration or 50

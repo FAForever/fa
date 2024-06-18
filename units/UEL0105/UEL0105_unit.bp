@@ -38,14 +38,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 10,
         Health = 150,
         MaxHealth = 150,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -187,7 +183,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 180,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,

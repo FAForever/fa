@@ -38,11 +38,9 @@ UnitBlueprint{
         "WEAKANTINAVY"
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         Health = 2000,
         MaxHealth = 2000,
-        RegenRate = 0,
         SubThreatLevel = 4,
         SurfaceThreatLevel = 0.1,
     },

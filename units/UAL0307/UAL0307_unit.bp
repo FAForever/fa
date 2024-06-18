@@ -30,12 +30,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 100,
         MaxHealth = 100,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "AeonShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -51,7 +48,6 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0.3,
             ShieldVerticalOffset = -3,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 9,
     },
     Display = {
@@ -179,9 +175,9 @@ UnitBlueprint{
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.55,
     SelectionThickness = 0.68,
-    SizeX = 1.0,
+    SizeX = 1.05,
     SizeY = 0.6,
-    SizeZ = 1.0,
+    SizeZ = 1.05,
     StrategicIconName = "icon_land2_shield",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },

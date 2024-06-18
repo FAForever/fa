@@ -28,15 +28,24 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 10,
         MaxHealth = 10,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
+        BlinkingLights = {
+            {
+                BLBone = 'Light',
+                BLOffsetX = 0,
+                BLOffsetY = 0,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
+        },
         Abilities = {
             "<LOC ability_radar>Radar",
             "<LOC ability_upgradable>Upgradeable",

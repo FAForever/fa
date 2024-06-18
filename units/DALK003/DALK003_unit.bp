@@ -28,12 +28,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 20,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1700,
         MaxHealth = 1700,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_aa>Anti-Air" },
@@ -144,9 +140,8 @@ UnitBlueprint{
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.85,
     SelectionThickness = 0.5,
-    CollisionOffsetY = 0,
     SizeX = 1,
-    SizeY = 1.5,
+    SizeY = 1.1,
     SizeZ = 1.2,
     StrategicIconName = "icon_bot3_antiair",
     StrategicIconSortPriority = 115,

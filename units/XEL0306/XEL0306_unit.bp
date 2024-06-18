@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xel0306_desc>Mobile Missile Platform",
-    AI = { InitialAutoMode = true },
+    AI = { },
     Audio = {
         AmbientMove = Sound { Bank = 'XEL',        Cue = 'XEL0306_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'UELDestroy', Cue = 'UEL_Destroy_Med_Land', LodCutoff = 'UnitMove_LodCutoff' },
@@ -28,13 +28,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 96,
         Health = 1700,
         MaxHealth = 1700,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 14,
     },
     Display = {

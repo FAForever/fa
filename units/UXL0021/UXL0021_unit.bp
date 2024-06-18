@@ -12,13 +12,9 @@ UnitBlueprint{
         "UEF",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 25,
         MaxHealth = 25,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 6,
     },
     Display = {

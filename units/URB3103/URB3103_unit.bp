@@ -13,14 +13,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 0.1,
         Health = 1,
         MaxHealth = 1,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationOpen = "/units/URL0101/URL0101_Aagro.sca",

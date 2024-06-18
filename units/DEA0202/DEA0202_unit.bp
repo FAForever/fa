@@ -63,11 +63,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 15,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 1200,
         MaxHealth = 1200,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 12,
     },
     Display = {
@@ -186,7 +183,6 @@ UnitBlueprint{
     SelectionSizeX = 1.7,
     SelectionSizeZ = 0.7,
     SelectionThickness = 0.34,
-    CollisionOffsetY = 0,
     SizeSphere = 1.6,
     SizeX = 1.8,
     SizeY = 0.3,

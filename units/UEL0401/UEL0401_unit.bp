@@ -67,7 +67,6 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 16,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 12500,
         MaxHealth = 12500,
         RegenRate = 20,
@@ -235,7 +234,6 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 2,
         SelectionSizeZ = 2,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetY = 1.5,
         SelectionCenterOffsetZ = 2.5,
     },
@@ -313,12 +311,10 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 30,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.3,
     SelectionSizeX = 4,
     SelectionSizeZ = 5.25,
     SelectionThickness = 0.34,
-    CollisionOffsetZ = 0,
     SizeX = 5.5,
     SizeY = 1.5,
     SizeZ = 8,

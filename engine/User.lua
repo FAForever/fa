@@ -235,9 +235,11 @@ end
 function DecreaseBuildCountInQueue(queueIndex, count)
 end
 
----
----@param id unknown
-function DeleteCommand(id)
+---Deletes a command from the player command queue.
+---Each player has an array that holds all commands for all units, the commandID indexes to that array.
+---Note: this function doesn't receive any units as arguments--you will have to retrieve the commandId by UserUnit:GetCommandQueue()[commandIndex].ID
+---@param commandId number commandId, from UserUnit:GetCommandQueue()[commandIndex].ID
+function DeleteCommand(commandId)
 end
 
 ---
@@ -1055,7 +1057,7 @@ end
 function SetActiveBuildTemplate(template)
 end
 
---- Set if anyone in the list is auto building
+--- Set if anyone in the list is auto building or auto assisting
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)

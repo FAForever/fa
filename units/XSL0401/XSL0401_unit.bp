@@ -44,11 +44,9 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 50,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 67000,
         MaxHealth = 67000,
         RegenRate = 20,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 379,
     },
     Display = {
@@ -66,7 +64,6 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 HitBox = {
                     CollisionOffsetX = -0.2,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 1.0,
                     SizeX = 3.2,
                     SizeY = 3.0,
@@ -80,7 +77,6 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 HitBox = {
                     CollisionOffsetX = 2.4,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 1.75,
                     SizeX = 4.2,
                     SizeY = 3.0,

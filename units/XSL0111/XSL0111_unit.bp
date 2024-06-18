@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xsl0111_desc>Mobile Missile Launcher",
-    AI = { InitialAutoMode = true },
+    AI = { },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0111_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Med', LodCutoff = 'UnitMove_LodCutoff' },
@@ -26,13 +26,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 12,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 6,
     },
     Display = {

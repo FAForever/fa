@@ -30,7 +30,6 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 42,
         Health = 300,
@@ -49,8 +48,6 @@ UnitBlueprint{
             ShieldSize = 35,
             ShieldVerticalOffset = -5,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_shielddome>Shield Dome" },

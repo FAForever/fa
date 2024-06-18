@@ -55,9 +55,6 @@ UnitBlueprint{
         EconomyThreatLevel = 840,
         Health = 22000,
         MaxHealth = 22000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -137,7 +134,6 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 4,
         SelectionSizeZ = 2,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetZ = 8.5,
     },
     Footprint = {

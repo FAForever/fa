@@ -34,7 +34,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 128,
         MaxHealth = 128,
-        RegenRate = 0,
     },
     Description = '<LOC opc1002_desc>OpC1 Symbiont Vehicle',
     Display = {

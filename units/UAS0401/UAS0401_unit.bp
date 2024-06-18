@@ -62,12 +62,10 @@ UnitBlueprint{
         "EXTERNALFACTORY",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Experimental",
         EconomyThreatLevel = 2573,
         Health = 60000,
         MaxHealth = 60000,
-        RegenRate = 0,
         SubThreatLevel = 42,
         SurfaceThreatLevel = 27,
     },
@@ -193,7 +191,6 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 3,
         SelectionSizeZ = 3,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetY = 2.0,
         SelectionCenterOffsetZ = 4,
     },

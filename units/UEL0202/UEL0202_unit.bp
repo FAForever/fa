@@ -24,13 +24,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1500,
         MaxHealth = 1500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 5,
     },
     Display = {
@@ -184,7 +180,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.769,
+            RateOfFire = 0.833,
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",

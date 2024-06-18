@@ -39,7 +39,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 264,
         MaxHealth = 264,
-        RegenRate = 0,
     },
     Description = '<LOC uec0001_desc>UEF Civilian Truck',
     Display = {

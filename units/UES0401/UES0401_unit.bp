@@ -67,9 +67,7 @@ UnitBlueprint{
         EconomyThreatLevel = 1440,
         Health = 40000,
         MaxHealth = 40000,
-        RegenRate = 0,
         SubThreatLevel = 40,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AINames = {
@@ -216,7 +214,6 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 1,
         SelectionSizeZ = 4.5,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetY = 1.0,
         SelectionCenterOffsetZ = 8,
     },

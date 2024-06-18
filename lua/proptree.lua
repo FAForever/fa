@@ -93,7 +93,7 @@ Tree = Class(Prop) {
     ---@param direction number
     ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
-        if self:BeenDestroyed() then
+        if self:BeenDestroyed() or type == 'FAF_AntiShield' then
             return
         end
 

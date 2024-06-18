@@ -28,12 +28,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 50,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -48,8 +46,6 @@ UnitBlueprint{
             ShieldSize = 44,
             ShieldVerticalOffset = -6,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_shielddome>Shield Dome" },

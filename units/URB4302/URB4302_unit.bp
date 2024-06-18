@@ -26,14 +26,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 2236,
         Health = 3800,
         MaxHealth = 3800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_stratmissiledef>Strategic Missile Defense" },
@@ -133,7 +129,6 @@ UnitBlueprint{
     SelectionSizeX = 1.25,
     SelectionSizeZ = 1.25,
     SelectionThickness = 0.55,
-    CollisionOffsetY = 0,
     SizeX = 1,
     SizeY = 2,
     SizeZ = 1,

@@ -44,13 +44,10 @@ UnitBlueprint{
     },
     CollisionOffsetZ = 0.1,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 99999,
         MaxHealth = 99999,
         RegenRate = 10,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 250,
     },
     Display = {
@@ -66,8 +63,6 @@ UnitBlueprint{
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 3,
                     SizeX = 2.5,
                     SizeY = 1.0,
@@ -199,7 +194,6 @@ UnitBlueprint{
         TurnRadius = 3,
         TurnRate = 40,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,

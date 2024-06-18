@@ -30,12 +30,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 113,
         Health = 3600,
         MaxHealth = 3600,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "AeonShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -51,7 +49,6 @@ UnitBlueprint{
             ShieldSize = 2.5,
             ShieldVerticalOffset = 0,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 32,
     },
     Display = {
@@ -67,7 +64,6 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 HitBox = {
                     CollisionOffsetX = 0.15,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.15,
                     SizeX = 1.1,
                     SizeY = 0.5,
@@ -80,8 +76,6 @@ UnitBlueprint{
                 AnimationRateMax = 2,
                 AnimationRateMin = 1,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 0.5,
                     SizeX = 1,
                     SizeY = 0.5,
@@ -183,7 +177,6 @@ UnitBlueprint{
     SelectionSizeX = 0.85,
     SelectionSizeZ = 0.85,
     SelectionThickness = 0.5,
-    CollisionOffsetY = 0,
     SizeX = 1,
     SizeY = 1.7,
     SizeZ = 1.2,

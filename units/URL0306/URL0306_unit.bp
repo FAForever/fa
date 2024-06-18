@@ -26,13 +26,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 350,
         MaxHealth = 350,
-        RegenRate = 0,
-        SubThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_stealthfield>Stealth Field" },
@@ -137,8 +133,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 120,
     },
-    SelectionCenterOffsetX = 0,
-    SelectionCenterOffsetZ = 0,
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.83,

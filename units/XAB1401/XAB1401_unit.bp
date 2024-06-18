@@ -26,14 +26,10 @@ UnitBlueprint{
         "VOLATILE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "ExperimentalStructure",
         EconomyThreatLevel = 150,
         Health = 5000,
         MaxHealth = 5000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_deathaoe>Volatile" },
@@ -129,7 +125,6 @@ UnitBlueprint{
         SkirtSizeX = 10,
         SkirtSizeZ = 10,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.09,
     SelectionSizeX = 3.4,
     SelectionSizeZ = 3.4,

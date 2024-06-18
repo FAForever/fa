@@ -27,14 +27,10 @@ UnitBlueprint {
         'UNSELECTABLE',
         'UNTARGETABLE',
     },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     Defense = {
         ArmorType = 'Normal',
         Health = 5000000,
         MaxHealth = 5000000,
-        RegenRate = 0,
     },
     Description = '<LOC xsc9010_desc>Jammer Crystal',
     Display = {

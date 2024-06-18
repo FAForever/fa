@@ -28,6 +28,7 @@
 ---@type table<AbsorptionType, table<DamageType, number>>
 shieldAbsorptionValues = {
 	["Default"] = {
-		["Deathnuke"] = 1.0
+		["Deathnuke"] = 1.0,
+		["Overcharge"] = 1.0,
 	},
 }

@@ -55,11 +55,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 2,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 5900,
         MaxHealth = 5900,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 23,
     },
     Display = {
@@ -201,7 +198,6 @@ UnitBlueprint{
     SelectionSizeX = 1,
     SelectionSizeZ = 1.2,
     SelectionThickness = 0.35,
-    CollisionOffsetZ = 0,
     SizeSphere = 1.6,
     SizeX = 1.2,
     SizeY = 0.7,
@@ -315,10 +311,10 @@ UnitBlueprint{
             MaxRadius = 38,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 3,
-            MuzzleVelocity = 13,
+            MuzzleVelocity = 22,
             NotExclusive = true,
             ProjectileId = "/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp",
-            ProjectileLifetime = 2,
+            ProjectileLifetime = 2.4,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {

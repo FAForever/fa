@@ -29,12 +29,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 400,
         MaxHealth = 400,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "SeraphimShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -50,7 +47,6 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0.3,
             ShieldVerticalOffset = -3,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 9,
     },
     Display = {

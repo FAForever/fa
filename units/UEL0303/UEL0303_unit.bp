@@ -26,12 +26,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 2400,
         MaxHealth = 2400,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             OwnerShieldMesh = "/units/uel0303/UEL0303_PersonalShield_mesh",
@@ -45,7 +42,6 @@ UnitBlueprint{
             ShieldSize = 2.5,
             ShieldVerticalOffset = 0,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 15,
     },
     Display = {
@@ -57,7 +53,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.75,
                 HitBox = {
                     CollisionOffsetX = -0.1,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.5,
                     SizeX = 1.2,
                     SizeY = 0.5,
@@ -71,7 +66,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.75,
                 HitBox = {
                     CollisionOffsetX = -0.1,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 0.75,
                     SizeX = 1.2,
                     SizeY = 0.5,
@@ -177,7 +171,6 @@ UnitBlueprint{
         TurnRadius = 5,
         TurnRate = 120,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,

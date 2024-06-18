@@ -15,7 +15,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 170,
         MaxHealth = 170,
-        RegenRate = 0,
     },
     Description = '<LOC opc2002_desc>Seraphim Tech',
     Display = {

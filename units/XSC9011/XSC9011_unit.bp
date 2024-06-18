@@ -52,16 +52,11 @@ UnitBlueprint {
         'UNSELECTABLE',
         'UNTARGETABLE',
     },
-    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0.1,
         ArmorType = 'Light',
-        EconomyThreatLevel = 0,
         Health = 29,
         MaxHealth = 29,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC xsc9011_desc>Jammer Crystal',
     Display = {
