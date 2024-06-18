@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1150,
         MaxHealth = 1150,
-        RegenRate = 0,
     },
     Description = '<LOC uac1201_desc>Aeon Science Lab',
     Display = {

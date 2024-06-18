@@ -38,7 +38,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 264,
         MaxHealth = 264,
-        RegenRate = 0,
     },
     Description = '<LOC urc0001_desc>Cybran Civilian Truck',
     Display = {

@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 8000,
         MaxHealth = 8000,
-        RegenRate = 0,
     },
     Description = '<LOC xsc2201_desc>Seraphim Rift Support Structures',
     Display = {

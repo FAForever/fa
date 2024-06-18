@@ -27,16 +27,47 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 7,
         Health = 650,
         MaxHealth = 650,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = 0.2,
+                BLOffsetY = 0.25,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -0.2,
+                BLOffsetY = 0.25,
+                BLOffsetZ = 0,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 0.25,
+                BLOffsetZ = 0.2,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 0,
+                BLOffsetY = 0.25,
+                BLOffsetZ = -0.2,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {

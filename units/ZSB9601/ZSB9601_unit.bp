@@ -40,14 +40,10 @@ UnitBlueprint {
     },
     CollisionOffsetY = 0,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 49,
         Health = 7000,
         MaxHealth = 7000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         AnimationDeath = {
@@ -57,6 +53,41 @@ UnitBlueprint {
                 AnimationRateMin = 1,
                 Weight = 100,
             },
+        },
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = -1.75,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -1.68,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 1.74,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -1.68,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -1.75,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 1.77,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 1.74,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 1.77,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
         },
         BuildAttachBone = 'Attachpoint',
         Mesh = {

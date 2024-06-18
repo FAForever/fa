@@ -34,7 +34,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 5000000,
         MaxHealth = 5000000,
-        RegenRate = 0,
     },
     Description = '<LOC xsc9010_desc>Jammer Crystal',
     Display = {

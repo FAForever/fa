@@ -28,12 +28,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 4,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "CybranShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01b_mesh",
@@ -48,8 +46,6 @@ UnitBlueprint{
             ShieldSize = 22,
             ShieldVerticalOffset = -3,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {

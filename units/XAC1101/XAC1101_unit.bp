@@ -33,7 +33,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 7400,
         MaxHealth = 7400,
-        RegenRate = 0,
     },
     Display = {
         DamageEffects = {

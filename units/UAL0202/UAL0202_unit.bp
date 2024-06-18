@@ -29,12 +29,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1250,
         MaxHealth = 1250,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "AeonShieldHit01",
             OwnerShieldMesh = "/units/ual0202/ual0202_personalshield_mesh",
@@ -48,7 +45,6 @@ UnitBlueprint{
             ShieldSize = 3,
             ShieldVerticalOffset = 0,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 12,
     },
     Display = {

@@ -32,7 +32,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 1800,
         MaxHealth = 1800,
-        RegenRate = 0,
     },
     Description = '<LOC uac1401_desc>Aeon Agricultural Center',
     Display = {

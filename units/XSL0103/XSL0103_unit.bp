@@ -27,13 +27,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 170,
         MaxHealth = 170,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 8.5,
     },
     Display = {
@@ -183,7 +179,7 @@ UnitBlueprint{
     SelectionThickness = 0.75,
     SizeX = 0.7,
     SizeY = 0.5,
-    SizeZ = 0.9,
+    SizeZ = 1.0,
     StrategicIconName = "icon_land1_artillery",
     StrategicIconSortPriority = 135,
     Veteran = {

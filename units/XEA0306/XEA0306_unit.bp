@@ -69,10 +69,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 18,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 4500,
         MaxHealth = 4500,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -89,7 +87,6 @@ UnitBlueprint{
             ShieldVerticalOffset = -1,
             TransportShield = true,
         },
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 18,
     },
     Display = {

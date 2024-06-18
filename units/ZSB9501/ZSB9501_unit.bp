@@ -41,14 +41,10 @@ UnitBlueprint {
         'SUPPORTFACTORY',
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 11,
         Health = 3500,
         MaxHealth = 3500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { '<LOC ability_upgradable>Upgradeable' },
@@ -61,6 +57,41 @@ UnitBlueprint {
             },
         },
         AnimationUpgrade = '/units/zsb9501/zsb9501_Aupgrade.sca',
+        BlinkingLights = {
+            {
+                BLBone = 0,
+                BLOffsetX = -1.75,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -1.68,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 1.74,
+                BLOffsetY = 0.15,
+                BLOffsetZ = -1.68,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = -1.75,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 1.77,
+                BLScale = 1,
+            },
+            {
+                BLBone = 0,
+                BLOffsetX = 1.74,
+                BLOffsetY = 0.15,
+                BLOffsetZ = 1.77,
+                BLScale = 1,
+            },
+        },
+        BlinkingLightsFx = {
+            Green = '/effects/emitters/light_green_03_emit.bp',
+            Red = '/effects/emitters/light_red_03_emit.bp',
+            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+        },
         BuildAttachBone = 'Attachpoint',
         Mesh = {
             IconFadeInZoom = 130,

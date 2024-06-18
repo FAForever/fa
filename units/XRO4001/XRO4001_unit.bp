@@ -13,7 +13,6 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
     },
     Display = {
         HideLifebars = true,

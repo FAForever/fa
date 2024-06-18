@@ -26,14 +26,11 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 1,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
         SkipDynamicThreatCalculations = true,
-        SubThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_hover>Hover" },

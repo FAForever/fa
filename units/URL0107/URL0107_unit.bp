@@ -28,13 +28,10 @@
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 9,
         Health = 270,
         MaxHealth = 270,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 3,
     },
     Display = {
@@ -157,7 +154,7 @@
     SelectionThickness = 0.7,
     SizeX = 0.7,
     SizeY = 0.7,
-    SizeZ = 1,
+    SizeZ = 1.05,
     StrategicIconName = "icon_land1_directfire",
     StrategicIconSortPriority = 135,
     Transport = { CanFireFromTransport = false },
