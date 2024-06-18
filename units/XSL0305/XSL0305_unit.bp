@@ -32,10 +32,10 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        EconomyThreatLevel = 79,
+        EconomyThreatLevel = 44,
         Health = 700,
         MaxHealth = 700,
-        SurfaceThreatLevel = 21,
+        SurfaceThreatLevel = 24,
     },
     Display = {
         AnimationDeath = {
@@ -134,16 +134,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "land",
@@ -212,7 +207,7 @@ UnitBlueprint{
                     RackBone = "Barrel",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -270,7 +265,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.26,
+            RateOfFire = 10/38, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = false,
             TargetPriorities = {
@@ -343,7 +338,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.066,
+            RateOfFire = 10/152, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = false,
             TargetPriorities = {
@@ -380,12 +375,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

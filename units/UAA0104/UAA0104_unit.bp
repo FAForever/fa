@@ -61,7 +61,7 @@ UnitBlueprint{
         "WEAKANTIAIR",
     },
     Defense = {
-        AirThreatLevel = 3.5,
+        AirThreatLevel = 3,
         ArmorType = "Light",
         Health = 1575,
         MaxHealth = 1575,
@@ -123,15 +123,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -175,7 +170,6 @@ UnitBlueprint{
         SlotsSmall = 12,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Veteran = {
         Level1 = 3,
         Level2 = 6,
@@ -222,7 +216,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -282,7 +276,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -342,7 +336,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -402,7 +396,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -470,7 +464,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

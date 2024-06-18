@@ -29,22 +29,16 @@ UnitBlueprint{
         MaxHealth = 100,
     },
     Display = {
-        BlinkingLights = {
-            {
-                BLBone = 'Light',
-                BLOffsetX = 0,
-                BLOffsetY = 0,
-                BLOffsetZ = 0,
-                BLScale = 1,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_blinking_02_emit.bp',
-        },
         Abilities = {
             "<LOC ability_omni>Omni Sensor",
             "<LOC ability_radar>Radar",
+        },
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
         },
         DamageEffects = {
             { Bone = 0,     OffsetX = 0,     OffsetY = 2.75,  OffsetZ = 0 },
@@ -128,14 +122,6 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MeshExtentsX = 1.5,
@@ -162,12 +148,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

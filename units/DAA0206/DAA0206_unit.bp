@@ -51,7 +51,7 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Light",
-        EconomyThreatLevel = 6000,
+        EconomyThreatLevel = 80000,
         Health = 90,
         MaxHealth = 90,
     },
@@ -116,18 +116,9 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Dock = false,
-            RULEUCC_Guard = false,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "Aeon",
@@ -207,7 +198,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 10,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
             TargetCheckInterval = 999999,

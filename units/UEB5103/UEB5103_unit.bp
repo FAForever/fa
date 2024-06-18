@@ -11,7 +11,6 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Structure",
-        EconomyThreatLevel = 0.1,
         Health = 10,
         MaxHealth = 10,
     },
@@ -41,7 +40,7 @@ UnitBlueprint{
     },
     General = {
         FactionName = "UEF",
-        Icon = "land",
+        Icon = "amph",
         SelectionPriority = 5,
     },
     Intel = { VisionRadius = 0 },
@@ -50,11 +49,7 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,

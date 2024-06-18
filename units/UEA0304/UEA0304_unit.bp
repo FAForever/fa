@@ -61,7 +61,7 @@ UnitBlueprint{
         "WEAKANTIAIR",
     },
     Defense = {
-        AirThreatLevel = 5.5,
+        AirThreatLevel = 5,
         ArmorType = "Light",
         Health = 4000,
         MaxHealth = 4000,
@@ -153,17 +153,12 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "air",
@@ -270,7 +265,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.125,
+            RateOfFire = 10/80, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",
@@ -322,7 +317,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.428,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -383,7 +378,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.428,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -426,7 +421,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

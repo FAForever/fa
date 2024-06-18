@@ -11,7 +11,7 @@ UnitBlueprint{
     Categories = {
         "AMPHIBIOUS",
         "ANTINAVY",
-        "ANTITORPEDO", 
+        "ANTITORPEDO",
         "BOT",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -103,20 +103,14 @@ UnitBlueprint{
         TeleportTimeMod = 0.01,
     },
     General = {
-        Classification = "RULEUMT_Amphibious",
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "amph",
@@ -205,7 +199,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 2.5,
+            RateOfFire = 10/4, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -262,7 +256,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -312,7 +306,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.05,
+            RateOfFire = 10/200, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
@@ -330,7 +324,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

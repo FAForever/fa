@@ -12,8 +12,8 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CYBRAN",
-        "ECONOMIC",
         "DRAGBUILD",
+        "ECONOMIC",
         "MASSEXTRACTION",
         "MASSPRODUCTION",
         "PRODUCTSC1",
@@ -77,7 +77,7 @@ UnitBlueprint{
         SelectionPriority = 5,
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UpgradesFrom = "urb1202",
-        UpgradesFromBase = "urb1103"
+        UpgradesFromBase = "urb1103",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
@@ -86,12 +86,8 @@ UnitBlueprint{
     Physics = {
         AlwaysAlignToTerrain = true,
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
             LAYER_Seabed = true,
-            LAYER_Sub = false,
-            LAYER_Water = false,
         },
         BuildRestriction = "RULEUBR_OnMassDeposit",
         DragCoefficient = 0.2,
@@ -118,11 +114,8 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
-            Sub = false,
-            Water = false,
         },
     },
 }

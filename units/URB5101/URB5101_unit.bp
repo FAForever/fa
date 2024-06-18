@@ -28,7 +28,6 @@ UnitBlueprint{
         ArmorType = "Structure",
         Health = 500,
         MaxHealth = 500,
-        ThreatLevel = 0,
     },
     Display = {
         Mesh = {
@@ -66,14 +65,6 @@ UnitBlueprint{
     LifeBarSize = 0.8,
     Physics = {
         AlwaysAlignToTerrain = true,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxGroundVariation = 50,
         MotionType = "RULEUMT_None",
@@ -97,12 +88,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         UseCustomMesh = true,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

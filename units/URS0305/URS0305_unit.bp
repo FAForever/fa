@@ -34,8 +34,6 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 1200,
         MaxHealth = 1200,
-        SubThreatLevel = 0.1,
-        SurfaceThreatLevel = 0.1,
     },
     Display = {
         Abilities = {
@@ -102,18 +100,10 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Pause = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "sea",
@@ -167,12 +157,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = false,
-            Seabed = false,
-            Sub = false,
-            Water = true,
-        },
+        WreckageLayers = { Water = true },
     },
 }

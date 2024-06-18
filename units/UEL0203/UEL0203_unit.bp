@@ -32,7 +32,7 @@ UnitBlueprint{
         ArmorType = "Normal",
         Health = 1800,
         MaxHealth = 1800,
-        SurfaceThreatLevel = 9.5,
+        SurfaceThreatLevel = 9,
     },
     Display = {
         Abilities = { "<LOC ability_hover>Hover" },
@@ -132,16 +132,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "amph",
@@ -230,7 +225,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 5,
             TargetPriorities = {
@@ -262,7 +257,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

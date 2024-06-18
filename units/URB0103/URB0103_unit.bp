@@ -2,7 +2,7 @@ UnitBlueprint{
     Description = "<LOC urb0103_desc>Naval Factory",
     AI = {
         TargetBones = {
-            "B03", 
+            "B03",
             "B08",
             "B28",
             "B14",
@@ -47,25 +47,19 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationBuild = '/units/urb0103/urb0103_abuild.sca',
+        AnimationBuild = "/units/urb0103/urb0103_abuild.sca",
         AnimationUpgrade = "/units/urb0103/urb0103_aupgrade.sca",
         AnimationUpgradeTable = {
             urb0203 = "/units/urb0103/URB0103_Aupgrade.sca",
             zrb9503 = "/units/urb0103/URB0103_Aupgrade_sup.sca",
         },
         BlinkingLights = {
-            {
-                BLBone = 'B03',
-                BLOffsetX = 0,
-                BLOffsetY = 0.2,
-                BLOffsetZ = 0,
-                BLScale = 2,
-            },
+            { BLBone = "B03", BLOffsetX = 0,     BLOffsetY = 0.2,   BLOffsetZ = 0,     BLScale = 2 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
@@ -118,19 +112,12 @@ UnitBlueprint{
             BuildEffectBones = { "Right_Exhaust03" },
         },
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = "Cybran",
@@ -144,14 +131,7 @@ UnitBlueprint{
     LifeBarOffset = 6,
     LifeBarSize = 4,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BuildOnLayerCaps = { LAYER_Water = true },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
         MotionType = "RULEUMT_None",
@@ -169,7 +149,7 @@ UnitBlueprint{
     SelectionSizeZ = 8.1,
     SelectionThickness = 0.21,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = -1 ,
+    CollisionOffsetZ = -1,
     SizeX = 4,
     SizeY = 3,
     SizeZ = 13,
@@ -181,12 +161,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = false,
-            Seabed = false,
-            Sub = false,
-            Water = true,
-        },
+        WreckageLayers = { Water = true },
     },
 }

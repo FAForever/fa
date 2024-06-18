@@ -45,39 +45,15 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = -1.75,
-                BLOffsetY = 0.15,
-                BLOffsetZ = -1.68,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 1.74,
-                BLOffsetY = 0.15,
-                BLOffsetZ = -1.68,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -1.75,
-                BLOffsetY = 0.15,
-                BLOffsetZ = 1.77,
-                BLScale = 1,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 1.74,
-                BLOffsetY = 0.15,
-                BLOffsetZ = 1.77,
-                BLScale = 1,
-            },
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         Mesh = {
@@ -160,7 +136,6 @@ UnitBlueprint{
     LifeBarOffset = 2,
     LifeBarSize = 4.5,
     Physics = {
-        BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,

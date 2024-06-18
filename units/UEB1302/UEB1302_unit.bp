@@ -11,8 +11,8 @@ UnitBlueprint{
     Categories = {
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
-        "ECONOMIC",
         "DRAGBUILD",
+        "ECONOMIC",
         "MASSEXTRACTION",
         "MASSPRODUCTION",
         "PRODUCTSC1",
@@ -78,7 +78,7 @@ UnitBlueprint{
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UnitName = "<LOC ueb1302_name>Mass Pump 3",
         UpgradesFrom = "ueb1202",
-        UpgradesFromBase = "ueb1103"
+        UpgradesFromBase = "ueb1103",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
@@ -87,12 +87,8 @@ UnitBlueprint{
     Physics = {
         AlwaysAlignToTerrain = true,
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
             LAYER_Seabed = true,
-            LAYER_Sub = false,
-            LAYER_Water = false,
         },
         BuildRestriction = "RULEUBR_OnMassDeposit",
         DragCoefficient = 0.2,
@@ -121,12 +117,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

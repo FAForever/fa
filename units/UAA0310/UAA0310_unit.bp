@@ -59,6 +59,7 @@ UnitBlueprint{
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",
+        "EXTERNALFACTORY",
         "HIGHALTAIR",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -78,11 +79,11 @@ UnitBlueprint{
         "TARGETCHASER",
         "VISIBLETORECON",
         "WEAKANTINAVY",
-        "EXTERNALFACTORY"
     },
     Defense = {
-        AirThreatLevel = 130,
+        AirThreatLevel = 292,
         ArmorType = "Experimental",
+        EconomyThreatLevel = 1380,
         Health = 40000,
         MaxHealth = 40000,
         RegenRate = 15,
@@ -100,8 +101,8 @@ UnitBlueprint{
             ShieldSize = 26,
             ShieldVerticalOffset = -1.25,
         },
-        SubThreatLevel = 30,
-        SurfaceThreatLevel = 500,
+        SubThreatLevel = 8,
+        SurfaceThreatLevel = 333,
     },
     Display = {
         Abilities = {
@@ -141,10 +142,10 @@ UnitBlueprint{
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
     ExternalFactory = {
-        SelectionSizeX = 4,
-        SelectionSizeZ = 4,
         SelectionCenterOffsetY = 2.7,
         SelectionCenterOffsetZ = -2,
+        SelectionSizeX = 4,
+        SelectionSizeZ = 4,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -154,21 +155,16 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
         },
         ConstructionBar = true,
-    FactionName = "Aeon",
+        FactionName = "Aeon",
         Icon = "air",
         OrderOverrides = {
             RULEUCC_Transport = {
@@ -265,7 +261,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             TargetPriorities = {
                 "STRUCTURE",
                 "TECH3 MOBILE",
@@ -315,7 +311,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.833,
+            RateOfFire = 10/12, --10/integer interval in ticks
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -373,7 +369,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.833,
+            RateOfFire = 10/12, --10/integer interval in ticks
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -431,7 +427,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.833,
+            RateOfFire = 10/12, --10/integer interval in ticks
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -489,7 +485,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.833,
+            RateOfFire = 10/12, --10/integer interval in ticks
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -543,7 +539,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "NAVAL MOBILE",
                 "ALLUNITS",
@@ -586,7 +582,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "NAVAL MOBILE",
                 "ALLUNITS",
@@ -637,7 +633,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -704,7 +700,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -747,7 +743,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

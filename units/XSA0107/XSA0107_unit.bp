@@ -131,15 +131,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
         },
@@ -177,12 +172,11 @@ UnitBlueprint{
         Class1Capacity = 8,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsSmall = 8,
-        SlotsMedium = 4,
         SlotsLarge = 2,
+        SlotsMedium = 4,
+        SlotsSmall = 8,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Weapon = {
         {
             Damage = 0,
@@ -231,7 +225,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

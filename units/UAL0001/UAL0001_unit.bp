@@ -66,7 +66,7 @@ UnitBlueprint{
         MaxHealth = 11000,
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
-        SurfaceThreatLevel = 45,
+        SurfaceThreatLevel = 765,
     },
     Display = {
         Abilities = {
@@ -103,10 +103,10 @@ UnitBlueprint{
                     ShaderName = "Aeon",
                 },
                 {
-                    AlbedoName = 'ual0001_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Aeon',
-                    SpecularName = 'ual0001_lod1_specteam.dds',
+                    ShaderName = "Aeon",
+                    AlbedoName = "ual0001_lod1_albedo.dds",
+                    SpecularName = "ual0001_lod1_specteam.dds",
                 },
             },
         },
@@ -643,7 +643,6 @@ UnitBlueprint{
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Overcharge = true,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
@@ -651,8 +650,6 @@ UnitBlueprint{
             RULEUCC_Repair = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Teleport = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "amph",
@@ -767,7 +764,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "COMMAND",
@@ -840,7 +837,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.3,
+            RateOfFire = 10/33, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
@@ -917,7 +914,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
@@ -994,7 +991,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE,AIR*MOBILE",
             TurretDualManipulators = false,
@@ -1036,7 +1033,7 @@ UnitBlueprint{
                 },
             },
             RackRecoilDistance = 0,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Death",
@@ -1052,7 +1049,7 @@ UnitBlueprint{
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             WeaponCategory = "Teleport",
         },
     },

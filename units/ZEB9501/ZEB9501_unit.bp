@@ -1,4 +1,4 @@
-UnitBlueprint {
+UnitBlueprint{
     Description = "<LOC zeb9501_desc>Land Factory",
     AI = {
         TargetBones = {
@@ -9,41 +9,41 @@ UnitBlueprint {
         },
     },
     Audio = {
-        Construct      = Sound { Bank = "UEB",        Cue = "UEB0201_Construct_Start",    LodCutoff = "UnitMove_LodCutoff", },
-        ConstructLoop  = Sound { Bank = "UEB",        Cue = "UEB0201_Construct_Loop",     LodCutoff = "UnitMove_LodCutoff", },
-        DeathExplosion = Sound { Bank = "UELDestroy", Cue = "UEB_Destroy_Lrg_PreDestroy", LodCutoff = "UnitMove_LodCutoff", },
-        Destroyed      = Sound { Bank = "UELDestroy", Cue = "UEB_Destroy_Huge",           LodCutoff = "UnitMove_LodCutoff", },
-        DoneBeingBuilt = Sound { Bank = "UEB",        Cue = "UEB0201_Activate",           LodCutoff = "UnitMove_LodCutoff", },
-        UISelection    = Sound { Bank = "Interface",  Cue = "UEF_Select_Factory",         LodCutoff = "UnitMove_LodCutoff", },
+        Construct      = Sound { Bank = 'UEB',        Cue = 'UEB0201_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'UEB',        Cue = 'UEB0201_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0201_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 51,
     Categories = {
-        "PRODUCTSC1",
-        "SELECTABLE",
         "BUILTBYTIER1FACTORY",
-        "BUILTBYTIER2ENGINEER",
         "BUILTBYTIER2COMMANDER",
-        "BUILTBYTIER3ENGINEER",
+        "BUILTBYTIER2ENGINEER",
         "BUILTBYTIER3COMMANDER",
-        "UEF",
-        "STRUCTURE",
-        "LAND",
-        "TECH2",
+        "BUILTBYTIER3ENGINEER",
         "CONSTRUCTION",
-        "FACTORY",
-        "RALLYPOINT",
-        "DRAGBUILD",
         "CONSTRUCTIONSORTDOWN",
-        "SIZE16",
-        "VISIBLETORECON",
+        "DRAGBUILD",
+        "FACTORY",
+        "LAND",
+        "PRODUCTSC1",
+        "RALLYPOINT",
         "RECLAIMABLE",
+        "SELECTABLE",
         "SHOWQUEUE",
+        "SIZE16",
         "SORTCONSTRUCTION",
+        "STRUCTURE",
         "SUPPORTFACTORY",
+        "TECH2",
+        "UEF",
+        "VISIBLETORECON",
     },
     Defense = {
         ArmorType = "Structure",
-        EconomyThreatLevel = 11,
+        EconomyThreatLevel = 160,
         Health = 4000,
         MaxHealth = 4000,
     },
@@ -51,25 +51,13 @@ UnitBlueprint {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/zeb9501/ZEB9501_Aupgrade.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = -1.28,
-                BLOffsetY = 0.9,
-                BLOffsetZ = 1.4,
-                BLScale = 1.5,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 1.28,
-                BLOffsetY = 0.9,
-                BLOffsetZ = 1.4,
-                BLScale = 1.5,
-            },
+            { BLBone = 0,     BLOffsetX = -1.28, BLOffsetY = 0.9,   BLOffsetZ = 1.4,   BLScale = 1.5 },
+            { BLBone = 0,     BLOffsetX = 1.28,  BLOffsetY = 0.9,   BLOffsetZ = 1.4,   BLScale = 1.5 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         Mesh = {
@@ -81,14 +69,12 @@ UnitBlueprint {
                 },
                 {
                     LODCutoff = 500,
-                    AlbedoName = "zeb9501_lod1_albedo.dds",
                     ShaderName = "Unit",
+                    AlbedoName = "zeb9501_lod1_albedo.dds",
                     SpecularName = "zeb9501_lod1_specteam.dds",
                 },
             },
         },
-        PlaceholderMeshName = "UXB0006",
-        SpawnRandomRotation = false,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_01_albedo",
@@ -130,8 +116,6 @@ UnitBlueprint {
                 "Muzzle03",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
@@ -144,8 +128,6 @@ UnitBlueprint {
         FactionName = "UEF",
         Icon = "land",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Advanced",
-        UnitWeight = 1,
         UpgradesFrom = "ueb0101",
         UpgradesFromBase = "ueb0101",
         UpgradesTo = "zeb9601",
@@ -155,32 +137,31 @@ UnitBlueprint {
     LifeBarOffset = 2.5,
     LifeBarSize = 4.5,
     Physics = {
-        BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
         MotionType = "RULEUMT_None",
         RaisedPlatforms = {
-            --X,    Z,     Height   -- Offsets from center
+            --X,     Z,     height -- Offsets from center
 
-            -1.1,  -1.6,  0.5,      -- Top Left
-            1.1,   -1.6,  0.5,      -- Top Right
-            -1.1,  1.9,   0.5,      -- Bottom Left
-            1.1,   1.9,   0.5,      -- Bottom Right
+            -1.1,  -1.6,  0.5,     --Top left
+            1.1,   -1.6,  0.5,     --Top right
+            -1.1,  1.9,   0.5,     --Bottom left
+            1.1,   1.9,   0.5,     --Bottom right
 
-            -2,    -1.6,  0,        -- Top Left
-            -1.1,  -1.6,  0.5,      -- Top Right
-            -2,    1.9,   0,        -- Bottom Left
-            -1.1,  1.9,   0.5,      -- Bottom Right
+            -2,    -1.6,  0,       --Top left
+            -1.1,  -1.6,  0.5,     --Top right
+            -2,    1.9,   0,       --Bottom left
+            -1.1,  1.9,   0.5,     --Bottom right
 
-            1.1,   -1.6,  0.5,      -- Top Left
-            2,     -1.6,  0,        -- Top Right
-            1.1,   1.9,   0.5,      -- Bottom Left
-            2,     1.9,   0,        -- Bottom Right
+            1.1,   -1.6,  0.5,     --Top left
+            2,     -1.6,  0,       --Top right
+            1.1,   1.9,   0.5,     --Bottom left
+            2,     1.9,   0,       --Bottom right
         },
         RollOffPoints = {
-            { UnitSpin = 90,   X = 3,   Y = 0,  Z = 0 },
-            { UnitSpin = -90,  X = -3,  Y = 0,  Z = 0 },
+            { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
+            { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

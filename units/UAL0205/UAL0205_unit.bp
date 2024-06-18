@@ -102,16 +102,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "amph",
@@ -149,8 +144,8 @@ UnitBlueprint{
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.56,
-    CollisionOffsetZ = 0.05,
     CollisionOffsetY = -0.1,
+    CollisionOffsetZ = 0.05,
     SizeX = 1.0,
     SizeY = 0.5,
     SizeZ = 1.1,
@@ -179,7 +174,7 @@ UnitBlueprint{
                     RackBone = "Turret",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -226,7 +221,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             SlavedToBody = true,
             TargetPriorities = {
                 "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
@@ -260,7 +255,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

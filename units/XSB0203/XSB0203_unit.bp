@@ -2,11 +2,11 @@ UnitBlueprint{
     Description = "<LOC xsb0203_desc>Naval Factory HQ",
     AI = {
         TargetBones = {
-            'B04',
-            'B03',
-            'B06',
-            'B05'
-        }
+            "B04",
+            "B03",
+            "B06",
+            "B05",
+        },
     },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0203_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -55,25 +55,13 @@ UnitBlueprint{
         },
         AnimationUpgrade = "/units/xsb0203/xsb0203_aupgrade.sca",
         BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 1,
-                BLOffsetZ = 2.75,
-                BLScale = 2,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -1,
-                BLOffsetY = 0.75,
-                BLOffsetZ = 2.25,
-                BLScale = 2,
-            },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 1,     BLOffsetZ = 2.75,  BLScale = 2 },
+            { BLBone = 0,     BLOffsetX = -1,    BLOffsetY = 0.75,  BLOffsetZ = 2.25,  BLScale = 2 },
         },
         BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
         },
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
@@ -132,19 +120,12 @@ UnitBlueprint{
             },
         },
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = "Seraphim",
@@ -160,14 +141,7 @@ UnitBlueprint{
     LifeBarOffset = 6.5,
     LifeBarSize = 4.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BuildOnLayerCaps = { LAYER_Water = true },
         ComputeRollOffPoint = true,
         DragCoefficient = 0.2,
         MeshExtentsX = 5,
@@ -200,12 +174,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = false,
-            Seabed = false,
-            Sub = false,
-            Water = true,
-        },
+        WreckageLayers = { Water = true },
     },
 }
