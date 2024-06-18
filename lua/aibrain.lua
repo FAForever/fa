@@ -32,9 +32,6 @@ local EnergyManagerBrainComponent = import("/lua/aibrains/components/EnergyManag
 
 ---@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
----@alias HqTech "TECH2" | "TECH3"
----@alias HqLayer "AIR" | "LAND" | "NAVY"
----@alias HqFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
 ---@alias ReconTypes 'Radar' | 'Sonar' | 'Omni' | 'LOSNow'

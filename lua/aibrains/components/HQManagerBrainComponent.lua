@@ -22,74 +22,106 @@
 
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+---@alias HQTech "TECH2" | "TECH3"
+---@alias HQLayer "AIR" | "LAND" | "NAVY"
+---@alias HQFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
+
+-- upvalue scope for performance
+local categories = categories
+local AddBuildRestriction = AddBuildRestriction
+local RemoveBuildRestriction = RemoveBuildRestriction
+
+local MathMax = math.max
+
+---@type HQLayer[]
+local HQLayers = { "LAND", "AIR", "NAVAL" }
+
+---@type HQTech[]
+local HQTechs = { "TECH2", "TECH3" }
+
+--- Keeps track of and manages the HQ functionality.
 ---@class HQManagerBrainComponent
 ---@field HQs table
 HQManagerBrainComponent = ClassSimple {
 
     ---@param self HQManagerBrainComponent | AIBrain
     CreateBrainShared = function(self)
-        local layers = { "LAND", "AIR", "NAVAL" }
-        local techs = { "TECH2", "TECH3" }
-
-        self.HQs = {}
+        local info = {}
         for _, facData in Factions do
-            local faction = facData.Category
-            self.HQs[faction] = {}
-            for _, layer in layers do
-                self.HQs[faction][layer] = {}
-                for _, tech in techs do
-                    self.HQs[faction][layer][tech] = 0
+            local factionCategory = facData.Category
+
+            local byFaction = {}
+            for _, layer in HQLayers do
+                local byLayer = {}
+                for _, tech in HQTechs do
+                    byLayer[tech] = 0
                 end
+                byFaction[layer] = byLayer
             end
+
+            info[factionCategory] = byFaction
         end
+
+        self.HQs = info
 
         -- restrict all support factories by default
         AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
     end,
 
     --- Adds a HQ so that the engi mod knows we have it
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
+    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param faction HQFaction
+    ---@param layer HQLayer
+    ---@param tech HQTech
     AddHQ = function(self, faction, layer, tech)
-        self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
+        local byLayer = self.HQs[faction][layer]
+        if not byLayer then
+            -- WARN("")
+            return
+        end
+
+        byLayer[tech] = byLayer[tech] + 1
     end,
 
     --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
+    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param faction HQFaction
+    ---@param layer HQLayer
+    ---@param tech HQTech
     RemoveHQ = function(self, faction, layer, tech)
-        self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
+        local byLayer = self.HQs[faction][layer]
+        if not byLayer then
+            -- WARN("")
+            return
+        end
+
+        byLayer[tech] = MathMax(0, byLayer[tech] - 1)
     end,
 
     --- Completely re evaluates the support factory restrictions of the engi mod
-    ---@param self AIBrain
+    ---@param self HQManagerBrainComponent | AIBrain
     ReEvaluateHQSupportFactoryRestrictions = function(self)
-        local layers = { "AIR", "LAND", "NAVAL" }
-        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
-
-        if categories.NOMADS then
-            table.insert(factions, 'NOMADS')
-        end
-
-        for _, faction in factions do
-            for _, layer in layers do
-                self:SetHQSupportFactoryRestrictions(faction, layer)
+        for _, facData in Factions do
+            local factionCategory = facData.Category
+            for _, layer in HQLayers do
+                self:SetHQSupportFactoryRestrictions(factionCategory, layer)
             end
         end
     end,
 
     --- Manages the support factory restrictions of the engi mod
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
+    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param faction HQFaction
+    ---@param layer HQLayer
     SetHQSupportFactoryRestrictions = function(self, faction, layer)
 
         -- localize for performance
         local army = self:GetArmyIndex()
+        local byLayer = self.HQs[faction][layer]
+        if not byLayer then
+            -- WARN("")
+            return
+        end
 
         -- the pessimists we are, restrict everything!
         AddBuildRestriction(army,
@@ -98,7 +130,7 @@ HQManagerBrainComponent = ClassSimple {
             categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
 
         -- lift t2 / t3 support factory restrictions
-        if self.HQs[faction][layer]["TECH3"] > 0 then
+        if byLayer["TECH3"] > 0 then
             RemoveBuildRestriction(army,
                 categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
             RemoveBuildRestriction(army,
@@ -106,31 +138,34 @@ HQManagerBrainComponent = ClassSimple {
         end
 
         -- lift t2 support factory restrictions
-        if self.HQs[faction][layer]["TECH2"] > 0 then
+        if byLayer["TECH2"] > 0 then
             RemoveBuildRestriction(army,
                 categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
         end
     end,
 
     --- Counts all HQs of specific faction, layer and tech for the engi mod.
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
+    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param faction HQFaction
+    ---@param layer HQLayer
+    ---@param tech HQTech
     ---@return number
     CountHQs = function(self, faction, layer, tech)
         return self.HQs[faction][layer][tech]
     end,
 
     --- Counts all HQs of faction and tech, regardless of layer
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param tech HqTech
+    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param faction HQFaction
+    ---@param tech HQTech
     ---@return number
     CountHQsAllLayers = function(self, faction, tech)
-        local count = self.HQs[faction]["LAND"][tech]
-        count = count + self.HQs[faction]["AIR"][tech]
-        count = count + self.HQs[faction]["NAVAL"][tech]
+        local byFaction = self.HQs[faction]
+        local count = 0
+        for _, layer in HQLayers do
+            count = count + byFaction[layer][tech]
+        end
+
         return count
     end,
 }
