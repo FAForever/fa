@@ -40,11 +40,11 @@ local HQLayers = { "LAND", "AIR", "NAVAL" }
 local HQTechs = { "TECH2", "TECH3" }
 
 --- Keeps track of and manages the HQ functionality.
----@class HQManagerBrainComponent
+---@class FactoryManagerBrainComponent
 ---@field HQs table
-HQManagerBrainComponent = ClassSimple {
+FactoryManagerBrainComponent = ClassSimple {
 
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     CreateBrainShared = function(self)
         local info = {}
         for _, facData in Factions do
@@ -69,7 +69,7 @@ HQManagerBrainComponent = ClassSimple {
     end,
 
     --- Adds a HQ so that the engi mod knows we have it
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     ---@param faction HQFaction
     ---@param layer HQLayer
     ---@param tech HQTech
@@ -84,7 +84,7 @@ HQManagerBrainComponent = ClassSimple {
     end,
 
     --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     ---@param faction HQFaction
     ---@param layer HQLayer
     ---@param tech HQTech
@@ -99,7 +99,7 @@ HQManagerBrainComponent = ClassSimple {
     end,
 
     --- Completely re evaluates the support factory restrictions of the engi mod
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     ReEvaluateHQSupportFactoryRestrictions = function(self)
         for _, facData in Factions do
             local factionCategory = facData.Category
@@ -110,7 +110,7 @@ HQManagerBrainComponent = ClassSimple {
     end,
 
     --- Manages the support factory restrictions of the engi mod
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     ---@param faction HQFaction
     ---@param layer HQLayer
     SetHQSupportFactoryRestrictions = function(self, faction, layer)
@@ -145,7 +145,7 @@ HQManagerBrainComponent = ClassSimple {
     end,
 
     --- Counts all HQs of specific faction, layer and tech for the engi mod.
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     ---@param faction HQFaction
     ---@param layer HQLayer
     ---@param tech HQTech
@@ -155,7 +155,7 @@ HQManagerBrainComponent = ClassSimple {
     end,
 
     --- Counts all HQs of faction and tech, regardless of layer
-    ---@param self HQManagerBrainComponent | AIBrain
+    ---@param self FactoryManagerBrainComponent | AIBrain
     ---@param faction HQFaction
     ---@param tech HQTech
     ---@return number
