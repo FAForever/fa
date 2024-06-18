@@ -554,6 +554,9 @@ function table.count(t, fn)
 end
 
 --- Returns a new table with unique values stored using numeric keys and it does not preserve keys of the original table
+---@generic T, G
+---@param t? table<T, G>
+---@return table<T, G> | nil
 function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}

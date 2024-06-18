@@ -27,13 +27,11 @@ UnitBlueprint {
         'BENIGN',
     },
     CollisionOffsetX = 1.7,
-    CollisionOffsetY = 0,
     CollisionOffsetZ = -0.7,
     Defense = {
         ArmorType = 'Normal',
         Health = 8000,
         MaxHealth = 8000,
-        RegenRate = 0,
     },
     Description = '<LOC xec8009_desc>UEF Wall Segment',
     Display = {

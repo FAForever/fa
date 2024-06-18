@@ -27,13 +27,11 @@ UnitBlueprint {
         'BENIGN',
     },
     CollisionOffsetX = -1.5,
-    CollisionOffsetY = 0,
     CollisionOffsetZ = 0.5,
     Defense = {
         ArmorType = 'Normal',
         Health = 8000,
         MaxHealth = 8000,
-        RegenRate = 0,
     },
     Description = '<LOC xsc8011_desc>Seraphim Wall Segment',
     Display = {

@@ -27,14 +27,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 28,
         Health = 1800,
         MaxHealth = 1800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_amphibious>Amphibious" },
@@ -90,12 +86,8 @@ UnitBlueprint{
     LifeBarSize = 3,
     Physics = {
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
             LAYER_Seabed = true,
-            LAYER_Sub = false,
-            LAYER_Water = false,
         },
         BuildRestriction = "RULEUBR_OnHydrocarbonDeposit",
         DragCoefficient = 0.2,
@@ -113,7 +105,6 @@ UnitBlueprint{
     SelectionSizeX = 1.9,
     SelectionSizeZ = 1.9,
     SelectionThickness = 0.36,
-    CollisionOffsetY = 0,
     SizeX = 2.5,
     SizeY = 1.3,
     SizeZ = 2.5,
@@ -126,11 +117,8 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
-            Sub = false,
-            Water = false,
         },
     },
 }

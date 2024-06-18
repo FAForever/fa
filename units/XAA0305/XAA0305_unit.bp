@@ -56,11 +56,8 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 14,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 6000,
         MaxHealth = 6000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 14,
     },
     Display = {
@@ -84,19 +81,19 @@ UnitBlueprint{
                     },
                 },
             },
-            LandAir = {
-                Effects = {
-                    {
-                        Bones = { "XAA0305" },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
             AirWater = {
                 Effects = {
                     {
                         Bones = { "XAA0305" },
                         Type = "Landing01",
+                    },
+                },
+            },
+            LandAir = {
+                Effects = {
+                    {
+                        Bones = { "XAA0305" },
+                        Type = "TakeOff01",
                     },
                 },
             },
@@ -140,17 +137,12 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "air",
@@ -161,14 +153,6 @@ UnitBlueprint{
     LifeBarOffset = 0.6,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 10,
         FuelRechargeRate = 15,
         FuelUseTime = 800,
@@ -242,7 +226,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.255,
+            RateOfFire = 10/8, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "GROUNDATTACK",
@@ -303,7 +287,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -366,7 +350,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -411,7 +395,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

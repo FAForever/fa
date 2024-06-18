@@ -81,7 +81,7 @@
 ---@field DamageFriendly boolean
 --- blast radius
 ---@field DamageRadius number
---- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+--- how much additional damage is dealt to shields using the "FAF_AntiShield" damagetype
 ---@field DamageToShields? number
 --- the type of damage the unit will do
 ---@field DamageType DamageType

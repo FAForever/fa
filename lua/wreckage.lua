@@ -21,6 +21,11 @@ Wreckage = Class(Prop) {
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
+        -- only applies to trees and units
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == "FAF_AntiShield" then
+            return
+        end
+
         self:DoTakeDamage(instigator, amount, vector, damageType)
     end,
 

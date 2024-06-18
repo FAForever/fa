@@ -21,6 +21,33 @@
 --**********************************************************************************
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
 
 ---@class EnergyStorageUnit : StructureUnit
-EnergyStorageUnit = ClassUnit(StructureUnit) {}
+EnergyStorageUnit = ClassUnit(StructureUnit) {
+
+    ---@param self EnergyStorageUnit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        StructureUnitOnStopBeingBuilt(self, builder, layer)
+
+        local brain = self.Brain
+        brain:RegisterUnitEnergyStorage(self)
+        self:OnEnergyStorageStateChange(brain.EnergyStorageState)
+    end,
+
+    --- Implemented at the unit (type) level
+    ---@param self BlinkingLightsUnitComponent | StructureUnit
+    ---@param state AIBrainEnergyStorageState
+    OnEnergyStorageStateChange = function(self, state)
+        if state == 'EconLowEnergyStore' then
+            self:CreateBlinkingLights('Red')
+        elseif state == 'EconMidEnergyStore' then
+            self:CreateBlinkingLights('Yellow')
+        elseif state == 'EconFullEnergyStore' then
+            self:CreateBlinkingLights('Green')
+        end
+    end,
+
+}
