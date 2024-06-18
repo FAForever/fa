@@ -70,8 +70,6 @@ UnitBlueprint{
                 },
             },
         },
-        PlaceholderMeshName = "UXB0007",
-        SpawnRandomRotation = false,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_cybran_01_albedo",
@@ -117,8 +115,6 @@ UnitBlueprint{
                 "Arm06_Muzzle",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
@@ -132,8 +128,6 @@ UnitBlueprint{
         FactionName = "Cybran",
         Icon = "land",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Secret",
-        UnitWeight = 1,
         UpgradesFrom = "zrb9501",
         UpgradesFromBase = "urb0101",
     },

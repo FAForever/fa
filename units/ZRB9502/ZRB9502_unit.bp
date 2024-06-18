@@ -80,8 +80,6 @@ UnitBlueprint{
                 },
             },
         },
-        PlaceholderMeshName = "UXB0006",
-        SpawnRandomRotation = true,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_cybran_01_albedo",
@@ -126,8 +124,6 @@ UnitBlueprint{
                 "Arm04_Muzzle",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -147,14 +143,11 @@ UnitBlueprint{
         FactionName = "Cybran",
         Icon = "air",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Advanced",
-        UnitWeight = 1,
         UpgradesFrom = "urb0102",
         UpgradesFromBase = "urb0102",
         UpgradesTo = "zrb9602",
     },
     Intel = { VisionRadius = 20 },
-    Interface = { HelpText = "<LOC zrb9502_help>Air Factory" },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2,
     LifeBarSize = 4.5,

@@ -51,8 +51,6 @@ UnitBlueprint{
                 },
             },
         },
-        PlaceholderMeshName = "URA0001",
-        SpawnRandomRotation = true,
         UniformScale = 0.14,
     },
     Economy = {
@@ -72,8 +70,6 @@ UnitBlueprint{
     },
     General = {
         CapCost = 0,
-        Category = "Construction",
-        Classification = "RULEUC_Engineer",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
@@ -91,11 +87,8 @@ UnitBlueprint{
         FactionName = "Cybran",
         Icon = "air",
         SelectionPriority = 3,
-        TechLevel = "RULEUTL_Basic",
-        UnitWeight = 1,
     },
     Intel = { VisionRadius = 0 },
-    Interface = { HelpText = "<LOC ura0001_help>Build Bot Effect" },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.25,
     LifeBarRender = false,

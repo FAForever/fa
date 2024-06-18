@@ -175,7 +175,6 @@ UnitBlueprint{
         SlotsSmall = 12,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Veteran = {
         Level1 = 3,
         Level2 = 6,

@@ -79,7 +79,6 @@ UnitBlueprint{
                 },
             },
         },
-        SpawnRandomRotation = false,
         UniformScale = 0.09,
     },
     Economy = {
@@ -108,8 +107,6 @@ UnitBlueprint{
                 "Turret_Muzzle_03",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -129,8 +126,6 @@ UnitBlueprint{
         FactionName = "Aeon",
         Icon = "sea",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Secret",
-        UnitWeight = 1,
         UpgradesFrom = "zab9503",
         UpgradesFromBase = "uab0103",
     },

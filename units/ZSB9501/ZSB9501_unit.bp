@@ -87,8 +87,6 @@ UnitBlueprint{
                 },
             },
         },
-        PlaceholderMeshName = "UXB0006",
-        SpawnRandomRotation = false,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_seraphim_01_albedo",
@@ -129,8 +127,6 @@ UnitBlueprint{
                 "Muzzle02",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
@@ -143,9 +139,7 @@ UnitBlueprint{
         FactionName = "Seraphim",
         Icon = "land",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Advanced",
         UnitName = "<LOC zsb9501_name>Hethiya",
-        UnitWeight = 1,
         UpgradesFrom = "xsb0101",
         UpgradesFromBase = "xsb0101",
         UpgradesTo = "zsb9601",

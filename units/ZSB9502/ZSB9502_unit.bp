@@ -83,7 +83,6 @@ UnitBlueprint{
                 },
             },
         },
-        SpawnRandomRotation = true,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_seraphim_01_albedo",
@@ -125,8 +124,6 @@ UnitBlueprint{
                 "Muzzle02",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -146,15 +143,12 @@ UnitBlueprint{
         FactionName = "Seraphim",
         Icon = "air",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Advanced",
         UnitName = "<LOC zsb9502_name>Ia-iya",
-        UnitWeight = 1,
         UpgradesFrom = "xsb0102",
         UpgradesFromBase = "xsb0102",
         UpgradesTo = "zsb9602",
     },
     Intel = { VisionRadius = 20 },
-    Interface = { HelpText = "<LOC zsb9502_help>Air Factory" },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2,
     LifeBarSize = 4.5,

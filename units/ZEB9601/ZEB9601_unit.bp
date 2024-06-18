@@ -72,7 +72,6 @@ UnitBlueprint{
                 },
             },
         },
-        SpawnRandomRotation = false,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_01_albedo",
@@ -115,8 +114,6 @@ UnitBlueprint{
                 "Muzzle03",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
@@ -129,8 +126,6 @@ UnitBlueprint{
         FactionName = "UEF",
         Icon = "land",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Secret",
-        UnitWeight = 1,
         UpgradesFrom = "zeb9501",
         UpgradesFromBase = "ueb0101",
     },

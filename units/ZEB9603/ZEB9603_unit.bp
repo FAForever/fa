@@ -84,8 +84,6 @@ UnitBlueprint{
                 },
             },
         },
-        PlaceholderMeshName = "UXB0005",
-        SpawnRandomRotation = false,
         UniformScale = 0.083,
     },
     Economy = {
@@ -115,8 +113,6 @@ UnitBlueprint{
                 "Left_Exhaust",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -136,8 +132,6 @@ UnitBlueprint{
         FactionName = "UEF",
         Icon = "sea",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Secret",
-        UnitWeight = 1,
         UpgradesFrom = "zeb9503",
         UpgradesFromBase = "ueb0103",
     },

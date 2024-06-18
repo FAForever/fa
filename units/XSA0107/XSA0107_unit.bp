@@ -182,7 +182,6 @@ UnitBlueprint{
         SlotsSmall = 8,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Weapon = {
         {
             Damage = 0,

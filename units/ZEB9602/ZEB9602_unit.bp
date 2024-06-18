@@ -71,7 +71,6 @@ UnitBlueprint{
                 },
             },
         },
-        SpawnRandomRotation = true,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_01_albedo",
@@ -115,8 +114,6 @@ UnitBlueprint{
                 "Muzzle03",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -136,13 +133,10 @@ UnitBlueprint{
         FactionName = "UEF",
         Icon = "air",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Secret",
-        UnitWeight = 1,
         UpgradesFrom = "zeb9502",
         UpgradesFromBase = "ueb0102",
     },
     Intel = { VisionRadius = 20 },
-    Interface = { HelpText = "<LOC zeb9602_help>Air Factory" },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.15,
     LifeBarSize = 4.75,

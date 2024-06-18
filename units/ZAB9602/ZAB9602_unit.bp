@@ -69,7 +69,6 @@ UnitBlueprint{
                 },
             },
         },
-        SpawnRandomRotation = true,
         Tarmacs = {
             {
                 Albedo = "Tarmacs/Tar12x_aeon_01_albedo",
@@ -112,8 +111,6 @@ UnitBlueprint{
                 "Turret_Muzzle_03",
             },
         },
-        Category = "Factory",
-        Classification = "RULEUC_Factory",
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -133,13 +130,10 @@ UnitBlueprint{
         FactionName = "Aeon",
         Icon = "air",
         SelectionPriority = 5,
-        TechLevel = "RULEUTL_Secret",
-        UnitWeight = 1,
         UpgradesFrom = "zab9502",
         UpgradesFromBase = "uab0102",
     },
     Intel = { VisionRadius = 20 },
-    Interface = { HelpText = "<LOC zab9602_help>Air Factory" },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.1,
     LifeBarSize = 4.5,
