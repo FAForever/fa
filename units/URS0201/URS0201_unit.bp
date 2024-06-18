@@ -250,14 +250,6 @@ UnitBlueprint{
     Physics = {
         AltMotionType = "RULEUMT_Water",
         BackUpDistance = 10,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         LandSpeedMultiplier = 0.5,

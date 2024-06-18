@@ -160,14 +160,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         AttackElevation = 10,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 18,
         FuelRechargeRate = 10,
         FuelUseTime = 500,
