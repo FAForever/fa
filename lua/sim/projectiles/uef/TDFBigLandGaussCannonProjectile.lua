@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local TDFGeneralGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFGeneralGaussCannonProjectile.lua").TDFGeneralGaussCannonProjectilef
+local TDFGeneralGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFGeneralGaussCannonProjectile.lua").TDFGeneralGaussCannonProjectile
 
 --- Fatboy
 ---@class TDFBigLandGaussCannonProjectile : TDFGeneralGaussCannonProjectile
