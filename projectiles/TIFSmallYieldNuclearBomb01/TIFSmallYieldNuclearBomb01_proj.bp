@@ -1,38 +1,24 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Explosions',
-            Cue = 'Explosion_Bomb',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'Explosion_Bomb',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Explosions', Cue = 'Explosion_Bomb',          LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Explosions', Cue = 'Explosion_Bomb',          LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts',    Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'IGNOREASFONCOLLISION',
+        "IGNOREASFONCOLLISION",
+        "INDIRECTFIRE",
+        "PROJECTILE",
+        "UEF",
     },
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Scale = 1.25,
-        },
+        ImpactEffects = { Scale = 1.25 },
         Mesh = {
             LODs = {
                 {
-                    ShaderName = 'TMeshGlow',
                     LODCutoff = 215,
+                    ShaderName = "TMeshGlow",
                 },
             },
         },
@@ -40,13 +26,11 @@ ProjectileBlueprint {
         UniformScale = 0.125,
     },
     General = {
-        Category = 'Bomb',
-        Faction = 'UEF',
-        Weapon = 'Small Yield Nuclear Bomb',
+        Category = "Bomb",
+        Faction = "UEF",
+        Weapon = "Small Yield Nuclear Bomb",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         RealisticOrdinance = true,

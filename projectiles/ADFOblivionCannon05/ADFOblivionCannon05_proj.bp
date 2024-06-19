@@ -1,40 +1,24 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'AEON_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'AEON_Expl_Med_Impact',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_AEON',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'DIRECTFIRE',
+        "AEON",
+        "DIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
-        ImpactEffects = {
-            Type = 'Medium02',
-        },
+        ImpactEffects = { Type = "Medium02" },
         StrategicIconSize = 1,
     },
     General = {
-        Category = 'Direct Fire',
-        Faction = 'Aeon',
-        Weapon = 'Oblivion Cannon',
+        Category = "Direct Fire",
+        Faction = "Aeon",
+        Weapon = "Oblivion Cannon",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 28,

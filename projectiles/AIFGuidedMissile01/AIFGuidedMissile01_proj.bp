@@ -1,29 +1,27 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'MISSILE',
-        'NOSPLASHDAMAGE'
+        "AEON",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
     },
+    Defense = {
+        Health = 1,
+        MaxHealth = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowsProjectile = true,
         StrategicIconSize = 2,
         UniformScale = 0.09,
     },
-    Defense =  {
-        MaxHealth = 1,
-        Health = 1,
-    },
-    DesiredShooterCap = 1,
     General = {
-        Category = 'Anti Air',
-        Faction = 'Aeon',
+        Category = "Anti Air",
+        Faction = "Aeon",
         TechLevel = 3,
-        Weapon = 'Guided Missile',
+        Weapon = "Guided Missile",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
         DestroyOnWater = true,

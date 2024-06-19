@@ -1,25 +1,21 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "AEON",
+        "INDIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Medium02',
-        },
-        MeshBlueprint = '/projectiles/TIFMortar01/TIFMortar01_mesh.bp',
+        ImpactEffects = { Type = "Medium02" },
+        MeshBlueprint = "/projectiles/TIFMortar01/TIFMortar01_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.05,
     },
     General = {
-        Category = 'Artillery',
-        Faction = 'AEON',
+        Category = "Artillery",
+        Faction = "AEON",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 34,
