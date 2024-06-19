@@ -24,6 +24,8 @@ PropBlueprint{
     Footprint = { OccupancyCaps = 3 },
     Interface = { HelpText = "Geyser" },
     Physics = { BlockPath = true },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 3.5,
     SizeY = 0.75,
     SizeZ = 4,

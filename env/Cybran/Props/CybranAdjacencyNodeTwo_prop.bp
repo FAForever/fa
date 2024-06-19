@@ -24,6 +24,8 @@ PropBlueprint{
         ReclaimTime = 1,
     },
     Interface = { HelpText = "Cybran Adjacency Node" },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 0,
     SizeY = 0,
     SizeZ = 0,

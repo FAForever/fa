@@ -24,6 +24,8 @@ PropBlueprint{
     Footprint = { OccupancyCaps = 3 },
     Interface = { HelpText = "Mud Pot" },
     Physics = { BlockPath = true },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 2.5,
     SizeY = 0.25,
     SizeZ = 2.5,

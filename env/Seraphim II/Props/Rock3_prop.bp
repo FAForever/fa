@@ -27,6 +27,8 @@ PropBlueprint{
     Footprint = { OccupancyCaps = 3 },
     Interface = { HelpText = "Enormous Rock" },
     Physics = { BlockPath = true },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 50,
     SizeY = 35,
     SizeZ = 50,

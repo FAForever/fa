@@ -19,6 +19,8 @@ PropBlueprint{
     },
     Interface = { HelpText = "hydrocarbonDeposit" },
     Physics = { BlockPath = false },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     CollisionOffsetX = 0,
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0,
