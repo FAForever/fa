@@ -1,12 +1,10 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'auto_cannon_trail_01',
-	Lifetime = -1.00,
-    TrailLength = 0.6,
-    Size = 0.025,
+return {
     BlendMode = 3,
-    TextureRepeatRate = 1,
     LODCutoff = 160,
-	RepeatTexture = '/textures/particles/trail_white_04.dds',
-	RampTexture = '/textures/particles/ramp_red_05.dds',
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_red_05.dds",
+    RepeatTexture = "/textures/particles/trail_white_04.dds",
+    Size = 0.025,
+    TextureRepeatRate = 1,
+    TrailLength = 0.6,
 }
-

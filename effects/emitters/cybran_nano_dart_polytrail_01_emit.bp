@@ -1,12 +1,11 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'cybran_nanite_dart_polytrail_01',
-	Lifetime = -1.00,
-    TrailLength = 4.0,
+return {
+    BlendMode = 3,
+    LODCutoff = 200,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_16.dds",
+    RepeatTexture = "/textures/particles/trail_white_03.dds",
     Size = 0.1,
     SortOrder = 0,
-    BlendMode = 3,
     TextureRepeatRate = 0.45,
-    LODCutoff = 200,
-	RepeatTexture = '/textures/particles/trail_white_03.dds',
-	RampTexture = '/textures/particles/ramp_trail_16.dds',
+    TrailLength = 4.0,
 }

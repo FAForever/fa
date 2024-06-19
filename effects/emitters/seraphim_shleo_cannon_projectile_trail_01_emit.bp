@@ -1,13 +1,11 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'seraphim_shleo_cannon_projectile_trail_01',
-	Lifetime = -1.00,
-    TrailLength = 1.2,
+return {
+    BlendMode = 3,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_green_03.dds",
+    RepeatTexture = "/textures/particles/trail_white_02.dds",
     Size = 0.035,
     SortOrder = 0,
-    BlendMode = 3,
     TextureRepeatRate = 1,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/trail_white_02.dds',
-	RampTexture = '/textures/particles/ramp_green_03.dds',
+    TrailLength = 1.2,
 }
-
