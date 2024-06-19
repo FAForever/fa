@@ -139,12 +139,12 @@ local function PostProcessUnit(unit)
     unit.CategoriesHash = {}
     if unit.Categories then
         unit.CategoriesCount = table.getn(unit.Categories)
-        for k, category in unit.Categories do
+        for k, category in pairs(unit.Categories) do
             unit.CategoriesHash[category] = true
         end
     end
 
-    unit.CategoriesHash[unit.BlueprintId] = true
+    unit.CategoriesHash[unit.BlueprintId or 'nope'] = true
 
     -- sanitize guard scan radius
 
@@ -308,7 +308,7 @@ local function PostProcessUnit(unit)
     if unitGeneral then
         local commandCaps = unitGeneral.CommandCaps
         if commandCaps then
-            unitGeneral.CommandCapsHash = table.deepcopy(commandCaps)
+            unitGeneral.CommandCapsHash = table.copy(commandCaps)
         else
             unitGeneral.CommandCapsHash = {}
         end
@@ -363,22 +363,25 @@ local function PostProcessUnit(unit)
         local activeIntel = intelBlueprint.ActiveIntel
         if activeIntel then
             status.AllIntelMaintenanceFree = {}
-            for intel, _ in activeIntel do
+            for intel, _ in pairs(activeIntel) do
                 status.AllIntelMaintenanceFree[intel] = true
             end
         end
 
         -- usual case: find all remaining intel
         status.AllIntel = {}
-        for name, value in intelBlueprint do
+        for name, value in pairs(intelBlueprint) do
 
-            if value == true or value > 0 then
-                local intel = BlueprintNameToIntel[name]
-                if intel and not activeIntel[intel] then
-                    if allIntelIsFree then
-                        status.AllIntelMaintenanceFree[intel] = true
-                    else
-                        status.AllIntel[intel] = true
+            -- may contain tables, such as `JamRadius`
+            if not type(value) == 'table' then
+                if value == true or value > 0 then
+                    local intel = BlueprintNameToIntel[name]
+                    if intel and not activeIntel[intel] then
+                        if allIntelIsFree then
+                            status.AllIntelMaintenanceFree[intel] = true
+                        else
+                            status.AllIntel[intel] = true
+                        end
                     end
                 end
             end
@@ -399,7 +402,7 @@ local function PostProcessUnit(unit)
     if (not unit.Weapon[1]) or unit.General.ExcludeFromVeterancy then
         unit.VetEnabled = false
     else
-        for index, wep in unit.Weapon do
+        for index, wep in pairs(unit.Weapon) do
             if not LabelToVeterancyUse[wep.Label] then
                 unit.VetEnabled = true
             end
@@ -439,7 +442,7 @@ local function PostProcessUnit(unit)
             COUNTERMEASURE = 0,
         }
 
-        for k, weapon in weapons do
+        for k, weapon in pairs(weapons) do
             local dps = DetermineWeaponDPS(weapon)
             local category = DetermineWeaponCategory(weapon)
             if category then
@@ -477,7 +480,7 @@ local function PostProcessUnit(unit)
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
         local factor = array[1].Damage
 
-        for category, damage in damagePerRangeCategory do
+        for category, damage in pairs(damagePerRangeCategory) do
             if damage > 0 then
                 local cat = "OVERLAY" .. category
                 if not unit.CategoriesHash[cat] then
@@ -541,6 +544,34 @@ local function PostProcessUnit(unit)
     -- so that rollover unit view can work with Mantis.
     if unit.Economy and not unit.Economy.BuildRate then
         unit.Economy.BuildRate = 0
+    end
+end
+
+--- Feature: re-apply the ability to land on water
+---
+--- There was a bug with Rover drones (from the kennel) when they interact
+--- with naval factories. They would first move towards a 'free build
+--- location' when assisting a naval factory. As they can't land on water,
+--- that build location could be far away at the shore.
+---
+--- This doesn't fix the problem itself, but it does alleviate it. At least
+--- the drones do not need to go to the shore anymore, they now look for
+--- a 'free build location' near the naval factory on water
+--- See also:
+--- 
+--- - https://github.com/FAForever/fa/pull/5372
+--- - https://github.com/FAForever/FA-Binary-Patches/pull/20
+---@param unit UnitBlueprint
+local function ProcessCanLandOnWater(unit)
+    local isAir = table.find(unit.Categories, "AIR")
+    local isTransport = table.find(unit.Categories, "TRANSPORT")
+    local isGunship = table.find(unit.Categories, "GUNSHIP")
+    local isPod = table.find(unit.Categories, "POD")
+    local isExperimental = table.find(unit.Categories, "EXPERIMENTAL")
+    local hasCanLandOnWater = table.find(unit.Categories, "CANLANDONWATER")
+
+    if (isAir and (isTransport or isGunship or isPod) and (not isExperimental)) and not hasCanLandOnWater then
+        table.insert(unit.Categories, "CANLANDONWATER")
     end
 end
 
@@ -634,7 +665,7 @@ function VerifyIntelValues(unit)
     -- that are not accurate.
 
     if unit.Intel then
-        for nameIntel, radius in unit.Intel do
+        for nameIntel, radius in pairs(unit.Intel) do
             local ogrids = BlueprintIntelNameToOgrids[nameIntel]
             if ogrids then
                 local radiusOnGrid = math.floor(radius / ogrids) * ogrids
@@ -710,16 +741,17 @@ end
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
-    for _, unit in units do
+    for _, unit in pairs(units) do
         PostProcessUnit(unit)
     end
 
-    for _, unit in units do
+    for _, unit in pairs(units) do
+        ProcessCanLandOnWater(unit)
         VerifyIntelValues(unit)
         VerifyBlinkingLights(unit)
     end
 
-    for _, unit in units do
+    for _, unit in pairs(units) do
         if unit.CategoriesHash['EXTERNALFACTORY'] then
             PostProcessUnitWithExternalFactory(allBlueprints, unit)
         end
