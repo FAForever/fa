@@ -33,6 +33,10 @@ function SetLayout()
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
 
+    LayoutHelpers.Above(controls.queue, controls.bg, 10)
+    LayoutHelpers.AtLeftIn(controls.queue, controls.bg, 3)
+    controls.queue:SetThemeTextures()
+    
     controls.bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
     LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -19, -2)
 

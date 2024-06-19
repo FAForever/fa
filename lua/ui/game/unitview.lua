@@ -273,6 +273,68 @@ function CreateQueueGrid(parent)
         controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
     end
 
+    LayoutHelpers.SetDimensions(controls.queue, 316, 48)
+    LayoutHelpers.FillParent(controls.queue.bg, controls.queue)
+    LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
+
+    controls.queue:DisableHitTest()
+    controls.queue.grid:DisableHitTest()
+    controls.queue.bg:DisableHitTest()
+    
+    for id, item in controls.queue.grid.items do
+        if id > 1 then
+           local before = controls.queue.grid.items[id-1]
+           LayoutHelpers.RightOf(item, before, -6) 
+        else
+           LayoutHelpers.AtLeftTopIn(item, controls.queue.grid, 2)
+        end
+        item:DisableHitTest()
+        LayoutHelpers.DepthOverParent(item.icon, item)
+        LayoutHelpers.FillParentFixedBorder(item.icon, item, 8)
+        LayoutHelpers.DepthOverParent(item.text, item.icon)
+        LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
+    end
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.leftBracket, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToLeft(controls.queue.bg.leftBracket, controls.queue.bg, -6)
+    LayoutHelpers.SetHeight(controls.queue.bg.leftBracket, 54)
+    controls.queue.bg.leftBracket.Depth:Set(function() return controls.queue.bg.Depth() + 10 end)
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.leftGlowTop, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToLeft(controls.queue.bg.leftGlowTop, controls.queue.bg, -10)
+    LayoutHelpers.AtBottomIn(controls.queue.bg.leftGlowBottom, controls.queue.bg, -4)
+    controls.queue.bg.leftGlowBottom.Left:Set(controls.queue.bg.leftGlowTop.Left)
+    controls.queue.bg.leftGlowMiddle.Top:Set(controls.queue.bg.leftGlowTop.Bottom)
+    controls.queue.bg.leftGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.leftGlowTop.Bottom(), controls.queue.bg.leftGlowBottom.Top()) end)
+    controls.queue.bg.leftGlowMiddle.Left:Set(function() return controls.queue.bg.leftGlowTop.Left() end)
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.rightGlowTop, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToRight(controls.queue.bg.rightGlowTop, controls.queue.bg, -8)
+    LayoutHelpers.AtBottomIn(controls.queue.bg.rightGlowBottom, controls.queue.bg, -4)
+    controls.queue.bg.rightGlowBottom.Left:Set(controls.queue.bg.rightGlowTop.Left)
+    controls.queue.bg.rightGlowMiddle.Top:Set(controls.queue.bg.rightGlowTop.Bottom)
+    controls.queue.bg.rightGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.rightGlowTop.Bottom(), controls.queue.bg.rightGlowBottom.Top()) end)
+    controls.queue.bg.rightGlowMiddle.Right:Set(function() return controls.queue.bg.rightGlowTop.Right() end)
+
+    --- Set textures according to the current theme
+    --- @param - self queue control
+    controls.queue.SetThemeTextures = function(self)
+        self.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
+        self.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
+
+        for id, item in self.grid.items do
+            item:SetTexture(UIUtil.UIFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
+        end
+    
+        self.bg.leftGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
+        self.bg.leftGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
+        self.bg.leftGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
+        
+        self.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
+        self.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
+        self.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
+    end
+
     controls.queue.grid.UpdateQueue = function(self, queue)
         if not queue then
             controls.queue:Hide()
