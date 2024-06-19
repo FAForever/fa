@@ -24,8 +24,10 @@
 ---
 ---@param prop PropBlueprint
 local function ProcessCategories(prop)
+    prop.Categories = prop.Categories or { }
+
     prop.CategoriesHash = {}
-    for k, category in prop.Categories do
+    for k, category in pairs(prop.Categories) do
         prop.CategoriesHash[category] = true
     end
 end
@@ -78,7 +80,7 @@ end
 --- Feature: health value based on mass value
 ---
 ---@param prop PropBlueprint
-local function ProcessInvulnerability(prop)
+local function ProcessHealth(prop)
     local massValue = prop.Economy.ReclaimMassMax or 0
     local healthValue = math.max(50, 2 * massValue)
 
@@ -91,7 +93,7 @@ end
 --- Post-processes all props
 ---@param props PropBlueprint[]
 function PostProcessProps(props)
-    for _, prop in props do
+    for _, prop in pairs(props) do
         ProcessInvulnerability(prop)
         ProcessObstructions(prop)
         ProcessCategories(prop)
@@ -102,7 +104,7 @@ end
 ---@param blueprints BlueprintsTable
 function BatchProcessProps(blueprints)
     if blueprints.Prop then
-        for _, prop in blueprints.Prop do
+        for _, prop in pairs(blueprints.Prop) do
             ProcessInvulnerability(prop)
             ProcessObstructions(prop)
         end
