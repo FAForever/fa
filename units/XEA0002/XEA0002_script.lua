@@ -12,22 +12,19 @@ local TOrbitalDeathLaserBeamWeapon = import("/lua/terranweapons.lua").TOrbitalDe
 XEA0002 = ClassUnit(TAirUnit) {
     DestroyNoFallRandomChance = 1.1,
 
-    HideBones = {'Shell01', 'Shell02', 'Shell03', 'Shell04',},
+    HideBones = { 'Shell01', 'Shell02', 'Shell03', 'Shell04', },
 
     Weapons = {
-        OrbitalDeathLaserWeapon = ClassWeapon(TOrbitalDeathLaserBeamWeapon){},
+        OrbitalDeathLaserWeapon = ClassWeapon(TOrbitalDeathLaserBeamWeapon) {},
     },
-    
+
     OnDestroy = function(self)
-        -- If we were destroyed without triggering OnKilled and our parent exists, notify that we just died
         if not self.IsDying and self.Parent then
             self.Parent.Satellite = nil
-            -- Rebuild a new satellite for the AI
             if self:GetAIBrain().BrainType ~= 'Human' then
-                IssueBuildFactory({self.Parent}, 'XEA0002', 1)
+                IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
             end
         end
-
         TAirUnit.OnDestroy(self)
     end,
 
@@ -43,19 +40,17 @@ XEA0002 = ClassUnit(TAirUnit) {
 
         self.IsDying = true
 
-        -- If our parent exists, notify that we just died
         if self.Parent then
             self.Parent.Satellite = nil
-            -- Rebuild a new satellite for the AI
             if self:GetAIBrain().BrainType ~= 'Human' then
-                IssueBuildFactory({self.Parent}, 'XEA0002', 1)
+                IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
             end
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
-        
+
         local vx, vy, vz = self:GetVelocity()
-        
+
         -- randomize falling animation to prevent cntrl-k on nuke abuse
         -- use default animation if x or z speed > 0.1
         if math.abs(vx) < 0.1 and math.abs(vz) < 0.1 then
@@ -63,41 +58,41 @@ XEA0002 = ClassUnit(TAirUnit) {
             self.colliderProj:SetLocalAngularVelocity(0.5, 0.5, 0.5)
             local rng = Random(1, 8)
             local randomSetups = {
-                {x = 1, z = 1},
-                {x = 1, z = 0},
-                {x = 1, z = -1},
-                {x = 0, z = 1},
-                {x = -1, z = -1},
-                {x = -1, z = 0},
-                {x = -1, z = 1},
-                {x = 0, z = -1},    
+                { x = 1, z = 1 },
+                { x = 1, z = 0 },
+                { x = 1, z = -1 },
+                { x = 0, z = 1 },
+                { x = -1, z = -1 },
+                { x = -1, z = 0 },
+                { x = -1, z = 1 },
+                { x = 0, z = -1 },
             }
             local x = randomSetups[rng].x
             local z = randomSetups[rng].z
-            
+
             if x > 0 then
-                x = x + Random(0, 8)/10
+                x = x + Random(0, 8) / 10
             elseif x < 0 then
-                x = x - Random(0, 8)/10
+                x = x - Random(0, 8) / 10
             else
-                if Random(1,2) == 1 then
-                    x = x + Random(0, 8)/10 
+                if Random(1, 2) == 1 then
+                    x = x + Random(0, 8) / 10
                 else
-                    x = x - Random(0, 8)/10
-                end        
+                    x = x - Random(0, 8) / 10
+                end
             end
 
             if z > 0 then
-                z = z + Random(0, 8)/10
+                z = z + Random(0, 8) / 10
             elseif z < 0 then
-                z = z - Random(0, 8)/10
+                z = z - Random(0, 8) / 10
             else
-                if Random(1,2) == 1 then
-                    z = z + Random(0, 8)/10 
+                if Random(1, 2) == 1 then
+                    z = z + Random(0, 8) / 10
                 else
-                    z = z - Random(0, 8)/10
-                end 
-            end    
+                    z = z - Random(0, 8) / 10
+                end
+            end
 
             self.colliderProj:SetVelocity(x, 0, z)
         end

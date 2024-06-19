@@ -17,7 +17,6 @@ XRA0305 = ClassUnit(CAirUnit) {
     Weapons = {
         Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
         Disintegrator01 = ClassWeapon(CDFLaserDisintegratorWeapon) {},
-        Disintegrator02 = ClassWeapon(CDFLaserDisintegratorWeapon) {},
     },
     
     OnStopBeingBuilt = function(self,builder,layer)

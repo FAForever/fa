@@ -18,6 +18,4 @@ UAL0106 = ClassUnit(AWalkingLandUnit) {
     },
 
 }
-
-
 TypeClass = UAL0106

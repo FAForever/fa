@@ -36,6 +36,18 @@ local notifyOptions = LazyVar.Create()
 function InitMessages()
     local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile(NotifyMessages))
     if prefsMessages and not table.empty(prefsMessages) then
+        for catName, cat in defaultMessageTable do
+            if not prefsMessages[catName] then
+                prefsMessages[catName] = cat
+            else
+                local prefsCat = prefsMessages[catName]
+                for key, def in cat do
+                    if not prefsCat[key] then
+                        prefsCat[key] = def
+                    end
+                end
+            end
+        end
         notifyOptions:Set(prefsMessages)
     else
         notifyOptions:Set(defaultMessageTable)
@@ -815,6 +827,9 @@ function FormatData()
             LineGroups[category].collapsed = linesCollapsed
 
             for source, message in data do
+                -- Will break customiser if alias from `clarityTable` is nil
+                if not clarityTable[source] then continue end
+
                 local messageLine = {
                     source = source,
                     category = category,

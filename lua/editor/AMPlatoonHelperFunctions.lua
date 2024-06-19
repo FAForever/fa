@@ -6,9 +6,7 @@
 ----------------------------------------------------------------------
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 
--- === utility function === --
-
----@param time integer
+---@param time number
 ---@param name string
 function UnlockTimer(time, name)
     WaitSeconds( time )
@@ -16,7 +14,7 @@ function UnlockTimer(time, name)
 end
 
 ---@param pName string
----@param time integer
+---@param time number
 function PlatoonDeathUnlockThread( pName, time )
     if time > 0 then
         WaitSeconds(time)
@@ -68,7 +66,7 @@ end
 --- AMUnlockPlatoonTimer = BuildCallback
 ---@param brain AIBrain
 ---@param platoon Platoon
----@param duration integer
+---@param duration number
 function AMUnlockPlatoonTimer(brain, platoon, duration)
     local callback = function()
         if ScenarioInfo.AMLockTable and ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] then
@@ -95,18 +93,10 @@ end
 ---@return boolean
 function ChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
-    local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 1
-    local d2Num = ScenarioInfo.OSPlatoonCounter[master..'_D2'] or 2
-    local d3Num = ScenarioInfo.OSPlatoonCounter[master..'_D3'] or 2
-    if not ScenarioInfo.Options.Difficulty or ScenarioInfo.Options.Difficulty == 1 and counter < d1Num then
-        return true
-    elseif ScenarioInfo.Options.Difficulty == 2 and counter < d2Num then
-        return true
-    elseif ScenarioInfo.Options.Difficulty == 3 and counter < d3Num then
-        return true
-    else
-        return false
-    end
+	local difficulty = ScenarioInfo.Options.Difficulty or 3
+	local number = ScenarioInfo.OSPlatoonCounter[master..'_D'..difficulty] or difficulty
+	
+	return counter < number
 end
 
 --- MasterCountDifficulty = BuildCondition
@@ -115,18 +105,10 @@ end
 ---@return boolean
 function MasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
-    local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 1
-    local d2Num = ScenarioInfo.OSPlatoonCounter[master..'_D2'] or 2
-    local d3Num = ScenarioInfo.OSPlatoonCounter[master..'_D3'] or 2
-    if not ScenarioInfo.Options.Difficulty or ScenarioInfo.Options.Difficulty == 1 and counter >= d1Num then
-        return true
-    elseif ScenarioInfo.Options.Difficulty == 2 and counter >= d2Num then
-        return true
-    elseif ScenarioInfo.Options.Difficulty == 3 and counter >= d3Num then
-        return true
-    else
-        return false
-    end
+	local difficulty = ScenarioInfo.Options.Difficulty or 3
+	local number = ScenarioInfo.OSPlatoonCounter[master..'_D'..difficulty] or difficulty
+	
+	return counter >= number
 end
 
 -- Unused Files but moved for Mod Support

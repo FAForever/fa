@@ -498,7 +498,7 @@ function SelectOperation(opData)
         GUI.selectBtn.label:SetText(LOC("<LOC sel_campaign_0015>Select"))
         GUI.selectBtn.OnClick = function(self)
             GUI.parent:Destroy()
-            import("/lua/ui/campaign/operationbriefing.lua").CreateUI(opData.id, opData.briefingData)
+            import("/lua/ui/campaign/operationbriefing.lua").CreateUI(nil, opData.briefingData.opMap)
         end
         Tooltip.AddButtonTooltip(GUI.selectBtn, 'campaignselect_select')
     elseif opData.launchType == 'movie' then

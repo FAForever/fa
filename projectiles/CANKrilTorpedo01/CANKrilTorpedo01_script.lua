@@ -6,22 +6,17 @@
 ---------------------------------------------------------------------------------
 local CKrilTorpedo = import("/lua/cybranprojectiles.lua").CKrilTorpedo
 
+--- Kril Torpedo Projectile script, XRB2308
+---@class CANKrilTorpedo01 : CKrilTorpedo
 CANKrilTorpedo01 = ClassProjectile(CKrilTorpedo) {
     FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
                     '/effects/emitters/water_splash_plume_01_emit.bp',},
 	TrailDelay = 2,
 
+    ---@param self CANKrilTorpedo01
     OnCreate = function(self)
         CKrilTorpedo.OnCreate(self, true)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-    end,
-
-    OnEnterWater = function(self)
-        CKrilTorpedo.OnEnterWater(self)
-        local army = self.Army
-        for i in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
-        end
     end,
 }
 TypeClass = CANKrilTorpedo01

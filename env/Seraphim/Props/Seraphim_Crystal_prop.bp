@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,10 +12,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'seraphim_crystal_Albedo.dds',
-                    SpecName = 'seraphim_crystal_SpecTeam.dds',
                     LODCutoff = 750,
-                    ShaderName = 'Unit',
+                    ShaderName = "Unit",
+                    SpecName = "seraphim_crystal_SpecTeam.dds",
+                    AlbedoName = "seraphim_crystal_Albedo.dds",
                 },
             },
         },
@@ -25,15 +26,9 @@ PropBlueprint {
         ReclaimMassMax = 40,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Huge Seraphim Crystal',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Huge Seraphim Crystal" },
+    Physics = { BlockPath = true },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

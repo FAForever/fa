@@ -186,14 +186,14 @@ local origBottom = false
 
 function Expand()
     if viewRight then
-        origRightLeft = viewRight.Left.compute
-        origRightRight = viewRight.Right.compute
-        origRightTop = viewRight.Top.compute
-        origRightBottom = viewRight.Bottom.compute
-        origLeft = viewLeft.Left.compute
-        origRight = viewLeft.Right.compute
-        origTop = viewLeft.Top.compute
-        origBottom = viewLeft.Bottom.compute
+        origRightLeft = viewRight.Left[4]
+        origRightRight = viewRight.Right[4]
+        origRightTop = viewRight.Top[4]
+        origRightBottom = viewRight.Bottom[4]
+        origLeft = viewLeft.Left[4]
+        origRight = viewLeft.Right[4]
+        origTop = viewLeft.Top[4]
+        origBottom = viewLeft.Bottom[4]
 
         local gameViewTemp = GetFrame(parentForFrame:GetRootFrame():GetTargetHead())
 
@@ -207,10 +207,10 @@ function Expand()
         viewRight.Right:Set(gameViewTemp.Right)
         viewRight.Bottom:Set(gameViewTemp.Bottom)
     else
-        origLeft = viewLeft.Left.compute
-        origRight = viewLeft.Right.compute
-        origTop = viewLeft.Top.compute
-        origBottom = viewLeft.Bottom.compute
+        origLeft = viewLeft.Left[4]
+        origRight = viewLeft.Right[4]
+        origTop = viewLeft.Top[4]
+        origBottom = viewLeft.Bottom[4]
         LayoutHelpers.FillParent(viewLeft, GetFrame(parentForFrame:GetRootFrame():GetTargetHead()))
     end
 end
@@ -306,6 +306,7 @@ function ToggleMainCartographicView()
     end
 end
 
+---@param view WorldView
 function RegisterWorldView(view)
     if not MapControls[view._cameraName] then MapControls[view._cameraName] = {} end
     MapControls[view._cameraName] = view
@@ -317,6 +318,7 @@ function RegisterWorldView(view)
     end
 end
 
+---@param view WorldView
 function UnregisterWorldView(view)
     if MapControls[view._cameraName] then
         MapControls[view._cameraName] = nil

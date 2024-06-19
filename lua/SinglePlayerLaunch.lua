@@ -199,8 +199,6 @@ function SetupBotSession(mapName)
         ai = aitypes[1].key
     end
 
-    LOG('ai=' .. repr(ai))
-
     for index, name in armies do
         sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
         sessionInfo.teamInfo[index].PlayerName = name

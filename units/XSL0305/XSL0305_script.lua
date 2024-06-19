@@ -1,91 +1,154 @@
---**************************************************************************
---
+--------------------------------------------------------------------------------
 --  File     :  /data/units/XSL0305/XSL0305_script.lua
 --
 --  Summary  :  Seraphim Sniper Bot Script
 --
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---**************************************************************************
-local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+--------------------------------------------------------------------------------
+
 local SeraphimWeapons = import("/lua/seraphimweapons.lua")
-local EffectUtil = import("/lua/effectutilities.lua")  --added for effects
+local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local SLandUnitOnCreate = SLandUnit.OnCreate
+local SLandUnitOnScriptBitSet = SLandUnit.OnScriptBitSet
+local SLandUnitOnScriptBitClear = SLandUnit.OnScriptBitClear
 
 local SDFSihEnergyRifleNormalMode = SeraphimWeapons.SDFSniperShotNormalMode
 local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class XSL0305 : SLandUnit
+---@field TrashSniperFx TrashBag
+---@field IsChangingMoveMode boolean
+---@field IsSniperFiringMode boolean # Whether the sniper mode is active for next shot
 XSL0305 = ClassUnit(SLandUnit) {
-
     Weapons = {
-        MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {},
-        SniperGun = ClassWeapon(SDFSihEnergyRifleSniperMode) {
-            SetOnTransport = function(self, transportstate)
-                SDFSihEnergyRifleSniperMode.SetOnTransport(self, transportstate)
-                self.unit:SetScriptBit('RULEUTC_WeaponToggle', false)
-            end,
+        -- used for both modes of operation
+        MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {
+            RackSalvoFiringState = State(SDFSihEnergyRifleNormalMode.RackSalvoFiringState) {
+                Main = function(self)
+                    local unit = self.unit
+                    if unit.IsSniperFiringMode ~= nil then
+                        unit:ScheduleMovementChange(0, true)
+                        unit:ScheduleMovementChange(1 / self:GetWeaponRoF(), false)
+                    end
+                    SDFSihEnergyRifleNormalMode.RackSalvoFiringState.Main(self)
+                end,
+            }
         },
+
+        -- kind of a dummy weapon that carries the data of the sniper mode for the main gun
+        SniperGun = ClassWeapon(SDFSihEnergyRifleSniperMode) {},
     },
 
+    ---@param self XSL0305
     OnCreate = function(self)
-        SLandUnit.OnCreate(self)
-        self:SetWeaponEnabledByLabel('SniperGun', false)
-        
-        local wepBp = self:GetBlueprint().Weapon
-        self.sniperRange = 75
-        self.normalRange = 65
-        for k, v in wepBp do
-            if v.Label == 'SniperGun' then
-                self.sniperRange = v.MaxRadius
-            elseif v.Label == 'MainGun' then
-                self.normalRange = v.MaxRadius
-            end
-        end
+        SLandUnitOnCreate(self)
+
+        self:SetWeaponEnabledByLabel("SniperGun", false)
+        self.TrashSniperFx = TrashBag()
     end,
 
+    ---@param self XSL0305
+    ---@param bit integer
     OnScriptBitSet = function(self, bit)
-        SLandUnit.OnScriptBitSet(self, bit)
+        SLandUnitOnScriptBitSet(self, bit)
+
         if bit == 1 then
-            local bp = self:GetBlueprint()
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier * 0.75)
-
-            self:SetWeaponEnabledByLabel('SniperGun', true)
-            self:SetWeaponEnabledByLabel('MainGun', false)
-            self:GetWeaponManipulatorByLabel('SniperGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('MainGun'):GetHeadingPitch())
-            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.sniperRange)
+            self:SetSniperMode(true)
         end
-
-
-        --This is to add a visual que that the sniper is in sniper mode
-        if not self.ShieldEffectsBag then
-            self.ShieldEffectsBag = {}
-        end
-        self.ShieldEffectsBag = {}
-
-        table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0305', self.Army, '/effects/emitters/seraphim_being_built_ambient_01_emit.bp'))
     end,
 
+    ---@param self XSL0305
+    ---@param bit integer
     OnScriptBitClear = function(self, bit)
-        SLandUnit.OnScriptBitClear(self, bit)
-        if bit == 1 then
-            -- Reset movement speed
-            local bp = self:GetBlueprint()
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+        SLandUnitOnScriptBitClear(self, bit)
 
-            self:SetWeaponEnabledByLabel('SniperGun', false)
-            self:SetWeaponEnabledByLabel('MainGun', true)
-            self:GetWeaponManipulatorByLabel('MainGun'):SetHeadingPitch(self:GetWeaponManipulatorByLabel('SniperGun'):GetHeadingPitch())
-            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
-            
-            if self.ShieldEffectsBag then
-                for k, v in self.ShieldEffectsBag do
-                    v:Destroy()
-                end
-                self.ShieldEffectsBag = {}
-            end
-            self.ShieldEffectsBag = nil
+        if bit == 1 then
+            self:SetSniperMode(false)
         end
+    end,
+
+    ---@param self XSL0305
+    ---@param delaySeconds number
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    ScheduleMovementChange = function(self, delaySeconds, mode)
+        if delaySeconds == 0 then
+            self:SwitchMoveMode(mode)
+        elseif self.IsChangingMoveMode == nil then
+            self.Trash:Add(ForkThread(self.ChangeMoveModeThread, self, delaySeconds, mode))
+        end
+    end,
+
+    ---@param self XSL0305
+    ---@param delaySeconds number
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    ChangeMoveModeThread = function(self, delaySeconds, mode)
+        self.IsChangingMoveMode = true
+        WaitTicks(10 * delaySeconds + 1)
+        self:SwitchMoveMode(mode)
+        self.IsChangingMoveMode = nil
+    end,
+
+    ---@param self XSL0305
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    SwitchMoveMode = function(self, mode)
+        local blueprintPhysics = self.Blueprint.Physics
+
+        local speedMult = blueprintPhysics.LandSpeedMultiplier or 1 -- left for compatability
+        self.TrashSniperFx:Destroy()
+
+        if mode then
+            speedMult = speedMult * (blueprintPhysics.SniperModeSpeedMultiplier or 0.75)
+            self:SetSpeedMult(speedMult)
+            self.TrashSniperFx:Add(
+                CreateAttachedEmitter(
+                    self, "XSL0305", self.Army,
+                    "/effects/emitters/seraphim_being_built_ambient_01_emit.bp"
+                )
+            )
+        else
+            self:SetSpeedMult(speedMult)
+        end
+    end,
+
+    ---@param self XSL0305
+    ---@param mode boolean
+    SetSniperMode = function(self, mode)
+        local label
+        if mode then
+            label = "SniperGun"
+            self.IsSniperFiringMode = true
+        else
+            label = "MainGun"
+            self.IsSniperFiringMode = nil
+        end
+
+        local weapon = self:GetWeaponByLabel("MainGun")
+        local bp = self:GetWeaponByLabel(label):GetBlueprint()
+
+        -- a lot of the firing sequence relies on the stored blueprint - we'll store the current
+        -- weapon blueprint so that it works
+        weapon.Blueprint = bp
+        weapon.FxMuzzleFlash = self.Weapons[label].FxMuzzleFlash
+        weapon.damageTableCache = false
+        weapon:ChangeProjectileBlueprint(bp.ProjectileId)
+        weapon:ChangeFiringTolerance(bp.FiringTolerance)
+        weapon:ChangeMaxRadius(bp.MaxRadius)
+        weapon:ChangeRateOfFire(bp.RateOfFire)
+        weapon:SetTurretYawSpeed(bp.TurretYawSpeed)
+
+        -- old dummy weapon introduced to make the sniper bot go to the correct attack distance
+        -- (orders use the max range of the first weapon in the blueprint) back when both weapons
+        -- were used - since we change the range of the main gun now, we could use that instead,
+        -- but we don't for compatability
+        self:GetWeaponByLabel("DummyWeapon"):ChangeMaxRadius(bp.MaxRadius)
     end,
 }
-
 TypeClass = XSL0305
+
+--- backwards compatibility with mods
+local EffectUtil = import("/lua/effectutilities.lua")

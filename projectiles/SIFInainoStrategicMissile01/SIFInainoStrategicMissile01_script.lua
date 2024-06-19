@@ -6,9 +6,11 @@
 ---------------------------------------------------------------------------------------------------
 local SIFInainoStrategicMissile = import("/lua/seraphimprojectiles.lua").SIFInainoStrategicMissile
 
+--- Inaino Strategic Missile Projectile script, XSB2305
+---@class SIFInainoStrategicMissile01 : SIFInainoStrategicMissile
 SIFInainoStrategicMissile01 = ClassProjectile(SIFInainoStrategicMissile) {
     FxSplashScale = 0.5,
-    FxTrails = {},
+    FxTrails = { },
 
     LaunchSound = 'Nuke_Launch',
     ExplodeSound = 'Nuke_Impact',
@@ -27,11 +29,11 @@ SIFInainoStrategicMissile01 = ClassProjectile(SIFInainoStrategicMissile) {
         '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
     },
 
+    ---@param self SIFInainoStrategicMissile01
     OnCreate = function(self)
         SIFInainoStrategicMissile.OnCreate(self)
         self.effectEntityPath = '/effects/entities/InainoEffectController01/InainoEffectController01_proj.bp'
         self:LauncherCallbacks()
     end,
 }
-
 TypeClass = SIFInainoStrategicMissile01

@@ -15,13 +15,20 @@ local CzarShield = import("/lua/shield.lua").CzarShield
 
 local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
 
----@class UAA0310 : AirTransport
-UAA0310 = ClassUnit(AirTransport) {
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+
+-- upvalue for perfomance
+local ClassWeapon = ClassWeapon
+local TrashBagAdd = TrashBag.Add
+
+---@class UAA0310 : AirTransport, ExternalFactoryComponent
+UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     DestroyNoFallRandomChance = 1.1,
-    BuildAttachBone = 'UAA0310',
+    BuildAttachBone = 'Attachpoint01',
+    FactoryAttachBone = 'Attachpoint02',
 
     Weapons = {
-        QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator){},
+        QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator) {},
         SonicPulseBattery1 = ClassWeapon(AAAZealotMissileWeapon) {},
         SonicPulseBattery2 = ClassWeapon(AAAZealotMissileWeapon) {},
         SonicPulseBattery3 = ClassWeapon(AAAZealotMissileWeapon) {},
@@ -32,12 +39,21 @@ UAA0310 = ClassUnit(AirTransport) {
         AAFizz02 = ClassWeapon(AAATemporalFizzWeapon) {},
     },
 
+    ---@param self UAA0310
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         AirTransport.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonCZARBuildingEffects(self)
     end,
 
+    ---@param self UAA0310
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
+        ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
+
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
         for _, v in wep.Beams do
             v.Beam:Disable()
@@ -47,54 +63,83 @@ UAA0310 = ClassUnit(AirTransport) {
             v.Beam:Destroy()
         end
 
-        self.detector = CreateCollisionDetector(self)
-        self.Trash:Add(self.detector)
-        self.detector:WatchBone('Left_Turret01_Muzzle')
-        self.detector:WatchBone('Right_Turret01_Muzzle')
-        self.detector:WatchBone('Left_Turret02_WepFocus')
-        self.detector:WatchBone('Right_Turret02_WepFocus')
-        self.detector:WatchBone('Left_Turret03_Muzzle')
-        self.detector:WatchBone('Right_Turret03_Muzzle')
-        self.detector:WatchBone('Attachpoint01')
-        self.detector:WatchBone('Attachpoint02')
-        self.detector:EnableTerrainCheck(true)
-        self.detector:Enable()
+        local trash = self.Trash
+        local detector = self.detector
+        if not detector then
+            detector = CreateCollisionDetector(self)
+            TrashBagAdd(trash, detector)
+            self.detector = detector
+        end
+        detector:WatchBone('Left_Turret01_Muzzle')
+        detector:WatchBone('Right_Turret01_Muzzle')
+        detector:WatchBone('Left_Turret02_WepFocus')
+        detector:WatchBone('Right_Turret02_WepFocus')
+        detector:WatchBone('Left_Turret03_Muzzle')
+        detector:WatchBone('Right_Turret03_Muzzle')
+        detector:WatchBone('Attachpoint01')
+        detector:WatchBone('Attachpoint02')
+        detector:EnableTerrainCheck(true)
+        detector:Enable()
 
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    OnAnimTerrainCollision = function(self, bone,x,y,z)
-        local blueprint = self.Blueprint
-        DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
-        explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
+    ---@param self UAS0401
+    ---@param new Layer
+    ---@param old Layer
+    OnLayerChange = function(self, new, old)
+        AirTransport.OnLayerChange(self, new, old)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AirTransport.OnStopBeingBuilt(self,builder,layer)
+    ---@param self UAA0310
+    ---@param bone string
+    ---@param x number
+    ---@param y number
+    ---@param z number
+    OnAnimTerrainCollision = function(self, bone, x, y, z)
+        local blueprint = self.Blueprint
+        local position = { x, y, z }
+        DamageArea(self, position, 5, 1000, 'Default', true, false)
+        DamageArea(self, position, 5, 1, 'TreeForce', false)
+        explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
+            { blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ })
+    end,
+
+    ---@param self UAA0310
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UAA0310
     OnFailedToBuild = function(self)
         AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
-	
+
+    ---@param self UAA0310
+    ---@param bpShield table
     CreateShield = function(self, bpShield)
         local bpShield = table.deepcopy(bpShield)
+        local trash = self.Trash
         self:DestroyShield()
 
         self.MyShield = CzarShield(bpShield, self)
 
         self:SetFocusEntity(self.MyShield)
         self:EnableShield()
-        self.Trash:Add(self.MyShield)
+        TrashBagAdd(trash,self.MyShield)
     end,
 
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
+            self:OnIdle()
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -108,33 +153,16 @@ UAA0310 = ClassUnit(AirTransport) {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
+            unitBuilding:AttachBoneTo(-2, self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
             AirTransport.OnStopBuild(self, unitBeingBuilt)
-            ChangeState(self, self.FinishedBuildingState)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
-
-    FinishedBuildingState = State {
-        Main = function(self)
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
-            end
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
-        end,
-    }
 }
 
 TypeClass = UAA0310

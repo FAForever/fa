@@ -1,7 +1,3 @@
---
--- script for projectile BoneAttached
---
-
-local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
-DebrisMisc04 = Class(GenericDebris) { }
-TypeClass = DebrisMisc04
+---@class DebrisMisc010 : GenericDebris
+DebrisMisc010 = ClassDummyProjectile(import("/lua/genericdebris.lua").GenericDebris) { }
+TypeClass = DebrisMisc010

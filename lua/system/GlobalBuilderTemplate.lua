@@ -21,13 +21,15 @@
 ---@field [2] FunctionReference
 ---@field [3] FunctionParameters
 
----@alias BuilderType 'Air' | 'Land' | 'Sea' | 'Any'
+---@alias BuilderType 'Any' | 'Land' | 'Air' | 'Sea' | 'Gate' 
 
 ---@class BuilderSpec
 ---@field BuilderName BuilderNames
 ---@field BuilderType BuilderType
+---@field BuilderData table
 ---@field PlatoonTemplate string
 ---@field Priority number
+---@field InstanceCount number
 ---@field BuilderConditions BuilderCondition[]
 
 -- Global list of all builders found in the game

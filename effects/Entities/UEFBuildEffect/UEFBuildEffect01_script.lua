@@ -1,4 +1,5 @@
-
--- unused
-UEFBuildEffect01 = Class(import("/lua/sim/projectile.lua").DummyProjectile) { }
+--- Unused
+--- UEFBuildEffect01
+---@class UEFBuildEffect01 : DummyProjectile
+UEFBuildEffect01 = ClassDummyProjectile(import("/lua/sim/projectile.lua").DummyProjectile) { }
 TypeClass = UEFBuildEffect01

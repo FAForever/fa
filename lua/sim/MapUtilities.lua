@@ -1,29 +1,13 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local MapResourceCheckApplied = false
 
 --- Attempts to spawn in extractors and hydrocarbons on each marker that is enabled in the game. Attempts 
 --- to ring each extractor with storages and fabricators, similar to how the ringing feature works.
 function MapResourceCheck()
-
-    -- perform UI checks on sim to prevent cheating
-    local count = 0
-    local playerIndex = 1
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-            playerIndex = k
-        end
-    end
-
-    local onePlayer = count == 1
-    local cheatsEnabled = CheatsEnabled()
-
-    -- prevent it from working
-    if not (cheatsEnabled or onePlayer) then
-        WARN("Unable to run map resource check: cheats are disabled or there is more than one player")
-        return
-    end
-
     if MapResourceCheckApplied then
         WARN("Restart the session before running the resource check again.")
         return
@@ -31,17 +15,8 @@ function MapResourceCheck()
 
     MapResourceCheckApplied = true
 
-    -- inform us why it worked
-    if onePlayer then
-        SPEW("Map resource check can be toggled: there is only one player")
-    end
-
-    if cheatsEnabled then
-        SPEW("Map resource check can be toggled: cheats are enabled")
-    end
-
     -- get an arbitrary brain
-    local brain = ArmyBrains[playerIndex]
+    local brain = ArmyBrains[GetCurrentCommandSource()]
     local army = brain:GetArmyIndex()
     SetIgnoreArmyUnitCap(army, true)
 
@@ -49,7 +24,7 @@ function MapResourceCheck()
     local mass = MarkerUtilities.GetMarkersByType("Mass")
     local hydro = MarkerUtilities.GetMarkersByType("Hydrocarbon")
 
-    ---Helper function that attempts to build a unit there
+    --- Helper function that attempts to build a unit there
     ---@param x number
     ---@param y number
     ---@param z number
@@ -72,7 +47,7 @@ function MapResourceCheck()
 
             yield(2)
 
-            for k, marker in hydro do 
+            for k, marker in hydro do
                 local x, y, z = marker.position[1], marker.position[2], marker.position[3]
                 TryUnit(x, y, z, "uab1102")
             end
@@ -133,24 +108,6 @@ end
 
 --- Toggles the visualisation of the iMAP grid that is used by the AI. The grid can be tweaked using 'iMapSwitchPerspective' and 'iMapToggleThreat'
 function iMapToggleRendering()
-
-    -- perform UI checks on sim to prevent cheating
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    local onePlayer = count <= 1
-    local cheatsEnabled = CheatsEnabled()
-
-    -- prevent it from working
-    if not (cheatsEnabled or onePlayer) then
-        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
-        return
-    end
-
     -- allows us to keep track of the thread
     local type = "iMAPThread"
 

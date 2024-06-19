@@ -5,6 +5,7 @@
 Sync = { }
 
 local SyncDefaults = {
+    AIBrainData = true,
     UnitData = true,
     ReleaseIds = true,
     Reclaim = true,
@@ -121,7 +122,6 @@ function OnPostLoad()
 end
 
 function NoteFocusArmyChanged(new, old)
-    --LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
     import("/lua/simping.lua").OnArmyChange()
     import("/lua/sim/recall.lua").OnArmyChange()
     for entityID, data in UnitData do

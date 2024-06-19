@@ -4,5 +4,8 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 local CNeutronClusterBombProjectile = import("/lua/cybranprojectiles.lua").CNeutronClusterBombProjectile
+
+--- Cybran Neutron Cluster bomb
+---@class CIFNeutronClusterBomb01 : CNeutronClusterBombProjectile
 CIFNeutronClusterBomb01 = ClassProjectile(CNeutronClusterBombProjectile) { }
 TypeClass = CIFNeutronClusterBomb01

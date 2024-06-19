@@ -1,18 +1,22 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAA0104/UAA0104_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
---**
---**  Summary  :  Aeon T2 Transport Script
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAA0104/UAA0104_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+-- Summary  :  Aeon T2 Transport Script
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
+
+-- upvalue for perfomance
+local ClassWeapon = ClassWeapon
+local ForkThread = ForkThread
+local WaitSeconds = WaitSeconds
+local TrashBagAdd = TrashBag.Add
+local MathFloor = math.floor
+local GetRandomInt = util.GetRandomInt
+local GetRandomFloat = util.GetRandomFloat
 
 ---@class UAA0104 : AirTransport
 UAA0104 = ClassUnit(AirTransport) {
@@ -30,15 +34,19 @@ UAA0104 = ClassUnit(AirTransport) {
     },
 
     -- Override air destruction effects so we can do something custom here
+    ---@param self UAA0104
+    ---@param scale number unused
     CreateUnitAirDestructionEffects = function(self, scale)
-        self:ForkThread(self.AirDestructionEffectsThread, self)
+        local trash = self.Trash
+        TrashBagAdd(trash, ForkThread(self.AirDestructionEffectsThread, self))
     end,
 
     AirDestructionEffectsThread = function(self)
-        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
+        local airDestructionEffectBones = self.AirDestructionEffectBones
+        local numExplosions = MathFloor(table.getn(airDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
-            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
-            WaitSeconds(util.GetRandomFloat(0.2, 0.9))
+            explosion.CreateDefaultHitExplosionAtBone(self, airDestructionEffectBones[GetRandomInt(1, numExplosions)], 0.5)
+            WaitSeconds(GetRandomFloat(0.2, 0.9))
         end
     end,
 }

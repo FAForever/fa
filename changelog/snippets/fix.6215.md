@@ -1,0 +1,1 @@
+- (#6215) Fix an edge case where an engineer can assist an enemy construction task if they were given an order to build the same unit in the same location before the enemy task was started.

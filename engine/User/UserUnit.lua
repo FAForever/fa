@@ -1,7 +1,59 @@
 ---@meta
 
----@class UserUnit
+---@class UserUnit: InternalObject
+---@field ThreadUnpause? thread
+---@field ThreadUnpauseCandidates? table<EntityId, boolean>
 local UserUnit = {}
+
+---@alias UserUnitCommand 
+--- | 'UNITCOMMAND_BuildFactory' 
+--- | 'UNITCOMMAND_BuildSilo'
+--- | 'UNITCOMMAND_DestroySelf'
+--- | 'UNITCOMMAND_KillSelf'
+--- | 'UNITCOMMAND_AssistCommander'
+--- | 'UNITCOMMAND_Upgrade'
+--- | 'UNITCOMMAND_Land'
+--- | 'UNITCOMMAND_Stop'
+--- | 'UNITCOMMAND_Dive'
+--- | 'UNITCOMMAND_OverCharge'
+--- | 'UNITCOMMAND_Sacrifice'
+--- | 'UNITCOMMAND_Capture'
+--- | 'UNITCOMMAND_Dock'
+--- | 'UNITCOMMAND_Repair'
+--- | 'UNITCOMMAND_Reclaim'
+--- | 'UNITCOMMAND_Guard'
+--- | 'UNITCOMMAND_BuildMobile'
+--- | 'UNITCOMMAND_BuildAssist'
+--- | 'UNITCOMMAND_Teleport'
+--- | 'UNITCOMMAND_Ferry'
+--- | 'UNITCOMMAND_AssistMove'
+--- | 'UNITCOMMAND_DetachFromTransport'
+--- | 'UNITCOMMAND_TransportUnloadSpecificUnits'
+--- | 'UNITCOMMAND_TransportUnloadUnits'
+--- | 'UNITCOMMAND_TransportReverseLoadUnits'
+--- | 'UNITCOMMAND_TransportLoadUnits'
+--- | 'UNITCOMMAND_FormPatrol'
+--- | 'UNITCOMMAND_Patrol'
+--- | 'UNITCOMMAND_CoordinatedMove'
+--- | 'UNITCOMMAND_FormMove'
+--- | 'UNITCOMMAND_Move'
+--- | 'UNITCOMMAND_Nuke'
+--- | 'UNITCOMMAND_FormAggressiveMove'
+--- | 'UNITCOMMAND_AggressiveMove'
+--- | 'UNITCOMMAND_Script'
+--- | 'UNITCOMMAND_Tactical'
+--- | 'UNITCOMMAND_FormAttack'
+--- | 'UNITCOMMAND_Retaliate'
+--- | 'UNITCOMMAND_Attack'
+
+---@alias UserUnitBlueprintCommand
+--- | 'UNITCOMMAND_Upgrade'
+--- | 'UNITCOMMAND_BuildFactory'
+
+---@class UICommandInfo
+---@field type 'Teleport' | 'Move' | string
+---@field ID number
+---@field position Vector
 
 ---@class MissileInfo
 ---@field nukeSiloBuildCount number
@@ -30,6 +82,16 @@ end
 function UserUnit:GetArmy()
 end
 
+---Returns unit's position interpolated by current frame
+---@return Vector
+function UserUnit:GetInterpolatedPosition()
+end
+
+---Returns unit's fraction of being completed
+---@return number
+function UserUnit:GetFractionComplete()
+end
+
 ---
 ---@return UnitBlueprint
 function UserUnit:GetBlueprint()
@@ -41,7 +103,7 @@ function UserUnit:GetBuildRate()
 end
 
 --- Returns a table of commands
----@return OrderInfo[]
+---@return UICommandInfo[]
 function UserUnit:GetCommandQueue()
 end
 
@@ -61,7 +123,7 @@ function UserUnit:GetEconData()
 end
 
 ---
----@return string
+---@return EntityId
 function UserUnit:GetEntityId()
 end
 
@@ -115,13 +177,11 @@ end
 function UserUnit:GetShieldRatio()
 end
 
--- TODO was the UserUnit.GetStat method also binary patched?
-
----
----@generic T
+--- Retrieves a statistic that is assigned to a unit by the sim call `unit:UpdateStat`. Returns the default
+--- when the value does not exist
 ---@param name string
----@param defaultVal? T
----@return {Value: T}
+---@param defaultVal? number
+---@return {Value: number}
 function UserUnit:GetStat(name, defaultVal)
 end
 
@@ -187,9 +247,8 @@ end
 function UserUnit:IsStunned()
 end
 
----
----@param command string
----@param value string
+---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
+---@param value boolean | string
 function UserUnit:ProcessInfo(command, value)
 end
 

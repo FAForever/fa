@@ -12,7 +12,7 @@ EmitterBlueprint {
 	AlignToBone = false,
 	Flat = true,
 	LODCutoff = -1.00, -- nuke effect
-	EmitIfVisible = true,
+	EmitIfVisible = false,
 	CatchupEmit = true,
 	CreateIfVisible = false,
 	SnapToWaterline = true,

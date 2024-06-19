@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,23 +12,19 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    AlbedoName = 'rock05HD_albedo.dds',
                     LODCutoff = 150,
-                    ShaderName = 'VertexNormal',
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "rock05HD_albedo.dds",
                 },
             },
         },
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
         ReclaimMassMax = 5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Very Small Rock',
-    },
+    Interface = { HelpText = "Very Small Rock" },
     SizeX = 0.25,
     SizeY = 0.25,
     SizeZ = 0.25,

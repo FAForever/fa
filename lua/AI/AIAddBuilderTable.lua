@@ -14,7 +14,6 @@ function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
         error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
     end
 
-    --SPEW('*AI DEBUG: AddGlobalBaseTemplate(): Loading Base Template '..repr(baseBuilderName))
     for k,v in BaseBuilderTemplates[baseBuilderName].Builders do
         AddGlobalBuilderGroup(aiBrain, locationType, v)
     end
@@ -36,7 +35,7 @@ function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     if BuilderGroups[builderGroupName] then
         AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
     else
-        WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *AddGlobalBuilderGroup ERROR: BuilderGroup ' .. repr(builderGroupName) .. ' does not exist!' )
+        WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *AddGlobalBuilderGroup ERROR: BuilderGroup ' .. tostring(builderGroupName) .. ' does not exist!' )
     end
 end
 
@@ -63,7 +62,7 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     elseif builderTable.BuildersType == 'StrategyBuilder' and managers.StrategyManager then
         tableType = 'StrategyManager'
     else
-        WARN('*AI ERROR: Invalid BuildersType ('..repr(builderTable.BuildersType)..') for table of builder to add to brain')
+        WARN('*AI ERROR: Invalid BuildersType ('..tostring(builderTable.BuildersType)..') for table of builder to add to brain')
         return
     end
 

@@ -7,6 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Note some mods will replace this file, any new templates that need to be added should be added to LandPlatoonNewTemplates.lua
 -- ==== Global Form platoons ==== --
 PlatoonTemplate {
     Name = 'LandAttack',
@@ -83,7 +84,6 @@ PlatoonTemplate {
     GlobalSquads = {
         --DUNCAN - was 15 to 25
         { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 5, 25, 'Attack', 'none' },
-        { categories.ENGINEER - categories.COMMAND, 1, 1, 'Attack', 'none' },
     },
 }
 PlatoonTemplate {
@@ -172,7 +172,7 @@ PlatoonTemplate {
     Plan = 'None',
     GlobalSquads = {
         --DUNCAN - was 1 to 3
-        { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 3, 5, 'guard', 'None' }
+        { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 3, 'guard', 'None' }
     },
 }
 
@@ -184,7 +184,23 @@ PlatoonTemplate {
     },
 }
 
+PlatoonTemplate {
+    Name = 'StateMachinePlatoon',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 15, 'Attack', 'None' },
+        { categories.LAND * categories.MOBILE * categories.SCOUT, 1, 2, 'Scout', 'None' }
+    },
+}
 
+PlatoonTemplate {
+    Name = 'StateMachineSmallAttackPlatoon',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 5, 'Attack', 'None' },
+        { categories.LAND * categories.MOBILE * categories.SCOUT, 0, 2, 'Scout', 'None' }
+    },
+}
 -- ==== Factional Templates ==== --
 
 -- T1

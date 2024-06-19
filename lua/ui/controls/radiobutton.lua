@@ -29,6 +29,16 @@ RadioButton = ClassUI(Group) {
     --              Button-specific texture paths are relative to this path (and both are subject to
     --              the whims of the style engine.
     -- default: The index in the buttons array of the value to be selected by default.
+    ---@param self RadioButton
+    ---@param parent Control
+    ---@param texturePath FileName
+    ---@param buttons Button[]
+    ---@param default any
+    ---@param horizontal any
+    ---@param labelRight any
+    ---@param font string
+    ---@param fontSize number
+    ---@param fontColor Color
     __init = function(self, parent, texturePath, buttons, default, horizontal, labelRight, font, fontSize, fontColor)
         Group.__init(self, parent)
 
@@ -37,6 +47,15 @@ RadioButton = ClassUI(Group) {
         end
     end,
 
+    ---@param self RadioButton
+    ---@param buttons Button[]
+    ---@param texturePath FileName
+    ---@param default any
+    ---@param horizontal any
+    ---@param labelRight any
+    ---@param font string
+    ---@param fontSize number
+    ---@param fontColor Color
     SetOptions = function(self, buttons, texturePath, default, horizontal, labelRight, font, fontSize, fontColor)
         -- Destroy any existing contents.
         if self.mButtons then
@@ -126,22 +145,29 @@ RadioButton = ClassUI(Group) {
         end
     end,
 
+    ---@param self RadioButton
     Disable = function(self)
         for k, v in self.mButtons do
            v:Disable()
         end
     end,
 
+    ---@param self RadioButton
     Enable = function(self)
         for k, v in self.mButtons do
             v:Enable()
         end
     end,
 
+    ---@param self RadioButton
+    ---@param index number
     SetSelected = function(self, index)
         self.mButtons[index]:OnClick()
     end,
 
     -- Overload this method to get events when item is chosen.
+    ---@param self RadioButton
+    ---@param index number
+    ---@param key number
     OnChoose = function(self, index, key) end,
 }

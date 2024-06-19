@@ -7,7 +7,7 @@
 
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local StructureTemplates = lazyimport("/lua/buildingtemplates.lua")
+local StructureTemplates = import("/lua/buildingtemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 --- Retrieves all human brains that are hostile to the given army index
@@ -207,12 +207,21 @@ function TransportPool(platoon)
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
 
-    local tPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
-    if not tPool then
+    -- Default transport platoon to grab from
+	local poolName = 'TransportPool'
+	local BaseName = data.BaseName
+	
+	-- If base name is specified in platoon data, use that instead
+	if BaseName then 
+		poolName = BaseName .. '_TransportPool'
+	end
+	
+    local tPool = aiBrain:GetPlatoonUniquelyNamed(poolName)
+	if not tPool then
         tPool = aiBrain:MakePlatoon('', '')
-        tPool:UniquelyNamePlatoon('TransportPool')
+        tPool:UniquelyNamePlatoon(poolName)
     end
-
+    
     if data.TransportMoveLocation then
         if type(data.TransportMoveLocation) == 'string' then
             data.MoveRoute = {ScenarioUtils.MarkerToPosition(data.TransportMoveLocation)}
@@ -225,7 +234,7 @@ function TransportPool(platoon)
         MoveToThread(platoon)
     end
 
-    aiBrain:AssignUnitsToPlatoon('TransportPool', platoon:GetPlatoonUnits(), 'Scout', 'GrowthFormation')
+    aiBrain:AssignUnitsToPlatoon(tPool, platoon:GetPlatoonUnits(), 'Scout', 'GrowthFormation')
 end
 
 --- Grabs a specific number of transports from the transports pool and loads units into the transport. Once ready a scenario variable can be set. Can wait on another scenario variable. Attempts to land at the location with the least threat and uses the accompanying attack chain for the units that have landed.
@@ -615,7 +624,7 @@ function EngineersBuildPlatoon(platoon)
             for strName, tblData in unitGroup do
                 if eng and aiBrain:CanBuildStructureAt(tblData.type, tblData.Position) then
                     IssueStop({eng})
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     local result = aiBrain:BuildStructure(eng, tblData.type, {tblData.Position[1], tblData.Position[3], 0}, false)
                     unitBeingBuilt = false
 
@@ -992,12 +1001,27 @@ function ReturnTransportsToPool(platoon, data)
     local aiBrain = platoon:GetBrain()
     local transports = platoon:GetSquadUnits('Scout')
 
+    -- Default transport platoon to grab from
+    local poolName = 'TransportPool'
+    local BaseName = data.BaseName
+
+    -- If base name is specified in platoon data, use that instead
+    if BaseName then 
+        poolName = BaseName .. '_TransportPool'
+    end
+
+    local tPool = aiBrain:GetPlatoonUniquelyNamed(poolName)
+    if not tPool then
+        tPool = aiBrain:MakePlatoon('', '')
+        tPool:UniquelyNamePlatoon(poolName)
+    end
+    
     if table.empty(transports) then
         return
     end
 
     for _, unit in transports do
-        aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
+        aiBrain:AssignUnitsToPlatoon(tPool, {unit}, 'Scout', 'None')
     end
 
     -- If a route or chain was given, reverse it on return
@@ -1043,7 +1067,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
             if unit then
                 if aiBrain:CanBuildStructureAt(unit.type, unit.Position) then
                     IssueStop({eng})
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     local result = aiBrain:BuildStructure(eng, unit.type, {unit.Position[1], unit.Position[3], 0}, false)
                     if result then
                         unitBeingBuilt = eng.UnitBeingBuilt
@@ -1089,7 +1113,7 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
         for _, v in buildGroup do
             if aiBrain:CanBuildStructureAt(v.type, v.Position) then
                 IssueStop({eng})
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 local result = aiBrain:BuildStructure(eng, v.type, {v.Position[1], v.Position[3], 0}, false)
                 if result then
                     unitBeingBuilt = eng.UnitBeingBuilt
@@ -1356,7 +1380,7 @@ end
 --- Utility Function
 --- Has an engineer build a certain type of structure using a base template
 ---@param aiBrain AIBrain
----@param builder Builder
+---@param builder Unit
 ---@param building StructureUnit
 ---@param brainBaseTemplate any
 ---@param buildingTemplate any
@@ -1379,7 +1403,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
                     if m > 1 then
                         if aiBrain:CanBuildStructureAt(structureCategory, {location[1], 0, location[2]}) then
                             IssueStop({builder})
-                            IssueClearCommands({builder})
+                            IssueToUnitClearCommands(builder)
                             local result = aiBrain:BuildStructure(builder, structureCategory, location, false)
                             if result then
                                 return true
@@ -1392,7 +1416,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
     else
         if aiBrain:FindPlaceToBuild(building, structureCategory, brainBaseTemplate, false, nil) then
             IssueStop({builder})
-            IssueClearCommands({builder})
+            IssueToUnitClearCommands(builder)
             if AIBuildStructures.AIExecuteBuildStructure(aiBrain, builder, building, builder, false,
                                                          buildingTemplate, brainBaseTemplate) then
                 return true
@@ -1446,7 +1470,7 @@ function EngineersAssistFactories(platoon, locationType)
         end
     end
     if not location then
-        error('*SCENARIO PLATOON AI ERROR: No LocationType found for StartBaseEngineerThread, location named- '..repr(locationType), 2)
+        error('*SCENARIO PLATOON AI ERROR: No LocationType found for StartBaseEngineerThread, location named- '..tostring(locationType), 2)
     end
 
     -- Find engineers
@@ -1629,7 +1653,7 @@ function ReorganizeEngineers(platoon, engTable)
                                 brainFacData.NumEngs = brainFacData.NumEngs + 1
                             end
                         end
-                        IssueClearCommands({moveEng})
+                        IssueToUnitClearCommands(moveEng)
                         IssueGuard({moveEng}, facLowData.Factory)
                         break
                     end
@@ -1668,7 +1692,7 @@ function EngAssist(platoon, engTable)
                         break
                     end
                 end
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 IssueGuard({eng}, lowFac.Factory)
                 table.remove(engTable, engNum)
             else
@@ -1793,6 +1817,13 @@ function GetLoadTransports(platoon)
     for _, v in currLeftovers do table.insert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
+    -- Self-destruct any leftovers
+	for k, v in currLeftovers do
+		if not v.Dead then
+			v:Kill()
+		end
+	end
+    
     -- Old load transports
     local unitsToDrop = {}
     for num, data in transportTable do
@@ -1818,7 +1849,9 @@ function GetLoadTransports(platoon)
         end
     until attached
 
-    -- Any units that aren't transports and aren't attached send back to pool
+    -- We actually self-destruct any leftovers for now, usually only 1-2 units get left behind, not much of a point to create a platoon for that many.
+	-- I'm keeping the code around though, in case creating a copy of the original platoon from the leftovers is feasable
+		-- Any units that aren't transports and aren't attached send back to pool
     local pool
     if platoon.PlatoonData.BuilderName and platoon.PlatoonData.LocationType then
         pool = aiBrain:GetPlatoonUniquelyNamed(platoon.PlatoonData.LocationType..'_LeftoverUnits')
@@ -1834,9 +1867,11 @@ function GetLoadTransports(platoon)
         pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     end
 
+    -- For now we self-destruct any leftovers
     for _, unit in unitsToDrop do
         if not unit.Dead and not unit:IsUnitState('Attached') then
-            aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+            unit:Kill()
+            -- aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
         end
     end
 
@@ -1880,17 +1915,17 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
             end
             if transSlotNum > 0 then
                 table.insert(transportTable[transSlotNum].Units, unit)
-                if unit:GetBlueprint().Transport.TransportClass == 3 and remainingLarge >= 1 then
+                if unit.Blueprint.Transport.TransportClass == 3 and remainingLarge >= 1 then
                     transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - 1
                     transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 2
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 4
-                elseif unit:GetBlueprint().Transport.TransportClass == 2 and remainingMed > 0 then
+                elseif unit.Blueprint.Transport.TransportClass == 2 and remainingMed > 0 then
                     if transportTable[transSlotNum].LargeSlots > 0 then
                         transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - .5
                     end
                     transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 1
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 2
-                elseif unit:GetBlueprint().Transport.TransportClass == 1 and remainingSml > 0 then
+                elseif unit.Blueprint.Transport.TransportClass == 1 and remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
                 elseif remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
@@ -2092,11 +2127,21 @@ end
 
 --- Utility Function
 --- Function that gets the correct number of transports for a platoon
+--- If BaseName platoon data is specified, grabs transports from that platoon
 ---@param platoon Platoon
 ---@return number
 function GetTransportsThread(platoon)
     local data = platoon.PlatoonData
     local aiBrain = platoon:GetBrain()
+
+    -- Default transport platoon to grab from
+	local poolName = 'TransportPool'
+	local BaseName = data.BaseName
+	
+	-- If base name is specified in platoon data, use that instead
+	if BaseName then 
+		poolName = BaseName .. '_TransportPool'
+	end
 
     local neededTable = GetNumTransports(platoon)
     local numTransports = 0
@@ -2107,10 +2152,10 @@ function GetTransportsThread(platoon)
     local transSlotTable = {}
 
     if transportsNeeded then
-        local pool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
+        local pool = aiBrain:GetPlatoonUniquelyNamed(poolName)
         if not pool then
             pool = aiBrain:MakePlatoon('None', 'None')
-            pool:UniquelyNamePlatoon('TransportPool')
+            pool:UniquelyNamePlatoon(poolName)
         end
         while transportsNeeded do
             neededTable = GetNumTransports(platoon)
@@ -2251,7 +2296,7 @@ function GetNumTransports(platoon)
     }
     local transportClass
     for _, v in platoon:GetPlatoonUnits() do
-        transportClass = v:GetBlueprint().Transport.TransportClass
+        transportClass = v.Blueprint.Transport.TransportClass
         if transportClass == 1 then
             transportNeeded.Small = transportNeeded.Small + 1
         elseif transportClass == 2 then

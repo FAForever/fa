@@ -46,23 +46,26 @@ function RemoteViewing(SuperClass)
             self:AddToggleCap('RULEUTC_IntelToggle')
         end,
 
-        OnTargetLocation = function(self, location)
-            -- Initial energy drain here - we drain resources instantly when an eye is relocated (including initial move)
-            local aiBrain = self:GetAIBrain()
-            local bp = self:GetBlueprint()
-            local have = aiBrain:GetEconomyStored('ENERGY')
-            local need = bp.Economy.InitialRemoteViewingEnergyDrain
-            if not ( have > need ) then
-                return
-            end
-
-            -- Drain economy here
-            aiBrain:TakeResource( 'ENERGY', bp.Economy.InitialRemoteViewingEnergyDrain )
-
-            self.RemoteViewingData.VisibleLocation = location
+        TargetLocationThread = function(self)
+            local Cost = CreateEconomyEvent(self, self:GetBlueprint().Economy.InitialRemoteViewingEnergyDrain * (self.EnergyMaintAdjMod or 1), 0, 1, self.SetWorkProgress)
+            WaitFor(Cost)
+            self:SetWorkProgress(0.0)
+            RemoveEconomyEvent(self, Cost)
+            self:RequestRefreshUI()
+            self.RemoteViewingData.VisibleLocation = self.RemoteViewingData.PendingVisibleLocation
+            self.RemoteViewingData.PendingVisibleLocation = nil
             self:CreateVisibleEntity()
         end,
 
+        OnTargetLocation = function(self, location)
+            if self.RemoteViewingData.PendingVisibleLocation then
+                self.RemoteViewingData.PendingVisibleLocation = location
+            else
+                self.RemoteViewingData.PendingVisibleLocation = location
+                self:ForkThread(self.TargetLocationThread)
+            end
+        end,
+        
         CreateVisibleEntity = function(self)
             -- Only give a visible area if we have a location and intel button enabled
             if not self.RemoteViewingData.VisibleLocation then
@@ -118,24 +121,24 @@ function RemoteViewing(SuperClass)
             end
         end,
 
-        OnIntelEnabled = function(self)
+        OnIntelEnabled = function(self, intel)
             -- Make sure the button is only calculated once rather than once per possible intel type
             if not self.RemoteViewingData.IntelButton then
                 self.RemoteViewingData.IntelButton = true
                 self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter - 1
                 self:CreateVisibleEntity()
             end
-            SuperClass.OnIntelEnabled(self)
+            SuperClass.OnIntelEnabled(self, intel)
         end,
 
-        OnIntelDisabled = function(self)
+        OnIntelDisabled = function(self, intel)
             -- make sure button is only calculated once rather than once per possible intel type
             if self.RemoteViewingData.IntelButton then
                 self.RemoteViewingData.IntelButton = false
                 self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter + 1
                 self:DisableVisibleEntity()
             end
-            SuperClass.OnIntelDisabled(self)
+            SuperClass.OnIntelDisabled(self, intel)
         end,
 
         DisableResourceMonitor = function(self)
@@ -146,9 +149,9 @@ function RemoteViewing(SuperClass)
                 fraction = self:GetResourceConsumed()
             end
             if self.RemoteViewingData.IntelButton then
+                self:DisableVisibleEntity()
                 self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter + 1
                 self.RemoteViewingData.ResourceThread = self:ForkThread(self.EnableResourceMonitor)
-                self:DisableVisibleEntity()
             end
         end,
 

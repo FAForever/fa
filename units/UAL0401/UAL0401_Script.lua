@@ -9,15 +9,13 @@ local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
 local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import("/lua/utilities.lua")
 local explosion = import("/lua/defaultexplosions.lua")
-
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
 local MathSqrt = math.sqrt
-local MathCos = math.cos 
-local MathSin = math.sin 
+local MathCos = math.cos
+local MathSin = math.sin
 
 
 -- store for performance
@@ -29,7 +27,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = ClassWeapon(ADFPhasonLaser) {
             CreateProjectileAtMuzzle = function(self, muzzle)
-                ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
+                local projectile = ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
 
                 -- if possible, try not to fire on units that we're tractoring
                 local target = self:GetCurrentTarget()
@@ -39,23 +37,21 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
                         self:ResetTarget()
                     end
                 end
+
+                return projectile
             end,
         },
         RightArmTractor = ClassWeapon(ADFTractorClaw) {},
         LeftArmTractor = ClassWeapon(ADFTractorClaw) {},
     },
 
-    OnCreate = function (self, spec)
+    OnCreate = function(self, spec)
         AWalkingLandUnit.OnCreate(self, spec)
-
-        self:ForkThread(self.AdjustWeaponsThread)
+        self.Trash:Add(ForkThread(self.AdjustWeaponsThread, self))
     end,
 
-
     AdjustWeaponsThread = function(self)
-
-        while not self.Dead do 
-
+        while not self.Dead do
             -- only perform this logic if the unit is on the move
             if self:IsUnitState("Moving") then
 
@@ -64,14 +60,12 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
                 local heading = self:GetHeading()
                 local hx, hz = MathSin(heading), MathCos(heading)
 
-                for k = 1, self.WeaponCount do 
-
+                for k = 1, self.WeaponCount do
                     -- retrieve weapon and its target
                     local weapon = self:GetWeapon(k)
                     local target = weapon:GetCurrentTarget()
 
-                    if target then 
-
+                    if target then
                         -- compute direction and normalize
                         local tx, ty, tz = target:GetPositionXYZ()
                         local dx, dz = tx - sx, tz - sz
@@ -80,27 +74,35 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
 
                         -- compute dot product between weapon target and our heading, if it is lower than 0 it means the target is behind us
                         local dot = dx * hx + dz * hz
-                        if dot < 0 then 
+                        if dot < 0 then
                             weapon:ResetTarget()
                         end
                     end
                 end
             end
 
-            WaitSeconds(0.2)
+            WaitTicks(3)
         end
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonColossusBuildingEffects(self)
+        -- adjust collision box due to build animation
+        self:SetCollisionShape('Box',0.3,3.25,-0.65,self.Blueprint.SizeX * 0.5, self.Blueprint.SizeY * 0.5, (self.Blueprint.SizeZ * 0.7))
+    end,
+
+    OnStopBeingBuilt = function(self,builder,layer)
+        AWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+        -- adjust collision box due to build animation
+        self:RevertCollisionShape()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         AWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
 
         local wep = self:GetWeaponByLabel('EyeWeapon')
-        local bp = wep:GetBlueprint()
+        local bp = wep.Blueprint
         if bp.Audio.BeamStop then
             wep:PlaySound(bp.Audio.BeamStop)
         end
@@ -114,41 +116,48 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         end
     end,
 
-    DeathThread = function(self, overkillRatio , instigator)
-        local size = self.Size
+    DeathThread = function(self, overkillRatio, instigator)
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
-        WaitSeconds(2)
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
+            { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
-        WaitSeconds(0.1)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
-        WaitSeconds(0.1)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
-        WaitSeconds(0.3)
+        WaitTicks(3)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
 
-        WaitSeconds(3.5)
+        WaitTicks(15)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B02', 1.0)
+        WaitTicks(38)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
-
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
         end
 
         -- only apply death damage when the unit is sufficiently build
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.5
-        if self:GetFractionComplete() >= FractionThreshold then 
-            local bp = self:GetBlueprint()
+        if self:GetFractionComplete() >= FractionThreshold then
+            local bp = self.Blueprint
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
             local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
-                    position[3] = position[3]+5*math.cos(a)
-                    position[1] = position[1]+5*math.sin(a)
-                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    position[3] = position[3] + 5 * math.cos(a)
+                    position[1] = position[1] + 5 * math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType,
+                        bp.Weapon[i].DamageFriendly)
                     break
                 end
             end
@@ -169,13 +178,14 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
             elseif overkillRatio <= 3 then
                 self:CreateUnitDestructionDebris(true, true, true)
                 self:CreateUnitDestructionDebris(true, true, true)
-            else -- Vaporized
+            else
                 self:CreateUnitDestructionDebris(true, true, true)
             end
         end
-
         self:Destroy()
     end,
 }
-
 TypeClass = UAL0401
+
+-- Kept for Mod Backwards Compatability
+local Utilities = import("/lua/utilities.lua")

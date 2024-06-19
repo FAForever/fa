@@ -1,12 +1,11 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'seraphim_sih_polytrail_02',
-	Lifetime = -1.00,
-    TrailLength = 1.75,
+return {
+    BlendMode = 3.0,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_07.dds",
+    RepeatTexture = "/textures/particles/ramp_white_01.dds",
     Size = 0.022,
     SortOrder = 0,
-    BlendMode = 3.0,
     TextureRepeatRate = 1,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/ramp_white_01.dds',
-	RampTexture = '/textures/particles/ramp_trail_07.dds',
+    TrailLength = 1.75,
 }

@@ -11,6 +11,5 @@
 local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
 ---@class UEL0208 : TConstructionUnit
-UEL0208 = ClassUnit(TConstructionUnit) {}
-
+UEL0208 = ClassUnit(TConstructionUnit) { }
 TypeClass = UEL0208

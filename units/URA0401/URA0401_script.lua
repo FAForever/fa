@@ -1,12 +1,9 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URA0401/URA0401_script.lua
-----**  Author(s):  John Comes, Andres Mendez, Gordon Duclos
-----**
-----**  Summary  :  Cybran Gunship Script
-----**
-----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+--------------------------------------------------------------------------------
+--  File     :  /cdimage/units/URA0401/URA0401_script.lua
+-- Author(s):  John Comes, Andres Mendez, Gordon Duclos
+-- Summary  :  Cybran Gunship Script
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
 local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
 local CDFRocketIridiumWeapon = import("/lua/cybranweapons.lua").CDFRocketIridiumWeapon
 local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNaniteWeapon
@@ -44,6 +41,9 @@ URA0401 = ClassUnit(CAirUnit) {
         self.Trash:Add(self.AnimManip)
     end,
 
+    ---@param self URA0401
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old )
         CAirUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -85,6 +85,9 @@ URA0401 = ClassUnit(CAirUnit) {
         end 
     end,
 
+    ---@param self URA0401
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         CAirUnit.OnMotionVertEventChange(self, new, old)
 

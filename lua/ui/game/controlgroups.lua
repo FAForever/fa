@@ -133,8 +133,10 @@ function OnSelectionSetChanged(name, units, applied)
                     Selection.FactorySelection(self.name)
                 elseif event.Modifiers.Shift then
                     Selection.AppendSetToSelection(self.name)
-                else
+                elseif event.Modifiers.Left then
                     Selection.ApplySelectionSet(self.name)
+                elseif event.Modifiers.Right then
+                    Selection.AppendSelectionToSet(self.name)
                 end
             end
         end

@@ -16,6 +16,11 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 -- look in this file ever again.
 ---@class TextArea : ItemList
 TextArea = ClassUI(ItemList) {
+
+    ---@param self TextArea
+    ---@param parent Control
+    ---@param width number
+    ---@param height number
     __init = function(self, parent, width, height)
         ItemList.__init(self, parent)
 
@@ -48,17 +53,23 @@ TextArea = ClassUI(ItemList) {
         end
     end,
 
+    ---@param self TextArea
+    ---@param text string
     SetText = function(self, text)
         self.text = text
         self:ReflowText()
     end,
 
+    ---@param self TextArea
+    ---@return string
     GetText = function(self)
         return self.text
     end,
 
     --- Add more text to the textfield starting on a new line (high-performance append operation
     -- that avoids incurring a complete reflow).
+    ---@param self TextArea
+    ---@param text string
     AppendLine = function(self, text)
         if self.text == "" then
             self.text = text
@@ -72,6 +83,7 @@ TextArea = ClassUI(ItemList) {
         end
     end,
 
+    ---@param self TextArea
     ReflowText = function(self)
         local wrapped = Text.WrapText(self.text, self.Width(), self.advanceFunction)
 

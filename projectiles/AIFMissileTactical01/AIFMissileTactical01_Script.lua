@@ -1,54 +1,67 @@
---
--- Aeon Land-Based Tactical Missile
---
-local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
+--******************************************************************************************************
+--** Copyright (c) 2024 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
+local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
+local AMissileSerpentineProjectileOnCreate = AMissileSerpentineProjectile.OnCreate
+local AMissileSerpentineProjectileOnImpact = AMissileSerpentineProjectile.OnImpact
+
+local EffectTemplate = import("/lua/effecttemplates.lua")
+
+-- upvalue scope for performance
+local CreateLightParticleIntel = CreateLightParticleIntel
+
+
+--- Used by UAB2108 (T2 Tactical Missile Launcher)
+---@class AIFMissileTactical01 : AMissileSerpentineProjectile
 AIFMissileTactical01 = ClassProjectile(AMissileSerpentineProjectile) {
 
+    TerminalZigZagMultiplier = 0.5,
+
+    FxImpactUnit = EffectTemplate.AMissileHit02,
+    FxImpactProp = EffectTemplate.AMissileHit02,
+    FxImpactLand = EffectTemplate.AMissileHit02,
+
+    FxLandHitScale = 1.65,
+    FxPropHitScale = 1.65,
+    FxUnitHitScale = 1.65,
+
+    ---@param self AIFMissileTactical01
     OnCreate = function(self)
-        AMissileSerpentineProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.Trash:Add(ForkThread( self.MovementThread,self ))
+        AMissileSerpentineProjectileOnCreate(self)
+        self.MoveThread = self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
-    MovementThread = function(self)
-        self.WaitTime = 2
-        self:SetTurnRate(8)
-        WaitTicks(4)
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitTicks(self.WaitTime)
-        end
-    end,
+    --- Called by the engine when the projectile impacts something
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        AMissileSerpentineProjectileOnImpact(self, targetType, targetEntity)
 
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        --Get the nuke as close to 90 deg as possible
-        if dist > 50 then
-            --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(20)
-        elseif dist > 128 and dist <= 213 then
-						-- Increase check intervals
-						self:SetTurnRate(30)
-						WaitTicks(16)
-            self:SetTurnRate(30)
-        elseif dist > 43 and dist <= 107 then
-						-- Further increase check intervals
-            WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 43 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)
-            KillThread(self.MoveThread)
-        end
-    end,
+        local army = self.Army
 
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
-    end,
+        -- create light flashes
+        CreateLightParticleIntel(self, -1, army, 8, 2, 'flare_lens_add_02', 'ramp_green_02')
+        CreateLightParticleIntel(self, -1, army, 12, 4, 'flare_lens_add_02', 'ramp_green_12')
+    end
 }
 TypeClass = AIFMissileTactical01

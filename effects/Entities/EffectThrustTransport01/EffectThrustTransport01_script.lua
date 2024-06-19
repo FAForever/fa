@@ -1,10 +1,8 @@
---
--- script for projectile BoneAttached
---
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
+---@class EffectThrustTransport01 : EmitterProjectile
 EffectThrustTransport01 = Class(EmitterProjectile) {
-    FxTrails = {},
+    FxTrails = { },
     FxTrailScale = 1,
     FxTrailOffset = 0,
 
@@ -20,10 +18,7 @@ EffectThrustTransport01 = Class(EmitterProjectile) {
         },
 
     FxUnderWaterHitScale = 1,
-    FxImpactUnderWater = {},
     FxNoneHitScale = 1,
-    FxImpactNone = {},
+    FxImpactNone = { },
 }
-
 TypeClass = EffectThrustTransport01
-

@@ -1,19 +1,11 @@
-ProjectileBlueprint {
-    Categories = {
-        'UNTARGETABLE',
-    },
+ProjectileBlueprint{
+    Categories = { "UNTARGETABLE" },
     Display = {
-        MeshBlueprint = '/env/devtest/props/sphere01_mesh.bp',
+        MeshBlueprint = "/env/devtest/props/sphere01_mesh.bp",
         UniformScale = 0.005,
     },
-    General = {
-        EntityCategory = {
-            'UNTARGETABLE',
-        },
-    },
-    Interface = {
-        HelpText = 0,
-    },
+    General = {},
+    Interface = { HelpText = 0 },
     Physics = {
         CollideEntity = false,
         CollideSurface = false,

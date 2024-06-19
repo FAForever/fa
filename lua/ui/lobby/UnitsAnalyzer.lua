@@ -52,6 +52,11 @@ CategoriesSkipped  = {
     ["NOFORMATION"] = true,
     ["UNSELECTABLE"] = true,
     ["UNTARGETABLE"] = true,
+    ["UNSPAWNABLE"] = true,
+    ["DUMMYUNIT"] = true, -- cybran build drones
+    ["EXTERNALFACTORYUNIT"] = true, -- used by mobile factories
+    ["zxa0002"] = true,    -- used by mobile factories
+    ["INSIGNIFICANTUNIT"] = true, -- drones, jamming crystal, lighting storm
     ["zxa0001"] = true,    -- Dummy unit for gifting unfinished buildings
     ["uab5103"] = true,    -- Aeon Quantum Gate Beacon
     ["uab5204"] = true,    -- Concrete
@@ -491,19 +496,16 @@ end
 
 -- Get specs for a weapon with projectiles
 function GetWeaponProjectile(bp, weapon)
-    -- Multipliers is needed to properly calculate split projectiles.
-    -- Unfortunately these numbers hard-coded here are not available in the blueprint,
-    -- but specified in the .lua files for corresponding projectiles.
-    local multipliers = {
-        -- Lobo
-        ['/projectiles/TIFFragmentationSensorShell01/TIFFragmentationSensorShell01_proj.bp'] = 4,
-        -- Zthuee
-        ['/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_proj.bp'] = 5
-    }
 
-    if weapon.ProjectileId then
-       weapon.Multi = multipliers[weapon.ProjectileId] or 1
+    -- note we cannot use global __blueprints variable here because it is created on SIM side 
+    -- when the game is being loaded so we using local blueprints variable created in this file
+    local split = 1
+    local projPhysics = blueprints[weapon.ProjectileId].Physics
+    while projPhysics do
+        split = split * (projPhysics.Fragments or 1)
+        projPhysics = blueprints[projPhysics.FragmentId].Physics
     end
+    weapon.Multi = split
 
     -- NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
     if weapon.MuzzleSalvoSize > 1 then
@@ -965,7 +967,7 @@ end
 -- @param faction is table with { Name = 'FACTION' }
 function GetUnitsGroups(bps, faction)
     -- NOTE these unit groupings are for visualization purpose only
-    local TECH4ARTY = '(EXPERIMENTAL * ARTILLERY - FACTORY - LAND)' -- mobile factory (FATBOY)
+    local TECH4ARTY = '(EXPERIMENTAL * STRATEGIC * ARTILLERY - FACTORY)' -- '- FACTORY' left for backwards compatability with old Fatboys
     -- xrl0002 Crab Egg (Engineer)
     -- xrl0003 Crab Egg (Brick)
     -- xrl0004 Crab Egg (Flak)

@@ -34,6 +34,15 @@ function ToggleControl()
     end
 end
 
+function FocusArmyChanged()
+    local focusArmy = GetFocusArmy()
+    if focusArmy == -1 then
+        if panel then
+            panel:Hide()
+        end
+    end
+end
+
 ---@class MassFabPanel : Group
 MassFabPanel = ClassUI(Group) {
 
@@ -172,7 +181,7 @@ MassFabPanel = ClassUI(Group) {
             end
         end
         self._collapseArrow.OnHide = function(collapse, hide)
-            if hide ~= collapse:IsDisabled() then
+            if collapse:IsDisabled() and not hide then
                 return true
             end
         end

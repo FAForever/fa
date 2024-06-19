@@ -1,6 +1,5 @@
-ProjectileBlueprint {
-    Display = {
-    },
+ProjectileBlueprint{
+    Display = {},
     Physics = {
         Acceleration = 0,
         AccelerationRange = 0,

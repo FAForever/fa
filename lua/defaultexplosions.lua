@@ -206,8 +206,8 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
 ---@param unit Unit
----@param debrisMultiplier integer
----@param circularDebris boolean
+---@param debrisMultiplier? number
+---@param circularDebris? boolean
 function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 
     debrisMultiplier = debrisMultiplier or 1
@@ -392,10 +392,8 @@ function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 end
 
 --- Creates a flash and fire emitters that represents an explosion on hit.
--- @param obj The entity to create the flash at.
--- @param scale The scale of the flash.
----@param obj Unit
----@param scale number
+---@param obj Entity The entity to create the flash at.
+---@param scale number The scale of the flash.
 function CreateDefaultHitExplosion(obj, scale)
     if obj and not obj:BeenDestroyed() then
         local army = obj.Army
@@ -434,7 +432,7 @@ end
 
 --- Creates a flash and fire emitters that represents an explosion on hit.
 ---@param obj Unit The entity to create the flash at.
----@param boneName string The bone to attach the effect to.
+---@param boneName Bone The bone to attach the effect to.
 ---@param scale number The scale of the flash.
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
     local army = obj.Army
@@ -454,14 +452,14 @@ function CreateTimedStuctureUnitExplosion(obj, deathAnimation)
         while deathAnimation:GetAnimationFraction() < 1 do
             CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
             obj:PlayUnitSound('DeathExplosion')
-            WaitSeconds(GetRandomFloat(0.2, 0.5))
+            WaitSeconds(GetRandomFloat(0.1, 0.2))
         end
     -- do generic destruction effect
     else
         for i = 0, numExplosions do
             CreateDefaultHitExplosionOffset(obj, 1.0, unpack({GetRandomOffset(x, y, z, 0.8)}))
             obj:PlayUnitSound('DeathExplosion')
-            WaitSeconds(GetRandomFloat(0.2, 0.5))
+            WaitSeconds(GetRandomFloat(0.1, 0.2))
         end
     end
 end
@@ -496,7 +494,7 @@ end
 
 --- Old function that is no longer in use. Do not use this function - it creates a whole
 -- lot of overhead that is not necessary.
----@param obj Unit
+---@param obj Entity
 function _CreateScalableUnitExplosion(obj)
     local army = obj.Spec.Army
     local scale = obj.Spec.BoundingXZRadius
@@ -624,7 +622,7 @@ function CreateScorchMarkSplat(obj, scale, army)
         UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
         scale * 4, scale * 4,
         200 + 150 * Random(),
-        300 * 300 * Random(),
+        60 + 60 * Random(),
         army
     )
 end
@@ -641,7 +639,7 @@ function CreateScorchMarkDecal(obj, scale, army)
         '', 'Albedo', 
         scale * 3, scale * 3, 
         200 + 150 * Random(), 
-        300 * 300 * Random(), 
+        60 + 60 * Random(),
         army
     )
 end
@@ -649,8 +647,8 @@ end
 --- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 ---@param obj Unit
 ---@param scale number
----@param LOD integer
----@param lifetime integer
+---@param LOD number
+---@param lifetime number
 ---@param army string
 function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
     CreateSplat(
@@ -770,7 +768,7 @@ end
 
 ---@param unit Unit
 ---@param scale number
----@param overKillRatio number
+---@param overKillRatio number unused
 function CreateDefaultExplosion(unit, scale, overKillRatio)
 
     local spec = {
@@ -804,7 +802,7 @@ function CreateDestructionSparks(object, scale)
 end
 
 ---@param object Unit
----@param scale number
+---@param scale number unused
 function CreateFirePlume(object, scale)
     local proj
     for i = 1, GetRandomInt(4, 8) do
@@ -819,10 +817,10 @@ function CreateFirePlume(object, scale)
 end
 
 ---@param object Unit
----@param projectile string
----@param minnumber integer
----@param maxnumber integer
----@param effect string
+---@param projectile FileName
+---@param minnumber number
+---@param maxnumber number
+---@param effect FileName
 ---@param fxscalemin number
 ---@param fxscalemax number
 ---@param gravitymin number
@@ -862,7 +860,7 @@ end
 -- *****************
 
 ---@param object Unit
----@param projBP string
+---@param projBP FileName
 ---@param posX number
 ---@param posY number
 ---@param posZ number
@@ -879,7 +877,7 @@ end
 ---@return Projectile
 function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
 
-    proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
+    local proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
     proj:SetScale(scale,scale,scale):SetScaleVelocity(scaleVelocity):SetLifetime(Lifetime):SetVelocity(velX, velY, VelZ)
 
     local orient = {0, 0, 0, 0}
@@ -907,7 +905,7 @@ function CreateCompositeExplosionMeshes(object)
 end
 
 -----------------------------------------------------------------
---  Replaced by new effect structure (see EffectTemplates.lua) --
+--  Replaced by new effect structure (see effecttemplates.lua) --
 -----------------------------------------------------------------
 
 ---@param object Unit
@@ -941,3 +939,93 @@ function OldCreateWreckageEffects(object)
         CreateEmitterAtEntity(object, object.Army, v):SetEmitterParam('LIFETIME', GetRandomFloat(100, 1000))
     end
 end
+
+
+
+----------------------------------------------------------------
+-- Modern explosion effects
+
+--#region 
+
+--- Creates various fire plumes at bones that move away from the origin of the entity
+---@param entity BoneObject
+---@param army Army
+---@param bones Bone[]
+---@param yOffset number | nil
+CreateFirePlumes = function(entity, army, bones, yOffset)
+    yOffset = yOffset or 0
+    local ex, ey, ez = entity:GetPositionXYZ()
+    for _, vBone in bones do
+        -- determine local offset
+        local bx, by, bz = entity:GetPositionXYZ(vBone)
+        local dx, dy, dz = bx - ex, by - ey, bz - ez
+
+        -- determine velocity and make it a bit random
+        local id = 1 / math.sqrt(dx * dx + dy * dy + dz * dz)
+        local vx = id * dx + Random() * 0.6 - 0.3
+        local vy = id * dy + Random() * 0.3
+        local vz = id * dz + Random() * 0.6 - 0.3
+
+        -- create the projectile and the plume
+        local projectile = entity:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', dx, dy + yOffset, dz, vx, vy, vz)
+        projectile:SetBallisticAcceleration(-1 - Random())
+        projectile:SetVelocity(1 + 3 * Random())
+        CreateEmitterOnEntity(projectile, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
+    end
+end
+
+local CreateFirePlumeCache = { }
+
+--- Creates a single fire plume at a bone that moves away from the origin of the entity
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+---@param yOffset number | nil
+CreateFirePlume = function(entity, army, bone, yOffset)
+    CreateFirePlumeCache[1] = bone
+    CreateFirePlumes(entity, army, CreateFirePlumeCache, yOffset)
+end
+
+--- Creates basic large-sized debris / dirt as emitters
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+CreateLargeDebrisEmitters  = function(entity, army, bone)
+    for _, effect in EffectTemplate.ExplosionDebrisLrg01 do
+        CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic medium-sized debris / dirt as emitters
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+CreateMediumDebrisEmitters = function(entity, army, bone)
+    for _, effect in EffectTemplate.ExplosionDebrisMed01 do
+        CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic small-sized debris / dirt as emitters
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+CreateSmallDebrisEmitters = function(entity, army, bone)
+    for _, effect in EffectTemplate.ExplosionDebrisSml01 do
+        CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic damage effect emitters
+---@param self BoneObject
+---@param bone Bone
+---@param army Army
+---@param scale number | nil
+CreateDamageEmitters = function(self, bone, army, scale)
+    scale = scale or 1.0
+    for k, v in EffectTemplate.DamageFireSmoke01 do
+        CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
+    end
+end
+
+--#endregion

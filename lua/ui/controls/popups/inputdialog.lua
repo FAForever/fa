@@ -7,6 +7,12 @@ local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 --- A popup that asks the user for a string.
 ---@class InputDialog : Popup
 InputDialog = ClassUI(Popup) {
+
+    ---@param self InputDialog
+    ---@param parent any
+    ---@param title string
+    ---@param fallbackInputbox any
+    ---@param str string
     __init = function(self, parent, title, fallbackInputbox, str)
         -- For ridiculous reasons, the lobby *must* keep keyboard focus on the chat input, or
         -- in-game keybindings can be called and cause the world to end.
@@ -74,6 +80,7 @@ InputDialog = ClassUI(Popup) {
         self.OnShadowClicked = dialogCancelled
     end,
 
+    ---@param self InputDialog
     Close = function(self)
         -- Don't want to restore focus to the dialog's input box any more...
         self.inputBox.OnLoseKeyboardFocus = nil
@@ -85,10 +92,13 @@ InputDialog = ClassUI(Popup) {
     end,
 
     --- Called with the contents of the textfield when the presses enter or clicks the "OK" button.
-    -- If this function returns false, the dialog will remain open afterwards, allowing for input
-    -- validation (you should probably notify the user, too!)
+    --- If this function returns false, the dialog will remain open afterwards, allowing for input
+    --- validation (you should probably notify the user, too!)
+    ---@param self InputDialog
+    ---@param str string
     OnInput = function(self, str) end,
 
     --- Called when the user clicks "cancel", presses escape, or clicks outside the dialog.
+    ---@param self InputDialog
     OnCancelled = function(self) end
 }

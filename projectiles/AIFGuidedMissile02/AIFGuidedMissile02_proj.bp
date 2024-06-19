@@ -1,59 +1,45 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Lrg_PreDestroy', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Lrg_PreDestroy', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Lrg_PreDestroy', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'MISSILE',
+        "AEON",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
     },
+    Defense = {
+        Health = 1,
+        MaxHealth = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowsProjectile = true,
-
-        -- ----MeshBlueprint = '/units/DAA0206/DAA0206_mesh.bp',
         StrategicIconSize = 1,
         UniformScale = 0.045,
     },
     General = {
-        Category = 'Anti Air',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'MISSILE',
-        },
-        Faction = 'Aeon',
+        Category = "Anti Air",
+        Faction = "Aeon",
         TechLevel = 3,
-        Weapon = 'Guided Missile',
+        Weapon = "Guided Missile",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
         DestroyOnWater = true,
-        InitialSpeed = 15,
+        InitialSpeed = 20,
         LeadTarget = false,
         Lifetime = 10,
         MaxSpeed = 35,
         MaxZigZag = 10,
-        TrackTarget = false,
-        TurnRate = 180,
+        TrackTarget = true,
+        TurnRate = 120,
+        TurnRateRange = 30,
         UseGravity = false,
         VelocityAlign = true,
-        ZigZagFrequency = 0.2,
+        ZigZagFrequency = 0.4,
     },
 }

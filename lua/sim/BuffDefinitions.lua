@@ -4,6 +4,10 @@
 -----------------------------------------------------------------
 
 ---@alias VeterancyBuffType
+---| "VERTANCYHEALTH"
+---| "VETERANCYREGEN"
+
+---@alias VeterancyBuffName
 ---| 'VeterancyMaxHealth1'
 ---| 'VeterancyMaxHealth2'
 ---| 'VeterancyMaxHealth3'
@@ -164,5 +168,3 @@ BuffBlueprint {
         },
     },
 }
-
-__moduleinfo.auto_reload = true

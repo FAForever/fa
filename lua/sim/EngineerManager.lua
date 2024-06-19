@@ -12,27 +12,35 @@ local Builder = import("/lua/sim/builder.lua")
 local TableGetn = table.getn
 
 ---@class EngineerManager : BuilderManager
+---@field Location Vector
+---@field Radius number
 EngineerManager = Class(BuilderManager) {
     ---@param self EngineerManager
     ---@param brain AIBrain
-    ---@param lType any
+    ---@param lType LocationType
     ---@param location Vector
     ---@param radius number
     ---@return boolean
     Create = function(self, brain, lType, location, radius)
-        BuilderManager.Create(self,brain)
+        BuilderManager.Create(self,brain, lType, location, radius)
 
         if not lType or not location or not radius then
             error('*PLATOOM FORM MANAGER ERROR: Invalid parameters; requires locationType, location, and radius')
             return false
         end
 
-        self.Location = location
-        self.Radius = radius
-        self.LocationType = lType
+        -- backwards compatibility for mods
+        self.Location = self.Location or location
+        self.Radius = self.Radius or radius
+        self.LocationType = self.LocationType or lType
 
         self.ConsumptionUnits = {
             Engineers = { Category = categories.ENGINEER, Units = {}, UnitsList = {}, Count = 0, },
+
+
+
+
+            
             Fabricators = { Category = categories.MASSFABRICATION * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             Shields = { Category = categories.SHIELD * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             MobileShields = { Category = categories.SHIELD * categories.MOBILE, Units = {}, UnitsList = {}, Count = 0, },
@@ -44,7 +52,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     -- Universal on/off functions
-    ---@param self EngineerManager
+    ---@param self EngineerManager unused
     ---@param group table
     EnableGroup = function(self, group)
         for k,v in group.Units do
@@ -171,7 +179,7 @@ EngineerManager = Class(BuilderManager) {
         self:EnableGroup(self.ConsumptionUnits.Engineers)
     end,
 
-    ---@param self EngineerManager
+    ---@param self EngineerManager unused
     ---@param econ any unused
     ---@param pauseVal number
     ---@return boolean
@@ -207,8 +215,8 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     -- Functions for when an AI Brain's energy runs dry
-    ---@param self EngineerManager
-    ---@param econ any unused
+    ---@param self EngineerManager unused
+    ---@param econ any 
     ---@param pauseVal number
     ---@return boolean
     EnergyCheck = function(self, econ, pauseVal)
@@ -222,7 +230,7 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param group string
-    ---@param econ any unused
+    ---@param econ any 
     ---@param pauseVal number
     ---@param unitCheckFunc any
     ---@param category EntityCategory
@@ -310,8 +318,8 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     -- Check if turning off this fabricator would destroy the mass income
-    ---@param unit Unit
-    ---@param econ any unused
+    ---@param unit Unit unused
+    ---@param econ any 
     ---@param pauseVal number
     ---@return number | true
     MassDrainCheck = function(unit, econ, pauseVal)

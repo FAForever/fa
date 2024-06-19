@@ -12,6 +12,7 @@ local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local WeaponsFile = import("/lua/terranweapons.lua")
 
+
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
@@ -52,6 +53,9 @@ UEA0104 = ClassUnit(AirTransport) {
         self:ForkThread(self.ExpandThread)
     end,
 
+    ---@param self UEA0104
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then

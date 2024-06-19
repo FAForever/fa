@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,11 +12,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    AlbedoName = 'rock02_albedo.dds',
                     LODCutoff = 500,
-                    ShaderName = 'NormalMappedAlpha',
-                    SpecularName = 'rock02_specteam.dds',
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "rock02_albedo.dds",
+                    SpecularName = "rock02_specteam.dds",
                 },
             },
         },
@@ -26,9 +26,7 @@ PropBlueprint {
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Round Thing',
-    },
+    Interface = { HelpText = "Round Thing" },
     SizeX = 0.5,
     SizeY = 0.5,
     SizeZ = 0.5,

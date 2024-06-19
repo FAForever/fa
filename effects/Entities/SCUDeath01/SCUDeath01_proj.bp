@@ -1,19 +1,14 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        NukeExplosion = Sound {
-            Bank = 'Explosions',
-            Cue = 'Cybran_Nuke_Impact',
-        },
+        NukeExplosion = Sound { Bank = 'Explosions', Cue = 'Cybran_Nuke_Impact',  },
     },
-    Display = {
-        StrategicIconSize = 3,
-    },
+    Display = { StrategicIconSize = 3 },
     Physics = {
         CollideEntity = false,
         CollideSurface = false,
         DestroyOnWater = false,
         InitialSpeed = 0,
-        Lifetime = 10,        
+        Lifetime = 10,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         UseGravity = false,

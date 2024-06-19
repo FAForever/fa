@@ -1,18 +1,19 @@
--- script for projectile TankShell
 local Projectile = import("/lua/sim/projectile.lua").Projectile
+
+-- script for projectile TankShell
+---@class ShellTankTerran01 : Projectile
 ShellTankTerran01 = ClassProjectile(Projectile) {
     FxUnitHitScale = 1,
-    FxImpactUnit = {},
+    FxImpactUnit = { },
     FxLandHitScale = 1,
-    FxImpactLand = {},
+    FxImpactLand = { },
     FxWaterHitScale = 1,
-    FxImpactWater = {},
+    FxImpactWater = { },
     FxUnderWaterHitScale = 0.25,
-    FxImpactUnderWater = {},
     FxAirUnitHitScale = 1,
-    FxImpactAirUnit = {},
+    FxImpactAirUnit = { },
     FxNoneHitScale = 1,
-    FxImpactNone = {},
+    FxImpactNone = { },
     FxImpactLandScorch = false,
     FxImpactLandScorchScale = 1.0,
 
@@ -22,13 +23,16 @@ ShellTankTerran01 = ClassProjectile(Projectile) {
                     '/effects/emitters/dust_cloud_02_emit.bp',
                     '/effects/emitters/dust_cloud_04_emit.bp',
                     '/effects/emitters/destruction_explosion_debris_04_emit.bp',
-                    '/effects/emitters/destruction_explosion_debris_05_emit.bp',},
+                    '/effects/emitters/destruction_explosion_debris_05_emit.bp',
+    },
 
+    ---@param self ShellTankTerran01
     OnCreate = function(self)
         Projectile.OnCreate(self)
         self.Trash:Add(ForkThread(self.Thread,self))
     end,
 
+    ---@param self ShellTankTerran01
     Thread = function(self)
         WaitTicks(5)
         while true do

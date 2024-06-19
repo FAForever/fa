@@ -1,51 +1,37 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'UEF_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'UEF_Expl_Med_Impact',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_UEF',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "INDIRECTFIRE",
+        "PROJECTILE",
+        "UEF",
     },
     Display = {
         CameraFollowsProjectile = true,
-        MeshBlueprint = '/projectiles/TIFMortar01/TIFMortar01_mesh.bp',
+        MeshBlueprint = "/projectiles/TIFMortar01/TIFMortar01_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.1,
     },
     General = {
-        Category = 'Artillery',
-        Faction = 'UEF',
+        Category = "Artillery",
+        Faction = "UEF",
         TechLevel = 1,
-        Weapon = 'Fragmentation Artillery',
+        Weapon = "Fragmentation Artillery",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         DetonateBelowHeight = 3,
+        FragmentId = "/projectiles/TIFFragmentationSensorShell02/TIFFragmentationSensorShell02_proj.bp",
+        Fragments = 5,
         InitialSpeed = 14.6,
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
         LeadTarget = false,
         TurnRate = 360,
         VelocityAlign = true,
-        Fragments = 5,
-        FragmentId = '/projectiles/TIFFragmentationSensorShell02/TIFFragmentationSensorShell02_proj.bp'
     },
 }

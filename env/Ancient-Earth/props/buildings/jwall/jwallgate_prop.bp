@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 4000,
@@ -11,20 +12,16 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    AlbedoName = 'jwall01_albedo.dds',
-					NormalsName = 'jwall01_normalsts.dds',
-	  	    		ShaderName = 'NormalMappedTerrain',
                     LODCutoff = 200,
-                    
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "jwall01_albedo.dds",
+                    NormalsName = "jwall01_normalsts.dds",
                 },
-				{
-
-                    AlbedoName = 'jwall01_albedo.dds',
-					NormalsName = 'jwall01_normalsts.dds',
-	  	    		ShaderName = 'NormalMappedTerrain',
+                {
                     LODCutoff = 3000,
-                    
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "jwall01_albedo.dds",
+                    NormalsName = "jwall01_normalsts.dds",
                 },
             },
         },
@@ -35,13 +32,8 @@ PropBlueprint {
         ReclaimMassMax = 2,
         ReclaimTime = 5,
     },
-
-    Interface = {
-        HelpText = 'Japanese Wall Gate',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "Japanese Wall Gate" },
+    Physics = { BlockPath = false },
     SizeX = 2,
     SizeY = 1,
     SizeZ = 2,

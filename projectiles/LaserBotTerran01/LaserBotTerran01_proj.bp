@@ -1,46 +1,30 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'UEF_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'UEF_Expl_Med_Impact',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_UEF',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
     },
-    Display = {
-        StrategicIconSize = 2,
+    Categories = {
+        "DIRECTFIRE",
+        "PROJECTILE",
+        "UEF",
     },
+    Display = { StrategicIconSize = 2 },
+    General = {
+        Category = "Direct Fire",
+        EntityCategory = {
+            "UEF",
+            "PROJECTILE",
+            "DIRECTFIRE",
+        },
+        Faction = "UEF",
+        Weapon = "Zephyr Anti Matter Cannon",
+    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 17,
         Lifetime = 2.5,
         UseGravity = true,
     },
-   Categories = {
-      'UEF',
-      'PROJECTILE',
-      'DIRECTFIRE',
-   },
-   General = {
-      Category = 'Direct Fire',
-      EntityCategory = {
-         'UEF',
-         'PROJECTILE',
-         'DIRECTFIRE',
-      },
-      Faction = 'UEF',
-      Weapon = 'Zephyr Anti Matter Cannon',
-   },
-   Interface = {
-      HelpText = 0,
-   },
 }

@@ -1,7 +1,7 @@
 Instructions to set up your development environment
 ---------------------------------------------------
 
-A collection of useful information to help you set up your development environment.
+A collection of useful information to help you set up your development environment. There is also a video on [Youtube](https://www.youtube.com/watch?v=KoewR3193_U) to help guide you through this article.
 
 Read this in other languages: [English](setup-english.md), [Russian](setup-russian.md)
 
@@ -10,7 +10,7 @@ Running the game with your changes
 
 _There is a section about Git in the FAQ if you're unfamilar with it._
 
-Fork the repository. Clone your fork to your system using your favorite Git tool. We refer to the `repository` directory as the location of your repository on your system. We refer to the `bin` directory as the `bin` folder in the installation folder of the client. By default this is:
+Fork the repository. Clone your fork to your system using your favorite Git tool. We refer to the `repository` directory as the location of your repository on your system. We refer to the `bin` directory as the `bin` folder in the data location, as defined in the client settings. By default this is:
  - `C:/ProgramData/FAForever/bin`
 
 Copy the contents of `repository/setup/bin` into the `bin` folder. Open `init_dev.lua` now found in the `bin` folder. At the top it states:
@@ -74,6 +74,7 @@ Useful extensions in general:
  - [Git graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph): useful for graph visualizations
  - [Gitlens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens): useful for seeing who made what change
  - [Peacock](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock): useful for coloring your workspaces when you have multiple
+ - [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) 
 
 Useful extensions if you intent to work with shaders:
  - [Shader languages support for VS Code](https://marketplace.visualstudio.com/items?itemName=slevesque.shader)

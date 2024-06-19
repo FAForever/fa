@@ -1,41 +1,28 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'XSS_Missile_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'XSS_Missile_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'XSS_Missile_Impact',       LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'XSS_Missile_Impact',       LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'SERAPHIM',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'TACTICAL',
-        'MISSILE',
-        'NOSPLASHDAMAGE',
+        "INDIRECTFIRE",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "SERAPHIM",
+        "TACTICAL",
     },
     Defense = {
         Health = 2,
         MaxHealth = 2,
     },
+    DesiredShooterCap = 2,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Medium01',
-        },
-        MeshBlueprint = '/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp',
-        StrategicIconSize = 2,
+        ImpactEffects = { Type = "Medium01" },
+        MeshBlueprint = "/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp",
+        StrategicIconSize = 4,
     },
     Economy = {
         BuildCostEnergy = 3600,
@@ -43,17 +30,16 @@ ProjectileBlueprint {
         BuildTime = 700,
     },
     General = {
-        Category = 'Missile',
-        Faction = 'Seraphim',
+        Category = "Missile",
+        Faction = "Seraphim",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 3,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        MaxSpeed = 12,
+        MaxSpeed = 20,
+        MaxZigZag = 1,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -61,5 +47,6 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+        ZigZagFrequency = 1,
     },
 }

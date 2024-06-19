@@ -7,42 +7,55 @@
 
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AIFQuantumWarhead = import("/lua/aeonweapons.lua").AIFQuantumWarhead
-local EffectUtil = import("/lua/effectutilities.lua")
+
+-- upvalue for perfomance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAnimator = CreateAnimator
+local CreateAttachedEmitter = CreateAttachedEmitter
+local TrashBagAdd = TrashBag.Add
+
 
 ---@class UAB2305 : AStructureUnit
 UAB2305 = ClassUnit(AStructureUnit) {
     Weapons = {
         QuantumMissiles = ClassWeapon(AIFQuantumWarhead) {
-            UnpackEffects01 = {'/effects/emitters/aeon_nuke_unpack_01_emit.bp',},
+            UnpackEffects01 = { '/effects/emitters/aeon_nuke_unpack_01_emit.bp', },
 
             PlayFxWeaponUnpackSequence = function(self)
-                for k, v in self.UnpackEffects01 do
-                    CreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
-                end
+                local unit = self.unit
+                local army = unit.Army
 
+                for k, v in self.UnpackEffects01 do
+                    CreateAttachedEmitter(unit, 'B04', army, v)
+                end
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)
             end,
         },
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint()
-        self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
-        self:ForkThread(self.PlayArmSounds)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AStructureUnit.OnStopBeingBuilt(self, builder, layer)
+        local bp = self.Blueprint
+        local trash = self.Trash
+
+        TrashBagAdd(trash, CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
+        TrashBagAdd(trash, ForkThread(self.PlayArmSounds,self))
     end,
 
     PlayArmSounds = function(self)
-        local myBlueprint = self:GetBlueprint()
-        if myBlueprint.Audio.Open and myBlueprint.Audio.Activate then
-            WaitSeconds(4.75)
-            self:PlaySound(myBlueprint.Audio.Activate)
-            WaitSeconds(3.75)
-            self:PlaySound(myBlueprint.Audio.Activate)
-            WaitSeconds(3.85)
-            self:PlaySound(myBlueprint.Audio.Activate)
+        local activateSound = self.Blueprint.Audio.Activate
+        if activateSound then
+            WaitTicks(48)
+            self:PlaySound(activateSound)
+            WaitTicks(38)
+            self:PlaySound(activateSound)
+            WaitTicks(39)
+            self:PlaySound(activateSound)
         end
     end,
 }
-
 TypeClass = UAB2305
+
+-- Kept for mod support
+local EffectUtil = import("/lua/effectutilities.lua")

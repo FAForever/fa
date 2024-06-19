@@ -1,22 +1,29 @@
-------------------------------------------------------------------------------------------
--- File     :  /data/projectiles/ADFShieldDisruptor01/ADFShieldDisruptor01_script.lua
--- Author(s):  Matt Vainio
--- Summary  :  Aeon Shield Disruptor Projectile, DAL0310
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-------------------------------------------------------------------------------------------
+--******************************************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local ADisruptorProjectile = import("/lua/aeonprojectiles.lua").AShieldDisruptorProjectile
-ADFShieldDisruptor01 = ClassProjectile(ADisruptorProjectile) {
-    OnImpact = function(self, TargetType, TargetEntity)
-        ADisruptorProjectile.OnImpact(self, TargetType, TargetEntity)
-        if TargetType ~= 'Shield' then
-            TargetEntity = TargetEntity.MyShield
-        end
+local ADisruptorProjectileOnImpact = ADisruptorProjectile.OnImpact
 
-        if not TargetEntity then return end
-
-        -- Never cause overspill damage to the unit, 1 min to avoid logspam with 0 declared damage
-        local damage = math.max(math.min(self.Data, TargetEntity:GetHealth()), 1)
-        Damage(self, {0,0,0}, TargetEntity, damage, 'Normal')
-    end,
-}
+--- Aeon Shield Disruptor Projectile, DAL0310
+---@class ADFShieldDisruptor01 : AShieldDisruptorProjectile
+ADFShieldDisruptor01 = ClassProjectile(ADisruptorProjectile) {}
 TypeClass = ADFShieldDisruptor01

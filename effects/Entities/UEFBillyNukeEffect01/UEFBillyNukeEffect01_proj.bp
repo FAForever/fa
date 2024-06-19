@@ -1,18 +1,18 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
-                    ShaderName = 'NukeUEF',
-                    AlbedoName = '/effects/Entities/UEFNukeEffect01/UEFNukeEffect01_albedo.dds',
-                    NormalsName = '/effects/Entities/UEFNukeEffect01/UEFNukeEffect01_normals.dds',
                     LODCutoff = 1000.0,
+                    ShaderName = "NukeUEF",
+                    MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
+                    AlbedoName = "/effects/Entities/UEFNukeEffect01/UEFNukeEffect01_albedo.dds",
+                    NormalsName = "/effects/Entities/UEFNukeEffect01/UEFNukeEffect01_normals.dds",
                 },
             },
             SortOrder = 0,
         },
-        UniformScale = 10.00,
+        UniformScale = 10.0,
     },
     Physics = {
         CollideEntity = false,

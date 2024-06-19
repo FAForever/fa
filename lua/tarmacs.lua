@@ -13,19 +13,18 @@ local TarmacTable =
 {
     --UEF Tarmac Overrides
     [1] = {
-        
     },
-    
+
     --Aeon Tarmac Overrides
     [2] = {
     },
-    
+
     --Cybran Tarmac Overrides
     [3] = {
     },
-    
+
     --Seraphim Tarmac Overrides.
-    [4] = {        
+    [4] = {
         Dirt01 = '',
         Dirt02 = '_Evergreen',
         Dirt03 = '',
@@ -33,16 +32,16 @@ local TarmacTable =
         Dirt06 = '_RedRock',
         Dirt07 = '_Desert',
         Dirt08 = '_Desert',
-        
+
         Sand01 = '_Tropical',
         Sand02 = '_Evergreen',
-        
+
         Vegetation01 = '',
         Vegetation02 = '_Evergreen',
         Vegetation03 = '_Evergreen',
         Vegetation04 = '_Evergreen',
         Vegetation05 = '_Tropical',
-        
+
         Rocky01 = '',
         Rocky02 = '_Evergreen',
         Rocky03 = '_Tundra',
@@ -56,16 +55,14 @@ local TarmacTable =
         Rocky11 = '_Geothermal',
         Rocky12 = '_Geothermal',
         Rocky13 = '_Geothermal',
-        
+
         Concrete01 = '',
-        
+
         Snowy01 = '_Tundra',
         Snowy02 = '_Tundra',
-        Snowy03 = '_Tundra',  
+        Snowy03 = '_Tundra',
     },
 }
-
-
 
 function GetTarmacType(factionIdx, terrainType, tarmacLayer)
     return TarmacTable[factionIdx][terrainType] or ''

@@ -95,7 +95,7 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/ai/opai/leftovercleanup_editorfunctions.lua', 'LeftoverCleanupBC',
+                            {'/lua/ai/opai/leftovercleanup_editorfunctions.lua', 'LeftoverCleanupBC',
                                 {'default_brain','default_location_type'},
                                 {'default_brain','default_location_type'}
                             },

@@ -1,85 +1,221 @@
------------------------------------------------------------------
--- File     : /lua/sim/MarkerUtilities.lua
--- Summary  : Aim of this file is to work with markers without
--- worrying about unneccesary table allocations. All base game
--- functionality allocates a new table when you wish to retrieve
--- a sequence of markers. This file implicitly stores a sequence
--- of markers and returns a reference, unless you explicitly
--- want a new table with unique values.
-
--- Extractor / hydrocarbon markers are setup different from the other
--- markers. As an example, you can not flush these markers. This
--- is done to support adaptive maps and the crazy rush mode.
-
--- Contains various debug facilities to help understand the
--- state that is stored in this file.
-
--- Supports crazyrush-like maps.
------------------------------------------------------------------
+--******************************************************************************************************
+--** Copyright (c) 2023  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
 
----@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Expansion Area' | 'Protected Experimental Construction'
+---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Start Location' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'
 
----@class MarkerData
----@field size number
----@field resource boolean
----@field type string
----@field orientation Vector
----@field position Vector
----@field color Color | nil
----@field adjacentTo string         # used by old pathing markers to identify the neighbors
----@field name? string              # used by spawn markers
----@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
----@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
+---@class MarkerDataLegacy
+---@field size number           # Legacy name used by the GPG editor, same as `Size`
+---@field resource boolean      # Legacy name used by the GPG editor, same as `Resource`
+---@field type string           # Legacy name used by the GPG editor, same as `Type`
+---@field orientation Vector    # Legacy name used by the GPG editor, same as `Orientation`
+---@field position Vector       # Legacy name used by the GPG editor, same as `Position`
+---@field color? Color          # Legacy name used by the GPG editor, same as `Color`
+---@field adjacentTo? string    # Legacy name used by the Ozonex editor
 
---- Contains all the markers that are part of the map, including markers of chains
-local AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
+---@class MarkerDataModSupport
+---@field Size number           # Field exists for mod support, same as `size`
+---@field Resource boolean      # Field exists for mod support, same as `resource`
+---@field Type string           # Field exists for mod support, same as `type`
+---@field Orientation Vector    # Field exists for mod support, same as `orientation`
+---@field Position Vector       # Field exists for mod support, same as `position`
+---@field Color? Color          # Field exists for mod support, same as `color`
 
----@return MarkerData[]
-function GetAllMarkers()
-    return AllMarkers
+---@class MarkerData : MarkerDataLegacy, MarkerDataModSupport
+---@field Name string               # Unique name for marker
+---@field NavLayer? NavLayers       # Navigational layer that this marker is on, only defined for resources
+---@field NavLabel? number | nil    # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
+
+---@class MarkerResource : MarkerData
+---@field NavLayer NavLayers
+---@field NavLabel number
+-- ---@field Island MarkerIsland
+
+---@class MarkerExpansion : MarkerData
+---@field NavLabel number
+-- ---@field Island MarkerIsland
+---@field Extractors MarkerResource[]
+-- ---@field Hydrocarbons MarkerResource[]
+
+-- ---@class MarkerIsland
+-- ---@field NavLabel number
+-- ---@field Expansions MarkerExpansion[]
+-- ---@field Extractors MarkerResource[]
+-- ---@field Hydrocarbons MarkerResource[]
+
+-- easier access to all markers and all chains
+---@type table<string, MarkerData>
+local CachedMarkers = {}
+
+--- Represents a cache of markers to prevent re-populating tables
+local MarkerCache = {
+    Mass = { Count = 0, Markers = {} },
+    Hydrocarbon = { Count = 0, Markers = {} },
+    Spawn = { Count = 0, Markers = {} },
+}
+
+--- Represents a cache of chains to prevent re-populating tables
+local ChainCache = {}
+
+--- Converts the marker type to add support for legacy names
+---@param type MarkerType
+---@return MarkerType
+local function MapMarkerType(type)
+    if type == 'Start Location' then
+        return 'Spawn'
+    end
+
+    return type
+end
+
+--- Adds fields used for backwards compatibility
+---@param marker MarkerData
+local function BackwardsCompatibility(marker)
+    if marker.Name then
+        marker.name = marker.Name
+    elseif marker.name then
+        marker.Name = marker.name
+    else
+        marker.name = 'Unknown'
+        marker.Name = 'Unknown'
+    end
+
+    if marker.Type then
+        marker.type = marker.Type
+    elseif marker.type then
+        marker.Type = marker.type
+    else
+        marker.Type = 'Unknown'
+        marker.type = 'Unknown'
+    end
+
+    if marker.position then
+        marker.Position = marker.position
+    elseif marker.Position then
+        marker.position = marker.Position
+    else
+        marker.position = { 0, 0, 0 }
+        marker.Position = { 0, 0, 0 }
+    end
+
+    if marker.resource then
+        marker.Resource = marker.resource
+    elseif marker.Resource then
+        marker.resource = marker.Resource
+    else
+        marker.resource = false
+        marker.Resource = false
+    end
+
+    -- properties used for debugging
+
+    if marker.Size then
+        marker.size = marker.Size
+    elseif marker.size then
+        marker.Size = marker.size
+    else
+        marker.Size = 1
+        marker.size = 1
+    end
+
+    if marker.Color then
+        marker.color = marker.Color
+    elseif marker.color then
+        marker.Color = marker.color
+    else
+        marker.color = 'ffffff'
+        marker.Color = 'ffffff'
+    end
+end
+
+---@param type MarkerType
+---@param markers MarkerData
+---@param count number
+local function AddToMarkerCache(type, markers, count)
+
+    -- post process markers
+    for k = 1, count do
+        local marker = markers[k]
+
+        -- add fields for backwards compatibility
+        BackwardsCompatibility(marker)
+
+        -- register marker for quick lookup
+        CachedMarkers[marker.Name] = marker
+    end
+
+    -- add it to the marker cache
+    MarkerCache[type] = {
+        Count = count,
+        Markers = markers
+    }
+
+    -- easier debugging
+    SPEW("Caching " .. count .. " markers of type " .. tostring(type) .. "!")
+end
+
+---@param type MarkerType
+---@param marker MarkerData
+local function AppendToMarkerCache(type, marker)
+    if not MarkerCache[type] then
+        AddToMarkerCache(type, { marker }, 1)
+    end
+
+    -- add fields for backwards compatibility
+    BackwardsCompatibility(marker)
+
+    -- register marker for quick lookup
+    CachedMarkers[marker.Name] = marker
+
+    -- append it to the cache
+    local cache = MarkerCache[type]
+    cache.Count = cache.Count + 1
+    cache.Markers[cache.Count] = marker
+end
+
+---@return table<string, Marker>
+function GetCachedMarkers()
+    return CachedMarkers
 end
 
 --- Retrieves a single marker on the map.
 ---@param name string
 ---@return MarkerData
 function GetMarker(name)
-    return AllMarkers[name]
+    return CachedMarkers[name] or Scenario.MasterChain._MASTERCHAIN_.Markers[name]
 end
 
---- Represents a cache of markers to prevent re-populating tables
-local MarkerCache = {}
-
--- Pre-enable the caching of resource markers, to support adaptive maps
-MarkerCache["Mass"] = { Count = 0, Markers = {} }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = {} }
-MarkerCache["Spawn"] = { Count = 0, Markers = {} }
-
-local armies = table.hash(ListArmies())
-for k, marker in AllMarkers do
-    if armies[k] then
-        marker.name = k
-        MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
-        MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
-    end
-end
-
---- Retrieves all markers of a given type. This is a shallow copy,
--- which means the reference is copied but the values are not. If you
--- need a copy with unique values use GetMarkerByTypeDeep instead.
--- Common marker types are:
--- - "Mass", "Hydrocarbon", "Spawn"
--- - "Air Path Node", "Land Path Node", "Water Path Node", "Amphibious Path Node"
--- - "Transport Marker", "Naval Area", "Naval Link", "Rally Point", "Expansion Area"
--- - "Protected Experimental Construction"
--- The list is not limited to these marker types - any marker that has a 'type' property
--- can be cached. You can find them in the <map>_save.lua file.
----@param type string The type of marker to retrieve.
+---@param type MarkerType
 ---@return MarkerData[]
 ---@return number
 function GetMarkersByType(type)
+    type = MapMarkerType(type)
+
+    -- defensive programming
+    if not type then
+        return {}, 0
+    end
 
     -- check if it is cached and return that
     local cache = MarkerCache[type]
@@ -91,70 +227,59 @@ function GetMarkersByType(type)
     local ms = {}
     local n = 1
 
-    -- find all the relevant markers
-    for k, marker in AllMarkers do
+    -- find all the relevant markers by searching through the original scenario markers
+    for k, marker in Scenario.MasterChain._MASTERCHAIN_.Markers do
         if marker.type == type then
+            -- mod support syntax
+            marker.Name = marker.Name or k
+            marker.Size = marker.size or 1
+            marker.Resource = marker.resource or false
+            marker.Type = marker.type
+            marker.Orientation = marker.orientation
+            marker.Position = marker.position
+            marker.Color = marker.color or 'ffffff'
+
             ms[n] = marker
             n = n + 1
         end
     end
 
-    -- tell us about it, for now
-    SPEW("Caching " .. n - 1 .. " markers of type " .. type .. "!")
+    -- register the markers
+    AddToMarkerCache(type, ms, n - 1)
 
-    -- construct the cache
-    cache = {
-        Count = n - 1,
-        Markers = ms
-    }
-
-    -- cache it and return it
-    MarkerCache[type] = cache
-    return cache.Markers, cache.Count
+    return ms, n - 1
 end
 
---- Retrieves all markers of a given type. This is a deep copy
--- and involves a lot of additional allocations. Do not use this
--- unless you strictly need to.
----@param type string
----@return MarkerData[]
----@return number
-function GetMarkersByTypeDeep(type)
-    local markers, number = GetMarkersByType(type)
-    return TableDeepCopy(markers), number
-end
+---@param type MarkerType
+---@param markers any
+function OverwriteMarkerByType(type, markers)
+    type = MapMarkerType(type)
 
---- Flushes the cache of a certain type. Does not remove
--- existing references.
----@param type string The type to flush.
-function FlushMarkerCacheByType(type)
-
-    -- give developer a warning, you can't do this
-    if type == "Mass" or type == "Hydrocarbon" or type == "Spawn" then
-        WARN("Unable to flush resource markers from the cache - it can cause issues for adaptive maps.")
-        return
+    -- defensive programming
+    if not type then
+        return {}, 0
     end
 
-    MarkerCache[type] = false
+    local ms = {}
+    local n = 1
+
+    for k, marker in markers do
+        -- mod support syntax
+        marker.Name = marker.Name or k
+        marker.Size = marker.size
+        marker.Resource = marker.resource
+        marker.Type = marker.type
+        marker.Orientation = marker.orientation
+        marker.Position = marker.position
+        marker.Color = marker.color
+
+        ms[n] = marker
+        n = n + 1
+    end
+
+    -- register the markers
+    AddToMarkerCache(type, ms, n - 1)
 end
-
---- Flushes the entire marker cache. Does not remove existing references.
-function FlushMarkerCache()
-
-    -- copy over for consistency
-    local cache = {}
-    cache.Mass = MarkerCache.Mass
-    cache.Hydrocarbon = MarkerCache.Hydrocarbon
-    cache.Spawn = MarkerCache.Spawn
-
-    MarkerCache = cache
-end
-
---- Contains all the chains that are part of the map
-local AllChains = Scenario.Chains
-
---- Represents a cache of chains to prevent re-populating tables
-local ChainCache = {}
 
 --- Retrieves a chain of markers. Throws an error if the chain
 -- does not exist. This is a shallow copy, which means the
@@ -171,7 +296,7 @@ function GetMarkersInChain(name)
     end
 
     -- check if chain exists
-    local chain = AllChains[name]
+    local chain = Scenario.Chains[name]
     if not chain then
         error('ERROR: Invalid Chain Named- ' .. name, 2)
     end
@@ -201,11 +326,11 @@ end
 -- chain does not exist. This is a deep copy and involves
 -- a lot of additional allocations. Do not use this unless
 -- you strictly need to.
----@param type MarkerChain The type of marker to retrieve.
+---@param name MarkerChain The name of chain to retrieve.
 ---@return MarkerData[]
 ---@return number
-function GetMarkersInChainDeep(type)
-    local markers, count = GetMarkersInChain(type)
+function GetMarkersInChainDeep(name)
+    local markers, count = GetMarkersInChain(name)
     return TableDeepCopy(markers), count
 end
 
@@ -270,22 +395,33 @@ function ToggleDebugMarkersByType(type)
                     end
 
                     -- draw out all markers
-                    local markers, count = GetMarkersByType(type)
-                    for k = 1, count do
-                        local marker = markers[k]
-                        DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
+                    local markers = GetMarkersByType(type)
+                    for k, marker in markers do
+                        DrawCircle(marker.Position, marker.Size or 1, marker.Color or 'ffffffff')
 
                         if marker.NavLabel then
-                            DrawCircle(marker.position, (marker.size or 1) + 1, labelToColor(marker.NavLabel))
+                            DrawCircle(marker.Position, (marker.Size or 1) + 1, labelToColor(marker.NavLabel))
                         end
 
                         -- useful for pathing markers
                         if marker.adjacentTo then
                             for _, neighbour in StringSplit(marker.adjacentTo, " ") do
-                                local neighbour = AllMarkers[neighbour]
+                                local neighbour = GetMarker(neighbour)
                                 if neighbour then
-                                    DrawLine(marker.position, neighbour.position, marker.color or 'ffffffff')
+                                    DrawLine(marker.Position, neighbour.Position, marker.Color or 'ffffffff')
                                 end
+                            end
+                        end
+
+                        if marker.Extractors then
+                            for _, neighbour in marker.Extractors do
+                                DrawLine(marker.Position, neighbour.Position, '3BFF55')
+                            end
+                        end
+
+                        if marker.HydrocarbonPlants then
+                            for _, neighbour in marker.HydrocarbonPlants do
+                                DrawLine(marker.Position, neighbour.Position, 'F2FF3B')
                             end
                         end
                     end
@@ -396,9 +532,24 @@ function ToggleDebugChainByName(name)
     DebugChainThreads[name] = thread
 end
 
-do
+function Setup()
+    -- prepare spawn markers
+    local armies = table.hash(ListArmies())
+    for k, marker in Scenario.MasterChain._MASTERCHAIN_.Markers do
+        if string.sub(k, 1, 5) == 'ARMY_' then
+            marker.Name = k
+            marker.Position = marker.position
+            marker.size = 25
+            marker.Size = 25
+            marker.IsOccupied = (armies[k] and true) or false
 
-    -- hook to cache markers created on the fly by crazy rush type of games
+            BackwardsCompatibility(marker)
+            MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
+            MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
+        end
+    end
+
+    -- hook to catch created resources
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function(type, x, y, z, size)
 
@@ -428,31 +579,56 @@ do
         local marker = nil
         if type == 'Mass' then
             marker = {
+                NavLayer = layer,
+                NavLabel = label,
+
+                -- mod support syntax
+                Size = size,
+                Resource = true,
+                Type = type,
+                Orientation = orientation,
+                Position = position,
+
+                -- legacy syntax for markers
                 size = size,
                 resource = true,
                 type = type,
                 orientation = orientation,
                 position = position,
-
-                NavLayer = layer,
-                NavLabel = label,
             }
         else
             marker = {
+
+                NavLayer = layer,
+                NavLabel = label,
+
+                -- mod support syntax
+                Size = size,
+                Resource = true,
+                Type = type,
+                Orientation = orientation,
+                Position = position,
+
+                -- legacy syntax for markers
                 size = size,
                 resource = true,
                 type = type,
                 orientation = orientation,
                 position = position,
-
-                NavLayer = layer,
-                NavLabel = label,
             }
         end
 
-        -- make sure cache exists
-        local markers, count = GetMarkersByType(type)
-        MarkerCache[type].Count = count + 1
-        MarkerCache[type].Markers[count + 1] = marker
+        AppendToMarkerCache(type, marker)
+    end
+end
+
+GenerateExpansionMarkers = import("/lua/sim/markerutilities/expansions.lua").Generate
+GenerateNavalAreaMarkers = import("/lua/sim/markerutilities/navalareas.lua").Generate
+GenerateRallyPointMarkers = import("/lua/sim/markerutilities/rallypoints.lua").Generate
+
+function __moduleinfo.OnReload(newModule)
+    -- add existing markers to new module
+    for key, info in MarkerCache do
+        newModule.OverwriteMarkerByType(key, info.Markers)
     end
 end

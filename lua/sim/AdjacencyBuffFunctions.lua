@@ -11,14 +11,15 @@
 
 local TableGetn = table.getn
 
----@param buff BlueprintBuff
+
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@param instigator StructureUnit
 DefaultBuffRemove = function(buff, unit, instigator)
     unit:DestroyAdjacentEffects(instigator)
 end
 
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@param instigator StructureUnit
 DefaultBuffAffect = function(buff, unit, instigator)
@@ -26,11 +27,11 @@ DefaultBuffAffect = function(buff, unit, instigator)
 end
 
 -- Energy Build Bonus - Energy Active Consumption
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 EnergyBuildBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.BuildableCategory and TableGetn(bp.Economy.BuildableCategory) > 0 then
         return true
     end
@@ -55,11 +56,11 @@ EnergyBuildBuffAffect = function(buff, unit, instigator)
 end
 
 -- Mass Build Bonus - Mass Active Consumption
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 MassBuildBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.BuildableCategory and TableGetn(bp.Economy.BuildableCategory) > 0 then
         return true
     end
@@ -84,11 +85,11 @@ MassBuildBuffAffect = function(buff, unit, instigator)
 end
 
 -- Energy Maintenance Bonus
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 EnergyMaintenanceBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.MaintenanceConsumptionPerSecondEnergy or unit.EnergyMaintenanceConsumptionOverride then
         return true
     end
@@ -109,11 +110,11 @@ EnergyMaintenanceBuffAffect = function(buff, unit, instigator)
     DefaultBuffAffect(buff, unit, instigator)
 end
 
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 MassActiveBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.BuildableCategory and not table.empty(bp.Economy.BuildableCategory) then
         return true
     end
@@ -126,7 +127,7 @@ end
 EnergyActiveBuffCheck = MassActiveBuffCheck
 
 -- Energy Weapon Bonus
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 EnergyWeaponBuffCheck = function(buff, unit)
@@ -154,7 +155,7 @@ EnergyWeaponBuffAffect = function(buff, unit, instigator)
 end
 
 -- Weapon Rate of Fire
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 RateOfFireBuffCheck = function(buff, unit)
@@ -179,11 +180,11 @@ RateOfFireBuffAffect = function(buff, unit, instigator)
 end
 
 -- Energy Production
----@param buff BlueprintBuff
+---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
 ---@return boolean
 EnergyProductionBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.ProductionPerSecondEnergy and bp.Economy.ProductionPerSecondEnergy > 0 then
         return true
     end
@@ -209,7 +210,7 @@ end
 ---@param unit StructureUnit
 ---@return boolean
 MassProductionBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.ProductionPerSecondMass and bp.Economy.ProductionPerSecondMass > 0 then
         return true
     end

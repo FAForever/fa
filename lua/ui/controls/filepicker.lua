@@ -89,11 +89,15 @@ local invalidNameSet = {
 }
 
 -- this function tests a character to see if it's invalid in a file name
+---@param charcode string
+---@return boolean
 function IsCharInvalid(charcode)
     return invalidCharSet[charcode] or false
 end
 
 -- tests a filename for several validity issues, returns error code key
+---@param filename FileName
+---@return string
 function IsFilenameInvalid(filename)
     -- check for nil
     if not filename then
@@ -139,6 +143,12 @@ end
 
 ---@class FilePicker : Group
 FilePicker = ClassUI(Group) {
+    ---@param self FilePicker
+    ---@param parent Control
+    ---@param fileType filetype
+    ---@param onlyShowMine any
+    ---@param selectAction any
+    ---@param debugName any
     __init = function(self, parent, fileType, onlyShowMine, selectAction, debugName)
         Group.__init(self, parent)
         self:SetName(debugName or "FilePicker")
@@ -150,9 +160,9 @@ FilePicker = ClassUI(Group) {
 
         self._sortby = {field = 'name', ascending = true}
 
---[[---------------------------------------------------------------------------
+    --[[---------------------------------------------------------------------------
         LAYOUT
---]]----------------------------------------------------------------------------
+    --]]----------------------------------------------------------------------------
 
         self._filenameEdit = Edit(self)
         self._filenameEdit:SetForegroundColor(UIUtil.fontColor)
@@ -479,6 +489,8 @@ FilePicker = ClassUI(Group) {
         end
     end,
 
+    ---@param self FilePicker
+    ---@param configID number
     SetTabConfiguration = function(self, configID)
         if not table.empty(self._tabs) then
             for index, tab in self._tabs do
@@ -585,6 +597,8 @@ FilePicker = ClassUI(Group) {
         end
     end,
 
+    ---@param self FilePicker
+    ---@return boolean
     DoSelectBehavior = function(self)
         local err = IsFilenameInvalid(self._filenameEdit:GetText())
         if err then
@@ -605,19 +619,22 @@ FilePicker = ClassUI(Group) {
         return true
     end,
 
+    ---@param self FilePicker
     RepopulateList = function(self)
         local filesData = GetSpecialFiles(self._fileType)
 
         self._currentDir = filesData.directory
         self._currentExt = filesData.extension
-
         self._currentFiles = {}
 
         if (self._onlyMineCheckbox == nil) or self._onlyMineCheckbox:IsChecked() then
-            local curProfileName = Prefs.GetCurrentProfile().Name
-            if filesData.files[curProfileName] then
-                for index, file in filesData.files[curProfileName] do
-                    table.insert(self._currentFiles, {curProfileName, file})
+            -- find the current profile in a case insensitive manner
+            local curProfileName = string.lower(Prefs.GetCurrentProfile().Name)
+            for id, files in filesData.files do
+                if string.lower(id) == curProfileName then
+                    for index, file in files do
+                        table.insert(self._currentFiles, {curProfileName, file})
+                    end
                 end
             end
         else
@@ -652,27 +669,40 @@ FilePicker = ClassUI(Group) {
         end
     end,
 
+    ---@param self FilePicker
+    ---@param newText string
+    ---@param profile string
     SetFilename = function(self, newText, profile)
         self._currentProfile = profile or Prefs.GetCurrentProfile().Name
         self._filenameEdit:SetText(newText)
     end,
 
+    ---@param self FilePicker
+    ---@return any
     GetProfile = function(self)
         return self._currentProfile or Prefs.GetCurrentProfile().Name
     end,
 
+    ---@param self FilePicker
+    ---@return unknown
     GetBaseName = function(self)
         return self._filenameEdit:GetText()
     end,
 
+    ---@param self FilePicker
+    ---@return any
     GetExtension = function(self)
         return self._currentExt
     end,
 
+    ---@param self FilePicker
+    ---@return any
     GetDirectory = function(self)
         return self._currentDir
     end,
 
+    ---@param self FilePicker
+    ---@return table
     GetFileInfo = function(self)
         local useProfile = self._currentProfile or Prefs.GetCurrentProfile().Name
         local ret = {}

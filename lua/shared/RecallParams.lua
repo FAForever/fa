@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 
 --- ticks before a player can start the first recall vote (5 minutes)
 PlayerGateCooldown = 5 * 60 * 10
@@ -12,7 +15,7 @@ TeamVoteCooldown = 1 * 60 * 10
 VoteTime = 30 * 10
 
 function RecallRequestAccepted(acceptanceVotes, totalVotes)
-    if totalVotes <= 2 then
+    if totalVotes <= 3 then
         return acceptanceVotes >= totalVotes
     else
         return acceptanceVotes >= (totalVotes - 1)

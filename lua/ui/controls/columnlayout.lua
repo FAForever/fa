@@ -5,10 +5,10 @@ local Group = import("/lua/maui/group.lua").Group
 ---@class ColumnLayout : Group
 ColumnLayout = ClassUI(Group) {
     --- Create a new ColumnLayout
-    --
-    -- @param positions A list of values representing the x co-ordinate of the leftmost pixel of
-    --                  each column.
-    -- @param widths A list of values representing the width of each column.
+    ---@param self ColumnLayout
+    ---@param parent Control
+    ---@param positions number[] A list of values representing the x co-ordinate of the leftmost pixel of each column. 
+    ---@param widths number[] A list of values representing the width of each column.
     __init = function(self, parent, positions, widths)
         Group.__init(self, parent)
 
@@ -18,6 +18,8 @@ ColumnLayout = ClassUI(Group) {
     end,
 
     --- Add a control to the group, inserting it into the next available column.
+    ---@param self ColumnLayout
+    ---@param control Control
     AddChild = function(self, control)
         self.numChildren = self.numChildren + 1
         LayoutHelpers.SetWidth(control, self.widths[self.numChildren])

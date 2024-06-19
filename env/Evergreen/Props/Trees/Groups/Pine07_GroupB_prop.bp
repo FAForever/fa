@@ -1,10 +1,8 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
-    CollisionOffsetX = -0.75,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0.2,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -14,21 +12,21 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = '../Pine07_albedo.dds',
                     LODCutoff = 60,
-                    NormalsName = '../Pine07_normalsTS.dds',
-                    ShaderName = 'UndulatingNormalMappedAlpha',
+                    ShaderName = "UndulatingNormalMappedAlpha",
+                    AlbedoName = "../Pine07_albedo.dds",
+                    NormalsName = "../Pine07_normalsTS.dds",
                 },
                 {
-                    AlbedoName = '../Pine07_albedo.dds',
                     LODCutoff = 200,
-                    NormalsName = '../Pine07_normalsTS.dds',
-                    ShaderName = 'NormalMappedAlpha',
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "../Pine07_albedo.dds",
+                    NormalsName = "../Pine07_normalsTS.dds",
                 },
                 {
-                    AlbedoName = 'Pine07_GroupB_LOD2_albedo.dds',
                     LODCutoff = 750,
-                    ShaderName = 'VertexNormal',
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "Pine07_GroupB_LOD2_albedo.dds",
                 },
             },
         },
@@ -39,14 +37,13 @@ PropBlueprint {
         ReclaimMassMax = 5,
         ReclaimTime = 25,
     },
-    Interface = {
-        HelpText = 'Group of Very Small Trees - Pine ',
-    },
-    Physics = {
-        BlockPath = false,
-    },
-    ScriptClass = 'TreeGroup',
-    ScriptModule = '/lua/proptree.lua',
+    Interface = { HelpText = "Group of Very Small Trees - Pine " },
+    Physics = { BlockPath = false },
+    ScriptClass = "TreeGroup",
+    ScriptModule = "/lua/proptree.lua",
+    CollisionOffsetX = -0.75,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0.2,
     SizeX = 2.8,
     SizeY = 1.4,
     SizeZ = 3.1,

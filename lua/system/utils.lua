@@ -20,44 +20,6 @@ local TableGetn = table.getn
 local TableRemove = table.remove 
 local TableSort = table.sort
 
---- Determines the size in bytes of the given element
----@param element any
----@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
----@param seen? table<table, any>           # List of strings and / or tables that we've seen so far. Should be nil by default
----@return integer
-function ToBytes(element, ignore, seen)
-
-    -- has no allocated bytes
-    if element == nil then
-        return 0
-    end
-
-    -- applies to tables and strings, to prevent counting them multiple times
-    seen = seen or { }
-    if seen[element] then
-        return 0
-    end
-
-    -- determine size
-    local allocatedSize = debug.allocatedsize(element)
-    if allocatedSize == 0 then
-        return 8
-    elseif type(element) ~= 'table' then
-        seen[element] = true
-        return allocatedSize
-    end
-
-    -- at this point we know it is a table
-    seen[element] = true
-    for k, v in element do
-        if not ignore[k] then
-            allocatedSize = allocatedSize + ToBytes(v, ignore, seen)
-        end
-    end
-
-    return allocatedSize
-end
-
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
@@ -91,14 +53,36 @@ function safecall(msg, fn, ...)
     end
 end
 
---- table.copy(t) returns a shallow copy of t.
-function table.copy(t)
-    if not t then return end -- prevents looping over nil table
-    local r = {}
-    for k,v in t do
-        r[k] = v
+--- table.empty(t) returns true iff t has no keys/values.
+---@param t table
+---@return boolean
+function table.empty(t)
+    if type(t) ~= 'table' then return true end
+    return next(t) == nil
+end
+
+--- Returns actual size of a table, including string keys
+---@param t table
+---@return number
+function table.getsize(t)
+    if type(t) ~= 'table' then return 0 end
+    local size = 0
+    for k, v in t do
+        size = size + 1
     end
-    return r
+    return size
+end
+
+--- table.copy(t) returns a shallow copy of t.
+---@overload fun(t: Vector): Vector
+function table.copy(t)
+    if t then -- prevents looping over nil table
+        local r = {}
+        for k,v in t do
+            r[k] = v
+        end
+        return r
+    end
 end
 
 --- table.find(t,val) returns the key for val if it is in t table.
@@ -140,10 +124,21 @@ function table.removeByValue(t,val)
     end
 end
 
---- table.deepcopy(t) returns a copy of t with all sub-tables also copied.
+---@generic T
+---@param t T
+---@param backrefs? table
+---@return T
 function table.deepcopy(t,backrefs)
+    backrefs = backrefs or { }
+
     if type(t)=='table' then
-        if backrefs==nil then backrefs = {} end
+
+        -- do not deep-copy anything with a metatable as that doesn't make sense. With this we
+        -- naturally exclude deep-copying a brain, unit or other tables that are usually unique
+        if not table.empty(getmetatable(t)) then
+                WARN(reprs(debug.traceback()))
+            return t
+        end
 
         local b = backrefs[t]
         if b then
@@ -155,6 +150,7 @@ function table.deepcopy(t,backrefs)
         for k,v in t do
             r[k] = table.deepcopy(v,backrefs)
         end
+
         return r
     else
         return t
@@ -345,21 +341,6 @@ function sortedpairs(t, comp)
     end
 end
 
---- Returns actual size of a table, including string keys
-function table.getsize(t)
-    -- handling nil table like empty tables so that no need to check
-    -- for nil table and then size of table:
-    -- if t and not table.empty(t) then
-    -- do some thing
-    -- end
-    if type(t) ~= 'table' then return 0 end
-    local size = 0
-    for k, v in t do
-        size = size + 1
-    end
-    return size
-end
-
 --- Returns a table with keys and values from t reversed.
 --- e.g. table.inverse {'one','two','three'} => {one=1, two=2, three=3}
 ---      table.inverse {foo=17, bar=100}     => {[17]=foo, [100]=bar}
@@ -380,11 +361,26 @@ function table.reverse(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     local items = table.indexize(t) -- convert from hash table
-    local itemsCount = table.getsize(t)
+    local itemsCount = table.getn(t)
     for k, v in ipairs(items) do
         r[itemsCount + 1 - k] = v
     end
     return r
+end
+
+--- Combines a series of tables into one table. Returns a new table. The parameters are merged into the new table in order
+---@see `table.assimilate`
+---@param ... table[]
+---@return table
+function table.combine(...)
+    local combined = { }
+    for k = 1, arg.n do
+        for key, value in arg[k] do
+            combined[key] = value
+        end
+    end
+
+    return combined
 end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
@@ -456,12 +452,6 @@ function table.map(fn, t)
         r[k] = fn(v)
     end
     return r
-end
-
---- table.empty(t) returns true iff t has no keys/values.
-function table.empty(t)
-    if type(t) ~= 'table' then return true end
-    return next(t) == nil
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -564,6 +554,9 @@ function table.count(t, fn)
 end
 
 --- Returns a new table with unique values stored using numeric keys and it does not preserve keys of the original table
+---@generic T, G
+---@param t? table<T, G>
+---@return table<T, G> | nil
 function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}

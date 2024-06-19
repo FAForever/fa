@@ -1,21 +1,41 @@
 ---@meta
 
 ---@class MeshBlueprint : Blueprint
----@field LODs MeshBlueprintLod[]  List of LOD info
----@field IconFadeInZoom number    Zoom level at which to start fading in the strategic icon. Higher values increase how zoomed out you must be for the icon to appear.
----@field SortOrder number         Sort order of mesh we render smallest to largest
----@field UniformScale number     Uniform scale factor
----@field StraddleWater boolean    Render both above and below the water.
+--- List of LOD info. The order in the list corresponds to the LOD number.
+---@field LODs MeshBlueprintLod[]
+--- Zoom level at which to start fading in the strategic icon. Higher values increase how
+--- zoomed out you must be for the icon to appear.
+---@field IconFadeInZoom number
+--- sort order of mesh we render smallest to largest
+---@field SortOrder number
+--- uniform scale factor
+---@field UniformScale number
+--- render both above and below the water
+---@field StraddleWater boolean
 
 ---@class MeshBlueprintLod
----@field MeshName string       Name of mesh to use for this LOD
----@field AlbedoName string     Name of the albedo to use for this LOD
----@field NormalsName string    Name of the normal map to use for this LOD
----@field SpecularName string   Name of the specular map to use for this LOD
----@field LookupName string     Name of the lookup map to use for this LOD
----@field SecondaryName string  Name of the secondary map to use for this LOD
----@field ShaderName string     Name of the shader group to use for this LOD    
----@field LODCutoff number      Zoom level at which this guy starts fading out (higher value increases how zoomed out you must be)
----@field Scrolling boolean     True if this requires texture scrolling in the shader
----@field Occlude boolean       True if this may occlude other meshes (for silhouette generation)
----@field Silhouette boolean    True if this can generate a silhouette if blocked by an occluder
+--- name of mesh to use for this LOD
+---@field MeshName FileName
+--- name of the albedo to use for this LOD
+---@field AlbedoName FileName
+--- name of the normal map to use for this LOD
+---@field NormalsName FileName
+--- name of the specular map to use for this LOD
+---@field SpecularName FileName
+--- name of the lookup map to use for this LOD
+---@field LookupName FileName
+--- name of the secondary map to use for this LOD
+---@field SecondaryName FileName
+--- the shader name from `Mesh.fx` to use for this LOD
+---@field ShaderName? string
+--- name of the texture map to use for this LOD
+---@field TextureName? FileName
+--- zoom level at which this LOD starts fading out (higher value increases
+--- how zoomed out you must be)
+---@field LODCutoff number
+--- if this LOD requires texture scrolling in the shader
+---@field Scrolling? boolean
+--- if this LOD's mesh may occlude other meshes (for silhouette generation)
+---@field Occlude? boolean
+--- if this LOD's mesh can generate a silhouette if blocked by an occluder
+---@field Silhouette? boolean

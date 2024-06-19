@@ -1,7 +1,5 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
-    },
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -12,20 +10,18 @@ PropBlueprint {
             LODs = {
                 {
                     LODCutoff = 400,
-                    ShaderName = 'VertexNormal',
+                    ShaderName = "VertexNormal",
                 },
             },
         },
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'pillar test',
-    },
+    Interface = { HelpText = "pillar test" },
     Physics = {
         BlockPath = true,
         Footprint = {

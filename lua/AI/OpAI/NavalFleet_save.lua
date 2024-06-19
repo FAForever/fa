@@ -122,11 +122,11 @@ Scenario = {
                         PlatoonType = 'Sea',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
+                            {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -148,11 +148,11 @@ Scenario = {
                         PlatoonType = 'Sea',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
+                            {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -174,11 +174,11 @@ Scenario = {
                         PlatoonType = 'Sea',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
+                            {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -204,23 +204,23 @@ Scenario = {
                             {'default_platoon'}
                         },
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetMasterCountDifficulty',
+                            {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetMasterCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
                         },
                         PlatoonBuildCallbacks = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
                                 {'default_brain','default_platoon'},
                                 {'default_brain','default_platoon'}
                             },
                         },
                         PlatoonAddFunctions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMLockPlatoon',
                                 {'default_platoon'},
                                 {'default_platoon'}
                             },
@@ -239,11 +239,11 @@ Scenario = {
                         PlatoonType = 'Sea',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
+                            {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalFleetChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
@@ -265,11 +265,11 @@ Scenario = {
                         PlatoonType = 'Sea',
                         RequiresConstruction = true,
                         BuildConditions = {
-                            [0] = {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
+                            {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },
-                            [1] = {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalSubChildCountDifficulty',
+                            {'/lua/ai/opai/navalfleet_editorfunctions.lua', 'NavalSubChildCountDifficulty',
                                 {'default_brain','default_master'},
                                 {'default_brain','default_master'}
                             },

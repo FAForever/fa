@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 3000,
@@ -11,20 +12,16 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    AlbedoName = 'jbuild01_Albedo.dds',
-					NormalsName = 'jbuild01_NormalsTS.dds',
-	  	    		ShaderName = 'VertexNormal',
                     LODCutoff = 200,
-                    
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "jbuild01_Albedo.dds",
+                    NormalsName = "jbuild01_NormalsTS.dds",
                 },
-				{
-
-                    AlbedoName = 'jbuild01_Albedo.dds',
-					NormalsName = 'jbuild01_NormalsTS.dds',
-	  	    		ShaderName = 'VertexNormal',
+                {
                     LODCutoff = 3000,
-                    
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "jbuild01_Albedo.dds",
+                    NormalsName = "jbuild01_NormalsTS.dds",
                 },
             },
         },
@@ -35,15 +32,9 @@ PropBlueprint {
         ReclaimMassMax = 70,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Japanese Building 02',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Japanese Building 02" },
+    Physics = { BlockPath = true },
     SizeX = 3,
     SizeY = 3.9,
     SizeZ = 5,

@@ -1,0 +1,1 @@
+- (#6251) Fix a crash on startup if the Steam install of the game is using Czech, Polish, or Chinese localization and the FAF install's localization file is missing.

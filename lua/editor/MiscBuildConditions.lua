@@ -41,39 +41,28 @@ end
 ---@param layerPref string
 ---@return true | nil
 function IsAIBrainLayerPref(aiBrain, layerPref)
-    if layerPref == aiBrain.LayerPref then
-        return true
-    end
+	return layerPref == aiBrain.LayerPref
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumber(aiBrain, num)
-    local missionNumber = ScenarioInfo.MissionNumber
-    if missionNumber and missionNumber == num then
-        return true
-    end
+	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber == num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumberGreaterOrEqual(aiBrain, num)
-    local missionNumber = ScenarioInfo.MissionNumber
-    if missionNumber and missionNumber >= num then
-        return true
-    end
+	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber >= num
 end
 
 ---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumberLessOrEqual(aiBrain, num)
-    local missionNumber = ScenarioInfo.MissionNumber
-    if missionNumber and missionNumber <= num then
-        return true
-    end
+	return ScenarioInfo.MissionNumber and ScenarioInfo.MissionNumber <= num
 end
 
 ---@param aiBrain AIBrain unused
@@ -96,30 +85,21 @@ end
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyEqual(aiBrain, diffLevel)
-    local difficulty = ScenarioInfo.Options.Difficulty
-    if difficulty and difficulty == diffLevel then
-        return true
-    end
+	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty == diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyGreaterOrEqual(aiBrain, diffLevel)
-    local difficulty = ScenarioInfo.Options.Difficulty
-    if difficulty and difficulty >= diffLevel then
-        return true
-    end
+	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty >= diffLevel
 end
 
 ---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyLessOrEqual(aiBrain, diffLevel)
-    local difficulty = ScenarioInfo.Options.Difficulty
-    if difficulty and difficulty <= diffLevel then
-        return true
-    end
+	return ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty <= diffLevel
 end
 
 ---@param aiBrain AIBrain unused
@@ -204,15 +184,26 @@ end
 
 ---@param aiBrain AIBrain
 ---@return true | nil
-function ArmyNeedsTransports(aiBrain)
+function TransportRequested(aiBrain)
     if aiBrain then
-        local needTransports = aiBrain.NeedTransports
-        if needTransports and needTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+        if aiBrain.TransportRequested and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
 end
 
+-- deprecated kept for compatibility
+---@param aiBrain AIBrain
+---@return true | nil
+function ArmyNeedsTransports(aiBrain)
+    if aiBrain then
+        if aiBrain.NeedTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+            return true
+        end
+    end
+end
+
+-- deprecated kept for compatibility
 ---@param aiBrain AIBrain
 ---@param number number
 ---@return true | nil
@@ -330,6 +321,7 @@ function MapLessThan(aiBrain, sizeX, sizeZ)
 end
 
 --- Buildcondition to check pathing to current enemy 
+--- Note this requires the CanPathToCurrentEnemy thread to be running
 ---@param aiBrain AIBrain
 ---@param locationType string
 ---@param pathType string
@@ -354,6 +346,48 @@ function WaterMassMarkersPresent(aiBrain)
         return true
     end
     return false
+end
+
+---@param aiBrain BaseAIBrain
+---@param locationType string
+---@return true | nil
+function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
+    -- this condition won't work without a reference to the reclaim grid
+    local gridReclaim = aiBrain.GridReclaim
+    if not gridReclaim then
+        WARN(string.format("Build condition ('ReclaimAvailableInGrid') requires a reference to the reclaim grid in the brain (of %s)", aiBrain.Nickname))
+        return false
+    end
+    
+    -- this condition won't work without a reference to the engineer manager
+    local manager = aiBrain.BuilderManagers[locationType].EngineerManager --[[@type EngineerManager]]
+    if not manager then
+        return false
+    end
+    local rings = 3
+    if mapSearch then rings = 8 end
+    -- no need to reclaim when there's nothing around us to reclaim
+    local bx, bz = gridReclaim:ToGridSpace(manager.Location[1], manager.Location[3])
+    local maximumCell = gridReclaim:MaximumInRadius(bx, bz, rings)
+    if maximumCell.TotalMass < 10 then
+        return false
+    end
+
+    return true
+end
+
+function ReclaimEnabledOnBrain(aiBrain)
+    -- this condition won't work without a reference to the reclaim grid
+    if aiBrain.ReclaimFailCounter > 10 then
+        local currentTime = GetGameTimeSeconds()
+        if aiBrain.ReclaimFailTimeStamp + 180 < currentTime then
+            aiBrain.ReclaimFailCounter = 0
+            aiBrain.ReclaimFailTimeStamp = 0
+        else
+            return false
+        end
+    end
+    return true
 end
 
 -- unused imports kept for mod support

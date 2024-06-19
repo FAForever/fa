@@ -13,30 +13,36 @@ local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
 ---@class URL0104 : CLandUnit
 URL0104 = ClassUnit(CLandUnit) {
     Weapons = {
-        TargetPainter = ClassWeapon(TargetingLaser) {
-            -- Unit in range. Cease ground fire and turn on AA
-            OnWeaponFired = function(self)
-                if not self.AA then
-                    self.unit:SetWeaponEnabledByLabel('GroundGun', false)
-                    self.unit:SetWeaponEnabledByLabel('AAGun', true)
-                    self.unit:GetWeaponManipulatorByLabel('AAGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('GroundGun'):GetHeadingPitch())
-                    self.AA = true
-                end
-                TargetingLaser.OnWeaponFired(self)
-            end,
+       AAGun = ClassWeapon(CAANanoDartWeapon) {
+            IdleState = State (CAANanoDartWeapon.IdleState) {
+                OnGotTarget = function(self)
+                    CAANanoDartWeapon.IdleState.OnGotTarget(self)
 
-            IdleState = State(TargetingLaser.IdleState) {
-                -- Start with the AA gun off to reduce twitching of ground fire
-                Main = function(self)
-                    self.unit:SetWeaponEnabledByLabel('GroundGun', true)
-                    self.unit:SetWeaponEnabledByLabel('AAGun', false)
-                    self.unit:GetWeaponManipulatorByLabel('GroundGun'):SetHeadingPitch(self.unit:GetWeaponManipulatorByLabel('AAGun'):GetHeadingPitch())
-                    self.AA = false
-                    TargetingLaser.IdleState.Main(self)
+                    -- copy over heading / pitch from ground gun to aa gun
+                    local unit = self.unit
+                    local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
+                    local ground = unit:GetWeaponManipulatorByLabel('GroundGun') --[[@as moho.AimManipulator]]
+                    aa:SetHeadingPitch(ground:GetHeadingPitch())
+
+                    unit:SetWeaponEnabledByLabel('GroundGun', false)
                 end,
             },
+
+            OnLostTarget = function(self)
+                CAANanoDartWeapon.OnLostTarget(self)
+
+                -- copy over heading / pitch from aa gun to ground gun
+                local unit = self.unit
+                local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
+                local ground = unit:GetWeaponManipulatorByLabel('GroundGun') --[[@as moho.AimManipulator]]
+                ground:SetHeadingPitch(aa:GetHeadingPitch())
+
+                -- reset heading / pitch of aa gun to prevent twitching
+                aa:SetHeadingPitch(0, 0)
+
+                unit:SetWeaponEnabledByLabel('GroundGun', true)
+            end,
         },
-        AAGun = ClassWeapon(CAANanoDartWeapon) {},
         GroundGun = ClassWeapon(CAANanoDartWeapon) {},
     },
 }

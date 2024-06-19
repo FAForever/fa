@@ -18,6 +18,7 @@ doscript '/lua/system/config.lua'
 doscript '/lua/system/import.lua'
 doscript '/lua/system/utils.lua'
 doscript '/lua/system/repr.lua'
+doscript '/lua/system/debug.lua'
 doscript '/lua/system/class.lua'
 doscript '/lua/system/trashbag.lua'
 doscript '/lua/system/Localization.lua'
@@ -30,12 +31,6 @@ InitialRegistration = true
 -- load buff blueprints
 doscript '/lua/system/BuffBlueprints.lua'
 import("/lua/sim/buffdefinitions.lua")
-
--- load AI builder systems
-doscript '/lua/system/GlobalPlatoonTemplate.lua'
-doscript '/lua/system/GlobalBuilderTemplate.lua'
-doscript '/lua/system/GlobalBuilderGroup.lua'
-doscript '/lua/system/GlobalBaseTemplate.lua'
 
 EmptyTable = {}
 setmetatable(EmptyTable, {__newindex = function()

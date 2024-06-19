@@ -1,13 +1,11 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'seraphim_shrieker_cannon_projectile_polytrail_02',
-	Lifetime = -1.00,
-    TrailLength = 0.25,
+return {
+    BlendMode = 0,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_10.dds",
+    RepeatTexture = "/textures/particles/trail_white_02.dds",
     Size = 0.026,
     SortOrder = 10,
-    BlendMode = 0,
     TextureRepeatRate = 1,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/trail_white_02.dds',
-	RampTexture = '/textures/particles/ramp_trail_10.dds',
+    TrailLength = 0.25,
 }
-

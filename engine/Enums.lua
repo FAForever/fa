@@ -1,6 +1,11 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 ---@meta
 
----@alias CommandCap
+-- the game can add arbitrary caps, so these are just the ones hardcoded into the engine
+
+---@alias EngineCommandCap
 ---| "RULEUCC_Move"
 ---| "RULEUCC_Stop"
 ---| "RULEUCC_Attack"
@@ -27,7 +32,7 @@
 ---| "RULEUCC_Script"
 ---| "RULEUCC_Invalid"
 
----@alias ToggleCap
+---@alias EngineToggleCap
 ---| "RULEUTC_ShieldToggle"
 ---| "RULEUTC_WeaponToggle"
 ---| "RULEUTC_JammingToggle"
@@ -81,6 +86,18 @@
 ---| "Water"
 ---| "Air"
 ---| "Orbital"
+
+---@alias HorizontalMovementState
+---| 'TopSpeed'
+---| 'Stopped'
+---| 'Stopping'
+---| 'Cruise'
+
+---@alias VerticalMovementState
+---| 'Down'
+---| 'Bottom'
+---| 'Up'
+---| 'Top'
 
 ---@alias WeaponRangeCategory
 ---| "UWRC_Undefined"

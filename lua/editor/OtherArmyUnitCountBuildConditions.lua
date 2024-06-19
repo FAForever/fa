@@ -66,7 +66,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param targetBrain string[]
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@return boolean
 function BrainGreaterThanNumCategory(aiBrain, targetBrain, numReq, category)
@@ -75,7 +75,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param targetBrain string[]
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@return boolean
 function BrainLessThanNumCategory(aiBrain, targetBrain, numReq, category)
@@ -84,7 +84,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param targetBrain string[]
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@return boolean
 function BrainGreaterThanOrEqualNumCategory(aiBrain, targetBrain, numReq, category)
@@ -93,7 +93,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param targetBrain string[]
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@return boolean
 function BrainLessThanOrEqualNumCategory(aiBrain, targetBrain, numReq, category)
@@ -101,7 +101,7 @@ function BrainLessThanOrEqualNumCategory(aiBrain, targetBrain, numReq, category)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param categories EntityCategory
 ---@param compareType CompareType? defaults to `">="`
 ---@return boolean

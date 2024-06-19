@@ -13,12 +13,12 @@ local SRadarUnit = import("/lua/seraphimunits.lua").SRadarUnit
 ---@class XSB3104 : SRadarUnit
 XSB3104 = ClassUnit(SRadarUnit) {
     
-    OnIntelDisabled = function(self)
-        SRadarUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        SRadarUnit.OnIntelDisabled(self, intel)
     end,
 
-    OnIntelEnabled = function(self)
-        SRadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        SRadarUnit.OnIntelEnabled(self, intel)
 
         if(not self.Rotator1) then
             self.Rotator1 = CreateRotator(self, 'Array03', 'y')

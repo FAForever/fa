@@ -456,6 +456,59 @@ function GetLocalPlayerData()
 )
 end
 
+--- Compute an estimation of the rating of the given AI. The values originate from 'aitypes.lua'
+---@param gameOptions table
+---@param aiLobbyProperties AILobbyProperties
+---@return number
+function ComputeAIRating(gameOptions, aiLobbyProperties)
+
+    if not aiLobbyProperties then
+        return 0
+    end
+
+    if not aiLobbyProperties.rating then
+        return 0
+    end
+
+    if not gameInfo.GameOptions.ScenarioFile then
+        return 0
+    end
+
+    -- try and take into account map
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if not (scenarioInfo and scenarioInfo.size and scenarioInfo.size[1] and scenarioInfo.size[2]) then
+        return 0
+    end
+
+    -- clamp the value
+    local maparea = math.max(scenarioInfo.size[1], scenarioInfo.size[2])
+    if maparea < 256 then
+        maparea = 256
+    elseif maparea > 4096 then
+        maparea = 4096
+    end
+
+    -- process various multipliers to determine rating
+    local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
+    local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
+    local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
+
+    
+
+    -- compute the rating
+    local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
+    local cheatResourceValue = (aiLobbyProperties.ratingCheatMultiplier or 0.0) * cheatResourceMultiplier
+    local cheatOmniValue = (gameOptions.OmniCheat == 'on' and aiLobbyProperties.ratingOmniBonus) or 0.0
+    local rating = mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue + cheatOmniValue)
+
+    -- prevent very low numbers
+    if rating < aiLobbyProperties.ratingNegativeThreshold then
+        rating = aiLobbyProperties.ratingNegativeThreshold + (rating - aiLobbyProperties.ratingNegativeThreshold) * 0.2
+    end
+
+    return math.floor(rating)
+end
+
 function GetAIPlayerData(name, AIPersonality, slot)
    local AIColor
    -- gets the color of the player/AI occupying the slot directly prior if available
@@ -472,19 +525,14 @@ function GetAIPlayerData(name, AIPersonality, slot)
     end
 
     -- retrieve properties from AI table
-    local baseAI = false
-    local requiresNavMesh = false
+    ---@type AILobbyProperties | nil
+    local aiLobbyProperties = nil
     for k, entry in aitypes do 
         if entry.key == AIPersonality then
-            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
-            baseAI = baseAI or entry.baseAI
+            aiLobbyProperties = entry
         end
     end
-
-    reprsl(aitypes)
-
-    LOG(baseAI)
-    LOG(requiresNavMesh)
+    local iRating = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties)
 
     return PlayerData(
         {
@@ -496,9 +544,12 @@ function GetAIPlayerData(name, AIPersonality, slot)
             PlayerColor = AIColor,
             ArmyColor = AIColor,
 
-            -- properties from AI table
-            RequiresNavMesh = requiresNavMesh,
-            BaseAI = baseAI
+            PL = iRating,
+            MEAN = iRating,
+            DEV = 0,
+
+            -- keep track of the AI lobby properties for easier access
+            AILobbyProperties = aiLobbyProperties,
         }
 )
 end
@@ -1524,7 +1575,7 @@ end
 local function AssignRandomStartSpots()
     local teamSpawn = gameInfo.GameOptions['TeamSpawn']
 
-    if teamSpawn == 'fixed' then
+    if teamSpawn == 'fixed' or teamSpawn == 'penguin_autobalance' then
         return
     end
 
@@ -2079,6 +2130,25 @@ local function TryLaunch(skipNoObserversCheck)
     end
 
     if not gameInfo.GameOptions.AllowObservers then
+        
+        -- if observers are not allowed, and team spawn is set to penguin_autobalance, and there are
+        -- an odd number of players, then make the last player an observer now if human 
+        -- (before the check(s)/prompt(s) for having observer(s) when they're not allowed)
+        if gameInfo.GameOptions.TeamSpawn == 'penguin_autobalance' then
+            if math.mod(numPlayers, 2) == 1 then
+                for i = 16, 1, -1 do
+                    -- this gets the last occupied slot
+                    if gameInfo.PlayerOptions[i] then
+                        LOG(gameInfo.PlayerOptions[i].Human)
+                        if gameInfo.PlayerOptions[i].Human then
+                            HostUtils.ConvertPlayerToObserver(i)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
         local hostIsObserver = false
         local anyOtherObservers = false
         for k, observer in gameInfo.Observers:pairs() do
@@ -2111,6 +2181,11 @@ local function TryLaunch(skipNoObserversCheck)
 
     numberOfPlayers = numPlayers
     local function LaunchGame()
+
+        if gameInfo.GameOptions.TeamSpawn == 'penguin_autobalance' then
+            GUI.PenguinAutoBalance.OnClick()
+        end
+
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
         AssignAutoTeams()
@@ -2138,9 +2213,13 @@ local function TryLaunch(skipNoObserversCheck)
         local allRatings = {}
         local clanTags = {}
         for k, player in gameInfo.PlayerOptions do
-            if player.Human and player.PL then
+            if player.PL then
                 allRatings[player.PlayerName] = player.PL
                 clanTags[player.PlayerName] = player.PlayerClan
+
+                if not player.Human then
+                    allRatings[player.PlayerName] = ComputeAIRating(gameInfo.GameOptions, player.AILobbyProperties)
+                end
             end
 
             if player.OwnerID == localPlayerID then
@@ -2237,10 +2316,31 @@ local function UpdateGame()
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
+        -- update AI rating as game settings change
+        for k = 1, 16 do
+            local playerOptions = gameInfo.PlayerOptions[k]
+            if playerOptions then
+                if not playerOptions.Human then
+                    playerOptions.PL = ComputeAIRating(gameInfo.GameOptions, playerOptions.AILobbyProperties);
+                    playerOptions.MEAN = playerOptions.PL
+                    playerOptions.DEV = 0
+                end
+            end
+        end
+
         if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
             GUI.mapView:SetScenario(scenarioInfo)
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
+
+            -- Briefing button takes priority over the patch notes if the map has a briefing
+            if scenarioInfo.hasBriefing then
+                GUI.briefingButton:Show()
+                GUI.patchnotesButton:Hide()
+            else
+                GUI.briefingButton:Hide()
+                GUI.patchnotesButton:Show()
+            end
 
             -- contains information that is available during blueprint loading
             local preGameData = {}
@@ -2329,8 +2429,8 @@ local function UpdateGame()
             -- hence we can not rely on mod and / or lobby option
             -- changes to be present.
 
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
+            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
+            -- PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()
@@ -2348,6 +2448,7 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
+        UIUtil.setEnabled(GUI.briefingButton, notReady)
         -- This button is enabled for all non-host players to view the configuration, and for the
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
@@ -2464,7 +2565,7 @@ function ShowGameQuality()
         local playerOptions = gameInfo.PlayerOptions[i]
         if playerOptions then
             -- Can't do it for AI, either, not sensibly.
-            if not playerOptions.Human then
+            if not playerOptions.Human and (playerOptions.MEAN or 0) == 0 then
                 return
             end
 
@@ -2486,7 +2587,7 @@ function ShowGameQuality()
 
     if quality > 0 then
         gameInfo.GameOptions.Quality = quality
-        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", quality), 20)
+        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", string.format("%.2f",quality)), 20)
     end
 end
 
@@ -3232,6 +3333,18 @@ function CreateUI(maxPlayers)
         Changelog.Changelog(GUI)
     end
 
+    -- Create mission briefing button
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    GUI.briefingButton = briefingButton
+    LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
+    briefingButton.OnClick = function(self, modifiers)
+        GUI.briefing = Group(GUI)
+        GUI.briefing.Depth:Set(function() return GUI.Depth() + 20 end)
+        LayoutHelpers.FillParent(GUI.briefing, GUI)
+        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(GUI.briefing, gameInfo.GameOptions.ScenarioFile)
+    end
+
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
     if isHost then
@@ -3867,8 +3980,8 @@ function CreateUI(maxPlayers)
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
         GUI.PenguinAutoBalance.OnClick = function()
 
-            -- make sure spawns are set to fixed
-            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+            -- make sure spawns are set to fixed or penguin_autobalance
+            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' and gameInfo.GameOptions.TeamSpawn ~= 'penguin_autobalance' then
                 gameInfo.GameOptions.TeamSpawn = 'fixed'
                 -- tell everyone else to set spawns to fixed
                 lobbyComm:BroadcastData {
@@ -3909,9 +4022,9 @@ function CreateUI(maxPlayers)
                 goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
                 playerRatings[lastSlot[2]] = nil
                 playerCount = playerCount - 1
-                -- set the player to not be on a team if teams are manual
+                -- set the player to not be on a team if teams are manual and fixed
                 -- otherwise make the player an observer if human or remove it if AI
-                if gameInfo.GameOptions.AutoTeams == 'none' then
+                if gameInfo.GameOptions.AutoTeams == 'none' and gameInfo.GameOptions.TeamSpawn == 'fixed' then
                     for i, player in gameInfo.PlayerOptions:pairs() do
                         if player.StartSpot == lastSlot[1] then
                             player.Team = 1 -- no team
@@ -4169,6 +4282,23 @@ function CreateUI(maxPlayers)
                 end
             end
 
+            --shuffle player pairs
+            local random
+            local temp
+            for i, slot in bestTeam do
+                random = Random(1, teamSize)
+
+                --random swap on team 1
+                temp = bestTeam[random]
+                bestTeam[random] = bestTeam[i]
+                bestTeam[i] = temp
+
+                --mirrored swap on team2
+                temp = bestTeam2[random]
+                bestTeam2[random] = bestTeam2[i]
+                bestTeam2[i] = temp
+            end
+
             -- move players on team1 to the intended slots
             local team1OrderNum = 0
             local slotA
@@ -4221,21 +4351,31 @@ function CreateUI(maxPlayers)
             local teams = {}
             local numTeams = 0
             for i, player in gameInfo.PlayerOptions:pairs() do
-                if not teams[player.Team] and player.Team != 1 then
-                    teams[player.Team] = 1
+                if not teams[player.Team] and player.Team ~= 1 then
+                    teams[player.Team] = true
                     numTeams = numTeams + 1
                 end
             end
-            -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
-            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+
+            -- adjust index by 1 because 0-based (ItemList rows) vs 1-based (Lua array) indexing
             local obsIndex = row + 1
-            if numTeams < 3 then
-                obsIndex = obsIndex - numTeams
+            local maxObsIndex = self:GetItemCount()
+
+            -- adjust index by the number of rows taken up by team ratings. 
+            ---@see refreshObserverList
+            if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+                if numTeams < 3 then
+                    obsIndex = obsIndex - numTeams
+                else
+                    -- 3+ teams has ratings at the end of the list, don't allow kicking when clicking those rating rows
+                    maxObsIndex = maxObsIndex - numTeams
+                end
             end
             
             -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
             -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
-            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
+            -- and that aren't the rows with team ratings when there are 3 or more teams
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID ~= localPlayerID and obsIndex <= maxObsIndex then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                         "<LOC lobui_0167>Kick Player", function()
                                             SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
@@ -4297,7 +4437,7 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
-    if true then
+    if false then
         import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
     end
 end
@@ -5077,7 +5217,66 @@ local MessageHandlers = {
     },
 
     AddPlayer = {
-        Accept = AmHost,
+
+        ---@class LobbyAddPlayerData
+        ---@field PlayerOptions PlayerData
+        ---@field SenderId number
+        ---@field SenderName string
+        ---@field Type string
+
+        ---@param data LobbyAddPlayerData
+        Accept = function(data)
+            -- we need to do quite a bit of checks to prevent malicious values
+            if type(data.PlayerOptions.MEAN) != 'number' then
+                return false
+            end
+
+            if type (data.PlayerOptions.NG) != 'number' then
+                return false
+            end
+
+            if type(data.PlayerOptions.Faction) != 'number' then
+                return false
+            end
+
+            if type(data.PlayerOptions.PlayerName) != 'string' then
+                return false
+            end
+
+            local charactersInPlayerName = string.len(data.PlayerOptions.PlayerName)
+            if charactersInPlayerName < 2 or charactersInPlayerName > 32 then
+                return false
+            end
+
+            if data.PlayerOptions.PlayerClan then
+                if type(data.PlayerOptions.PlayerClan) != 'string' then
+                    return false
+                end
+
+                -- note: there are strange clan names that use more than 1 byte per character
+                if string.len(data.PlayerOptions.PlayerClan) > 6 then
+                    return false
+                end
+            end
+
+
+            if not data.PlayerOptions.OwnerID then
+                return false
+            end
+
+            if not (data.PlayerOptions.OwnerID == data.SenderID) then
+                return false
+            end
+
+            if FindNameForID(data.SenderID) then
+                return false
+            end
+            
+            return lobbyComm:IsHost()
+        end,
+        Reject = function(data)
+            lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
+        end,
         Handle = function(data)
             -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
             -- slot or move it to observer
@@ -5441,6 +5640,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.DataReceived = function(self, data)
 
+        
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
@@ -5451,6 +5651,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- No defined validator is taken to be always-accept.
         if not MessageHandlers[data.Type].Accept or MessageHandlers[data.Type].Accept(data) then
             MessageHandlers[data.Type].Handle(data)
+        elseif MessageHandlers[data.Type].Reject then
+            MessageHandlers[data.Type].Reject(data)
         else
             WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
         end
@@ -5923,7 +6125,7 @@ function CPUBenchmark()
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
-            j = i ^ 4   --Power
+            j = math.pow(i, 4)   --Power
             l = -i      --Negation
             m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
             TableInsert(m, '1234567890')     --Insert Table Value
@@ -6469,7 +6671,6 @@ end
 -- Write the given list of preset profiles to persistent storage.
 function SavePresetsList(list)
     Prefs.SetToCurrentProfile("LobbyPresets", list)
-    SavePreferences()
 end
 
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.

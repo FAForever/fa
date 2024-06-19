@@ -20,35 +20,70 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class NavPathToHeap
----@field Heap CompressedLabelTreeLeaf[]
----@field HeapSize number
-NavPathToHeap = ClassSimple {
+---@class Stack
+---@field Size number
+Stack = ClassSimple {
 
-    ---@param self NavPathToHeap
+    ---@param self Stack
+    __init = function(self)
+        self.Size = 0
+    end,
+
+    ---@param self Stack
+    ---@param element any
+    Push = function(self, element)
+        local size = self.Size
+        self[size + 1] = element
+        self.Size = size + 1
+    end,
+
+    ---@param self Stack
+    ---@return any
+    Pop = function(self)
+        local size = self.Size
+        if size > 0 then
+            local element = self[size]
+            self.Size = size - 1
+            return element
+        end
+    end,
+
+    ---@param self Stack
+    ---@return boolean
+    Empty = function(self)
+        return self.Size == 0
+    end,
+
+    ---@param self Stack
+    Clear = function(self)
+        self.Size = 0
+    end,
+}
+
+---@class NavHeap
+---@field Heap NavPathingData[]
+---@field HeapSize number
+NavHeap = ClassSimple {
+
+    ---@param self NavHeap
     __init = function(self)
         self.Heap = {}
         self.HeapSize = 0
     end,
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     ---@return boolean
     IsEmpty = function(self)
         return self.HeapSize == 0
     end,
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Clear = function(self)
-        local heap = self.Heap
-
-        for k = 1, self.HeapSize do
-            heap[k] = nil
-        end
         self.HeapSize = 0
     end,
 
-    ---@param self NavPathToHeap
-    ---@return CompressedLabelTreeLeaf?
+    ---@param self NavHeap
+    ---@return NavPathingData?
     ExtractMin = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -69,11 +104,13 @@ NavPathToHeap = ClassSimple {
         -- fix its position.
         self:Heapify()
 
+        -- DrawCircle(value.Center, 5, '9999ff')
+
         return value
     end,
 
     --- 'Bubble down' operation, applied when we extract an element from the heap
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Heapify = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -89,13 +126,13 @@ NavPathToHeap = ClassSimple {
 
             -- if there is a right child, compare its value with the left one
             -- if right is smaller, then assign min = right. Else, keep min on left.
-            if heap[right] and (heap[right].TotalCosts < heap[left].TotalCosts) then
+            if right <= heapSize and (heap[right].HeapTotalCosts < heap[left].HeapTotalCosts) then
                 min = right
             end
 
             -- if min has higher value than the index it means we restored heap properties
             -- and can break the loop
-            if heap[min].TotalCosts > heap[index].TotalCosts then
+            if heap[min].HeapTotalCosts > heap[index].HeapTotalCosts then
                 return
             end
 
@@ -112,17 +149,16 @@ NavPathToHeap = ClassSimple {
     end,
 
     --- 'Bubble up' operation, applied when we insert a new element into the heap
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Rootify = function(self)
         local heap = self.Heap
         local index = self.HeapSize
 
-        -- math.floor(index / 2)
-        local parent = index >> 1
+        local parent = math.floor(index / 2)
         while parent >= 1 do
 
             -- if parent value is smaller than index value it means we restored correct order of the elements
-            if heap[parent].TotalCosts < heap[index].TotalCosts then
+            if heap[parent].HeapTotalCosts < heap[index].HeapTotalCosts then
                 return
             end
 
@@ -134,16 +170,18 @@ NavPathToHeap = ClassSimple {
             -- and update index and parent indexes
             index = parent
 
-            -- math.floor(parent / 2)
-            parent = parent >> 1
+            parent = math.floor(parent / 2)
         end
     end,
 
-    ---@param self NavPathToHeap
-    ---@param element CompressedLabelTreeLeaf
+    ---@param self NavHeap
+    ---@param element NavPathingData
     Insert = function(self, element)
         self.HeapSize = self.HeapSize + 1
         self.Heap[self.HeapSize] = element
         self:Rootify()
+
+        -- DrawCircle(element.Center, 5, '999999')
+
     end,
 }

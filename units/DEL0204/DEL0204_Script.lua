@@ -1,12 +1,9 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/DEL0204/DEL0204_script.lua
-----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
-----**
-----**  Summary  :  UEF Mongoose Gatling Bot
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+------------------------------------------------------------------------------
+-- File     :  /cdimage/units/DEL0204/DEL0204_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
+-- Summary  :  UEF Mongoose Gatling Bot
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
 local TWalkingLandUnit = import("/lua/terranunits.lua").TWalkingLandUnit
 local TWeapons = import("/lua/terranweapons.lua")
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
@@ -14,6 +11,7 @@ local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 
 local EffectUtils = import("/lua/effectutilities.lua")
 local Effects = import("/lua/effecttemplates.lua")
+
 
 ---@class DEL0204 : TWalkingLandUnit
 DEL0204 = ClassUnit(TWalkingLandUnit)

@@ -9,11 +9,25 @@ local Prefs = import("/lua/user/prefs.lua")
 local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
 local UIUtil = import("/lua/ui/uiutil.lua")
 
+local function TemplateAxisOffset(unitbp, axe)
+    return (math.mod(math.ceil(unitbp.Footprint and unitbp.Footprint[axe] or unitbp[axe] or 1), 2) == 1 and 0 or 0.5)
+end
+
 function CreateBuildTemplate()
     GenerateBuildTemplateFromSelection()
     local template = GetActiveBuildTemplate()
     ClearBuildTemplates()
-    if not table.empty(template) then
+    if next(template) then
+        local str1bp = __blueprints[ template[3][1] ]
+        local s1Xoffset = TemplateAxisOffset(str1bp, 'SizeX')
+        local s1Yoffset = TemplateAxisOffset(str1bp, 'SizeZ')
+        if s1Xoffset ~= 0 or s1Yoffset ~= 0 then
+            for i=3, table.getn(template) do
+                local str = template[i]
+                str[3] = str[3] + s1Xoffset
+                str[4] = str[4] + s1Yoffset
+            end
+        end
         AddTemplate(template)
     end
 end

@@ -1,22 +1,29 @@
 ---@meta
 ---@diagnostic disable: lowercase-global
 
+---@class FileName: string, stringlib
+---@operator concat(FileName | string): FileName
+
 ---@class Quaternion
----@field [1] number
----@field [2] number
----@field [3] number
----@field [4] number
+---@field [1] number    # y
+---@field [2] number    # z
+---@field [3] number    # x
+---@field [4] number    # w
 
 ---@class Vector
----@field [1] number
----@field [2] number
----@field [3] number
+---@field [1] number    # x
+---@field [2] number    # y (up)
+---@field [3] number    # z
+---@field x number      # east/west
+---@field y number      # up/down
+---@field z number      # north/south
 
 ---@class Vector2
----@field [1] number
----@field [2] number
+---@field [1] number    # x
+---@field [2] number    # y
 
----@class Rectangle     # A point-to-point based rectangle, where the first point is usually in the top left corner
+--- A point-to-point based rectangle, where the first point is usually in the top left corner
+---@class Rectangle
 ---@field x0 number
 ---@field y0 number
 ---@field x1 number
@@ -27,102 +34,108 @@
 ---@alias Army string | number
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
+-- note that these object span both the sim and user states
+---@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
+
 ---@unknown
 function AITarget()
 end
 
---- Set the audio language
+--- sets the audio language
 ---@param language Language
 function AudioSetLanguage(language)
 end
 
---- Returns the last component of a path
----@param fullPath string
+--- returns the last component of a path
+---@param fullPath FileName
 ---@param stripExtension boolean?
+---@return FileName
 function Basename(fullPath, stripExtension)
 end
 
---- Likely used for debugging, but the use is unknown
+--- likely used for debugging, but the use is unknown
 ---@unknown
 function BeginLoggingStats()
 end
 
---- Called during blueprint loading to update the loading animation
+--- called during blueprint loading to update the loading animation
 function BlueprintLoaderUpdateProgress()
 end
 
---- Create an empty prefetch set
+--- creates an empty prefetch set
 ---@return moho.CPrefetchSet
 function CreatePrefetchSet()
 end
 
---- Returns the current running thread
+--- returns the currently running thread
 ---@return thread?
 function CurrentThread()
 end
 
---- Returns the directory name
+--- returns the directory name
 ---@param fullPath FileName
 ---@return string
 function Dirname(fullPath)
 end
 
---- Returns all files in the directory that matches the pattern
+--- returns all files in the directory that matches the pattern
 ---@param directory FileName
 ---@param pattern string
 ---@return FileName[]
-function DiskFindFiles(directory,  pattern)
+function DiskFindFiles(directory, pattern)
 end
 
---- Returns a table of information for the given file, or false if the file doesn't exist 
+--- returns a table of information for the given file, or `false` if the file doesn't exist
 ---@param filename FileName
 ---@return table | false
 function DiskGetFileInfo(filename)
 end
 
---- Converts a system path to a local path (based on the init file directories), returns the path if it is already local
+--- converts a system path to a local path (based on the init file directories),
+--- returns the path if it is already local
 ---@param SysOrLocalPath FileName
 ---@return FileName
 function DiskToLocal(SysOrLocalPath)
 end
 
----End logging stats and optionally exit app
+--- stops logging stats and optionally exits the application
 ---@param exit boolean
 function EndLoggingStats(exit)
 end
 
---- Return true if a unit category contains this unit
+--- returns true if a unit category contains this unit
 ---@param category EntityCategory
----@param unit Unit | UserUnit
+---@param unit Unit | UserUnit | UnitId | Projectile | Blip | Prop
+---@return boolean
 function EntityCategoryContains(category, unit)
 end
 
---- Checks for the empty category
+--- checks if the category is the empty category
 ---@param category EntityCategory
 ---@return boolean
 function EntityCategoryEmpty(category)
 end
 
 ---@overload fun(units: UserUnit[]): UserUnit[]
---- Filter a list of units to only those found in the category
+--- filters a list of units to only those found in the category
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
 function EntityCategoryFilterDown(category, units)
 end
 
---- Computes a list of unit blueprint names that match the categories
+--- computes a list of unit blueprint names that match the categories
 ---@param category EntityCategory
 ---@return string[]
 function EntityCategoryGetUnitList(category)
 end
 
---- Returns an ordered list of named colors available for a `Color` instead of using a hexcode
+--- returns an ordered list of named colors available for a `Color` instead of using a hexcode
 ---@return EnumColor[]
 function EnumColorNames()
 end
 
---- Converts euler angles to a quaternion
+--- converts an Euler angle to a quaternion
 ---@param roll number
 ---@param pitch number
 ---@param yaw number
@@ -130,20 +143,20 @@ end
 function EulerToQuaternion(roll, pitch, yaw)
 end
 
---- Collapse all intermediate `/./` or `/../` directory names from a path
+--- collapses all relative `/./` or `/../` directory names from a path
 ---@param fullPath FileName
 ---@return FileName
 function FileCollapsePath(fullPath)
 end
 
---- Creates a new thread, passing all additional arguments to the callback
+--- creates a new thread, passing all additional arguments to the callback
 ---@param callback function
 ---@param ... any
 ---@return thread
 function ForkThread(callback, ...)
 end
 
---- Get the blueprint of an object
+--- gets the blueprint of an object
 ---@overload fun(entity: Entity): EntityBlueprint
 ---@overload fun(mesh: Mesh): MeshBlueprint
 ---@overload fun(effect: moho.IEffect): EffectBlueprint
@@ -151,6 +164,8 @@ end
 ---@overload fun(prop: Prop): PropBlueprint
 ---@overload fun(unit: UserUnit | Unit): UnitBlueprint
 ---@overload fun(weapon: Weapon): WeaponBlueprint
+---@param object Object
+---@return Blueprint
 function GetBlueprint(object)
 end
 
@@ -177,8 +192,7 @@ end
 function GetMovieDuration(localFileName)
 end
 
----
----@param id UnitId
+---@param id EntityId
 ---@return UserUnit | Unit
 function GetUnitById(id)
 end
@@ -188,14 +202,12 @@ end
 function GetVersion()
 end
 
----
 ---@param language Language
 function HasLocalizedVO(language)
 end
 
----
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsAlly(army1, army2)
 end
@@ -206,16 +218,14 @@ end
 function IsDestroyed(entity)
 end
 
----
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsEnemy(army1, army2)
 end
 
----
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsNeutral(army1, army2)
 end
@@ -233,12 +243,14 @@ end
 function MATH_IRound(number)
 end
 
+---@overload fun(s: number, a1: number, b1: number, a2: number, b2: number): number, number
 --- Applies linear interpolation between two values `a` and `b`
----@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
+---@param s number between 0 or `sMin` (returns `a`) and 1 or `sMax` (returns `b`)
 ---@param a number
 ---@param b number
 ---@return number
-function MATH_Lerp(s,  a,  b)
+---@overload fun(s: number, sMin: number, sMax: number, a: number, b: number): number
+function MATH_Lerp(s, a, b)
 end
 
 --- Applies linear interpolation between two quaternions `L` and `R`
@@ -357,7 +369,6 @@ end
 function SessionIsReplay()
 end
 
----
 ---@param armyIndex number index or -1
 function SetFocusArmy(armyIndex)
 end
@@ -386,16 +397,16 @@ end
 ---@param start number
 ---@param count number
 ---@return string
-function STR_Utf8SubString(string,  start,  count)
+function STR_Utf8SubString(string, start, count)
 end
 
 --- Converts an integer into a hexidecimal string
 ---@param int number
----@return string 
+---@return string
 function STR_itox(int)
 end
 
----  Converts a hexidecimal string to an integer
+--- Converts a hexidecimal string to an integer
 ---@param string string
 ---@return number
 function STR_xtoi(string)
@@ -511,22 +522,22 @@ end
 function WARN(out, ...)
 end
 
---- Suspends the thread until the manipulator reaches its goal
----@param manipulator moho.manipulator_methods | EconomyEvent
+--- suspends the thread until the object reaches its goal
+---@param manipulator GoalObject
 function WaitFor(manipulator)
 end
 
---- Run another script. The environment table, if given, will be used for the script's global variables.
----@param script string
+--- Runs another script file. The environment table, if given,
+--- will be used for the script's global variables.
+---@param script FileName
 ---@param env? table
-function doscript(script,  env)
+function doscript(script, env)
 end
 
---- Returns if the given resource file exists
+--- returns true if the given resource file exists
 ---@param name FileName
 function exists(name)
 end
-
 
 ------
 -- New functions from engine patch:
@@ -553,4 +564,3 @@ end
 ---@return PatchedDepositResult[]
 function GetDepositsAroundPoint(x, z, radius, type)
 end
-

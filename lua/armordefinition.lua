@@ -23,10 +23,17 @@
 ---| "OtheTacticalBomb"
 ---| "Overcharge"
 ---| "Reclaimed"
+---| "Spell"
 ---| "Stun"
 ---| "TacticalMissile"
 ---| "TreeFire"
 ---| "TreeForce"
+---| "Disintegrate" # Used by tree props
+---| "Force"        # Used by tree props
+---| "Fire"         # Used by tree props
+---| "WallOverspill"
+---| "TransportDamage" # Skips visual effects in OnKilled
+---| "FAF_AntiShield" # Only deals damage to shields
 
 ---@alias ArmorType
 ---| "ASF"

@@ -1,13 +1,11 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'electron_bolter_trail_02',
-	Lifetime = -1.00,
-    TrailLength = 0.9,
-    Size = 0.10,
-    SortOrder = 0,
+return {
     BlendMode = 3,
-    TextureRepeatRate = 1,
     LODCutoff = 160,
-	RepeatTexture = '/textures/particles/trail_white_01.dds',
-	RampTexture = '/textures/particles/ramp_trail_14.dds',
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_14.dds",
+    RepeatTexture = "/textures/particles/trail_white_01.dds",
+    Size = 0.1,
+    SortOrder = 0,
+    TextureRepeatRate = 1,
+    TrailLength = 0.9,
 }
-

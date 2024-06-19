@@ -1,35 +1,35 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
---**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
---**
---**  Summary  :  Aeon T3 Mass Fabricator
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAB1303/UAB1303_script.lua
+-- Author(s):  Jessica St. Croix, David Tomandl, John Comes
+-- Summary  :  Aeon T3 Mass Fabricator
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local AMassFabricationUnit = import("/lua/aeonunits.lua").AMassFabricationUnit
+
+-- upvalue for perfomance
+local CreateRotator = CreateRotator
+local Random = Random
+local TrashBagAdd = TrashBag.Add
+
 
 ---@class UAB1303 : AMassFabricationUnit
 UAB1303 = ClassUnit(AMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         AMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
-        --B04 = parent, B03 = ball, B01/2 = rings
-        --CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
         local num = self:GetRandomDir()
+        local trash = self.Trash
         self.RingManip1 = CreateRotator(self, 'B01', 'x', nil, 0, 15, 45)
-        self.Trash:Add(self.RingManip1)
-        self.RingManip2 = CreateRotator(self, 'B02', 'x', nil, 0, 15, -45)
-        self.Trash:Add(self.RingManip2)
+        TrashBagAdd(trash, self.RingManip1)
+        self.RingManip2 = CreateRotator(self, 'B02', '-x', nil, 0, 15, 45)
+        TrashBagAdd(trash, self.RingManip2)
         self.BallManip = CreateRotator(self, 'B03', 'y', nil, 0, 15, 80 + Random(0, 20) * num)
-        self.Trash:Add(self.BallManip)
+        TrashBagAdd(trash, self.BallManip)
         self.ParentManip1 = CreateRotator(self, 'B04', 'z', nil, 0, 15, 80 + Random(0, 20) * num)
-        self.Trash:Add(self.ParentManip1)
+        TrashBagAdd(trash, self.ParentManip1)
         self.ParentManip2 = CreateRotator(self, 'B04', 'y', nil, 0, 15, 80 + Random(0, 20) * num)
-        self.Trash:Add(self.ParentManip2)
+        TrashBagAdd(trash, self.ParentManip2)
         self.ParentManip3 = CreateRotator(self, 'B04', 'x', nil, 0, 15, 80 + Random(0, 20) * num)
-        self.Trash:Add(self.ParentManip3)
+        TrashBagAdd(trash, self.ParentManip3)
     end,
 
     OnProductionPaused = function(self)

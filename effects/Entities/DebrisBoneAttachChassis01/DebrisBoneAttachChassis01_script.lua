@@ -1,12 +1,9 @@
---
--- script for projectile BoneAttached
---
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
-DebrisBoneAttachChassis01 = Class(GenericDebris) {
+
+---@class DebrisBoneAttachChassis01 : GenericDebris
+DebrisBoneAttachChassis01 = ClassDummyProjectile(GenericDebris) {
     FxLandHitScale = 1.0,
-    FxTrails = {},
+    FxTrails = { },
     FxTrailScale = 1,
 }
-
 TypeClass = DebrisBoneAttachChassis01
-

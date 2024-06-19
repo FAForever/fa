@@ -1,5 +1,5 @@
-
 local PlayReclaimEndEffects = import("/lua/effectutilities.lua").PlayReclaimEndEffects
+local GridReclaimInstance = import("/lua/AI/GridReclaim.lua").GridReclaimInstance
 
 -- upvalue for performance
 local type = type
@@ -18,7 +18,7 @@ local TableInsert = table.insert
 ---@field CachePosition Vector
 ---@field MaxMassReclaim number
 ---@field MaxEnergyReclaim number
----@field TimeReclaim number
+---@field TimeReclaim number        # This is a multiplier and not the actual total time
 ---@field ReclaimLeft number
 ---@field SyncData? table
 ---@field Extents? table
@@ -61,14 +61,17 @@ Prop = Class(moho.prop_methods) {
 
         self:SetMaxHealth(maxHealth)
         self:SetHealth(self, maxHealth)
+
+        -- track in reclaim grid
+
     end,
 
-    ---@param self Prop 
-    ---@param fn function 
-    ---@param when PropCallbackTypes 
+    ---@param self Prop
+    ---@param fn function
+    ---@param when PropCallbackTypes
     AddPropCallback = function(self, fn, when)
-        self.EventCallbacks = self.EventCallbacks or { }
-        self.EventCallbacks[when] = self.EventCallbacks[when] or { }
+        self.EventCallbacks = self.EventCallbacks or {}
+        self.EventCallbacks[when] = self.EventCallbacks[when] or {}
         TableInsert(self.EventCallbacks[when], fn)
     end,
 
@@ -110,6 +113,11 @@ Prop = Class(moho.prop_methods) {
         self:Destroy()
     end,
 
+    ---@param self Prop
+    BeingReclaimed = function(self)
+    end,
+
+    ---@param self Prop
     ---@param entity Unit
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
@@ -127,6 +135,11 @@ Prop = Class(moho.prop_methods) {
     OnDestroy = function(self)
         self:CleanupUILabel()
         self.Trash:Destroy()
+
+        -- keep track of reclaim
+        if GridReclaimInstance then
+            GridReclaimInstance:OnReclaimDestroyed(self)
+        end
     end,
 
     ---@param self Prop
@@ -135,8 +148,8 @@ Prop = Class(moho.prop_methods) {
     ---@param direction Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, direction, damageType)
-        -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then
+        -- only applies to trees and units
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == "FAF_AntiShield" then
             return
         end
 
@@ -158,7 +171,7 @@ Prop = Class(moho.prop_methods) {
                 local maxHealth = self:GetMaxHealth()
                 if excess < 0 and maxHealth > 0 then
                     self:Kill(instigator, damageType, -excess / maxHealth)
-                else 
+                else
                     self:Kill(instigator, damageType, 0.0)
                 end
             end
@@ -168,7 +181,7 @@ Prop = Class(moho.prop_methods) {
     end,
 
     --- Set the mass/energy value of this wreck when at full health, and the time coefficient
-    --- that determine how quickly it can be reclaimed. These values are used to set the real reclaim 
+    --- that determine how quickly it can be reclaimed. These values are used to set the real reclaim
     --- values as fractions of the health as the wreck takes damage.
     ---@param self Prop
     ---@param time number
@@ -178,7 +191,7 @@ Prop = Class(moho.prop_methods) {
         self.MaxMassReclaim = mass
         self.MaxEnergyReclaim = energy
         self.TimeReclaim = time
-        self.ReclaimLeft = self.ReclaimLeft or 1
+        self:UpdateReclaimLeft()
 
         if self.MaxMassReclaim * self.ReclaimLeft >= 10 then
             self:SetupUILabel()
@@ -196,6 +209,13 @@ Prop = Class(moho.prop_methods) {
             -- we have to take into account if the wreck has been partly reclaimed by an engineer
             self.ReclaimLeft = ratio * self:GetFractionComplete()
             self:UpdateUILabel()
+        else
+            self.ReclaimLeft = 0
+        end
+
+        -- keep track of reclaim
+        if GridReclaimInstance then
+            GridReclaimInstance:OnReclaimUpdate(self)
         end
     end,
 
@@ -246,12 +266,15 @@ Prop = Class(moho.prop_methods) {
     ---@return number energy to reclaim
     ---@return number mass to reclaim
     GetReclaimCosts = function(self, reclaimer)
-        local maxValue = self.MaxMassReclaim
-        if self.MaxEnergyReclaim > maxValue then
-            maxValue = self.MaxEnergyReclaim
+        local maxMass = self.MaxMassReclaim or 0
+        local maxEnergy = self.MaxEnergyReclaim or 0
+        local timeReclaim = self.TimeReclaim or 0
+        local maxValue = maxMass * 5
+        if maxEnergy > maxValue then
+            maxValue = maxEnergy
         end
 
-        local time = self.TimeReclaim * (maxValue / reclaimer:GetBuildRate())
+        local time = (timeReclaim or 0) * (maxValue / reclaimer:GetBuildRate())
         time = time / 10
 
         -- prevent division by 0 when the prop has no value
@@ -259,7 +282,7 @@ Prop = Class(moho.prop_methods) {
             time = 0.0001
         end
 
-        return time, self.MaxEnergyReclaim, self.MaxMassReclaim
+        return time, maxEnergy, maxMass
     end,
 
     --- Split this prop into multiple sub-props, placing one at each of our bone locations.
@@ -284,7 +307,8 @@ Prop = Class(moho.prop_methods) {
         local economy = self.Blueprint.Economy
         local time = 1
         if economy then
-            time = economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1
+            time = economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or
+                economy.ReclaimEnergyTimeMultiplier or 1
         end
 
         -- compute directory prefix if it is not set
@@ -298,12 +322,12 @@ Prop = Class(moho.prop_methods) {
         local trimmedBoneName, blueprint, bone, ok, out
 
         -- contains the new props and the expected number of props
-        local props = { }
+        local props = {}
         local count = self:GetBoneCount() - 1
 
         -- compute information of new props
         local compensationMult = 2
-        local time = time / count 
+        local time = time / count
         local mass = (self.MaxMassReclaim * self.ReclaimLeft * compensationMult) / count
         local energy = (self.MaxEnergyReclaim * self.ReclaimLeft * compensationMult) / count
         for ibone = 1, count do
@@ -317,10 +341,10 @@ Prop = Class(moho.prop_methods) {
 
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
-            if ok then 
+            if ok then
                 out:SetMaxReclaimValues(time, mass, energy)
-                props[ibone] = out 
-            else 
+                props[ibone] = out
+            else
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
                 WARN(out)
             end
@@ -356,7 +380,7 @@ Prop = Class(moho.prop_methods) {
     SetupUILabel = function(self)
         if not self.SyncData then
             self.SyncData = {
-                mass = self.MaxMassReclaim,
+                mass = self.MaxMassReclaim * (self.ReclaimLeft or 1),
                 position = self.CachePosition
             }
             Sync.Reclaim[self.EntityId] = self.SyncData

@@ -1,4 +1,17 @@
 
+# Checklist before doing a release:
+
+echo "Press enter if the executable is set to release, if required"
+read
+
+echo "Press enter if you updated the version in mod_info.lua"
+read
+
+echo "Press enter if you updated the version in version.lua"
+read
+
+# Doing the release
+
 git checkout faforever/deploy/fafdevelop 
 git pull faforever deploy/fafdevelop 
 

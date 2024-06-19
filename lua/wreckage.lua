@@ -16,19 +16,16 @@ Wreckage = Class(Prop) {
     IsWreckage = true,
 
     ---@param self Wreckage
-    OnCreate = function(self)
-        self.Trash = TrashBag()
-        self.EntityId = self:GetEntityId()
-        self.Blueprint = self:GetBlueprint()
-        self.CachePosition = self:GetPosition()
-    end,
-
-    ---@param self Wreckage
     ---@param instigator Unit
     ---@param amount number
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
+        -- only applies to trees and units
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == "FAF_AntiShield" then
+            return
+        end
+
         self:DoTakeDamage(instigator, amount, vector, damageType)
     end,
 
@@ -117,7 +114,7 @@ Wreckage = Class(Prop) {
 ---@param energy number
 ---@param time number
 ---@param deathHitBox? table
----@return Prop
+---@return Wreckage
 function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
     local prop = CreateProp(position, bp.Wreckage.Blueprint)
     prop:SetOrientation(orientation, true)
@@ -148,7 +145,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sz = sz * 0.5
 
     -- set health
-    prop:SetMaxHealth(bp.Defense.Health)
+    prop:SetMaxHealth(bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
     prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
 
     -- set collision box and reclaim values, the latter depends on the health of the wreck

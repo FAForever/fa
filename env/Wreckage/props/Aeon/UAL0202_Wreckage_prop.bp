@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,9 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
                     LODCutoff = 750,
-                    ShaderName = 'TMeshAlpha',
+                    ShaderName = "TMeshAlpha",
                 },
             },
         },
@@ -24,11 +24,9 @@ PropBlueprint {
         ReclaimMassMax = 150,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Obsidian Wreckage',
-    },
-    ScriptClass = 'Wreckage',
-    ScriptModule = '/lua/wreckage.lua',
+    Interface = { HelpText = "Obsidian Wreckage" },
+    ScriptClass = "Wreckage",
+    ScriptModule = "/lua/wreckage.lua",
     SizeX = 1,
     SizeY = 0.25,
     SizeZ = 1,

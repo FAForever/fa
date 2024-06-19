@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 
 local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
 
@@ -9,16 +12,21 @@ local Conditions = {
 
 --- Ends the game, processing all events including sending score and statistics to the UI
 function CallEndGame()
-    ForkThread(function()
-        WaitSeconds(2.9)
-        for _, v in GameOverListeners do
-            v()
-        end
-        Sync.GameEnded = true
-        WaitSeconds(0.1)
-        EndGame()
-    end)
+    ForkThread(CallEndGameThread)
 end
+
+function CallEndGameThread()
+    WaitSeconds(2.9)
+
+    for _, v in GameOverListeners do
+        v()
+    end
+    Sync.GameEnded = true
+    WaitSeconds(0.1)
+
+    EndGame()
+end
+
 
 --- Finds and collectors the brains that are defeated
 ---@param aliveBrains AIBrain[]         # Table of brains that are relevant to check for defeat
@@ -211,4 +219,6 @@ local function MatchStateThread()
 
 end
 
-ForkThread(MatchStateThread)
+function Setup()
+    ForkThread(MatchStateThread)
+end

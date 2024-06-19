@@ -159,10 +159,9 @@ BuilderGroup {
         PlatoonTemplate = 'T4ExperimentalLand',
         Priority = 1000,
         FormRadius = 10000,
-        InstanceCount = 10,
+        InstanceCount = 1,
         BuilderConditions = {
-            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 1, categories.NUKE * categories.STRUCTURE, 'Enemy'}},
-            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 2, categories.TACTICALMISSILEPLATFORM, 'Enemy'}},
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.MOBILE * categories.LAND * categories.EXPERIMENTAL } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -180,6 +179,9 @@ BuilderGroup {
         Priority = 1000,
         FormRadius = 10000,
         InstanceCount = 10,
+        BuilderConditions = {
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND * categories.EXPERIMENTAL } },
+        },
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {
@@ -289,12 +291,11 @@ BuilderGroup {
         PlatoonTemplate = 'T4ExperimentalAir',
         PlatoonAddPlans = {'NameUnits'},
         Priority = 801,
-        InstanceCount = 50,
-        FormRadius = 10000,
+        InstanceCount = 1,
         BuilderConditions = {
-            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 3, categories.DEFENSE * categories.TECH3 * categories.ANTIAIR, 'Enemy'}},
-            { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 8, categories.MOBILE * categories.TECH3 * categories.AIR * categories.ANTIAIR, 'Enemy'}},
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.MOBILE * categories.AIR * categories.EXPERIMENTAL } },
         },
+        FormRadius = 10000,
         BuilderType = 'Any',
         BuilderData = {
             ThreatWeights = {
@@ -310,6 +311,9 @@ BuilderGroup {
         PlatoonAddPlans = {'NameUnits'},
         Priority = 800,
         InstanceCount = 50,
+        BuilderConditions = {
+            { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 1, categories.MOBILE * categories.AIR * categories.EXPERIMENTAL } },
+        },
         FormRadius = 10000,
         BuilderType = 'Any',
         BuilderData = {

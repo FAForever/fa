@@ -112,19 +112,44 @@ local taunts = {
 --    {text = '<LOC MP_Taunt_0033>', bank = '', cue = ''},
 }
 
+---@type table<string, number>
+local lastTauntTimestamp = { }
+
 local prevHandle
 
+---@param sender string # player name
+---@param msg { Taunt: boolean; data: string }
 local function RecieveTaunt(sender, msg)
-    if Prefs.GetOption('mp_taunt_head_enabled') == 'true' then
-        local taunt = taunts[msg.data]
-        if taunt then
-            StopSound(prevHandle)
-            prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
-        end
+
+    -- check if we accept taunts
+    if Prefs.GetOption('mp_taunt_head_enabled') != 'true' then
+        return
     end
+
+    -- check if the taunt exists
+    local taunt = taunts[msg.data]
+    if not taunt then
+        return
+    end
+
+    -- at this point we do show the message
+    import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
+
+    -- check if we also play a sound
+    local systemTimeSeconds = GetSystemTimeSeconds()
+    if lastTauntTimestamp[sender] and (systemTimeSeconds - lastTauntTimestamp[sender] < 10) then
+        return
+    end
+
+    lastTauntTimestamp[sender] = systemTimeSeconds
+
+    -- make sure to remove any taunts that are playing right now
+    StopSound(prevHandle)
+    prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
 end
 
+---@param sender string # player name
+---@param msg { Taunt: boolean; data: string, aisender: string }
 function RecieveAITaunt(sender, msg)
     if Prefs.GetOption('mp_taunt_head_enabled') == 'true' then
         local taunt = taunts[msg.data]

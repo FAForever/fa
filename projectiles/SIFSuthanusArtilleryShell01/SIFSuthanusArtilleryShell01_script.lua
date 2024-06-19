@@ -5,8 +5,14 @@
 ------------------------------------------------------------
 local SSuthanusMobileArtilleryShell = import("/lua/seraphimprojectiles.lua").SSuthanusMobileArtilleryShell
 
+--- Suthanus Artillery Shell Projectile script. Seraphim T3 Mobile Artillery : XSL0304
+---@class SIFSuthanusArtilleryShell01 : SSuthanusMobileArtilleryShell
 SIFSuthanusArtilleryShell01 = ClassProjectile(SSuthanusMobileArtilleryShell) {
-    OnImpact = function(self, targetType, targetEntity) 
+
+    ---@param self SIFSuthanusArtilleryShell01
+    ---@param targetType string
+    ---@param targetEntity Prop|Unit
+    OnImpact = function(self, targetType, targetEntity)
         SSuthanusMobileArtilleryShell.OnImpact(self, targetType, targetEntity)
         self:ShakeCamera( 20, 1, 0, 1 )
     end,

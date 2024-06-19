@@ -1,22 +1,18 @@
-PropBlueprint {
+PropBlueprint{
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
-                {
-                    ShaderName = 'EditorMarker',
-                },
+                { ShaderName = "EditorMarker" },
             },
         },
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = '',
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
     },
-    Interface = {
-        HelpText = 'Marker for general use',
-    },
+    Interface = { HelpText = "Marker for general use" },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,
