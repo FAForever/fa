@@ -1,7 +1,5 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Physics = {
-        MinBounceCount = 1,
-        MaxBounceCount = 3,
         BounceVelDamp = 1,
         CollideEntity = false,
         CollideSurface = false,
@@ -9,7 +7,9 @@ ProjectileBlueprint {
         InitialSpeed = 10,
         InitialSpeedRange = 0,
         Lifetime = 30,
+        MaxBounceCount = 3,
         MaxSpeed = 100,
+        MinBounceCount = 1,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0.5,
         TurnRate = 0,

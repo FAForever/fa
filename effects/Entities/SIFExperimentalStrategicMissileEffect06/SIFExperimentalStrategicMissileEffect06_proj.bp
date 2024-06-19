@@ -1,18 +1,16 @@
-ProjectileBlueprint {
-    Display = {
-        StrategicIconSize = 0,
-    },
+ProjectileBlueprint{
+    Display = { StrategicIconSize = 0 },
     Physics = {
+        Acceleration = 0,
         CollideEntity = false,
         DestroyOnWater = true,
+        Lifetime = 1.5,
+        RotationalAcceleration = 0,
+        RotationalVelocity = 0,
+        StayUpright = false,
         TrackTarget = false,
         TurnRate = 360,
-        VelocityAlign = false,
-        StayUpright = false,
-        Lifetime = 1.5,
         UseGravity = false,
-        RotationalVelocity= 0,
-        RotationalAcceleration = 0,
-        Acceleration = 0,
+        VelocityAlign = false,
     },
 }

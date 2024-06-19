@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -13,15 +13,15 @@ PropBlueprint {
             LODs = {
                 {
                     LODCutoff = 225,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
+                    ShaderName = "Seraphim",
                 },
                 {
-                    AlbedoName = 'seraphim_dock_lod1_albedo.dds',
                     LODCutoff = 750,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
-                    SpecularName = 'seraphim_dock_lod1_specteam.dds',
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
+                    ShaderName = "Seraphim",
+                    AlbedoName = "seraphim_dock_lod1_albedo.dds",
+                    SpecularName = "seraphim_dock_lod1_specteam.dds",
                 },
             },
         },
@@ -32,15 +32,9 @@ PropBlueprint {
         ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Seraphim Dock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Seraphim Dock" },
+    Physics = { BlockPath = true },
     SizeX = 16,
     SizeY = 4.5,
     SizeZ = 6,

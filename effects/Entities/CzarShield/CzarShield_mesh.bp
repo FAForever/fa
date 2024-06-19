@@ -1,15 +1,15 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 4,
     LODs = {
         {
-            MeshName = '/effects/Entities/CzarEllipsoid/CzarEllipsoid_lod0.scm',
-            AlbedoName = 'CzarShield_Albedo.dds',
-            NormalsName = 'CzarShield_Normals.dds',
-            SpecularName = 'CzarShield_Specular.dds',
-            ShaderName = 'ShieldAeon',
             LODCutoff = 500,
+            ShaderName = "ShieldAeon",
+            MeshName = "/effects/Entities/CzarEllipsoid/CzarEllipsoid_lod0.scm",
+            AlbedoName = "CzarShield_Albedo.dds",
+            NormalsName = "CzarShield_Normals.dds",
+            SpecularName = "CzarShield_Specular.dds",
         },
     },
-    IconFadeInZoom = 4,
     SortOrder = 1000,
     StraddleWater = true,
 }

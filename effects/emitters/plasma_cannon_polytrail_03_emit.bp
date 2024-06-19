@@ -1,12 +1,11 @@
-TrailEmitterBlueprint {
-	BlueprintId = 'plasma_cannon_polytrail_01',
-	Lifetime = -1.00,
-    TrailLength = 1.4,
+return {
+    BlendMode = 3.0,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_04.dds",
+    RepeatTexture = "/textures/particles/plasma_alpha_04.dds",
     Size = 0.07,
     SortOrder = 0,
-    BlendMode = 3.0,
     TextureRepeatRate = 0.15,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/plasma_alpha_04.dds',
-	RampTexture = '/textures/particles/ramp_trail_04.dds',
+    TrailLength = 1.4,
 }
