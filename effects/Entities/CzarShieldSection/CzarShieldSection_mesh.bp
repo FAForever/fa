@@ -1,14 +1,14 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 4,
     LODs = {
         {
-            MeshName = '/effects/Entities/SphereSection01/SphereSection01_lod0.scm',
-            AlbedoName = 'CzarShieldSection_Albedo.dds',
-            SpecularName = 'CzarShieldSection_Normals.dds',
-            ShaderName = 'ShieldImpact',
             LODCutoff = 500,
+            ShaderName = "ShieldImpact",
+            MeshName = "/effects/Entities/SphereSection01/SphereSection01_lod0.scm",
+            AlbedoName = "CzarShieldSection_Albedo.dds",
+            SpecularName = "CzarShieldSection_Normals.dds",
         },
     },
-    IconFadeInZoom = 4,
     SortOrder = 500,
     StraddleWater = true,
 }
