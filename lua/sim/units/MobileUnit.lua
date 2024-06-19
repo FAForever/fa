@@ -95,7 +95,8 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        -- This unit was in a transport and should create a wreck on crash
+        -- Skips a single OnKilled call
+        -- currently used by transports with external storage, so that death effects can be applied later from OnImpact
         if self.killedInTransport then
             self.killedInTransport = false
         else
@@ -122,6 +123,20 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     OnStopBeingBuilt = function(self, builder, layer)
         UnitOnStopBeingBuilt(self, builder, layer)
         self:OnLayerChange(layer, 'None')
+    end,
+
+    ---@param self MobileUnit
+    ---@param built Unit
+    ---@param order string
+    ---@return boolean
+    OnStartBuild = function(self, built, order)
+        if IsAlly(self.Army, built.Army) then
+            return Unit.OnStartBuild(self, built, order)
+        else
+            self:OnFailedToBuild()
+            IssueToUnitClearCommands(self)
+            return false
+        end
     end,
 
     ---@param self MobileUnit

@@ -59,10 +59,13 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field EnergyDepleted boolean
 ---@field EconomyTicksMonitor number
 ---@field HasPlatoonList boolean
+---@field IMAPConfig table
 ---@field IntelData? table<string, number>
 ---@field IntelTriggerList table
+---@field InterestList table
 ---@field LayerPref "LAND" | "AIR"
 ---@field Name string
+---@field NumOpponents number
 ---@field Radars table<string, Unit[]>
 ---@field Result? AIResult
 ---@field Sorian boolean
@@ -245,7 +248,7 @@ AIBrain = Class(StandardBrain) {
         if plan then
             return plan.EvaluatePlan(self)
         else
-            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', repr(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
+            LOG('*WARNING: TRIED TO IMPORT PLAN NAME ', tostring(planName), ' BUT IT ERRORED OUT IN THE AI BRAIN.')
             return 0
         end
     end,
@@ -308,10 +311,10 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self BaseAIBrain
     ---@param loc Vector
-    ---@return Vector | false
+    ---@return Vector?
     PBMGetLocationCoords = function(self, loc)
         if not loc then
-            return false
+            return
         end
         if self.HasPlatoonList then
             for _, v in self.PBM.Locations do
@@ -326,7 +329,7 @@ AIBrain = Class(StandardBrain) {
         elseif self.BuilderManagers[loc] then
             return self.BuilderManagers[loc].FactoryManager:GetLocationCoords()
         end
-        return false
+        return
     end,
 
     ---@param self BaseAIBrain
@@ -792,10 +795,10 @@ AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param position Vector
     ---@param radius number
-    ---@param threshold number
-    ---@return boolean|table
+    ---@param threshold? number
+    ---@return Vector?
     BaseMonitorDistressLocation = function(self, position, radius, threshold)
-        local returnPos = false
+        local returnPos
         local highThreat = false
         local distance
         if self.BaseMonitor.CDRDistress
@@ -1313,7 +1316,7 @@ AIBrain = Class(StandardBrain) {
     ---## Function: GetUntaggedMustScoutArea
     --- Gets an area that has been flagged with the AddScoutArea function that does not have a unit heading to scout it already.
     ---@param self BaseAIBrain
-    ---@return Vector location
+    ---@return ScoutLocation location
     ---@return number index
     GetUntaggedMustScoutArea = function(self)
         -- If any locations have been specifically tagged for scouting

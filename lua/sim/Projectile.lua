@@ -5,15 +5,48 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local ProjectileMethods = moho.projectile_methods
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
+local UnitDoTThread = DefaultDamage.UnitDoTThread
+local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
+-- upvalue scope for performance
+local unpack = unpack
+local Damage = Damage
+local Random = Random
+local IsAlly = IsAlly
+local ForkThread = ForkThread
+local DamageArea = DamageArea
+local IsDestroyed = IsDestroyed
+local CreateSplat = CreateSplat
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local EntityCategoryContains = EntityCategoryContains
+
+local ProjectileMethods = moho.projectile_methods
+local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
+local ProjectileMethodsGetMaxZigZag = ProjectileMethods.GetMaxZigZag
+local ProjectileMethodsGetZigZagFrequency = ProjectileMethods.GetZigZagFrequency
+
+local EntityMethods = _G.moho.entity_methods
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetArmy = EntityMethods.GetArmy
+local EntitySetMaxHealth = EntityMethods.SetMaxHealth
+local EntitySetHealth = EntityMethods.SetHealth
+local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
+local EntityDestroy = EntityMethods.Destroy
+local EntityGetOrientation = EntityMethods.GetOrientation
+
+local TrashBag = TrashBag
+local TrashBagAdd = TrashBag.Add
+local TrashBagDestroy = TrashBag.Destroy
+
+local TableEmpty = table.empty
 local TableGetn = table.getn
 
-local MathCos = math.cos
-local MathSin = math.sin
+-- cache categories computations
+local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
 -- scorch mark interaction
 local ScorchSplatTextures = {
@@ -49,31 +82,6 @@ local OnImpactPreviousZ = 0
 
 local VectorCached = Vector(0, 0, 0)
 
--- upvalue for performance
-local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
-local EntityGetArmy = _G.moho.entity_methods.GetArmy
-local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth
-local EntitySetHealth = _G.moho.entity_methods.SetHealth
-local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
-local EntityDestroy = _G.moho.entity_methods.Destroy
-
-local TrashBag = TrashBag
-
-local TableEmpty = table.empty
-
-local EntityCategoryContains = EntityCategoryContains
-local CreateEmitterAtBone = CreateEmitterAtBone
-local CreateEmitterAtEntity = CreateEmitterAtEntity
-local CreateSplat = CreateSplat
-local DamageArea = DamageArea
-local Damage = Damage
-local Random = Random
-local IsAlly = IsAlly
-local ForkThread = ForkThread
-
--- cache categories computations
-local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
-
 ---@class Projectile : moho.projectile_methods, InternalObject
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
@@ -83,6 +91,8 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field DamageData table
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
+---@field InnerRing? NukeAOE
+---@field OuterRing? NukeAOE
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
@@ -120,12 +130,13 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile The projectile that we're creating
     ---@param inWater? boolean Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
-        local blueprint = self:GetBlueprint() --[[@as ProjectileBlueprint]]
+        local blueprint = EntityGetBlueprint(self) --[[@as ProjectileBlueprint]]
+        local trash = TrashBag() --[[@as TrashBag]]
 
         self.Blueprint = blueprint
-        self.Army = self:GetArmy() --[[@as number]]
+        self.Trash = trash
+        self.Army = EntityGetArmy(self) --[[@as number]]
         self.Launcher = self:GetLauncher() --[[@as Unit]]
-        self.Trash = TrashBag() --[[@as TrashBag]]
 
         -- set some health, if we have some
         local maxHealth = blueprint.Defense.MaxHealth
@@ -136,7 +147,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- do not track target, but track where the target was
         if blueprint.Physics.TrackTargetGround then
-            self.Trash:Add(ForkThread(self.OnTrackTargetGround, self))
+            TrashBagAdd(trash, ForkThread(self.OnTrackTargetGround, self))
         end
     end,
 
@@ -164,50 +175,41 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
-            sy = sy + offset
             sz = sz + offset
 
             local dx = sx * (Random() - 0.5) * fuzziness
-            local dy = sy * (Random() - 0.5) * fuzziness + cy * 2
-            local dz = sz * (Random() - 0.5) * fuzziness + cz * 2
+            local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy / 2 + cy
+            local dz = sz * (Random() - 0.5) * fuzziness + cz
             local dw
 
             -- Rotate a vector by a quaternion: q * v * conjugate(q)
             -- Supreme Commander quaternions use y,z,x,w!
-            local ty, tz, tx, tw = unpack(target:GetOrientation())
+            local ty, tz, tx, tw = unpack(EntityGetOrientation(target))
 
             -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dw, dx, dy, dz = 
-            -tx * dx - tz * dy - ty * dz,
-             tw * dx + tz * dz - ty * dy,
-             tw * dy + ty * dx - tx * dz,
-             tw * dz + tx * dy - tz * dx
+            dw, dx, dy, dz = -tx * dx - tz * dy - ty * dz,
+                tw * dx + tz * dz - ty * dy,
+                tw * dy + ty * dx - tx * dz,
+                tw * dz + tx * dy - tz * dx
 
             tx, tz, ty = -tx, -tz, -ty
-            
-            -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dx, dy, dz = 
-            dw * tx + dx * tw + dy * ty - dz * tz,
-            dw * tz + dy * tw + dz * tx - dx * ty,
-            dw * ty + dz * tw + dx * tz - dy * tx
 
-            local pos = { px + dx, py + dy, pz + dz }
-            DrawCircle(pos, 1, 'ffffff')
-            self:SetNewTargetGround(pos)
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
+            dx, dy, dz = dw * tx + dx * tw + dy * ty - dz * tz,
+                dw * tz + dy * tw + dz * tx - dx * ty,
+                dw * ty + dz * tw + dx * tz - dy * tx
+
+            self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
-            local pos = self:GetCurrentTargetPosition()
+            local px, _, pz = self:GetCurrentTargetPositionXYZ()
 
             local physics = self.Blueprint.Physics
-            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0
             local offset = physics.TrackTargetGroundOffset or 0
-            local dx = (Random() - 0.5) * fuzziness * (1 + offset)
-            local dz = (Random() - 0.5) * fuzziness * (1 + offset)
+            local tx = px + (Random() - 0.5) * fuzziness * (1 + offset)
+            local tz = pz + (Random() - 0.5) * fuzziness * (1 + offset)
 
-            pos[1] = pos[1] + dx
-            pos[3] = pos[3] + dz
-
-            pos[2] = GetSurfaceHeight(pos[1], pos[3])
-            self:SetNewTargetGround(pos)
+            self:SetNewTargetGroundXYZ(tx, GetSurfaceHeight(tx, tz), tz)
         end
     end,
 
@@ -298,7 +300,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnDestroy = function(self)
         local trash = self.Trash
         if trash then
-            trash:Destroy()
+            TrashBagDestroy(trash)
         end
     end,
 
@@ -571,7 +573,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
         local trackTarget = bp.TrackTarget
         local trackTargetGround = bp.TrackTargetGround
         if trackTarget and (not trackTargetGround) then
-            self.Trash:Add(ForkThread(self.RetargetThread, self))
+            TrashBagAdd(self.Trash, ForkThread(self.RetargetThread, self))
         end
     end,
 
@@ -581,7 +583,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     RetargetThread = function(self)
         local createdByWeapon = self.CreatedByWeapon
         if createdByWeapon then
-            WaitTicks(0.2)
+            WaitTicks(0.5)
 
             if IsDestroyed(self) then
                 return
@@ -627,7 +629,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile
     ---@param instigator Unit
     ---@param DamageData table
-    ---@param targetEntity Unit | Prop
+    ---@param targetEntity Unit | Prop | nil
     ---@param cachedPosition Vector
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
@@ -635,101 +637,121 @@ Projectile = ClassProjectile(ProjectileMethods) {
         cachedPosition = cachedPosition or self:GetPosition()
 
         local damage = DamageData.DamageAmount
-        if damage and damage > 0 then
+        if damage > 0 then
 
-            -- check for radius
+            -- deal damage in a radius
             local radius = DamageData.DamageRadius
-            if radius and radius > 0 then
+            if radius > 0 then
+                local damageType = DamageData.DamageType
+                local damageFriendly =  DamageData.DamageFriendly
+                local damageSelf = DamageData.DamageSelf or false
 
                 -- check for damage-over-time
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                local DoTTime = DamageData.DoTTime
+                if DoTTime <= 0 then
                     -- no damage over time, do radius-based damage
                     DamageArea(
                         instigator,
                         cachedPosition,
                         radius,
                         damage,
-                        DamageData.DamageType,
-                        DamageData.DamageFriendly,
-                        DamageData.DamageSelf or false
+                        damageType,
+                        damageFriendly,
+                        damageSelf
                     )
+
+                    local damageToShields = DamageData.DamageToShields
+                    if damageToShields then
+                        DamageArea(
+                            instigator,
+                            cachedPosition,
+                            radius,
+                            damageToShields,
+                            "FAF_AntiShield",
+                            damageFriendly,
+                            damageSelf
+                        )
+                    end
                 else
                     -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
+                    local initialDmg = DamageData.InitialDamageAmount
                     if initialDmg > 0 then
-                        if radius > 0 then
-                            DamageArea(
-                                instigator,
-                                cachedPosition,
-                                radius,
-                                initialDmg,
-                                DamageData.DamageType,
-                                DamageData.DamageFriendly,
-                                DamageData.DamageSelf or false
-                            )
-                        elseif targetEntity then
-                            Damage(
-                                instigator,
-                                cachedPosition,
-                                targetEntity,
-                                initialDmg,
-                                DamageData.DamageType
-                            )
-                        end
+                        DamageArea(
+                            instigator,
+                            cachedPosition,
+                            radius,
+                            initialDmg,
+                            damageType,
+                            damageFriendly,
+                            damageSelf
+                        )
                     end
 
                     -- apply damage over time
+                    local DoTPulses = DamageData.DoTPulses or 1
                     ForkThread(
-                        DefaultDamage.AreaDoTThread,
+                        AreaDoTThread,
                         instigator,
                         self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                        DamageData.DoTPulses or 1,
-                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)),
+                        DoTPulses,
+                        (DoTTime / (DoTPulses)),
                         radius,
                         damage,
-                        DamageData.DamageType,
-                        DamageData.DamageFriendly
+                        damageType,
+                        damageFriendly
                     )
                 end
 
-                -- check for entity-specific damage
-            elseif DamageData.DamageAmount and targetEntity then
+            -- damage a single entity
+            elseif targetEntity then
+                local damageType = DamageData.DamageType
+
+                local damageToShields = DamageData.DamageToShields
+                if damageToShields then
+                    Damage(
+                        instigator,
+                        cachedPosition,
+                        targetEntity,
+                        damageToShields,
+                        "FAF_AntiShield"
+                    )
+                end
 
                 -- check for damage-over-time
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                local DoTTime = DamageData.DoTTime
+                if DoTTime <= 0 then
 
                     -- no damage over time, do single target damage
                     Damage(
                         instigator,
                         cachedPosition,
                         targetEntity,
-                        DamageData.DamageAmount,
-                        DamageData.DamageType
+                        damage,
+                        damageType
                     )
                 else
                     -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
-                        if targetEntity then
-                            Damage(
-                                instigator,
-                                cachedPosition,
-                                targetEntity,
-                                initialDmg,
-                                DamageData.DamageType
-                            )
-                        end
+                        Damage(
+                            instigator,
+                            cachedPosition,
+                            targetEntity,
+                            initialDmg,
+                            damageType
+                        )
                     end
 
                     -- apply damage over time
+                    local DoTPulses = DamageData.DoTPulses or 1
                     ForkThread(
-                        DefaultDamage.UnitDoTThread,
+                        UnitDoTThread,
                         instigator,
                         targetEntity,
-                        DamageData.DoTPulses or 1,
-                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)),
+                        DoTPulses,
+                        (DoTTime / (DoTPulses)),
                         damage,
-                        DamageData.DamageType,
+                        damageType,
                         DamageData.DamageFriendly
                     )
                 end
@@ -738,12 +760,13 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- related to strategic missiles
         if self.InnerRing and self.OuterRing then
+            local damageType = DamageData.DamageType or 'Nuke'
             self.InnerRing:DoNukeDamage(
                 self.Launcher,
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
-                DamageData.DamageType or 'Nuke'
+                damageType
             )
 
             self.OuterRing:DoNukeDamage(
@@ -751,7 +774,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                 self.Brain,
                 self.Army,
-                DamageData.DamageType or 'Nuke'
+                damageType
             )
         end
     end,
@@ -935,7 +958,44 @@ Projectile = ClassProjectile(ProjectileMethods) {
         end
     end,
 
-    -- Deprecated functionality
+    ---------------------------------------------------------------------------
+    --#region C hooks
+
+    --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
+    ---@param blueprint BlueprintId
+    ---@return Projectile
+    CreateChildProjectile = function(self, blueprint)
+        local childProjectile = ProjectileMethodsCreateChildProjectile(self, blueprint)
+        childProjectile.Launcher = self.Launcher
+        return childProjectile
+    end,
+
+    --- Returns the zig zag distance of the projectile.
+    ---@param self Projectile
+    ---@return number
+    GetMaxZigZag = function(self)
+        local distance = ProjectileMethodsGetMaxZigZag(self)
+        if distance == -1 then
+            distance = self.Blueprint.Physics.MaxZigZag or 0
+        end
+
+        return distance
+    end,
+
+    --- Returns the zig zag frequency of the projectile.
+    ---@param self Projectile
+    ---@return number
+    GetZigZagFrequency = function(self)
+        local frequency = ProjectileMethodsGetZigZagFrequency(self)
+        if frequency == -1 then
+            frequency = self.Blueprint.Physics.ZigZagFrequency or 0
+        end
+
+        return frequency
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Deprecated functionality
 
     ---@deprecated
     ---@param self Projectile
@@ -990,18 +1050,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
         else
             return nil
         end
-    end,
-
-    ---------------------------------------------------------------------------
-    --#region C hooks
-
-    --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
-    ---@param blueprint BlueprintId
-    ---@return Projectile
-    CreateChildProjectile = function(self, blueprint)
-        local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)
-        projectile.Launcher = self.Launcher
-        return projectile
     end,
 }
 

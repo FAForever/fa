@@ -3,7 +3,6 @@
 --  Author(s): John Comes, Gordon Duclos, Matt Vainio
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
-
 TFragmentationGrenade = import("/lua/sim/projectiles/uef/TFragmentationGrenadeProjectile.lua").TFragmentationGrenade
 TIFMissileNuke = import("/lua/sim/projectiles/uef/TIFMissileNukeProjectile.lua").TIFMissileNuke
 TIFTacticalNuke = import("/lua/sim/projectiles/uef/TIFTacticalNukeProjectile.lua").TIFTacticalNuke
@@ -51,5 +50,4 @@ local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NukeProjectile = import("/lua/sim/defaultprojectiles.lua").NukeProjectile
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
-
 --#endregion

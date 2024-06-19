@@ -400,8 +400,8 @@ Weapon = ClassWeapon(WeaponMethods) {
     end,
 
     ---@param self Weapon
-    ---@param new any
-    ---@param old any
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
     end,
 
@@ -409,6 +409,8 @@ Weapon = ClassWeapon(WeaponMethods) {
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self.Blueprint
         local damageTable = {}
+        
+        damageTable.DamageToShields = weaponBlueprint.DamageToShields
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
         damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod

@@ -51,7 +51,7 @@
 ---@field BeamLifetime number
 --- if the weapon will only fire when underwater
 ---@field BelowWaterFireOnly? boolean
---- threshold to release point before releasing ordnance
+--- Distance from bomb firing solution's position to the target's position within which the weapon will fire 
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
@@ -81,7 +81,7 @@
 ---@field DamageFriendly boolean
 --- blast radius
 ---@field DamageRadius number
---- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+--- how much additional damage is dealt to shields using the "FAF_AntiShield" damagetype
 ---@field DamageToShields? number
 --- the type of damage the unit will do
 ---@field DamageType DamageType
@@ -287,7 +287,8 @@
 ---@field SkipReadyState? boolean
 --- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
 ---@field SlavedToBody? boolean
---- range of arc to be considered "slaved" to a target
+--- Range of arc in both directions to be considered "slaved" to a target. With multiple weapons, 
+--- the first weapon in the blueprint that currently has a target is used for turning.
 ---@field SlavedToBodyArcRange? number
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean

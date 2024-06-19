@@ -63,14 +63,14 @@ UnitBlueprint{
         "TRANSPORTFOCUS",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
+        "WEAKDIRECTFIRE",
     },
     Defense = {
-        AirThreatLevel = 18,
+        AirThreatLevel = 27,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 4500,
         MaxHealth = 4500,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -87,8 +87,7 @@ UnitBlueprint{
             ShieldVerticalOffset = -1,
             TransportShield = true,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 18,
+        SurfaceThreatLevel = 6,
     },
     Display = {
         Abilities = {
@@ -98,61 +97,6 @@ UnitBlueprint{
         },
         AnimationLand = "/units/UEA0104/UEA0104_atakeoff01.sca",
         ForcedBuildSpin = 90,
-        LayerChangeEffects = {
-            AirLand = {
-                Effects = {
-                    {
-                        Bones = {
-                            "FrontRight_Engine",
-                            "FrontLeft_Engine",
-                            "BackRight_Engine",
-                            "BackLeft_Engine",
-                        },
-                        Offset = { 0, 0, 0 },
-                        Type = "Landing01",
-                    },
-                },
-            },
-            LandAir = {
-                Effects = {
-                    {
-                        Bones = {
-                            "FrontRight_Engine",
-                            "FrontLeft_Engine",
-                            "BackRight_Engine",
-                            "BackLeft_Engine",
-                        },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
-            AirWater = {
-                Effects = {
-                    {
-                        Bones = {
-                            "FrontRight_Engine",
-                            "FrontLeft_Engine",
-                            "BackRight_Engine",
-                            "BackLeft_Engine",
-                        },
-                        Type = "Landing01",
-                    },
-                },
-            },
-            WaterAir = {
-                Effects = {
-                    {
-                        Bones = {
-                            "FrontRight_Engine",
-                            "FrontLeft_Engine",
-                            "BackRight_Engine",
-                            "BackLeft_Engine",
-                        },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
-        },
         IdleEffects = {
             Air = {
                 Effects = {
@@ -177,6 +121,61 @@ UnitBlueprint{
                             "BackLeft_Engine",
                         },
                         Type = "SeaIdleGunship01",
+                    },
+                },
+            },
+        },
+        LayerChangeEffects = {
+            AirLand = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Offset = { 0, 0, 0 },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            LandAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Type = "TakeOff01",
                     },
                 },
             },
@@ -224,15 +223,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -254,14 +248,6 @@ UnitBlueprint{
     LifeBarOffset = 3.6,
     LifeBarSize = 2,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 10,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -287,10 +273,9 @@ UnitBlueprint{
         Class3AttachSize = 4,
         SlotsLarge = 6,
         SlotsMedium = 12,
-        SlotsSmall = 24,
+        SlotsSmall = 28,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Veteran = {
         Level1 = 12,
         Level2 = 24,
@@ -338,8 +323,12 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 2.2,
-            TargetPriorities = { "ALLUNITS" },
+            RateOfFire = 10/5, --10/integer interval in ticks
+            TargetPriorities = {
+                "ANTIAIR",
+                "GROUNDATTACK",
+                "ALLUNITS",
+            },
             TargetRestrictDisallow = "HIGHALTAIR, UNTARGETABLE",
             TurretBoneMuzzle = "PlasmaGun01_Muzzle",
             TurretBonePitch = "PlasmaGun01",
@@ -394,8 +383,12 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 2.2,
-            TargetPriorities = { "ALLUNITS" },
+            RateOfFire = 10/5, --10/integer interval in ticks
+            TargetPriorities = {
+                "ANTIAIR",
+                "GROUNDATTACK",
+                "ALLUNITS",
+            },
             TargetRestrictDisallow = "HIGHALTAIR, UNTARGETABLE",
             TurretBoneMuzzle = "PlasmaGun02_Muzzle",
             TurretBonePitch = "PlasmaGun02",
@@ -469,13 +462,11 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
-                "AIR MOBILE TECH3 BOMBER",
-                "AIR MOBILE BOMBER",
-                "AIR MOBILE GROUNDATTACK",
-                "AIR MOBILE TRANSPORTATION",
-                "AIR MOBILE",
+                "TECH3 ANTIAIR",
+                "TECH2 ANTIAIR",
+                "TECH1 ANTIAIR",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE,LAND,STRUCTURE,NAVAL",
@@ -555,13 +546,11 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
-                "AIR MOBILE TECH3 BOMBER",
-                "AIR MOBILE BOMBER",
-                "AIR MOBILE GROUNDATTACK",
-                "AIR MOBILE TRANSPORTATION",
-                "AIR MOBILE",
+                "TECH3 ANTIAIR",
+                "TECH2 ANTIAIR",
+                "TECH1 ANTIAIR",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE,LAND,STRUCTURE,NAVAL",
@@ -641,13 +630,11 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
-                "AIR MOBILE TECH3 BOMBER",
-                "AIR MOBILE BOMBER",
-                "AIR MOBILE GROUNDATTACK",
-                "AIR MOBILE TRANSPORTATION",
-                "AIR MOBILE",
+                "TECH3 ANTIAIR",
+                "TECH2 ANTIAIR",
+                "TECH1 ANTIAIR",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE,LAND,STRUCTURE,NAVAL",
@@ -727,13 +714,11 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
-                "AIR MOBILE TECH3 BOMBER",
-                "AIR MOBILE BOMBER",
-                "AIR MOBILE GROUNDATTACK",
-                "AIR MOBILE TRANSPORTATION",
-                "AIR MOBILE",
+                "TECH3 ANTIAIR",
+                "TECH2 ANTIAIR",
+                "TECH1 ANTIAIR",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE,LAND,STRUCTURE,NAVAL",
@@ -773,7 +758,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

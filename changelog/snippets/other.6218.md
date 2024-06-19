@@ -1,0 +1,1 @@
+- (#6218) Annotate auto-assist toggling in `InitialAutoMode` and `SetAutoMode`.

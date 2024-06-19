@@ -1,0 +1,1 @@
+- (#6213) Fix the default teleport delay being set to 15 seconds instead of 0, which caused some modded units to teleport much slower.

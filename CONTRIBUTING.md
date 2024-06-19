@@ -20,4 +20,4 @@ Code convention
 Please follow the [Lua Style Guide](http://lua-users.org/wiki/LuaStyleGuide) as
 much as possible.
 
-For file encoding, use UTF-8 and unix-style file endings in the repo (Set core.autocrlf).
+For file encoding, use UTF-8 and unix-style file endings (Set core.autocrlf).

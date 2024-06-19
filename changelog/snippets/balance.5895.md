@@ -1,0 +1,8 @@
+- (#5895) After receiving several buffs, the Seraphim Tech 3 Submarine Hunter has become too oppressive, especially in larger formations. These changes aim to bring it back in line, while preserving its identity.
+  - Yathsou: T3 Submarine Hunter (XSS0304):
+    - Damage: 290 --> 380
+    - RateOfFire: 0.25 --> 0.22
+    - MuzzleSalvoDelay: 0.7 --> 1
+    - MuzzleSalvoSize: 5 --> 4
+    - DPS: 363 --> 338
+    - Torpedo Defense RateOfFire (x2): 0.15 --> 0.1

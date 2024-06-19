@@ -43,6 +43,8 @@ local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 ---@field NoBurn? boolean
 Tree = Class(Prop) {
 
+    IsTree = true,
+
     ---@param self Tree
     OnDestroy = function(self)
         Prop.OnDestroy(self)
@@ -91,7 +93,7 @@ Tree = Class(Prop) {
     ---@param direction number
     ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
-        if self:BeenDestroyed() then
+        if self:BeenDestroyed() or type == 'FAF_AntiShield' then
             return
         end
 
@@ -269,6 +271,9 @@ Tree = Class(Prop) {
 ---@class TreeGroup : Prop
 TreeGroup = Class(Prop) {
 
+    IsTree = true,
+    IsTreeGroup = true,
+    
     --- Break when colliding with a projectile of some sort
     ---@param self TreeGroup
     ---@param other string

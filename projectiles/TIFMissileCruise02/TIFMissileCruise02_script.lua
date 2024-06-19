@@ -21,8 +21,15 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
+
+local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
+local TMissileCruiseSubProjectileOnCreate = TMissileCruiseSubProjectile.OnCreate
+local TMissileCruiseSubProjectileOnExitWater = TMissileCruiseSubProjectile.OnExitWater
+local TMissileCruiseProjectileOnImpact = TMissileCruiseSubProjectile.OnImpact
+
+-- upvalue scope for performance
+local CreateLightParticleIntel = CreateLightParticleIntel
 
 --- Used by ues0304
 ---@class TIFMissileCruise02 : TMissileCruiseSubProjectile
@@ -54,15 +61,26 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
 
     ---@param self TIFMissileCruise02
     OnCreate = function(self)
-        TMissileCruiseSubProjectile.OnCreate(self)
+        TMissileCruiseSubProjectileOnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self TIFMissileCruise02
     OnExitWater = function(self)
-        TMissileCruiseSubProjectile.OnExitWater(self)
+        TMissileCruiseSubProjectileOnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
+
+    --- Called by the engine when the projectile impacts something
+    ---@param self TIFMissileCruise01
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        TMissileCruiseProjectileOnImpact(self, targetType, targetEntity)
+
+        -- create light flashes
+        CreateLightParticleIntel(self, -1, self.Army, 7, 4, 'glow_02', 'ramp_antimatter_02')
+    end
 }
 
 TypeClass = TIFMissileCruise02

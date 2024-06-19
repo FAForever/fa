@@ -19,7 +19,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
-local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
+local unitViewLayout = nil -- Holds the current layout, updated by SetLayout().
 local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local Grid = import("/lua/maui/grid.lua").Grid
 local Construction = import("/lua/ui/game/construction.lua")
@@ -238,7 +238,7 @@ local statFuncs = {
             return false
         end
         if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 1 then
-            return string.format("%d", math.floor(info.userUnit:GetBuildRate()))
+            return string.format("%.6g", info.userUnit:GetBuildRate())
         end
         return false
     end,
@@ -482,7 +482,7 @@ function UpdateWindow(info)
                         elseif upperThreshold >= 10000 then
                             text = string.format('%.1fK/%.1fK', experience / 1000, upperThreshold / 1000)
                         else
-                            text = experience .. '/' .. upperThreshold
+                            text = experience .. '/' .. string.format('%d', upperThreshold)
                         end
                         controls.nextVet:SetText(text)
 
@@ -532,9 +532,9 @@ function UpdateWindow(info)
 
         -- -- Build queue upon hovering of unit
 
-        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local always = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
-        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+        local whenObserving = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'only-obs'
 
         if always or (whenObserving and isObserver) then
             if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and
@@ -739,12 +739,14 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
     unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
     controls.parent = mapGroup
     controls.orderPanel = orderControl
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview')) -- SetLayout() will set this too but let's make sure CreateUI() does not use nil, even though it only sets up an OnFrame function.
     CreateUI()
     SetLayout(UIUtil.currentLayout)
 end

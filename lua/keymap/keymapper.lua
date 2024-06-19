@@ -291,18 +291,19 @@ function GenerateHotbuildModifiers()
                 local altModKey = "Alt-" .. key
                 local shiftModBinding = keyDetails[shiftModKey]
                 local altModBinding = keyDetails[altModKey]
-                if not shiftModBinding and not altModBinding then
-                    modifiers[shiftModKey] =  info.action
-                    modifiers[altModKey] =  info.action
-                elseif not shiftModBinding then
-                    modifiers[shiftModKey] =  info.action
-                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
-                elseif not altModBinding then
-                    modifiers[altModKey] =  info.action
-                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
+
+                if shiftModBinding then
+                    WARN(string.format('Shift modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Shift modifier of the Hotbuild action will not work!'
+                        , info.name, key, shiftModBinding.name, shiftModKey))
                 else
-                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
-                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
+                    modifiers[shiftModKey] = info.action
+                end
+
+                if altModBinding then
+                    WARN(string.format('Alt modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Alt modifier of the Hotbuild action will not work!'
+                        , info.name, key, altModBinding.name, altModKey))
+                else
+                    modifiers[altModKey] =  info.action
                 end
             end
         end

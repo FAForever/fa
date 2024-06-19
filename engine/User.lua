@@ -1,5 +1,12 @@
 ---@meta
 
+---@class UIHighlightedCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field blueprintId? UnitId
+---@field commandType number
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
@@ -11,6 +18,111 @@
 ---| 0 # Return fire
 ---| 1 # Hold fire
 ---| 2 # Ground fire
+
+---@alias Keycode
+--- | 'BACK'
+--- | 'TAB'
+--- | 'RETURN'
+--- | 'ESCAPE'
+--- | 'SPACE'
+--- | 'DELETE'
+--- | 'START'
+--- | 'LBUTTON'
+--- | 'RBUTTON'
+--- | 'CANCEL'
+--- | 'MBUTTON'
+--- | 'CLEAR'
+--- | 'SHIFT'
+--- | 'ALT'
+--- | 'CONTROL'
+--- | 'MENU'
+--- | 'PAUSE'
+--- | 'CAPITAL'
+--- | 'PRIOR'
+--- | 'NEXT'
+--- | 'END'
+--- | 'HOME'
+--- | 'LEFT'
+--- | 'UP'
+--- | 'RIGHT'
+--- | 'DOWN'
+--- | 'SELECT'
+--- | 'PRINT'
+--- | 'EXECUTE'
+--- | 'SNAPSHOT'
+--- | 'INSERT'
+--- | 'HELP'
+--- | 'NUMPAD0'
+--- | 'NUMPAD1'
+--- | 'NUMPAD2'
+--- | 'NUMPAD3'
+--- | 'NUMPAD4'
+--- | 'NUMPAD5'
+--- | 'NUMPAD6'
+--- | 'NUMPAD7'
+--- | 'NUMPAD8'
+--- | 'NUMPAD9'
+--- | 'MULTIPLY'
+--- | 'ADD'
+--- | 'SEPARATOR'
+--- | 'SUBTRACT'
+--- | 'DECIMAL'
+--- | 'DIVIDE'
+--- | 'F1'
+--- | 'F2'
+--- | 'F3'
+--- | 'F4'
+--- | 'F5'
+--- | 'F6'
+--- | 'F7'
+--- | 'F8'
+--- | 'F9'
+--- | 'F10'
+--- | 'F11'
+--- | 'F12'
+--- | 'F13'
+--- | 'F14'
+--- | 'F15'
+--- | 'F16'
+--- | 'F17'
+--- | 'F18'
+--- | 'F19'
+--- | 'F20'
+--- | 'F21'
+--- | 'F22'
+--- | 'F23'
+--- | 'F24'
+--- | 'NUMLOCK'
+--- | 'SCROLL'
+--- | 'PAGEUP'
+--- | 'PAGEDOWN'
+--- | 'NUMPAD_SPACE'
+--- | 'NUMPAD_TAB'
+--- | 'NUMPAD_ENTER'
+--- | 'NUMPAD_F1'
+--- | 'NUMPAD_F2'
+--- | 'NUMPAD_F3'
+--- | 'NUMPAD_F4'
+--- | 'NUMPAD_HOME'
+--- | 'NUMPAD_LEFT'
+--- | 'NUMPAD_UP'
+--- | 'NUMPAD_RIGHT'
+--- | 'NUMPAD_DOWN'
+--- | 'NUMPAD_PRIOR'
+--- | 'NUMPAD_PAGEUP'
+--- | 'NUMPAD_NEXT'
+--- | 'NUMPAD_PAGEDOWN'
+--- | 'NUMPAD_END'
+--- | 'NUMPAD_BEGIN'
+--- | 'NUMPAD_INSERT'
+--- | 'NUMPAD_DELETE'
+--- | 'NUMPAD_EQUAL'
+--- | 'NUMPAD_MULTIPLY'
+--- | 'NUMPAD_ADD'
+--- | 'NUMPAD_SEPARATOR'
+--- | 'NUMPAD_SUBTRACT'
+--- | 'NUMPAD_DECIMAL'
+--- | 'NUMPAD_DIVIDE'
 
 --- No clue what this does
 ---@param entityId number
@@ -123,9 +235,11 @@ end
 function DecreaseBuildCountInQueue(queueIndex, count)
 end
 
----
----@param id unknown
-function DeleteCommand(id)
+---Deletes a command from the player command queue.
+---Each player has an array that holds all commands for all units, the commandID indexes to that array.
+---Note: this function doesn't receive any units as arguments--you will have to retrieve the commandId by UserUnit:GetCommandQueue()[commandIndex].ID
+---@param commandId number commandId, from UserUnit:GetCommandQueue()[commandIndex].ID
+function DeleteCommand(commandId)
 end
 
 ---
@@ -156,11 +270,10 @@ end
 function EntityCategoryFilterOut(category, units)
 end
 
---- Executes some Lua code in the sim
+--- Executes some Lua code in the sim. Requires cheats to be enabled
 ---@param func function
----@param ... any this may actually be a comma-separated string of args instead of a vararg
----@return any
-function ExecLuaInSim(func, ...)
+---@param value any
+function ExecLuaInSim(func, value)
 end
 
 --- Requests that the application shut down
@@ -198,7 +311,7 @@ function GenerateBuildTemplateFromSelection()
 end
 
 --- Gets active build template back to Lua
----@return BuildTemplate
+---@return UIBuildTemplate
 function GetActiveBuildTemplate()
 end
 
@@ -258,7 +371,7 @@ function GetCurrentUIState()
 end
 
 ---
----@return Cursor
+---@return UICursor
 function GetCursor()
 end
 
@@ -293,6 +406,11 @@ end
 --- Returns a formatted string displaying the time the game has been played
 ---@return string
 function GetGameTime()
+end
+
+--- Returns information about the command of the command graph that is below the cursor
+---@return UIHighlightedCommand?
+function GetHighlightCommand()
 end
 
 --- Returns a table of idle engineer units for the army
@@ -366,7 +484,11 @@ end
 function GetOptions(key)
 end
 
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- kilobytes worth of data!
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param string string
 ---@param default any?
 ---@return any
@@ -546,7 +668,7 @@ end
 
 --- For internal use by `CreateDiscoveryService()`
 ---@param serviceClass fa-class
----@return DiscoveryService
+---@return UILobbyDiscoveryService
 function InternalCreateDiscoveryService(serviceClass)
 end
 
@@ -584,15 +706,17 @@ end
 function InternalCreateItemList(itemList, parent)
 end
 
+---@alias UILobbyProtocols "UDP" | "TCP" | "None
+
 --- For internal use by `CreateLobbyComm()`
 ---@param lobbyComClass fa-class
----@param protocol string
+---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
----@param playerUID string
----@param natTraversalProvider userdata
----@return LobbyComm
+---@param playerUID? string
+---@param natTraversalProvider? userdata
+---@return UILobbyCommunication
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
@@ -787,7 +911,7 @@ end
 --- Make `dragger` the active dragger from a particular frame.
 --- You can pass `nil` to cancel the current dragger.
 ---@param originFrame Frame
----@param keycode string
+---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
 ---@param dragger Dragger | nil
 function PostDragger(originFrame, keycode, dragger)
 end
@@ -846,7 +970,10 @@ end
 function RestartSession()
 end
 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- game does this automatically when it exits, there should be no reason to call this manually.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 function SavePreferences()
 end
 
@@ -876,6 +1003,7 @@ function SessionGetLocalCommandSource()
 end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
+--- Unlike other engine functions that return tables, this function returns the same table each time it is called.
 ---@return UIScenarioInfo
 function SessionGetScenarioInfo()
 end
@@ -925,11 +1053,11 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildTemplate
+---@param template UIBuildTemplate
 function SetActiveBuildTemplate(template)
 end
 
---- Set if anyone in the list is auto building
+--- Set if anyone in the list is auto building or auto assisting
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
@@ -948,7 +1076,7 @@ function SetCurrentFactoryForQueueDisplay(unit)
 end
 
 ---
----@param cursor Cursor
+---@param cursor UICursor
 function SetCursor(cursor)
 end
 
@@ -1005,7 +1133,9 @@ end
 function SetPausedOfUnit(unit, pause)
 end
 
+--- Updates a value in the preference file. Updating the preference file on disk is delayed until the application exits.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param key string
 ---@param obj any
 function SetPreference(key, obj)
@@ -1147,7 +1277,7 @@ function WorldIsPlaying()
 end
 
 --- For internal use by `Cursor.__init()`
----@param cursor Cursor
+---@param cursor UICursor
 ---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end

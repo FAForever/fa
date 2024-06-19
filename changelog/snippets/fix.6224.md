@@ -1,0 +1,1 @@
+- (#6224) Adds `EnabledByEnhancement = "Teleporter",` to the teleport weapon of the Cybran ACU, so it is displayed under 'Upgrades' and not 'Basics' when `Show Armament Detail in Build Menu` is enabled in the settings.

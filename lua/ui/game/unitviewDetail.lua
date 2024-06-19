@@ -12,6 +12,8 @@ local armorDefinition = import("/lua/armordefinition.lua").armordefinition
 
 local controls = import("/lua/ui/controls.lua").Get()
 
+local MathFloor = math.floor
+
 View = controls.View or false
 MapView = controls.MapView or false
 ViewState = "full"
@@ -44,7 +46,7 @@ function GetTechLevelString(bp)
 end
 
 function FormatTime(seconds)
-    return string.format("%02d:%02d", math.floor(seconds / 60), math.mod(seconds, 60))
+    return string.format("%02d:%02d", MathFloor(seconds / 60), math.mod(seconds, 60))
 end
 
 function GetAbilityList(bp)
@@ -399,10 +401,10 @@ GetAbilityDesc = {
             if v.RemoveEnhancements or (not v.Slot) then continue end
             cnt = cnt + 1
         end
-        return cnt
+        return LOCF('<LOC uvd_0016>Enhancements: %d', cnt)
     end,
     ability_massive = function(bp)
-        return string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d'),
+        return string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
             bp.Display.MovementEffects.Land.Footfall.Damage.Amount,
             bp.Display.MovementEffects.Land.Footfall.Damage.Radius)
     end,
@@ -555,17 +557,17 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
                         local weaponDetails2
                         if info.NukeInnerRingDamage then
-                            weaponDetails2 = string.format(LOC('<LOC uvd_0014>Damage: %d - %d, Splash: %d - %d')..', '..LOC('<LOC uvd_Range>'),
+                            weaponDetails2 = string.format(LOC('<LOC uvd_0014>Damage: %.8g - %.8g, Splash: %.3g - %.3g')..', '..LOC('<LOC uvd_Range>'),
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius, info.MinRadius, info.MaxRadius)
                         else
                             --DPS Calculations
                             local Damage = info.Damage
                             if info.DamageToShields then
-                                Damage = math.max(Damage, info.DamageToShields)
+                                Damage = Damage + info.DamageToShields
                             end
                             if info.BeamLifetime > 0 then
-                                Damage = Damage * (MATH_IRound(10 * info.BeamLifetime) + 1)
+                                Damage = Damage * (1 + MathFloor(MATH_IRound(info.BeamLifetime*10)/(MATH_IRound(info.BeamCollisionDelay*10)+1)))
                             else
                                 Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
                                 local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
@@ -612,7 +614,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                     if info.MuzzleSalvoDelay == 0 then
                                         MuzzleCount = table.getsize(Rack.MuzzleBones)
                                     end
-                                    if MuzzleCount > 1 then singleShot = false end
+                                    if MuzzleCount > 1 or info.RackFireTogether and RackCount > 1 then singleShot = false end
                                     CycleProjs = CycleProjs + MuzzleCount
 
                                     SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
@@ -632,24 +634,32 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 CycleTime = CycleTime + FiringCooldown
                             end
 
-                            if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' then
+                            if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' and info.WeaponCategory ~= 'Defense' then
                                 --Round DPS, or else it gets floored in string.format.
                                 local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
                             end
 
                             -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
-                            if singleShot and ReloadTime == 0 then
+                            if singleShot and ReloadTime == 0 and CycleProjs > 1 then
                                 CycleTime = CycleTime / CycleProjs
                                 CycleProjs = 1
                             end
 
                             if CycleProjs > 1 then
-                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %d x%d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                            -- Do not display Reload stats for Kamikaze weapons
+                            elseif info.WeaponCategory == 'Kamikaze' then
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>'),
+                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius)
+                            -- Do not display 'Range' and Reload stats for 'Teleport in' weapons
+                            elseif info.WeaponCategory == 'Teleport' then
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
+                                Damage, info.DamageRadius)
                             else
-                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
 
 
@@ -658,7 +668,14 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails1 = weaponDetails1..' x'..weapon.count
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
-                        table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+
+                        if info.DamageType == 'Overcharge' then
+                            table.insert(blocks, {color = 'FF5AB34B', lines = {weaponDetails2}}) -- Same color as auto-overcharge highlight (autocast_green.dds)
+                        elseif info.WeaponCategory == 'Kamikaze' then
+                            table.insert(blocks, {color = 'FFFF2C2C', lines = {weaponDetails2}})
+                        else
+                            table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+                        end
 
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
                             local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
@@ -676,11 +693,11 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         local info = weapon.info
                         local weaponDetails = LOCStr(name)..' ('..LOCStr(info.WeaponCategory)..') '
                         if info.NukeInnerRingDamage then
-                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0014>Damage: %d - %d, Splash: %d - %d',
+                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0014>Damage: %.8g - %.8g, Splash: %.3g - %.3g',
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius)
                         else
-                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0010>Damage: %d, Splash: %d',
+                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0010>Damage: %.7g, Splash: %.3g',
                                 info.Damage, info.DamageRadius)
                         end
                         if weapon.count > 1 then

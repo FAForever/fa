@@ -180,11 +180,11 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 end
                 if unpathableCandidateCount > 0 then
                     self:LogDebug(string.format('unpathableCandidateCount '..unpathableCandidateCount))
-                    self:LogDebug(string.format('Current raid position is '..repr(expansion.position)))
+                    self:LogDebug(string.format('Current raid position is {%f, %f, %f}', unpack(expansion.position)))
                 end
                 self.LocationToRaid = expansion.position
                 if self.LocationToRaid then
-                    self:LogDebug(string.format('Location to raid is '..repr(self.LocationToRaid)))
+                    self:LogDebug(string.format('Location to raid is {%f, %f, %f}', unpack(self.LocationToRaid)))
                 else
                     self:LogDebug(string.format('Location to raid is nil'))
                 end
@@ -506,7 +506,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
             -- tell attack units to attack
             local attackCommand
-            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4)       -- TODO: remove magic numbers'
+            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32)       -- TODO: remove magic numbers'
             if not attackOffset then
                 attackCommand = self:AggressiveMoveToLocation(location, 'Attack')
             else
@@ -514,7 +514,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             end
 
             -- tell scout units to patrol for threats
-            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4)    -- TODO: remove magic numbers
+            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32)    -- TODO: remove magic numbers
             if not scoutOffsets then
                 self:Patrol(location, 'Scout')
             else

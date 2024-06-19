@@ -24,7 +24,7 @@ Change the material that the importer assigned to one of the PBR materials. It's
 
 By default blender will just link to the existing material. Changes here would also affect the original object you got this material from. Make this material a single user by pressing the "2".
 
-![Apply material to spesific Unit](/blender/step3.png)
+![Apply material to specific Unit](/blender/step3.png)
 
 ### Apply the Unit Texture
 
