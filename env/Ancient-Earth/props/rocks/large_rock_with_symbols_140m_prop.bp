@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 300,
@@ -12,9 +12,9 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'gravel_symbols_albedo.dds',
                     LODCutoff = 750,
-                    ShaderName = 'NormalMappedTerrain',
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "gravel_symbols_albedo.dds",
                 },
             },
         },
@@ -25,15 +25,9 @@ PropBlueprint {
         ReclaimMassMax = 140,
         ReclaimTime = 10,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Large Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Large Rock" },
+    Physics = { BlockPath = true },
     SizeX = 3,
     SizeY = 0.5,
     SizeZ = 4,

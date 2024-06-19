@@ -1,27 +1,10 @@
-PropBlueprint {
+PropBlueprint{
     Audio = {
-        BurnLoop = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        BurnStart = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        TreeFall = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Tree_Crush',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        BurnLoop  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
+        BurnStart = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        TreeFall  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Tree_Crush', LodCutoff = 'UnitMove_LodCutoff' },
     },
-    Categories = {
-        'RECLAIMABLE',
-    },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -31,19 +14,19 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'Brch01_albedo.dds',
                     LODCutoff = 60,
-                    ShaderName = 'UndulatingNormalMappedAlpha',
+                    ShaderName = "UndulatingNormalMappedAlpha",
+                    AlbedoName = "Brch01_albedo.dds",
                 },
                 {
-                    AlbedoName = 'Brch01_albedo.dds',
                     LODCutoff = 200,
-                    ShaderName = 'TMeshAlpha',
+                    ShaderName = "TMeshAlpha",
+                    AlbedoName = "Brch01_albedo.dds",
                 },
                 {
-                    AlbedoName = 'Brch01_LOD2_albedo.dds',
                     LODCutoff = 750,
-                    ShaderName = 'VertexNormal',
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "Brch01_LOD2_albedo.dds",
                 },
             },
         },
@@ -54,14 +37,13 @@ PropBlueprint {
         ReclaimMassMax = 0.66,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Small Tree',
-    },
-    Physics = {
-        BlockPath = false,
-    },
-    ScriptClass = 'Tree',
-    ScriptModule = '/lua/proptree.lua',
+    Interface = { HelpText = "Small Tree" },
+    Physics = { BlockPath = false },
+    ScriptClass = "Tree",
+    ScriptModule = "/lua/proptree.lua",
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
     SizeX = 0.1,
     SizeY = 1.25,
     SizeZ = 0.1,

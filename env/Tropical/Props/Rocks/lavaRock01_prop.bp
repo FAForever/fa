@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -13,7 +13,7 @@ PropBlueprint {
             LODs = {
                 {
                     LODCutoff = 750,
-                    ShaderName = 'NormalMappedTerrain',
+                    ShaderName = "NormalMappedTerrain",
                 },
             },
         },
@@ -24,15 +24,9 @@ PropBlueprint {
         ReclaimMassMax = 75,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Large Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Large Rock" },
+    Physics = { BlockPath = true },
     SizeX = 2,
     SizeY = 3,
     SizeZ = 2,
