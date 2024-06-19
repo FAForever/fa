@@ -1,4 +1,4 @@
-UnitBlueprint {
+UnitBlueprint{
     Description = "<LOC uel0001_desc>Armored Command Unit",
     AI = {
         GuardRadius = 10,
@@ -67,15 +67,13 @@ UnitBlueprint {
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Commander",
         EconomyThreatLevel = 746,
         Health = 12000,
         MaxHealth = 12000,
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 45,
+        SurfaceThreatLevel = 765,
     },
     Display = {
         Abilities = {
@@ -90,9 +88,9 @@ UnitBlueprint {
         AnimationWalkRate = 1.7,
         AttackReticleSize = 55,
         DamageEffects = {
-            { Bone = 0, OffsetX = 0.25, OffsetY = 0.75, OffsetZ = 0 },
-            { Bone = 0, OffsetX = -0.25, OffsetY = 0.75, OffsetZ = 0 },
-            { Bone = 0, OffsetX = -0.35, OffsetY = 0.1, OffsetZ = 0 },
+            { Bone = 0,     OffsetX = 0.25,  OffsetY = 0.75,  OffsetZ = 0 },
+            { Bone = 0,     OffsetX = -0.25, OffsetY = 0.75,  OffsetZ = 0 },
+            { Bone = 0,     OffsetX = -0.35, OffsetY = 0.1,   OffsetZ = 0 },
         },
         IdleEffects = {
             Seabed = {
@@ -448,9 +446,9 @@ UnitBlueprint {
             UpgradeUnitAmbientBones = { "UEL0001" },
         },
         ShieldGeneratorField = {
-            BuildCostEnergy = 70000,
-            BuildCostMass = 2000,
-            BuildTime = 1700,
+            BuildCostEnergy = 45000,
+            BuildCostMass = 1400,
+            BuildTime = 1500,
             Icon = "sgf",
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -460,9 +458,9 @@ UnitBlueprint {
             Name = "<LOC enhancements_0050>Shield Generator Field",
             ShieldEnergyDrainRechargeTime = 5,
             ShieldEnhancementNumber = 5,
-            ShieldMaxHealth = 7000,
-            ShieldRechargeTime = 60,
-            ShieldRegenRate = 67,
+            ShieldMaxHealth = 5000,
+            ShieldRechargeTime = 45,
+            ShieldRegenRate = 60,
             ShieldRegenStartTime = 1,
             ShieldSize = 20,
             ShieldSpillOverDamageMod = 0,
@@ -649,19 +647,13 @@ UnitBlueprint {
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Overcharge = true,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
             RULEUCC_RetaliateToggle = true,
-            RULEUCC_SiloBuildNuke = false,
-            RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,
-            RULEUCC_Tactical = false,
-            RULEUCC_Teleport = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "amph",
@@ -684,22 +676,12 @@ UnitBlueprint {
     LifeBarOffset = 0.65,
     LifeBarSize = 1.25,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -0.95,
         MaxAcceleration = 1.7,
         MaxSpeed = 1.7,
         MaxSpeedReverse = 0,
         MaxSteerForce = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
@@ -783,7 +765,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE",
@@ -857,7 +839,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.3,
+            RateOfFire = 10/33, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
@@ -898,8 +880,8 @@ UnitBlueprint {
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = "Overcharge",
-            EnergyRequired = 7500,
             DisplayName = "AutoOvercharge Cannon",
+            EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
@@ -934,7 +916,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
@@ -1009,7 +991,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 5,
+            RateOfFire = 10/2, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -1022,7 +1004,6 @@ UnitBlueprint {
             WeaponUnpacks = true,
         },
         {
-
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound { Bank = 'UELWeapon', Cue = 'UEL0111_Missile_Cruise', LodCutoff = 'Weapon_LodCutoff' },
@@ -1078,13 +1059,12 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Missile",
             WeaponRepackTimeout = 0,
             WeaponUnpacks = true,
-
         },
         {
             AboveWaterTargetsOnly = true,
@@ -1113,7 +1093,7 @@ UnitBlueprint {
                 },
             },
             RackRecoilDistance = 0,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Death",
@@ -1129,7 +1109,7 @@ UnitBlueprint {
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             WeaponCategory = "Teleport",
         },
     },

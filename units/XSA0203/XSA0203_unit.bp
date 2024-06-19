@@ -7,8 +7,8 @@ UnitBlueprint{
         CanFly = true,
         CirclingDirChangeFrequencySec = 1,
         CirclingElevationChangeRatio = 0.25,
-        CirclingRadiusChangeMaxRatio = 0.9,
-        CirclingRadiusChangeMinRatio = 0.6,
+        CirclingRadiusChangeMaxRatio = 0.7,
+        CirclingRadiusChangeMinRatio = 0.5,
         CirclingRadiusVsAirMult = 0.66,
         CirclingTurnMult = 3,
         KLift = 3,
@@ -53,14 +53,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 1800,
         MaxHealth = 1800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 8,
+        SurfaceThreatLevel = 10,
     },
     Display = {
         LayerChangeEffects = {
@@ -120,17 +116,12 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "air",
@@ -141,14 +132,6 @@ UnitBlueprint{
     LifeBarOffset = 0.6,
     LifeBarSize = 0.6,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 10,
         FuelRechargeRate = 5,
         FuelUseTime = 400,
@@ -189,7 +172,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 19.2,
+            Damage = 20,
             DamageType = "Normal",
             DisplayName = "Heavy Phasic Autogun",
             FireTargetLayerCapsTable = {
@@ -199,7 +182,7 @@ UnitBlueprint{
             },
             FiringTolerance = 2,
             Label = "TurretLeft",
-            MaxRadius = 22,
+            MaxRadius = 24,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 35,
@@ -223,7 +206,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.255,
+            RateOfFire = 10/8, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "GROUNDATTACK",
@@ -251,7 +234,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 19.2,
+            Damage = 20,
             DamageType = "Normal",
             DisplayName = "Heavy Phasic Autogun",
             FireTargetLayerCapsTable = {
@@ -261,7 +244,7 @@ UnitBlueprint{
             },
             FiringTolerance = 2,
             Label = "TurretRight",
-            MaxRadius = 22,
+            MaxRadius = 24,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 40,
@@ -286,7 +269,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.255,
+            RateOfFire = 10/8, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "GROUNDATTACK",
@@ -325,7 +308,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

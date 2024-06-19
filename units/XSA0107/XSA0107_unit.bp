@@ -60,12 +60,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_transport>Transport" },
@@ -135,16 +131,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
         },
@@ -158,14 +148,6 @@ UnitBlueprint{
     LifeBarOffset = 4.5,
     LifeBarSize = 3,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 8,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -190,12 +172,11 @@ UnitBlueprint{
         Class1Capacity = 8,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsSmall = 8,
-        SlotsMedium = 4,
         SlotsLarge = 2,
+        SlotsMedium = 4,
+        SlotsSmall = 8,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Weapon = {
         {
             Damage = 0,
@@ -244,7 +225,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

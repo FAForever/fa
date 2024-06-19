@@ -35,18 +35,15 @@ UnitBlueprint{
         "VOLATILE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 17285,
+        EconomyThreatLevel = 18013,
         Health = 900,
         MaxHealth = 900,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 290,
+        SurfaceThreatLevel = 216,
     },
     Display = {
-        Abilities = { 
-            "<LOC ability_manuallaunch>Manual Launch", 
+        Abilities = {
+            "<LOC ability_manuallaunch>Manual Launch",
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationDeath = {
@@ -108,21 +105,11 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_SiloBuildTactical = true,
             RULEUCC_Stop = true,
             RULEUCC_Tactical = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "land",
@@ -134,14 +121,6 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         HorizontalSkirt = true,
@@ -157,7 +136,6 @@ UnitBlueprint{
     SelectionSizeX = 0.45,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.6,
-    CollisionOffsetY = 0,
     SizeX = 0.65,
     SizeY = 0.8,
     SizeZ = 1,
@@ -216,7 +194,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
                 "ALLUNITS",
@@ -253,12 +231,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

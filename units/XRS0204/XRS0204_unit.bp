@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xrs0204_desc>Submarine Killer",
-    AI = {
-        GuardReturnRadius = 30,
-    },
+    AI = { GuardReturnRadius = 30 },
     Audio = {
         AmbientMove    = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop_UW',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -18,7 +16,7 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",
-        "ANTITORPEDO", 
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -37,14 +35,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 1430,
         MaxHealth = 1430,
-        RegenRate = 0,
         SubThreatLevel = 11,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -146,7 +140,7 @@ UnitBlueprint{
         BuildCostEnergy = 8800,
         BuildCostMass = 1100,
         BuildTime = 4400,
-        MaintenanceConsumptionPerSecondEnergy = 30,
+        MaintenanceConsumptionPerSecondEnergy = 45,
     },
     Footprint = {
         SizeX = 2,
@@ -156,18 +150,12 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Dive = false,
+            RULEUCC_Dive = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "sea",
@@ -192,15 +180,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         Elevation = -1.5,
@@ -209,7 +188,6 @@ UnitBlueprint{
         MaxSpeed = 6.5,
         MaxSpeedReverse = 6.5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,
@@ -273,7 +251,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
             TargetPriorities = {
@@ -333,7 +311,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.05,
+            RateOfFire = 10/200, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

@@ -51,7 +51,7 @@
 ---@field BeamLifetime number
 --- if the weapon will only fire when underwater
 ---@field BelowWaterFireOnly? boolean
---- threshold to release point before releasing ordnance
+--- Distance from bomb firing solution's position to the target's position within which the weapon will fire 
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
@@ -81,7 +81,7 @@
 ---@field DamageFriendly boolean
 --- blast radius
 ---@field DamageRadius number
---- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+--- how much additional damage is dealt to shields using the "FAF_AntiShield" damagetype
 ---@field DamageToShields? number
 --- the type of damage the unit will do
 ---@field DamageType DamageType

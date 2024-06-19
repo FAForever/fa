@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ues0203_desc>Attack Submarine",
-    AI = {
-        GuardReturnRadius = 30,
-    },
+    AI = { GuardReturnRadius = 30 },
     Audio = {
         AmbientMove    = Sound { Bank = 'UES',        Cue = 'UES0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'UES',        Cue = 'UES0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -36,15 +34,12 @@ UnitBlueprint{
         "TECH1",
         "UEF",
         "VISIBLETORECON",
-        "WEAKDIRECTFIRE"
+        "WEAKDIRECTFIRE",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
         SubThreatLevel = 4,
         SurfaceThreatLevel = 3,
     },
@@ -156,18 +151,12 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Dive = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "sea",
@@ -183,15 +172,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         Elevation = -1.5,
@@ -203,7 +183,6 @@ UnitBlueprint{
         MeshExtentsX = 5,
         MeshExtentsY = 0.65,
         MeshExtentsZ = 2.15,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 5,
         TurnRate = 80,
@@ -266,7 +245,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
             TargetPriorities = {
@@ -325,7 +304,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",

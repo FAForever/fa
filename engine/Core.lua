@@ -14,6 +14,9 @@
 ---@field [1] number    # x
 ---@field [2] number    # y (up)
 ---@field [3] number    # z
+---@field x number      # east/west
+---@field y number      # up/down
+---@field z number      # north/south
 
 ---@class Vector2
 ---@field [1] number    # x
@@ -240,11 +243,13 @@ end
 function MATH_IRound(number)
 end
 
+---@overload fun(s: number, a1: number, b1: number, a2: number, b2: number): number, number
 --- Applies linear interpolation between two values `a` and `b`
----@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
+---@param s number between 0 or `sMin` (returns `a`) and 1 or `sMax` (returns `b`)
 ---@param a number
 ---@param b number
 ---@return number
+---@overload fun(s: number, sMin: number, sMax: number, a: number, b: number): number
 function MATH_Lerp(s, a, b)
 end
 

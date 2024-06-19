@@ -22,8 +22,6 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "ANTIMISSILE",
-        "WEAKANTIAIR",
-        "WEAKANTINAVY",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -42,6 +40,8 @@ UnitBlueprint{
         "SNIPEMODE",
         "TECH3",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
+        "WEAKANTINAVY",
     },
     Defense = {
         AirThreatLevel = 6,
@@ -49,7 +49,6 @@ UnitBlueprint{
         EconomyThreatLevel = 274,
         Health = 44500,
         MaxHealth = 44500,
-        RegenRate = 0,
         SubThreatLevel = 2,
         SurfaceThreatLevel = 18,
     },
@@ -142,17 +141,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "sea",
@@ -169,15 +162,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 3,
@@ -185,7 +169,6 @@ UnitBlueprint{
         MaxSpeed = 3.2,
         MaxSpeedReverse = 3,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -252,7 +235,7 @@ UnitBlueprint{
             RackSalvoSize = 3,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 140,
@@ -320,7 +303,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 130,
@@ -383,7 +366,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.25,
+            RateOfFire = 10/8, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -448,7 +431,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.25,
+            RateOfFire = 10/8, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -510,7 +493,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -537,8 +520,8 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 1,
             DamageType = "Normal",
-            DisplayName = "Zapper Anti Missile",
             DisableWhileReloading = true,
+            DisplayName = "Zapper Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             HeadingArcCenter = -90,
@@ -562,7 +545,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 1.0,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
@@ -590,8 +573,8 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 1,
             DamageType = "Normal",
-            DisplayName = "Zapper Anti Missile",
             DisableWhileReloading = true,
+            DisplayName = "Zapper Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             HeadingArcCenter = 90,
@@ -615,7 +598,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 1.0,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",

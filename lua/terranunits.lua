@@ -14,6 +14,7 @@ TAirStagingPlatformUnit = import('/lua/sim/units/uef/TAirStagingPlatformUnit.lua
 TAirUnit = import('/lua/sim/units/uef/TAirUnit.lua').TAirUnit
 TConcreteStructureUnit = import('/lua/sim/units/uef/TConcreteStructureUnit.lua').TConcreteStructureUnit
 TConstructionUnit = import('/lua/sim/units/uef/TConstructionUnit.lua').TConstructionUnit
+TConstructionPodUnit = import('/lua/sim/units/uef/TConstructionPodUnit.lua').TConstructionPodUnit
 TEnergyCreationUnit = import('/lua/sim/units/uef/TEnergyCreationUnit.lua').TEnergyCreationUnit
 TEnergyStorageUnit = import('/lua/sim/units/uef/TEnergyStorageUnit.lua').TEnergyStorageUnit
 THoverLandUnit = import('/lua/sim/units/uef/THoverLandUnit.lua').THoverLandUnit

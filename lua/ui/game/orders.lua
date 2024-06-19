@@ -116,31 +116,7 @@ function CreateMouseoverDisplay(parent, ID)
         return
     end
 
-    controls.mouseoverDisplay = Tooltip.CreateExtendedToolTip(parent, text, desc)
-    local Frame = GetFrame(0)
-    controls.mouseoverDisplay.Bottom:Set(parent.Top)
-    if (parent.Left() + (parent.Width() / 2)) - (controls.mouseoverDisplay.Width() / 2) < 0 then
-        controls.mouseoverDisplay.Left:Set(4)
-    elseif (parent.Right() - (parent.Width() / 2)) + (controls.mouseoverDisplay.Width() / 2) > Frame.Right() then
-        controls.mouseoverDisplay.Right:Set(function() return Frame.Right() - 4 end)
-    else
-        LayoutHelpers.AtHorizontalCenterIn(controls.mouseoverDisplay, parent)
-    end
-
-    local alpha = 0.0
-    controls.mouseoverDisplay:SetAlpha(alpha, true)
-    local mdThread = ForkThread(function()
-        WaitSeconds(createDelay)
-        while alpha <= 1.0 do
-            controls.mouseoverDisplay:SetAlpha(alpha, true)
-            alpha = alpha + 0.1
-            WaitSeconds(0.01)
-        end
-    end)
-
-    controls.mouseoverDisplay.OnDestroy = function(self)
-        KillThread(mdThread)
-    end
+    controls.mouseoverDisplay = Tooltip.CreateMouseoverDisplay(parent, {["text"] = text, ["body"] = desc}, nil, true)
 end
 
 local function CreateOrderButtonGrid()

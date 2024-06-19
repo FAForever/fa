@@ -33,14 +33,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "ExperimentalStructure",
         EconomyThreatLevel = 1774,
         Health = 9000,
         MaxHealth = 9000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Mesh = {
@@ -86,17 +82,8 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "land",
@@ -108,14 +95,6 @@ UnitBlueprint{
     LifeBarOffset = 3.8,
     LifeBarSize = 5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.2,
@@ -131,7 +110,6 @@ UnitBlueprint{
     SelectionSizeX = 4,
     SelectionSizeZ = 4.8125,
     SelectionThickness = 0.27,
-    CollisionOffsetY = 0,
     SizeX = 3.75,
     SizeY = 3.375,
     SizeZ = 4.5,
@@ -174,8 +152,8 @@ UnitBlueprint{
             MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 98,
-            MuzzleVelocityReduceDistance = 1400,
+            MuzzleVelocity = 150,
+            MuzzleVelocityReduceDistance = 4000,
             ProjectileId = "/projectiles/AIFFragmentationSensorShell01/AIFFragmentationSensorShell01_proj.bp",
             ProjectileLifetime = 150,
             ProjectilesPerOnFire = 25,
@@ -194,7 +172,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.32,
+            RateOfFire = 10/31, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "EXPERIMENTAL MASSFABRICATION",
@@ -233,12 +211,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

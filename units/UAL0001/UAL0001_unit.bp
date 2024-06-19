@@ -60,15 +60,13 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Commander",
         EconomyThreatLevel = 686,
         Health = 11000,
         MaxHealth = 11000,
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 45,
+        SurfaceThreatLevel = 765,
     },
     Display = {
         Abilities = {
@@ -105,10 +103,10 @@ UnitBlueprint{
                     ShaderName = "Aeon",
                 },
                 {
-                    AlbedoName = 'ual0001_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Aeon',
-                    SpecularName = 'ual0001_lod1_specteam.dds',
+                    ShaderName = "Aeon",
+                    AlbedoName = "ual0001_lod1_albedo.dds",
+                    SpecularName = "ual0001_lod1_specteam.dds",
                 },
             },
         },
@@ -645,7 +643,6 @@ UnitBlueprint{
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Overcharge = true,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
@@ -653,8 +650,6 @@ UnitBlueprint{
             RULEUCC_Repair = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Teleport = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "amph",
@@ -679,28 +674,17 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 1.25,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -0.9,
         MaxAcceleration = 1.7,
         MaxSpeed = 1.7,
         MaxSpeedReverse = 0,
         MaxSteerForce = 12,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         StandUpright = true,
         TurnRadius = 10,
         TurnRate = 90,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.125,
     SelectionSizeX = 0.7,
     SelectionSizeZ = 0.6,
@@ -780,7 +764,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "COMMAND",
@@ -853,7 +837,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.3,
+            RateOfFire = 10/33, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
@@ -930,7 +914,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
@@ -1008,7 +992,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             TargetPriorities = { "MOBILE" },
             TargetRestrictDisallow = "UNTARGETABLE,AIR,EXPERIMENTAL,COMMAND",
             TurretDualManipulators = false,
@@ -1050,7 +1034,7 @@ UnitBlueprint{
                 },
             },
             RackRecoilDistance = 0,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Death",
@@ -1066,7 +1050,7 @@ UnitBlueprint{
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             WeaponCategory = "Teleport",
         },
     },

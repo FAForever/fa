@@ -538,8 +538,8 @@ keyDescriptions = {
     ['toggle_ai_nav_retreat_direction_from'] = 'NavUtils - Toggle to visualize output of RetreatDirectionFrom ',
     ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
 
-    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers',
-    ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers',
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
+    ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
     ['abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['shift_abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',

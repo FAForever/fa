@@ -74,13 +74,15 @@ function table.getsize(t)
 end
 
 --- table.copy(t) returns a shallow copy of t.
+---@overload fun(t: Vector): Vector
 function table.copy(t)
-    if not t then return end -- prevents looping over nil table
-    local r = {}
-    for k,v in t do
-        r[k] = v
+    if t then -- prevents looping over nil table
+        local r = {}
+        for k,v in t do
+            r[k] = v
+        end
+        return r
     end
-    return r
 end
 
 --- table.find(t,val) returns the key for val if it is in t table.
@@ -552,6 +554,9 @@ function table.count(t, fn)
 end
 
 --- Returns a new table with unique values stored using numeric keys and it does not preserve keys of the original table
+---@generic T, G
+---@param t? table<T, G>
+---@return table<T, G> | nil
 function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}

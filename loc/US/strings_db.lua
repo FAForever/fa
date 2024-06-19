@@ -1433,7 +1433,7 @@ Unit_Description_0007="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0008="Doubles the main cannon's damage, and increases its range and that of Overcharge.\n\n+100 Main cannon damage\n+8 Main cannon range"
 Unit_Description_0009="Tactical Cruise Missiles replaced by much more expensive, powerful Tactical Nuclear Missiles."
 Unit_Description_0010="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside it. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield Regen Rate = 60 HP/s\nShield Recharge Time = 90 seconds"
+Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside it. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield Regen Rate = 60 HP/s\nShield Recharge Time = 45 seconds"
 Unit_Description_0012="Increases ACU's resource generation to 15 mass per second and 2520 energy per second."
 Unit_Description_0013="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 140 seconds"
 Unit_Description_0014="Creates an Engineering Drone which act as a flying T1 Engineer. Assists the ACU by default, but can be given its own orders.\n\n+5 Buildpower Drone"
@@ -1447,7 +1447,7 @@ Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield 
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
 Unit_Description_0021="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems.\n\n+64 Omni Radius\n+15 Vision Radius"
-Unit_Description_0023="Primary weapon now fires 1.82 times as fast.\n\n+82% Rate of Fire"
+Unit_Description_0023="Primary weapon now fires twice as fast.\n\n+100% Rate of Fire"
 Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range.\n\n+10 Main cannon range\n+2 Main cannon damage radius"
 
 -- UEF -- Land Units

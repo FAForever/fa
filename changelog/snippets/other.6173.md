@@ -1,0 +1,1 @@
+- (#6173) Fix slow transparency change for the tooltips of order buttons by making them use the generic tooltip creator function.

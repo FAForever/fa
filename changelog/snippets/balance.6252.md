@@ -1,0 +1,2 @@
+- (#6252) A bug fix reverts a 1.2 -> 1.3 second reload time increase for the following unit weapons:
+	- Megalith proton cannons, CZAR AA missiles, Pillar cannons, and Cybran cruiser AA

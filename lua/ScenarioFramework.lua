@@ -64,19 +64,21 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
 
     import("/lua/sim/matchstate.lua").CallEndGame() -- We need this here to populate the score screen
 
-    ForkThread(function()
-        WaitSeconds(3) -- Wait for the stats to be synced
-        UnlockInput()
-        EndOperationT {
-            success = success,
-            difficulty = ScenarioInfo.Options.Difficulty,
-            allPrimary = allPrimary,
-            allSecondary = allSecondary,
-            allBonus = allBonus,
-            faction = ScenarioInfo.LocalFaction,
-            opData = opData.operationData
-        }
-    end)
+    ForkThread(EndOperationThread, {
+        success = success,
+        difficulty = ScenarioInfo.Options.Difficulty,
+        allPrimary = allPrimary,
+        allSecondary = allSecondary,
+        allBonus = allBonus,
+        faction = ScenarioInfo.LocalFaction,
+        opData = opData.operationData
+    })
+end
+
+function EndOperationThread(tbl)
+    WaitSeconds(3) -- Wait for the stats to be synced
+    UnlockInput()
+    EndOperationT(tbl)
 end
 
 ---@alias FactionSelectData {Faction: "aeon" | "cybran" | "uef"}

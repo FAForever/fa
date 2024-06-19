@@ -11,15 +11,6 @@ CDFRocketIridium03 = Class(CIridiumRocketProjectile) {
         local army = self:GetArmy()
         CreateLightParticle( self, -1, army, 2, 1, 'glow_03', 'ramp_red_06' )
         CreateLightParticle( self, -1, army, 1, 3, 'glow_03', 'ramp_antimatter_02' )
-        if targetType == 'Shield' then
-            Damage(
-                self,
-                {0,0,0},
-                targetEntity,
-                self.Data,
-                'Normal'
-            )
-        end
     end,
 }
 
