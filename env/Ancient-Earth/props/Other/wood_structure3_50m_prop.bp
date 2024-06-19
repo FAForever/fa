@@ -3,6 +3,10 @@ PropBlueprint{
         "OBSTRUCTSBUILDING",
         "RECLAIMABLE",
     },
+    Defense = {
+        Health = 100,
+        MaxHealth = 100,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,

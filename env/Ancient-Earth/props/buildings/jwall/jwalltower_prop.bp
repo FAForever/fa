@@ -5,8 +5,8 @@ PropBlueprint{
         "WALL",
     },
     Defense = {
-        Health = 2000,
-        MaxHealth = 2000,
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {

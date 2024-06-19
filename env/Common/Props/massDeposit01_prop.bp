@@ -3,6 +3,10 @@ PropBlueprint{
         "INVULNERABLE",
         "UNTARGETABLE",
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,

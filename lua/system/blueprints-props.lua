@@ -96,6 +96,7 @@ function PostProcessProps(props)
     for _, prop in pairs(props) do
         ProcessInvulnerability(prop)
         ProcessObstructions(prop)
+        ProcessHealth(prop)
         ProcessCategories(prop)
     end
 end
@@ -107,6 +108,7 @@ function BatchProcessProps(blueprints)
         for _, prop in pairs(blueprints.Prop) do
             ProcessInvulnerability(prop)
             ProcessObstructions(prop)
+            ProcessHealth(prop)
         end
     end
 end
