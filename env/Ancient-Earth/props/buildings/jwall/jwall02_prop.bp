@@ -13,13 +13,13 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 70,
                     ShaderName = "NormalMappedTerrain",
                     AlbedoName = "jwall01_albedo.dds",
                     NormalsName = "jwall01_normalsts.dds",
                 },
                 {
-                    LODCutoff = 3000,
+                    LODCutoff = 250,
                     ShaderName = "NormalMappedTerrain",
                     AlbedoName = "jwall01_albedo.dds",
                     NormalsName = "jwall01_normalsts.dds",

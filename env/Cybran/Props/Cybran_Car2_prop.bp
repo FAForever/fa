@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 320,
                     ShaderName = "Unit",
                     SpecName = "cybran_car2_SpecTeam.dds",
                     AlbedoName = "cybran_car2_Albedo.dds",

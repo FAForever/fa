@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 3000,
+                    LODCutoff = 1020,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "Rockb_albedo.dds",
                     NormalsName = "Rockb_normalsTS.dds",

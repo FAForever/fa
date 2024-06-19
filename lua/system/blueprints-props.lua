@@ -20,11 +20,22 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- upvalue for performance
+local pairs = pairs
+
+local TableInsert = table.insert
+local TableFind = table.find
+local TableGetn = table.getn
+
+local MathFloor = math.floor
+local MathSqrt = math.sqrt
+local MathMax = math.max
+
 --- Feature: quick access to (individual) categories
 ---
 ---@param prop PropBlueprint
 local function ProcessCategories(prop)
-    prop.Categories = prop.Categories or { }
+    prop.Categories = prop.Categories or {}
 
     prop.CategoriesHash = {}
     for k, category in pairs(prop.Categories) do
@@ -46,11 +57,11 @@ end
 ---@param prop PropBlueprint
 local function ProcessObstructions(prop)
     if prop.ScriptClass == "Wreckage" and prop.ScriptModule == '/lua/wreckage.lua' then
-        table.insert(prop.Categories, 'OBSTRUCTSBUILDING')
+        TableInsert(prop.Categories, 'OBSTRUCTSBUILDING')
     end
 
-    local isObstructing = table.find(prop.Categories, 'OBSTRUCTSBUILDING')
-    local isReclaimable = table.find(prop.Categories, 'OBSTRUCTSBUILDING')
+    local isObstructing = TableFind(prop.Categories, 'OBSTRUCTSBUILDING')
+    local isReclaimable = TableFind(prop.Categories, 'OBSTRUCTSBUILDING')
 
     -- check for props that should block pathing
     if not (prop.ScriptClass == "Tree" or prop.ScriptClass == "TreeGroup") and isReclaimable then
@@ -67,7 +78,7 @@ end
 ---
 ---@param prop PropBlueprint
 local function ProcessInvulnerability(prop)
-    local isInvulnerable = table.find(prop.Categories, 'INVULNERABLE')
+    local isInvulnerable = TableFind(prop.Categories, 'INVULNERABLE')
     -- make invulnerable props actually invulnerable
     if prop.Categories then
         if isInvulnerable then
@@ -82,13 +93,48 @@ end
 ---@param prop PropBlueprint
 local function ProcessHealth(prop)
     local massValue = prop.Economy.ReclaimMassMax or 0
-    local healthValue = math.max(50, 2 * massValue)
+    local healthValue = MathMax(50, 2 * massValue)
 
-    prop.Defense = prop.Defense or { }
+    prop.Defense = prop.Defense or {}
     prop.Defense.Health = healthValue
     prop.Defense.MaxHealth = healthValue
 end
 
+--- Feature: LOD based on the size of the prop
+---
+--- See also:
+--- - https://github.com/FAForever/fa/pull/3662
+--- - https://github.com/FAForever/fa/pull/4675
+---@param prop any
+local function ProcessLOD(prop)
+
+    local sx = prop.SizeX or 1
+    local sy = prop.SizeY or 1
+    local sz = prop.SizeZ or 1
+
+    -- give more emphasis to the x / z value as that is easier to see in the average camera angle
+    local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
+    if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
+        weighted = 2.6
+    end
+
+    -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
+    local lod = 0.9 * MathSqrt(100 * 500 * weighted)
+
+    if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs then
+        local n = TableGetn(prop.Display.Mesh.LODs)
+        for k = 1, n do
+            local data = prop.Display.Mesh.LODs[k]
+
+            -- https://www.desmos.com/calculator (x * x)
+            local factor = (k / n) * (k / n)
+            local LODCutoff = factor * lod
+
+            -- sanitize the value
+            data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+        end
+    end
+end
 
 --- Post-processes all props
 ---@param props PropBlueprint[]
@@ -97,6 +143,7 @@ function PostProcessProps(props)
         ProcessInvulnerability(prop)
         ProcessObstructions(prop)
         ProcessHealth(prop)
+        ProcessLOD(prop)
         ProcessCategories(prop)
     end
 end
@@ -109,6 +156,7 @@ function BatchProcessProps(blueprints)
             ProcessInvulnerability(prop)
             ProcessObstructions(prop)
             ProcessHealth(prop)
+            ProcessLOD(prop)
         end
     end
 end

@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 50,
+                    LODCutoff = 520,
                     ShaderName = "UnderwaterClutter",
                     SpecName = "kelp_01_SpecTeam.dds",
                     AlbedoName = "kelp_01_Albedo.dds",

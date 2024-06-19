@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 500,
+                    LODCutoff = 190,
                     ShaderName = "Unit",
                     MeshName = "/env/Wreckage/props/Walls/Wall01_lod0.scm",
                     AlbedoName = "/env/Wreckage/props/Walls/Wall01_Albedo.dds",

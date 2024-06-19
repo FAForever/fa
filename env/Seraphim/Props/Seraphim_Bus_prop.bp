@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 400,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "Seraphim",
                     SpecName = "seraphim_bus_SpecTeam.dds",
