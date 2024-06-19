@@ -1,12 +1,22 @@
-BeamBlueprint {
-    Lifetime = 2,
-    TextureName = '/textures/particles/debris_alpha_03.dds',
-    Thickness = 0.075,
-    StartColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
-    EndColor = {x=0,y=0,z=0,w=0}, -- R,G,B,A
-    Length = 8,
+BeamBlueprint{
     Blendmode = 1.0,
+    EndColor = {
+        w = 0,
+        x = 0,
+        y = 0,
+        z = 0,
+    },
+    Length = 8,
+    Lifetime = 2,
     RepeatRate = 2,
+    StartColor = {
+        w = 0,
+        x = 1,
+        y = 1,
+        z = 1,
+    },
+    TextureName = "/textures/particles/debris_alpha_03.dds",
+    Thickness = 0.075,
     UShift = 0.0,
     VShift = 0.5,
 }

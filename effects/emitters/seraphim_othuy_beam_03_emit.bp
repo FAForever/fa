@@ -1,12 +1,22 @@
-BeamBlueprint {
-    Lifetime = 5.0,
-    TextureName = '/textures/particles/electricity_beam_04.dds',
+BeamBlueprint{
+    EndColor = {
+        w = 0.0,
+        x = 0.6,
+        y = 0.6,
+        z = 1,
+    },
+    LODCutoff = 200,
     Length = 1.5,
+    Lifetime = 5.0,
+    RepeatRate = 0.1,
+    StartColor = {
+        w = 0.0,
+        x = 0.8,
+        y = 0.8,
+        z = 1,
+    },
+    TextureName = "/textures/particles/electricity_beam_04.dds",
     Thickness = 2.5,
-    StartColor = {x=0.8,y=0.8,z=1,w=0.0}, -- R,G,B,A
-    EndColor = {x=0.6,y=0.6,z=1,w=0.0}, -- R,G,B,A
     UShift = 0.0,
     VShift = 0.4,
-    RepeatRate= 0.1,
-    LODCutoff= 200,
 }
