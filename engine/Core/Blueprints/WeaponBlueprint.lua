@@ -207,8 +207,8 @@
 --- if `NeedProp` is true then whenever the unit aquires a new target and is ready to attack it, it
 --- will first run the `OnGotTarget` script on the weapon
 ---@field NeedPrep? boolean
---- currently just sets `AlwaysRecheckTarget = false` so that bombers don't retarget halfway through
---- a bombing run
+--- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
+--- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
 --- if the unit is set as "busy" while the weapon charges
 ---@field NotExclusive? boolean
