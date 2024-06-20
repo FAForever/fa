@@ -25,6 +25,17 @@ local BlueprintNameToIntel = {
     SonarStealthFieldRadius = 'SonarStealthField',
 }
 
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
+}
+
 local LabelToVeterancyUse = {
     ['DeathWeapon'] = true,
     ['DeathImpact'] = true,
@@ -41,9 +52,10 @@ local TechToVetMultipliers = {
 
 ---@param weapon WeaponBlueprint
 local function CalculatedDamage(weapon)
-    local ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}), weapon.MuzzleSalvoSize or 1)
+    local ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or { 'nehh' }),
+        weapon.MuzzleSalvoSize or 1)
     if weapon.RackFireTogether then
-        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or {'nehh'}))
+        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or { 'nehh' }))
     end
     return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
 end
@@ -57,16 +69,19 @@ local function DetermineWeaponDPS(weapon)
     -- Base values
     local ProjectileCount
     if weapon.MuzzleSalvoDelay == 0 then
-        ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}))
+        ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or { 'nehh' }))
     else
         ProjectileCount = (weapon.MuzzleSalvoSize or 1)
     end
     if weapon.RackFireTogether then
-        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or {'nehh'}))
+        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or { 'nehh' }))
     end
     -- Game logic rounds the timings to the nearest tick --  MathMax(0.1, 1 / (weapon.RateOfFire or 1)) for unrounded values
-    local DamageInterval = MathFloor((MathMax(0.1, 1 / (weapon.RateOfFire or 1)) * 10) + 0.5) / 10 + ProjectileCount * (MathMax(weapon.MuzzleSalvoDelay or 0, weapon.MuzzleChargeDelay or 0) * (weapon.MuzzleSalvoSize or 1))
-    local Damage = ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
+    local DamageInterval = MathFloor((MathMax(0.1, 1 / (weapon.RateOfFire or 1)) * 10) + 0.5) / 10 +
+        ProjectileCount *
+        (MathMax(weapon.MuzzleSalvoDelay or 0, weapon.MuzzleChargeDelay or 0) * (weapon.MuzzleSalvoSize or 1))
+    local Damage = ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1
+        )
 
     -- Beam calculations.
     if weapon.BeamLifetime and weapon.BeamLifetime == 0 then
@@ -88,7 +103,8 @@ end
 local function DetermineWeaponCategory(weapon)
     --- With thanks to Sean 'Balthazar' Wheeldon
 
-    if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
+    if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or
+        StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
         return 'ANTIAIR'
     end
 
@@ -123,12 +139,12 @@ local function PostProcessUnit(unit)
     unit.CategoriesHash = {}
     if unit.Categories then
         unit.CategoriesCount = table.getn(unit.Categories)
-        for k, category in unit.Categories do
+        for k, category in pairs(unit.Categories) do
             unit.CategoriesHash[category] = true
         end
     end
 
-    unit.CategoriesHash[unit.BlueprintId] = true
+    unit.CategoriesHash[unit.BlueprintId or 'nope'] = true
 
     -- sanitize guard scan radius
 
@@ -277,6 +293,12 @@ local function PostProcessUnit(unit)
                         , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeZ = 0.1 * speed
                 end
+
+                if unit.SizeY < 0.5 then
+                    WARN(string.format("Overriding the y axis of collision box of unit ( %s ), it should be atleast 0.5 to guarantee proper functioning gunships"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeY = 0.5
+                end
             end
         end
     end
@@ -286,7 +308,7 @@ local function PostProcessUnit(unit)
     if unitGeneral then
         local commandCaps = unitGeneral.CommandCaps
         if commandCaps then
-            unitGeneral.CommandCapsHash = table.deepcopy(commandCaps)
+            unitGeneral.CommandCapsHash = table.copy(commandCaps)
         else
             unitGeneral.CommandCapsHash = {}
         end
@@ -321,51 +343,52 @@ local function PostProcessUnit(unit)
         ---@type UnitIntelStatus
         local status = {}
 
-        -- life is good, intel is funded by the government
+        -- all of the unit's intel is free due to a bp flag or 0 maintenance cost
         local allIntelIsFree = false
-        if intelBlueprint.FreeIntel or (
-            not enhancementBlueprints and
-                (
-                (not economyBlueprint) or
-                    (not economyBlueprint.MaintenanceConsumptionPerSecondEnergy) or
-                    economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
+        if intelBlueprint.FreeIntel
+            or (
+            not enhancementBlueprints
+                and (
+                not economyBlueprint
+                    or not economyBlueprint.MaintenanceConsumptionPerSecondEnergy
+                    or economyBlueprint.MaintenanceConsumptionPerSecondEnergy == 0
                 )
-            ) then
+            )
+        then
             allIntelIsFree = true
             status.AllIntelMaintenanceFree = {}
         end
 
-        -- special case: unit has intel that is considered free
-        if intelBlueprint.ActiveIntel then
-            status.AllIntelMaintenanceFree = status.AllIntelMaintenanceFree or {}
-            for intel, _ in intelBlueprint.ActiveIntel do
+        -- special case: unit has specific intel types that are considered free
+        local activeIntel = intelBlueprint.ActiveIntel
+        if activeIntel then
+            status.AllIntelMaintenanceFree = {}
+            for intel, _ in pairs(activeIntel) do
                 status.AllIntelMaintenanceFree[intel] = true
             end
         end
 
-        -- special case: unit has enhancements and therefore can have any intel type
-        if enhancementBlueprints then
-            status.AllIntelFromEnhancements = {}
-        end
-
         -- usual case: find all remaining intel
         status.AllIntel = {}
-        for name, value in intelBlueprint do
+        for name, value in pairs(intelBlueprint) do
 
-            if value == true or value > 0 then
-                local intel = BlueprintNameToIntel[name]
-                if intel then
-                    if allIntelIsFree then
-                        status.AllIntelMaintenanceFree[intel] = true
-                    else
-                        status.AllIntel[intel] = true
+            -- may contain tables, such as `JamRadius`
+            if not type(value) == 'table' then
+                if value == true or value > 0 then
+                    local intel = BlueprintNameToIntel[name]
+                    if intel and not activeIntel[intel] then
+                        if allIntelIsFree then
+                            status.AllIntelMaintenanceFree[intel] = true
+                        else
+                            status.AllIntel[intel] = true
+                        end
                     end
                 end
             end
         end
 
         -- check if we have any intel
-        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree) and not enhancementBlueprints) then
+        if not (table.empty(status.AllIntel) and table.empty(status.AllIntelMaintenanceFree)) then
             -- cache it
             status.AllIntelDisabledByEvent = {}
             status.AllIntelRecharging = {}
@@ -379,7 +402,7 @@ local function PostProcessUnit(unit)
     if (not unit.Weapon[1]) or unit.General.ExcludeFromVeterancy then
         unit.VetEnabled = false
     else
-        for index, wep in unit.Weapon do
+        for index, wep in pairs(unit.Weapon) do
             if not LabelToVeterancyUse[wep.Label] then
                 unit.VetEnabled = true
             end
@@ -419,13 +442,13 @@ local function PostProcessUnit(unit)
             COUNTERMEASURE = 0,
         }
 
-        for k, weapon in weapons do
+        for k, weapon in pairs(weapons) do
             local dps = DetermineWeaponDPS(weapon)
             local category = DetermineWeaponCategory(weapon)
             if category then
                 damagePerRangeCategory[category] = damagePerRangeCategory[category] + dps
             else
-                if weapon.WeaponCategory != 'Death' then
+                if weapon.WeaponCategory ~= 'Death' then
                     -- WARN("Invalid weapon on " .. unit.BlueprintId)
                 end
             end
@@ -457,7 +480,7 @@ local function PostProcessUnit(unit)
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
         local factor = array[1].Damage
 
-        for category, damage in damagePerRangeCategory do
+        for category, damage in pairs(damagePerRangeCategory) do
             if damage > 0 then
                 local cat = "OVERLAY" .. category
                 if not unit.CategoriesHash[cat] then
@@ -468,7 +491,7 @@ local function PostProcessUnit(unit)
 
                 local cat = "WEAK" .. category
                 if not (
-                        category == 'COUNTERMEASURE' or
+                    category == 'COUNTERMEASURE' or
                         unit.CategoriesHash['COMMAND'] or
                         unit.CategoriesHash['STRATEGIC'] or
                         unit.CategoriesHash[cat]
@@ -494,7 +517,7 @@ local function PostProcessUnit(unit)
 
     -- Populate help text field when applicable
     if not (unit.Interface and unit.Interface.HelpText) then
-        unit.Interface = unit.Interface or { }
+        unit.Interface = unit.Interface or {}
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
 
@@ -502,8 +525,8 @@ local function PostProcessUnit(unit)
     --#region (Re) apply the ability to land on water
 
     -- there was a bug with Rover drones (from the kennel) when they interact
-    -- with naval factories. They would first move towards a 'free build 
-    -- location' when assisting a naval factory. As they can't land on water, 
+    -- with naval factories. They would first move towards a 'free build
+    -- location' when assisting a naval factory. As they can't land on water,
     -- that build location could be far away at the shore.
 
     -- this doesn't fix the problem itself, but it does alleviate it. At least
@@ -516,6 +539,40 @@ local function PostProcessUnit(unit)
     end
 
     --#endregion
+
+    -- Override the default 1 build rate given to units
+    -- so that rollover unit view can work with Mantis.
+    if unit.Economy and not unit.Economy.BuildRate then
+        unit.Economy.BuildRate = 0
+    end
+end
+
+--- Feature: re-apply the ability to land on water
+---
+--- There was a bug with Rover drones (from the kennel) when they interact
+--- with naval factories. They would first move towards a 'free build
+--- location' when assisting a naval factory. As they can't land on water,
+--- that build location could be far away at the shore.
+---
+--- This doesn't fix the problem itself, but it does alleviate it. At least
+--- the drones do not need to go to the shore anymore, they now look for
+--- a 'free build location' near the naval factory on water
+--- See also:
+--- 
+--- - https://github.com/FAForever/fa/pull/5372
+--- - https://github.com/FAForever/FA-Binary-Patches/pull/20
+---@param unit UnitBlueprint
+local function ProcessCanLandOnWater(unit)
+    local isAir = table.find(unit.Categories, "AIR")
+    local isTransport = table.find(unit.Categories, "TRANSPORT")
+    local isGunship = table.find(unit.Categories, "GUNSHIP")
+    local isPod = table.find(unit.Categories, "POD")
+    local isExperimental = table.find(unit.Categories, "EXPERIMENTAL")
+    local hasCanLandOnWater = table.find(unit.Categories, "CANLANDONWATER")
+
+    if (isAir and (isTransport or isGunship or isPod) and (not isExperimental)) and not hasCanLandOnWater then
+        table.insert(unit.Categories, "CANLANDONWATER")
+    end
 end
 
 ---@param allBlueprints BlueprintsTable
@@ -554,6 +611,15 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
         efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
 
+        -- add our select button override
+        if not efBlueprint.General.OrderOverrides then
+            efBlueprint.General.OrderOverrides = {}
+        end
+        efBlueprint.General.OrderOverrides.ExFac = {
+            bitmapId = 'exfacunit',
+            helpText = 'external_factory_unit',
+        }
+
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then
 
@@ -581,7 +647,93 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
 
         -- remove properties of the seed unit
         unit.Categories = table.unhash(unit.CategoriesHash)
-        unit.Economy.BuildRate = 0
+    end
+end
+
+---@param unit UnitBlueprint
+function VerifyIntelValues(unit)
+
+    ---------------------------------------------------------------------------
+    --#region Sanity check for intel values
+
+    -- Intel is visualised as a circle but it works in squares/blocks. You can
+    -- view the intel that a unit produces via a console command 'dbg Radar'.
+    --
+    -- It appears the engine divides the radius by the grid size and floors the
+    -- result. Therefore not all intel values and/or changes are actually
+    -- meaningful. With this code we check all intel values and point out those
+    -- that are not accurate.
+
+    if unit.Intel then
+        for nameIntel, radius in pairs(unit.Intel) do
+            local ogrids = BlueprintIntelNameToOgrids[nameIntel]
+            if ogrids then
+                local radiusOnGrid = math.floor(radius / ogrids) * ogrids
+                if radiusOnGrid ~= radius then
+                    WARN(
+                        string.format(
+                            "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d"
+                            ,
+                            tostring(unit.BlueprintId), radius, nameIntel, ogrids, radiusOnGrid, radiusOnGrid + ogrids
+                        )
+                    )
+                end
+            end
+        end
+    end
+end
+
+--- Warns and deletes invalid configurations for the blinking lights feature.
+---@param unit UnitBlueprint
+function VerifyBlinkingLights(unit)
+
+    local unitDisplay = unit.Display
+    local blinkingLights = unitDisplay.BlinkingLights
+    local blinkingLightsFx = unitDisplay.BlinkingLightsFx
+
+    if blinkingLights and not blinkingLightsFx then
+        WARN("Unit " .. unit.BlueprintId .. " has a field 'BlinkingLights' but no 'BlinkingLightsFx'")
+        unitDisplay.BlinkingLights = nil
+        unitDisplay.BlinkingLightsFx = nil
+        return
+    end
+
+    if not blinkingLights and blinkingLightsFx then
+        WARN("Unit " .. unit.BlueprintId .. " has 'BlinkingLightsFx' but no 'BlinkingLights'")
+        unitDisplay.BlinkingLights = nil
+        unitDisplay.BlinkingLightsFx = nil
+        return
+    end
+
+    if blinkingLights and blinkingLightsFx then
+        if not (blinkingLightsFx.Green) then
+            WARN("Unit " .. unit.BlueprintId .. " has 'BlinkingLightsFx' but no 'BlinkingLightsFx.Green'")
+            unitDisplay.BlinkingLights = nil
+            unitDisplay.BlinkingLightsFx = nil
+            return
+        end
+
+        if not (blinkingLightsFx.Red) then
+            WARN("Unit " .. unit.BlueprintId .. " has 'BlinkingLightsFx' but no 'BlinkingLightsFx.Red'")
+            unitDisplay.BlinkingLights = nil
+            unitDisplay.BlinkingLightsFx = nil
+            return
+        end
+
+        for _, blinkingLight in ipairs(blinkingLights) do
+            if not (blinkingLight.BLBone) then
+                WARN("Unit " .. unit.BlueprintId .. " has 'BlinkingLights' but no 'BlinkingLights.BLBone'")
+                unitDisplay.BlinkingLights = nil
+                unitDisplay.BlinkingLightsFx = nil
+                return
+            end
+
+            -- default values
+            blinkingLight.BLOffsetY = blinkingLight.BLOffsetY or 0
+            blinkingLight.BlOffsetX = blinkingLight.BlOffsetX or 0
+            blinkingLight.BLOffsetZ = blinkingLight.BLOffsetZ or 0
+            blinkingLight.BLScale = blinkingLight.BLScale or 1
+        end
     end
 end
 
@@ -589,11 +741,17 @@ end
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
-    for _, unit in units do
+    for _, unit in pairs(units) do
         PostProcessUnit(unit)
     end
 
-    for _, unit in units do
+    for _, unit in pairs(units) do
+        ProcessCanLandOnWater(unit)
+        VerifyIntelValues(unit)
+        VerifyBlinkingLights(unit)
+    end
+
+    for _, unit in pairs(units) do
         if unit.CategoriesHash['EXTERNALFACTORY'] then
             PostProcessUnitWithExternalFactory(allBlueprints, unit)
         end

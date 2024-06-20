@@ -1,0 +1,3 @@
+- (#6141) Slightly buff the currently underused Hoplite by increasing the muzzle velocity of its rockets.
+    - Hoplite: T2 Rocket Bot (DRL0204):
+        - MuzzleVelocity: 20 --> 25

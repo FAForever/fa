@@ -1,40 +1,24 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
+    Description = "CYBRAN Nuclear Missile",
     Audio = {
-        ExistLoop = Sound {
-            Bank = 'UELWeapon',
-            Cue = 'UEF_Nuke_Flight',
-            LodCutoff = 'DefaultLodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'Cybran_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Explosions',
-            Cue = 'Cybran_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        NukeExplosion = Sound {
-            Bank = 'Explosions',
-            Cue = 'Cybran_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        ExistLoop     = Sound { Bank = 'UELWeapon',  Cue = 'UEF_Nuke_Flight',    LodCutoff = 'DefaultLodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Explosions', Cue = 'Cybran_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Explosions', Cue = 'Cybran_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        NukeExplosion = Sound { Bank = 'Explosions', Cue = 'Cybran_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'STRATEGIC',
-        'MISSILE',
-        'NOSPLASHDAMAGE',
-        'KILLAIRONCOLLISION',
+        "CYBRAN",
+        "INDIRECTFIRE",
+        "KILLAIRONCOLLISION",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "STRATEGIC",
     },
     Defense = {
         Health = 25000,
         MaxHealth = 25000,
     },
-    Description = 'CYBRAN Nuclear Missile',
     DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 5,
@@ -42,9 +26,7 @@ ProjectileBlueprint {
         Mesh = {
             IconFadeInZoom = 200,
             LODs = {
-                {
-                    ShaderName = 'TMeshAlpha',
-                },
+                { ShaderName = "TMeshAlpha" },
             },
         },
         UniformScale = 1,
@@ -55,12 +37,10 @@ ProjectileBlueprint {
         BuildTime = 450000,
     },
     General = {
-        Category = 'Missile',
-        Faction = 'Cybran',
+        Category = "Missile",
+        Faction = "Cybran",
     },
-    Interface = {
-        HelpText = 'CYBRAN Nuclear Missile',
-    },
+    Interface = { HelpText = "CYBRAN Nuclear Missile" },
     Physics = {
         Acceleration = 3,
         CollideEntity = false,
@@ -77,5 +57,5 @@ ProjectileBlueprint {
         UseGravity = false,
         VelocityAlign = true,
     },
-    StrategicIconName = '/textures/ui/common/game/unit-over/icon-nuke_bmp.dds',
+    StrategicIconName = "/textures/ui/common/game/unit-over/icon-nuke_bmp.dds",
 }

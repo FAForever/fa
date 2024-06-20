@@ -1,26 +1,24 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'DIRECTFIRE',
+        "CYBRAN",
+        "DIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
-        MeshBlueprint = '/meshes/projectiles/missile_antiair_cybran01_mesh.bp',
+        MeshBlueprint = "/meshes/projectiles/missile_antiair_cybran01_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.3,
     },
     General = {
-        Category = 'Direct Fire',
+        Category = "Direct Fire",
         EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'DIRECTFIRE',
+            "CYBRAN",
+            "PROJECTILE",
+            "DIRECTFIRE",
         },
-        Faction = 'Cybran',
+        Faction = "Cybran",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 500,
         DestroyOnWater = true,

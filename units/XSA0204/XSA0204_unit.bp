@@ -55,14 +55,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 840,
         MaxHealth = 840,
-        RegenRate = 0,
         SubThreatLevel = 8,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -140,24 +136,19 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "air",
         UnitName = "<LOC xsa0204_name>Uosioz",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -165,14 +156,6 @@ UnitBlueprint{
     LifeBarSize = 0.8,
     Physics = {
         AttackElevation = 6,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,
@@ -211,7 +194,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 250,
+            Damage = 375,
             DamageType = "Normal",
             DisplayName = "Cavitation Cluster Torpedo",
             FireTargetLayerCapsTable = {
@@ -225,8 +208,8 @@ UnitBlueprint{
             Label = "Bomb",
             MaxRadius = 42,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.3,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoDelay = 0.1,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_proj.bp",
             ProjectileLifetime = 20,
@@ -247,7 +230,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             TargetPriorities = {
                 "CRUISER",
                 "(NAVAL * TECH2 * SHIELD)",
@@ -285,7 +268,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

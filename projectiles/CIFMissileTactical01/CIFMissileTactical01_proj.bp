@@ -1,28 +1,16 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'CYB_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'CYB_Expl_Med_Impact',        LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_CYBRAN',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'TACTICAL',
-        'MISSILE',
-        'NOSPLASHDAMAGE'
+        "CYBRAN",
+        "INDIRECTFIRE",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TACTICAL",
     },
     Defense = {
         Health = 1,
@@ -32,14 +20,12 @@ ProjectileBlueprint {
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Medium02',
-        },
+        ImpactEffects = { Type = "Medium02" },
         Mesh = {
             LODs = {
                 {
                     LODCutoff = 150,
-                    ShaderName = 'TMeshNoLighting',
+                    ShaderName = "TMeshNoLighting",
                 },
             },
         },
@@ -47,26 +33,25 @@ ProjectileBlueprint {
         UniformScale = 0.13,
     },
     General = {
-        Category = 'Missile',
+        Category = "Missile",
         EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'TACTICAL',
-            'MISSILE',
-            'CYBRANMOBILEMISSILE',
-            'NOSPLASHDAMAGE',
+            "CYBRAN",
+            "PROJECTILE",
+            "INDIRECTFIRE",
+            "TACTICAL",
+            "MISSILE",
+            "CYBRANMOBILEMISSILE",
+            "NOSPLASHDAMAGE",
         },
-        Faction = 'Cybran',
+        Faction = "Cybran",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 9,
         DestroyOnWater = true,
         InitialSpeed = 3,
         MaxSpeed = 18,
+        MaxZigZag = 1,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -74,8 +59,6 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
-
         ZigZagFrequency = 1,
-        MaxZigZag = 1,
     },
 }

@@ -63,12 +63,11 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
-
             -- determine navigational label of that unit
-            local position = unit:GetPosition()
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
 
             --Guard the closest least-defended base
             local bestBase = false
@@ -84,6 +83,10 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
             if bestBase then
                 local platPos = self:GetPlatoonPosition()
+                if not platPos then
+                    return
+                end
+
                 local dx = platPos[1] - bestBase.Position[1]
                 local dz = platPos[3] - bestBase.Position[3]
                 if dx * dx + dz * dz > 3600 then
@@ -121,13 +124,11 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                 self.CurrentPlatoonThreat = self:CalculatePlatoonThreat('Surface', categories.ALLUNITS)
             end
             local units = self:GetPlatoonUnits()
-            local origin
-            for _, v in units do
-                if v and not v.Dead then
-                    origin = v:GetPosition()
-                    break
-                end
+            local origin = self:GetPlatoonPosition()
+            if not origin then
+                return
             end
+
             local brain = self:GetBrain()
             local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, origin, destination, brain, NavUtils.ThreatFunctions.AntiSurface, 200, brain.IMAPConfig.Rings)
             if not path then
@@ -152,14 +153,13 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                     if self.Dead then
                         return
                     end
-                    local position
-                    units = self:GetPlatoonUnits()
-                    for _, v in units do
-                        if v and not v.Dead then
-                            position = v:GetPosition()
-                            break
-                        end
+                    local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
                     end
+
+                    units = self:GetPlatoonUnits()
+
                     -- check for opportunities
                     distEnd = VDist2Sq(path[pathNodesCount][1], path[pathNodesCount][3], position[1], position[3] )
                     if not attackFormation and distEnd < 6400 then
@@ -188,14 +188,12 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                     coroutine.yield(15)
                 end
             end
-            local position
-            units = self:GetPlatoonUnits()
-            for _, v in units do
-                if v and not v.Dead then
-                    position = v:GetPosition()
-                    break
-                end
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
             end
+
+            units = self:GetPlatoonUnits()
             local hx = position[1] - destination[1]
             local hz = position[3] - destination[3]
             if hx * hx + hz * hz < 3600 then
@@ -293,6 +291,10 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
             while not IsDestroyed(self) do
 
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
@@ -306,6 +308,9 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx

@@ -1,9 +1,8 @@
-MeshBlueprint {
+MeshBlueprint{
     LODs = {
         {
-            ShaderName = 'TMeshCloud',
             LODCutoff = -1.0,
+            ShaderName = "TMeshCloud",
         },
     },
-    --UniformScale = 0.229,
 }

@@ -1,0 +1,12 @@
+MeshBlueprint{
+    LODs = {
+        {
+            LODCutoff = 200,
+            ShaderName = "PhalanxEffect",
+            MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
+            AlbedoName = "CybranPhalanxSphere03_Albedo.dds",
+            NormalsName = "CybranPhalanxSphere01_Normals.dds",
+        },
+    },
+    SortOrder = 999,
+}

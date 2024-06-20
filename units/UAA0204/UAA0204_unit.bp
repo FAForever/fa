@@ -57,14 +57,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 820,
         MaxHealth = 820,
-        RegenRate = 0,
         SubThreatLevel = 8,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -140,24 +136,19 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "air",
         UnitName = "<LOC uaa0204_name>Skimmer",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -165,14 +156,6 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         AttackElevation = 6,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,
@@ -212,7 +195,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 250,
+            Damage = 187.5,
             DamageType = "Normal",
             DisplayName = "Harmonic Torpedo",
             FireTargetLayerCapsTable = {
@@ -226,8 +209,8 @@ UnitBlueprint{
             Label = "Bomb",
             MaxRadius = 42,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.6,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoSize = 4,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/AANTorpedo03/AANTorpedo03_proj.bp",
             ProjectileLifetime = 20,
@@ -248,7 +231,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             TargetPriorities = {
                 "CRUISER",
                 "(NAVAL * TECH2 * SHIELD)",
@@ -293,7 +276,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

@@ -8,7 +8,12 @@ UnitBlueprint{
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
-            "UAS0303",
+            "Attachpoint01",
+            "Attachpoint02",
+            "Attachpoint03",
+            "Attachpoint04",
+            "Attachpoint05",
+            "Attachpoint06",
             "Exhaust01",
             "Exhaust02",
         },
@@ -28,7 +33,7 @@ UnitBlueprint{
         "ANTIMISSILE",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
-        "FACTORY",
+        "EXTERNALFACTORY",
         "MOBILE",
         "NAVAL",
         "NAVALCARRIER",
@@ -43,17 +48,12 @@ UnitBlueprint{
         "SHOWQUEUE",
         "TECH3",
         "VISIBLETORECON",
-        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 60,
         ArmorType = "Normal",
-        EconomyThreatLevel = 840,
         Health = 22000,
         MaxHealth = 22000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -131,10 +131,9 @@ UnitBlueprint{
         },
     },
     ExternalFactory = {
+        SelectionCenterOffsetZ = 8.5,
         SelectionSizeX = 4,
         SelectionSizeZ = 2,
-        SelectionCenterOffsetX = 0,
-        SelectionCenterOffsetZ = 8.5,
     },
     Footprint = {
         SizeX = 5,
@@ -143,15 +142,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -178,15 +172,6 @@ UnitBlueprint{
     LifeBarSize = 5,
     Physics = {
         BackUpDistance = 10,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 3,
@@ -197,7 +182,6 @@ UnitBlueprint{
         MeshExtentsX = 6.5,
         MeshExtentsY = 4.5,
         MeshExtentsZ = 17,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
         TurnRadius = 25,
         TurnRate = 30,
@@ -257,7 +241,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -314,7 +298,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -349,19 +333,13 @@ UnitBlueprint{
             DisplayName = "Will O Wisp Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 360,
-            Flare = {
-                Category = "MISSILE TACTICAL",
-                OffsetMult = 1.33,
-                Radius = 15,
-                Stack = true,
-            },
             Label = "AntiMissile",
             MaxRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 15,
+            MuzzleVelocity = 18,
             ProjectileId = "/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp",
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 3.5,
             RackBones = {
                 {
                     MuzzleBones = { "Projectile" },
@@ -375,7 +353,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.8,
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

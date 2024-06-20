@@ -1,37 +1,23 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'CYB_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'CYB_Expl_Med_Impact',        LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_CYBRAN',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "CYBRAN",
+        "INDIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         CameraFollowTimeout = 5,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Medium02',
-        },
+        ImpactEffects = { Type = "Medium02" },
         Mesh = {
             LODs = {
                 {
-                    ShaderName = 'TMeshNoNormals',
-                     LODCutoff = 130,
+                    LODCutoff = 130,
+                    ShaderName = "TMeshNoNormals",
                 },
             },
         },
@@ -39,18 +25,16 @@ ProjectileBlueprint {
         UniformScale = 0.25,
     },
     General = {
-        Category = 'Artillery',
+        Category = "Artillery",
         EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
+            "CYBRAN",
+            "PROJECTILE",
+            "INDIRECTFIRE",
         },
-        Faction = 'Cybran',
+        Faction = "Cybran",
         TechLevel = 2,
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         LeadTarget = false,

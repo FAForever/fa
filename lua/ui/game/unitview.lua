@@ -19,7 +19,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
-local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
+local unitViewLayout = nil -- Holds the current layout, updated by SetLayout().
 local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local Grid = import("/lua/maui/grid.lua").Grid
 local Construction = import("/lua/ui/game/construction.lua")
@@ -237,8 +237,8 @@ local statFuncs = {
         if options.gui_detailed_unitview == 0 then
             return false
         end
-        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
-            return string.format("%d", math.floor(info.userUnit:GetBuildRate()))
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 1 then
+            return string.format("%.6g", info.userUnit:GetBuildRate())
         end
         return false
     end,
@@ -271,6 +271,68 @@ function CreateQueueGrid(parent)
 
     for id = 1, 7 do
         controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
+    end
+
+    LayoutHelpers.SetDimensions(controls.queue, 316, 48)
+    LayoutHelpers.FillParent(controls.queue.bg, controls.queue)
+    LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
+
+    controls.queue:DisableHitTest()
+    controls.queue.grid:DisableHitTest()
+    controls.queue.bg:DisableHitTest()
+    
+    for id, item in controls.queue.grid.items do
+        if id > 1 then
+           local before = controls.queue.grid.items[id-1]
+           LayoutHelpers.RightOf(item, before, -6) 
+        else
+           LayoutHelpers.AtLeftTopIn(item, controls.queue.grid, 2)
+        end
+        item:DisableHitTest()
+        LayoutHelpers.DepthOverParent(item.icon, item)
+        LayoutHelpers.FillParentFixedBorder(item.icon, item, 8)
+        LayoutHelpers.DepthOverParent(item.text, item.icon)
+        LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
+    end
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.leftBracket, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToLeft(controls.queue.bg.leftBracket, controls.queue.bg, -6)
+    LayoutHelpers.SetHeight(controls.queue.bg.leftBracket, 54)
+    controls.queue.bg.leftBracket.Depth:Set(function() return controls.queue.bg.Depth() + 10 end)
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.leftGlowTop, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToLeft(controls.queue.bg.leftGlowTop, controls.queue.bg, -10)
+    LayoutHelpers.AtBottomIn(controls.queue.bg.leftGlowBottom, controls.queue.bg, -4)
+    controls.queue.bg.leftGlowBottom.Left:Set(controls.queue.bg.leftGlowTop.Left)
+    controls.queue.bg.leftGlowMiddle.Top:Set(controls.queue.bg.leftGlowTop.Bottom)
+    controls.queue.bg.leftGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.leftGlowTop.Bottom(), controls.queue.bg.leftGlowBottom.Top()) end)
+    controls.queue.bg.leftGlowMiddle.Left:Set(function() return controls.queue.bg.leftGlowTop.Left() end)
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.rightGlowTop, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToRight(controls.queue.bg.rightGlowTop, controls.queue.bg, -8)
+    LayoutHelpers.AtBottomIn(controls.queue.bg.rightGlowBottom, controls.queue.bg, -4)
+    controls.queue.bg.rightGlowBottom.Left:Set(controls.queue.bg.rightGlowTop.Left)
+    controls.queue.bg.rightGlowMiddle.Top:Set(controls.queue.bg.rightGlowTop.Bottom)
+    controls.queue.bg.rightGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.rightGlowTop.Bottom(), controls.queue.bg.rightGlowBottom.Top()) end)
+    controls.queue.bg.rightGlowMiddle.Right:Set(function() return controls.queue.bg.rightGlowTop.Right() end)
+
+    --- Set textures according to the current theme
+    --- @param - self queue control
+    controls.queue.SetThemeTextures = function(self)
+        self.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
+        self.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
+
+        for id, item in self.grid.items do
+            item:SetTexture(UIUtil.UIFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
+        end
+    
+        self.bg.leftGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
+        self.bg.leftGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
+        self.bg.leftGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
+        
+        self.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
+        self.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
+        self.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
     end
 
     controls.queue.grid.UpdateQueue = function(self, queue)
@@ -482,7 +544,7 @@ function UpdateWindow(info)
                         elseif upperThreshold >= 10000 then
                             text = string.format('%.1fK/%.1fK', experience / 1000, upperThreshold / 1000)
                         else
-                            text = experience .. '/' .. upperThreshold
+                            text = experience .. '/' .. string.format('%d', upperThreshold)
                         end
                         controls.nextVet:SetText(text)
 
@@ -532,9 +594,9 @@ function UpdateWindow(info)
 
         -- -- Build queue upon hovering of unit
 
-        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local always = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
-        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+        local whenObserving = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'only-obs'
 
         if always or (whenObserving and isObserver) then
             if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and
@@ -552,8 +614,7 @@ function UpdateWindow(info)
                 end
 
                 -- show that queue
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
-                ClearCurrentFactoryForQueueDisplay()
+                controls.queue.grid:UpdateQueue(PeekCurrentFactoryForQueueDisplay(factory))
             else
                 controls.queue:Hide()
             end
@@ -740,12 +801,14 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
     unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
     controls.parent = mapGroup
     controls.orderPanel = orderControl
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview')) -- SetLayout() will set this too but let's make sure CreateUI() does not use nil, even though it only sets up an OnFrame function.
     CreateUI()
     SetLayout(UIUtil.currentLayout)
 end

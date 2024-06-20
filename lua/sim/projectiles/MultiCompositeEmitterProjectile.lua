@@ -22,6 +22,7 @@
 
 
 local MultiPolyTrailProjectile = import("/lua/sim/projectiles/multipolytrailprojectile.lua").MultiPolyTrailProjectile
+local MultiPolyTrailProjectileOnCreate = MultiPolyTrailProjectile.OnCreate
 
 -- upvalue for performance
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
@@ -29,21 +30,21 @@ local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 ---@class MultiCompositeEmitterProjectile : MultiPolyTrailProjectile
 MultiCompositeEmitterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
 
-    Beams = {'/effects/emitters/default_beam_01_emit.bp',},
-    PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
+    Beams = { '/effects/emitters/default_beam_01_emit.bp', },
+    PolyTrails = { '/effects/emitters/test_missile_trail_emit.bp' },
     PolyTrailOffset = { 0 },
     RandomPolyTrails = 0,
-    FxTrails = { },
+    FxTrails = {},
 
     ---@param self MultiCompositeEmitterProjectile
     OnCreate = function(self)
-        MultiPolyTrailProjectile.OnCreate(self)
+        MultiPolyTrailProjectileOnCreate(self)
 
         local army = self.Army
         local beams = self.Beams
 
-        for _, beamName in beams do
-            CreateBeamEmitterOnEntity(self, -1, army, beamName)
+        for i in beams do
+            CreateBeamEmitterOnEntity(self, -1, army, beams[i])
         end
     end,
 }

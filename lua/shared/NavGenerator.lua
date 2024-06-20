@@ -139,7 +139,15 @@ end
 --- | 'Air' 
 --- | 'Naval'
 
----@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
+---@class ThreatFunctions: table
+---@field Land function
+---@field Air function
+---@field Naval function
+---@field AntiSurface function
+---@field AntiSub function
+---@field AntiAir function
+---@field MobileAntiSurface function
+---@field StructureAntiSurface function
 ThreatFunctions = {
     ---@param aibrain AIBrain
     ---@param position Vector

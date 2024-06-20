@@ -33,13 +33,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -47,6 +43,13 @@ UnitBlueprint{
             "<LOC ability_upgradable>Upgradeable",
         },
         AnimationUpgrade = "/units/ueb3202/ueb3202_aupgrade.sca",
+        BlinkingLights = {
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 0.7,   BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
+        },
         IdleEffects = {
             Water = {
                 Effects = {
@@ -77,8 +80,8 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 7200,
         BuildCostMass = 300,
-        BuildRate = 15,
-        BuildTime = 1680,
+        BuildRate = 20,
+        BuildTime = 780,
         BuildableCategory = { "ues0305" },
         MaintenanceConsumptionPerSecondEnergy = 100,
         RebuildBonusIds = {
@@ -88,21 +91,7 @@ UnitBlueprint{
     },
     Footprint = { MinWaterDepth = 1.5 },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_Pause = true },
         FactionName = "UEF",
         Icon = "sea",
         OrderOverrides = {
@@ -120,43 +109,32 @@ UnitBlueprint{
     Intel = {
         ReactivateTime = 4,
         ShowIntelOnSelect = true,
-        SonarRadius = 290,
-        VisionRadius = 25,
+        SonarRadius = 288,
+        VisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BuildOnLayerCaps = { LAYER_Water = true },
         DragCoefficient = 0.2,
-        MaxSteerForce = 0,
         MeshExtentsOffsetY = -1.5,
         MeshExtentsX = 1.25,
         MeshExtentsY = 2.5,
         MeshExtentsZ = 1.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = 0,
         SkirtOffsetZ = 0,
         SkirtSizeX = 1,
         SkirtSizeZ = 1,
-        TurnRate = 0,
     },
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.55,
     SelectionThickness = 0.7,
     CollisionOffsetY = -0.25,
-    SizeX = 0.5,
-    SizeY = 0.5,
-    SizeZ = 0.5,
+    SizeX = 1.0,
+    SizeY = 1.0,
+    SizeZ = 1.0,
     StrategicIconName = "icon_structure2_intel",
     StrategicIconSortPriority = 230,
     Wreckage = {
@@ -166,7 +144,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

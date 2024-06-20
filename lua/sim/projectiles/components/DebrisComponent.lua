@@ -21,7 +21,11 @@
 --** SOFTWARE.
 --**********************************************************************************
 
+-- upvalue scope for performance
+local TableRandom = table.random
+
 ---@class DebrisComponent
+---@field DebrisBlueprints BlueprintId[]
 DebrisComponent = ClassSimple {
 
     DebrisBlueprints = {
@@ -30,7 +34,7 @@ DebrisComponent = ClassSimple {
 
     ---@param self DebrisComponent | Projectile
     CreateDebris = function(self)
-        local blueprint = table.random(self.DebrisBlueprints)
+        local blueprint = TableRandom(self.DebrisBlueprints)
         return self:CreateChildProjectile(blueprint)
     end,
 }

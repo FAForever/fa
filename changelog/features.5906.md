@@ -1,0 +1,1 @@
+- (#5906) Allow holding Ctrl to bypass the "Hold alt to force attack move" option. This allows binding hotkeys that use rollover unit info (such as "Prioritize unit type") with Ctrl + Alt key combinations.

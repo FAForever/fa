@@ -21,6 +21,11 @@ Wreckage = Class(Prop) {
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
+        -- only applies to trees and units
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == "FAF_AntiShield" then
+            return
+        end
+
         self:DoTakeDamage(instigator, amount, vector, damageType)
     end,
 
@@ -109,7 +114,7 @@ Wreckage = Class(Prop) {
 ---@param energy number
 ---@param time number
 ---@param deathHitBox? table
----@return Prop
+---@return Wreckage
 function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
     local prop = CreateProp(position, bp.Wreckage.Blueprint)
     prop:SetOrientation(orientation, true)

@@ -21,27 +21,82 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
---- Filters your selection to the highest tech of engineers. All other engineers assist one of those engineers.
+-- upvalue scope for performance
+local SelectUnits = SelectUnits
+local SimCallback = SimCallback
+local GetSelectedUnits = GetSelectedUnits
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+
+local TableInsert = table.insert
+local TableGetn = table.getn
+local TableEmpty = table.empty
+
+local GetFactions = import('/lua/factions.lua').GetFactions
+
+-- cached for performance
+local CategoriesTech3EngineersAndSACUs = (categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER) - (categories.FIELDENGINEER + categories.COMMAND)
+local CategoriesTech2Engineers = categories.ENGINEER * categories.TECH2 - (categories.FIELDENGINEER + categories.COMMAND)
+local CategoriesFieldEngineers = categories.FIELDENGINEER - categories.COMMAND
+local CategoriesTech1Engineers = categories.ENGINEER * categories.TECH1 - (categories.FIELDENGINEER + categories.COMMAND)
+
+--- Get the faction category for each faction, including custom factions.
+--- Equivalent to {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM} for the base game.
+function GetFactionCategories()
+    local factionCategories = {}
+
+    for _, faction in GetFactions() do
+        TableInsert(factionCategories, categories[faction['Category']])
+    end
+
+    return factionCategories
+end
+
+local factionCategories = GetFactionCategories()
+
+--- Filter units down to the of the majority faction among them.
+---@param units UserUnit[]
+---@return UserUnit[]
+function GetMajorityFaction(units)
+    local majorityFactionUnits = {}
+    local majorityFactionUnitCount = 0
+
+    for _, factionCategory in factionCategories do
+        local factionUnits = EntityCategoryFilterDown(factionCategory, units)
+        local factionUnitCount = TableGetn(factionUnits)
+        if factionUnitCount > majorityFactionUnitCount then
+            majorityFactionUnits = factionUnits
+            majorityFactionUnitCount = factionUnitCount
+        end
+    end
+
+    return majorityFactionUnits
+end
+
+--- Filter your selection to the highest tech engineers of the majority faction for that tech level.
+--- All other units assist one of those engineers.
 function SelectHighestEngineerAndAssist()
     local selection = GetSelectedUnits()
 
     if selection then
+        local tech3EngineersAndSACUs = EntityCategoryFilterDown(CategoriesTech3EngineersAndSACUs, selection)
+        local tech2Engineers = EntityCategoryFilterDown(CategoriesTech2Engineers, selection)
+        local fieldEngineers = EntityCategoryFilterDown(CategoriesFieldEngineers, selection)
+        local tech1Engineers = EntityCategoryFilterDown(CategoriesTech1Engineers, selection)
 
-        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
-        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
-        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
+        local highestTechEngiesAndSacusOfMajorityFaction
+        if not TableEmpty(tech3EngineersAndSACUs) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech3EngineersAndSACUs)
+        elseif not TableEmpty(tech2Engineers) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech2Engineers)
+        elseif not TableEmpty(fieldEngineers) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(fieldEngineers)
+        elseif not TableEmpty(tech1Engineers) then
+            highestTechEngiesAndSacusOfMajorityFaction = GetMajorityFaction(tech1Engineers)
+        end
 
-        if next(sACUs) then
-            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() } }, true)
-            SelectUnits(sACUs)
-        elseif next(tech3) then
-            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() } }, true)
-            SelectUnits(tech3)
-        elseif next(tech2) then
-            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() } }, true)
-            SelectUnits(tech2)
-        else
-            -- do nothing
+        if highestTechEngiesAndSacusOfMajorityFaction then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highestTechEngiesAndSacusOfMajorityFaction[1]:GetEntityId() }}, true)
+            SelectUnits(highestTechEngiesAndSacusOfMajorityFaction)
         end
     end
 end

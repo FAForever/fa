@@ -26,11 +26,6 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
     Weapons = {
         MainGun = ClassWeapon(ADFCannonOblivionWeapon) {},
         Torpedo01 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo02 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo03 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo04 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo05 = ClassWeapon(AANChronoTorpedoWeapon) {},
-        Torpedo06 = ClassWeapon(AANChronoTorpedoWeapon) {},
         AntiTorpedo01 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
         AntiTorpedo02 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
     },
@@ -87,6 +82,9 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UAS0401
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         ASeaUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then

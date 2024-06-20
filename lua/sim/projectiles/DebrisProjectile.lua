@@ -21,10 +21,13 @@
 --******************************************************************************************************
 
 local DummyProjectile = import("/lua/sim/projectile.lua").DummyProjectile
+local DummyProjectileOnCreate = DummyProjectile.OnCreate
 
 -- upvalue for performance
 local Random = Random
 local CreateEmitterOnEntity = CreateEmitterOnEntity
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+
 local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
 
 ---@class BaseGenericDebris : DummyProjectile
@@ -36,11 +39,12 @@ BaseGenericDebris = ClassDummyProjectile(DummyProjectile) {
 
     ---@param self BaseGenericDebris
     OnCreate = function(self)
-        DummyProjectile.OnCreate(self)
+        DummyProjectileOnCreate(self)
 
         local army = self.Army
-        for k, effect in self.FxTrails do
-            CreateEmitterOnEntity(self, army, effect)
+        local fxTrails = self.FxTrails
+        for i in fxTrails do
+            CreateEmitterOnEntity(self, army, fxTrails[i])
         end
     end,
 
@@ -56,7 +60,7 @@ BaseGenericDebris = ClassDummyProjectile(DummyProjectile) {
                 local effect = CreateEmitterAtEntity(self, army, fxBlueprint)
                 IEffectScaleEmitter(effect, 0.05 + 0.15 * Random())
             end
-        -- default impact for water
+            -- default impact for water
         elseif targetType == 'Water' then
             for _, fxBlueprint in self.FxImpactWater do
                 local effect = CreateEmitterAtEntity(self, army, fxBlueprint)

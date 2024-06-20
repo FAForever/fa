@@ -37,14 +37,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 30,
         MaxHealth = 30,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Mesh = {
@@ -113,8 +108,6 @@ UnitBlueprint{
         MaxAcceleration = 10.5,
         MaxSpeed = 10.5,
         MaxSpeedReverse = 0,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Air",
         RotateBodyWhileMoving = true,
         TurnFacingRate = 100,

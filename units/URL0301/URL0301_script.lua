@@ -54,7 +54,6 @@ URL0301 = ClassUnit(CCommandUnit) {
         if self.Blueprint.General.BuildBones then
             self:SetupBuildBones()
         end
-        self.IntelButtonSet = true
     end,
 
     __init = function(self)
@@ -78,6 +77,8 @@ URL0301 = ClassUnit(CCommandUnit) {
         local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         if enh == 'CloakingGenerator' then
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
+            self:AddToggleCap('RULEUTC_CloakToggle')
             self.StealthEnh = false
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
@@ -101,29 +102,32 @@ URL0301 = ClassUnit(CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranSCUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
+            -- remove prerequisites
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
+            self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
+
+            -- remove cloak
             self:DisableUnitIntel('Enhancement', 'Cloak')
-            self.StealthEnh = false
             self.CloakEnh = false
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
             end
         elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
+            self:AddToggleCap('RULEUTC_StealthToggle')
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
                 self.IntelEffectsBag = nil
             end
-            self.CloakEnh = false
             self.StealthEnh = true
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
         elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
-            self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
             self:ShowBone('AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', true)

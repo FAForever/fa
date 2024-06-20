@@ -25,13 +25,13 @@ local NullShell = import("/lua/sim/projectiles/nullprojectile.lua").NullShell
 ---@class NukeProjectile : NullShell
 NukeProjectile = ClassProjectile(NullShell) {
 
-    InitialEffects = { },
-    LaunchEffects = { },
-    ThrustEffects = { },
+    InitialEffects = {},
+    LaunchEffects = {},
+    ThrustEffects = {},
 
     ---@param self NukeProjectile
     MovementThread = function(self)
-		self.Nuke = true
+        self.Nuke = true
         self:CreateEffects(self.InitialEffects, self.Army, 1)
         self:TrackTarget(false)
         WaitTicks(26) -- Height
@@ -108,7 +108,8 @@ NukeProjectile = ClassProjectile(NullShell) {
     ---@param TargetType string
     ---@param TargetEntity Unit | Prop
     OnImpact = function(self, TargetType, TargetEntity)
-        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH3, TargetEntity) then
+        if not TargetEntity or
+            not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH3, TargetEntity) then
             local myBlueprint = self.Blueprint
             if myBlueprint.Audio.NukeExplosion then
                 self:PlaySound(myBlueprint.Audio.NukeExplosion)
@@ -116,7 +117,7 @@ NukeProjectile = ClassProjectile(NullShell) {
 
             self.effectEntity = self:CreateProjectile(self.effectEntityPath, 0, 0, 0, nil, nil, nil):SetCollision(false)
             self.effectEntity:ForkThread(self.effectEntity.EffectThread)
-            self.Trash:Add(ForkThread(self.ForceThread,self))
+            self.Trash:Add(ForkThread(self.ForceThread, self))
         end
         NullShell.OnImpact(self, TargetType, TargetEntity)
     end,
@@ -126,12 +127,12 @@ NukeProjectile = ClassProjectile(NullShell) {
         local launcher = self.Launcher
         if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
-            for k,v in launcher.EventCallbacks.ProjectileDamaged do
+            for k, v in launcher.EventCallbacks.ProjectileDamaged do
                 table.insert(self.ProjectileDamaged, v)
             end
         end
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.Trash:Add(ForkThread(self.MovementThread,self))
+        self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self NukeProjectile
@@ -141,7 +142,7 @@ NukeProjectile = ClassProjectile(NullShell) {
     ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         if self.ProjectileDamaged then
-            for k,v in self.ProjectileDamaged do
+            for k, v in self.ProjectileDamaged do
                 v(self)
             end
         end
@@ -154,11 +155,11 @@ NukeProjectile = ClassProjectile(NullShell) {
     ---@param vector Vector
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
-		local bp = self.Blueprint.Defense.MaxHealth
-			if bp then
-			self:DoTakeDamage(instigator, amount, vector, damageType)
-		else
-			self:OnKilled(instigator, damageType)
-		end
+        local bp = self.Blueprint.Defense.MaxHealth
+        if bp then
+            self:DoTakeDamage(instigator, amount, vector, damageType)
+        else
+            self:OnKilled(instigator, damageType)
+        end
     end,
 }

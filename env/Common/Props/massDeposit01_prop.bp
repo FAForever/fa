@@ -1,28 +1,24 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'INVULNERABLE',
-        'UNTARGETABLE',
+        "INVULNERABLE",
+        "UNTARGETABLE",
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'massDeposit01_albedo.dds',
                     LODCutoff = 50,
-                    NormalsName = 'massDeposit01_normalsTS.dds',
-                    ShaderName = 'NormalMappedAlpha',
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "massDeposit01_albedo.dds",
+                    NormalsName = "massDeposit01_normalsTS.dds",
                 },
             },
         },
         UniformScale = 0.06,
     },
-    Interface = {
-        HelpText = 'massDeposit',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "massDeposit" },
+    Physics = { BlockPath = false },
     SizeX = 0.1,
     SizeY = 0.1,
     SizeZ = 0.1,

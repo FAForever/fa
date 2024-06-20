@@ -45,7 +45,6 @@ function toggleOverlay(bool, lockout)
     else
         overlayDisabled = bool
         Prefs.SetToCurrentProfile('Notify_overlay_disabled', bool)
-        Prefs.SavePreferences()
         if not overlayDisabled then
             print 'Notify Overlay Enabled'
         elseif overlayDisabled then

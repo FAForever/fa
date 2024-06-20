@@ -1,13 +1,11 @@
 TrailEmitterBlueprint {
-	BlueprintId = 'gauss_cannon_polytrail_01',
-	Lifetime = -1.00,
-    TrailLength = 4.5,
+    BlendMode = 3,
+    LODCutoff = 70,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_white_19.dds",
+    RepeatTexture = "/textures/particles/railgun_trail_01.dds",
     Size = 0.016,
     SortOrder = 0,
-    BlendMode = 3,
     TextureRepeatRate = 1,
-    LODCutoff = 70,
-	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
-	RampTexture = '/textures/particles/ramp_white_19.dds',
+    TrailLength = 4.5,
 }
-

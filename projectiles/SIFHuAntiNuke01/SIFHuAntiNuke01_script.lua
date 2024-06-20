@@ -8,12 +8,19 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local SIFHuAntiNuke = import("/lua/seraphimprojectiles.lua").SIFHuAntiNuke
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
+
+--- Seraphim Anti Nuke Missile
+---@class SIFHuAntiNuke01 : SIFHuAntiNuke
 SIFHuAntiNuke01 = ClassProjectile(SIFHuAntiNuke) {
-    --This is a custom impact to maeke the seraphim hit look really good, like some kind of tendrilled explosion.
-    OnImpact = function(self, TargetType, TargetEntity) 
-        local FxHitEffect = EffectTemplate.SKhuAntiNukeHit 
-        local LargeTendrilProjectile = '/effects/Entities/SIFHuAntiNuke02/SIFHuAntiNuke02_proj.bp'  
-        local SmallTendrilProjectile = '/effects/Entities/SIFHuAntiNuke03/SIFHuAntiNuke03_proj.bp'  
+
+    --- This is a custom impact to maeke the seraphim hit look really good, like some kind of tendrilled explosion.
+    ---@param self SIFHuAntiNuke01
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
+    OnImpact = function(self, TargetType, TargetEntity)
+        local FxHitEffect = EffectTemplate.SKhuAntiNukeHit
+        local LargeTendrilProjectile = '/effects/Entities/SIFHuAntiNuke02/SIFHuAntiNuke02_proj.bp'
+        local SmallTendrilProjectile = '/effects/Entities/SIFHuAntiNuke03/SIFHuAntiNuke03_proj.bp'
         --Play the hit effect for the core explosion on the anti nuke.
         for k, v in FxHitEffect do
             CreateEmitterAtEntity( self, self.Army, v )

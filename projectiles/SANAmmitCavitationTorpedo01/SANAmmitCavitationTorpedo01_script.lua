@@ -1,7 +1,1 @@
--- File     :  /data/projectiles/SANAmmitCavitationTorpedo01/SANAmmitCavitationTorpedo01_script.lua
--- Author(s):  Greg Kohne
--- Summary  :  Seraphim Ammit Torpedo Projectile script, XSB2109
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
------------------------------------------------------------------------------------------------------
-SANAmmitCavitationTorpedo01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SAmmitTorpedo) {}
-TypeClass = SANAmmitCavitationTorpedo01
+-- shadows file from the Steam distribution; content of this file is unused

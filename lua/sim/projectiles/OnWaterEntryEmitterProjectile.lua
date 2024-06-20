@@ -21,17 +21,22 @@
 --******************************************************************************************************
 
 local Projectile = import("/lua/sim/projectile.lua").Projectile
+local ProjectileOnCreate = Projectile.OnCreate
+local ProjectileOnEnterWater = Projectile.OnEnterWater
+local ProjectileOnImpact = Projectile.OnImpact
 
 -- upvalue scope for performance
 local WaitTicks = WaitTicks
 local IsDestroyed = IsDestroyed
 local CreateTrail = CreateTrail
+local GetSurfaceHeight = GetSurfaceHeight
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 
 local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
 ---@class OnWaterEntryEmitterProjectile : Projectile
+---@field MovementThread fun(projectile: OnWaterEntryEmitterProjectile)
 OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     FxTrails = { '/effects/emitters/torpedo_munition_trail_01_emit.bp', },
     FxTrailScale = 1,
@@ -50,7 +55,7 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     ---@param self OnWaterEntryEmitterProjectile
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        Projectile.OnCreate(self, inWater)
+        ProjectileOnCreate(self, inWater)
 
         if inWater then
 
@@ -64,24 +69,13 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 
             for i in fxTrails do
                 local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
-
-                -- only do these engine calls when they matter
-                if fxTrailScale ~= 1 then
-                    IEffectScaleEmitter(effect, fxTrailScale)
-                end
-
-                if fxTrailOffset ~= 1 then
-                    IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
-                end
+                IEffectScaleEmitter(effect, fxTrailScale)
+                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
             end
 
             if polyTrail ~= '' then
                 local effect = CreateTrail(self, -1, army, polyTrail)
-
-                -- only do these engine calls when they matter
-                if polyTrailOffset ~= 0 then
-                    IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-                end
+                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
             end
         end
     end,
@@ -103,30 +97,19 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 
         for i in fxTrails do
             local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
-
-            -- only do these engine calls when they matter
-            if fxTrailScale ~= 1 then
-                IEffectScaleEmitter(effect, fxTrailScale)
-            end
-
-            if fxTrailOffset ~= 1 then
-                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
-            end
+            IEffectScaleEmitter(effect, fxTrailScale)
+            IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
         end
 
         if polyTrail ~= '' then
             local effect = CreateTrail(self, -1, army, polyTrail)
-
-            -- only do these engine calls when they matter
-            if polyTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-            end
+            IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
         end
     end,
 
     ---@param self OnWaterEntryEmitterProjectile
     OnEnterWater = function(self)
-        Projectile.OnEnterWater(self)
+        ProjectileOnEnterWater(self)
 
         self:SetVelocityAlign(true)
         self:SetStayUpright(false)
@@ -137,8 +120,9 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
         self.Trash:Add(ForkThread(self.EnterWaterThread, self))
 
         -- adjusts the velocity / acceleration, used for torpedo bombers
-        if self.MovementThread then
-            self.Trash:Add(ForkThread(self.MovementThread, self))
+        local movementThread = self.MovementThread
+        if movementThread then
+            self.Trash:Add(ForkThread(movementThread, self))
         end
     end,
 
@@ -155,6 +139,6 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
             end
         end
 
-        Projectile.OnImpact(self, targetType, targetEntity)
+        ProjectileOnImpact(self, targetType, targetEntity)
     end,
 }

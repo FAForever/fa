@@ -1,0 +1,1 @@
+- (#6091) Count cargo for veterancy when a transport or carrier is killed.

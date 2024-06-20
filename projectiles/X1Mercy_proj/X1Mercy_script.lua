@@ -1,16 +1,16 @@
-#
-# script for projectile AIFMiasmaShell
-#
 local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
-local utilities = import('/lua/utilities.lua')
 local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
+--- script for projectile AIFMiasmaShell
+---@class X1Mercy : AMiasmaProjectile
 X1Mercy = Class(AMiasmaProjectile) {
 
+    ---@param self X1Mercy
+    ---@param data table
     PassMetaDamage = function(self, data)
       AMiasmaProjectile.PassMetaDamage(self, data)
       local ScaleRadius = data.DamageRadius
-      WARN("ScaleRadius" .. " - " .. tostring(ScaleRadius))
+      -- WARN("ScaleRadius" .. " - " .. tostring(ScaleRadius))
       self.FxAirUnitHitScale = ScaleRadius
       self.FxLandHitScale = ScaleRadius
       self.FxNoneHitScale = ScaleRadius
@@ -24,6 +24,7 @@ X1Mercy = Class(AMiasmaProjectile) {
       self.FxOnKilledScale = ScaleRadius
     end,
 
+    ---@param self X1Mercy
     OnCreate = function(self)
         AMiasmaProjectile.OnCreate(self)
 
@@ -34,6 +35,9 @@ X1Mercy = Class(AMiasmaProjectile) {
         self:ForkThread( self.SplitThread )
     end,
 
+    ---@param self X1Mercy
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
 	OnImpact = function(self, TargetType, TargetEntity)
         AMiasmaProjectile.OnImpact(self, TargetType, TargetEntity)
 
@@ -79,7 +83,8 @@ X1Mercy = Class(AMiasmaProjectile) {
 
         self:Destroy()
     end,
-
 }
-
 TypeClass = X1Mercy
+
+--- Moved for Mod Support
+local utilities = import('/lua/utilities.lua')

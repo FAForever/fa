@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xrb2308_desc>Torpedo Ambushing System",
-    AI = {
-        TargetBones = { "Turret_Barrel" },
-    },
     Audio = {
         DeathExplosion = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         Deploy         = Sound { Bank = 'XRB',        Cue = 'XRB2308_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
@@ -35,13 +32,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 9000,
         MaxHealth = 9000,
-        RegenRate = 0,
         SubThreatLevel = 38,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -97,17 +91,8 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "sea",
@@ -116,35 +101,24 @@ UnitBlueprint{
     },
     Intel = {
         RadarStealth = false,
-        SonarRadius = 42,
+        SonarRadius = 40,
         SonarStealth = false,
         VisionRadius = 20,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.4,
     LifeBarSize = 2.5,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BuildOnLayerCaps = { LAYER_Water = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SinkSpeed = 0.5,
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -0.5,
         SkirtSizeX = 3,
         SkirtSizeZ = 3,
-        TurnRate = 0,
     },
     SelectionSizeX = 1.8,
     SelectionSizeZ = 1.6,
@@ -205,7 +179,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -233,8 +207,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
-            Land = false,
             Seabed = true,
             Sub = true,
             Water = true,

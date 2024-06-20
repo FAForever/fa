@@ -1,17 +1,17 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'boards_1_tiled_albedo.dds',
                     LODCutoff = 350,
-                    ShaderName = 'VertexNormal',
-                    SpecularName = 'boards_1_tiled_albedo.dds',
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "boards_1_tiled_albedo.dds",
+                    SpecularName = "boards_1_tiled_albedo.dds",
                 },
             },
         },
@@ -21,12 +21,8 @@ PropBlueprint {
         ReclaimMassMax = 60,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Wood Buildings',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Interface = { HelpText = "Wood Buildings" },
+    Physics = { BlockPath = true },
     SizeX = 2,
     SizeY = 2,
     SizeZ = 2,

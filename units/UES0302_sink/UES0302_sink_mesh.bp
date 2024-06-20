@@ -1,11 +1,9 @@
-MeshBlueprint {
+MeshBlueprint{
     Mesh = {
         IconFadeInZoom = 130,
         LODs = {
-            {
-                LODCutoff = 175,
-            },
+            { LODCutoff = 175 },
         },
-        MeshName = '/units/ues0302_sink/ues0302_sink_lod0.scm',
+        MeshName = "/units/ues0302_sink/ues0302_sink_lod0.scm",
     },
 }

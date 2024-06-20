@@ -1,14 +1,11 @@
--- used by urb2302
 TrailEmitterBlueprint {
-	BlueprintId = 'proton_artillery_polytrail_01',
-	Lifetime = -1.00,
-    TrailLength = 16,
+    BlendMode = 0.0,
+    LODCutoff = -1,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_white_07.dds",
+    RepeatTexture = "/textures/particles/railgun_trail_01.dds",
     Size = 0.25,
     SortOrder = 0,
-    BlendMode = 0.0,
     TextureRepeatRate = 1,
-    LODCutoff = -1, -- t3 / t4 artillery
-	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
-	RampTexture = '/textures/particles/ramp_white_07.dds',
+    TrailLength = 16,
 }
-

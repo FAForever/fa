@@ -228,10 +228,12 @@ SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     FxTrails = EffectTemplate.SLaanseMissleExhaust02,
     PolyTrail = EffectTemplate.SLaanseMissleExhaust01,
 
-    ---@param self SLaanseMissileWeapon
+    ---@param self SLaanseTacticalMissile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 
     ---@param self SLaanseTacticalMissile
@@ -372,6 +374,7 @@ SLosaareAAAutoCannon02 = ClassProjectile(SLosaareAAAutoCannon) {
 }
 
 ---  SERAPHIM OTHE TACTICAL BOMB
+---@class SOtheTacticalBomb : SinglePolyTrailProjectile
 SOtheTacticalBomb= ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactLand =	EffectTemplate.SOtheBombHit,
     FxImpactNone =	EffectTemplate.SOtheBombHit,
@@ -437,6 +440,7 @@ SUallCavitationTorpedo = ClassProjectile(SinglePolyTrailProjectile) {
 }
 
 ---  SERAPHIM Inaino STRATEGIC MISSILE
+---@class SIFInainoStrategicMissile : NukeProjectile, EmitterProjectile
 SIFInainoStrategicMissile = ClassProjectile(NukeProjectile, EmitterProjectile) {
     ExitWaterTicks = 9,
     FxExitWaterEmitter = EffectTemplate.DefaultProjectileWaterImpact,
@@ -447,6 +451,7 @@ SIFInainoStrategicMissile = ClassProjectile(NukeProjectile, EmitterProjectile) {
 }
 
 ---  SERAPHIM EXPERIMENTAL STRATEGIC MISSILE
+---@class SExperimentalStrategicMissile : NukeProjectile, MultiPolyTrailProjectile
 SExperimentalStrategicMissile = ClassProjectile(NukeProjectile, MultiPolyTrailProjectile) {
     ExitWaterTicks = 9,
     FxExitWaterEmitter = EffectTemplate.DefaultProjectileWaterImpact,

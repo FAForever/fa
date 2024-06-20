@@ -180,6 +180,25 @@ options = {
             },
 
             {
+                title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
+                key = 'invert_middle_mouse_button',
+                type = 'toggle',
+                default = 0,
+                update = function(control,value)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                set = function(key,value,startup)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0},
+                        {text = "<LOC _On>", key = 1},
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0158>Screen Edge Pans Main View",
                 key = 'screen_edge_pans_main_view',
                 type = 'toggle',
@@ -217,9 +236,9 @@ options = {
                     ConExecute("ui_KeyboardPanSpeed " .. tostring(value))
                 end,
                 custom = {
-                    min = 1,
-                    max = 200,
-                    inc = 0,
+                    min = 10,
+                    max = 400,
+                    inc = 10,
                 },
             },
             {
@@ -482,14 +501,30 @@ options = {
             -- },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade",
+                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade mass extractors",
                 key = 'assist_to_upgrade',
                 type = 'toggle',
                 default = 'Off',
                 custom = {
                     states = {
                         { text = "<LOC _Off>", key = 'Off' },
-                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 extractors", key = 'Tech1Extractors' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 extractors", key = 'Tech1Extractors' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1_TECH2>Tech 1 and tech 2 extractors",
+                            key = 'Tech1Tech2Extractors' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade radars",
+                key = 'assist_to_upgrade_radar',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_RADAR_TECH1>Only tech 1 radars", key = 'Tech1Radars' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_RADAR_TECH1_TECH2>Tech 1 and tech 2 radars", key = 'Tech1Tech2Radars' },
                     },
                 },
             },
@@ -517,21 +552,10 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 'Off' },
-                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS>Only engineers",
+                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS>Engineers",
                             key = 'OnlyEngineers' },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
-                key = 'repeatbuild',
-                type = 'toggle',
-                default = 'Off',
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = 'Off' },
-                        { text = "<LOC _On>", key = 'On' },
+                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS_ADD>Engineers and add to the selection",
+                            key = 'OnlyEngineersAddToSelection' },
                     },
                 },
             },
@@ -568,7 +592,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
-                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators", key = "inner" },
+                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators",
+                            key = "inner" },
                         { text = "<LOC structure_ringing_extractors_fabs_option_8>Up to 8 Mass Fabricators", key = "all" },
                     },
                 },
@@ -629,6 +654,19 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC _On>", key = 'On' },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC ASSIST_TO_UPGRADE>Hold alt to force attack move",
                 key = 'alt_to_force_attack_move',
                 type = 'toggle',
@@ -640,6 +678,32 @@ options = {
                     },
                 },
             },
+
+            -- {
+            --     title = '<LOC OPTIONS_0323>Area commands',
+            --     type = 'header',
+
+            --     -- these are expected everywhere
+            --     default = '',
+            --     key = '',
+            -- },
+
+            -- {
+            --     title = "<LOC area_commands_key>Key to trigger area commands",
+            --     key = 'area_commands_key',
+            --     type = 'toggle',
+            --     default = "no-key",
+            --     set = function(key, value, startup)
+            --         import("/lua/ui/game/hotkeys/area-reclaim-order.lua").SetDragKeyCode(value)
+            --     end,
+            --     custom = {
+            --         states = {
+            --             { text = "<LOC _Nokey>No key required", key = "no-key" },
+            --             { text = "<LOC _Alt>Alt", key = "ALT" },
+            --             { text = "<LOC _Control>Control", key = "CONTROL" },
+            --         },
+            --     },
+            -- },
 
             {
                 title = '<LOC OPTIONS_0322>Selection',
@@ -879,6 +943,26 @@ options = {
             },
 
             {
+                title = "<LOC options_show_player_names_title>Show Player Names",
+                key = 'options_show_player_names',
+                type = 'toggle',
+                default = 'on',
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/ArmiesTable.lua").OptionShowPlayerNames = value
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC options_show_player_names_allies_only>Allies only", key = 'allies-only' },
+                        -- { text = "<LOC _Off>", key = 'off' },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0242>Always Show Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
@@ -906,6 +990,23 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 0 },
                         { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE>Scale strategic icons",
+                key = 'strat_icon_scale',
+                type = 'toggle',
+                default = 1.0,
+                set = function(key, value, startup)
+                    ConExecute("ui_StrategicIconScale " .. value)
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 1.0 },
+                        { text = "<LOC strat_icon_scale-150>150% (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale-200>200%", key = 2.0 },
                     },
                 },
             },
@@ -1575,10 +1676,34 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_FRAMETIME>Frametime",
+                key = 'frametime',
+                type = 'slider',
+                default = 16,
+                update = function(control, value)
+                    logic = import("/lua/options/optionslogic.lua")
+                    logic.SetValue('vsync', 0)
+                end,
+                set = function(key, value, startup)
+                    if not startup then
+                        ConExecute("sc_FrameTimeClamp " .. tostring(value))
+                    end
+                end,
+                custom = {
+                    min = 4,
+                    max = 16,
+                    inc = 1,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0148>Vertical Sync",
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
+                update = function(control, value)
+                    logic = import("/lua/options/optionslogic.lua")
+                    logic.SetValue('frametime', 16)
+                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))

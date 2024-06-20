@@ -86,10 +86,6 @@ end
 --but before any armies are created.
 function SetupSession()
 
-    ScenarioInfo.pathcap_land = 20000
-    ScenarioInfo.pathcap_sea = 20000
-    ScenarioInfo.pathcap_both = 20000
-
     import("/lua/ai/gridreclaim.lua").Setup()
 
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
@@ -154,6 +150,7 @@ function SetupSession()
     local buildRestrictions, enhRestrictions = nil, {}
 
     local restrictions = ScenarioInfo.Options.RestrictedCategories
+
     if restrictions then
         table.print(restrictions, 'RestrictedCategories')
         local presets = import("/lua/ui/lobby/unitsrestrictions.lua").GetPresetsData()
@@ -236,20 +233,29 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
     if (not info.Human) then
-        local instance
-        local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
+        local reference
+        local keys = import("/lua/aibrains/index.lua").keyToBrain
         if (not info.Civilian) and (info.AIPersonality != '') then
             -- likely a skirmish scenario
-            instance = keyToBrain[info.AIPersonality]
+            reference = keys[info.AIPersonality]
         else
             -- likely a campaign scenario
             if ScenarioInfo.type != 'skirmish' then
-                instance = keyToBrain['campaign']
+                reference = keys['campaign']
             end
         end
 
-        if instance then
-            setmetatable(brain, instance)
+        if reference then
+            local instance
+            if not table.empty(getmetatable(reference)) then
+                instance = reference
+            else
+                instance = import(reference[1])[reference[2]]
+            end
+
+            if instance then
+                setmetatable(brain, instance)
+            end
         end
     end
 
@@ -316,6 +322,10 @@ function BeginSession()
         Sync.StartPositions = syncStartPositions
     end
 
+    if not Sync.NewPlayableArea then
+        Sync.NewPlayableArea = {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
+    end
+
     -- keep track of user name for LOCs
     local focusarmy = GetFocusArmy()
     if focusarmy>=0 and ArmyBrains[focusarmy] then
@@ -323,14 +333,7 @@ function BeginSession()
     end
 
     -- add on game over callbacks
-    ForkThread(function()
-        while not IsGameOver() do
-            WaitTicks(1)
-        end
-        for _, v in GameOverListeners do
-            v()
-        end
-    end)
+    ForkThread(GameOverListenerThread)
 
     -- log game time
     ForkThread(GameTimeLogger)
@@ -341,6 +344,15 @@ function BeginSession()
     -- trigger event for brains
     for k, brain in ArmyBrains do
         brain:OnBeginSession()
+    end
+end
+
+function GameOverListenerThread()
+    while not IsGameOver() do
+        WaitTicks(1)
+    end
+    for _, v in GameOverListeners do
+        v()
     end
 end
 
@@ -376,6 +388,15 @@ function BeginSessionAI()
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
         end
+
+        -- allow for debugging code
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineVisualize
+        )
+
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineSyncMessages
+        )
     end
 end
 
@@ -425,14 +446,14 @@ function BeginSessionTeams()
 
     -- setup special team options
     if ScenarioInfo.Options.CommonArmy == 'Union' then
-        BeginSessionUnionArmy()
+        BeginSessionUnionArmy(teams)
     elseif ScenarioInfo.Options.CommonArmy == 'Common' then
-        BeginSessionCommonArmy()
+        BeginSessionCommonArmy(teams)
     end
 end
 
 --- Setup for union army, where all teams can control the units of its allies
-function BeginSessionUnionArmy()
+function BeginSessionUnionArmy(teams)
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
@@ -446,17 +467,7 @@ end
 
 
 --- Setup for common army, where all teams are batched together into one army
-function BeginSessionCommonArmy()
-    local teams = {}
-    for name,army in ScenarioInfo.ArmySetup do
-        if army.Team > 1 then
-            if not teams[army.Team] then
-                teams[army.Team] = {}
-            end
-            table.insert(teams[army.Team],army.ArmyIndex)
-        end
-    end
-
+function BeginSessionCommonArmy(teams)
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -480,31 +491,38 @@ function BeginSessionCommonArmy()
                 ArmyBrains[i2].Status = 'Defeat'
                 SetArmyOutOfGame(i2)
                 local Units = ArmyBrains[i2]:GetListOfUnits(categories.COMMAND, false, true)
-                ForkThread(function(i, i2, comm)
-                    while true do
-                        if comm then
-                            WaitTicks(1)
-                            if comm:IsUnitState('Busy') then continue end
-                            if comm:IsUnitState('UnSelectable') then continue end
-                            if comm:IsUnitState('BlockCommandQueue') then continue end
-                        end
-                        SetCommandSource(i2 - 1, IsHuman[i2], false)
-                        SetCommandSource(i - 1, IsHuman[i2], true)
-                        SetArmyUnitCap(i, GetArmyUnitCap(i) + GetArmyUnitCap(i2))
-                        Units = ArmyBrains[i2]:GetListOfUnits(categories.ALLUNITS, false, true)
-                        for _, unit in Units do
-                            ChangeUnitArmy(unit, i, true)
-                        end
-                        local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
-                        local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
-                        SetArmyEconomy(i, v1, v2)
-                        SetFocusArmy(i - 1)
-                        break
-                    end
-                end, i, i2, Units[1])
+                ForkThread(MergeArmyPair, i, i2, Units[1], IsHuman[i2])
             end
             break
         end
+    end
+end
+
+---@param into integer
+---@param from integer
+---@param comm Unit
+---@param humanIndex integer
+function MergeArmyPair(into, from, comm, humanIndex)
+    if comm then
+        repeat
+            WaitTicks(1)
+        until
+            not comm:IsUnitState("Busy") and
+            not comm:IsUnitState("UnSelectable") and
+            not comm:IsUnitState("BlockCommandQueue")
+    end
+    SetCommandSource(from - 1, humanIndex, false)
+    SetCommandSource(into - 1, humanIndex, true)
+    SetArmyUnitCap(into, GetArmyUnitCap(into) + GetArmyUnitCap(from))
+    Units = ArmyBrains[from]:GetListOfUnits(categories.ALLUNITS, false, true)
+    for _, unit in Units do
+        ChangeUnitArmy(unit, into, true)
+    end
+    local v1 = ArmyBrains[into]:GetEconomyStored("MASS") + ArmyBrains[from]:GetEconomyStored("MASS")
+    local v2 = ArmyBrains[into]:GetEconomyStored("ENERGY") + ArmyBrains[from]:GetEconomyStored("ENERGY")
+    SetArmyEconomy(into, v1, v2)
+    if from == GetFocusArmy() then
+        SetFocusArmy(into - 1)
     end
 end
 

@@ -1,25 +1,23 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'ANTIAIR',
+        "ANTIAIR",
+        "PROJECTILE",
+        "UEF",
     },
     Display = {
         CameraFollowsProjectile = true,
         StrategicIconSize = 2,
     },
     General = {
-        Category = 'Artillery',
+        Category = "Artillery",
         EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'ANTIAIR',
+            "UEF",
+            "PROJECTILE",
+            "ANTIAIR",
         },
-        Faction = 'UEF',
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 28,

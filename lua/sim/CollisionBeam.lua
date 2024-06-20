@@ -14,7 +14,12 @@
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
+-- terrain interaction
+local GetTerrainType = GetTerrainType
+local DefaultTerrainType = GetTerrainType(-1, -1)
+
 ---@class CollisionBeam : moho.CollisionBeamEntity
+---@field Trash TrashBag
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     FxBeam = { },
@@ -97,7 +102,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param instigator Unit
     ---@param damageData table
-    ---@param targetEntity? Unit | Prop
+    ---@param targetEntity? Unit
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
@@ -217,14 +222,17 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     UpdateTerrainCollisionEffects = function(self, TargetType)
         local pos = self:GetPosition(1)
         local TerrainType = nil
+        local TerrainImpactType = self.TerrainImpactType
 
-        if self.TerrainImpactType ~= 'Default' then
+        if TerrainImpactType ~= 'Default' then
             TerrainType = GetTerrainType(pos.x,pos.z)
         else
-            TerrainType = GetTerrainType(-1, -1)
+            TerrainType = DefaultTerrainType
         end
 
-        local TerrainEffects = TerrainType.FXImpact[TargetType][self.TerrainImpactType] or nil
+        local TerrainEffects = TerrainType.FXImpact[TargetType][TerrainImpactType]
+                            or DefaultTerrainType.FXImpact[TargetType][TerrainImpactType]
+                            or nil
 
         if TerrainEffects and (self.LastTerrainType ~= TerrainType) then
             self:DestroyTerrainEffects()
@@ -384,7 +392,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))

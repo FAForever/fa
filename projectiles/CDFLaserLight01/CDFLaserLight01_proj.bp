@@ -1,29 +1,27 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'DIRECTFIRE',
+        "CYBRAN",
+        "DIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         ImpactEffects = {
             Scale = 1,
-            Type = 'Small01',
+            Type = "Small01",
         },
         StrategicIconSize = 1,
     },
     General = {
-        Category = 'Direct Fire',
+        Category = "Direct Fire",
         EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'DIRECTFIRE',
+            "CYBRAN",
+            "PROJECTILE",
+            "DIRECTFIRE",
         },
-        Faction = 'Cybran',
-        Weapon = 'Light Pulse Laser',
+        Faction = "Cybran",
+        Weapon = "Light Pulse Laser",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 22,
