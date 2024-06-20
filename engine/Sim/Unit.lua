@@ -635,8 +635,17 @@ end
 function Unit:SetStat(name, value)
 end
 
---- Sets the icon underlay to set texture.
---- Used in campaign to highlight objective targets.
+--- Sets the icon underlay to a given texture. 
+--- 
+--- The provided string is used as a lookup to find the relevant textures in `fa/textures/ui/common/game/strategicicons`. It ends up using:
+---
+--- - fa/textures/ui/common/game/strategicicons/x_over.dds
+--- - fa/textures/ui/common/game/strategicicons/x_rest.dds
+--- - fa/textures/ui/common/game/strategicicons/x_selected.dds
+--- - fa/textures/ui/common/game/strategicicons/x_selectedover.dds
+---
+--- Where `x` is the string provided.
+--- Often used in campaign to highlight objective targets.
 ---@param icon 'icon_objective_primary' | 'icon_objective_secondary' | 'icon_objective_bonus' | string
 function Unit:SetStrategicUnderlay(icon)
 end
