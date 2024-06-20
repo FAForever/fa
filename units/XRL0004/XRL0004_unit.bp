@@ -10,6 +10,7 @@ UnitBlueprint{
         EggSink        = Sound { Bank = 'XRL_Stream', Cue = 'XRL_Crab_Sink',              LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 10,
     BuildIconSortPriority = 30,
     Categories = {
         "CONSTRUCTION",

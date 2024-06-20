@@ -9,6 +9,7 @@ UnitBlueprint{
         ShieldOn    = Sound { Bank = 'UEB',        Cue = 'UEB4301_Activate',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 160,
     Categories = {
         "BUILTBYTIER3COMMANDER",

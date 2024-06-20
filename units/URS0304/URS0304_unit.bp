@@ -17,6 +17,7 @@ UnitBlueprint{
         SurfaceStart          = Sound { Bank = 'URS',        Cue = 'URS_Sub_Surface',                       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Sub',                     LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3500,
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",

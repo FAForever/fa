@@ -43,6 +43,7 @@ UnitBlueprint{
         TeleportOut                   = Sound { Bank = 'XSB',            Cue = 'XSB0101_Activate',          LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                   = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Commander', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 11500,
     Categories = {
         "ABILITYBUTTON",
         "AMPHIBIOUS",

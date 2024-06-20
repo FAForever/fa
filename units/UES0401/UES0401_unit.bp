@@ -28,6 +28,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'UES',        Cue = 'UES_Sub_Surface',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Naval',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 40000,
     BuildIconSortPriority = 20,
     Categories = {
         "AIRSTAGINGPLATFORM",

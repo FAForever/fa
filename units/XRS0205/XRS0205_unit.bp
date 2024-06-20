@@ -16,6 +16,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XRS',        Cue = 'XRS0205_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1500,
     BuildIconSortPriority = 40,
     Categories = {
         "ANTITORPEDO",

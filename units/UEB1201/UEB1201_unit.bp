@@ -8,6 +8,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB1201_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Resource',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2500,
     BuildIconSortPriority = 70,
     Categories = {
         "BUILTBYTIER2COMMANDER",

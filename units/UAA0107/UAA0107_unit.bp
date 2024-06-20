@@ -39,7 +39,7 @@ UnitBlueprint{
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
         Unload             = Sound { Bank = 'UAA',        Cue = 'UAA0104_Unit_Unload',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 500,
     BuildIconSortPriority = 50,
     Categories = {
         "AEON",

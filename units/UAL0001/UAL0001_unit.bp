@@ -34,6 +34,7 @@ UnitBlueprint{
         TeleportIn                    = Sound { Bank = 'Impacts',     Cue = 'AEON_Expl_Lrg_Naval',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                   = Sound { Bank = 'Interface',   Cue = 'Aeon_Select_Commander',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 11000,
     Categories = {
         "AEON",
         "AMPHIBIOUS",
