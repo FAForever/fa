@@ -2324,6 +2324,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
+        self:SetStrategicUnderlay('icon_objective_support')
+
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then
             self:CreateIdleEffects()

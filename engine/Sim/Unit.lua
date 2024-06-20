@@ -637,7 +637,7 @@ end
 
 --- Sets the icon underlay to set texture.
 --- Used in campaign to highlight objective targets.
----@param icon string
+---@param icon 'icon_objective_primary' | 'icon_objective_secondary' | 'icon_objective_bonus' | string
 function Unit:SetStrategicUnderlay(icon)
 end
 
