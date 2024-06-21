@@ -122,11 +122,10 @@ UnitAdjacencyLabel = ClassUI(Group) {
             unitPosition[3] - unitFootprintSize / 2 })
 
         -- check if the icon fits on top of the footprint, if not then we shrink it once
-        local iconDoesNotFit = (unitScreenPosition2[1] - unitScreenPosition1[1]) / 32 < 1
-        local scaleFactor = (iconDoesNotFit and 0.5) or 1
+        local ratio = math.floor(math.clamp((unitScreenPosition2[1] - unitScreenPosition1[1]) / (0.5 * self.StandardLabelDimensions), 0.5, 2.0) * self.StandardLabelDimensions) * (1 / self.StandardLabelDimensions)
         LayoutHelpers.LayoutFor(self)
-            :Width(scaleFactor * self.StandardLabelDimensions)
-            :Height(scaleFactor * self.StandardLabelDimensions)
+            :Width(ratio * self.StandardLabelDimensions)
+            :Height(ratio * self.StandardLabelDimensions)
     end,
 
     --- Positions the label on top of a unit.
