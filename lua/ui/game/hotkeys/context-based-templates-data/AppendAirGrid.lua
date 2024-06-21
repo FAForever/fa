@@ -27,8 +27,8 @@ Template = {
     TemplateBlueprintId = 'zeb9602',
     TemplateSortingOrder = 100,
     TemplateData = {
-        16,
-        16,
+        16, -- intentional 16 instead of 24 to make drag-building optimal
+        16, -- intentional 16 instead of 24 to make drag-building optimal
         {
             'dummy',
             0,
