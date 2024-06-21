@@ -136,6 +136,7 @@ local function FormatTime(seconds)
 end
 
 local statFuncs = {
+    -- combined stats showing mass trend for own units or army icon + nickname for others' units
     function(info)
         local massUsed = math.max(info.massRequested, info.massConsumed)
         if info.massProduced > 0 or massUsed > 0 then
@@ -171,6 +172,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- energy trend
     function(info)
         local energyUsed = math.max(info.energyRequested, info.energyConsumed)
         if info.energyProduced > 0 or energyUsed > 0 then
@@ -190,6 +192,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- vet xp
     function(info)
         if UnitData[info.entityId].xp ~= nil then
             local nextLevel = 0
@@ -210,6 +213,7 @@ local statFuncs = {
 
 
     end,
+    -- kill count
     function(info)
         if info.kills > 0 then
             return string.format('%d', info.kills)
@@ -217,7 +221,7 @@ local statFuncs = {
             return false
         end
     end,
-
+    -- tactical/strategic missile count
     function(info)
         if info.tacticalSiloMaxStorageCount > 0 or info.nukeSiloMaxStorageCount > 0 then
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
@@ -248,6 +252,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- shield % HP
     function(info, bp)
         if info.shieldRatio > 0 then
             return string.format('%d%%', math.floor(info.shieldRatio * 100))
@@ -255,6 +260,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- fuel remaining time
     function(info, bp)
         if info.fuelRatio > -1 then
             return FormatTime(bp.Physics.FuelUseTime * info.fuelRatio)
@@ -262,6 +268,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- buildrate
     function(info, bp)
         if options.gui_detailed_unitview == 0 then
             return false
