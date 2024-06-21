@@ -1,0 +1,1 @@
+- (#6282) The unit viewer that appears when you hover over a unit now shows decimals for mass/energy consumption/production, which helps show adjacency bonuses and other small numbers.
