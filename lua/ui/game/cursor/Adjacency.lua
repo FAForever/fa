@@ -44,6 +44,8 @@ local BackgroundTextures = {
 ---@field FrameCount number
 UnitAdjacencyLabel = ClassUI(Group) {
 
+    StandardLabelDimensions = 48,
+
     ---@param self UIUnitAdjacencyLabel
     ---@param parent Control
     __init = function(self, parent)
@@ -60,8 +62,8 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param self UIUnitAdjacencyLabel
     __post_init = function(self)
         LayoutHelpers.LayoutFor(self)
-            :Width(64)
-            :Height(64)
+            :Width(self.StandardLabelDimensions)
+            :Height(self.StandardLabelDimensions)
             :End()
 
         LayoutHelpers.LayoutFor(self.UnitIcon)
@@ -123,8 +125,8 @@ UnitAdjacencyLabel = ClassUI(Group) {
         local iconDoesNotFit = (unitScreenPosition2[1] - unitScreenPosition1[1]) / 32 < 1
         local scaleFactor = (iconDoesNotFit and 0.5) or 1
         LayoutHelpers.LayoutFor(self)
-            :Width(scaleFactor * 64)
-            :Height(scaleFactor * 64)
+            :Width(scaleFactor * self.StandardLabelDimensions)
+            :Height(scaleFactor * self.StandardLabelDimensions)
     end,
 
     --- Positions the label on top of a unit.
@@ -150,8 +152,8 @@ UnitAdjacencyLabel = ClassUI(Group) {
             self:Hide()
         end
 
-        -- clean up after not being used for 1000 frames
-        if self.FrameCount > 1000 then
+        -- clean up after not being used for 100 frames
+        if self.FrameCount > 100 then
             self:Destroy()
         end
     end,
