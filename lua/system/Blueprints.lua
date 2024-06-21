@@ -764,10 +764,9 @@ end
 ---@param all_bps BlueprintsTable All the blueprints of the game.
 function PreModBlueprints(all_bps)
     for _, bp in all_bps.Unit do
-        ExtractCloakMeshBlueprint(bp)
-
         -- Units with no categories are skipped
         if bp.Categories then
+            ExtractCloakMeshBlueprint(bp)
 
             -- Construct hash-based categories
             bp.CategoriesHash = table.hash(bp.Categories)
