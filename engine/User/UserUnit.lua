@@ -63,6 +63,9 @@ local UserUnit = {}
 ---@field tacticalSiloMaxStorageCount number
 ---@field tacticalSiloStorageCount number
 
+-- Thanks to the following engine patches this contains floats instead of ints:
+-- - https://github.com/FAForever/FA-Binary-Patches/pull/14
+-- - https://github.com/FAForever/FA-Binary-Patches/pull/75
 ---@class EconData
 ---@field energyConsumed number
 ---@field energyProduced number
