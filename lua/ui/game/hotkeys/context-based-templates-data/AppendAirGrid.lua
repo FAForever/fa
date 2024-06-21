@@ -27,8 +27,8 @@ Template = {
     TemplateBlueprintId = 'zeb9602',
     TemplateSortingOrder = 100,
     TemplateData = {
-        24,
-        24,
+        16,
+        16,
         {
             'dummy',
             0,
