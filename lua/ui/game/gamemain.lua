@@ -891,8 +891,15 @@ end
 
 -- Given an UserUnit that is adjacent to a given blueprint, does it yield a
 -- bonus? Used by the UI to draw extra info
+---@param userUnit UserUnit
+---@param otherBp UnitBlueprint
+---@return boolean      # if true, the function is no longer called after the first unit that is adjacent
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    return true
+    if GetOptions('adjacent_unit_icons') > 0 then
+        import("/lua/ui/game/cursor/Adjacency.lua").OnAdjacentUnit(userUnit)
+    end
+
+    return false
 end
 
 function OnFocusArmyUnitDamaged(unit)
