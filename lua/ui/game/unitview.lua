@@ -147,9 +147,9 @@ local statFuncs = {
             -- - https://github.com/FAForever/FA-Binary-Patches/pull/75
             -- This allows us to show adjacency-affected values better.
             if absNetMass < 5 then
-                str = string.format('%.3g', netMass)
+                str = string.format('%+.3g', netMass)
             elseif absNetMass < 10 then
-                str = string.format('&.2g', netMass)
+                str = string.format('%+.2g', netMass)
             elseif absNetMass < 100 then
                 str = string.format('%+.3g', netMass)
             else
