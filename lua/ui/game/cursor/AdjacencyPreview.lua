@@ -241,3 +241,14 @@ OnAdjacentUnit = function(unit, adjacentBlueprint)
 
     DrawUnitAdjacencyLabel(worldViewLeft, unit, adjacentBlueprint)
 end
+
+
+--- Called by the module manager when this module is dirty due to a disk change
+function __moduleinfo.OnDirty()
+    -- clean up all the existing labels
+    for k, label in pairs(UnitAdjacencyLabelCache) do
+        if not IsDestroyed(label) then
+            label:Destroy()
+        end
+    end
+end
