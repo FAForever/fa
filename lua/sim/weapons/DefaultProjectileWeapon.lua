@@ -1150,7 +1150,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if unit then
                     unit:OnLostTarget(self)
                 end
-
                 Weapon.OnLostTarget(self)
 
                 -- Some weapons look too ridiculous shooting into the air, so stop them from firing
@@ -1163,6 +1162,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         ChangeState(self, self.RackSalvoReloadState)
                     else
                         ChangeState(self, self.WeaponPackingState)
+                    end
+                elseif bp.MuzzleChargeDelay > 0.5 then
+                    if bp.RackSalvoReloadTime > 0 then
+                        self.CurrentRackSalvoNumber = 1
+                        ChangeState(self, self.RackSalvoReloadState)
+                    else
+                        ChangeState(self, self.IdleState)
                     end
                 end
             end
