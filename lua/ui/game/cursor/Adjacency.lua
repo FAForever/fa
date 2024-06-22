@@ -157,7 +157,7 @@ UnitAdjacencyLabel = ClassUI(Group) {
 }
 
 ---@type table<EntityId, UIUnitAdjacencyLabel>
-local UnitAdjacencyLabels = setmetatable({}, { __mode = 'v' })
+local UnitAdjacencyLabelCache = setmetatable({}, { __mode = 'v' })
 
 --- Draws a unit icon on top of the unit that we're adjacent to
 ---@param worldView WorldView
@@ -167,10 +167,10 @@ local function DrawUnitAdjacencyLabel(worldView, unit)
     local unitEntityId = unit:GetEntityId()
 
     ---@type UIUnitAdjacencyLabel
-    local unitAdjacencyLabel = UnitAdjacencyLabels[unitEntityId]
+    local unitAdjacencyLabel = UnitAdjacencyLabelCache[unitEntityId]
     if IsDestroyed(unitAdjacencyLabel) then
         unitAdjacencyLabel = UnitAdjacencyLabel(GetFrame(0)) --[[@as UIUnitAdjacencyLabel]]
-        UnitAdjacencyLabels[unitEntityId] = unitAdjacencyLabel
+        UnitAdjacencyLabelCache[unitEntityId] = unitAdjacencyLabel
     end
 
     -- update the label
