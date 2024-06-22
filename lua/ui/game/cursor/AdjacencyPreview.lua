@@ -37,7 +37,6 @@ local BackgroundTextures = {
 ---@field Unit UserUnit
 ---@field UnitIcon Bitmap
 ---@field UnitBackground Bitmap
----@field UnitStrategicIcon Bitmap
 ---@field FrameCount number
 ---@field WorldView WorldView
 UnitAdjacencyLabel = ClassUI(Group) {
@@ -53,7 +52,6 @@ UnitAdjacencyLabel = ClassUI(Group) {
 
         self.UnitIcon = Bitmap(self, nil, 'unit-adjacency-label-icon')
         self.UnitBackground = Bitmap(self, nil, 'unit-adjacency-label-background')
-        self.UnitStrategicIcon = Bitmap(self, nil, 'unit-adjacency-label-strategic-icon')
         self:SetNeedsFrameUpdate(true)
     end,
 
@@ -71,11 +69,6 @@ UnitAdjacencyLabel = ClassUI(Group) {
 
         ReusedLayoutFor(self.UnitBackground)
             :Under(self.UnitIcon, 1)
-            :Fill(self)
-            :End()
-
-        ReusedLayoutFor(self.UnitStrategicIcon)
-            :Over(self.UnitIcon, 1)
             :Fill(self)
             :End()
     end,
@@ -126,8 +119,6 @@ UnitAdjacencyLabel = ClassUI(Group) {
         else
             self.UnitBackground:Hide()
         end
-
-        self.UnitStrategicIcon:Hide()
     end,
 
     --- Scales the label in case the unit is relative small.
