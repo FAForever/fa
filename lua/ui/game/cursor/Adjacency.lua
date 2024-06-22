@@ -159,8 +159,9 @@ local UnitAdjacencyLabelCache = setmetatable({}, { __mode = 'v' })
 
 --- Draws a unit icon on top of the unit that we're adjacent to
 ---@param worldView WorldView
----@param unit UserUnit
-local function DrawUnitAdjacencyLabel(worldView, unit)
+---@param unit UserUnit                     # The unit that our build preview is adjacent to.
+---@param adjacentBlueprint UnitBlueprint   # The blueprint of the build preview that is adjacent to the unit.
+local function DrawUnitAdjacencyLabel(worldView, unit, adjacentBlueprint)
     ---@type EntityId
     local unitEntityId = unit:GetEntityId()
 
@@ -186,5 +187,5 @@ OnAdjacentUnit = function(unit, adjacentBlueprint)
         return
     end
 
-    DrawUnitAdjacencyLabel(worldViewLeft, unit)
+    DrawUnitAdjacencyLabel(worldViewLeft, unit, adjacentBlueprint)
 end
