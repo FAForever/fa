@@ -34,10 +34,12 @@ local BackgroundTextures = {
 }
 
 ---@class UIUnitAdjacencyLabel: Group
+---@field Unit UserUnit
 ---@field UnitIcon Bitmap
 ---@field UnitBackground Bitmap
 ---@field UnitStrategicIcon Bitmap
 ---@field FrameCount number
+---@field WorldView WorldView
 UnitAdjacencyLabel = ClassUI(Group) {
 
     StandardLabelDimensions = 64,
@@ -78,11 +80,24 @@ UnitAdjacencyLabel = ClassUI(Group) {
             :End()
     end,
 
+    --- Updates the internal references that are used to update the label in the next frame
     ---@param self UIUnitAdjacencyLabel
-    ---@param unitBlueprint UnitBlueprint
-    SetUnitTexture = function(self, unitBlueprint)
+    ---@param unit UserUnit
+    ---@param worldView WorldView
+    UpdateReferences = function(self, worldView, unit)
+        self.Unit = unit
+        self.WorldView = worldView
         self.FrameCount = 0
         self:Show()
+
+        -- label needs an initial position
+        self:UpdatePosition(worldView, unit)
+    end,
+
+    ---@param self UIUnitAdjacencyLabel
+    ---@param unit UserUnit
+    UpdateUnitTexture = function(self, unit)
+        local unitBlueprint = unit:GetBlueprint()
 
         ---@type FileName
         local texturePath = UIUtil.UIFile(
@@ -111,7 +126,7 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param self UIUnitAdjacencyLabel
     ---@param worldView WorldView
     ---@param unit UserUnit
-    SetScale = function(self, worldView, unit)
+    UpdateScale = function(self, worldView, unit)
         local unitBlueprint = unit:GetBlueprint()
         local unitSkirtSize = math.min(unitBlueprint.Physics.SkirtSizeX, unitBlueprint.Physics.SkirtSizeZ)
         local unitPosition = unit:GetPosition()
@@ -148,7 +163,7 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param self UIUnitAdjacencyLabel
     ---@param worldView WorldView
     ---@param unit UserUnit
-    SetPosition = function(self, worldView, unit)
+    UpdatePosition = function(self, worldView, unit)
         local unitPosition = unit:GetPosition()
         local unitScreenPosition = worldView:Project(unitPosition)
         self.Left:Set(unitScreenPosition[1] - self.Width() / 2)
@@ -158,8 +173,8 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param self UIUnitAdjacencyLabel
     ---@param delta number
     OnFrame = function(self, delta)
+        LOG("OnFrame", self.FrameCount)
         self.FrameCount = self.FrameCount + 1
-
         local alpha = 1 - self.FrameCount / 10
         if alpha > 0 then
             self:SetAlpha(alpha, true)
@@ -170,7 +185,20 @@ UnitAdjacencyLabel = ClassUI(Group) {
         -- clean up after not being used for 100 frames
         if self.FrameCount > 100 then
             self:Destroy()
+            return
         end
+
+        local unit = self.Unit
+        local worldView = self.WorldView
+        if IsDestroyed(unit) or IsDestroyed(worldView) then
+            self:Destroy()
+            return
+        end
+
+        -- update the label
+        self:UpdateUnitTexture(unit)
+        self:UpdatePosition(worldView, unit)
+        self:UpdateScale(worldView, unit)
     end,
 }
 
@@ -193,9 +221,7 @@ local function DrawUnitAdjacencyLabel(worldView, unit, adjacentBlueprint)
     end
 
     -- update the label
-    unitAdjacencyLabel:SetUnitTexture(unit:GetBlueprint())
-    unitAdjacencyLabel:SetPosition(worldView, unit)
-    unitAdjacencyLabel:SetScale(worldView, unit)
+    unitAdjacencyLabel:UpdateReferences(worldView, unit)
 end
 
 ---@param unit UserUnit                     # The unit that our build preview is adjacent to.
