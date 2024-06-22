@@ -107,17 +107,20 @@ UnitAdjacencyLabel = ClassUI(Group) {
                 unitBlueprint.BlueprintId
             )--[[@as FileName]]
         )
+
+        local unitIcon = self.UnitIcon
         if texturePath then
-            self.UnitIcon:SetTexture(texturePath)
+            unitIcon:SetTexture(texturePath)
         else
-            self.UnitIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/unidentified.dds'))
+            unitIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/unidentified.dds'))
         end
 
+        local unitBackground = self.UnitBackground
         local backgroundPath = UIUtil.UIFile(BackgroundTextures[unitBlueprint.General.Icon or 'land'])
         if backgroundPath then
-            self.UnitBackground:SetTexture(backgroundPath)
+            unitBackground:SetTexture(backgroundPath)
         else
-            self.UnitBackground:Hide()
+            unitBackground:Hide()
         end
     end,
 
