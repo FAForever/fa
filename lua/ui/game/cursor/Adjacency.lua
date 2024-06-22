@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 local UIUtil = import("/lua/ui/uiutil.lua")
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local ReusedLayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
@@ -57,22 +57,22 @@ UnitAdjacencyLabel = ClassUI(Group) {
 
     ---@param self UIUnitAdjacencyLabel
     __post_init = function(self)
-        LayoutHelpers.LayoutFor(self)
+        ReusedLayoutFor(self)
             :Width(self.StandardLabelDimensions)
             :Height(self.StandardLabelDimensions)
             :End()
 
-        LayoutHelpers.LayoutFor(self.UnitIcon)
+        ReusedLayoutFor(self.UnitIcon)
             :Over(self, 1)
             :Fill(self)
             :End()
 
-        LayoutHelpers.LayoutFor(self.UnitBackground)
+        ReusedLayoutFor(self.UnitBackground)
             :Under(self.UnitIcon, 1)
             :Fill(self)
             :End()
 
-        LayoutHelpers.LayoutFor(self.UnitStrategicIcon)
+        ReusedLayoutFor(self.UnitStrategicIcon)
             :Over(self.UnitIcon, 1)
             :Fill(self)
             :End()
@@ -138,7 +138,7 @@ UnitAdjacencyLabel = ClassUI(Group) {
             math.clamp(screenPixels / standardPixels, 0.25, 1.0) * standardPixels
         ) * (1 / standardPixels)
 
-        LayoutHelpers.LayoutFor(self)
+        ReusedLayoutFor(self)
             :Width(ratio * standardPixels)
             :Height(ratio * standardPixels)
             :End()
