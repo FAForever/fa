@@ -85,13 +85,21 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param unit UserUnit
     ---@param worldView WorldView
     UpdateReferences = function(self, worldView, unit)
-        self.Unit = unit
-        self.WorldView = worldView
-        self.FrameCount = 0
-        self:Show()
+        -- update the texture if we're not the same reference anymore
+        if unit != self.Unit then
+            self:UpdateUnitTexture(unit)
+        end
 
         -- label needs an initial position
         self:UpdatePosition(worldView, unit)
+
+        -- update internal state that we need during `OnFrame`
+        self.Unit = unit
+        self.WorldView = worldView
+
+        -- show the label
+        self.FrameCount = 0
+        self:Show()
     end,
 
     ---@param self UIUnitAdjacencyLabel
@@ -173,7 +181,6 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param self UIUnitAdjacencyLabel
     ---@param delta number
     OnFrame = function(self, delta)
-        LOG("OnFrame", self.FrameCount)
         self.FrameCount = self.FrameCount + 1
         local alpha = 1 - self.FrameCount / 10
         if alpha > 0 then
@@ -196,7 +203,6 @@ UnitAdjacencyLabel = ClassUI(Group) {
         end
 
         -- update the label
-        self:UpdateUnitTexture(unit)
         self:UpdatePosition(worldView, unit)
         self:UpdateScale(worldView, unit)
     end,
