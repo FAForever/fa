@@ -40,7 +40,7 @@ local BackgroundTextures = {
 ---@field FrameCount number
 UnitAdjacencyLabel = ClassUI(Group) {
 
-    StandardLabelDimensions = 48,
+    StandardLabelDimensions = 64,
 
     ---@param self UIUnitAdjacencyLabel
     ---@param parent Control
@@ -110,18 +110,34 @@ UnitAdjacencyLabel = ClassUI(Group) {
     ---@param unit UserUnit
     SetScale = function(self, worldView, unit)
         local unitBlueprint = unit:GetBlueprint()
-        local unitFootprintSize = math.min(unitBlueprint.Footprint.SizeX, unitBlueprint.Footprint.SizeZ)
+        local unitSkirtSize = math.min(unitBlueprint.Physics.SkirtSizeX, unitBlueprint.Physics.SkirtSizeZ)
         local unitPosition = unit:GetPosition()
-        local unitScreenPosition1 = worldView:Project({ unitPosition[1] - unitFootprintSize / 2, unitPosition[2],
-            unitPosition[3] + unitFootprintSize / 2 })
-        local unitScreenPosition2 = worldView:Project({ unitPosition[1] + unitFootprintSize / 2, unitPosition[2],
-            unitPosition[3] - unitFootprintSize / 2 })
+        local unitScreenPosition1 = worldView:Project(
+            {
+                unitPosition[1] - unitSkirtSize * 0.5,
+                unitPosition[2],
+                unitPosition[3] + unitSkirtSize * 0.5
+            }
+        )
+        local unitScreenPosition2 = worldView:Project(
+            {
+                unitPosition[1] + unitSkirtSize * 0.5,
+                unitPosition[2],
+                unitPosition[3] - unitSkirtSize * 0.5
+            }
+        )
+
+        local standardPixels = self.StandardLabelDimensions
+        local screenPixels = unitScreenPosition2[1] - unitScreenPosition1[1]
 
         -- check if the icon fits on top of the footprint, if not then we shrink it once
-        local ratio = math.floor(math.clamp((unitScreenPosition2[1] - unitScreenPosition1[1]) / (0.5 * self.StandardLabelDimensions), 0.5, 2.0) * self.StandardLabelDimensions) * (1 / self.StandardLabelDimensions)
+        local ratio = math.floor(
+            math.clamp(screenPixels / standardPixels, 0.25, 1.0) * standardPixels
+        ) * (1 / standardPixels)
+
         LayoutHelpers.LayoutFor(self)
-            :Width(ratio * self.StandardLabelDimensions)
-            :Height(ratio * self.StandardLabelDimensions)
+            :Width(ratio * standardPixels)
+            :Height(ratio * standardPixels)
     end,
 
     --- Positions the label on top of a unit.
