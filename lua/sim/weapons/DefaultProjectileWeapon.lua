@@ -1152,6 +1152,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                 Weapon.OnLostTarget(self)
 
+                -- Some weapons look too ridiculous shooting into the air, so stop them from firing
+                -- stopping firing will cause the last shot of AttackGroundTries to not fire
                 if self.Blueprint.WeaponUnpacks then
                     ChangeState(self, self.WeaponPackingState)
                 end
