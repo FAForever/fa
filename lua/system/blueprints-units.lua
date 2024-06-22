@@ -373,7 +373,7 @@ local function PostProcessUnit(unit)
         for name, value in pairs(intelBlueprint) do
 
             -- may contain tables, such as `JamRadius`
-            if not type(value) == 'table' then
+            if type(value) ~= 'table' then
                 if value == true or value > 0 then
                     local intel = BlueprintNameToIntel[name]
                     if intel and not activeIntel[intel] then
