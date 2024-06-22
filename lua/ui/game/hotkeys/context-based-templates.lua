@@ -71,8 +71,8 @@ function loadUserTemplates(ConvertedTemplates)
     end
     if UserTemplates then
         for k = 1, TableGetn(UserTemplates) do
-            local template = {TemplateData = UserTemplates[k].templateData, TemplateSortingOrder = k, Name = UserTemplates[k].name, TriggersOnLand = true,}
-            TableInsert(ConvertedTemplates, template)
+            local template = {TemplateData = UserTemplates[k].templateData, TemplateSortingOrder = k, Name = UserTemplates[k].name, TriggersOnLand = true, TriggersOnWater = true,}
+            ConvertedTemplates[k] = template
         end
     end
 end
@@ -350,10 +350,6 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
             if massDeposits > 0 and template.TriggersOnMassDeposit then
                 TableInsert(ContextBasedTemplates, template)
             elseif hydroDeposits > 0 and template.TriggersOnHydroDeposit then
-                TableInsert(ContextBasedTemplates, template)
-            elseif noDeposits and onLand and template.TriggersOnLand then
-                TableInsert(ContextBasedTemplates, template)
-            elseif noDeposits and (not onLand) and template.TriggersOnWater then
                 TableInsert(ContextBasedTemplates, template)
             end
         end
