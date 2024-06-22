@@ -65,14 +65,17 @@ UnitAdjacencyLabel = ClassUI(Group) {
         LayoutHelpers.LayoutFor(self.UnitIcon)
             :Over(self, 1)
             :Fill(self)
+            :End()
 
         LayoutHelpers.LayoutFor(self.UnitBackground)
             :Under(self.UnitIcon, 1)
             :Fill(self)
+            :End()
 
         LayoutHelpers.LayoutFor(self.UnitStrategicIcon)
             :Over(self.UnitIcon, 1)
             :Fill(self)
+            :End()
     end,
 
     ---@param self UIUnitAdjacencyLabel
@@ -138,6 +141,7 @@ UnitAdjacencyLabel = ClassUI(Group) {
         LayoutHelpers.LayoutFor(self)
             :Width(ratio * standardPixels)
             :Height(ratio * standardPixels)
+            :End()
     end,
 
     --- Positions the label on top of a unit.
