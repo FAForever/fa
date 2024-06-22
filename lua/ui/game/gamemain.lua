@@ -897,7 +897,7 @@ end
 ---@return boolean
 function OnDetectAdjacencyBonus(userUnit, adjacentBlueprint)
     if GetOptions('adjacent_unit_icons') > 0 then
-        import("/lua/ui/game/cursor/Adjacency.lua").OnAdjacentUnit(userUnit, otherBp)
+        import("/lua/ui/game/cursor/adjacencypreview.lua").OnAdjacentUnit(userUnit, otherBp)
     end
 
     -- We should always return false here or engine behavior takes over. The engine behavior 
