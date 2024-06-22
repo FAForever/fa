@@ -1144,6 +1144,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
                 baseOnLostTarget(self)
             else
+                local unit = self.unit
+                if unit then
+                    unit:OnLostTarget(self)
+                end
+
                 Weapon.OnLostTarget(self)
 
                 if self.Blueprint.WeaponUnpacks then
@@ -1205,6 +1210,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         OnLostTarget = function(self)
             -- Override default OnLostTarget to prevent bypassing reload time by switching to idle state immediately
+            local unit = self.unit
+            if unit then
+                unit:OnLostTarget(self)
+            end
+
+            Weapon.OnLostTarget(self)
         end,
     },
 
