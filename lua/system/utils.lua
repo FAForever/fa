@@ -73,8 +73,10 @@ function table.getsize(t)
     return size
 end
 
---- table.copy(t) returns a shallow copy of t.
----@overload fun(t: Vector): Vector
+--- Returns a shallow copy of t
+---@generic T
+---@param t T
+---@return T
 function table.copy(t)
     if type(t) ~= 'table' then return t end
 
