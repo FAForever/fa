@@ -1154,8 +1154,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                 -- Some weapons look too ridiculous shooting into the air, so stop them from firing
                 -- stopping firing will cause the last shot of AttackGroundTries to not fire
-                if self.Blueprint.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
+                local bp = self.Blueprint
+                if bp.WeaponUnpacks then
+                    -- since we're stopping firing anyway, also prevent skipping the reload state here
+                    if bp.RackSalvoReloadTime > 0 then
+                        self.CurrentRackSalvoNumber = 1
+                        ChangeState(self, self.RackSalvoReloadState)
+                    else
+                        ChangeState(self, self.WeaponPackingState)
+                    end
                 end
             end
         end,
