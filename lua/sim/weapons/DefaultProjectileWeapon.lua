@@ -1192,9 +1192,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if notExclusive then
                 unit:SetBusy(false)
             end
-            self.ReloadEndTime = GetGameTick() + MATH_IRound(bp.RackSalvoReloadTime * 10)
+
             WaitSeconds(bp.RackSalvoReloadTime)
-            self.ReloadEndTime = nil
 
             self:WaitForAndDestroyManips()
 
