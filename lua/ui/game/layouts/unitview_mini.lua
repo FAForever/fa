@@ -171,8 +171,16 @@ function PositionWindow()
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
         LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 24)
     else
-        LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 120)
-        LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 42)
+        local ordersControl = import("/lua/ui/game/orders.lua").controls
+        if ordersControl.bg then
+            LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 120)
+            LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 42)
+        else
+            -- Replay? Anyway, the orders control does not exist so the construction control is all the way to the left.
+            -- The construction control is taller than the orders control, so we have to move unit view higher.
+            LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 140)
+            LayoutHelpers.AtLeftIn(controls.bg, controls.parent, 18)
+        end
     end
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent, 17)
 end
