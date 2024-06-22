@@ -893,9 +893,9 @@ end
 --- orders. Works for single-build orders, drag-build orders and template-build orders.
 ---
 ---@param userUnit UserUnit         # The unit that our build preview is adjacent to.
----@param otherBp UnitBlueprint     # The blueprint of the build preview that is adjacent to the unit.
+---@param adjacentBlueprint UnitBlueprint     # The blueprint of the build preview that is adjacent to the unit.
 ---@return boolean
-function OnDetectAdjacencyBonus(userUnit, otherBp)
+function OnDetectAdjacencyBonus(userUnit, adjacentBlueprint)
     if GetOptions('adjacent_unit_icons') > 0 then
         import("/lua/ui/game/cursor/Adjacency.lua").OnAdjacentUnit(userUnit, otherBp)
     end
