@@ -20,8 +20,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Prefs = import("/lua/user/prefs.lua")
-
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
@@ -179,8 +177,9 @@ local function DrawUnitAdjacencyLabel(worldView, unit)
     unitAdjacencyLabel:SetScale(worldView, unit)
 end
 
----@param unit UserUnit
-OnAdjacentUnit = function(unit)
+---@param unit UserUnit                     # The unit that our build preview is adjacent to.
+---@param adjacentBlueprint UnitBlueprint   # The blueprint of the build preview that is adjacent to the unit.
+OnAdjacentUnit = function(unit, adjacentBlueprint)
     ---@type WorldView | nil
     local worldViewLeft = import("/lua/ui/game/worldview.lua").viewLeft
     if not worldViewLeft then
