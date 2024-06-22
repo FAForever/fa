@@ -417,19 +417,20 @@ options = {
             },
 
             {
-                title = "<LOC gui_template_merge_context_ingame_title>Merge context based and normal templates",
+                title = "<LOC gui_template_merge_context_ingame_title>Combine context based and normal templates",
                 key = 'gui_template_merge_context_ingame',
                 type = 'toggle',
                 default = "off",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/context-based-templates.lua").UseIngametemplates = value == 'on'
+                        import("/lua/ui/game/hotkeys/context-based-templates.lua").UseIngametemplates = value
                     end
                 end,
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
-                        { text = "<LOC _On>On", key = "on" },
+                        { text = "<LOC _Replace>Replace", key = "replace" },
+                        { text = "<LOC _Merge>Merge", key = "merge" },
                     },
                 },
             },

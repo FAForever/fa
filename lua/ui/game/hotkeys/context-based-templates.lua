@@ -42,7 +42,7 @@ local TableHash = table.hash
 local StringFormat = string.format
 
 local Prefs = import("/lua/user/prefs.lua")
-UseIngametemplates = Prefs.GetFromCurrentProfile('options.gui_template_merge_context_ingame') == 'on'
+UseIngametemplates = Prefs.GetFromCurrentProfile('options.gui_template_merge_context_ingame')
 
 -------------------------------------------------------------------------------
 --#region Debugging
@@ -357,7 +357,7 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
 
     -- no templates to use, default to those that trigger on land or water
     if TableGetn(ContextBasedTemplates) == 0 then
-        if UseIngametemplates then
+        if not (UseIngametemplates == "off") then
             for k = 1, TableGetn(ConvertedTemplates) do
                 local template = ConvertedTemplates[k]
                 local valid = ValidateTemplate(template, buildableUnits, prefix)
@@ -365,7 +365,8 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
                     TableInsert(ContextBasedTemplates, template)
                 end
             end
-        else
+        end
+        if not (UseIngametemplates == "replace") then
             for k = 1, TableGetn(Templates) do
                 local template = Templates[k]
                 local valid = ValidateTemplate(template, buildableUnits, prefix)

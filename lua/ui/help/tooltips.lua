@@ -1012,7 +1012,7 @@ Tooltips = {
     },
     options_gui_template_merge_context_ingame = {
         title = '<LOC gui_template_merge_context_ingame_title>Merge context based and normal templates',
-        description = '<LOC gui_template_merge_context_ingame_desc>Show ingame templates instead of default ones when hovering over empty land/water.',
+        description = '<LOC gui_template_merge_context_ingame_desc>Replace or Combine default Templates with user created ones when hovering over empty land/water.',
     },
     options_gui_detailed_unitview = {
         title = '<LOC OPTIONS_0241>Display More Unit Stats',
