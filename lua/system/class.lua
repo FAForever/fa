@@ -785,14 +785,6 @@ EffectFactory = {
 ---@param instance table The current instance we want to switch states for
 ---@param newState State the state we want to insert between the instance and its base class
 function ChangeState(instance, newState)
-    LOG(string.format("T:%d %s changing state: %s (%s) -> %s (%s)\n"
-        , GetGameTick()
-        , tostring(instance)
-        , instance.StateName or 'unnamed', tostring(instance.__StateIdentifier)
-        , newState.StateName or 'unnamed', tostring(newState.__StateIdentifier)
-    ))
-    local dbg = debug.getinfo(2, 'Sl')
-    LOG(string.format('%10s:%s', dbg.short_src, dbg.currentline))
 
     -- call on-exit function
     if instance.OnExitState then
