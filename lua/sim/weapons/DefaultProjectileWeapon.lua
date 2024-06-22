@@ -1139,6 +1139,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         OnLostTarget = function(self)
             -- Override the default OnLostTarget but not inherited ones
+            -- the inherited ones are needed for beam weapons to stop firing: https://github.com/FAForever/fa/pull/4863
+            -- and for ythotha storm to not instantly stop firing: https://github.com/FAForever/fa/pull/5291
             local baseOnLostTarget = self.__base.OnLostTarget
             if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
                 baseOnLostTarget(self)
