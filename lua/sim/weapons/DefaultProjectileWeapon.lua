@@ -1151,9 +1151,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                 Weapon.OnLostTarget(self)
 
-                if self.Blueprint.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
-                end
+                -- don't change states as that will cancel the salvo, which we want to keep around for AttackGroundTries to function
             end
         end,
 
