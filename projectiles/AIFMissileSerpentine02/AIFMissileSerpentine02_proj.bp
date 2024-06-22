@@ -1,28 +1,16 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'AEON_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'AEON_Expl_Med_Impact',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_AEON',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'TACTICAL',
-        'MISSILE',
-        'NOSPLASHDAMAGE'
+        "AEON",
+        "INDIRECTFIRE",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TACTICAL",
     },
     Defense = {
         Health = 3,
@@ -32,36 +20,31 @@ ProjectileBlueprint {
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Medium01',
-        },
-        MeshBlueprint = '/projectiles/AIFMissileSerpentine01/AIFMissileSerpentine01_mesh.bp',
-        StrategicIconSize = 2,
+        ImpactEffects = { Type = "Medium01" },
+        MeshBlueprint = "/projectiles/AIFMissileSerpentine01/AIFMissileSerpentine01_mesh.bp",
+        StrategicIconSize = 3,
         UniformScale = 0.035,
     },
     General = {
-        Category = 'Missile',
-        Faction = 'Aeon',
+        Category = "Missile",
+        Faction = "Aeon",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 3,
         DestroyOnWater = false,
         InitialSpeed = 3,
         LifeTime = 30,
         MaxSpeed = 12,
-
+        MaxZigZag = 4,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
         TrackTargetGround = true,
+        TrackTargetGroundFuzziness = 0.5,
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
-
-        MaxZigZag = 5,
-        ZigZagFrequency = 0.5,
+        ZigZagFrequency = 0.4,
     },
 }

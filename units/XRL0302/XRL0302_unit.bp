@@ -1,8 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xrl0302_desc>Mobile Bomb",
-    AI = {
-        TargetBones = { "torso" },
-    },
+    AI = { GuardScanRadius = 30 },
     Audio = {
         AmbientMove        = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Loop',        LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed          = Sound { Bank = 'XRL_Weapon', Cue = 'XRL0302_SelfDestructBomb', LodCutoff = 'UnitMove_LodCutoff' },
@@ -43,13 +41,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 400,
         MaxHealth = 400,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 110,
     },
     Display = {
@@ -59,7 +53,7 @@ UnitBlueprint{
             "<LOC ability_stun>EMP Weapon",
         },
         AnimationWalk = "/units/XRL0302/XRL0302_Awalk.sca",
-        AnimationWalkRate = 11.5,
+        AnimationWalkRate = 20,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -96,7 +90,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 1300,
         BuildCostMass = 190,
-        BuildTime = 700,
+        BuildTime = 550,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -105,15 +99,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "Cybran",
@@ -137,14 +127,6 @@ UnitBlueprint{
     LifeBarSize = 0.5,
     Physics = {
         BankingSlope = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         Elevation = 0.25,
         MaxAcceleration = 7,
@@ -155,7 +137,6 @@ UnitBlueprint{
         MeshExtentsX = 0.55,
         MeshExtentsY = 0.25,
         MeshExtentsZ = 0.65,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         TurnRadius = 4,
         TurnRate = 200,
@@ -165,7 +146,7 @@ UnitBlueprint{
     SelectionThickness = 0.83,
     CollisionOffsetZ = 0.05,
     SizeX = 0.5,
-    SizeY = 0.4,
+    SizeY = 0.5,
     SizeZ = 1,
     StrategicIconName = "icon_land2_bomb",
     StrategicIconSortPriority = 135,
@@ -188,7 +169,8 @@ UnitBlueprint{
             },
             FiringTolerance = 180,
             Label = "Suicide",
-            MaxRadius = 3,
+            MaxRadius = 5,
+            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -216,7 +198,8 @@ UnitBlueprint{
             FiringTolerance = 2,
             IgnoreIfDisabled = true,
             Label = "DeathWeapon",
-            MaxRadius = 3,
+            ManualFire = false,
+            MaxRadius = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/CIFEMP01/CIFEMP01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
@@ -227,7 +210,7 @@ UnitBlueprint{
                 },
             },
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SalvoSize = 1,
             SlavedToBody = true,
             TargetRestrictDisallow = "UNTARGETABLE, AIR",
@@ -262,12 +245,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

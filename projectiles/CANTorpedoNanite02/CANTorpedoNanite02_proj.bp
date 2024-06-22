@@ -1,31 +1,17 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        EnterWater = Sound {
-            Bank = 'URAWeapon',
-            Cue = 'URA0204_Torpedo_Water',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        EnterWater  = Sound { Bank = 'URAWeapon', Cue = 'URA0204_Torpedo_Water',      LodCutoff = 'UnitMove_LodCutoff' },
+        Impact      = Sound { Bank = 'Impacts',   Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater = Sound { Bank = 'Impacts',   Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'ANTINAVY',
-        'TORPEDO',
-        'NOSPLASHDAMAGE'
+        "ANTINAVY",
+        "CYBRAN",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TORPEDO",
     },
-    Defense = {
-        Health = 1,
-    },
+    Defense = { Health = 1 },
     DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
@@ -34,7 +20,7 @@ ProjectileBlueprint {
             LODs = {
                 {
                     LODCutoff = 175,
-                    ShaderName = 'TMeshGlow',
+                    ShaderName = "TMeshGlow",
                 },
             },
         },
@@ -42,28 +28,24 @@ ProjectileBlueprint {
         UniformScale = 0.3,
     },
     General = {
-        Category = 'Anti Navy',
-        Faction = 'Cybran',
-        Weapon = 'Nanite Torpedo',
+        Category = "Anti Navy",
+        Faction = "Cybran",
+        Weapon = "Nanite Torpedo",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
+        AccelerationRange = 2,
         DestroyOnWater = false,
         InitialSpeed = 3,
         Lifetime = 10,
         MaxSpeed = 15,
+        MaxZigZag = 1,
         StayUnderwater = true,
         TrackTarget = true,
         TurnRate = 180,
-        VelocityAlign = true,
-
-        -- these parameters make the path of the torpedo feel unique
-        AccelerationRange = 2,
         TurnRateRange = 10,
-        MaxZigZag = 1,
+        VelocityAlign = true,
         ZigZagFrequency = 0.4,
     },
 }

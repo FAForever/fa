@@ -1,0 +1,1 @@
+- (#6195) Better match the Chariot's (Aeon Tech 1 transport) hitbox to its model.

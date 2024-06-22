@@ -1,17 +1,15 @@
 UnitBlueprint{
     Description = "<LOC uel0401_desc>Experimental Mobile Factory",
     AI = {
-        AttackAngle = 10,
+        AttackAngle = 20,
         RefuelingMultiplier = 75,
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
-            "Bay_Cover",
             "Front_Core",
             "Rear_Core",
-            "Ramp",
             "Turret_Left01",
             "Turret_Left02",
             "Turret_Right01",
@@ -43,9 +41,10 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CONSTRUCTION",
+        "CQUEMOV",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
+        "EXTERNALFACTORY",
         "INDIRECTFIRE",
         "LAND",
         "LOWSELECTPRIO",
@@ -59,16 +58,16 @@ UnitBlueprint{
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
+        "SHIELD",
         "SHOWQUEUE",
         "SNIPEMODE",
         "UEF",
         "VISIBLETORECON",
-        "EXTERNALFACTORY",
     },
     Defense = {
-        AirThreatLevel = 16,
+        AirThreatLevel = 11,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
+        EconomyThreatLevel = 2018,
         Health = 12500,
         MaxHealth = 12500,
         RegenRate = 20,
@@ -87,8 +86,8 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0,
             ShieldVerticalOffset = -7,
         },
-        SubThreatLevel = 40,
-        SurfaceThreatLevel = 380,
+        SubThreatLevel = 8,
+        SurfaceThreatLevel = 250,
     },
     Display = {
         Abilities = {
@@ -175,6 +174,19 @@ UnitBlueprint{
                     },
                 },
                 Treads = {
+                    Damage = {
+                        Amount = 400,
+                        Bones = {
+                            "Wheel_Left01",
+                            "Wheel_Right01",
+                            "Wheel_Left02",
+                            "Wheel_Right02",
+                        },
+                        DamageFriendly = false,
+                        PulseInterval = 0.5,
+                        Radius = 1.2,
+                        Type = "ExperimentalFootfall",
+                    },
                     ScrollTreads = true,
                     TreadMarks = {
                         {
@@ -191,19 +203,6 @@ UnitBlueprint{
                             TreadMarksSizeZ = 5.5,
                             TreadOffset = { 0, 0, -4.5 },
                         },
-                    },
-                    Damage = {
-                        Bones = {
-                            "Wheel_Left01",
-                            "Wheel_Right01",
-                            "Wheel_Left02",
-                            "Wheel_Right02",
-                        },
-                        Amount = 400,
-                        PulseInterval = 0.5,
-                        DamageFriendly = false,
-                        Radius = 1.2,
-                        Type = "ExperimentalFootfall",
                     },
                 },
             },
@@ -234,11 +233,10 @@ UnitBlueprint{
         StorageMass = 200,
     },
     ExternalFactory = {
-        SelectionSizeX = 2,
-        SelectionSizeZ = 2,
-        SelectionCenterOffsetX = 0,
         SelectionCenterOffsetY = 1.5,
         SelectionCenterOffsetZ = 2.5,
+        SelectionSizeX = 2,
+        SelectionSizeZ = 2,
     },
     General = {
         BuildBones = {
@@ -253,15 +251,10 @@ UnitBlueprint{
         },
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -290,16 +283,8 @@ UnitBlueprint{
     LifeBarOffset = 4.35,
     LifeBarSize = 5.75,
     Physics = {
-        BackUpDistance = 15,
+        BackUpDistance = 30,
         BankingSlope = 3,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         DragCoefficient = 0.2,
         Elevation = 1,
         LayerChangeOffsetHeight = -0.75,
@@ -311,7 +296,6 @@ UnitBlueprint{
         MeshExtentsX = 8,
         MeshExtentsY = 2,
         MeshExtentsZ = 10.5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         RotateBodyWhileMoving = false,
         RotateOnSpot = false,
@@ -323,12 +307,10 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 30,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.3,
     SelectionSizeX = 4,
     SelectionSizeZ = 5.25,
     SelectionThickness = 0.34,
-    CollisionOffsetZ = 0,
     SizeX = 5.5,
     SizeY = 1.5,
     SizeZ = 8,
@@ -378,7 +360,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 90,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -402,7 +384,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -456,7 +438,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -480,7 +462,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -532,7 +514,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -556,7 +538,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -610,7 +592,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -634,7 +616,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -682,7 +664,7 @@ UnitBlueprint{
             MaxRadius = 45,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 45,
+            MuzzleVelocity = 60,
             ProjectileId = "/projectiles/TDFRiot02/TDFRiot02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {
@@ -699,7 +681,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -743,7 +725,7 @@ UnitBlueprint{
             MaxRadius = 45,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 45,
+            MuzzleVelocity = 60,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFRiot02/TDFRiot02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
@@ -761,7 +743,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -827,7 +809,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -897,7 +879,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -959,7 +941,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "(STRUCTURE * DEFENSE - ANTIAIR)",
@@ -996,7 +978,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

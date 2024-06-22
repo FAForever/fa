@@ -1,26 +1,24 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'ANTINAVY',
+        "ANTINAVY",
+        "PROJECTILE",
+        "UEF",
     },
     Display = {
-        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        MeshBlueprint = "/meshes/projectiles/torpedo_default_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.1,
     },
     General = {
-        Category = 'Anti Navy',
+        Category = "Anti Navy",
         EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'ANTINAVY',
+            "UEF",
+            "PROJECTILE",
+            "ANTINAVY",
         },
-        Faction = 'UEF',
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 0.1,
         DestroyOnWater = false,

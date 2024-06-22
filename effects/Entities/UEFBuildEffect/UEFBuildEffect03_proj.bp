@@ -1,13 +1,13 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    MeshName = '/meshes/generic/cube01_lod0.scm',
-                    ShaderName = 'UEFBuildCube',
-                    AlbedoName = '/meshes/generic/cube03_albedo.dds',
-                    SecondaryName = '/textures/effects/UEFBuildSpecular.dds',
                     LODCutoff = 300,
+                    SecondaryName = "/textures/effects/UEFBuildSpecular.dds",
+                    ShaderName = "UEFBuildCube",
+                    MeshName = "/meshes/generic/cube01_lod0.scm",
+                    AlbedoName = "/meshes/generic/cube03_albedo.dds",
                 },
             },
         },

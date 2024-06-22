@@ -1,43 +1,27 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'XSA_Destroy',
-            Cue = 'XSA_Strag_Bomb_Explosion',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'XSA_Destroy',
-            Cue = 'XSA_Strag_Bomb_Explosion',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'XSA_Destroy',
-            Cue = 'XSA_Strag_Bomb_Explosion',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'XSA_Destroy', Cue = 'XSA_Strag_Bomb_Explosion', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'XSA_Destroy', Cue = 'XSA_Strag_Bomb_Explosion', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'XSA_Destroy', Cue = 'XSA_Strag_Bomb_Explosion', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'SERAPHIM',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "INDIRECTFIRE",
+        "PROJECTILE",
+        "SERAPHIM",
     },
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Small01',
-        },
+        NoGenericScorchSplats = true,
         StrategicIconSize = 3,
     },
     General = {
-        Category = 'Bomb',
-        Faction = 'Seraphim',
+        Category = "Bomb",
+        Faction = "Seraphim",
         TechLevel = 1,
-        Weapon = 'Ohwalli Strategic Bomb',
+        Weapon = "Ohwalli Strategic Bomb",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         RealisticOrdinance = true,

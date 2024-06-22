@@ -1,40 +1,24 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
+    Description = "UEF Nuclear Missile",
     Audio = {
-        ExistLoop = Sound {
-            Bank = 'UELWeapon',
-            Cue = 'UEF_Nuke_Flight',
-            LodCutoff = 'DefaultLodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        NukeExplosion = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        ExistLoop     = Sound { Bank = 'UELWeapon',  Cue = 'UEF_Nuke_Flight', LodCutoff = 'DefaultLodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Explosions', Cue = 'UEF_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Explosions', Cue = 'UEF_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        NukeExplosion = Sound { Bank = 'Explosions', Cue = 'UEF_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'STRATEGIC',
-        'MISSILE',
-        'NOSPLASHDAMAGE',
-        'KILLAIRONCOLLISION',
+        "INDIRECTFIRE",
+        "KILLAIRONCOLLISION",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "STRATEGIC",
+        "UEF",
     },
     Defense = {
         Health = 25000,
         MaxHealth = 25000,
     },
-    Description = 'UEF Nuclear Missile',
     DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 5,
@@ -42,9 +26,7 @@ ProjectileBlueprint {
         Mesh = {
             IconFadeInZoom = 200,
             LODs = {
-                {
-                    ShaderName = 'TMeshGlow',
-                },
+                { ShaderName = "TMeshGlow" },
             },
         },
         UniformScale = 0.035,
@@ -55,12 +37,10 @@ ProjectileBlueprint {
         BuildTime = 450000,
     },
     General = {
-        Category = 'Missile',
-        Faction = 'UEF',
+        Category = "Missile",
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 'UEF Nuclear Missile',
-    },
+    Interface = { HelpText = "UEF Nuclear Missile" },
     Physics = {
         Acceleration = 3,
         CollideEntity = false,
@@ -77,5 +57,5 @@ ProjectileBlueprint {
         UseGravity = false,
         VelocityAlign = true,
     },
-    StrategicIconName = '/textures/ui/common/game/unit-over/icon-nuke_bmp.dds',
+    StrategicIconName = "/textures/ui/common/game/unit-over/icon-nuke_bmp.dds",
 }

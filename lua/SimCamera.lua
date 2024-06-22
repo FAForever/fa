@@ -43,7 +43,6 @@ SimCamera = Class(SingleEvent) {
     end,
 
     MoveTo = function(self,rectRegion,seconds)
-        --LOG('Camera:MoveTo ', repr(rectRegion), ' ',seconds)
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_MOVE',
@@ -55,7 +54,6 @@ SimCamera = Class(SingleEvent) {
     end,
 
     MoveToMarker = function(self,marker,seconds)
-        --LOG('Camera:MoveToMarker ', repr(marker.type), ' ',seconds)
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_MOVE',
@@ -67,18 +65,15 @@ SimCamera = Class(SingleEvent) {
     end,
 
     SyncPlayableRect = function(self,rectRegion)
-        LOG('Camera:SyncPlayableRect ', repr(rectRegion))
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_SYNC_PLAYABLE_RECT',
             Region = rectRegion,
         }
-        LOG('Request: ',repr(request))
         SyncCameraRequest(request)
     end,
 
     SnapToMarker = function(self,marker)
-        --LOG('Camera:SnapToMarker('..repr(marker.type)..')')
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_SNAP',
@@ -88,7 +83,6 @@ SimCamera = Class(SingleEvent) {
     end,
 
     TrackEntities = function(self, units, zoom, seconds)
-        --LOG('Camera:TrackEntities')
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_TRACK_ENTITIES',
@@ -104,7 +98,6 @@ SimCamera = Class(SingleEvent) {
     end,
 
     NoseCam = function(self, ent, pitchAdjust, zoom, seconds, transition)
-        --LOG('Camera:NoseCam')
         local idNum = false
         if ent:GetAIBrain():GetArmyIndex() ~= ArmyBrains[1]:GetArmyIndex() then
             local entBlip = ent:GetBlip(1)

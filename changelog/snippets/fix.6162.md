@@ -1,0 +1,1 @@
+- (#6162) Fix the display of engineers' reclaim statistics in the left and right UI layouts (default is the bottom layout).

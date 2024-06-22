@@ -28,13 +28,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 10,
         MaxHealth = 10,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -42,6 +38,13 @@ UnitBlueprint{
             "<LOC ability_upgradable>Upgradeable",
         },
         AnimationUpgrade = "/units/uab3101/uab3101_aupgrade.sca",
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
+        },
         IdleEffects = {
             Land = {
                 Effects = {
@@ -84,7 +87,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 720,
         BuildCostMass = 80,
-        BuildRate = 14.08,
+        BuildRate = 13,
         BuildTime = 80,
         BuildableCategory = { "uab3201" },
         MaintenanceConsumptionPerSecondEnergy = 20,
@@ -99,21 +102,7 @@ UnitBlueprint{
         SizeZ = 1,
     },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_Pause = true },
         FactionName = "Aeon",
         Icon = "land",
         OrderOverrides = {
@@ -127,7 +116,7 @@ UnitBlueprint{
         UpgradesTo = "uab3201",
     },
     Intel = {
-        RadarRadius = 115,
+        RadarRadius = 116,
         ReactivateTime = 2,
         ShowIntelOnSelect = true,
         VisionRadius = 20,
@@ -136,28 +125,16 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
         MeshExtentsX = 1.25,
         MeshExtentsY = 2,
         MeshExtentsZ = 1.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -0.5,
         SkirtSizeX = 2,
         SkirtSizeZ = 2,
-        TurnRate = 0,
     },
     SelectionSizeX = 0.75,
     SelectionSizeZ = 0.75,
@@ -174,12 +151,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

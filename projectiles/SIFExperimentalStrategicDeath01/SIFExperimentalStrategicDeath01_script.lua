@@ -2,10 +2,13 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+--- SIF Experimental Strategic Death 01
+---@class SIFExperimentalStrategicDeath01 : NullShell
 SIFExperimentalStrategicDeath01 = ClassProjectile(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
+    ---@param self SIFExperimentalStrategicDeath01
     EffectThread = function(self)
         local army = self.Army
 
@@ -25,6 +28,8 @@ SIFExperimentalStrategicDeath01 = ClassProjectile(NullShell) {
         end
     end,
 
+    ---@param self SIFExperimentalStrategicDeath01
+    ---@param army number
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
         WaitTicks(6)
@@ -42,6 +47,7 @@ SIFExperimentalStrategicDeath01 = ClassProjectile(NullShell) {
         self:ShakeCamera(75, 1, 0, 15)
     end,
 
+    ---@param self SIFExperimentalStrategicDeath01
     DistortionField = function(self)
         local proj = self:CreateProjectile('/effects/QuantumWarhead/QuantumWarheadEffect01_proj.bp')
         local scale = proj.Blueprint.Display.UniformScale

@@ -1,13 +1,12 @@
-
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 100,
     LODs = {
         {
-            AlbedoName = 'ping_nuke_Albedo.dds',
-            ShaderName = 'CommandFeedback3',
             LODCutoff = 99999,
-            MeshName = 'ping_nuke_lod0.scm',
+            ShaderName = "CommandFeedback3",
+            MeshName = "ping_nuke_lod0.scm",
+            AlbedoName = "ping_nuke_Albedo.dds",
         },
     },
-    IconFadeInZoom = 100,
     UniformScale = 1.0,
 }

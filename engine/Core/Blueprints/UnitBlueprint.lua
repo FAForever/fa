@@ -27,7 +27,7 @@
 ---@alias EnhancementSlot "Back" | "RCH" | "LCH"
 ---@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL"
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
----@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM"
+---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
 
 ---@alias UnitId BlueprintId
@@ -141,7 +141,8 @@
 ---@field GuardReturnRadius number
 --- guard range for the unit, automatically added if absent
 ---@field GuardScanRadius number
---- initial auto mode behaviour for the unit
+--- initial toggle of automatic behaviors (silo building and auto-assist)
+---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
 ---@field NeedUnpack boolean
@@ -383,7 +384,7 @@
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.
 --- Should not be defined with `PersonalBubble`, `PersonalShield`, or `TransportShield`.
 ---@field AntiArtilleryShield? boolean
---- impact effect name in `/lua/EffectTemplates.lua`
+--- impact effect name in `/lua/effecttemplates.lua`
 ---@field ImpactEffects? string
 --- effect mesh to be created for impacts on the shield
 ---@field ImpactMesh? FileName
@@ -410,7 +411,9 @@
 --- stunning).
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `TransportShield`.
 ---@field PersonalShield? boolean
---- an efficacy multiplier applied to units assisting the shield to regenerate its health
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
 ---@field RegenAssistMult? number
 --- The amount of time the shield takes to come back online when its disabled due to insufficient
 --- energy. Defaults to `10` in the shield spec.
@@ -442,6 +445,17 @@
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
 
+---@class UnitBlueprintBlinkingLightsData
+---@field BLBone Bone
+---@field BlOffsetX number      # defaults to 0
+---@field BLOffsetY number      # defaults to 0
+---@field BLOffsetZ number      # defaults to 0
+---@field BLScale number        # defaults to 1
+
+---@class UnitBlueprintBlinkingLightsFx
+---@field Green string          # Path to emitter, usually '/effects/emitters/light_green_03_emit.bp'
+---@field Red string            # Path to emitter, usually '/effects/emitters/light_red_03_emit.bp'
+---@field Yellow? string         # Path to emitter, usually '/effects/emitters/light_yellow_02_emit.bp'
 
 ---@class UnitBlueprintDisplay
 --- Used by the Aeon build animation for a custom mercury pool
@@ -491,6 +505,8 @@
 --- used by UEF and Cybran construction units to animate their hover transition
 ---@field AnimationWater? FileName
 ---@field AttackReticleSize? number unused
+---@field BlinkingLights UnitBlueprintBlinkingLightsData[]
+---@field BlinkingLightsFx UnitBlueprintBlinkingLightsFx
 --- the bone on factories where units are built
 ---@field BuildAttachBone? Bone
 --- used while cloaked
@@ -655,6 +671,7 @@
 
 ---@class UnitBlueprintTarmac
 ---@field Albedo FileName
+---@field Albedo2 FileName
 ---@field DeathLifetime number
 ---@field FadeOut number
 ---@field Length number
@@ -752,7 +769,10 @@
 ---@field TeleportMassMod? number
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
+---@see TeleportDelay For an additional flat delay that also delays teleport FX showing at the destination.
 ---@field TeleportTimeMod? number
+--- Whether to use the new distance-based teleport cost calculation method, or revert to the old unit cost based method.
+---@field UseVariableTeleportCosts? boolean
 
 ---@class UnitBlueprintExternalFactory
 ---@field SelectionSizeX? number
@@ -767,21 +787,6 @@
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
-
----@class UnitBlueprintEnhancement
----@field BuildCostEnergy number
----@field BuildCostMass number
----@field BuildTime number
----@field HideBones? Bone[]
----@field Icon string
----@field MaintenanceConsumptionPerSecondEnergy number
----@field Name UnlocalizedString
----@field Prerequisite? Enhancement
----@field RemoveEnhancements? Enhancement[]
----@field ShowBones? Bone[]
----@field Slot EnhancementSlot
----@field UpgradeEffectBones? Bone[]
----@field UpgradeUnitAmbientBones? Bone[]
 
 ---@class UnitBlueprintEnhancementPreset
 ---@field BuildIconSortPriority number
@@ -799,8 +804,133 @@
 ---@field Enhancements Enhancement[]
 ---@field BaseBlueprintId UnitId
 
---- TODO
 ---@class UnitBlueprintEnhancement
+--- Cost of the enhancement in energy
+---@field BuildCostEnergy number
+--- Cost of the enhancement in mass
+---@field BuildCostMass number
+--- Time it takes to build the enhancement
+---@field BuildTime number
+--- Adds buildable enhancements to the unit
+---@field BuildableCategoryAdds string
+--- Unit icon to use for the enhancement
+---@field Icon string
+--- Name of the enhancement
+---@field Name string|number
+--- Energy Production of the enhancement
+---@field ProductionPerSecondEnergy number
+--- Mass Production of the enhancement
+---@field ProductionPerSecondMass number
+---
+---
+--- New Build Rate of the unit
+---@field NewBuildRate number
+--- New Health of the unit
+---@field NewHealth number
+--- New Regen Rate of the unit
+---@field NewRegenRate number
+--- Gun Damage Enhancement
+---@field ZephyrDamageMod number
+--- New Max Radius of the unit
+---@field NewMaxRadius number
+--- New Rate of Fire of the unit. This is How fast the Gun shoots
+---@field NewRateOfFire number
+--- New Damage Radius of the unit
+---@field NewDamageRadius number
+---
+--- New Omni Radius of the unit
+---@field NewOmniRadius number
+--- New Vision Radius of the unit
+---@field NewVisionRadius number
+--- New Sonar Radius of the unit
+---@field NewSonarRadius number
+---
+--- Show bones of the unit
+---@field ShowBones? Bone[]
+--- Hide bones of the unit
+---@field HideBones? Bone[]
+---
+--- Slot of the enhancement
+---@field Slot EnhancementSlot
+---
+--- Upgrade effect bones of the unit
+---@field UpgradeEffectBones? Bone[]
+--- Upgrade unit ambient bones of the unit
+---@field UpgradeUnitAmbientBones? Bone[]
+---
+--- Prerequisite enhancement
+---@field Prerequisite? Enhancement
+--- Remove enhancements
+---@field RemoveEnhancements Enhancement[]
+---
+--- Impact effects of the enhancement
+---@field ImpactEffects string
+--- 
+--- Maintenance energy consumption of the enhancement
+---@field MaintenanceConsumptionPerSecondEnergy number
+---
+---
+--- Owner shield mesh blueprint
+---@field OwnerShieldMesh string
+--- Personal shiled toggle
+---@field PersonalShield boolean
+--- How much buildpower is required to provide 1x of the shield's regen rate.
+--- The cost of assisting a shield is `repairCostRate / RegenAssistMult`,
+--- where repairCostRate is determined by Unit:UpdateConsumptionValues
+---@field RegenAssistMult number
+--- The amount of time the shield takes to come back online when its disabled due to insufficient energy. Defaults to 10 in the shield spec.
+---@field ShieldEnergyDrainRechargeTime number
+--- The maximum health of the shield. Defaults to 250 in the shield spec.
+---@field ShieldMaxHealth number
+--- The time it takes for the shield to come online once completely depleted by damage. Treated as 10 when absent and 5 when false for the shield spec.
+---@field ShieldRechargeTime number
+---The amount of health the shield regenerates per second when it's not taking damage. Defaults to 1 in the shield spec (and treated the same when false).
+---@field ShieldRegenRate number
+---The delay after getting hit by ordinance the shield starts recharging. Defaults to 5 in the shield spec.
+---@field ShieldRegenStartTime number
+---The radius of the shield (converted to Size for the final shield spec, where it defaults to 10 as a default if absent from this blueprint)
+---@field ShieldSize number
+---How much of the damage applied to the shield will also be applied to others overlapping this one. Treated as 0.15 when absent from the shield spec.
+---@field ShieldSpillOverDamageMod number
+--- How many units the shield is moved up (or down if negative) from center. Defaults to -1 in the shield spec.
+---@field ShieldVerticalOffset number
+--- Shield mesh effect
+---@field Mesh string
+--- Shield mesh Z blueprint
+---@field MeshZ string
+--- Shield Enhancement number (Unknown)
+---@field ShieldEnhancement number
+---
+--- Impact Mesh of the enhancement
+---@field ImpactMesh string
+---
+---
+--- Add Health to the unit
+---@field ACUAddHealth number
+--- Max Health of the unit
+---@field MaxHealthFactor number
+--- Radius Increase of RegenAura
+---@field Radius number
+---
+--- Max Regen of SCU
+---@field RegenCeilingSCU number
+--- Max Regen of T1 
+---@field RegenCeilingT1 number
+--- Max Regen of T2
+---@field RegenCeilingT2 number
+--- Max Regen of T3
+---@field RegenCeilingT3 number
+--- Max Regen of T4
+---@field RegenCeilingT4 number
+--- Base Regen
+---@field RegenFloor number
+--- Regen Per Second. How much health the unit regenerates per second
+--- This is a multiplier of the base regen
+---@field RegenPerSecond number
+
+
+
+
 
 ---@class UnitBlueprintGeneral
 ---@field BuildBones? BuildBones
@@ -832,8 +962,17 @@
 ---@field TarmacGlowDecal? any unused
 --- defines the tech level used for display purposes
 ---@field TechLevel UnitTechLevel
---- if present, makes the "teleport" ability show up in the unit view with the delay of this value
+--- Extra time taken to teleport before other teleport time calculations. Defaults to 0 seconds.
+--- If `UseVariableTeleportCosts` is false, then this also delays teleport FX appearing at the destination.
+--- If `UseVariableTeleportCosts` is true, then destination FX appear after 0.4x the total teleport time.
+---@see TeleportTimeMod For an energy-scaling teleport time that does not delay teleport FX at the destination.
 ---@field TeleportDelay? number
+--- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
+---@field TeleportFlatEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 2.500.000 energy.
+---@field TeleportMaximumEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 50 seconds.
+---@field TeleportMaximumDuration? number
 --- table of toggle capabilities available for this unit
 ---@field ToggleCaps table<ToggleCap, boolean>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
@@ -845,7 +984,7 @@
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
 ---@field UpgradesTo? UnitId
---- the base unit from which all units in this upgrade chain can be upgraded from
+--- the base unit from which all units in this upgrade chain can be upgraded from. If this field is lacking then the unit may refuse to upgrade even when `UpgradesFrom` and `UpgradesTo` are set
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
@@ -866,7 +1005,6 @@
 ---@field AllIntel table<IntelType, boolean>
 ---@field AllIntelRecharging table<IntelType, boolean>
 ---@field AllIntelMaintenanceFree table<IntelType, boolean>
----@field AllIntelFromEnhancements table<IntelType, boolean>
 ---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
@@ -884,8 +1022,8 @@
 --- used by the Seraphim T1 air scout for how long the after-death vison remains
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
----@field JamRadius {Max: number, Min: number}
---- how many blips does a jammer produce
+---@field JamRadius { Max: number, Min: number }
+--- How many blips a jammer produces. Maximum 255
 ---@field JammerBlips number
 --- used by the Soothsayer
 ---@field MaxVisionRadius? number
@@ -914,7 +1052,7 @@
 --- how far our sonar stealth goes
 ---@field SonarStealthFieldRadius number
 --- how far off displace blips
----@field SpoofRadius {Max: number, Min: number}
+---@field SpoofRadius { Max: number, Min: number }
 --- used by the Selen to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
 --- how far the unit can see above water and land
@@ -948,10 +1086,6 @@
 ---@field BuildRestriction UnitBuildRestriction
 --- acceleration to allow unit to catch up to the target when it starts to drift
 ---@field CatchUpAcc number
---- used by the Loyalist for its charge ability
----@field ChargeAccMult? number
---- used by the Loyalist for its charge ability
----@field ChargeSpeedMult? number
 --- unknown if significant in `Physics`
 ---@field CollisionOffsetX? number
 --- if a naval factory uses the special rolloff point computation
@@ -989,8 +1123,11 @@
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsX number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsY number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
 --- method of locomotion
@@ -1011,7 +1148,7 @@
 ---@field RotateBodyWhileMoving? boolean
 --- if this unit can try to rotate on the spot
 ---@field RotateOnSpot? boolean
---- threshold for rotate on spot to take effect when moving
+--- threshold speed in ogrids/s for rotate on spot to take effect. defaults to 0.5
 ---@field RotateOnSpotThreshold? number
 --- unknown behavior, used by Spiderbot and Megabot
 ---@field SinkLower? boolean
@@ -1031,9 +1168,10 @@
 ---@field SubSpeedMultiplier? number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
---- turn radius for the unit, in wolrd units
+--- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
+--- and if it results in a faster turn rate than `TurnRate`. Disabled at 0
 ---@field TurnRadius number
---- turn radius for the unit, in degrees per second
+--- turn rate for the unit, in degrees per second. Turning acts improperly when at 0
 ---@field TurnRate number
 --- when present, the speed multiplier is set to this number when entering the water layer
 ---@field WaterSpeedMultiplier? number

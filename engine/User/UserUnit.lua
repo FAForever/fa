@@ -50,6 +50,11 @@ local UserUnit = {}
 --- | 'UNITCOMMAND_Upgrade'
 --- | 'UNITCOMMAND_BuildFactory'
 
+---@class UICommandInfo
+---@field type 'Teleport' | 'Move' | string
+---@field ID number
+---@field position Vector
+
 ---@class MissileInfo
 ---@field nukeSiloBuildCount number
 ---@field nukeSiloMaxStorageCount number
@@ -58,6 +63,9 @@ local UserUnit = {}
 ---@field tacticalSiloMaxStorageCount number
 ---@field tacticalSiloStorageCount number
 
+-- Thanks to the following engine patches this contains floats instead of ints:
+-- - https://github.com/FAForever/FA-Binary-Patches/pull/14
+-- - https://github.com/FAForever/FA-Binary-Patches/pull/75
 ---@class EconData
 ---@field energyConsumed number
 ---@field energyProduced number
@@ -77,6 +85,16 @@ end
 function UserUnit:GetArmy()
 end
 
+---Returns unit's position interpolated by current frame
+---@return Vector
+function UserUnit:GetInterpolatedPosition()
+end
+
+---Returns unit's fraction of being completed
+---@return number
+function UserUnit:GetFractionComplete()
+end
+
 ---
 ---@return UnitBlueprint
 function UserUnit:GetBlueprint()
@@ -88,7 +106,7 @@ function UserUnit:GetBuildRate()
 end
 
 --- Returns a table of commands
----@return OrderInfo[]
+---@return UICommandInfo[]
 function UserUnit:GetCommandQueue()
 end
 

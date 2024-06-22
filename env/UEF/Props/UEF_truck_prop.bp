@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,10 +12,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'UEF_truck_Albedo.dds',
-                    SpecName = 'UEF_truck_SpecTeam.dds',
                     LODCutoff = 750,
-                    ShaderName = 'Unit',
+                    ShaderName = "Unit",
+                    SpecName = "UEF_truck_SpecTeam.dds",
+                    AlbedoName = "UEF_truck_Albedo.dds",
                 },
             },
         },
@@ -26,9 +26,7 @@ PropBlueprint {
         ReclaimMassMax = 150,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'UEF Truck',
-    },
+    Interface = { HelpText = "UEF Truck" },
     SizeX = 1,
     SizeY = 0.5,
     SizeZ = 1.5,

@@ -3,7 +3,7 @@
 
 ---@class PlatoonCommand : userdata
 
----@class moho.platoon_methods
+---@class moho.platoon_methods : InternalObject
 local CPlatoon = {}
 
 ---@alias PlatoonSquadType 'Attack' | 'Artillery' | 'Guard' | 'None' | 'Scout' | 'Support'
@@ -12,7 +12,7 @@ local CPlatoon = {}
 --- Orders platoon to attack target unit.
 -- If squad is specified, attacks only with the squad.
 ---@param target Unit Unit to attack.
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:AttackTarget(target, squad)
 end
@@ -20,7 +20,7 @@ end
 --- Orders platoon to attack mote to target position..
 -- If squad is specified, attack moves only with the squad.
 ---@param position Vector Table with position {x, y, z}.
----@param squad PlatoonSquadType?
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:AggressiveMoveToLocation(position, squad)
 end
@@ -153,8 +153,8 @@ end
 function CPlatoon:GetPlatoonLifetimeStats()
 end
 
---- Computes the average platoon position, returns {0,0,0} if the platoon has no units
----@return Vector
+--- Computes the average platoon position, returns nil if the platoon has no units
+---@return Vector?
 function CPlatoon:GetPlatoonPosition()
 end
 
@@ -252,7 +252,7 @@ end
 --- Orders platoon to patrol at target position.
 -- If squad is specified, patrols only with the squad.
 ---@param position Vector Table with position {x, y, z}.
----@param squad PlatoonSquadType
+---@param squad? PlatoonSquadType
 ---@return PlatoonCommand
 function CPlatoon:Patrol(position, squad)
 end

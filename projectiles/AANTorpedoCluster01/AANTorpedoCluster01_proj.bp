@@ -1,31 +1,17 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        EnterWater = Sound {
-            Bank = 'URAWeapon',
-            Cue = 'URA0204_Torpedo_Water',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        EnterWater  = Sound { Bank = 'URAWeapon', Cue = 'URA0204_Torpedo_Water',    LodCutoff = 'UnitMove_LodCutoff' },
+        Impact      = Sound { Bank = 'Impacts',   Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater = Sound { Bank = 'Impacts',   Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'ANTINAVY',
-        'TORPEDO',
-        'NOSPLASHDAMAGE'
+        "AEON",
+        "ANTINAVY",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TORPEDO",
     },
-    Defense = {
-        Health = 1,
-    },
+    Defense = { Health = 1 },
     DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
@@ -33,10 +19,10 @@ ProjectileBlueprint {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds',
-                    MeshName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm',
-                    ShaderName = 'TMeshGlow',
                     LODCutoff = 120,
+                    ShaderName = "TMeshGlow",
+                    MeshName = "/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm",
+                    AlbedoName = "/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds",
                 },
             },
         },
@@ -44,19 +30,17 @@ ProjectileBlueprint {
         UniformScale = 0.05,
     },
     General = {
-        Category = 'Anti Navy',
-        Faction = 'Aeon',
-        Weapon = 'Torpedo Cluster',
-        EntityCategory = {
-            'TORPEDO'
-        },
+        Category = "Anti Navy",
+        EntityCategory = { "TORPEDO" },
+        Faction = "Aeon",
+        Weapon = "Torpedo Cluster",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 0,
         DestroyOnWater = false,
+        FragmentId = "/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp",
+        Fragments = 2,
         Lifetime = 30,
         MaxSpeed = 20,
         RealisticOrdinance = false,

@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,10 +12,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'Floe_Floe_albedo.dds',
                     LODCutoff = 750,
-                    ShaderName = 'NormalMappedAlpha',
-                    SpecularName = 'Floe_Floe_specteam.dds',
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "Floe_Floe_albedo.dds",
+                    SpecularName = "Floe_Floe_specteam.dds",
                 },
             },
         },
@@ -26,15 +26,9 @@ PropBlueprint {
         ReclaimMassMax = 200,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Floe',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Floe" },
+    Physics = { BlockPath = true },
     SizeX = 12,
     SizeY = 1,
     SizeZ = 12,

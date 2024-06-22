@@ -1,8 +1,8 @@
-MeshBlueprint {
+MeshBlueprint{
     LODs = {
         {
-            ShaderName = 'GlassAlpha',
             LODCutoff = 1000,
+            ShaderName = "GlassAlpha",
         },
     },
     SortOrder = 1000,

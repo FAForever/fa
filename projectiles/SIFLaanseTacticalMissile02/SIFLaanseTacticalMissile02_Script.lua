@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
@@ -28,9 +27,9 @@ local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').Tacti
 ---@class SIFLaanseTacticalMissile02 : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
 
-    LaunchTicks = 16,
+    LaunchTicks = 9,
     LaunchTicksRange = 1,
-    LaunchTurnRate = 20,
+    LaunchTurnRate = 60,
     LaunchTurnRateRange = 1,
     HeightDistanceFactor = 8,
     HeightDistanceFactorRange = 0,
@@ -39,6 +38,10 @@ SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
+    TerminalSpeed = 20,
+    TerminalDistance = 15,
+
+    ---@param self SIFLaanseTacticalMissile02
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))

@@ -49,7 +49,7 @@ function UnitWeapon:ChangeMinRadius(minRadius)
 end
 
 --- Changes the projectile blueprint of a weapon
----@param projBp ProjectileBlueprint
+---@param projBp BlueprintId
 function UnitWeapon:ChangeProjectileBlueprint(projBp)
 end
 
@@ -60,6 +60,7 @@ end
 
 ---
 ---@param muzzlebone Bone
+---@return Projectile
 function UnitWeapon:CreateProjectile(muzzlebone)
 end
 

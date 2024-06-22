@@ -6,50 +6,130 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+---@class AILobbyProperties
+---@field key string
+---@field name string
+---@field rating? number
+---@field ratingCheatMultiplier? number
+---@field ratingBuildMultiplier? number
+---@field ratingMapMultiplier? number[]
+---@field ratingOmniBonus? number
+---@field ratingNegativeThreshold? number
+
 function GetAItypes()
     --Table of AI Names to return
     local aitypes = {
         {
             key = 'easy',
             name = "<LOC lobui_0347>AI: Easy",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 200,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'medium',
             name = "<LOC lobui_0349>AI: Normal",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 300,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'adaptive',
             name = "<LOC lobui_0368>AI: Adaptive",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 450,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'rush',
             name = "<LOC lobui_0360>AI: Rush",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 450,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'turtle',
             name = "<LOC lobui_0372>AI: Turtle",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 450,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'tech',
             name = "<LOC lobui_0370>AI: Tech",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 450,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'random',
             name = "<LOC lobui_0374>AI: Random",
-            requiresNavMesh = true,
-            baseAI = true,
+
+            rating = 500,
+            ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
+            ratingOmniBonus = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         }
     }
 
@@ -84,9 +164,9 @@ function GetAItypes()
     -- loop over all installed mods
     for Index, ModData in simMods do
         -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
-        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+        if exists(ModData.location .. '/lua/AI/CustomAIs_v2') then
             -- get all AI files from CustomAIs_v2 folder
-            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            ModAIFiles = DiskFindFiles(ModData.location .. '/lua/AI/CustomAIs_v2', '*.lua')
             -- check, if we have found at least 1 file
             if ModAIFiles[1] then
                 -- loop over all AI files
@@ -106,11 +186,96 @@ function GetAItypes()
     end
 
     --Default GPG Cheating AIs
-    table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive", requiresNavMesh = true, baseAI = true })
-    table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush", requiresNavMesh = true, baseAI = true })
-    table.insert(aitypes, { key = 'turtlecheat', name = "<LOC lobui_0384>AIx: Turtle", requiresNavMesh = true,  baseAI = true})
-    table.insert(aitypes, { key = 'techcheat', name = "<LOC lobui_0385>AIx: Tech", requiresNavMesh = true, baseAI = true })
-    table.insert(aitypes, { key = 'randomcheat', name = "<LOC lobui_0395>AIx: Random", requiresNavMesh = true, baseAI = true })
+    table.insert(aitypes,
+        {
+            key = 'adaptivecheat',
+            name = "<LOC lobui_0379>AIx: Adaptive",
+
+            rating = 450,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
+            ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
+        })
+    table.insert(aitypes,
+        {
+            key = 'rushcheat',
+            name = "<LOC lobui_0380>AIx: Rush",
+
+            rating = 450,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
+            ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
+        })
+    table.insert(aitypes,
+        {
+            key = 'turtlecheat',
+            name = "<LOC lobui_0384>AIx: Turtle",
+
+            rating = 450,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
+            ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
+        })
+    table.insert(aitypes,
+        {
+            key = 'techcheat',
+            name = "<LOC lobui_0385>AIx: Tech",
+
+            rating = 450,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
+            ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
+        })
+    table.insert(aitypes,
+        {
+            key = 'randomcheat',
+            name = "<LOC lobui_0395>AIx: Random",
+
+            rating = 550,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
+            ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
+        })
 
     --Load Custom Cheating AIs - old style
     for i, v in AIFilesold do
@@ -135,9 +300,9 @@ function GetAItypes()
     -- loop over all installed mods
     for Index, ModData in simMods do
         -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
-        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+        if exists(ModData.location .. '/lua/AI/CustomAIs_v2') then
             -- get all AI files from CustomAIs_v2 folder
-            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            ModAIFiles = DiskFindFiles(ModData.location .. '/lua/AI/CustomAIs_v2', '*.lua')
             -- check, if we have found at least 1 file
             if ModAIFiles[1] then
                 -- loop over all AI files

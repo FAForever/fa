@@ -25,6 +25,7 @@ UnitBlueprint{
     Categories = {
         "AMPHIBIOUS",
         "ANTINAVY",
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -44,6 +45,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "TECH2",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 3,
@@ -51,7 +53,6 @@ UnitBlueprint{
         EconomyThreatLevel = 95,
         Health = 6500,
         MaxHealth = 6500,
-        RegenRate = 0,
         SubThreatLevel = 10,
         SurfaceThreatLevel = 14,
     },
@@ -131,37 +132,39 @@ UnitBlueprint{
         },
         MovementEffects = {
             Land = {
-                Footfall = {
-                    Bones = {
-                        {
-                            FootBone = "Exhaust_Leg_L01",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_L02",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_L03",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R01",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R02",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R03",
-                            Scale = 0.58,
-                            Type = "FootFall01",
+                Effects = {
+                    Footfall = {
+                        Bones = {
+                            {
+                                FootBone = "Exhaust_Leg_L01",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_L02",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_L03",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R01",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R02",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R03",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
                         },
                     },
                 },
@@ -212,17 +215,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "amph",
@@ -236,26 +233,17 @@ UnitBlueprint{
         UnitName = "<LOC urs0201_name>Salem Class",
     },
     Intel = {
-        RadarRadius = 35,
-        SonarRadius = 37,
+        RadarRadius = 36,
+        SonarRadius = 32,
         VisionRadius = 32,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.8,
     LifeBarSize = 1.5,
     Physics = {
         AltMotionType = "RULEUMT_Water",
-        BackUpDistance = 5,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BackUpDistance = 10,
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         LandSpeedMultiplier = 0.5,
@@ -266,7 +254,6 @@ UnitBlueprint{
         MaxSpeed = 5,
         MaxSpeedReverse = 5,
         MaxSteerForce = 5,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_AmphibiousFloating",
         TurnRadius = 15,
         TurnRate = 50,
@@ -330,7 +317,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 130,
             TargetPriorities = {
@@ -394,7 +381,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -455,7 +442,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
             TargetPriorities = {
@@ -483,7 +470,7 @@ UnitBlueprint{
             },
             DisableWhileReloading = true,
             DisplayName = "Anti Torpedo Solution",
-            FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
+            FireTargetLayerCapsTable = { Water = "Water" },
             FiringTolerance = 2,
             Label = "AntiTorpedoF",
             MaxRadius = 30,
@@ -510,7 +497,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.26,
+            RateOfFire = 10/38, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
@@ -536,7 +523,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Water = true,

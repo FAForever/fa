@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,10 +12,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'cybran_dock_Albedo.dds',
-                    SpecName = 'cybran_dock_SpecTeam.dds',
                     LODCutoff = 750,
-                    ShaderName = 'Unit',
+                    ShaderName = "Unit",
+                    SpecName = "cybran_dock_SpecTeam.dds",
+                    AlbedoName = "cybran_dock_Albedo.dds",
                 },
             },
         },
@@ -26,15 +26,9 @@ PropBlueprint {
         ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Cybran Dock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Cybran Dock" },
+    Physics = { BlockPath = true },
     SizeX = 5,
     SizeY = 0.1,
     SizeZ = 3,

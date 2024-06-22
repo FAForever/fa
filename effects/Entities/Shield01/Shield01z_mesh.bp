@@ -1,12 +1,12 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 4,
     LODs = {
         {
-            MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
-            ShaderName = 'ShieldFill',
             LODCutoff = 1000,
+            ShaderName = "ShieldFill",
+            MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
         },
     },
-    IconFadeInZoom = 4,
     SortOrder = 999,
     StraddleWater = true,
 }
