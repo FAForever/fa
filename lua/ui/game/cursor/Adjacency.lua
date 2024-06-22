@@ -27,8 +27,6 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
-local CommandMode = import("/lua/ui/game/commandmode.lua")
-local GameOptions = Prefs.GetFromCurrentProfile('options')
 
 local BackgroundTextures = {
     land = '/textures/ui/common/icons/units/land_up.dds',
@@ -179,8 +177,6 @@ local function DrawUnitAdjacencyLabel(worldView, unit)
     unitAdjacencyLabel:SetUnitTexture(unit:GetBlueprint())
     unitAdjacencyLabel:SetPosition(worldView, unit)
     unitAdjacencyLabel:SetScale(worldView, unit)
-
-    LOG(table.getsize(UnitAdjacencyLabels))
 end
 
 ---@param unit UserUnit
