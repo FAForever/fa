@@ -1146,23 +1146,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             else
                 Weapon.OnLostTarget(self)
 
-                -- Deal with the rack firing sequence
-                if self.CurrentRackSalvoNumber > self.NumRackBones then
-                    self.CurrentRackSalvoNumber = 1
-
-                    if bp.RackSalvoReloadTime > 0 then
-                        ChangeState(self, self.RackSalvoReloadState)
-                    elseif bp.WeaponUnpacks then
-                        ChangeState(self, self.WeaponPackingState)
-                    else
-                        ChangeState(self, self.IdleState)
-                    end
-                else
-                    if bp.WeaponUnpacks then
-                        ChangeState(self, self.WeaponPackingState)
-                    else
-                        ChangeState(self, self.IdleState)
-                    end
+                if self.Blueprint.WeaponUnpacks then
+                    ChangeState(self, self.WeaponPackingState)
                 end
             end
         end,
