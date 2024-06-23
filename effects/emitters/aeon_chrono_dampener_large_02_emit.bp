@@ -11,7 +11,7 @@ EmitterBlueprint {
 	AlignToBone = false,
 	Flat = true,
 	LODCutoff = 250.00,
-	EmitIfVisible = true,
+	EmitIfVisible = false,
 	CatchupEmit = true,
 	CreateIfVisible = false,
 	SnapToWaterline = false,
@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/ring_white_06.dds]],
-	RampTexture = [[/textures/particles/ramp_chrono_dampener.dds]],
+	Texture = '/textures/particles/ring_white_06.dds',
+	RampTexture = '/textures/particles/ramp_chrono_dampener.dds',
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
