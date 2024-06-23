@@ -1,13 +1,13 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    MeshName = '/meshes/generic/cube01_lod0.scm',
-                    ShaderName = 'TMeshGlow',
-                    AlbedoName = '/meshes/generic/cube01_albedo.dds',
-                    SpecularName =  '/meshes/generic/cube01_specteam.dds',
                     LODCutoff = 300,
+                    ShaderName = "TMeshGlow",
+                    MeshName = "/meshes/generic/cube01_lod0.scm",
+                    AlbedoName = "/meshes/generic/cube01_albedo.dds",
+                    SpecularName = "/meshes/generic/cube01_specteam.dds",
                 },
             },
         },

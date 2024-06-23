@@ -1,13 +1,13 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
-                    ShaderName = 'NukeEMP',
-                    AlbedoName = 'EMPFluxWarheadEffect03_Albedo.dds',
-                    NormalsName = 'EMPFluxWarheadEffect03_Alpha.dds',
                     LODCutoff = 1000.0,
+                    ShaderName = "NukeEMP",
+                    MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
+                    AlbedoName = "EMPFluxWarheadEffect03_Albedo.dds",
+                    NormalsName = "EMPFluxWarheadEffect03_Alpha.dds",
                 },
             },
         },

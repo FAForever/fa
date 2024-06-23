@@ -1,4 +1,4 @@
-ProjectileBlueprint {  
+ProjectileBlueprint{
     Physics = {
         BounceVelDamp = 0.5,
         CollideEntity = false,

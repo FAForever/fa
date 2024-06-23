@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,24 +12,20 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    AlbedoName = "GreenCrystal01_albedo.dds",
                     LODCutoff = 500,
-                    ShaderName = 'NormalMappedTerrain',
-                    
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "GreenCrystal01_albedo.dds",
                 },
             },
         },
-        UniformScale = 0.250,
+        UniformScale = 0.25,
     },
     Economy = {
         ReclaimEnergyMax = 0,
         ReclaimMassMax = 40,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Crystal Formation',
-    },
+    Interface = { HelpText = "Crystal Formation" },
     SizeX = 2,
     SizeY = 2.25,
     SizeZ = 3,

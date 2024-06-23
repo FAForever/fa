@@ -1,17 +1,17 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
-        MeshBlueprint = '/effects/Nuke/Shockwave01_mesh.bp',
-        UniformScale = 0.0000001,
+        MeshBlueprint = "/effects/Nuke/Shockwave01_mesh.bp",
+        UniformScale = 1e-007,
     },
     Physics = {
-        MinBounceCount = 10000,
-        MaxBounceCount = 10000,
         BounceVelDamp = 1,
         DestroyOnWater = false,
         InitialSpeed = 10,
         InitialSpeedRange = 0,
         Lifetime = 30,
+        MaxBounceCount = 10000,
         MaxSpeed = 100,
+        MinBounceCount = 10000,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0.5,
         TurnRate = 0,

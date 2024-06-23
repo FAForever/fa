@@ -1,28 +1,26 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'PROJECTILE',
-        'TACTICAL',
-        'MISSILE',
-        'INDIRECTFIRE',
-        'UEF',
+        "INDIRECTFIRE",
+        "MISSILE",
+        "PROJECTILE",
+        "TACTICAL",
+        "UEF",
     },
     Display = {
-        MeshBlueprint = '/meshes/projectiles/missile_cruise01_mesh.bp',
+        MeshBlueprint = "/meshes/projectiles/missile_cruise01_mesh.bp",
         StrategicIconSize = 2,
         UniformScale = 0.4,
     },
     General = {
         EntityCategory = {
-            'PROJECTILE',
-            'TACTICAL',
-            'MISSILE',
-            'INDIRECTFIRE',
-            'UEF',
+            "PROJECTILE",
+            "TACTICAL",
+            "MISSILE",
+            "INDIRECTFIRE",
+            "UEF",
         },
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 0.25,
         DestroyOnWater = true,

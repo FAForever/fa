@@ -1,6 +1,6 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
-        MeshBlueprint = 'Stem01_mesh.bp',
+        MeshBlueprint = "Stem01_mesh.bp",
         UniformScale = 0.15,
     },
     Physics = {

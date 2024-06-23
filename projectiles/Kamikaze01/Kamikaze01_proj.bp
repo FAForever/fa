@@ -1,4 +1,4 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Physics = {
         Acceleration = 500,
         DestroyOnWater = true,

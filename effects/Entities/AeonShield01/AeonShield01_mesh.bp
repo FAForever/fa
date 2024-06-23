@@ -1,15 +1,15 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 4,
     LODs = {
         {
-            MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
-            AlbedoName = 'AeonShield01_Albedo.dds',
-            NormalsName = 'AeonShield01_Normals.dds',
-            SpecularName = 'AeonShield01_Specular.dds',
-            ShaderName = 'ShieldAeon',
             LODCutoff = 1000,
+            ShaderName = "ShieldAeon",
+            MeshName = "/effects/Entities/Sphere01/Sphere01_lod0.scm",
+            AlbedoName = "AeonShield01_Albedo.dds",
+            NormalsName = "AeonShield01_Normals.dds",
+            SpecularName = "AeonShield01_Specular.dds",
         },
     },
-    IconFadeInZoom = 4,
     SortOrder = 1000,
     StraddleWater = true,
 }

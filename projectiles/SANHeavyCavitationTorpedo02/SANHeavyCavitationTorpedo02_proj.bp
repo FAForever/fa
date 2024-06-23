@@ -1,50 +1,33 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'UEF_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'UEF_Expl_Med_Impact',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_UEF',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'SERAPHIM',
-        'PROJECTILE',
-        'ANTINAVY',
-        'TORPEDO',
-        'NOSPLASHDAMAGE',
-        'UNTARGETABLE',
+        "ANTINAVY",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "SERAPHIM",
+        "TORPEDO",
+        "UNTARGETABLE",
     },
-    Defense = {
-        Health = 1,
-    },
+    Defense = { Health = 1 },
     DesiredShooterCap = 1,
     Display = {
-        ImpactEffects = {
-            Type = 'Small01',
-        },
+        ImpactEffects = { Type = "Small01" },
         StrategicIconSize = 1,
     },
     General = {
-        Category = 'Anti Navy',
-        Faction = 'Seraphim',
+        Category = "Anti Navy",
+        Faction = "Seraphim",
         TechLevel = 1,
-        Weapon = 'Heavy Cavitation Torpedo',
+        Weapon = "Heavy Cavitation Torpedo",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
+        AccelerationRange = 2,
         DestroyOnWater = false,
         InitialSpeed = 5,
         Lifetime = 10,
@@ -52,11 +35,8 @@ ProjectileBlueprint {
         StayUnderwater = true,
         TrackTarget = true,
         TurnRate = 200,
+        TurnRateRange = 10,
         UseGravity = false,
         VelocityAlign = true,
-
-        -- these parameters make the path of the torpedo feel unique
-        AccelerationRange = 2,
-        TurnRateRange = 10,
     },
 }
