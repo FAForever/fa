@@ -54,19 +54,22 @@ AAMSaintWeapon = import('/lua/sim/weapons/aeon/AAMSaintWeapon.lua').AAMSaintWeap
 AAMWillOWisp = import('/lua/sim/weapons/aeon/AAMWillOWisp.lua').AAMWillOWisp
 ADFCannonOblivionNaval = import('/lua/sim/weapons/aeon/ADFCannonOblivionNaval.lua').ADFCannonOblivionNaval
 
---- kept for mod backwards compatibility
-local PhasonLaserCollisionBeam = import("/lua/defaultcollisionbeams.lua").PhasonLaserCollisionBeam
-local DisruptorBeamCollisionBeam = import("/lua/defaultcollisionbeams.lua").DisruptorBeamCollisionBeam
-local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+--#region kept for mod backwards compatibility
 local BareBonesWeapon = import("/lua/sim/defaultweapons.lua").BareBonesWeapon
-local EffectUtil = import("/lua/effectutilities.lua")
-local QuantumBeamGeneratorCollisionBeam = import("/lua/defaultcollisionbeams.lua").QuantumBeamGeneratorCollisionBeam
-local TractorClawCollisionBeam = import("/lua/defaultcollisionbeams.lua").TractorClawCollisionBeam
-local utilities = import('/lua/utilities.lua')
-local Explosion = import("/lua/defaultexplosions.lua")
 local KamikazeWeapon = import("/lua/sim/defaultweapons.lua").KamikazeWeapon
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
+local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
+local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
+local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
+
+local EffectUtil = import("/lua/effectutilities.lua")
+local utilities = import('/lua/utilities.lua')
+local Explosion = import("/lua/defaultexplosions.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
 local Weapon = import("/lua/sim/weapon.lua").Weapon
+--#endregion
