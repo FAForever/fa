@@ -57,6 +57,7 @@ ADFCannonOblivionNaval = import('/lua/sim/weapons/aeon/ADFCannonOblivionNaval.lu
 --- kept for mod backwards compatibility
 local PhasonLaserCollisionBeam = import("/lua/defaultcollisionbeams.lua").PhasonLaserCollisionBeam
 local DisruptorBeamCollisionBeam = import("/lua/defaultcollisionbeams.lua").DisruptorBeamCollisionBeam
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local BareBonesWeapon = import("/lua/sim/defaultweapons.lua").BareBonesWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local QuantumBeamGeneratorCollisionBeam = import("/lua/defaultcollisionbeams.lua").QuantumBeamGeneratorCollisionBeam
