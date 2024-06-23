@@ -320,7 +320,7 @@ PlatoonTemplate {
             { 'uel0203', 1, 1, 'attack', 'none' }
         },
         Aeon = {
-            { 'ual0201', 1, 1, 'attack', 'none' }
+            { 'xal0203', 1, 1, 'attack', 'none' }
         },
         Cybran = {
             { 'url0203', 1, 1, 'attack', 'none' }
