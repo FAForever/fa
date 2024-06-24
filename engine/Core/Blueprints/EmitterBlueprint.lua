@@ -1,44 +1,52 @@
 ---@meta
 
+---@alias BlendType
+---| '0' # Alpha Blend
+---| '1' # Modulate Inverse
+---| '2' # Modulate2x Inverse
+---| '3' # Add
+---| '4' # Premodulated Alpha
+---| '5' # Refract
+
 ---@class EmitterBlueprint : EffectBlueprint
----@field SizeCurve             EffectCurve  Size of emitter over time
----@field XDirectionCurve       EffectCurve  X direction
----@field YDirectionCurve       EffectCurve  Y direction
----@field ZDirectionCurve       EffectCurve  Z direction
----@field EmitRateCurve         EffectCurve
----@field LifetimeCurve         EffectCurve
----@field VelocityCurve         EffectCurve
----@field XAccelCurve           EffectCurve
----@field YAccelCurve           EffectCurve
----@field ZAccelCurve           EffectCurve
----@field ResistanceCurve       EffectCurve  drag coefficient (actually, the drag coefficient divied by the mass)
----@field StartSizeCurve        EffectCurve
----@field EndSizeCurve          EffectCurve
----@field InitialRotationCurve  EffectCurve
----@field RotationRateCurve     EffectCurve
----@field FrameRateCurve        EffectCurve
----@field TextureSelectionCurve EffectCurve
----@field XPosCurve             EffectCurve  X Offset Curve
----@field YPosCurve             EffectCurve  Y Offset Curve
----@field ZPosCurve             EffectCurve  Z Offset Curve
----@field RampSelectionCurve    EffectCurve
----@field LocalVelocity         boolean      Is velocity attached to bone
----@field LocalAcceleration     boolean      Is acceleration attached to bone
----@field Gravity               boolean      Gravity enabled?
+---@field SizeCurve             EffectCurve  Radius around emitter in the XZ plane where particles randomly spawn
+---@field XDirectionCurve       EffectCurve  X multiplier of "Velocity" (actually speed)
+---@field YDirectionCurve       EffectCurve  Y multiplier of "Velocity" (actually speed)
+---@field ZDirectionCurve       EffectCurve  Z multiplier of "Velocity" (actually speed)
+---@field EmitRateCurve         EffectCurve  How many particles per second are emitted
+---@field LifetimeCurve         EffectCurve  Lifetime of particle
+---@field VelocityCurve         EffectCurve  Speed of particle in ogrids/tick
+---@field XAccelCurve           EffectCurve  X Acceleration of particle in ogrids/tick/tick
+---@field YAccelCurve           EffectCurve  Y Acceleration of particle in ogrids/tick/tick
+---@field ZAccelCurve           EffectCurve  Z Acceleration of particle in ogrids/tick/tick
+---@field ResistanceCurve       EffectCurve  drag coefficient (actually, the drag coefficient divided by the mass)
+---@field StartSizeCurve        EffectCurve	 Particle scale at start of its lifetime
+---@field EndSizeCurve          EffectCurve  Particle scale at end of its lifetime
+---@field InitialRotationCurve  EffectCurve  Initial rotation of particle in degrees
+---@field RotationRateCurve     EffectCurve  Degrees/second
+---@field FrameRateCurve        EffectCurve  Frames/second
+---@field TextureSelectionCurve EffectCurve  Which texture strip is selected for the particle.
+---@field XPosCurve             EffectCurve  X position of emitter
+---@field YPosCurve             EffectCurve  Y position of emitter
+---@field ZPosCurve             EffectCurve  Z position of emitter
+---@field RampSelectionCurve    EffectCurve  Vertical 1px line of the ramp that is used. Value is [0,1] relative to the full height of the ramp texture.
+---@field LocalVelocity         boolean      Is velocity attached to bone. Doesn't work?
+---@field LocalAcceleration     boolean      Is acceleration attached to bone. Doesn't work?
+---@field Gravity               boolean      Gravity enabled? -4.9 ogrids/s/s
 ---@field AlignRotation         boolean      Align the rotation of the particle with direction?
 ---@field AlignToBone           boolean      Align the intitial rotation of the particle to the bone
----@field ParticleResistance    boolean      true to enable the use of drag on a particle
+---@field ParticleResistance    boolean      true to enable the use of drag on a particle. Changes take effect only on restart?
 ---@field CreateIfVisible       boolean      when this emitter is initially created only create and emit if visible
 ---@field Flat                  boolean      Make the particles flat in world space.
 ---@field InterpolateEmission   boolean      Interpolate emission over tick
 ---@field SnapToWaterline       boolean      Snap underwater emission to the waterline
 ---@field OnlyEmitOnWater       boolean      Only emit if over water
----@field TextureStripcount     number       Number of strips in the animated texture
+---@field TextureStripcount     number       How many rows (strips) to divide the texture into for selection by `TextureSelectionCurve`.
 ---@field SortOrder             number       Sort order of particles emitted
----@field Lifetime              number       Lifetime of emitter in ticks
----@field Distance              number       emission cuts out.
----@field Repeattime            number       Repeattime of emitter in ticks
----@field TextureFramecount     number       number of frames in texture we are using.
----@field Blendmode             number       Blendmode for this emitter.
----@field TextureName           string       Texture Name of texture we are using for this particle
----@field RampTexture           string       Name of ramp texture we are using for this particle
+---@field Lifetime              number       Lifetime of emitter in ticks. -1 is infinite.
+---@field LODCutoff             number       Distance at which emission cuts out.
+---@field Repeattime            number       Repeat/cycle time of the emitter in ticks
+---@field TextureFramecount     number       How many columns (frames) to divide the texture into for particle animation.
+---@field Blendmode             BlendType    Blendmode for this emitter.
+---@field TextureName           FileName     Texture Name of texture we are using for this particle
+---@field RampTexture           FileName     Name of ramp texture we are using for this particle
