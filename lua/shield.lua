@@ -224,7 +224,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
 
         -- lookup our damage absorption type's table
-        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[ownerBp.Defense.Shield.AbsorptionType or "Default"]
+        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[spec.AbsorptionType or "Default"]
 
         -- use trashbag of the unit that owns us
         self.Trash = self.Owner.Trash
