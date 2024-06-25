@@ -60,9 +60,9 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Normal",
         EconomyThreatLevel = 1046,
-        Health = 15500,
-        MaxHealth = 15500,
-        RegenRate = 15,
+        Health = 11500,
+        MaxHealth = 11500,
+        RegenRate = 12,
         SurfaceThreatLevel = 40,
     },
     Display = {
@@ -196,7 +196,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 30200,
         BuildCostMass = 2400,
-        BuildRate = 56,
+        BuildRate = 40,
         BuildTime = 14400,
         BuildableCategory = { "BUILTBYTIER3ENGINEER SERAPHIM" },
         MaxBuildDistance = 10,
@@ -584,7 +584,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 400,
+            Damage = 100,
             DamageType = "Normal",
             DisplayName = "Light Chronotron Cannon",
             FireTargetLayerCapsTable = {
@@ -903,6 +903,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Land = true },
+        WreckageLayers = { Land = true, Seabed = true },
     },
 }
