@@ -547,10 +547,11 @@ end
 
 ---@param command UserCommand
 local function OnReclaimIssued(command)
-    -- Area reclaim dragger, command mode only
-    if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
-    end
+    -- feature: area commands
+    -- -- Area reclaim dragger, command mode only
+    -- if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+    --     import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
+    -- end
 end
 
 ---@param command UserCommand
@@ -564,10 +565,11 @@ end
 
 ---@param command UserCommand
 local function OnAttackIssued(command)
-    -- Area attack dragger, command mode only
-    if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
-        import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
-    end
+    -- feature: area commands
+    -- -- Area attack dragger, command mode only
+    -- if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
+    --     import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
+    -- end
 end
 
 ---@param command UserCommand
