@@ -487,10 +487,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:SetMaintenanceConsumptionInactive()
             self:DisableUnitIntel('ToggleBit8', 'Cloak')
         end
-
-        if not self.MaintenanceConsumption then
-            self.ToggledOff = true
-        end
     end,
 
     ---@param self Unit
@@ -535,10 +531,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:PlayUnitAmbientSound('ActiveLoop')
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
-        end
-
-        if self.MaintenanceConsumption then
-            self.ToggledOff = false
         end
     end,
 
@@ -845,14 +837,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
-
-        -- Force me to move on to the guard properly when done
-        local guard = self:GetGuardedUnit()
-        if guard then
-            IssueToUnitClearCommands(self)
-            IssueReclaim({self}, target)
-            IssueGuard({self}, guard)
-        end
 
         -- add state to be able to show the amount reclaimed in the UI
         if target.IsProp then
@@ -1323,12 +1307,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         if self.CanTakeDamage then
-            self:DoOnDamagedCallbacks(instigator)
 
             -- Pass damage to an active personal shield, as personal shields no longer have collisions
-            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
+            local myShield = self.MyShield
+            if myShield.ShieldType == "Personal" and myShield:IsUp() then
+                self:DoOnDamagedCallbacks(instigator)
                 self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
-            else
+            elseif damageType ~= "FAF_AntiShield" then
+                self:DoOnDamagedCallbacks(instigator)
                 self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
@@ -1755,7 +1741,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        local time  = time * 2
+        local time  = time / 2
 
         local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
 
@@ -2765,6 +2751,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 u:CheckAssistFocus()
             end
         end
+    end,
+
+    ---Called via hotkey to refocus any assisting engineers
+    ---@param self Unit
+    RefocusAssisters = function(self)
+        local engineerGuards = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
+        IssueClearCommands(engineerGuards)
+        IssueGuard(engineerGuards, self)
     end,
 
     ---@param self Unit
@@ -3958,8 +3952,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 duration = 1
             end
 
-            -- for units the energy and mass fields are ignored but they do need to exist or the engine burps
-            return duration, 0, 0
+            -- duration determines both unbuilt and built unit reclaim speed
+            -- energy and mass fields needed for unbuilt units to give back resources when reclaimed
+            return duration, buildEnergyCosts, buildMassCosts
         end
 
         return 0, 0, 0

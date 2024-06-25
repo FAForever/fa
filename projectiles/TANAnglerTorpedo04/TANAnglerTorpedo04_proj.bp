@@ -1,42 +1,32 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact      = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'ANTINAVY',
-        'TORPEDO',
-        'NOSPLASHDAMAGE',
+        "ANTINAVY",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TORPEDO",
+        "UEF",
     },
     Display = {
-        MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
+        MeshBlueprint = "/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.12,
     },
     General = {
-        Category = 'Anti Navy',
+        Category = "Anti Navy",
         EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'ANTINAVY',
-            'TORPEDO',
+            "UEF",
+            "PROJECTILE",
+            "ANTINAVY",
+            "TORPEDO",
         },
-        Faction = 'UEF',
-        Weapon = 'Angler Torpedo',
+        Faction = "UEF",
+        Weapon = "Angler Torpedo",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
         DestroyOnWater = false,
@@ -46,7 +36,7 @@ ProjectileBlueprint {
         StayUnderwater = true,
         TrackTarget = true,
         TurnRate = 230,
-        VelocityAlign = true,
         UseGravity = true,
+        VelocityAlign = true,
     },
 }

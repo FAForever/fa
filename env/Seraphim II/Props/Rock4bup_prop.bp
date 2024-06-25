@@ -1,7 +1,5 @@
-PropBlueprint {
-    Categories = {
-        'INVULNERABLE',
-    },
+PropBlueprint{
+    Categories = { "INVULNERABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -11,11 +9,11 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'Rock4b_albedo.dds',
                     LODCutoff = 3000,
-                    NormalsName = 'Rock4b_normalsTS.dds',
-                    ShaderName = 'NormalMappedAlpha',
-                    SpecularName = 'Rock4_specteam.dds',
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "Rock4b_albedo.dds",
+                    NormalsName = "Rock4b_normalsTS.dds",
+                    SpecularName = "Rock4_specteam.dds",
                 },
             },
         },
@@ -26,15 +24,9 @@ PropBlueprint {
         ReclaimMassMax = 1,
         ReclaimTime = 1,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Huge Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Huge Rock" },
+    Physics = { BlockPath = true },
     SizeX = 30,
     SizeY = 15,
     SizeZ = 24,

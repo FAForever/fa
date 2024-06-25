@@ -1,0 +1,1 @@
+- (#6277) Fix bombers never switching ground attack targets. They now switch to the next ground attack target after 3 tries (the default number).

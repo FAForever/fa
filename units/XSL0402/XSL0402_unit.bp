@@ -20,13 +20,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 100,
         MaxHealth = 100,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 667,
     },
     Display = {
@@ -89,19 +85,9 @@ UnitBlueprint{
     General = {
         CapCost = 0,
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Pause = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_Sacrifice = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "amph",
@@ -116,14 +102,6 @@ UnitBlueprint{
     Physics = {
         BackUpDistance = 4,
         BankingSlope = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         Elevation = 2.5,
         MaxAcceleration = 10,
@@ -203,7 +181,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             RequireTime = 0,
             SlavedToBody = true,
             TargetPriorities = { "ALLUNITS" },

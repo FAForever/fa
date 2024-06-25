@@ -45,17 +45,13 @@ UnitBlueprint {
         'OVERLAYDEFENSE',
         'SORTDEFENSE',
     },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'STRUCTURE',
         EconomyThreatLevel = 42,
         Health = 12000,
         MaxHealth = 12000,
-        RegenRate = 0,
         Shield = {
+            AbsorptionType = "StaticShield",
             ImpactEffects = 'AeonShieldHit01',
             ImpactMesh = '/effects/entities/ShieldSection01/ShieldSection01_mesh',
             Mesh = '/effects/entities/AeonShield01/AeonShield01_mesh',
@@ -69,8 +65,6 @@ UnitBlueprint {
             ShieldSize = 130,
             ShieldVerticalOffset = -40,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = '<LOC xac2101_desc>Aeon Palace',
     Display = {

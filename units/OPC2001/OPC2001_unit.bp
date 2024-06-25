@@ -9,7 +9,6 @@ UnitBlueprint {
         ArmorType = 'Normal',
         Health = 18000,
         MaxHealth = 18000,
-        RegenRate = 0,
     },
     Description = '<LOC opc2001_desc>OpC2 Temple',
     Display = {

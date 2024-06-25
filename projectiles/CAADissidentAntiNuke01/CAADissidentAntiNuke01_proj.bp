@@ -1,27 +1,23 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
+    Description = "CYBRAN Anti Nuclear Missile",
     Audio = {
-        Impact = Sound {
-            Bank = 'Explosions',
-            Cue = 'Expl_Anti_Nuke',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact = Sound { Bank = 'Explosions', Cue = 'Expl_Anti_Nuke', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'PROJECTILE',
-        'ANTIMISSILE',
-        'NOSPLASHDAMAGE',
-        'CYBRAN',
-        'DEFENSE',
-        'TECH3',
-        'KILLAIRONCOLLISION'
+        "ANTIMISSILE",
+        "CYBRAN",
+        "DEFENSE",
+        "KILLAIRONCOLLISION",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TECH3",
     },
-    Description = 'CYBRAN Anti Nuclear Missile',
     Display = {
         Mesh = {
             LODs = {
                 {
                     LODCutoff = 150,
-                    ShaderName = 'TMeshAlpha',
+                    ShaderName = "TMeshAlpha",
                 },
             },
         },
@@ -34,13 +30,11 @@ ProjectileBlueprint {
         BuildTime = 259200,
     },
     General = {
-        Category = 'Defense',
-        Faction = 'Cybran',
-        Weapon = 'EMP Anti Nuke',
+        Category = "Defense",
+        Faction = "Cybran",
+        Weapon = "EMP Anti Nuke",
     },
-    Interface = {
-        HelpText = 'CYBRAN Anti Nuclear Missile',
-    },
+    Interface = { HelpText = "CYBRAN Anti Nuclear Missile" },
     Physics = {
         Acceleration = 30,
         DestroyOnWater = false,
@@ -52,5 +46,5 @@ ProjectileBlueprint {
         UseGravity = false,
         VelocityAlign = true,
     },
-    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_strategic_antinuke.dds',
+    StrategicIconName = "/textures/ui/common/game/strategicicons/icon_strategic_antinuke.dds",
 }

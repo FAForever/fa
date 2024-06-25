@@ -1,0 +1,1 @@
+- (#6217) Clarify warning when Hotbuild hotkeys collide with other hotkeys.

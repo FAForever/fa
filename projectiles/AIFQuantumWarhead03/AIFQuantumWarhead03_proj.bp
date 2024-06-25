@@ -1,45 +1,29 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
+    Description = "AEON Nuclear Missile",
     Audio = {
-        ExistLoop = Sound {
-            Bank = 'UELWeapon',
-            Cue = 'UEF_Nuke_Flight',
-            LodCutoff = 'DefaultLodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'Aeon_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Explosions',
-            Cue = 'Aeon_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        NukeExplosion = Sound {
-            Bank = 'Explosions',
-            Cue = 'Aeon_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        ExistLoop     = Sound { Bank = 'UELWeapon',  Cue = 'UEF_Nuke_Flight',  LodCutoff = 'DefaultLodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Explosions', Cue = 'Aeon_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Explosions', Cue = 'Aeon_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        NukeExplosion = Sound { Bank = 'Explosions', Cue = 'Aeon_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'STRATEGIC',
-        'MISSILE',
-        'NOSPLASHDAMAGE',
-        'KILLAIRONCOLLISION',
+        "AEON",
+        "INDIRECTFIRE",
+        "KILLAIRONCOLLISION",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "STRATEGIC",
     },
     Defense = {
         Health = 25000,
         MaxHealth = 25000,
     },
-    Description = 'AEON Nuclear Missile',
     DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 5,
         CameraFollowsProjectile = true,
-        MeshBlueprint = '/projectiles/AIFQuantumWarhead01/AIFQuantumWarhead01_mesh.bp',
+        MeshBlueprint = "/projectiles/AIFQuantumWarhead01/AIFQuantumWarhead01_mesh.bp",
         UniformScale = 0.05,
     },
     Economy = {
@@ -48,12 +32,10 @@ ProjectileBlueprint {
         BuildTime = 324000,
     },
     General = {
-        Category = 'Missile',
-        Faction = 'Aeon',
+        Category = "Missile",
+        Faction = "Aeon",
     },
-    Interface = {
-        HelpText = 'AEON Nuclear Missile',
-    },
+    Interface = { HelpText = "AEON Nuclear Missile" },
     Physics = {
         Acceleration = 3,
         CollideEntity = false,
@@ -70,5 +52,5 @@ ProjectileBlueprint {
         UseGravity = false,
         VelocityAlign = true,
     },
-    StrategicIconName = '/textures/ui/common/game/unit-over/icon-nuke_bmp.dds',
+    StrategicIconName = "/textures/ui/common/game/unit-over/icon-nuke_bmp.dds",
 }

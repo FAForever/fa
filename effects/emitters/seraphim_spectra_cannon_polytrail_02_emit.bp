@@ -1,13 +1,11 @@
 TrailEmitterBlueprint {
-	BlueprintId = 'seraphim_spectra_cannon_polytrail_02',
-	Lifetime = -1.00,
-    TrailLength = .55,
+    BlendMode = 1,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_09.dds",
+    RepeatTexture = "/textures/particles/trail_white_02_blankmips.dds",
     Size = 0.06,
     SortOrder = 3,
-    BlendMode = 1,
     TextureRepeatRate = 1,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/trail_white_02_blankmips.dds',
-	RampTexture = '/textures/particles/ramp_trail_09.dds',
+    TrailLength = 0.55,
 }
-

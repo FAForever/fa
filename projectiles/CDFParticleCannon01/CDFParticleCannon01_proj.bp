@@ -1,25 +1,21 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'DIRECTFIRE',
+        "CYBRAN",
+        "DIRECTFIRE",
+        "PROJECTILE",
     },
-    Display = {
-        StrategicIconSize = 1,
-    },
+    Display = { StrategicIconSize = 1 },
     General = {
-        Category = 'Direct Fire',
+        Category = "Direct Fire",
         EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'DIRECTFIRE',
+            "CYBRAN",
+            "PROJECTILE",
+            "DIRECTFIRE",
         },
-        Faction = 'Cybran',
-        Weapon = 'Particle Cannon',
+        Faction = "Cybran",
+        Weapon = "Particle Cannon",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 15,

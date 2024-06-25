@@ -39,6 +39,8 @@
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
 ---@field Audio WeaponBlueprintAudio
+--- How many times the engine calls OnFire for the weapon when attacking ground before moving on to the next ground attack order. Defaults to 3
+---@field AttackGroundTries? number
 --- if the unit has no issued commands and has a weapon that has `AutoInitiateAttackCommand` set,
 --- then if it finds a suitable target it will issue an attack command to go after the target
 ---@field AutoInitiateAttackCommand? boolean
@@ -81,7 +83,7 @@
 ---@field DamageFriendly boolean
 --- blast radius
 ---@field DamageRadius number
---- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+--- how much additional damage is dealt to shields using the "FAF_AntiShield" damagetype
 ---@field DamageToShields? number
 --- the type of damage the unit will do
 ---@field DamageType DamageType
@@ -205,8 +207,8 @@
 --- if `NeedProp` is true then whenever the unit aquires a new target and is ready to attack it, it
 --- will first run the `OnGotTarget` script on the weapon
 ---@field NeedPrep? boolean
---- currently just sets `AlwaysRecheckTarget = false` so that bombers don't retarget halfway through
---- a bombing run
+--- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
+--- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
 --- if the unit is set as "busy" while the weapon charges
 ---@field NotExclusive? boolean

@@ -180,6 +180,25 @@ options = {
             },
 
             {
+                title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
+                key = 'invert_middle_mouse_button',
+                type = 'toggle',
+                default = 0,
+                update = function(control,value)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                set = function(key,value,startup)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0},
+                        {text = "<LOC _On>", key = 1},
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0158>Screen Edge Pans Main View",
                 key = 'screen_edge_pans_main_view',
                 type = 'toggle',
@@ -217,9 +236,9 @@ options = {
                     ConExecute("ui_KeyboardPanSpeed " .. tostring(value))
                 end,
                 custom = {
-                    min = 1,
-                    max = 200,
-                    inc = 0,
+                    min = 10,
+                    max = 400,
+                    inc = 10,
                 },
             },
             {

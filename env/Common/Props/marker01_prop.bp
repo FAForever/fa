@@ -1,11 +1,11 @@
-PropBlueprint {
+PropBlueprint{
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = '/env/common/props/marker01_albedo.dds',
-                    ShaderName = 'TMeshNoNormals',
+                    ShaderName = "TMeshNoNormals",
+                    AlbedoName = "/env/common/props/marker01_albedo.dds",
                 },
             },
         },
@@ -16,9 +16,7 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 0,
     },
-    Interface = {
-        HelpText = 'Marker for general use',
-    },
+    Interface = { HelpText = "Marker for general use" },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

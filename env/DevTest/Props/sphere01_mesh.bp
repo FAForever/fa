@@ -1,10 +1,5 @@
--- not used by faf
-MeshBlueprint {
+MeshBlueprint{
     LODs = {
-        {
---            ShaderName = 'Metal',
---            AlbedoName = '',
-            LODCutoff = 300,
-        },
+        { LODCutoff = 300 },
     },
 }

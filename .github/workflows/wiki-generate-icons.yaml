@@ -1,7 +1,28 @@
+# Copyright (c) 2024 Aaron 'relent0r' Warner
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 name: Wiki - generate unit icons
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
 
@@ -12,59 +33,41 @@ jobs:
           shell: bash
 
       steps:
-        # Checkout repos
-
-        # FA repo is sparse checkout as it is quite large and we dont won't to incur higher action minutes for no reason
-        - name: Checkout FAF Repository # -png folder doesnt exist yet, confirm location.
+        # https://github.com/actions/checkout/tree/v4/
+        - name: Checkout FAF Repository
           uses: actions/checkout@v4
           with:
-            path: ./fa
+            repository: FAForever/fa
+            ref: deploy/faf
             sparse-checkout: |
               wiki
               textures/ui/common/game/strategicicons
               textures/ui/common/icons/units
 
-        - name: Checkout FAF Wiki Repository
-          uses: actions/checkout@v4
-          with:
-            repository: FAForever/fa.wiki
-            path: ./fa.wiki
-
         - name: Install Image Magick
           run: |
             sudo apt-get install -y imagemagick
 
-        # copy strategic and unit icons and convert them to PNGs. Assume this should be going to the wiki location not the fa repo
-        - name: Convert Strategic Icons
-          working-directory: fa
+        - name: Prepare output folder
           run: |
-            wiki/icons-convert-strategic.sh
-            wiki/icons-convert-unit.sh
+            mkdir -p wiki/generated/units
+            mkdir -p wiki/generated/strategicicons
 
-        - name: Move Strategic Icons
+        - name: Convert icons
           run: |
-            mv -f fa/wiki/generated/strategicicons/*.png fa.wiki/icons/strategicicons
-            mv -f fa/wiki/generated/units/*.png fa.wiki/icons/units
+            mogrify -path "wiki/generated/units" -format png "textures/ui/common/icons/units/*.dds"
+            mogrify -path "wiki/generated/strategicicons" -format png "textures/ui/common/game/strategicicons/*.dds"
 
-        - name: Upload as artifact
+        # https://github.com/actions/upload-artifact/tree/v4/
+        - name: Upload unit icons
           uses: actions/upload-artifact@v4
           with:
-            name: Wiki
-            path: fa.wiki
-      
-        # - name: Store the game version
-        #   id: gameVersionJSON # but it is a string here!
-        #   working-directory: app/data
-        #   run: |
-        #       json=`cat ./version.json`
-        #       echo "json=$json" >> $GITHUB_OUTPUT
+            name: fa-unit-icons
+            path: wiki/generated/units
 
-        # - name: Update Wiki repository # but it is a string here!
-        #   working-directory: fa.wiki
-        #   run: |
-        #       git config user.email "administrator@faforever.com"
-        #       git config user.name "FAForever"
-
-        #       git stage .
-        #       git commit -m "Update generated data to game version ${{ fromJson(steps.gameVersionJSON.outputs.json).version}}"
-        #       git push origin HEAD:master
+        # https://github.com/actions/upload-artifact/tree/v4/
+        - name: Upload strategic icons
+          uses: actions/upload-artifact@v4
+          with:
+            name: fa-strategic-icons
+            path: wiki/generated/strategicicons
