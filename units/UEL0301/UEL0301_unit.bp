@@ -255,6 +255,7 @@ UnitBlueprint{
         },
     },
     Enhancements = {
+        -- Left Upgrade
         AdvancedCoolingUpgrade = {
             BuildCostEnergy = 44700,
             BuildCostMass = 1000,
@@ -279,6 +280,35 @@ UnitBlueprint{
             },
             Slot = "LCH",
         },
+        SensorRangeEnhancer = {
+            BuildCostEnergy = 20000,
+            BuildCostMass = 600,
+            BuildTime = 3000,
+            Icon = "sre",
+            Name = "<LOC enhancements_0071>Enhanced Sensor System",
+            NewOmniRadius = 80,
+            NewVisionRadius = 45,
+            ShowBones = { "SAM" },
+            Slot = "LCH",
+            UpgradeEffectBones = { "SAM" },
+            UpgradeUnitAmbientBones = { "UEL0301" },
+        },
+        SensorRangeEnhancerRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "SAM" },
+            Icon = "sre",
+            Name = "<LOC enhancements_0072>Remove Enhanced Sensor System",
+            Prerequisite = "SensorRangeEnhancer",
+            RemoveEnhancements = {
+                "SensorRangeEnhancer",
+                "SensorRangeEnhancerRemove",
+            },
+            Slot = "LCH",
+        },
+
+        -- Right Upgrade
         HighExplosiveOrdnance = {
             BuildCostEnergy = 30000,
             BuildCostMass = 800,
@@ -311,6 +341,35 @@ UnitBlueprint{
             },
             Slot = "RCH",
         },
+        ResourceAllocation = {
+            BuildCostEnergy = 90000,
+            BuildCostMass = 4500,
+            BuildTime = 8400,
+            Icon = "isb",
+            Name = "<LOC enhancements_0069>Resource Allocation System",
+            ProductionPerSecondEnergy = 1000,
+            ProductionPerSecondMass = 10,
+            ShowBones = { "SAM" },
+            Slot = "RCH",
+            UpgradeEffectBones = { "SAM" },
+            UpgradeUnitAmbientBones = { "UEL0301" },
+        },
+        ResourceAllocationRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "SAM" },
+            Icon = "isb",
+            Name = "<LOC enhancements_0070>Remove Resource Allocation System",
+            Prerequisite = "ResourceAllocation",
+            RemoveEnhancements = {
+                "ResourceAllocation",
+                "ResourceAllocationRemove",
+            },
+            Slot = "RCH",
+        },
+
+        -- Back Upgrade
         Pod = {
             BuildCostEnergy = 8700,
             BuildCostMass = 380,
@@ -360,60 +419,6 @@ UnitBlueprint{
                 "RadarJammerRemove",
             },
             Slot = "Back",
-        },
-        ResourceAllocation = {
-            BuildCostEnergy = 90000,
-            BuildCostMass = 4500,
-            BuildTime = 8400,
-            Icon = "isb",
-            Name = "<LOC enhancements_0069>Resource Allocation System",
-            ProductionPerSecondEnergy = 1000,
-            ProductionPerSecondMass = 10,
-            ShowBones = { "SAM" },
-            Slot = "RCH",
-            UpgradeEffectBones = { "SAM" },
-            UpgradeUnitAmbientBones = { "UEL0301" },
-        },
-        ResourceAllocationRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "SAM" },
-            Icon = "isb",
-            Name = "<LOC enhancements_0070>Remove Resource Allocation System",
-            Prerequisite = "ResourceAllocation",
-            RemoveEnhancements = {
-                "ResourceAllocation",
-                "ResourceAllocationRemove",
-            },
-            Slot = "RCH",
-        },
-        SensorRangeEnhancer = {
-            BuildCostEnergy = 20000,
-            BuildCostMass = 600,
-            BuildTime = 3000,
-            Icon = "sre",
-            Name = "<LOC enhancements_0071>Enhanced Sensor System",
-            NewOmniRadius = 80,
-            NewVisionRadius = 45,
-            ShowBones = { "SAM" },
-            Slot = "LCH",
-            UpgradeEffectBones = { "SAM" },
-            UpgradeUnitAmbientBones = { "UEL0301" },
-        },
-        SensorRangeEnhancerRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "SAM" },
-            Icon = "sre",
-            Name = "<LOC enhancements_0072>Remove Enhanced Sensor System",
-            Prerequisite = "SensorRangeEnhancer",
-            RemoveEnhancements = {
-                "SensorRangeEnhancer",
-                "SensorRangeEnhancerRemove",
-            },
-            Slot = "LCH",
         },
         Shield = {
             BuildCostEnergy = 100200,
@@ -495,6 +500,8 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
+
+
         Slots = {
             Back = {
                 name = "<LOC _Back>",
