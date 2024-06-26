@@ -42,8 +42,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Structure",
         EconomyThreatLevel = 440,
-        Health = 5000,
-        MaxHealth = 5000,
+        Health = 7500,
+        MaxHealth = 7500,
     },
     Display = {
         BlinkingLights = {
