@@ -22,5 +22,57 @@
 
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
 
+---Because the rally point orders are applied after 1 tick, we need
+---to wait 1 tick before clearing them and adding our own
+---@param unit Unit
+---@param rollOffPoint Vector
+---@param assistTarget Unit
+local AssistOverrideThread = function(unit, rollOffPoint, assistTarget)
+    WaitTicks(1)
+    if unit.Dead or assistTarget.Dead then
+        return
+    end
+    IssueToUnitClearCommands(unit)
+    IssueToUnitMove(unit, rollOffPoint)
+    IssueGuard({unit}, assistTarget)
+end
+
 ---@class LandFactoryUnit : FactoryUnit
-LandFactoryUnit = ClassUnit(FactoryUnit) {}
+LandFactoryUnit = ClassUnit(FactoryUnit) {
+
+        ---@param self LandFactoryUnit
+        ---@param unitBeingBuilt Unit
+        ---@param order string
+        OnStopBuild = function(self, unitBeingBuilt, order)
+            local guardTarget = self:GetGuardedUnit()
+            if guardTarget then
+                if EntityCategoryContains(categories.FACTORY * categories.AIR, guardTarget) then
+                    if not EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
+                        unitBeingBuilt.autoLoadTarget = guardTarget
+                    end
+                end
+            end
+            FactoryUnit.OnStopBuild(self, unitBeingBuilt, order)
+        end,
+
+        ---We need to override our roll off function to point directly to
+        ---the location of the factory we are assisting, not its rally point
+        ---@param self LandFactoryUnit
+        RollOffUnit = function(self)
+
+            local unitBeingBuilt = self.UnitBeingBuilt
+            if not unitBeingBuilt then
+                return
+            end
+
+            local autoLoadTarget = unitBeingBuilt.autoLoadTarget
+            if autoLoadTarget then
+                local rollOffPoint = self.RollOffPoint
+                unitBeingBuilt.autoLoadTarget = nil
+                _, rollOffPoint.x, rollOffPoint.y, rollOffPoint.z = self:CalculateRollOffPoint(autoLoadTarget:GetPosition())
+                ForkThread(AssistOverrideThread, unitBeingBuilt, rollOffPoint, autoLoadTarget)
+            else
+                FactoryUnit.RollOffUnit(self)
+            end
+        end,
+}
