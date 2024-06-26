@@ -41,6 +41,9 @@ local TableHash = table.hash
 
 local StringFormat = string.format
 
+local Prefs = import("/lua/user/prefs.lua")
+UseIngametemplates = Prefs.GetFromCurrentProfile('options.gui_template_merge_context_ingame')
+
 -------------------------------------------------------------------------------
 --#region Debugging
 
@@ -57,10 +60,46 @@ end
 --#endregion
 
 -------------------------------------------------------------------------------
+--#region ingame Template conversion
+local TemplatesHelper = import("/lua/ui/game/build_templates.lua")
+-- function to convert in game templates to context based templates
+function loadUserTemplates(ConvertedTemplates)
+    UserTemplates = TemplatesHelper.GetTemplates()
+    -- clear table for reuse
+    for k,_ in ConvertedTemplates do
+        ConvertedTemplates[k] = nil
+    end
+    if UserTemplates then
+        for k = 1, TableGetn(UserTemplates) do
+            local template = {TemplateData = UserTemplates[k].templateData, TemplateSortingOrder = k, Name = UserTemplates[k].name, TriggersOnLand = true, TriggersOnWater = true,}
+            ConvertedTemplates[k] = template
+        end
+    end
+end
+---@type ContextBasedTemplate[]
+ConvertedTemplates = {}
+loadUserTemplates(ConvertedTemplates)
+-- hook into add/remove/rename templates function to rebuild local conversion table when templates are added/removed/renamed
+oldAddTemplate = TemplatesHelper.AddTemplate
+TemplatesHelper.AddTemplate = function (newTemplate)
+    oldAddTemplate(newTemplate)
+    loadUserTemplates(ConvertedTemplates)
+end
+
+oldRemoveTemplate = TemplatesHelper.RemoveTemplate
+TemplatesHelper.RemoveTemplate = function (templateID)
+    oldRemoveTemplate(templateID)
+    loadUserTemplates(ConvertedTemplates)
+end
+
+oldRenameTemplate = TemplatesHelper.RenameTemplate
+TemplatesHelper.RenameTemplate = function (templateID, name)
+    oldRenameTemplate(templateID, name)
+    loadUserTemplates(ConvertedTemplates)
+end
+--#endregion
+
 --#region Template discovery
-
--- convert all known templates
-
 ---@type table
 local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
@@ -312,25 +351,32 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
                 TableInsert(ContextBasedTemplates, template)
             elseif hydroDeposits > 0 and template.TriggersOnHydroDeposit then
                 TableInsert(ContextBasedTemplates, template)
-            elseif noDeposits and onLand and template.TriggersOnLand then
-                TableInsert(ContextBasedTemplates, template)
-            elseif noDeposits and (not onLand) and template.TriggersOnWater then
-                TableInsert(ContextBasedTemplates, template)
             end
         end
     end
 
     -- no templates to use, default to those that trigger on land or water
     if TableGetn(ContextBasedTemplates) == 0 then
-        for k = 1, TableGetn(Templates) do
-            local template = Templates[k]
-            local valid = ValidateTemplate(template, buildableUnits, prefix)
-            if valid then
-                if -- check conditions based on the context of the mouse
-                (template.TriggersOnLand and onLand) or
-                    (template.TriggersOnWater and (not onLand))
-                then
+        if not (UseIngametemplates == "off") then
+            for k = 1, TableGetn(ConvertedTemplates) do
+                local template = ConvertedTemplates[k]
+                local valid = ValidateTemplate(template, buildableUnits, prefix)
+                if valid then
                     TableInsert(ContextBasedTemplates, template)
+                end
+            end
+        end
+        if not (UseIngametemplates == "replace") then
+            for k = 1, TableGetn(Templates) do
+                local template = Templates[k]
+                local valid = ValidateTemplate(template, buildableUnits, prefix)
+                if valid then
+                    if -- check conditions based on the context of the mouse
+                    (template.TriggersOnLand and onLand) or
+                        (template.TriggersOnWater and (not onLand))
+                    then
+                        TableInsert(ContextBasedTemplates, template)
+                    end
                 end
             end
         end
