@@ -253,10 +253,12 @@ AirUnit = ClassUnit(MobileUnit) {
         local selfBlueprintCategoriesHashed = self.Blueprint.CategoriesHash
         local otherBlueprintCategoriesHashed = other.Blueprint.CategoriesHash
 
-        -- allow regular air units to be destroyed by the projectiles of SMDs and SMLs
-        if otherBlueprintCategoriesHashed["KILLAIRONCOLLISION"] and (not selfBlueprintCategoriesHashed["EXPERIMENTAL"]) then
-            self:Kill()
-            return false
+        -- allow regular air units and satellites to be destroyed by the projectiles of SMDs and SMLs
+        if otherBlueprintCategoriesHashed["KILLAIRONCOLLISION"] then
+	        if selfBlueprintCategoriesHashed["SATELLITE"] or not selfBlueprintCategoriesHashed["EXPERIMENTAL"] then
+                self:Kill()
+                return false
+            end
         end
 
         -- disallow ASF to intercept certain projectiles
