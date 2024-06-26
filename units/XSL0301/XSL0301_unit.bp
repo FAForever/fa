@@ -279,6 +279,7 @@ UnitBlueprint{
         },
     },
     Enhancements = {
+        -- Left Upgrade
         DamageStabilization = {
             BuildCostEnergy = 74300,
             BuildCostMass = 2300,
@@ -336,6 +337,65 @@ UnitBlueprint{
             },
             Slot = "LCH",
         },
+
+        -- Right Upgrade
+        Overcharge = {
+            BuildCostEnergy = 283500,
+            BuildCostMass = 4500,
+            BuildTime = 12600,
+            Icon = "oc",
+            Name = "<LOC enhancements_0139>Overcharge",
+            Slot = "RCH",
+            UpgradeEffectBones = {
+                "Right_Arm_Muzzle",
+                "Right_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        OverchargeRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "oc",
+            Name = "<LOC enhancements_0140>Remove Overcharge",
+            Prerequisite = "Overcharge",
+            RemoveEnhancements = {
+                "Overcharge",
+                "OverchargeRemove",
+            },
+            Slot = "RCH",
+        },
+        Teleporter = {
+            BuildCostEnergy = 1500000,
+            BuildCostMass = 15000,
+            BuildTime = 21000,
+            Icon = "pqt",
+            MaintenanceConsumptionPerSecondEnergy = 10000,
+            Name = "<LOC enhancements_0035>Personal Teleporter",
+            ShowBones = { "Back_Upgrade" },
+            Slot = "RCH",
+            UpgradeEffectBones = {
+                "Right_Arm_Muzzle",
+                "Right_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        TeleporterRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "Back_Upgrade" },
+            Icon = "pqt",
+            Name = "<LOC enhancements_0036>Remove Personal Teleporter",
+            Prerequisite = "Teleporter",
+            RemoveEnhancements = {
+                "Teleporter",
+                "TeleporterRemove",
+            },
+            Slot = "RCH",
+        },
+
+        -- Back Upgrade
         EnhancedSensors = {
             BuildCostEnergy = 32100,
             BuildCostMass = 650,
@@ -389,32 +449,6 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
-        Overcharge = {
-            BuildCostEnergy = 283500,
-            BuildCostMass = 4500,
-            BuildTime = 12600,
-            Icon = "oc",
-            Name = "<LOC enhancements_0139>Overcharge",
-            Slot = "RCH",
-            UpgradeEffectBones = {
-                "Right_Arm_Muzzle",
-                "Right_Arm_Barrel",
-            },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        OverchargeRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "oc",
-            Name = "<LOC enhancements_0140>Remove Overcharge",
-            Prerequisite = "Overcharge",
-            RemoveEnhancements = {
-                "Overcharge",
-                "OverchargeRemove",
-            },
-            Slot = "RCH",
-        },
         Shield = {
             BuildCostEnergy = 107500,
             BuildCostMass = 1050,
@@ -450,6 +484,8 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
+
+
         Slots = {
             Back = {
                 name = "<LOC _Back>",
@@ -466,35 +502,6 @@ UnitBlueprint{
                 x = -16,
                 y = 50,
             },
-        },
-        Teleporter = {
-            BuildCostEnergy = 1500000,
-            BuildCostMass = 15000,
-            BuildTime = 21000,
-            Icon = "pqt",
-            MaintenanceConsumptionPerSecondEnergy = 10000,
-            Name = "<LOC enhancements_0035>Personal Teleporter",
-            ShowBones = { "Back_Upgrade" },
-            Slot = "RCH",
-            UpgradeEffectBones = {
-                "Right_Arm_Muzzle",
-                "Right_Arm_Barrel",
-            },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        TeleporterRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "Back_Upgrade" },
-            Icon = "pqt",
-            Name = "<LOC enhancements_0036>Remove Personal Teleporter",
-            Prerequisite = "Teleporter",
-            RemoveEnhancements = {
-                "Teleporter",
-                "TeleporterRemove",
-            },
-            Slot = "RCH",
         },
     },
     General = {
