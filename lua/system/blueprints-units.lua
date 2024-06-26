@@ -223,6 +223,28 @@ local function PostProcessUnit(unit)
         end
     end
 
+    -- Build range overlay
+    -- only for engineers, excluding insignificant units such as Cybran build drones or air staging that has its own radius set
+    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT'] or unit.CategoriesHash['AIRSTAGINGPLATFORM']) then
+        -- guarantee that the table exists
+        if not unit.AI then unit.AI = {} end
+
+        -- Engine allows building +2 range outside the max distance (or even more for large buildings)
+        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+
+        -- Display auto-assist range for engineer stations instead of max build distance if it is smaller
+        if unit.CategoriesHash['ENGINEERSTATION'] then
+            local guardScanRadius = unit.AI.GuardScanRadius
+            if guardScanRadius < overlayRadius then
+                overlayRadius = guardScanRadius
+            end
+        end
+
+        unit.AI.StagingPlatformScanRadius = overlayRadius
+        table.insert(unit.Categories, 'OVERLAYMISC')
+        unit.CategoriesHash.OVERLAYMISC = true
+    end
+
     -- sanitize air unit footprints
 
     -- value used by formations to determine the distance between other air units. Note
