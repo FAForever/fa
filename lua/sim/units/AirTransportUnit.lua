@@ -79,7 +79,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param totalweight CargoWeight
     ---@param unit Unit
     CalculateSpeedMult = function(self)
-        local transportspeed = self:GetBlueprint().Air.MaxAirspeed
+        local transportspeed = self.Blueprint.Air.MaxAirspeed
         local totalweight = 0
         for _, unit in ipairs(self:GetCargo()) do
             totalweight = totalweight + unit.Blueprint.General.UnitWeight
