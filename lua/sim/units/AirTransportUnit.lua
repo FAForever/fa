@@ -81,7 +81,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     CalculateSpeedMult = function(self)
         local transportspeed = self.Blueprint.Air.MaxAirspeed
         local totalweight = 0
-        for _, unit in ipairs(self:GetCargo()) do
+        for _, unit in self:GetCargo() do
             totalweight = totalweight + unit.Blueprint.General.UnitWeight
 	    end
         self:SetSpeedMult(1 - (totalweight * 0.1 / transportspeed))
