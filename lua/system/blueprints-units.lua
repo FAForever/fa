@@ -545,9 +545,9 @@ local function PostProcessUnit(unit)
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
 
-    -- Define a specific UnitWeight for all units. Not done in the blueprints to keep mod compatibility.
+    -- Define a specific UnitWeight for all land units. Not done in the blueprints to keep mod compatibility.
 	-- Experimentals have a weight of 1 because transports gained 1 speed and some survival maps load experimentals into transports.
-    if not unit.General.UnitWeight then    
+    if not unit.General.UnitWeight and not isStructure then    
         if isLand and isTech1 then
             unit.General.UnitWeight = 0.15
         elseif isLand and isTech2 then
