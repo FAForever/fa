@@ -1,3 +1,3 @@
-- (#6110) Veterancy Fixes and Features
-    - Volatile units (example: Paragon being killed by Mavor) will now give full veterancy credit on death, where before their own death weapon would "steal" some of the credit
-    - Adds a new stat--'VetMassKillCredit`--which records the total mass killed by a unit without respect to the "one vet level per kill" guardrail
+- (#6110) Veterancy Fixes and Features:
+    - Volatile units (example: Paragon being killed by Mavor) will now give full veterancy credit on death, where before their own death weapon would "steal" some of the credit.
+    - Adds a new stat `VetMassKillCredit`, which records the total mass killed by a unit without respect to the "one vet level per kill" guardrail.
