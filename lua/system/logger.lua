@@ -62,9 +62,7 @@ function LoggingThread()
             string.format("Heap: %s / %s", heapTotal, heapCommitted)
         )
 
-        for k = 1, 10 do
-            WaitSeconds(1)
-        end
+        WaitSeconds(10)
     end
 end
 
