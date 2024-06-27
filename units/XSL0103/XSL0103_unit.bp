@@ -136,7 +136,6 @@ UnitBlueprint{
         FactionName = "Seraphim",
         Icon = "amph",
         UnitName = "<LOC xsl0103_name>Zthuee",
-        UnitWeight = 1.5,
     },
     Intel = { VisionRadius = 18 },
     LifeBarHeight = 0.075,

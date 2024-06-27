@@ -115,7 +115,6 @@ UnitBlueprint{
         FactionName = "Cybran",
         Icon = "amph",
         UnitName = "<LOC xrl0305_name>The Brick",
-        UnitWeight = 6,
     },
     Intel = {
         VisionRadius = 26,

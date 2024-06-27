@@ -84,7 +84,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         for _, unit in self:GetCargo() do
             totalweight = totalweight + unit.Blueprint.General.UnitWeight
 	    end
-        self:SetSpeedMult(1 - (totalweight * 0.1 / transportspeed))
+        self:SetSpeedMult(1 - (totalweight / transportspeed))
     end,
 
     ---@param self AirTransport

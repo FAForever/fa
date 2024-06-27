@@ -95,7 +95,6 @@ UnitBlueprint{
         FactionName = "Cybran",
         Icon = "land",
         UnitName = "<LOC url0202_name>Rhino",
-        UnitWeight = 3,
     },
     Intel = { VisionRadius = 22 },
     LifeBarHeight = 0.075,
