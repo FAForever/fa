@@ -291,5 +291,4 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 }
-
 TypeClass = UEL0301

@@ -1,5 +1,5 @@
 UnitBlueprint{
-    Description = "<LOC uea0003_desc>Engineering Drone",
+    Description = "<LOC uea0003_desc>C-D3 Engineering Drone",
     AI = { InitialAutoMode = true },
     Air = {
         BankFactor = 0.1,
@@ -75,7 +75,7 @@ UnitBlueprint{
         BuildCostEnergy = 1600,
         BuildCostMass = 160,
         BuildRadius = 8,
-        BuildRate = 35,
+        BuildRate = 51,
         BuildTime = 400,
         BuildableCategory = { "BUILTBYTIER3ENGINEER UEF" },
     },
@@ -166,6 +166,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Land = true },
+        WreckageLayers = { Land = true, Seabed = true },
     },
 }
