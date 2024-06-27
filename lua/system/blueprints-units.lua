@@ -547,18 +547,20 @@ local function PostProcessUnit(unit)
 
     -- Define a specific UnitWeight for all units. Not done in the blueprints to keep mod compatibility.
 	-- Experimentals have a weight of 1 because transports gained 1 speed and some survival maps load experimentals into transports.
-    if isLand and isTech1 then
-        unit.General.UnitWeight = 0.15
-    elseif isLand and isTech2 then
-        unit.General.UnitWeight = 0.3
-	elseif isSACU then
-        unit.General.UnitWeight = 1
-	elseif isLand and isTech3 then
-        unit.General.UnitWeight = 0.6
-	elseif isLand and isExperimental then
-        unit.General.UnitWeight = 1
-    elseif isACU then
-        unit.General.UnitWeight = 1
+    if not unit.General.UnitWeight then    
+        if isLand and isTech1 then
+            unit.General.UnitWeight = 0.15
+        elseif isLand and isTech2 then
+            unit.General.UnitWeight = 0.3
+        elseif isSACU then
+            unit.General.UnitWeight = 1
+        elseif isLand and isTech3 then
+            unit.General.UnitWeight = 0.6
+        elseif isLand and isExperimental then
+            unit.General.UnitWeight = 1
+        elseif isACU then
+            unit.General.UnitWeight = 1
+        end
     end
 
     ---------------------------------------------------------------------------
