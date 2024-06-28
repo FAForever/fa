@@ -723,6 +723,11 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
         end
 
+        if bp.General.UnitWeight then
+            table.insert(lines, LOCF("<LOC uvd_0017>Unit Weight: %.3g",
+            bp.General.UnitWeight))
+        end
+
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})
     end
     CreateLines(control, blocks)
