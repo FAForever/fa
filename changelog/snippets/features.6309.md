@@ -9,3 +9,5 @@
         - MaxAirspeed: 10 --> 10.75 (Tech 1 transports)
         - MaxAirspeed: 13.5 --> 14.5 (Tech 2 transports)
         - MaxAirspeed: 15 --> 17.5 (The Continental)
+
+- (#6309) Display the `UnitWeight` stat in the additional unit details displayed when `Show Armament Detail in Build Menu` is enabled in the settings.
