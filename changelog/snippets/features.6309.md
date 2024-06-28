@@ -1,5 +1,5 @@
 - (#6309) The movement speed of transports now changes based on how many and which types of units they have loaded.
-    - Units slow down transports based on their `UnitWeight` stat. If a unit has a `UnitWeight` of 1, each instance of this unit will slow down the transport's `MaxAirspeed` by 1.
+    - Units slow down transports based on their `UnitWeight` stat. If a unit has a `UnitWeight` of 1, each instance of this unit will slow down the transport's `MaxAirspeed` by 1. The primary implication of this change is that the effectiveness the currently too oppressive Zthuee drops is reduced in an intuitive way. The effectiveness of ACU drops via Tech 2 transports remains unchanged.
         - UnitWeight: 0.15 (Tech 1 land units)
         - UnitWeight: 0.3 (Tech 2 land units)
         - UnitWeight: 0.6 (Tech 3 land units)
