@@ -27,7 +27,7 @@ local DraggerInit = Dragger.__init
 
 ---@class UIRadialDragger : Dragger
 ---@field Origin Vector
----@field ShapeStart UIRenderableCircle
+---@field RadiusCircle UIRenderableCircle
 ---@field MinimumDistance number
 ---@field WorldView WorldView
 ---@field Callback fun(origin: Vector, radius: number)
@@ -56,11 +56,11 @@ RadialDragger = Class(Dragger) {
         local size = self.Size
         local trash = self.Trash
         local thickness = self.Thickness
-        self.ShapeStart = trash:Add(UIRenderableCircle(view, 'radialDragger' .. keycode, mouseWorldPosition[1],
+        self.RadiusCircle = trash:Add(UIRenderableCircle(view, 'radialDragger' .. keycode, mouseWorldPosition[1],
             mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
 
         if minimumDistance > 0 then
-            self.ShapeStart:Hide()
+            self.RadiusCircle:Hide()
         end
 
         self.Origin = mouseWorldPosition
@@ -84,11 +84,11 @@ RadialDragger = Class(Dragger) {
         local distance = math.sqrt(dx * dx + dz * dz)
 
         if distance > self.MinimumDistance then
-            self.ShapeStart:Show()
-            self.ShapeStart.Size = distance
+            self.RadiusCircle:Show()
+            self.RadiusCircle.Size = distance
         else
             -- try to hide it
-            self.ShapeStart:Hide()
+            self.RadiusCircle:Hide()
         end
     end,
 
