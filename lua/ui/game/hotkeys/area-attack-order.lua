@@ -64,11 +64,14 @@ AreaAttackOrder = function(command)
 
     local worldView = GetMousedOverWorldView()
 
-    RadialDragger(
+    local radialDragger = RadialDragger(
         worldView,
         AreaAttackOrderCallback,
         DragKeycode,
         MinimumRadius
     )
+
+    radialDragger.RadiusCircle.Color = 'e52c2c'
+    radialDragger.RadiusCircle.Thickness = 0.03
 
 end
