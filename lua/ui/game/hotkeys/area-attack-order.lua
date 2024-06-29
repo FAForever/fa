@@ -22,8 +22,6 @@
 --******************************************************************************************************
 
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
-local MaximumWidth = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
-local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
 
 ---@type number
 local MinimumDistance = 4
@@ -69,8 +67,6 @@ AreaAttackOrder = function(command)
         AreaReclaimOrderCallback,
         DragKeycode,
         MinimumDistance,
-        MaximumWidth,
-        MaximumDistance
     )
 
 end
