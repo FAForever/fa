@@ -23,7 +23,7 @@
 -- upvalue scope for performance
 local TableGetn = table.getn
 
-local IssueReclaim = IssueReclaim
+local IssueAttack = IssueAttack
 
 local MathRound = math.round
 local MathSqrt = math.sqrt
