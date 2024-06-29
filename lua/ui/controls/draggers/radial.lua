@@ -27,11 +27,8 @@ local DraggerInit = Dragger.__init
 
 ---@class UIRadialDragger : Dragger
 ---@field Origin Vector
----@field Destination Vector
 ---@field ShapeStart UIRenderableCircle
 ---@field MinimumDistance number
----@field MaximumDistance number
----@field Width number
 ---@field WorldView WorldView
 ---@field Callback fun(origin: Vector, radius: number)
 RadialDragger = Class(Dragger) {
@@ -44,16 +41,12 @@ RadialDragger = Class(Dragger) {
     ---@param view WorldView
     ---@param callback fun(origin: Vector, radius: number)
     ---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
-    ---@param maximumWidth number
     ---@param minimumDistance number
-    ---@param maximumDistance number
-    __init = function(self, view, callback, keycode, maximumWidth, minimumDistance, maximumDistance)
+    __init = function(self, view, callback, keycode, minimumDistance)
         DraggerInit(self)
 
         -- store parameters
-        self.Width = maximumWidth
         self.MinimumDistance = minimumDistance
-        self.MaximumDistance = maximumDistance
         self.WorldView = view
         self.Callback = callback
 
@@ -81,7 +74,6 @@ RadialDragger = Class(Dragger) {
     ---@param x number  # x coordinate of screen position
     ---@param y number  # y coordinate of screen position
     OnMove = function(self, x, y)
-        local width = self.Width
         local view = self.WorldView
 
         local ps = self.Origin
