@@ -21,6 +21,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local GetTopmostWorldViewAt = import("/lua/ui/game/worldview.lua").GetTopmostWorldViewAt
+
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 
 ---@type number
@@ -59,8 +61,9 @@ end
 
 ---@param command UserCommand
 AreaAttackOrder = function(command)
-
-    local worldView = import("/lua/ui/game/worldview.lua").viewLeft
+    
+    local mousePos = GetMouseScreenPos()
+    local worldView = GetTopmostWorldViewAt(mousePos[1], mousePos[2])
 
     RadialDragger(
         worldView,
