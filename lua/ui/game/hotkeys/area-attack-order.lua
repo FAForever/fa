@@ -24,7 +24,7 @@
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 
 ---@type number
-local MinimumDistance = 4
+local MinimumRadius = 4
 
 ---@param value number
 SetMinimumDistance = function(value)
@@ -32,7 +32,7 @@ SetMinimumDistance = function(value)
         error('Expected a number, got ' .. type(value))
     end
 
-    MinimumDistance = value
+    MinimumRadius = value
 end
 
 ---@type Keycode
@@ -49,8 +49,8 @@ end
 
 ---@param origin Vector
 ---@param radius number
-local AreaReclaimOrderCallback = function(origin, radius)
-    if radius < MinimumDistance then
+local AreaAttackOrderCallback = function(origin, radius)
+    if radius < MinimumRadius then
         return
     end
 
@@ -64,9 +64,9 @@ AreaAttackOrder = function(command)
 
     RadialDragger(
         worldView,
-        AreaReclaimOrderCallback,
+        AreaAttackOrderCallback,
         DragKeycode,
-        MinimumDistance,
+        MinimumRadius
     )
 
 end
