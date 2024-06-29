@@ -12,6 +12,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local Factions = import("/lua/factions.lua").Factions
 
+---@type { [string]: WorldView }
 MapControls = {}
 
 view = false
@@ -325,6 +326,17 @@ function UnregisterWorldView(view)
     end
 end
 
+---@return { [string]: WorldView }
 function GetWorldViews()
     return MapControls
+end
+
+---@return WorldView
+function GetMousedOverWorldView()
+    local mousePos = GetMouseScreenPos()
+    for _, worldView in MapControls do
+        if worldView:HitTest(mousePos[1], mousePos[2]) then
+            return worldView
+        end
+    end
 end
