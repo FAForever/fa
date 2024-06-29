@@ -65,11 +65,14 @@ AreaAttackOrder = function(command)
     local mousePos = GetMouseScreenPos()
     local worldView = GetTopmostWorldViewAt(mousePos[1], mousePos[2])
 
-    RadialDragger(
+    local radialDragger = RadialDragger(
         worldView,
         AreaAttackOrderCallback,
         DragKeycode,
         MinimumRadius
     )
+
+    radialDragger.RadiusCircle.Color = 'e52c2c'
+    radialDragger.RadiusCircle.Thickness = 0.03
 
 end
