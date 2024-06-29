@@ -56,7 +56,7 @@ RadialDragger = Class(Dragger) {
         local size = self.Size
         local trash = self.Trash
         local thickness = self.Thickness
-        self.ShapeStart = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-start', mouseWorldPosition[1],
+        self.ShapeStart = trash:Add(UIRenderableCircle(view, 'radialDragger' .. keycode, mouseWorldPosition[1],
             mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
 
         if minimumDistance > 0 then
