@@ -66,6 +66,10 @@ RadialDragger = Class(Dragger) {
         self.ShapeStart = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-start', mouseWorldPosition[1],
             mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
 
+        if minimumDistance > 0 then
+            self.ShapeStart:Hide()
+        end
+
         self.Origin = mouseWorldPosition
 
         -- register the dragger
