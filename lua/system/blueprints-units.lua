@@ -547,19 +547,19 @@ local function PostProcessUnit(unit)
 
     -- Define a specific TransportSpeedReduction for all land units.
 	-- Experimentals have a weight of 1 because transports gained 1 speed and some survival maps load experimentals into transports.
-    if not unit.General.TransportSpeedReduction and not isStructure then    
+    if not unit.Physics.TransportSpeedReduction and not isStructure then    
         if isLand and isTech1 then
-            unit.General.TransportSpeedReduction = 0.15
+            unit.Physics.TransportSpeedReduction = 0.15
         elseif isLand and isTech2 then
-            unit.General.TransportSpeedReduction = 0.3
+            unit.Physics.TransportSpeedReduction = 0.3
         elseif isSACU then
-            unit.General.TransportSpeedReduction = 1
+            unit.Physics.TransportSpeedReduction = 1
         elseif isLand and isTech3 then
-            unit.General.TransportSpeedReduction = 0.6
+            unit.Physics.TransportSpeedReduction = 0.6
         elseif isLand and isExperimental then
-            unit.General.TransportSpeedReduction = 1
+            unit.Physics.TransportSpeedReduction = 1
         elseif isACU then
-            unit.General.TransportSpeedReduction = 1
+            unit.Physics.TransportSpeedReduction = 1
         end
     end
 

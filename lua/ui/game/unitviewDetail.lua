@@ -723,9 +723,9 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
         end
 
-        if bp.General.TransportSpeedReduction then
+        if bp.Physics.TransportSpeedReduction then
             table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
-            bp.General.TransportSpeedReduction))
+            bp.Physics.TransportSpeedReduction))
         end
 
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})
