@@ -1,4 +1,4 @@
-local AirUnit = import("/lua/sim/units/airunit.lua").AirUnit
+#local AirUnit = import("/lua/sim/units/airunit.lua").AirUnit
 local AirUnitOnCreate = AirUnit.OnCreate
 local AirUnitOnMotionHorzEventChange = AirUnit.OnMotionHorzEventChange
 local AirUnitOnTransportAttach = AirUnit.OnTransportAttach
@@ -76,13 +76,12 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 
     ---@param self AirTransport
-    ---@param totalweight CargoWeight
-    ---@param unit Unit
-    TransportSpeedReduction = function(self)
+    ---@param totalweight Cargnt
+function(self)
         local transportspeed = self.Blueprint.Air.MaxAirspeed
         local totalweight = 0
         for _, unit in self:GetCargo() do
-            totalweight = totalweight + unit.Blueprint.General.UnitWeight
+            totalweight = totalweight + unit.Blueprint.General.TransportSpeedReduction
 	    end
         self:SetSpeedMult(1 - (totalweight / transportspeed))
     end,
@@ -93,7 +92,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     OnTransportAttach = function(self, attachBone, unit)
         AirUnitOnTransportAttach(self, attachBone, unit)
         BaseTransportOnTransportAttach(self, attachBone, unit)
-        self:TransportSpeedReduction()
+        self:ReduceTransportSpeed()
     end,
 
     ---@param self AirTransport
@@ -102,7 +101,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     OnTransportDetach = function(self, attachBone, unit)
         AirUnitOnTransportDetach(self, attachBone, unit)
         BaseTransportOnTransportDetach(self, attachBone, unit)
-        self:TransportSpeedReduction()
+        self:ReduceTransportSpeed()
     end,
 
     OnAttachedKilled = function(self, attached)
