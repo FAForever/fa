@@ -724,7 +724,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
         end
 
         if bp.General.TransportSpeedReduction then
-            table.insert(lines, LOCF("<LOC uvd_0017>Unit Weight: %.3g",
+            table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
             bp.General.TransportSpeedReduction))
         end
 
