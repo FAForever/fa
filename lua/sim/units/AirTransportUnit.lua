@@ -76,8 +76,9 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 
     ---@param self AirTransport
-    ---@param totalweight Cargnt
-function(self)
+    ---@param totalweight CargoWeight
+    ---@param unit Unit
+    ReduceTransportSpeed = function(self)
         local transportspeed = self.Blueprint.Air.MaxAirspeed
         local totalweight = 0
         for _, unit in self:GetCargo() do
