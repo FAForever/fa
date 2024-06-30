@@ -1,4 +1,4 @@
-#local AirUnit = import("/lua/sim/units/airunit.lua").AirUnit
+local AirUnit = import("/lua/sim/units/airunit.lua").AirUnit
 local AirUnitOnCreate = AirUnit.OnCreate
 local AirUnitOnMotionHorzEventChange = AirUnit.OnMotionHorzEventChange
 local AirUnitOnTransportAttach = AirUnit.OnTransportAttach
