@@ -1230,6 +1230,15 @@ local LayouterAttributeControl = ClassSimple {
         return self
     end;
 
+    --- Shows the control
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@return T
+    Show = function(self)
+        self.layoutControl:Show()
+        return self
+    end;
+
     --- Enables the control's hit test
     ---@generic T : LayouterAttributeControl
     ---@param self T
@@ -1356,6 +1365,17 @@ local LayouterAttributeControl = ClassSimple {
         return self
     end;
 
+    --- Sets the dimensions of the control
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@param width? LazyVar | number no change if nil
+    ---@param height? LazyVar | number no change if nil
+    ---@return T
+    Dimensions = function(self, width, height)
+        SetDimensions(self.layoutControl, width, height)
+        return self
+    end,
+
     --- Sets the width of the control to a texture
     ---@generic T : LayouterAttributeControl
     ---@param self T
@@ -1388,7 +1408,6 @@ local LayouterAttributeControl = ClassSimple {
         SetDimensionsFromTexture(self.layoutControl, filename, padding)
         return self
     end;
-
 
     ----------
     -- Depth setters

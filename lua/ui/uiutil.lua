@@ -416,7 +416,7 @@ function RotateLayout(direction)
 end
 
 --- Given a path and name relative to the skin path, returns the full path based on the current skin
----@param filespec FileName
+---@param filespec FileName|string
 ---@param checkMods? boolean
 ---@return FileName
 function UIFile(filespec, checkMods)
@@ -486,7 +486,7 @@ function UIFile(filespec, checkMods)
 end
 
 --- Returns the filename as a lazy var function to allow triggering of `OnDirty()`
----@param filespec FileName
+---@param filespec FileName|string
 ---@param checkMods? boolean
 ---@return fun(): FileName
 function SkinnableFile(filespec, checkMods)
