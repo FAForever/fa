@@ -331,12 +331,20 @@ function GetWorldViews()
     return MapControls
 end
 
+--- Returns the top-most moused over WorldView.
 ---@return WorldView
 function GetMousedOverWorldView()
     local mousePos = GetMouseScreenPos()
+    local topView = nil
+    local topViewDepth = nil
     for _, worldView in MapControls do
-        if worldView:HitTest(mousePos[1], mousePos[2]) then
-            return worldView
+        if worldView:HitTest(mousePos[1], mousePos[2]) and worldView.Depth() > topViewDepth then
+            local viewDepth = worldView.Depth()
+            if viewDepth > topViewDepth then
+                topView = worldView
+                topViewDepth = viewDepth
+            end
         end
     end
+    return topView
 end
