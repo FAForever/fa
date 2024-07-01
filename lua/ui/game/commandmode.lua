@@ -566,10 +566,10 @@ end
 ---@param command UserCommand
 local function OnAttackIssued(command)
     -- feature: area commands
-    -- -- Area attack dragger, command mode only
-    -- if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
-    --     import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
-    -- end
+    -- Area attack dragger, command mode only
+    if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
+        import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
+    end
 end
 
 ---@param command UserCommand
