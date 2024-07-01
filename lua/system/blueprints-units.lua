@@ -546,8 +546,8 @@ local function PostProcessUnit(unit)
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
 
-    -- Define a specific TransportSpeedReduction for all land units.
-	-- Experimentals have a TransportSpeedReduction of 1 because transports gained 1 speed and some survival maps load experimentals into transports.
+    -- Define a specific TransportSpeedReduction for all land and naval units.
+    -- Experimentals have a TransportSpeedReduction of 1 due to transports gaining 1 speed and some survival maps loading experimentals into transports.
     -- Naval units also gain a TransportSpeedReduction of 1 to enable mod compatibility.
     if not unit.Physics.TransportSpeedReduction and not isStructure then    
         if isLand and isTech1 then
