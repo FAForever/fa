@@ -133,9 +133,9 @@ AIPlatoonAdaptiveSilo = Class(AIPlatoon) {
                                 --enemyTMD = GetUnitsAroundPoint(aiBrain, categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2, targetPosition, 25, 'Enemy')
                                 enemyTmdCount = AIAttackUtils.AIFindNumberOfUnitsBetweenPointsRNG( aiBrain, self.CenterPosition, targetPosition, categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2, 30, 'Enemy')
                                 enemyShield = GetUnitsAroundPoint(aiBrain, categories.STRUCTURE * categories.DEFENSE * categories.SHIELD, targetPosition, 25, 'Enemy')
-                                if RNGGETN(enemyShield) > 0 then
+                                if TableGetn(enemyShield) > 0 then
                                     local enemyShieldHealth = 0
-                                    --RNGLOG('There are '..RNGGETN(enemyShield)..'shields')
+                                    --RNGLOG('There are '..TableGetn(enemyShield)..'shields')
                                     for k, shield in enemyShield do
                                         if not shield or shield.Dead or not shield.MyShield then continue end
                                         enemyShieldHealth = enemyShieldHealth + shield.MyShield:GetHealth()
@@ -144,7 +144,7 @@ AIPlatoonAdaptiveSilo = Class(AIPlatoon) {
                                 end
 
                                 --RNGLOG('Enemy Unit has '..enemyTmdCount.. 'TMD along path')
-                                --RNGLOG('Enemy Unit has '..RNGGETN(enemyShield).. 'Shields around it with a total health of '..enemyShieldHealth)
+                                --RNGLOG('Enemy Unit has '..TableGetn(enemyShield).. 'Shields around it with a total health of '..enemyShieldHealth)
                                 --RNGLOG('Missiles Required for Shield Penetration '..shieldMissilesRequired)
 
                                 if enemyTmdCount >= readyTmlLauncherCount then
@@ -169,7 +169,7 @@ AIPlatoonAdaptiveSilo = Class(AIPlatoon) {
                                                         continue
                                                     end
                                                 end
-                                                RNGINSERT(inRangeTmlLaunchers, tml)
+                                                TableInsert(inRangeTmlLaunchers, tml)
                                                 break
                                             else
                                                 if tml.TargetBlackList then
@@ -178,8 +178,8 @@ AIPlatoonAdaptiveSilo = Class(AIPlatoon) {
                                                         continue
                                                     end
                                                 end
-                                                RNGINSERT(inRangeTmlLaunchers, tml)
-                                                local readyTML = RNGGETN(inRangeTmlLaunchers)
+                                                TableInsert(inRangeTmlLaunchers, tml)
+                                                local readyTML = TableGetn(inRangeTmlLaunchers)
                                                 if (readyTML >= missilesRequired) and (readyTML > enemyTmdCount + shieldMissilesRequired) then
                                                     --RNGLOG('inRangeTmlLaunchers table number is enough for kill')
                                                     break
@@ -187,7 +187,7 @@ AIPlatoonAdaptiveSilo = Class(AIPlatoon) {
                                             end
                                         end
                                     end
-                                    --RNGLOG('Have Target and number of in range ready launchers is '..RNGGETN(inRangeTmlLaunchers))
+                                    --RNGLOG('Have Target and number of in range ready launchers is '..TableGetn(inRangeTmlLaunchers))
                                     break
                                 end
                             else
