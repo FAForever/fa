@@ -161,6 +161,7 @@ local function PostProcessUnit(unit)
     local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
     local isAir = unit.CategoriesHash['AIR']
+    local isNaval = unit.CategoriesHash['NAVAL']
     local isBomber = unit.CategoriesHash['BOMBER']
     local isGunship = unit.CategoriesHash['GROUNDATTACK'] and isAir and (not isBomber)
     local isTransport = unit.CategoriesHash['TRANSPORTATION']
@@ -546,7 +547,8 @@ local function PostProcessUnit(unit)
     end
 
     -- Define a specific TransportSpeedReduction for all land units.
-	-- Experimentals have a weight of 1 because transports gained 1 speed and some survival maps load experimentals into transports.
+	-- Experimentals have a TransportSpeedReduction of 1 because transports gained 1 speed and some survival maps load experimentals into transports.
+    -- Naval units also gain a TransportSpeedReduction of 1 to enable mod compatibility.
     if not unit.Physics.TransportSpeedReduction and not isStructure then    
         if isLand and isTech1 then
             unit.Physics.TransportSpeedReduction = 0.15
@@ -559,6 +561,8 @@ local function PostProcessUnit(unit)
         elseif isLand and isExperimental then
             unit.Physics.TransportSpeedReduction = 1
         elseif isACU then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isNaval then
             unit.Physics.TransportSpeedReduction = 1
         end
     end
