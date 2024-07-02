@@ -47,8 +47,9 @@ There are various specifics but you're usually actively discouraged to use them.
 
 - The operator `^` is the bit-wise XOR operator and **not** the typical power operator, which is `math.pow`.
 - The operator `|` is the bit-wise OR operator.
-- The operator `>>` and `<<` are the bit-wise shift operators.
-- The operator `!=` is an alternative to `~=`.
+- The operator `&` is the bit-wise AND operator.
+- The operators `>>` and `<<` are the bit-wise shift operators.
+- The operator `!=` is an alternative to `~=` to check for inequality.
 - The syntax `#` is an alternative to `--` for creating comments.
 
 The one exception that can be used to [improve the performance of the game](https://github.com/FAForever/fa/issues/4539) is this:
