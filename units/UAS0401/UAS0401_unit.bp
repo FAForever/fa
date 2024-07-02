@@ -258,7 +258,7 @@ UnitBlueprint{
         Level4 = 128,
         Level5 = 160,
     },
-    VeteranMassMult = 0.5,
+    VeteranMassMult = 0.75,
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -270,7 +270,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 8000,
+            Damage = 10000,
             DamageRadius = 5,
             DamageType = "Normal",
             DisplayName = "Oblivion Cannon",
@@ -304,7 +304,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 10/100, --10/integer interval in ticks
+            RateOfFire = 10/125, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "NAVAL MOBILE",
@@ -344,7 +344,7 @@ UnitBlueprint{
             },
             FiringTolerance = 2,
             Label = "Torpedo01",
-            MaxRadius = 80,
+            MaxRadius = 65,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 20,
@@ -371,7 +371,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 10/50, --10/integer interval in ticks
+            RateOfFire = 10/60, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "(STRUCTURE * DEFENSE - ANTIAIR)",

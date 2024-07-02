@@ -180,6 +180,25 @@ options = {
             },
 
             {
+                title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
+                key = 'invert_middle_mouse_button',
+                type = 'toggle',
+                default = 0,
+                update = function(control,value)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                set = function(key,value,startup)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0},
+                        {text = "<LOC _On>", key = 1},
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0158>Screen Edge Pans Main View",
                 key = 'screen_edge_pans_main_view',
                 type = 'toggle',
@@ -217,9 +236,9 @@ options = {
                     ConExecute("ui_KeyboardPanSpeed " .. tostring(value))
                 end,
                 custom = {
-                    min = 1,
-                    max = 200,
-                    inc = 0,
+                    min = 10,
+                    max = 400,
+                    inc = 10,
                 },
             },
             {
@@ -397,6 +416,24 @@ options = {
                 },
             },
 
+            {
+                title = "<LOC gui_template_merge_context_ingame_title>Combine context based and normal templates",
+                key = 'gui_template_merge_context_ingame',
+                type = 'toggle',
+                default = "off",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/context-based-templates.lua").UseIngametemplates = value
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _Replace>Replace", key = "replace" },
+                        { text = "<LOC _Merge>Merge", key = "merge" },
+                    },
+                },
+            },
             {
                 title = '<LOC OPTIONS_0324>Control groups',
                 type = 'header',

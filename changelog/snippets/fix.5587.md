@@ -1,0 +1,1 @@
+- (#5587) Fix an error when deleting the last user build template.

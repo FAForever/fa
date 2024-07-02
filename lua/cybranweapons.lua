@@ -5,7 +5,6 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
---- Weapon Files ---
 CAAAutocannon = import('/lua/sim/weapons/cybran/CAAAutocannon.lua').CAAAutocannon
 CAANanoDartWeapon = import('/lua/sim/weapons/cybran/CAANanoDartWeapon.lua').CAANanoDartWeapon
 CAABurstCloudFlakArtilleryWeapon = import('/lua/sim/weapons/cybran/CAABurstCloudFlakArtilleryWeapon.lua').CAABurstCloudFlakArtilleryWeapon
@@ -49,14 +48,17 @@ CIFMissileLoaWeapon = import('/lua/sim/weapons/cybran/CIFMissileLoaWeapon.lua').
 CKrilTorpedoLauncherWeapon = import('/lua/sim/weapons/cybran/CKrilTorpedoLauncherWeapon.lua').CKrilTorpedoLauncherWeapon
 CMobileKamikazeBombWeapon = import('/lua/sim/weapons/cybran/CMobileKamikazeBombWeapon.lua').CMobileKamikazeBombWeapon
 
--- kept for mod backwards compatibility
+--#region kept for mod backwards compatibility
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
+local KamikazeWeapon = WeaponFile.KamikazeWeapon
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
+
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local Explosion = import("/lua/defaultexplosions.lua")
 local Util = import("/lua/utilities.lua")
-local KamikazeWeapon = WeaponFile.KamikazeWeapon
-local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
-local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local OverchargeWeapon = WeaponFile.OverchargeWeapon
-local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
-local EffectTemplate = import("/lua/effecttemplates.lua")
+--#endregion

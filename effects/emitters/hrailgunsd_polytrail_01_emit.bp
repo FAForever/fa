@@ -1,4 +1,4 @@
-return {
+TrailEmitterBlueprint {
     BlendMode = 3,
     EmitIfVisible = true,
     LODCutoff = 300.0,
