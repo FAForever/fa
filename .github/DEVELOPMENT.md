@@ -102,7 +102,7 @@ This is run (as a separate instance) during the splash screen, during the main m
 
 This is run when a game session has started. It is responsible for a lot of the UI functionality. The [sessionInit.lua](../lua/SessionInit.lua) is run to initialize the context and all [user globals](../engine/User.lua) are available. You can use [Sim Callbacks](../lua/SimCallbacks.lua) to pass and synchronize information to the session sim context. In general, all user globals that (indirectly) interact with the simulation is input and synchronized between users. 
 
-- (4) Session sim context
+- (5) Session sim context
 
 This is run when a game session has started. It is responsible for all the Lua interactions in the simulation and all [sim globals](../engine/Sim.lua) are available. The [simInit.lua](../lua/simInit.lua) is run to initialize the context. You can use [UserSync.lua](../lua/UserSync.lua) to pass information to the Session UI context.
 
