@@ -6,6 +6,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URL',        Cue = 'URB4302_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Gun', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3800,
     BuildIconSortPriority = 170,
     Categories = {
         "ANTIMISSILE",

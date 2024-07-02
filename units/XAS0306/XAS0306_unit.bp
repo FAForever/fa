@@ -15,6 +15,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XAS',        Cue = 'XAS0306_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Naval',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 7500,
     BuildIconSortPriority = 20,
     Categories = {
         "AEON",

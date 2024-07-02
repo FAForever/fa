@@ -23,6 +23,7 @@ UnitBlueprint{
         SurfaceStart          = Sound { Bank = 'UAS',        Cue = 'UAS_Sub_Surface',                       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Sub',                       LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3750,
     BuildIconSortPriority = 15,
     Categories = {
         "AEON",
