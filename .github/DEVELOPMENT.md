@@ -51,6 +51,7 @@ There are various specifics but you're usually actively discouraged to use them.
 - The operators `>>` and `<<` are the bit-wise shift operators.
 - The operator `!=` is an alternative to `~=` to check for inequality.
 - The syntax `#` is an alternative to `--` for creating comments.
+- The statement `continue` exists, which works like you'd expect in other languages with the `continue` keyword.
 
 The one exception that can be used to [improve the performance of the game](https://github.com/FAForever/fa/issues/4539) is this:
 
