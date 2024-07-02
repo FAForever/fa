@@ -41,7 +41,7 @@ And the following fields should be empty:
 - `EnvironmentData.ExtraData`
 - `ModDirectories`
 
-Depending on what blueprints you'd like to rebuild you'll need to update `RebuildBlueprintOptions.RebuildBpFiles` and `EnvironmentData.LoadExtraBlueprints`. You should now be able to batch process all the blueprint files using the functions provided in `EnvironmentData.PostModBlueprints`. You can use [#6279](https://github.com/FAForever/fa/pull/6279) and [#6274](https://github.com/FAForever/fa/pull/6274) as an example on how to prepare the functionality in [blueprints.lua](../lua/system/Blueprints.lua).
+Depending on what blueprints you'd like to rebuild you'll need to update `RebuildBlueprintOptions.RebuildBpFiles` and `EnvironmentData.LoadExtraBlueprints`. You should now be able to batch process all the blueprint files using the functions provided in `EnvironmentData.PostModBlueprints` by calling your run file with the Lua compiler that you installed. You can use [#6279](https://github.com/FAForever/fa/pull/6279) and [#6274](https://github.com/FAForever/fa/pull/6274) as an example on how to prepare the functionality in [blueprints.lua](../lua/system/Blueprints.lua).
 
 ### For development on automation via GitHub Actions
 
