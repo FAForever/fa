@@ -12,10 +12,10 @@ All three branches originate from the `develop` branch, which is the default bra
 
 The following (manual) steps are relevant to create a valid deployment to the FAF game type.
 
-- (1) Update the game version in [mod_info.lua](/mod_info.lua) and [version.lua](/lua/version.lua).
+- (1) Update the game version in [mod_info.lua](../mod_info.lua) and [version.lua](../lua/version.lua).
 - (2) Update the game executable. This needs to be done by a server administrator. This is only required when there are changes to the executable.
-- (3) Update the changelog in [changelog.md](/changelog.md) and [changelogData.lua](/lua/ui/lobby/changelogData.lua).
-- (4) Update the game version in [changelogData.lua](/lua/ui/lobby/changelogData.lua).
+- (3) Update the changelog in [changelog.md](/CHANGELOG.md) and [changelogData.lua](../lua/ui/lobby/changelogData.lua).
+- (4) Update the game version in [changelogData.lua](../lua/ui/lobby/changelogData.lua).
 
 ## Automated deployments
 
