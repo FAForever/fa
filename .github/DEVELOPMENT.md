@@ -6,7 +6,7 @@ This document contains a wide range of tips and tricks surrounding the developme
 
 Everything works and breaks with your tooling. In this section we explain what has worked best so far.
 
-### For development on Supreme Commander
+### Lua development
 
 We recommend the following tooling for development of Supreme Commander:
 
@@ -20,20 +20,20 @@ For Visual Studio Code we recommend the following extensions:
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode): useful for formatting.
 - [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker): useful to prevent common spelling mistakes.
 
-### For batch processing of blueprints
+### Batch processing of blueprints
 
 We recommend the following tooling in addition of the tooling used for development of Supreme Commander:
 
-- [Brew WikiGen](https://github.com/The-Balthazar/BrewWikiGen) that allows for batch processing of blueprints
+- [Brew WikiGen](https://github.com/The-Balthazar/BrewWikiGen) that allows for batch processing of blueprints.
 - [Lua 5.4](https://www.lua.org/download.html) required for the Brew WikiGen to work.
 
 There is a `Run.lua` file inside the Brew WikiGen source files. It represents the configuration of the tool. Copy the file and update the following fields:
 
-- `WikiGeneratorDirectory` needs to reference the folder where the Brew WikiGen is located. Requires a trailing `/`
-- `EnvironmentData.location` needs to reference the checked out fa repository. Requires a trailing `/`
-- `EnvironmentData.RebuildBlueprints` should be `true`
-- `EnvironmentData.lua` needs to reference the checked out fa repository. Requires a trailing `/`
-- `EnvironmentData.LOC` needs to reference the checked out fa repository. Requires a trailing `/`
+- `WikiGeneratorDirectory` needs to reference the folder where the Brew WikiGen is located. Requires a trailing `/`.
+- `EnvironmentData.location` needs to reference the checked out fa repository. Requires a trailing `/`.
+- `EnvironmentData.RebuildBlueprints` should be `true`.
+- `EnvironmentData.lua` needs to reference the checked out fa repository. Requires a trailing `/`.
+- `EnvironmentData.LOC` needs to reference the checked out fa repository. Requires a trailing `/`.
 - `EnvironmentData.PostModBlueprints` needs to reference the name of a function that is in the scope of [blueprints.lua](../lua/system/Blueprints.lua). This function is provided all the blueprint values that are loaded in a similar fashion to how the game provides the blueprint files. 
 
 And the following fields should be empty:
@@ -43,7 +43,7 @@ And the following fields should be empty:
 
 Depending on what blueprints you'd like to rebuild you'll need to update `RebuildBlueprintOptions.RebuildBpFiles` and `EnvironmentData.LoadExtraBlueprints`. You should now be able to batch process all the blueprint files using the functions provided in `EnvironmentData.PostModBlueprints` by calling your run file with the Lua compiler that you installed. You can use [#6279](https://github.com/FAForever/fa/pull/6279) and [#6274](https://github.com/FAForever/fa/pull/6274) as an example on how to prepare the functionality in [blueprints.lua](../lua/system/Blueprints.lua).
 
-### For development on automation via GitHub Actions
+### Automation via GitHub Actions
 
 We recommend the following tooling in addition of the tooling used for development of Supreme Commander:
 
