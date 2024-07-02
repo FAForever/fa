@@ -76,11 +76,24 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 
     ---@param self AirTransport
+    ---@param totalweight CargoWeight
+    ---@param unit Unit
+    ReduceTransportSpeed = function(self)
+        local transportspeed = self.Blueprint.Air.MaxAirspeed
+        local totalweight = 0
+        for _, unit in self:GetCargo() do
+            totalweight = totalweight + unit.Blueprint.Physics.TransportSpeedReduction
+	    end
+        self:SetSpeedMult(1 - (totalweight / transportspeed))
+    end,
+
+    ---@param self AirTransport
     ---@param attachBone Bone
     ---@param unit Unit
     OnTransportAttach = function(self, attachBone, unit)
         AirUnitOnTransportAttach(self, attachBone, unit)
         BaseTransportOnTransportAttach(self, attachBone, unit)
+        self:ReduceTransportSpeed()
     end,
 
     ---@param self AirTransport
@@ -89,6 +102,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     OnTransportDetach = function(self, attachBone, unit)
         AirUnitOnTransportDetach(self, attachBone, unit)
         BaseTransportOnTransportDetach(self, attachBone, unit)
+        self:ReduceTransportSpeed()
     end,
 
     OnAttachedKilled = function(self, attached)

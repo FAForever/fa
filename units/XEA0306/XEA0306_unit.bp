@@ -22,7 +22,7 @@ UnitBlueprint{
         KTurn = 2,
         KTurnDamping = 2,
         LiftFactor = 7,
-        MaxAirspeed = 15,
+        MaxAirspeed = 17.5,
         StartTurnDistance = 10,
         TransportHoverHeight = 6,
     },
