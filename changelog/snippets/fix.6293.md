@@ -1,0 +1,1 @@
+- (#6293) Fix `CollisionBeamFile` being missing in the Aeon weapons file, which was causing large mod compatibility issues (for example with Xtreme Wars).

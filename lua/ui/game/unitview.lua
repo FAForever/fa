@@ -136,11 +136,30 @@ local function FormatTime(seconds)
 end
 
 local statFuncs = {
+    -- combined stats showing mass trend for own units or army icon + nickname for others' units
     function(info)
         local massUsed = math.max(info.massRequested, info.massConsumed)
         if info.massProduced > 0 or massUsed > 0 then
-            return string.format('%+d', math.ceil(info.massProduced - massUsed)),
-                UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+            local netMass = info.massProduced - massUsed
+            local absNetMass = math.abs(netMass)
+            local str
+            -- Thanks to an engine patch, `GetRolloverInfo` returns floats for economy values:
+            -- - https://github.com/FAForever/FA-Binary-Patches/pull/75
+            -- This allows us to show adjacency-affected values better.
+            if absNetMass < 5 then
+                str = string.format('%+.3g', netMass)
+            elseif absNetMass < 10 then
+                str = string.format('%+.2g', netMass)
+            elseif absNetMass < 100 then
+                str = string.format('%+.3g', netMass)
+            else
+                str = string.format('%+d', math.round(netMass))
+            end
+
+            return str
+                , UIUtil.UIFile('/game/unit_view_icons/mass.dds')
+                , '00000000'
+
         elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
             local armyData = GetArmiesTable().armiesTable[info.armyIndex + 1]
             local icon = Factions.Factions[armyData.faction + 1].Icon
@@ -153,14 +172,27 @@ local statFuncs = {
             return false
         end
     end,
+    -- energy trend
     function(info)
         local energyUsed = math.max(info.energyRequested, info.energyConsumed)
         if info.energyProduced > 0 or energyUsed > 0 then
-            return string.format('%+d', math.ceil(info.energyProduced - energyUsed))
+            local netEnergy = info.energyProduced - energyUsed
+            local absNetEnergy = math.abs(netEnergy)
+            -- Thanks to an engine patch, `GetRolloverInfo` returns floats for economy values:
+            -- - https://github.com/FAForever/FA-Binary-Patches/pull/75
+            -- This allows us to show adjacency-affected values better.
+            if absNetEnergy < 10 then
+                return string.format('%+.2g', netEnergy)
+            elseif absNetEnergy < 100 then
+                return string.format('%+.3g', netEnergy)
+            else
+                return string.format('%+d', math.round(netEnergy))
+            end
         else
             return false
         end
     end,
+    -- vet xp
     function(info)
         if UnitData[info.entityId].xp ~= nil then
             local nextLevel = 0
@@ -181,6 +213,7 @@ local statFuncs = {
 
 
     end,
+    -- kill count
     function(info)
         if info.kills > 0 then
             return string.format('%d', info.kills)
@@ -188,7 +221,7 @@ local statFuncs = {
             return false
         end
     end,
-
+    -- tactical/strategic missile count
     function(info)
         if info.tacticalSiloMaxStorageCount > 0 or info.nukeSiloMaxStorageCount > 0 then
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
@@ -219,6 +252,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- shield % HP
     function(info, bp)
         if info.shieldRatio > 0 then
             return string.format('%d%%', math.floor(info.shieldRatio * 100))
@@ -226,6 +260,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- fuel remaining time
     function(info, bp)
         if info.fuelRatio > -1 then
             return FormatTime(bp.Physics.FuelUseTime * info.fuelRatio)
@@ -233,6 +268,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- buildrate
     function(info, bp)
         if options.gui_detailed_unitview == 0 then
             return false

@@ -38,6 +38,7 @@ UnitBlueprint{
         Health = 500,
         MaxHealth = 500,
         Shield = {
+            AbsorptionType = "StaticShield",
             ImpactEffects = "CybranShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01b_mesh",
             Mesh = "/effects/entities/CybranShield01/CybranShield01_mesh",

@@ -4,6 +4,8 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
+local controls = import("/lua/ui/game/unitview.lua").controls
+local consControl = import("/lua/ui/game/construction.lua").controls.constructionGroup
 
 local iconPositions = {
     [1] = {Left = 70, Top = 55},
@@ -29,7 +31,6 @@ local iconTextures = {
 }
 
 function SetLayout()
-    local controls = import("/lua/ui/game/unitview.lua").controls
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
@@ -171,8 +172,6 @@ function SetBG(controls)
 end
 
 function PositionWindow()
-    local controls = import("/lua/ui/game/unitview.lua").controls
-    local consControl = import("/lua/ui/game/construction.lua").controls.constructionGroup
     if consControl:IsHidden() then
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
         LayoutHelpers.AtLeftIn(controls.bg, consControl, 18)

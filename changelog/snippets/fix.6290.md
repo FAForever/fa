@@ -1,0 +1,1 @@
+- (#6290) Define the Asylum's (Aeon T2 Mobile Shield) footprint in its blueprint.

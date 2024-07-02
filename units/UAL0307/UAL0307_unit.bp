@@ -118,6 +118,10 @@ UnitBlueprint{
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
     },
+    Footprint = {
+        SizeX = 1,
+        SizeZ = 1,
+    },
     General = {
         CommandCaps = {
             RULEUCC_CallTransport = true,

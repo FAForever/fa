@@ -37,6 +37,7 @@ UnitBlueprint{
         Health = 150,
         MaxHealth = 150,
         Shield = {
+            AbsorptionType = "StaticShield",
             ImpactEffects = "AeonShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
             Mesh = "/effects/entities/AeonShield01/AeonShield01_mesh",

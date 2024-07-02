@@ -1,0 +1,1 @@
+- (#6280) Increase the maximum amount of energy that can be stored before mass fabricators turn on from 61000 to 108000 to allow full damage overcharges.
