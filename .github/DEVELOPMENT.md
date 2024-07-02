@@ -1,6 +1,6 @@
-# Best practices
+# Development
 
-This document contains a wide range of tips and tricks surrounding the development of the Lua code of the FAForever project. It can help you setup the development environment. It can help you with understand what is, and is not available to you in the Lua environment of Supreme Commander. And it even provides a few performance oriented practices. It is however not a guide on how to write Lua code. And it is not a guide on programming in general. And it is also not a guide on how Git and/or GitHub works.
+This document contains a wide range of tips and tricks surrounding the development of the Lua code of the FAForever project. It can help you setup the development environment. It can help you with understand what is, and is not available to you in the Lua environment of Supreme Commander. It is however not a guide on how to write Lua code. And it is not a guide on programming in general. And it is also not a guide on how Git and/or GitHub works.
 
 ## Tooling
 
@@ -81,10 +81,11 @@ This is run when a game session has started. It is responsible for a lot of the 
 
 This is run when a game session has started. It is responsible for all the Lua interactions in the simulation and all [sim globals](../engine/Sim.lua) are available. The [simInit.lua](../lua/simInit.lua) is run to initialize the context. You can use [UserSync.lua](../lua/UserSync.lua) to pass information to the Session UI context.
 
+<!-- 
 ## Writing high performing Lua code for Supreme Commander
 
 It goes without saying that premature optimisation is the root of all evil in the world. But Supreme Commander is not like the world. There is some common hygiene that you can apply to make your code a magnitude faster and more readable at the same time.
 
 In Supreme Commander all Lua code is read, parsed and transpiled into bytecode that represent instructions. This happens when a module is [imported](../lua/system/import.lua) for the first time. The instructions are then executed by an interpreter. Unlike the [average compiler](https://en.wikipedia.org/wiki/Optimizing_compiler), an interpreter (and specifically a Lua interpreter) takes your code extremely literal. The instructions directly map to the syntax of the Lua script. You can learn more about what instructions exist by reading chapter 7 of [The implementation of Lua 5.0](https://www.lua.org/doc/jucs05.pdf). You can evaluate the instructions that make up a function using `debug.listcode`.
 
-<todo>
+<todo> -->
