@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 290,
                     ShaderName = "VertexNormal",
                     AlbedoName = "UEF_Building_002_albedo.dds",
                     NormalsName = "UEF_Building_002_normalsTS.dds",
