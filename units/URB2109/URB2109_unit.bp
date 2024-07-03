@@ -12,6 +12,7 @@ UnitBlueprint{
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Gun', LodCutoff = 'UnitMove_LodCutoff' },
         Unpack         = Sound { Bank = 'URB',        Cue = 'URB2109_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1600,
     BuildIconSortPriority = 130,
     Categories = {
         "ANTINAVY",

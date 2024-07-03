@@ -15,6 +15,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XSS',            Cue = 'XSS0303_Move_Stop',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 24000,
     BuildIconSortPriority = 30,
     Categories = {
         "AIRSTAGINGPLATFORM",

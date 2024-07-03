@@ -3,12 +3,16 @@ PropBlueprint{
         "OBSTRUCTSBUILDING",
         "RECLAIMABLE",
     },
+    Defense = {
+        Health = 120,
+        MaxHealth = 120,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 350,
+                    LODCutoff = 290,
                     ShaderName = "VertexNormal",
                     AlbedoName = "boards_1_tiled_albedo.dds",
                     SpecularName = "boards_1_tiled_albedo.dds",

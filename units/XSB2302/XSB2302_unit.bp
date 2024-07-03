@@ -7,6 +7,7 @@ UnitBlueprint{
         Killed         = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_gun',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 13500,
     BuildIconSortPriority = 140,
     Categories = {
         "ARTILLERY",

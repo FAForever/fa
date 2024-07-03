@@ -8,6 +8,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'XSS',            Cue = 'XSS_Sub_Surface',            LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Sonar',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1400,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER2COMMANDER",

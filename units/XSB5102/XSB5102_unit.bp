@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xsb5102_desc>Seraphim Transport Beacon",
+    AverageDensity = 10,
     Categories = {
         "FERRYBEACON",
         "PRODUCTFA",

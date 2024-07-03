@@ -759,6 +759,29 @@ function VerifyBlinkingLights(unit)
     end
 end
 
+--- Feature: Unit weight based on the maximum health of a unit
+---
+--- Affects the behavior of units when they bump into each other. Units 
+--- with more weight push units with less weight. As a result units with
+--- more health will receive less to no pushback from units with less health.
+---@param unit UnitBlueprint
+local function ProcessUnitDensity(unit)
+    local averageDensity = 10
+    if unit.Defense and unit.Defense.MaxHealth then
+        averageDensity = unit.Defense.MaxHealth
+
+        if unit.Physics and unit.Physics.MotionType == "RULEUMT_Hover" then
+            averageDensity = 0.50 * averageDensity
+        end
+    end
+
+    if averageDensity ~= unit.AverageDensity then
+        WARN(string.format("Overwriting the average density of %s from %s to %s", tostring(unit.BlueprintId), unit.AverageDensity, averageDensity))
+    end
+
+    unit.AverageDensity = averageDensity
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
@@ -776,6 +799,18 @@ function PostProcessUnits(allBlueprints, units)
     for _, unit in pairs(units) do
         if unit.CategoriesHash['EXTERNALFACTORY'] then
             PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
+    end
+end
+
+--- Batch process all units
+---@param blueprints BlueprintsTable
+function BatchProcessUnits(blueprints)
+    LOG("Batch processing units")
+    if blueprints.Unit then
+        for _, unit in pairs(blueprints.Unit) do
+            ProcessCanLandOnWater(unit)
+            ProcessUnitDensity(unit)
         end
     end
 end
