@@ -1,5 +1,5 @@
 ---
-title: Deployment
+title: Development
 layout: page
 nav_order: 4
 permalink: /development
