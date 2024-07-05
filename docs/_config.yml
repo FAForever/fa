@@ -1,10 +1,7 @@
-title: FAForever Game Repository
+title: FAForever Game Repo
 description: All the Documentation for the Maintenance of the FA Repository for all New and existing Maintainers
 theme: just-the-docs
-logo: "./assets/FAF-Logo.svg"
-favlogo_ico: "./assets/FAF-Logo.ico"
-
-url: https://just-the-docs.github.io
+url: https://FAForever.github.io
 nav_enabled: true
 search_enabled: false
 # color_scheme: "dark"
