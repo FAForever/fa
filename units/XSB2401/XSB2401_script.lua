@@ -32,6 +32,9 @@ XSB2401 = ClassUnit(SStructureUnit) {
         DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
+    --- Run any OnGiven callbacks then update the missile slider on the new unit to the correct position.
+    ---@param self XSB2401
+    ---@param newUnit Unit
     OnGiven = function(self, newUnit)
         SStructureUnit.OnGiven(self, newUnit)
         if self.MissileBuilt then
