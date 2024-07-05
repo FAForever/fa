@@ -67,6 +67,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
         -- Convey to the player how the launcher reloads by showing the effect right when it is built
         -- Also creates the initial pulsing glow for when the launcher is reloaded and missile is built
+        -- Though this doesn't mean that the launcher is unable to fire, since the weapon's state starts reloaded.
         self.PlayReloadEffects(self:GetWeapon(1))
     end,
 
@@ -145,15 +146,18 @@ XSB2401 = ClassUnit(SStructureUnit) {
         -- Create the reload stage effects: 3 effects in the middle column and a blue glow when the missile is built and launcher is reloaded
         local reloadTime = bp.RackSalvoReloadTime
         weapon.Trash:Add(ForkThread(function()
+            -- stage effects
             local stage = 0
             while stage < 3 do
                 WaitSeconds(reloadTime/3)
                 stage = stage + 1
                 unit:CreateReloadEmitter(stage)
             end
+            -- wait until the missile is built
             while not unit.MissileBuilt do
                 WaitTicks(1)
             end
+            -- play the "missile built and launcher reloaded" effects
             local template = EffectTemplate.SIFExperimentalStrategicLauncherLoaded01
             for i, effect in template do
                 if not unit.MissileEffect[stage + 1] then
