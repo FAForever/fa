@@ -71,7 +71,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
         -- Convey to the player how the launcher reloads by showing the effect right when it is built
         -- Also creates the initial pulsing glow for when the launcher is reloaded and missile is built
         -- Though this doesn't mean that the launcher is unable to fire, since the weapon's state starts reloaded.
-        self.PlayReloadEffects(self:GetWeapon(1))
+        self.PlayReloadEffects(self.WeaponInstances[1])
     end,
 
     ---@param self XSB2401
