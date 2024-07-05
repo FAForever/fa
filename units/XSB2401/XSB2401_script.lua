@@ -1,7 +1,7 @@
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/XSB2401/XSB2401_script.lua
 -- Author(s):  John Comes, David Tomandl, Matt Vainio
--- Summary  :  Seraphim Tactical Missile Launcher Script
+-- Summary  :  Seraphim Experimental Strategic Missile Launcher Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
