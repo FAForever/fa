@@ -22,11 +22,11 @@ Forged Alliance Forever is a vibrant, community-driven [project](https://github.
 
 All contributions are expected to apply the [code of conduct](https://www.faforever.com/rules) to create a healthy and sustainable contributor environment.
 
-- [Changelog](./.github/CHANGELOG.md): documentation about how we manage changelogs and release notes.
-- [Development](./.github/DEVELOPMENT.md): documentation about development including how to setup a development environment and various best practices.
-- [Deployment](./.github/DEVELOPMENT.md): documentation about deployment to the FAF, FAF Beta Balance and FAF Develop game types.
+- [Changelog](changelog): documentation about how we manage changelogs and release notes.
+- [Development](development): documentation about development including how to setup a development environment and various best practices.
+- [Deployment](deployment): documentation about deployment to the FAF, FAF Beta Balance and FAF Develop game types.
 
-In addition, there is an [extensive guide](./setup/setup-english.md) to help you setup your development environment. This guide is due to be replaced by the development file.
+In addition, there is an [extensive guide](development/development-environment) to help you setup your development environment. This guide is due to be replaced by the development file.
 
 ## Related repositories
 
