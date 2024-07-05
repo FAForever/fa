@@ -32,6 +32,16 @@ XSB2401 = ClassUnit(SStructureUnit) {
         DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
+    OnGiven = function(self, newUnit)
+        SStructureUnit.OnGiven(self, newUnit)
+        if self.MissileBuilt then
+            newUnit.MissileSlider:SetGoal(0, 0, 115)
+            newUnit.MissileBuilt = true
+        else
+            newUnit.MissileSlider:SetGoal(0, 0, 115 * self:GetWorkProgress())
+        end
+    end,
+
     ---@param self XSB2401
     ---@param builder Unit
     ---@param layer string
