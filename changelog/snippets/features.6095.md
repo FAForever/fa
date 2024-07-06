@@ -1,1 +1,1 @@
-- (#6095, #6312) Implement a new area attack order when you left click and drag while issuing an attack command. It issues extra orders within the radius of the command which you can then distribute to spread out the attacks.
+- (#6095, #6312, #6317) Implement a new area attack order when you left click and drag while issuing an attack command. It issues extra orders within the radius of the command which you can then distribute to spread out the attacks.
