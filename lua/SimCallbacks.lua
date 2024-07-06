@@ -803,9 +803,8 @@ do
 
         local start = GetSystemTimeSecondsOnlyForProfileUse()
         import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection,
-            { lastCommand.x, lastCommand.y, lastCommand.z }, true, data.Radius)
-        SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start),
-            "miliseconds")
+            { lastCommand.x, lastCommand.y, lastCommand.z }, data.Radius)
+        SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
     end
 
 end

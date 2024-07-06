@@ -335,9 +335,6 @@ function BeginSession()
     -- add on game over callbacks
     ForkThread(GameOverListenerThread)
 
-    -- log game time
-    ForkThread(GameTimeLogger)
-
     -- keep track of units off map
     OnStartOffMapPreventionThread()
 
@@ -542,17 +539,6 @@ function BeginSessionEffects()
                 end
             end
         end
-    end
-end
-
-function GameTimeLogger()
-    while true do
-        GTS = GetGameTimeSeconds()
-        hours   = math.floor(GTS / 3600);
-        minutes = math.floor((GTS - (hours * 3600)) / 60);
-        seconds = GTS - (hours * 3600) - (minutes * 60);
-        SPEW(string.format('Current gametime: %02d:%02d:%02d', hours, minutes, seconds))
-        WaitSeconds(30)
     end
 end
 

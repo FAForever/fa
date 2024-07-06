@@ -113,7 +113,6 @@ if replayID then
     LOG("REPLAY ID: " .. replayID)
 end
 
-
 do
 
     -- Moderation functionality

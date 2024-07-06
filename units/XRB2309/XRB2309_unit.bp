@@ -7,6 +7,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',          LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Gun',          LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 9000,
     BuildIconSortPriority = 130,
     Categories = {
         "ANTINAVY",

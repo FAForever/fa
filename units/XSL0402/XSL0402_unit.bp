@@ -6,6 +6,7 @@ UnitBlueprint{
         HoverKilledOnWater = Sound { Bank = 'Explosions',  Cue = 'Expl_Water_Lrg_01', LodCutoff = 'UnitMove_LodCutoff' },
         Spawn              = Sound { Bank = 'XSL',         Cue = 'XSL0402_Spawn',     LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 50.0,
     BuildIconSortPriority = 10,
     Categories = {
         "EXPERIMENTAL",
