@@ -1,3 +1,10 @@
+---
+layout: post
+title: Blender and PBR Texture
+parent: Development
+permalink: development/blender-pbr
+---
+
 # How to Import Units & add PBR Texture
 
 This guide can also be found on [Youtube](https://youtu.be/pq9os0NhfB4), with thanks to Rowey.
@@ -10,27 +17,27 @@ This guide can also be found on [Youtube](https://youtu.be/pq9os0NhfB4), with th
 
 ### Importing Unit
 
-Open `PBR Shaders.blend` then import the unit you want through `file > import > supreme commander model`. The unit will have a material already attached, but it is the wrong (default) material. If you want multiple models to have the right relative scale to each other, you can scale the object according to the unit's `UniformScale` in its blueprint.
+Open [`PBR Shaders.blend`](./assets/PBR%20shaders.blend) then import the unit you want through `file > import > supreme commander model`. The unit will have a material already attached, but it is the wrong (default) material. If you want multiple models to have the right relative scale to each other, you can scale the object according to the unit's `UniformScale` in its blueprint.
 
-![Adding Unit](/blender/step%201.png)
+![Adding Unit](./assets/step1.png)
 
 ### Changing the material
 
 Change the material that the importer assigned to one of the PBR materials. It's named after the corresponding faction. In a shader editor you can change it by clicking the ball.
 
-![Applying PBR material](/blender/step2.png)
+![Applying PBR material](./assets/step2.png)
 
 ### Make the material only affect the current model
 
 By default blender will just link to the existing material. Changes here would also affect the original object you got this material from. Make this material a single user by pressing the "2".
 
-![Apply material to specific Unit](/blender/step3.png)
+![Apply material to specific Unit](./assets/step3.png)
 
 ### Apply the Unit Texture
 
 You can now change the textures to the ones appropriate for your new model. Press the "x".
 
-![remove current texture](/blender/step%204.png)
+![remove current texture](./assets/step4.png)
 
 Then you can open a new texture. Browse to the correct folder and select the right texture(unit_Albedo.dds).
 
@@ -38,7 +45,7 @@ Then you can open a new texture. Browse to the correct folder and select the rig
 
 As a last step you need to make sure that the SpecTeam and Normal map use Non-Color colorspace.
 
-![set to no-color](/blender/step%205.png)
+![set to no-color](./assets/step5.png)
 
 Otherwise the unit will look kind of odd and blender likes to reset that to sRGB colorspace when changing the image.
 
