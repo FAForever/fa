@@ -49,6 +49,6 @@ jobs:
           git pull origin develop --rebase
 
       # Update the deploy/faf branch
-      - name: Rebase deploy/faf
+      - name: Update deploy/faf
         run: |
           git push
