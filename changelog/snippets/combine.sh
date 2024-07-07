@@ -83,8 +83,8 @@ if ! [ -e "$templateOther" ]; then
 fi
 
 if ! ls *.md >/dev/null 2>&1; then
-    echo "No Markdown files found to combine. Are you looking in the wrong directory?"
-    exit 1
+    echo "No Markdown files found to combine."
+    exit 0
 fi
 
 #endregion
