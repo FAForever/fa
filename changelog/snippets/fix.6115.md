@@ -1,1 +1,0 @@
-- (#6115, #6201) Fix damage calculation in the unit view UI for beam weapons with a `BeamCollisionDelay` such as the Zapper's weapon.

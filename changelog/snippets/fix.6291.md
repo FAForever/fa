@@ -1,1 +1,0 @@
-- (#6291) Fix unit tooltip clipping with contruction tech level selection or enhancement slot selection UI in replays on the default layout (mini).

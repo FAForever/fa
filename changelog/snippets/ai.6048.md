@@ -1,1 +1,0 @@
-- (#6048) Increase maximum distances for Naval Area marker generation to improve AI naval presence on certain maps.

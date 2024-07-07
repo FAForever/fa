@@ -1,1 +1,0 @@
-- (#6316) Add `game/worldview.lua` function `GetMousedOverWorldView()` that returns the top-most moused-over worldview, useful for in-world cursor overlays.
