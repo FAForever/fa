@@ -51,6 +51,10 @@ REM /init               Defines what initialisation file to use
 REM /EnableDiskWatch    Allows the game to reload files when it sees they're changed on disk
 REM /showlog            Opens the moho log by default
 REM /log                Defines where to store the log file
+REM /nomovie            Removes potentially lagging starting/launching movies (will require you to hit escape on startup)
+REM
+REM Other interesting program arguments:
+REM /debug              Start the game with the Lua debugger enabled
 ```
 
 For Linux users you can use the following bash script file instead:
@@ -66,8 +70,10 @@ $RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_dev.lua /showlog /
 # /EnableDiskWatch    Allows the game to reload files when it sees they're changed on disk
 # /showlog            Opens the moho log by default
 # /log                Informs the game where to store the log
-# /nomovie            Removes super laggy starting/launching movies (will require you to hit escape on startup)
-
+# /nomovie            Removes potentially lagging starting/launching movies (will require you to hit escape on startup)
+#
+# Other interesting program arguments:
+# /debug              Start the game with the Lua debugger enabled
 ```
 
 Now you can start the game by executing the batch/bash script file. If all is good then the game starts as usual and you'll be in the main menu. If something is off then the game usually does not start. In that case you likely made a typo.
