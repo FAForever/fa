@@ -40,15 +40,13 @@ jobs:
       - name: Checkout FA repository
         uses: actions/checkout@v4
         with:
-          repository: FAForever/fa
-          ref: deploy/faf
+            repository: FAForever/fa
+            ref: develop
 
-      # Rebase the deploy/faf branch
-      - name: Rebase deploy/faf
-        run: |
-          git pull origin develop --rebase
-
-      # Update the deploy/faf branch
+      # Update the deploy/faf branch, we force push here because 
+      # we're not interested in fixing conflicts
       - name: Update deploy/faf
         run: |
-          git push
+          git push origin HEAD:deploy/faf --force
+
+
