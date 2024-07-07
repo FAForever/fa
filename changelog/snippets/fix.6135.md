@@ -1,1 +1,0 @@
-- (#6135) Fix several experimental units not being able to damage units by walking over them.

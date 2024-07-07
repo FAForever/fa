@@ -1,1 +1,0 @@
-- (#6134) Various general fixes and optimizations for the Cooperative AI, along with a change to its base building logic from a thread-based one to using unit callbacks, resulting in more reliable structure registrations and upgrades.
