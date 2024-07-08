@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Step by Step Example of manual crash analysis
-parent: Development
+title: Example of Manual Crash Analysis
 permalink: development/manual-crash-analysis
+parent: Development
 ---
 
 We will analyze this: [#2045 (comment)](https://github.com/FAForever/fa/issues/2045#issuecomment-924210717)

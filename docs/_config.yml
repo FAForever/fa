@@ -6,4 +6,3 @@ nav_enabled: true
 search_enabled: false
 logo: "./assets/FAF-Logo.svg"
 favlogo_ico: "./assets/favicon.ico"
-# color_scheme: "dark"

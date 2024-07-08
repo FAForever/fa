@@ -1,8 +1,8 @@
 ---
-title: Deployment
 layout: page
-nav_order: 3
+title: Deployment
 permalink: /deploy
+nav_order: 3
 ---
 
 # Deployment

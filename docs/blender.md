@@ -1,8 +1,8 @@
 ---
-layout: post
-title: Blender and PBR Texture
-parent: Development
-permalink: development/blender-pbr
+layout: page
+title: Blender & PBR
+permalink: /blender
+nav_order: 4
 ---
 
 # How to Import Units & add PBR Texture
