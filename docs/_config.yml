@@ -4,5 +4,6 @@ theme: just-the-docs
 url: https://FAForever.github.io
 nav_enabled: true
 search_enabled: false
-icon: "./assets/FAF-Logo.svg"
+logo: "./assets/FAF-Logo.svg"
+favlogo_ico: "./assets/favicon.ico"
 # color_scheme: "dark"
