@@ -1,9 +1,11 @@
 ---
-layout: post
+layout: page
 title: Example of Manual Crash Analysis
 permalink: development/manual-crash-analysis
 parent: Development
 ---
+
+# Step by Step Example of Manual Crash Analysis
 
 We will analyze this: [#2045 (comment)](https://github.com/FAForever/fa/issues/2045#issuecomment-924210717)
 The analysis of this simple example should help those who want to start picking FAF.

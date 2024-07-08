@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 title: Creating the Changelogs
 parent: Changelogs
 permalink: changelog/creating-changelog

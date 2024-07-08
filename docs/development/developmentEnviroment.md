@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 title: Setting up Development Environment
 parent: Development
 permalink: development/development-environment
