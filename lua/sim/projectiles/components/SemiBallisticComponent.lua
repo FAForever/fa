@@ -214,8 +214,7 @@ SemiBallisticComponent = ClassSimple {
     ---@return number
     OptimalMaxHeight = function(self)
         local horizDist = self:HorizontalDistanceToTarget()
-        local targetHeight = self:GetCurrentTargetPosition()[2]
-        local maxHeight = targetHeight + horizDist/(self.HeightDistanceFactor + self.HeightDistanceFactorRange * (2 * Random() - 1))
+        local maxHeight = self:GetPosition()[2] + horizDist/(self.HeightDistanceFactor + self.HeightDistanceFactorRange * (2 * Random() - 1))
         return maxHeight
     end,
 
