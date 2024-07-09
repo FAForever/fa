@@ -190,30 +190,6 @@ UnitBlueprint{
         TeleportTimeMod = 0.0001,
     },
     EnhancementPresets = {
-        BubbleShield = {
-            Description = "<LOC uel0301_BubbleShield_desc>SACU (Shield preset)",
-            BuildIconSortPriority = 30,
-            Enhancements = {
-                "Shield",
-                "ShieldGeneratorField",
-            },
-            HelpText = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
-            SelectionPriority = 1,
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_BubbleShield_name>SACU (Shield preset)",
-        },
-        Combat = {
-            Description = "<LOC uel0301_Combat_desc>SACU (Combatant preset)",
-            BuildIconSortPriority = 15,
-            Enhancements = {
-                "AdvancedCoolingUpgrade",
-                "HighExplosiveOrdnance",
-            },
-            HelpText = "<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.",
-            SelectionPriority = 1,
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_Combat_name>SACU (Combatant preset)",
-        },
         Engineer = {
             Description = "<LOC uel0301_Engineer_desc>SACU (Engineer preset)",
             BuildIconSortPriority = 20,
@@ -222,17 +198,6 @@ UnitBlueprint{
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_Engineer_name>SACU (Engineer preset)",
         },
-        IntelJammer = {
-            Description = "<LOC uel0301_IntelJammer_desc>SACU (Intel Jammer preset)",
-            BuildIconSortPriority = 35,
-            Enhancements = {
-                "RadarJammer",
-                "SensorRangeEnhancer",
-            },
-            HelpText = "<LOC uel0301_IntelJammer_help>Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.",
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_IntelJammer_name>SACU (Intel Jammer preset)",
-        },
         RAS = {
             Description = "<LOC uel0301_RAS_desc>SACU (RAS preset)",
             BuildIconSortPriority = 10,
@@ -240,6 +205,19 @@ UnitBlueprint{
             HelpText = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_RAS_name>SACU (RAS preset)",
+        },
+        Support = {
+            Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
+            BuildIconSortPriority = 25,
+            Enhancements = {
+                "AdvancedCoolingUpgrade",
+                "HighExplosiveOrdnance",
+                "Shield",
+            },
+            HelpText = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
+            SelectionPriority = 1,
+            SortCategory = "SORTOTHER",
+            UnitName = "<LOC uel0301_Rambo_name>SACU (Rambo preset)",
         },
         Rambo = {
             Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
@@ -311,29 +289,6 @@ UnitBlueprint{
         },
 
         -- Back Upgrade
-        Pod = {
-            BuildCostEnergy = 8700,
-            BuildCostMass = 380,
-            BuildTime = 2500,
-            Icon = "ed",
-            Name = "<LOC enhancements_0065>C-D3 Engineering Drone",
-            Slot = "Back",
-            UpgradeEffectBones = { "AttachSpecial01" },
-            UpgradeUnitAmbientBones = { "UEL0301" },
-        },
-        PodRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "ed",
-            Name = "<LOC enhancements_0066>C-D3 Remove Engineering Drone",
-            Prerequisite = "Pod",
-            RemoveEnhancements = {
-                "Pod",
-                "PodRemove",
-            },
-            Slot = "Back",
-        },
         Shield = {
             BuildCostEnergy = 100200,
             BuildCostMass = 2000,
@@ -352,7 +307,7 @@ UnitBlueprint{
             ShieldRegenStartTime = 1,
             ShieldSize = 3,
             ShieldVerticalOffset = 0,
-            NewHealthMod = 6500,
+            NewHealth = 6500,
             ShowBones = { "Jetpack" },
             Slot = "Back",
             UpgradeEffectBones = {
@@ -361,6 +316,20 @@ UnitBlueprint{
                 "Arm_Left_B01",
             },
             UpgradeUnitAmbientBones = { "UEL0301" },
+        },
+        ShieldRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "Jetpack" },
+            Icon = "psg",
+            Name = "<LOC enhancements_0076>Remove Personal Shield Generator",
+            Prerequisite = "Shield",
+            RemoveEnhancements = {
+                "Shield",
+                "ShieldRemove",
+            },
+            Slot = "Back",
         },
         ShieldGeneratorField = {
             BuildCostEnergy = 360800,
@@ -401,17 +370,26 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
-        ShieldRemove = {
+        Pod = {
+            BuildCostEnergy = 8700,
+            BuildCostMass = 380,
+            BuildTime = 2500,
+            Icon = "ed",
+            Name = "<LOC enhancements_0065>C-D3 Engineering Drone",
+            Slot = "Back",
+            UpgradeEffectBones = { "AttachSpecial01" },
+            UpgradeUnitAmbientBones = { "UEL0301" },
+        },
+        PodRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
-            HideBones = { "Jetpack" },
-            Icon = "psg",
-            Name = "<LOC enhancements_0076>Remove Personal Shield Generator",
-            Prerequisite = "Shield",
+            Icon = "ed",
+            Name = "<LOC enhancements_0066>C-D3 Remove Engineering Drone",
+            Prerequisite = "Pod",
             RemoveEnhancements = {
-                "Shield",
-                "ShieldRemove",
+                "Pod",
+                "PodRemove",
             },
             Slot = "Back",
         },

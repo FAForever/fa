@@ -5,12 +5,21 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local Shield = import("/lua/shield.lua").Shield
-local EffectUtil = import("/lua/effectutilities.lua")
+---@alias UEFSCUEnhancementBuffType
+---| "SCUBuildRate"
+---| "SCUHealthBonus"
+
+
+---@alias UEFSCUEnhancementBuffName
+---| "UEFHealthBonus"
+
+
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
+local EffectUtil = import("/lua/effectutilities.lua")
+local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0301 : CommandUnit
 UEL0301 = ClassUnit(CommandUnit) {
@@ -54,7 +63,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UEL0301
     ---@param unitBeingBuilt Unit
-    ---@param order string
+    ---@param order string # unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -127,7 +136,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UEL0301
-    ---@param pod TConstructionPodUnit
+    ---@param pod TConstructionPodUnit # unused
     ---@param rebuildDrone boolean
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
@@ -199,6 +208,25 @@ UEL0301 = ClassUnit(CommandUnit) {
             end
             KillThread(self.RebuildThread)
         elseif enh == 'Shield' then
+            if not Buffs['UEFSCUHealthBonus'] then
+                BuffBlueprint {
+                    Name = 'UEFSCUHealthBonus',
+                    DisplayName = 'UEFSCUHealthBonus',
+                    BuffType = 'SCUHealthBonus',
+                    Stacks = "ALWAYS",
+                    Duration = -1,
+                    Affects = {
+                        MaxHealth = {
+                            Add = bp.NewHealth,
+                            Mult = 1.0,
+                        },
+                    },
+                }
+            end
+            if Buff.HasBuff(self, 'UEFSCUHealthBonus') then
+                Buff.RemoveBuff(self, 'UEFSCUHealthBonus')
+            end
+            Buff.ApplyBuff(self, 'UEFSCUHealthBonus')
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -208,6 +236,9 @@ UEL0301 = ClassUnit(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            if Buff.HasBuff(self, 'UEFSCUHealthBonus') then
+                Buff.RemoveBuff(self, 'UEFSCUHealthBonus')
+            end
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
             self:ForkThread(function()
