@@ -9,6 +9,7 @@ UnitBlueprint{
         StopMove      = Sound { Bank = 'UAL',        Cue = 'UAL0303_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection   = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Bot',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1700,
     BuildIconSortPriority = 25,
     Categories = {
         "AEON",

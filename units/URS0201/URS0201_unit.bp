@@ -21,6 +21,7 @@ UnitBlueprint{
         TransitionWater                = Sound { Bank = 'URSStream',  Cue = 'URS0201_Land_Retract',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Naval',     LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 6500,
     BuildIconSortPriority = 25,
     Categories = {
         "AMPHIBIOUS",

@@ -6,27 +6,27 @@ PropBlueprint{
     },
     Categories = { "RECLAIMABLE" },
     Defense = {
-        Health = 100,
-        MaxHealth = 100,
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 60,
+                    LODCutoff = 40,
                     ShaderName = "UndulatingNormalMappedAlpha",
                     AlbedoName = "fallmix1oak1_s3_albedo.dds",
                     NormalsName = "oak1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 300,
+                    LODCutoff = 150,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "fallmix1oak1_s3_albedo.dds",
                     NormalsName = "oak1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 820,
+                    LODCutoff = 330,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "fallmix1oak1_s3_LOD2_albedo.dds",
                     NormalsName = "oak1_normalsTS.dds",

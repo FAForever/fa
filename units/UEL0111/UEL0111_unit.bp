@@ -10,6 +10,7 @@ UnitBlueprint{
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Vehicle',   LodCutoff = 'UnitMove_LodCutoff' },
         Unpack      = Sound { Bank = 'UEL',        Cue = 'UEL0111_Open',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 825,
     BuildIconSortPriority = 100,
     Categories = {
         "BUILTBYTIER2FACTORY",

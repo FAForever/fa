@@ -24,6 +24,7 @@ UnitBlueprint{
         TeleportIn                    = Sound { Bank = 'Impacts',     Cue = 'AEON_Expl_Lrg_Naval',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                   = Sound { Bank = 'Interface',   Cue = 'Aeon_Select_Commander',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 15000,
     BuildIconSortPriority = 10,
     Categories = {
         "AEON",
@@ -53,9 +54,9 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Normal",
         EconomyThreatLevel = 968,
-        Health = 15000,
-        MaxHealth = 15000,
-        RegenRate = 17,
+        Health = 11500,
+        MaxHealth = 11500,
+        RegenRate = 14,
         SurfaceThreatLevel = 30,
     },
     Display = {
@@ -183,10 +184,10 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 27100,
-        BuildCostMass = 1950,
-        BuildRate = 56,
-        BuildTime = 14400,
+        BuildCostEnergy = 21450,
+        BuildCostMass = 1650,
+        BuildRate = 40,
+        BuildTime = 11500,
         BuildableCategory = { "BUILTBYTIER3ENGINEER AEON" },
         MaxBuildDistance = 10,
         NaturalProducer = true,
@@ -596,7 +597,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 100,
             DamageType = "Normal",
             DisplayName = "Reacton Cannon",
             FireTargetLayerCapsTable = {
@@ -605,7 +606,7 @@ UnitBlueprint{
             },
             FiringTolerance = 2,
             Label = "RightReactonCannon",
-            MaxRadius = 30,
+            MaxRadius = 25,
             MinRadius = 1,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
@@ -702,6 +703,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Land = true },
+        WreckageLayers = { Land = true, Seabed = true },
     },
 }

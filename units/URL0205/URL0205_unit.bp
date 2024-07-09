@@ -7,6 +7,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'URL',        Cue = 'URL0205_Move_Stop',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1000,
     BuildIconSortPriority = 30,
     Categories = {
         "ANTIAIR",

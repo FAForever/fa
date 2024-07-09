@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC urb5102_desc>Cybran Transport Beacon",
+    AverageDensity = 10,
     Categories = {
         "CYBRAN",
         "FERRYBEACON",

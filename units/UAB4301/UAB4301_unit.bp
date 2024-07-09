@@ -11,6 +11,7 @@ UnitBlueprint{
         ShieldOn       = Sound { Bank = 'UAB',        Cue = 'UAB4301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Structure',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 300,
     BuildIconSortPriority = 160,
     Categories = {
         "AEON",

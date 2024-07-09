@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove       = Sound { Bank = 'URS',        Cue = 'URS0305_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Sonar', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1200,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER3COMMANDER",

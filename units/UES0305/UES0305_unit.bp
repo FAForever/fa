@@ -14,6 +14,7 @@ UnitBlueprint{
         StopMove       = Sound { Bank = 'UES',        Cue = 'UES0305_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Sonar',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2000,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER3COMMANDER",

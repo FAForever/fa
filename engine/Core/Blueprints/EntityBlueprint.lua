@@ -3,7 +3,7 @@
 ---@class EntityBlueprint : HitBox, Blueprint
 --- alternate Unit footprint
 ---@field AltFootprint? FootprintBlueprint
---- unit average density in tons / m^3 (default is 0.49)
+--- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other. Units with more weight push units with less weight.
 ---@field AverageDensity? number
 --- list of category names that this entity belongs to
 ---@field Categories CategoryName[]
