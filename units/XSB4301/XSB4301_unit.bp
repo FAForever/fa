@@ -12,6 +12,7 @@ UnitBlueprint{
         ShieldOn       = Sound { Bank = 'XSB',            Cue = 'XSB4301_On_Off',             LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Structure',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 600,
     BuildIconSortPriority = 160,
     Categories = {
         "BUILTBYTIER3COMMANDER",

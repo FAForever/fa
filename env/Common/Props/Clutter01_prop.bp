@@ -14,7 +14,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 300,
+                    LODCutoff = 110,
                     ShaderName = "Clutter",
                     AlbedoName = "Clutter01_albedo.dds",
                 },

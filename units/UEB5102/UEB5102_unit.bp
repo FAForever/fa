@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ueb5102_desc>UEF Transport Beacon",
+    AverageDensity = 10,
     Categories = {
         "FERRYBEACON",
         "PRODUCTSC1",

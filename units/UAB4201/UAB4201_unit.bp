@@ -7,6 +7,7 @@ UnitBlueprint{
         Open           = Sound { Bank = 'UAB',        Cue = 'UAB4201_Doors',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Gun',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 155,
     Categories = {
         "AEON",

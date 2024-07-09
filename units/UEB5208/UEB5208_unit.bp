@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ueb5208_desc>Sonar Beacon",
+    AverageDensity = 5,
     Categories = {
         "PRODUCTSC1",
         "SONAR",

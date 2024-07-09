@@ -41,6 +41,7 @@ UnitBlueprint{
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Air',      LodCutoff = 'UnitMove_LodCutoff' },
         Unload             = Sound { Bank = 'UEA',        Cue = 'UEA0104_Unit_Unload',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3700,
     BuildIconSortPriority = 40,
     Categories = {
         "AIR",

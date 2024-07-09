@@ -10,6 +10,7 @@ UnitBlueprint{
         ShieldOn       = Sound { Bank = 'URB',        Cue = 'URB4202_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Structure',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 160,
     Categories = {
         "BUILTBYTIER2COMMANDER",
