@@ -30,14 +30,18 @@
     - RegenRate: 15 -> 12
     - BuildRate: 56 -> 40
     - GunDamage: 400 -> 100
+    - EnergyProd: 300 -> 100
+    - MassProd: 3 -> 1
 
   - All:
+    - MassCost: 1650
+    - EnergyCost: 21,450
+    - BuildTime: 11500
+    - Wreck will show on the Seabed when unit dies
 
-    - Wreck will show on the Seabed
+  Small Buff to the Quantum Gate.
 
-    Small Buff to the Quantum Gate.
-
-    - Health: 10000 -> 7500
-    - EnergyCost: 30000 -> 25500
-    - MassCost: 3000 -> 2550
-    - BuildTime: 4097 -> 4100
+  - Health: 10000 -> 7500
+  - EnergyCost: 30000 -> 25500
+  - MassCost: 3000 -> 2550
+  - BuildTime: 4097 -> 4100
