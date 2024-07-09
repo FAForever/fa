@@ -217,7 +217,7 @@ UnitBlueprint{
                 Treads = { ScrollTreads = true },
             },
         },
-        UniformScale = 0.209,
+        UniformScale = 0.215,
     },
     Economy = {
         BuildCostEnergy = 350000,
@@ -312,9 +312,9 @@ UnitBlueprint{
     SelectionSizeX = 4,
     SelectionSizeZ = 5.25,
     SelectionThickness = 0.34,
-    SizeX = 5.5,
-    SizeY = 1.5,
-    SizeZ = 8,
+    SizeX = 5.2,
+    SizeY = 1.4,
+    SizeZ = 7.5,
     StrategicIconName = "icon_experimental_generic",
     StrategicIconSortPriority = 45,
     Transport = {
