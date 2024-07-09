@@ -15,6 +15,7 @@ In general the Fatboy has been in an awkward position for a while now. With thes
 - The (collision) size is reduced by roughly 5% - 7% to make artillery less viable.
 
   - UniformScale: 2.22 -> 2.15
+  - ShieldSize: 25 -> 24
   - SizeX: 5.5 -> 5.2
   - SizeY: 1.5 -> 1.4
   - SizeZ: 8.0 -> 7.2
