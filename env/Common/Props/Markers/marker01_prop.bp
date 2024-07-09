@@ -1,9 +1,16 @@
 PropBlueprint{
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
-                { ShaderName = "EditorMarker" },
+                {
+                    LODCutoff = 210,
+                    ShaderName = "EditorMarker",
+                },
             },
         },
         UniformScale = 0.1,

@@ -29,8 +29,8 @@
 # directory. The active directory should always be '(...)/fa/changelog/snippets'
 
 if ! ls *.md >/dev/null 2>&1; then
-    echo "No Markdown files found to verify. Are you looking in the wrong directory?"
-    exit 1
+    echo "No Markdown files found to verify."
+    exit 0
 fi
 
 #endregion

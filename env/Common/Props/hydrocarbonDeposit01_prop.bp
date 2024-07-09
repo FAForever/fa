@@ -3,12 +3,16 @@ PropBlueprint{
         "INVULNERABLE",
         "UNTARGETABLE",
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 50,
+                    LODCutoff = 70,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "hydrocarbonDeposit01_albedo.dds",
                     NormalsName = "hydrocarbonDeposit01_normalsTS.dds",
@@ -19,6 +23,8 @@ PropBlueprint{
     },
     Interface = { HelpText = "hydrocarbonDeposit" },
     Physics = { BlockPath = false },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     CollisionOffsetX = 0,
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0,

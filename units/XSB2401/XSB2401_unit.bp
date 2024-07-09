@@ -12,6 +12,7 @@ UnitBlueprint{
         NukeCharge            = Sound { Bank = 'XSB',            Cue = 'XSB2401_Nuke_Charge',                   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_gun',                   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 12000,
     BuildIconSortPriority = 150,
     Categories = {
         "BUILTBYTIER3COMMANDER",

@@ -10,6 +10,7 @@ UnitBlueprint{
         MoveArms       = Sound { Bank = 'XEB',         Cue = 'XEB2402_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',   Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 9000,
     Categories = {
         "AIR",
         "BUILTBYTIER3COMMANDER",

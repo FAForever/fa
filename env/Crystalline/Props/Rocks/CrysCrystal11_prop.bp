@@ -4,15 +4,15 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 80,
+        MaxHealth = 80,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 230,
                     ShaderName = "NormalMappedTerrain",
                     AlbedoName = "CrysCrystal11_albedo.dds",
                 },

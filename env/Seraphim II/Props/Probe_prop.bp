@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 3000,
+                    LODCutoff = 430,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "Probe_albedo.dds",
                     SpecularName = "Probe_specteam.dds",
@@ -26,6 +26,8 @@ PropBlueprint{
     Footprint = { OccupancyCaps = 3 },
     Interface = { HelpText = "Probe" },
     Physics = { BlockPath = true },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 2,
     SizeY = 14,
     SizeZ = 2,

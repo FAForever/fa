@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 100,
+                    LODCutoff = 120,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "log03_albedo.dds",
                     NormalsName = "log03_normalsTS.dds",
@@ -24,6 +24,8 @@ PropBlueprint{
         ReclaimTime = 0,
     },
     Interface = { HelpText = "chad on a Log" },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 0.4,
     SizeY = 0.25,
     SizeZ = 0.25,

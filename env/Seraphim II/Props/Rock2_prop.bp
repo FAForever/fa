@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 3000,
+                    LODCutoff = 700,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "Rock2_albedo.dds",
                     NormalsName = "Rock2_normalsTS.dds",
@@ -27,6 +27,8 @@ PropBlueprint{
     Footprint = { OccupancyCaps = 3 },
     Interface = { HelpText = "Huge Rock" },
     Physics = { BlockPath = true },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 12,
     SizeY = 11,
     SizeZ = 12,
