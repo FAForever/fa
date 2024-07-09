@@ -35,6 +35,7 @@ UnitBlueprint{
         TeleportIn                    = Sound { Bank = 'Impacts',     Cue = 'XSA_Bomb_Explosion_01',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                   = Sound { Bank = 'Interface',   Cue = 'Cybran_Select_Commander', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 10000,
     BuildBotTotal = 2,
     Categories = {
         "AMPHIBIOUS",
@@ -62,15 +63,13 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Commander",
         EconomyThreatLevel = 626,
         Health = 10000,
         MaxHealth = 10000,
         RegenRate = 18,
         SkipDynamicThreatCalculations = true,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 45,
+        SurfaceThreatLevel = 765,
     },
     Display = {
         Abilities = {
@@ -570,7 +569,6 @@ UnitBlueprint{
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Overcharge = true,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
@@ -578,8 +576,6 @@ UnitBlueprint{
             RULEUCC_Repair = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Teleport = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "amph",
@@ -589,7 +585,6 @@ UnitBlueprint{
                 helpText = "toggle_stealth_personal",
             },
         },
-
         QuickSelectPriority = 1,
         SelectionPriority = 3,
         TeleportDelay = 15,
@@ -612,14 +607,6 @@ UnitBlueprint{
     LifeBarOffset = 0.5,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -0.95,
         MaxAcceleration = 1.7,
@@ -631,7 +618,6 @@ UnitBlueprint{
         TurnRadius = 10,
         TurnRate = 90,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
     SelectionSizeX = 0.7,
     SelectionSizeZ = 0.6,
@@ -687,7 +673,7 @@ UnitBlueprint{
                     RackBone = "Right_Turret",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
@@ -750,7 +736,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE",
                 "COMMAND",
@@ -825,7 +811,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.3,
+            RateOfFire = 10/33, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
                 "MOBILE TECH3",
@@ -901,7 +887,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
                 "MOBILE TECH3",
@@ -953,7 +939,7 @@ UnitBlueprint{
                 },
             },
             RackRecoilDistance = 0,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Death",
@@ -1008,7 +994,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             TargetPriorities = {
                 "COMMAND",
                 "MOBILE EXPERIMENTAL",
@@ -1069,7 +1055,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "LIGHTBOAT TECH2",
                 "SUBMERSIBLE",
@@ -1090,10 +1076,11 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Teleport in",
             DummyWeapon = true,
+            EnabledByEnhancement = "Teleporter",
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             WeaponCategory = "Teleport",
         },
     },

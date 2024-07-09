@@ -1,4 +1,4 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Physics = {
         CollideEntity = false,
         CollideSurface = false,

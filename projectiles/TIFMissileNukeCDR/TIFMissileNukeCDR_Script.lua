@@ -155,7 +155,7 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
         local InnerRing = self.InnerRing
         local OuterRing = self.OuterRing
         DamageArea(instigator, cachedPosition, InnerRing.Radius, InnerRing.Damage, 'Normal', true, true)
-        DamageArea(instigator, cachedPosition, OuterRing.Radius, OuterRing.Radius, 'Normal', true, true)
+        DamageArea(instigator, cachedPosition, OuterRing.Radius, OuterRing.Damage, 'Normal', true, true)
     end,
 }
 TypeClass = TIFMissileNukeCDR

@@ -38,6 +38,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'URA',        Cue = 'URA0204_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Air',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 800,
     BuildIconSortPriority = 20,
     Categories = {
         "AIR",
@@ -57,14 +58,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
         SubThreatLevel = 8,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -148,17 +145,12 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "air",
@@ -173,14 +165,6 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         AttackElevation = 6,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,
@@ -255,7 +239,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             TargetPriorities = {
                 "CRUISER",
                 "(NAVAL * TECH2 * SHIELD)",
@@ -291,7 +275,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

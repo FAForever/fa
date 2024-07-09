@@ -1448,7 +1448,7 @@ Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield 
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
 Unit_Description_0021="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems.\n\n+64 Omni Radius\n+15 Vision Radius"
-Unit_Description_0023="Primary weapon now fires 1.82 times as fast.\n\n+82% Rate of Fire"
+Unit_Description_0023="Primary weapon now fires twice as fast.\n\n+100% Rate of Fire"
 Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range.\n\n+10 Main cannon range\n+2 Main cannon damage radius"
 
 -- UEF -- Land Units
@@ -1751,7 +1751,7 @@ Unit_Description_s204="Constructs Tech 3 Naval units. Buildable for a much cheap
 -- AEON -- Armored Commander Unit/Upgrades
 Unit_Description_0305="The Armored Command Unit (ACU) is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suites, resource allocation system, and teleportation."
 Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
-Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within the ACU's main cannon range.\n\n+3000 Health"
+Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within the ACU's main cannon range. Multiple Quantum Stasis Fields interfere with each other, having a limited effect.\n\n+3000 Health"
 Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge.\n\n+8 Main cannon range"
 Unit_Description_0159="Grants the ACU a long range omni Sensor and increased optical range.\n\n+54 Vision Radius\n+54 Omni Radius"
 Unit_Description_0160="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1000 Health\n+10 Regen"

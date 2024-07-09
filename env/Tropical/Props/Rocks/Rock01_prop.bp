@@ -1,20 +1,19 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 150,
+        MaxHealth = 150,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 750,
-                    ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 400,
+                    ShaderName = "NormalMappedTerrain",
                 },
             },
         },
@@ -25,15 +24,9 @@ PropBlueprint {
         ReclaimMassMax = 75,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Large Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Large Rock" },
+    Physics = { BlockPath = true },
     SizeX = 4.5,
     SizeY = 3,
     SizeZ = 3.5,

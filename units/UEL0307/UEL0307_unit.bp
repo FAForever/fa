@@ -10,6 +10,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UEL',        Cue = 'UEL0307_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Vehicle',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 150,
     BuildIconSortPriority = 110,
     Categories = {
         "BUILTBYTIER2FACTORY",
@@ -29,12 +30,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 150,
         MaxHealth = 150,
-        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -50,8 +48,6 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0.3,
             ShieldVerticalOffset = -3,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 9,
     },
     Display = {
         Abilities = { "<LOC ability_shielddome>Shield Dome" },
@@ -112,18 +108,11 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "UEF",
@@ -143,14 +132,6 @@ UnitBlueprint{
     LifeBarSize = 0.7,
     Physics = {
         BackUpDistance = 8,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 3.5,
         MaxBrake = 3.5,
@@ -166,7 +147,6 @@ UnitBlueprint{
         TurnRadius = 0,
         TurnRate = 120,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = 0.025,
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.5,
@@ -193,7 +173,7 @@ UnitBlueprint{
                     RackBone = "Turret",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -206,12 +186,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

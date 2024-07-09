@@ -1,25 +1,13 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'AEON_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'AEON_Expl_Med_Impact',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_AEON',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "AEON",
+        "INDIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         CameraFollowTimeout = 5,
@@ -27,14 +15,12 @@ ProjectileBlueprint {
         StrategicIconSize = 3,
     },
     General = {
-        Category = 'Artillery',
-        Faction = 'Aeon',
+        Category = "Artillery",
+        Faction = "Aeon",
         TechLevel = 3,
-        Weapon = 'Sonance Artillery',
+        Weapon = "Sonance Artillery",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 50,

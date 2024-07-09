@@ -13,6 +13,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'URL',       Cue = 'URL0401_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Gun',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 9000,
     BuildIconSortPriority = 10,
     Categories = {
         "AMPHIBIOUS",
@@ -33,19 +34,15 @@ UnitBlueprint{
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWATTACKRETICLE",
-        "STRATEGIC",
         "SNIPEMODE",
+        "STRATEGIC",
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Experimental",
         EconomyThreatLevel = 1600,
         Health = 9000,
         MaxHealth = 9000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -127,17 +124,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "amph",
@@ -153,14 +144,6 @@ UnitBlueprint{
     LifeBarSize = 6,
     Physics = {
         BackUpDistance = 15,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = true,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -1,
         MaxAcceleration = 1.5,
@@ -245,7 +228,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.05,
+            RateOfFire = 10/200, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "EXPERIMENTAL MASSFABRICATION",
@@ -290,7 +273,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

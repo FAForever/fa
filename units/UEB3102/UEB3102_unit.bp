@@ -11,6 +11,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB3102_Activate',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Sonar',     LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 400,
     BuildIconSortPriority = 20,
     Categories = {
         "BUILTBYTIER1ENGINEER",
@@ -34,13 +35,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 400,
         MaxHealth = 400,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -90,21 +87,7 @@ UnitBlueprint{
     },
     Footprint = { MinWaterDepth = 1.5 },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_Pause = true },
         FactionName = "UEF",
         Icon = "sea",
         OrderOverrides = {
@@ -128,14 +111,7 @@ UnitBlueprint{
     LifeBarOffset = 0.2,
     LifeBarSize = 0.75,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
+        BuildOnLayerCaps = { LAYER_Water = true },
         DragCoefficient = 0.2,
         MeshExtentsOffsetY = -1.2,
         MeshExtentsX = 1.25,
@@ -162,12 +138,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = false,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = {},
     },
 }

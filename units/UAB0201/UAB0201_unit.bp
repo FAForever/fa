@@ -4,7 +4,7 @@ UnitBlueprint{
         TargetBones = {
             "B01",
             "B02",
-            "Attachpoint"
+            "Attachpoint",
         },
     },
     Audio = {
@@ -15,6 +15,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB0201_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Factory',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 6400,
     BuildIconSortPriority = 50,
     Categories = {
         "AEON",
@@ -37,18 +38,25 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 208,
         Health = 6400,
         MaxHealth = 6400,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/uab0201/uab0201_aopen.sca",
+        BlinkingLights = {
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_03_emit.bp",
+            Yellow = "/effects/emitters/light_yellow_02_emit.bp",
+        },
         BuildAttachBone = "Attachpoint",
         Mesh = {
             IconFadeInZoom = 130,
@@ -130,7 +138,6 @@ UnitBlueprint{
     LifeBarOffset = 1.95,
     LifeBarSize = 4.5,
     Physics = {
-        BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,

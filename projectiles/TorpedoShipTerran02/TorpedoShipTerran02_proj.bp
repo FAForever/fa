@@ -1,12 +1,10 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
-        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        MeshBlueprint = "/meshes/projectiles/torpedo_default_mesh.bp",
         StrategicIconSize = 2,
         UniformScale = 0.1,
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = false,
         InitialSpeed = 10,

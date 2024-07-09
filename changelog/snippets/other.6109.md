@@ -1,1 +1,0 @@
-- (#6109) Annotate the shield assist mechanics of `RegenAssistMult`

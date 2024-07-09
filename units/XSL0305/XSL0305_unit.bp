@@ -10,6 +10,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XSL',            Cue = 'XSL0305_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 700,
     BuildIconSortPriority = 20,
     Categories = {
         "BOT",
@@ -31,14 +32,11 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 79,
+        EconomyThreatLevel = 44,
         Health = 700,
         MaxHealth = 700,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 21,
+        SurfaceThreatLevel = 24,
     },
     Display = {
         AnimationDeath = {
@@ -48,7 +46,6 @@ UnitBlueprint{
                 AnimationRateMin = 1,
                 HitBox = {
                     CollisionOffsetX = -0.65,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.65,
                     SizeX = 1.0,
                     SizeY = 0.8,
@@ -138,16 +135,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "land",
@@ -165,14 +157,6 @@ UnitBlueprint{
     LifeBarOffset = 0.45,
     LifeBarSize = 0.75,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 2.2,
         MaxBrake = 2.2,
@@ -224,7 +208,7 @@ UnitBlueprint{
                     RackBone = "Barrel",
                 },
             },
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -282,7 +266,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.26,
+            RateOfFire = 10/38, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = false,
             TargetPriorities = {
@@ -355,7 +339,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.066,
+            RateOfFire = 10/152, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = false,
             TargetPriorities = {
@@ -392,12 +376,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

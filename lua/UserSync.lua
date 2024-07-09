@@ -200,7 +200,7 @@ function OnSync()
     --Play Sounds
     if Sync.Sounds then
         for k, v in Sync.Sounds do
-            PlaySound(Sound{ Bank=v.Bank, Cue=v.Cue })
+            PlaySound(Sound(v))
         end
     end
 
@@ -302,7 +302,7 @@ function OnSync()
     if Sync.Voice then
         if not import("/lua/ui/game/missiontext.lua").IsHeadPlaying() then
             for k, v in Sync.Voice do
-                PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
+                PlayVoice(Sound(v), true)
             end
         end
     end

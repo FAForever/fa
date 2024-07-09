@@ -1,1 +1,0 @@
-- (#6067) Fix a performance issue related to AIs and their transport logic

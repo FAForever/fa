@@ -73,16 +73,18 @@ function table.getsize(t)
     return size
 end
 
---- table.copy(t) returns a shallow copy of t.
----@overload fun(t: Vector): Vector
+--- Returns a shallow copy of t
+---@generic T
+---@param t T
+---@return T
 function table.copy(t)
-    if t then -- prevents looping over nil table
-        local r = {}
-        for k,v in t do
-            r[k] = v
-        end
-        return r
+    if type(t) ~= 'table' then return t end
+
+    local r = {}
+    for k, v in t do
+        r[k] = v
     end
+    return r
 end
 
 --- table.find(t,val) returns the key for val if it is in t table.
@@ -131,7 +133,7 @@ end
 function table.deepcopy(t,backrefs)
     backrefs = backrefs or { }
 
-    if type(t)=='table' then
+    if type(t) == 'table' then
 
         -- do not deep-copy anything with a metatable as that doesn't make sense. With this we
         -- naturally exclude deep-copying a brain, unit or other tables that are usually unique
@@ -554,6 +556,9 @@ function table.count(t, fn)
 end
 
 --- Returns a new table with unique values stored using numeric keys and it does not preserve keys of the original table
+---@generic T, G
+---@param t? table<T, G>
+---@return table<T, G> | nil
 function table.unique(t)
     if not t then return end -- prevents looping over nil table
     local unique = {}

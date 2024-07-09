@@ -19,6 +19,7 @@ UnitBlueprint{
         StopMove              = Sound { Bank = 'UAL',        Cue = 'UAL0401_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Bot',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 99999,
     BuildIconSortPriority = 100,
     Categories = {
         "AEON",
@@ -42,15 +43,11 @@ UnitBlueprint{
         "SNIPEMODE",
         "VISIBLETORECON",
     },
-    CollisionOffsetZ = 0.1,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 99999,
         MaxHealth = 99999,
         RegenRate = 10,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 250,
     },
     Display = {
@@ -66,8 +63,6 @@ UnitBlueprint{
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 3,
                     SizeX = 2.5,
                     SizeY = 1.0,
@@ -156,17 +151,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "amph",
@@ -180,14 +169,6 @@ UnitBlueprint{
     LifeBarOffset = 1.55,
     LifeBarSize = 3.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         LayerChangeOffsetHeight = -3.25,
         MaxAcceleration = 2.4,
@@ -207,12 +188,12 @@ UnitBlueprint{
         TurnRadius = 3,
         TurnRate = 40,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.25,
     SelectionSizeX = 2.2,
     SelectionSizeZ = 1.6,
     SelectionThickness = 0.32,
     CollisionOffsetY = 0.3,
+    CollisionOffsetZ = 0.1,
     SizeX = 3.0,
     SizeY = 7.0,
     SizeZ = 1.9,
@@ -274,7 +255,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
             TargetPriorities = {
@@ -348,7 +329,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetCheckInterval = 0.2,
             TargetPriorities = {
                 "TECH3 MOBILE",
@@ -423,7 +404,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 2,
+            RateOfFire = 10/5, --10/integer interval in ticks
             TargetCheckInterval = 0.2,
             TargetPriorities = {
                 "TECH3 MOBILE",
@@ -469,7 +450,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

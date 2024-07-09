@@ -1,1 +1,0 @@
-- (#6042) Improve annotations for `OnMotionHorzEventChange` and `OnMotionVertEventChange`

@@ -25,32 +25,5 @@ local ADisruptorProjectileOnImpact = ADisruptorProjectile.OnImpact
 
 --- Aeon Shield Disruptor Projectile, DAL0310
 ---@class ADFShieldDisruptor01 : AShieldDisruptorProjectile
-ADFShieldDisruptor01 = ClassProjectile(ADisruptorProjectile) {
-
-    ---@param self ADFShieldDisruptor01
-    ---@param targetType string
-    ---@param targetEntity Unit
-    OnImpact = function(self, targetType, targetEntity)
-        ADisruptorProjectileOnImpact(self, targetType, targetEntity)
-
-        -- try to find the shield that we hit
-        if targetType ~= 'Shield' then
-            targetEntity = targetEntity.MyShield
-        end
-
-        if not targetEntity then
-            return
-        end
-
-        -- we directly damage the shield to prevent generating overspill damage
-        local damage = targetEntity:GetHealth()
-        if damage > 1300 then -- TODO: find a better way to pass this damage
-            damage = 1300
-        elseif damage < 1 then
-            damage = 1
-        end
-
-        Damage(self, self:GetPosition(), targetEntity, damage, 'Normal')
-    end,
-}
+ADFShieldDisruptor01 = ClassProjectile(ADisruptorProjectile) {}
 TypeClass = ADFShieldDisruptor01

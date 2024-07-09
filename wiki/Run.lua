@@ -8,20 +8,52 @@
 --[[ ---------------------------------------------------------------------- ]]--
 local OutputDirectory = "D:/faf-development/fa.wiki/"
 local WikiGeneratorDirectory = "D:/faf-development/BrewWikiGen/"
+local FADirectory = "D:/faf-development/fa/"
+
+-- This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required
+local function parse_args(arg)
+    local args = {}
+    for i = 1, #arg do
+        local key, value = arg[i]:match("--([^=]+)=(.*)")
+        if key and value then
+            key = key:gsub("^%-+", "")  -- Remove leading '-' characters
+            args[key] = value
+        end
+    end
+    return args
+end
+
+local args = parse_args(arg)
+
+-- Overwrite default values if provided as command-line arguments
+if args["OutputDirectory"] then
+    OutputDirectory = args["OutputDirectory"]
+end
+if args["WikiGeneratorDirectory"] then
+    WikiGeneratorDirectory = args["WikiGeneratorDirectory"]
+end
+if args["FADirectory"] then
+    FADirectory = args["FADirectory"]
+end
+
+print("Directories set")
+print("Output Directory: " ..OutputDirectory)
+print("Wiki Generator Directory: " ..WikiGeneratorDirectory)
+print("FA Directory: " ..FADirectory)
 
 EnvironmentData = {
     name = 'Forged Alliance Forever',
     author = 'Gas Powered Games',
     version = '1.6.6',
     icon = false,
-    location = 'D:/faf-development/fa/',
+    location = FADirectory,
 
     GenerateWikiPages = true,  --Generate pages for env blueprints
     RebuildBlueprints = true,  --Rebuild env blueprints
     RunSanityChecks = false,   --Sanity check env bps
 
-    Lua = 'D:/faf-development/fa/',
-    LOC = 'D:/faf-development/fa/',
+    Lua = FADirectory,
+    LOC = FADirectory,
     -- ExtraData = '',
 
     PreModBlueprints = {},
@@ -46,7 +78,7 @@ WikiOptions = {
     BuildListSaysModUnits = true,
 
     OnlineRepoUnitPageBlueprintLink = 'https://github.com/FAForever/fa/',
-    LocalRepuUnitPageBlueprintLink = 'D:/faf-development/fa/',
+    LocalRepuUnitPageBlueprintLink = FADirectory,
 }
 
 RebuildBlueprintOptions = {

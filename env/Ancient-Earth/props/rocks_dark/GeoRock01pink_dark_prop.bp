@@ -1,20 +1,20 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 75.0,
+        MaxHealth = 75.0,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'GeoRock01pink_dark_Albedo.dds',
-                    LODCutoff = 250,
-                    ShaderName = 'VertexNormal',
+                    LODCutoff = 210,
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "GeoRock01pink_dark_Albedo.dds",
                 },
             },
         },
@@ -25,10 +25,8 @@ PropBlueprint {
         ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Medium Rock',
-    },
-	SizeX = 1,
+    Interface = { HelpText = "Medium Rock" },
+    SizeX = 1,
     SizeY = 1,
     SizeZ = 1,
 }

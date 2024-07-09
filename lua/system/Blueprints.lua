@@ -787,15 +787,6 @@ function PreModBlueprints(all_bps)
                 bp.AddCategories = nil
             end
 
-            -- Build range overlay
-            if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
-                if not bp.AI then bp.AI = {} end
-                bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-                if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
-                    bp.CategoriesHash.OVERLAYMISC = true
-                end
-            end
-
             -- Add common category values for easier lookup
 
             -- Add tech category
@@ -900,6 +891,9 @@ local function SpawnMenuDummyChanges(all_bps)
                         MeshBlueprint = '/meshes/game/nil_mesh',
                         UniformScale = 0,
                         HideLifebars = true,
+                    },
+                    Intel = {
+                        WaterVisionRadius = 0,
                     },
                     Physics = {
                         SkirtOffsetX = SOffsetX,

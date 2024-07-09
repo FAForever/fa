@@ -45,7 +45,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'URA',        Cue = 'URA0401_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Air',      LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 75000,
     BuildIconSortPriority = 100,
     Categories = {
         "AIR",
@@ -74,11 +74,9 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 24,
         ArmorType = "Experimental",
-        EconomyThreatLevel = 0,
         Health = 75000,
         MaxHealth = 75000,
         RegenRate = 75,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 243,
     },
     Display = {
@@ -167,17 +165,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "air",
@@ -198,14 +190,6 @@ UnitBlueprint{
     LifeBarOffset = 3.25,
     LifeBarSize = 6.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         MaxSpeed = 0.5,
         MotionType = "RULEUMT_Air",
@@ -278,7 +262,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "TECH3 MOBILE",
@@ -343,7 +327,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "TECH3 MOBILE",
@@ -408,7 +392,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
@@ -472,7 +456,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.4,
+            RateOfFire = 10/25, --10/integer interval in ticks
             SlavedToBody = false,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
@@ -537,7 +521,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.428,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "TECH3 MOBILE",
@@ -605,7 +589,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.428,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "ANTIAIR",
                 "TECH3 MOBILE",
@@ -648,7 +632,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

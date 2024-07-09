@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,11 +12,11 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'UEF_Building_002_albedo.dds',
-                    LODCutoff = 750,
-                    NormalsName = 'UEF_Building_002_normalsTS.dds',
-                    ShaderName = 'VertexNormal',
-                    SpecularName = 'UEF_Building_002_specteam.dds',
+                    LODCutoff = 290,
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "UEF_Building_002_albedo.dds",
+                    NormalsName = "UEF_Building_002_normalsTS.dds",
+                    SpecularName = "UEF_Building_002_specteam.dds",
                 },
             },
         },
@@ -27,15 +27,9 @@ PropBlueprint {
         ReclaimMassMax = 1,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'UEF Buildings',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "UEF Buildings" },
+    Physics = { BlockPath = true },
     SizeX = 2,
     SizeY = 2,
     SizeZ = 2,

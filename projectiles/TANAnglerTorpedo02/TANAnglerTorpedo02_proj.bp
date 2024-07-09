@@ -1,59 +1,46 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_UEF',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact      = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_UEF', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'ANTINAVY',
-        'TORPEDO',
-        'NOSPLASHDAMAGE'
+        "ANTINAVY",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TORPEDO",
+        "UEF",
     },
     Defense = {
-        MaxHealth = 1,
         Health = 1,
+        MaxHealth = 1,
     },
     DesiredShooterCap = 1,
     Display = {
-        MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
+        MeshBlueprint = "/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.12,
     },
     General = {
-        Category = 'Anti Navy',
-        Faction = 'UEF',
-        Weapon = 'Angler Torpedo',
+        Category = "Anti Navy",
+        Faction = "UEF",
+        Weapon = "Angler Torpedo",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
-
+        AccelerationRange = 2,
         DestroyOnWater = false,
         InitialSpeed = 5,
         Lifetime = 10,
         MaxSpeed = 15,
+        MaxZigZag = 1,
         RealisticOrdinance = true,
         StayUnderwater = true,
         TrackTarget = true,
         TurnRate = 165,
-        VelocityAlign = true,
-        UseGravity = true,
-
-        -- these parameters make the path of the torpedo feel unique
-        AccelerationRange = 2,
-        MaxZigZag = 1,
-        ZigZagFrequency = 0.4,
         TurnRateRange = 10,
+        UseGravity = true,
+        VelocityAlign = true,
+        ZigZagFrequency = 0.4,
     },
 }

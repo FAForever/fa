@@ -1,40 +1,26 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'CYB_Expl_Med_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Impacts', Cue = 'CYB_Expl_Med_Impact',        LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_CYBRAN',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'ANTIAIR',
+        "ANTIAIR",
+        "CYBRAN",
+        "PROJECTILE",
     },
     Display = {
-        MeshBlueprint = '/projectiles/CAAMissileNanite01/CAAMissileNanite01_mesh.bp',
+        MeshBlueprint = "/projectiles/CAAMissileNanite01/CAAMissileNanite01_mesh.bp",
         StrategicIconSize = 2,
         UniformScale = 0.25,
     },
     General = {
-        Category = 'Anti Air',
-        Faction = 'Cybran',
+        Category = "Anti Air",
+        Faction = "Cybran",
         TechLevel = 3,
-        Weapon = 'Nanite Missile System',
+        Weapon = "Nanite Missile System",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
         DestroyOnWater = true,

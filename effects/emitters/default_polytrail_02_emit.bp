@@ -1,13 +1,11 @@
 TrailEmitterBlueprint {
-	BlueprintId = 'default_polytrail_02',
-	Lifetime = -1.00,
-    TrailLength = 1,
+    BlendMode = 0,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_white_04.dds",
+    RepeatTexture = "/textures/particles/railgun_trail_01.dds",
     Size = 0.025,
     SortOrder = 0,
-    BlendMode = 0,
     TextureRepeatRate = 1,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
-	RampTexture = '/textures/particles/ramp_white_04.dds',
+    TrailLength = 1,
 }
-

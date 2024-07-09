@@ -245,10 +245,11 @@ end
 
 ---@overload fun(s: number, a1: number, b1: number, a2: number, b2: number): number, number
 --- Applies linear interpolation between two values `a` and `b`
----@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
+---@param s number between 0 or `sMin` (returns `a`) and 1 or `sMax` (returns `b`)
 ---@param a number
 ---@param b number
 ---@return number
+---@overload fun(s: number, sMin: number, sMax: number, a: number, b: number): number
 function MATH_Lerp(s, a, b)
 end
 

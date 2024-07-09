@@ -3,7 +3,6 @@ UnitBlueprint{
     AI = {
         AttackAngle = 90,
         GuardReturnRadius = 30,
-        InitialAutoMode = true,
         TargetBones = {
             "UES0202",
             "Back_Wake",
@@ -18,6 +17,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UES',        Cue = 'UES0202_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Naval',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2500,
     BuildIconSortPriority = 35,
     Categories = {
         "ANTIAIR",
@@ -49,11 +49,9 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 50,
         ArmorType = "Normal",
-        EconomyThreatLevel = 96,
+        EconomyThreatLevel = 101,
         Health = 2500,
         MaxHealth = 2500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 7,
     },
     Display = {
@@ -140,19 +138,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
-            RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,
-            RULEUCC_Tactical = false,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "sea",
@@ -169,14 +159,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 4.5,
@@ -274,7 +256,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "NAVAL MOBILE",
@@ -333,7 +315,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 115,
             TargetPriorities = {
@@ -396,7 +378,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetPriorities = {
                 "EXPERIMENTAL",
@@ -456,7 +438,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

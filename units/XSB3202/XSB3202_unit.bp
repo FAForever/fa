@@ -8,6 +8,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'XSS',            Cue = 'XSS_Sub_Surface',            LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Sonar',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1400,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER2COMMANDER",
@@ -33,13 +34,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 1400,
         MaxHealth = 1400,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -97,20 +94,12 @@ UnitBlueprint{
     Footprint = { MinWaterDepth = 1.5 },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Dive = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Pause = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "sea",
@@ -137,14 +126,6 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         BackUpDistance = 8,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = true,
-        },
         DragCoefficient = 0.2,
         Elevation = -2,
         MaxAcceleration = 2.8,
@@ -179,8 +160,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
-            Land = false,
             Seabed = true,
             Sub = true,
             Water = true,

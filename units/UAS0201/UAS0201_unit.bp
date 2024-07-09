@@ -8,12 +8,13 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UAS',        Cue = 'UAS0201_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Naval',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 7200,
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
-        "ANTITORPEDO",
         "ANTINAVY",
         "ANTISUB",
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "DESTROYER",
@@ -37,7 +38,6 @@ UnitBlueprint{
         EconomyThreatLevel = 61,
         Health = 7200,
         MaxHealth = 7200,
-        RegenRate = 0,
         SubThreatLevel = 16,
         SurfaceThreatLevel = 15,
     },
@@ -114,17 +114,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "sea",
@@ -141,14 +135,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 5,
@@ -217,7 +203,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.2,
+            RateOfFire = 10/50, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {
@@ -273,7 +259,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -320,7 +306,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -351,9 +337,7 @@ UnitBlueprint{
             ProjectileLifetime = 4,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Projectile02",
-                    },
+                    MuzzleBones = { "Projectile02" },
                     RackBone = "Projectile02",
                 },
             },
@@ -365,7 +349,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.131,
+            RateOfFire = 10/76, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",
@@ -405,9 +389,7 @@ UnitBlueprint{
             ProjectileLifetime = 4,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Projectile04",
-                    },
+                    MuzzleBones = { "Projectile04" },
                     RackBone = "Projectile04",
                 },
             },
@@ -419,7 +401,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.131,
+            RateOfFire = 10/76, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",

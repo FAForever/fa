@@ -1,18 +1,18 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "CYBRAN",
+        "INDIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         CameraFollowsProjectile = true,
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_albedo.dds',
                     LODCutoff = 150,
-                    MeshName = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_lod0.scm',
-                    ShaderName = 'TMeshGlow',
+                    ShaderName = "TMeshGlow",
+                    MeshName = "/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_lod0.scm",
+                    AlbedoName = "/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_albedo.dds",
                 },
             },
         },
@@ -20,17 +20,15 @@ ProjectileBlueprint {
         UniformScale = 0.8,
     },
     General = {
-        Category = 'Bomb',
+        Category = "Bomb",
         EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
+            "CYBRAN",
+            "PROJECTILE",
+            "INDIRECTFIRE",
         },
-        Faction = 'Cybran',
+        Faction = "Cybran",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 2,
         InitialSpeed = 1,
