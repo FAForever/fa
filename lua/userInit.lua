@@ -113,7 +113,6 @@ if replayID then
     LOG("REPLAY ID: " .. replayID)
 end
 
-
 do
 
     -- Moderation functionality
@@ -150,8 +149,6 @@ do
     --- We delay the event to make sure we're not trying to send events when a player is trying to leave
     ---@param message string
     local SendModeratorEventThread = function(message)
-        WaitSeconds(2)
-
         local currentFocusArmy = GetFocusArmy()
 
         if not SessionIsGameOver() then

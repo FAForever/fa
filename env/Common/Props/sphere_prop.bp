@@ -1,10 +1,14 @@
 PropBlueprint{
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 1000,
+                    LODCutoff = 210,
                     ShaderName = "TMeshShield",
                     MeshName = "sphere_lod0.scm",
                 },

@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 150,
+                    LODCutoff = 110,
                     ShaderName = "VertexNormal",
                     AlbedoName = "rock04HD_albedo.dds",
                 },

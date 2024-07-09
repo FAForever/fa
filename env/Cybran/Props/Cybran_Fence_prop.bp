@@ -4,15 +4,15 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 350,
                     ShaderName = "Unit",
                     SpecName = "cybran_fence_SpecTeam.dds",
                     AlbedoName = "cybran_fence_Albedo.dds",

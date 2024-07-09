@@ -18,6 +18,7 @@ UnitBlueprint{
         SurfaceStart          = Sound { Bank = 'UES',        Cue = 'UES_Sub_Surface',                       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Sub',                        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 4000,
     BuildIconSortPriority = 15,
     Categories = {
         "BUILTBYTIER3FACTORY",

@@ -223,6 +223,28 @@ local function PostProcessUnit(unit)
         end
     end
 
+    -- Build range overlay
+    -- only for engineers, excluding insignificant units such as Cybran build drones or air staging that has its own radius set
+    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT'] or unit.CategoriesHash['AIRSTAGINGPLATFORM']) then
+        -- guarantee that the table exists
+        if not unit.AI then unit.AI = {} end
+
+        -- Engine allows building +2 range outside the max distance (or even more for large buildings)
+        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+
+        -- Display auto-assist range for engineer stations instead of max build distance if it is smaller
+        if unit.CategoriesHash['ENGINEERSTATION'] then
+            local guardScanRadius = unit.AI.GuardScanRadius
+            if guardScanRadius < overlayRadius then
+                overlayRadius = guardScanRadius
+            end
+        end
+
+        unit.AI.StagingPlatformScanRadius = overlayRadius
+        table.insert(unit.Categories, 'OVERLAYMISC')
+        unit.CategoriesHash.OVERLAYMISC = true
+    end
+
     -- sanitize air unit footprints
 
     -- value used by formations to determine the distance between other air units. Note
@@ -737,6 +759,29 @@ function VerifyBlinkingLights(unit)
     end
 end
 
+--- Feature: Unit weight based on the maximum health of a unit
+---
+--- Affects the behavior of units when they bump into each other. Units 
+--- with more weight push units with less weight. As a result units with
+--- more health will receive less to no pushback from units with less health.
+---@param unit UnitBlueprint
+local function ProcessUnitDensity(unit)
+    local averageDensity = 10
+    if unit.Defense and unit.Defense.MaxHealth then
+        averageDensity = unit.Defense.MaxHealth
+
+        if unit.Physics and unit.Physics.MotionType == "RULEUMT_Hover" then
+            averageDensity = 0.50 * averageDensity
+        end
+    end
+
+    if averageDensity ~= unit.AverageDensity then
+        WARN(string.format("Overwriting the average density of %s from %s to %s", tostring(unit.BlueprintId), unit.AverageDensity, averageDensity))
+    end
+
+    unit.AverageDensity = averageDensity
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
@@ -754,6 +799,18 @@ function PostProcessUnits(allBlueprints, units)
     for _, unit in pairs(units) do
         if unit.CategoriesHash['EXTERNALFACTORY'] then
             PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
+    end
+end
+
+--- Batch process all units
+---@param blueprints BlueprintsTable
+function BatchProcessUnits(blueprints)
+    LOG("Batch processing units")
+    if blueprints.Unit then
+        for _, unit in pairs(blueprints.Unit) do
+            ProcessCanLandOnWater(unit)
+            ProcessUnitDensity(unit)
         end
     end
 end

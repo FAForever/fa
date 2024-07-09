@@ -1,1 +1,0 @@
-- (#6229) Improve annotation for `MATH_Lerp`.

@@ -18,6 +18,7 @@ UnitBlueprint{
         StartReclaim   = Sound { Bank = 'URL',        Cue = 'URL0105_Reclaim_Start',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildBotTotal = 1,
     BuildIconSortPriority = 200,
     Categories = {

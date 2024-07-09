@@ -32,6 +32,7 @@ UnitBlueprint{
         TransitionWater  = Sound { Bank = 'UEL',        Cue = 'UEL0401_Water_Trans',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection      = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Tank',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 12500,
     BuildIconSortPriority = 10,
     Categories = {
         "AIRSTAGINGPLATFORM",
