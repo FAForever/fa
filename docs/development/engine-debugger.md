@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 title: Engine debugger
 parent: Development
 permalink: development/engine-debugger

@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 nav_order: 1
 title: 01. Setup
 parent: Development

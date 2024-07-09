@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 nav_order: 1
 title: Start here
 parent: Development
