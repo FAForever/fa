@@ -657,6 +657,7 @@ local OnCommandIssuedCallback = {
 ---@param command UserCommand
 function OnCommandIssued(command)
     if not command.Clear then
+        -- ??? signal for OnCommandModeBeat
         issuedOneCommand = true
     else
         EndCommandMode(true)
