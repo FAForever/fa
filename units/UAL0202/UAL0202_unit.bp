@@ -11,6 +11,7 @@ UnitBlueprint{
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Tank',   LodCutoff = 'UnitMove_LodCutoff' },
         Unpack      = Sound { Bank = 'UAL',        Cue = 'UAL0202_Open',       LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1250,
     BuildIconSortPriority = 20,
     Categories = {
         "AEON",

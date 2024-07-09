@@ -98,9 +98,6 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     ---@param z number
     OnAnimTerrainCollision = function(self, bone, x, y, z)
         local blueprint = self.Blueprint
-        local position = { x, y, z }
-        DamageArea(self, position, 5, 1000, 'Default', true, false)
-        DamageArea(self, position, 5, 1, 'TreeForce', false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
             { blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ })

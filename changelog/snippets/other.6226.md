@@ -1,1 +1,0 @@
-- (#6226) Improve the visual representation of the Exodus’ and Tempest’s depth charges by increasing their `StrategicIconSize` and `UniformScale`.

@@ -1,1 +1,0 @@
-- (#6119) Do not display the Bouncer's targeting laser in the additional unit details displayed when `Show Armament Detail in Build Menu` is enabled.

@@ -8,6 +8,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB1201_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Resource',       LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2300,
     BuildIconSortPriority = 70,
     Categories = {
         "AEON",

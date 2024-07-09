@@ -14,19 +14,19 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 30,
+                    LODCutoff = 40,
                     ShaderName = "UndulatingNormalMappedAlpha",
                     AlbedoName = "DC01_s1_pink_dark_albedo.dds",
                     NormalsName = "DC01_s1_pink_dark_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 150,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "DC01_s1_pink_dark_albedo.dds",
                     NormalsName = "DC01_s1_pink_dark_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 330,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "DC01_s1_pink_dark_albedo.dds",
                     NormalsName = "DC01_pink_s1_dark_normalsTS.dds",

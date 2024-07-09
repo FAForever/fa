@@ -14,6 +14,7 @@ UnitBlueprint{
         Open           = Sound { Bank = 'XEB',        Cue = 'XEB0204_Open',            LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Structure',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2500,
     BuildIconSortPriority = 200,
     Categories = {
         "CONSTRUCTION",
