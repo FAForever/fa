@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Patches
+permalink: /patches
 nav_order: 8
 ---
 
