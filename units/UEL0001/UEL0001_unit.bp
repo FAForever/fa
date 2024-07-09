@@ -486,7 +486,7 @@ UnitBlueprint{
             ShieldEnergyDrainRechargeTime = 5,
             ShieldEnhancementNumber = 5,
             ShieldMaxHealth = 20000,
-            ShieldRechargeTime = 90,
+            ShieldRechargeTime = 120,
             ShieldRegenRate = 60,
             ShieldRegenStartTime = 1,
             ShieldSize = 20,
