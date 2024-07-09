@@ -1,0 +1,8 @@
+- (#6184) Introduce an Advanced Shield Field upgrade for the UEF ACU. The prerequisite for this upgrade is the first Shield Field.
+    - AdvancedShieldGeneratorField
+        - BuildCostEnergy = 110000
+        - BuildCostMass = 2200
+        - BuildTime = 2200
+        - ShieldMaxHealth = 20000
+        - ShieldRechargeTime = 120
+        - ShieldRegenRate = 60
