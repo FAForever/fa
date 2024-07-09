@@ -4,15 +4,15 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 350,
+        MaxHealth = 350,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 370,
                     ShaderName = "VertexNormal",
                     AlbedoName = "/env/geothermal/props/rocks/GeoRockGroup01_albedo.dds",
                 },

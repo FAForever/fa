@@ -1,1 +1,0 @@
-- (#6106) Fix partially built units not transferring properly in Full Share.
