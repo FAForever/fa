@@ -656,6 +656,11 @@ local OnCommandIssuedCallback = {
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 ---@param command UserCommand
 function OnCommandIssued(command)
+    if not command.Clear then
+        issuedOneCommand = true
+    else
+        EndCommandMode(true)
+    end
 
     -- If our callback returns true or we don't have a command type, we skip the rest of our logic
     if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
@@ -663,10 +668,7 @@ function OnCommandIssued(command)
         return
     end
     -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
-    if not command.Clear then
-        issuedOneCommand = true
-    else
-        EndCommandMode(true)
+    if command.Clear then
         if command.CommandType ~= 'Stop'
         and TableGetN(command.Units) == 1
         and checkBadClean(command.Units[1]) then
