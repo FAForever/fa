@@ -1,1 +1,0 @@
-- (#6286) Fix T2LandAmphibious factory template as the Aeon Aurora was being built instead of the Aeon Blaze.

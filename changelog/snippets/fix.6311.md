@@ -1,1 +1,0 @@
-- (#6311) Ahwassa and CZAR dealt an extra 1000 crash damage due to a line hidden in their script, which doesn't show up with the 7000 crash damage listed in the UI. The 1000 damage is added to the 7000 damage to make it work in the UI. As a consequence, the radius where that extra damage is dealt is increased from 5 to 10/15.

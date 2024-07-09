@@ -1,1 +1,0 @@
-- (#6107) Absolver can no longer damage shields while they are disabled and preventing them from recharging.
