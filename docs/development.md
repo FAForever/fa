@@ -1,9 +1,9 @@
 ---
-title: Development
 layout: page
+title: Development
+permalink: /development
 nav_order: 4
 has_children: true
-permalink: /development
 ---
 
 # Development

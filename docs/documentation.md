@@ -1,8 +1,8 @@
 ---
-title: Documentation
 layout: page
-nav_order: 5
+title: Documentation
 permalink: /documentation
+nav_order: 5
 ---
 
 # Documentation
