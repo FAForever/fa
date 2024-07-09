@@ -472,9 +472,9 @@ UnitBlueprint{
             UpgradeUnitAmbientBones = { "UEL0001" },
         },
         AdvancedShieldGeneratorField = {
-            BuildCostEnergy = 100000,
-            BuildCostMass = 2000,
-            BuildTime = 2500,
+            BuildCostEnergy = 110000,
+            BuildCostMass = 2200,
+            BuildTime = 2200,
             Icon = "asf",
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
