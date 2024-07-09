@@ -41,6 +41,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'UAA',        Cue = 'UAA0102_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 285,
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",

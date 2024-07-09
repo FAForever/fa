@@ -4,15 +4,15 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 400,
+        MaxHealth = 400,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 640,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "Floe_Floe_albedo.dds",
                     SpecularName = "Floe_Floe_specteam.dds",

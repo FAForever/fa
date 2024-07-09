@@ -1,1 +1,0 @@
-- (#6174) Annotate and document some of the internal lobby functionality.

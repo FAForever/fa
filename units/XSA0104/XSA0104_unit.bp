@@ -40,7 +40,7 @@ UnitBlueprint{
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
         Unload             = Sound { Bank = 'XSA',            Cue = 'XSA0104_Unit_Unload',        LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 1625,
     BuildIconSortPriority = 40,
     Categories = {
         "AIR",

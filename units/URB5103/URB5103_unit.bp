@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC urb5103_desc>Quantum Gate Beacon",
+    AverageDensity = 10,
     Categories = {
         "CYBRAN",
         "PRODUCTSC1",

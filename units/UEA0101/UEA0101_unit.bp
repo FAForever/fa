@@ -34,6 +34,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'UEA',        Cue = 'UEA0101_Move_Stop',      LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 35,
     BuildIconSortPriority = 20,
     Categories = {
         "AIR",

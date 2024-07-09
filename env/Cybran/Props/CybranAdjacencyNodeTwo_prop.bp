@@ -9,7 +9,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 3000,
+                    LODCutoff = 10,
                     ShaderName = "Unit",
                     SpecName = "cybranadjacencynodetwo_SpecTeam.dds",
                     AlbedoName = "cybranadjacencynodetwo_Albedo.dds",
@@ -24,6 +24,8 @@ PropBlueprint{
         ReclaimTime = 1,
     },
     Interface = { HelpText = "Cybran Adjacency Node" },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 0,
     SizeY = 0,
     SizeZ = 0,

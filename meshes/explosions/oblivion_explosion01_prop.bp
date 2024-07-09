@@ -1,10 +1,15 @@
 PropBlueprint{
     Categories = { "RECLAIMABLE" },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
+                    LODCutoff = 690,
                     ShaderName = "TMeshNoNormals",
                     AlbedoName = "/data/Env/Common/Props/marker01.dds",
                 },

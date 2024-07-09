@@ -10,6 +10,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XES',         Cue = 'XES0205_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',   Cue = 'UEF_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 550,
     BuildIconSortPriority = 60,
     Categories = {
         "BUILTBYTIER2FACTORY",
