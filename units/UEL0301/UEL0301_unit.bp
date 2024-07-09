@@ -173,10 +173,10 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 25200,
-        BuildCostMass = 2100,
+        BuildCostEnergy = 21450,
+        BuildCostMass = 1650,
         BuildRate = 40,
-        BuildTime = 14400,
+        BuildTime = 11500,
         BuildableCategory = { "BUILTBYTIER3ENGINEER UEF" },
         MaintenanceConsumptionPerSecondEnergy = 0,
         MaxBuildDistance = 10,
