@@ -1,1 +1,1 @@
-- (#6308) Satellites and falling satellite wrecks do not trigger nuke explosions anymore. Instead, the nuke destroys the satellite when they collide, a behavior consistent with other low-hp air units. This prevents a rarely used, but possible exploit.
+- (#6308) Falling satellite wrecks do not trigger nuke explosions anymore. This prevents a rarely used, but possible exploit.
