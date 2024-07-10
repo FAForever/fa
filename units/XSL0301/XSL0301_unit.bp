@@ -281,14 +281,16 @@ UnitBlueprint{
     },
     Enhancements = {
 
-        -- Left Upgrade
+        -- Left Upgrade --
+
+        -- Nano
         DamageStabilization = {
             BuildCostEnergy = 74300,
             BuildCostMass = 2300,
             BuildTime = 5900,
             Icon = "dss",
             Name = "<LOC enhancements_0131>Nano-Repair System",
-            NewHealth = 14000,
+            NewHealth = 18000,
             NewRegenRate = 250,
             ShowBones = { "Back_Upgrade" },
             Slot = "LCH",
@@ -312,13 +314,15 @@ UnitBlueprint{
             },
             Slot = "LCH",
         },
+
+        -- Rapid Fab
         EngineeringThroughput = {
             BuildCostEnergy = 47400,
             BuildCostMass = 450,
             BuildTime = 4200,
             Icon = "efm",
             Name = "<LOC enhancements_0143>Rapid Fabricator",
-            NewBuildRate = 98,
+            NewBuildRate = 58,
             Slot = "LCH",
             UpgradeEffectBones = {
                 "Left_Arm_Muzzle",
@@ -340,7 +344,15 @@ UnitBlueprint{
             Slot = "LCH",
         },
 
-        -- Right Upgrade
+        -- Regen Field
+
+
+
+
+
+        -- Right Upgrade --
+
+        -- OC
         Overcharge = {
             BuildCostEnergy = 283500,
             BuildCostMass = 4500,
@@ -367,6 +379,8 @@ UnitBlueprint{
             },
             Slot = "RCH",
         },
+
+        -- Telly
         Teleporter = {
             BuildCostEnergy = 1500000,
             BuildCostMass = 15000,
@@ -397,22 +411,50 @@ UnitBlueprint{
             Slot = "RCH",
         },
 
-        -- Back Upgrade
-        EnhancedSensors = {
+        --RAS
+        ResourceAllocation = {
+            BuildCostEnergy = 90000,
+            BuildCostMass = 4500,
+            BuildTime = 8400,
+            Icon = "ras",
+            Name = "<LOC enhancements_0010>Resource Allocation System",
+            ProductionPerSecondEnergy = 1000,
+            ProductionPerSecondMass = 10,
+            Slot = "RCH",
+            UpgradeUnitAmbientBones = { "UAL0301" },
+        },
+        ResourceAllocationRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "ras",
+            Name = "<LOC enhancements_0013>Remove Resource Allocation System",
+            Prerequisite = "ResourceAllocation",
+            RemoveEnhancements = {
+                "ResourceAllocation",
+                "ResourceAllocationRemove",
+            },
+            Slot = "RCH",
+        },
+
+
+        -- Back Upgrade --
+
+        -- EnhancedSensorsGun
+        EnhancedGunSensors = {
             BuildCostEnergy = 32100,
             BuildCostMass = 650,
             BuildTime = 3100,
             Icon = "sre",
-            Name = "<LOC enhancements_0141>Enhanced Sensor System",
-            NewMaxRadius = 35,
-            NewOmniRadius = 60,
-            NewVisionRadius = 36,
+            Name = "<LOC enhancements_0141>Enhanced Gun Sensor System",
+            NewGunDamage = 300,
+            NewGunRange = 5,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = { "Back_Upgrade" },
             UpgradeUnitAmbientBones = { "Torso" },
         },
-        EnhancedSensorsRemove = {
+        EnhancedGunSensorsRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
@@ -426,6 +468,40 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
+
+        --- EnhancedSensorsVision
+        EnhancedVisionSensors = {
+            BuildCostEnergy = 32100,
+            BuildCostMass = 650,
+            BuildTime = 3100,
+            Icon = "sre",
+            Name = "<LOC enhancements_0141>Enhanced Sensor System",
+            Prerequisite = "EnhancedGunSensors",
+            NewMaxRadius = 35,
+            NewOmniRadius = 60,
+            NewVisionRadius = 36,
+            ShowBones = { "Back_Upgrade" },
+            Slot = "Back",
+            UpgradeEffectBones = { "Back_Upgrade" },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        EnhancedVisionSensorsRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "Back_Upgrade" },
+            Icon = "sre",
+            Name = "<LOC enhancements_0142>Remove Enhanced Sensor System",
+            Prerequisite = "EnhancedVisionSensors",
+            RemoveEnhancements = {
+                "EnhancedGunSensors",
+                "EnhancedVisionSensors",
+                "EnhancedVisionSensorsRemove",
+            },
+            Slot = "Back",
+        },
+
+        -- TML
         Missile = {
             BuildCostEnergy = 46000,
             BuildCostMass = 1500,
@@ -450,66 +526,6 @@ UnitBlueprint{
                 "MissileRemove",
             },
             Slot = "Back",
-        },
-        Shield = {
-            BuildCostEnergy = 107500,
-            BuildCostMass = 1050,
-            BuildTime = 6720,
-            Icon = "sp",
-            ImpactEffects = "SeraphimShieldHit01",
-            MaintenanceConsumptionPerSecondEnergy = 300,
-            Name = "<LOC enhancements_0028>Personal Shield Generator",
-            OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
-            PersonalShield = true,
-            RegenAssistMult = 10,
-            ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 20000,
-            ShieldRechargeTime = 160,
-            ShieldRegenRate = 22,
-            ShieldRegenStartTime = 1,
-            ShowBones = { "Back_Upgrade" },
-            Slot = "Back",
-            UpgradeEffectBones = { "Back_Upgrade" },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        ShieldRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "Back_Upgrade" },
-            Icon = "sp",
-            Name = "<LOC enhancements_0147>Remove Personal Shield Generator",
-            Prerequisite = "Shield",
-            RemoveEnhancements = {
-                "Shield",
-                "ShieldRemove",
-            },
-            Slot = "Back",
-        },
-
-        ResourceAllocation = {
-            BuildCostEnergy = 90000,
-            BuildCostMass = 4500,
-            BuildTime = 8400,
-            Icon = "ras",
-            Name = "<LOC enhancements_0010>Resource Allocation System",
-            ProductionPerSecondEnergy = 1000,
-            ProductionPerSecondMass = 10,
-            Slot = "RCH",
-            UpgradeUnitAmbientBones = { "UAL0301" },
-        },
-        ResourceAllocationRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "ras",
-            Name = "<LOC enhancements_0013>Remove Resource Allocation System",
-            Prerequisite = "ResourceAllocation",
-            RemoveEnhancements = {
-                "ResourceAllocation",
-                "ResourceAllocationRemove",
-            },
-            Slot = "RCH",
         },
 
 

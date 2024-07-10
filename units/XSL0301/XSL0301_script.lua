@@ -117,11 +117,11 @@ XSL0301 = ClassUnit(CommandUnit) {
                     Name = 'SeraphimSCUBuildRate',
                     DisplayName = 'SeraphimSCUBuildRate',
                     BuffType = 'SCUBUILDRATE',
-                    Stacks = 'REPLACE',
+                    Stacks = 'ALWAYS',
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                            Add = bp.NewBuildRate,
                             Mult = 1,
                         },
                     },
