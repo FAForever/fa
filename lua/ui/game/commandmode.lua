@@ -659,17 +659,19 @@ function OnCommandIssued(command)
     if not command.Clear then
         -- ??? signal for OnCommandModeBeat
         issuedOneCommand = true
-    else
-        EndCommandMode(true)
     end
 
     -- If our callback returns true or we don't have a command type, we skip the rest of our logic
     if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
     or command.CommandType == 'None' then
+        if command.Clear then
+            EndCommandMode(true)
+        end
         return
     end
     -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
     if command.Clear then
+        EndCommandMode(true)
         if command.CommandType ~= 'Stop'
         and TableGetN(command.Units) == 1
         and checkBadClean(command.Units[1]) then
