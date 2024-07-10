@@ -17,6 +17,7 @@ UnitBlueprint{
         StopMove              = Sound { Bank = 'XSL',            Cue = 'XSL0401_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Bot',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 67000,
     BuildIconSortPriority = 30,
     Categories = {
         "AMPHIBIOUS",

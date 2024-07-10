@@ -35,6 +35,7 @@ UnitBlueprint{
         TeleportIn                    = Sound { Bank = 'Impacts',     Cue = 'UEF_Expl_Lrg_Naval',      LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                   = Sound { Bank = 'Interface',   Cue = 'UEF_Select_Commander',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 12000,
     Categories = {
         "AMPHIBIOUS",
         "BUBBLESHIELDSPILLOVERCHECK",

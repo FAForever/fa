@@ -1,1 +1,0 @@
-- (#5883) Make Chrono Dampener fire rate, stun categories, and range adjustable with blueprint values. Range is also adjustable with `UnitWeapon:ChangeMaxRadius`.

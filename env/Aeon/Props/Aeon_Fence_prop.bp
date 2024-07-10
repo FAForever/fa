@@ -14,7 +14,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 300,
+                    LODCutoff = 330,
                     ShaderName = "Unit",
                     SpecName = "aeon_fence_SpecTeam.dds",
                     AlbedoName = "aeon_fence_Albedo.dds",

@@ -8,6 +8,7 @@ UnitBlueprint{
         Open           = Sound { Bank = 'UEB',        Cue = 'UEB4302_Door',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Gun',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3800,
     BuildIconSortPriority = 155,
     Categories = {
         "ANTIMISSILE",

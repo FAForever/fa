@@ -4,6 +4,7 @@ UnitBlueprint{
         Killed      = Sound { Bank = 'UASDestroy', Cue = 'UAS0305_Destroy',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Sonar', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1500,
     BuildIconSortPriority = 190,
     Categories = {
         "AEON",

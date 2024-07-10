@@ -11,6 +11,7 @@ UnitBlueprint{
         Open                  = Sound { Bank = 'XSB',            Cue = 'XSB2305_Open',                          LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_gun',                   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 4000,
     BuildIconSortPriority = 150,
     Categories = {
         "BUILTBYTIER3COMMANDER",

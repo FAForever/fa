@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC uab5204_desc>Concrete",
+    AverageDensity = 1,
     Categories = {
         "AEON",
         "LAND",

@@ -4,21 +4,21 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 225,
+                    LODCutoff = 90,
                     ShaderName = "Aeon",
                     SpecName = "Aeon_dock_SpecTeam.dds",
                     AlbedoName = "Aeon_dock_Albedo.dds",
                 },
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 340,
                     ShaderName = "Aeon",
                     AlbedoName = "Aeon_dock_lod1_albedo.dds",
                     SpecularName = "Aeon_dock_lod1_specteam.dds",

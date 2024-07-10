@@ -3,12 +3,16 @@ PropBlueprint{
         "INVULNERABLE",
         "UNTARGETABLE",
     },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 50,
+                    LODCutoff = 70,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "massDeposit01_albedo.dds",
                     NormalsName = "massDeposit01_normalsTS.dds",
@@ -19,6 +23,8 @@ PropBlueprint{
     },
     Interface = { HelpText = "massDeposit" },
     Physics = { BlockPath = false },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 0.1,
     SizeY = 0.1,
     SizeZ = 0.1,

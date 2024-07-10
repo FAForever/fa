@@ -4,21 +4,21 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 2000,
-        MaxHealth = 2000,
+        Health = 300,
+        MaxHealth = 300,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 90,
                     ShaderName = "VertexNormal",
                     AlbedoName = "jbuild01_Albedo.dds",
                     NormalsName = "jbuild01_NormalsTS.dds",
                 },
                 {
-                    LODCutoff = 3000,
+                    LODCutoff = 350,
                     ShaderName = "VertexNormal",
                     AlbedoName = "jbuild01_Albedo.dds",
                     NormalsName = "jbuild01_NormalsTS.dds",

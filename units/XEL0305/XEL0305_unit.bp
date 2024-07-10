@@ -15,6 +15,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XEL',        Cue = 'XEL0305_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Bot',          LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 7200,
     BuildIconSortPriority = 30,
     Categories = {
         "AMPHIBIOUS",
