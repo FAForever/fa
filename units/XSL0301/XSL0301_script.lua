@@ -89,6 +89,16 @@ XSL0301 = ClassUnit(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
+        elseif enh == 'ResourceAllocation' then
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
+            if not bp then return end
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+        elseif enh == 'ResourceAllocationRemove' then
+            local bpEcon = self.Blueprint.Economy
+            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
             -- Overcharge
         elseif enh == 'Overcharge' then
             self:AddCommandCap('RULEUCC_Overcharge')

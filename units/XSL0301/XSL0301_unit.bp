@@ -280,6 +280,7 @@ UnitBlueprint{
         },
     },
     Enhancements = {
+
         -- Left Upgrade
         DamageStabilization = {
             BuildCostEnergy = 74300,
@@ -484,6 +485,31 @@ UnitBlueprint{
                 "ShieldRemove",
             },
             Slot = "Back",
+        },
+
+        ResourceAllocation = {
+            BuildCostEnergy = 90000,
+            BuildCostMass = 4500,
+            BuildTime = 8400,
+            Icon = "ras",
+            Name = "<LOC enhancements_0010>Resource Allocation System",
+            ProductionPerSecondEnergy = 1000,
+            ProductionPerSecondMass = 10,
+            Slot = "RCH",
+            UpgradeUnitAmbientBones = { "UAL0301" },
+        },
+        ResourceAllocationRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "ras",
+            Name = "<LOC enhancements_0013>Remove Resource Allocation System",
+            Prerequisite = "ResourceAllocation",
+            RemoveEnhancements = {
+                "ResourceAllocation",
+                "ResourceAllocationRemove",
+            },
+            Slot = "RCH",
         },
 
 
