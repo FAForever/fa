@@ -1,0 +1,1 @@
+- (#6341) Improve the formatting of the additional unit details displayed when `Show Armament Detail in Build Menu` is enabled in the settings. For example, the Harbinger is now correctly shown as having a speed of `2.95` instead of `3.0`. Additionally, trailing zeroes are removed where possible.
