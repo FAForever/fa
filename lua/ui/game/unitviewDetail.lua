@@ -714,18 +714,18 @@ function WrapAndPlaceText(bp, builder, descID, control)
         end
         --Other parameters
         lines = {}
-        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %0.1f, Cap Cost: %0.1f",
+        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %.3g, Cap Cost: %.3g",
             bp.Intel.VisionRadius, bp.Intel.WaterVisionRadius, bp.Defense.RegenRate, bp.General.CapCost))
 
         if (bp.Physics.MotionType ~= 'RULEUMT_Air' and bp.Physics.MotionType ~= 'RULEUMT_None')
         or (bp.Physics.AltMotionType ~= 'RULEUMT_Air' and bp.Physics.AltMotionType ~= 'RULEUMT_None') then
-            table.insert(lines, LOCF("<LOC uvd_0012>Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d",
+            table.insert(lines, LOCF("<LOC uvd_0012>Speed: %.3g, Reverse: %.3g, Acceleration: %.3g, Turning: %d",
                 bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
         end
         
         -- Display the TransportSpeedReduction stat in the UI.
         -- Naval units and land experimentals also have this stat, but it since it is not relevant for non-modded games, we do not display it by default.
-        -- If a mod wants to display this stat for naval units or experimentals, this file can be hooked.
+        -- If a mod wants to display the TransportSpeedReduction stat for naval units or experimentals, this file can be hooked.
         if bp.Physics.TransportSpeedReduction and not (bp.CategoriesHash.NAVAL or bp.CategoriesHash.EXPERIMENTAL) then
             table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
             bp.Physics.TransportSpeedReduction))
