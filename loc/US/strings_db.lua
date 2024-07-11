@@ -6783,7 +6783,7 @@ uvd_RegenRate="Regen Rate: %d"
 uvd_Delay="Delay: %0.1f"
 uvd_basic="Basic"
 uvd_upgrades="Upgrades"
-uvd_Scry="Radius: %d, Initial Cost: %d, Upkeep: %d"
+uvd_Scry="Radius: %d, Initial Cost: %d E, Upkeep: %d E"
 
 at_Default="Default"
 at_Normal="Normal"
