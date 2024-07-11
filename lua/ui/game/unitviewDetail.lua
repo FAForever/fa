@@ -238,6 +238,8 @@ IsAbilityExist = {
     end,
     ability_scry = function(bp)
         return bp.Intel.RemoteViewingRadius > 0
+           and bp.Economy.InitialRemoteViewingEnergyDrain > 0
+           and bp.Economy.MaintenanceConsumptionPerSecondEnergy > 0
     end,
     ability_flying = function(bp)
         return bp.Air.CanFly
@@ -351,7 +353,7 @@ GetAbilityDesc = {
         return LOCF('<LOC uvd_Radius>', bp.Intel.OmniRadius)
     end,
     ability_scry = function(bp)
-        return LOCF('<LOC uvd_Radius>', bp.Intel.RemoteViewingRadius)
+        return LOCF('<LOC uvd_Scry>', bp.Intel.RemoteViewingRadius, bp.Economy.InitialRemoteViewingEnergyDrain, bp.Economy.MaintenanceConsumptionPerSecondEnergy)
     end,
     ability_flying = function(bp)
         return LOCF("<LOC uvd_0011>Speed: %0.1f, Turning: %0.1f", bp.Air.MaxAirspeed, bp.Air.TurnSpeed)
