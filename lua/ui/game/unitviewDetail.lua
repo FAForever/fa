@@ -236,6 +236,9 @@ IsAbilityExist = {
     ability_omni = function(bp)
         return bp.Intel.OmniRadius > 0
     end,
+    ability_scry = function(bp)
+        return bp.Intel.RemoteViewingRadius > 0
+    end,
     ability_flying = function(bp)
         return bp.Air.CanFly
     end,
@@ -346,6 +349,9 @@ GetAbilityDesc = {
     end,
     ability_omni = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.OmniRadius)
+    end,
+    ability_scry = function(bp)
+        return LOCF('<LOC uvd_Radius>', bp.Intel.RemoteViewingRadius)
     end,
     ability_flying = function(bp)
         return LOCF("<LOC uvd_0011>Speed: %0.1f, Turning: %0.1f", bp.Air.MaxAirspeed, bp.Air.TurnSpeed)
