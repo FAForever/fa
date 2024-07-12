@@ -12,19 +12,19 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 60,
+                    LODCutoff = 40,
                     ShaderName = "UndulatingNormalMappedAlpha",
                     AlbedoName = "../Palm01_s1_albedo.dds",
                     NormalsName = "../Palm01_s1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 200,
+                    LODCutoff = 150,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "../Palm01_s1_albedo.dds",
                     NormalsName = "../Palm01_s1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 330,
                     ShaderName = "VertexNormal",
                     AlbedoName = "Palm01_Group3_LOD2_albedo.dds",
                 },

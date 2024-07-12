@@ -168,8 +168,8 @@
 --- registered properly by the engine and the unit will remain stuck on the first order, never firing again until the
 --- player clears the command queue and re-issues the order
 ---@field ManualFire? boolean
---- changes the weapon range from spherical to cylindrical, where the cylinder has a height of
---- this twice this value
+--- The maximum height difference upon which the weapon can fire at targets (cylindrical range).
+--- Defaults to nil, which gives infinite vertical range.
 ---@field MaxHeightDiff? number
 --- this weapon can only hold this many counted projectiles
 ---@field MaxProjectileStorage number

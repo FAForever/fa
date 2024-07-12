@@ -6,6 +6,7 @@ UnitBlueprint{
         Killed         = Sound { Bank = 'Explosions', Cue = 'Aeon_Nuke_Impact',     LodCutoff = 'Weapon_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Resource', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 5000,
     BuildIconSortPriority = 140,
     Categories = {
         "AEON",
