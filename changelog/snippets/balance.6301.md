@@ -45,3 +45,6 @@
   - EnergyCost: 30000 -> 25500
   - MassCost: 3000 -> 2550
   - BuildTime: 4097 -> 4100
+  - Adjacency Buff:
+    - T2 Mass Fab: -0.0075 -> -0.0125
+    - T3 Mass Fab: -0.0375 -> -0.2
