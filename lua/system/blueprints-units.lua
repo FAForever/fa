@@ -161,6 +161,7 @@ local function PostProcessUnit(unit)
     local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
     local isAir = unit.CategoriesHash['AIR']
+    local isNaval = unit.CategoriesHash['NAVAL']
     local isBomber = unit.CategoriesHash['BOMBER']
     local isGunship = unit.CategoriesHash['GROUNDATTACK'] and isAir and (not isBomber)
     local isTransport = unit.CategoriesHash['TRANSPORTATION']
@@ -170,6 +171,8 @@ local function PostProcessUnit(unit)
     local isTech2 = unit.CategoriesHash['TECH2']
     local isTech3 = unit.CategoriesHash['TECH3']
     local isExperimental = unit.CategoriesHash['EXPERIMENTAL']
+    local isACU = unit.CategoriesHash['COMMAND']
+    local isSACU = unit.CategoriesHash['SUBCOMMANDER']
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
     -- the factory-reclaim-bug that we're keen in keeping that at this point
@@ -541,6 +544,27 @@ local function PostProcessUnit(unit)
     if not (unit.Interface and unit.Interface.HelpText) then
         unit.Interface = unit.Interface or {}
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
+    end
+
+    -- Define a specific TransportSpeedReduction for all land and naval units.
+    -- Experimentals have a TransportSpeedReduction of 1 due to transports gaining 1 speed and some survival maps loading experimentals into transports.
+    -- Naval units also gain a TransportSpeedReduction of 1 to ensure mod compatibility.
+    if not unit.Physics.TransportSpeedReduction and not isStructure then    
+        if isLand and isTech1 then
+            unit.Physics.TransportSpeedReduction = 0.15
+        elseif isLand and isTech2 then
+            unit.Physics.TransportSpeedReduction = 0.3
+        elseif isSACU then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isLand and isTech3 then
+            unit.Physics.TransportSpeedReduction = 0.6
+        elseif isLand and isExperimental then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isACU then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isNaval then
+            unit.Physics.TransportSpeedReduction = 1
+        end
     end
 
     ---------------------------------------------------------------------------
