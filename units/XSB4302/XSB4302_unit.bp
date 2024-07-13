@@ -6,6 +6,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB4302_Activate',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_gun', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3800,
     BuildIconSortPriority = 155,
     Categories = {
         "ANTIMISSILE",

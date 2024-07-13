@@ -3,6 +3,7 @@ UnitBlueprint{
     Audio = {
         UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1000,
     Categories = {
         "OPERATION",
         "RECLAIMABLE",

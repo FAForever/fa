@@ -4,20 +4,20 @@ PropBlueprint{
         "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 225,
+                    LODCutoff = 160,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "Seraphim",
                 },
                 {
-                    LODCutoff = 750,
+                    LODCutoff = 630,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "Seraphim",
                     AlbedoName = "seraphim_dock_lod1_albedo.dds",

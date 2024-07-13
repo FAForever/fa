@@ -10,6 +10,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UAL',        Cue = 'UAL0307_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Vehicle',     LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 50.0,
     BuildIconSortPriority = 50,
     Categories = {
         "AEON",
@@ -116,6 +117,10 @@ UnitBlueprint{
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
+    },
+    Footprint = {
+        SizeX = 1,
+        SizeZ = 1,
     },
     General = {
         CommandCaps = {

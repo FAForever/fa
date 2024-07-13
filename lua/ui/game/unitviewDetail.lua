@@ -722,6 +722,14 @@ function WrapAndPlaceText(bp, builder, descID, control)
             table.insert(lines, LOCF("<LOC uvd_0012>Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d",
                 bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
         end
+        
+        -- Display the TransportSpeedReduction stat in the UI.
+        -- Naval units and land experimentals also have this stat, but it since it is not relevant for non-modded games, we do not display it by default.
+        -- If a mod wants to display this stat for naval units or experimentals, this file can be hooked.
+        if bp.Physics.TransportSpeedReduction and not (bp.CategoriesHash.NAVAL or bp.CategoriesHash.EXPERIMENTAL) then
+            table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
+            bp.Physics.TransportSpeedReduction))
+        end
 
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})
     end

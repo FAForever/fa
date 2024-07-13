@@ -17,6 +17,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UES',        Cue = 'UES0202_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Naval',   LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2500,
     BuildIconSortPriority = 35,
     Categories = {
         "ANTIAIR",

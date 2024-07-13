@@ -547,10 +547,11 @@ end
 
 ---@param command UserCommand
 local function OnReclaimIssued(command)
-    -- Area reclaim dragger, command mode only
-    if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
-    end
+    -- feature: area commands
+    -- -- Area reclaim dragger, command mode only
+    -- if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+    --     import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
+    -- end
 end
 
 ---@param command UserCommand
@@ -564,6 +565,7 @@ end
 
 ---@param command UserCommand
 local function OnAttackIssued(command)
+    -- feature: area commands
     -- Area attack dragger, command mode only
     if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
         import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
@@ -654,16 +656,21 @@ local OnCommandIssuedCallback = {
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 ---@param command UserCommand
 function OnCommandIssued(command)
+    if not command.Clear then
+        -- ??? signal for OnCommandModeBeat
+        issuedOneCommand = true
+    end
 
     -- If our callback returns true or we don't have a command type, we skip the rest of our logic
     if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
     or command.CommandType == 'None' then
+        if command.Clear then
+            EndCommandMode(true)
+        end
         return
     end
     -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
-    if not command.Clear then
-        issuedOneCommand = true
-    else
+    if command.Clear then
         EndCommandMode(true)
         if command.CommandType ~= 'Stop'
         and TableGetN(command.Units) == 1

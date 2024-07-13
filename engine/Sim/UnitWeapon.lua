@@ -122,7 +122,7 @@ end
 function UnitWeapon:PlaySound(params)
 end
 
----
+--- Force the weapon to recheck its targets. Also resets the counter for AttackGroundTries
 function UnitWeapon:ResetTarget()
 end
 

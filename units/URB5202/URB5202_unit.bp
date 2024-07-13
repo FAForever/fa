@@ -13,6 +13,7 @@ UnitBlueprint{
         Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Structure',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 210,
     Categories = {
         "AIRSTAGINGPLATFORM",
