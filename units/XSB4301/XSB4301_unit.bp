@@ -98,6 +98,7 @@ UnitBlueprint{
         BuildCostMass = 3600,
         BuildTime = 5800,
         MaintenanceConsumptionPerSecondEnergy = 500,
+        DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "xsb4301" },
     },
     Footprint = {
