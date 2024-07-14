@@ -1,3 +1,3 @@
-- (#6347) Add DifferentialUpgradeCostCalculation to UEF and Seraphime Tech 3 Shield
+- (#6347) Enable `DifferentialUpgradeCostCalculation` for UEF and Seraphim Tech 3 Shields.
 
-By adding this is it will make it so when upgrading from T2 -> T3 it wont cost the full t3 shield price only the extra that is need. All the Cybran Shield already have this in place.
+This makes upgrading from T2 to T3 shields get discounted by the cost of the T2 shield. All Cybran Shields already have this in place.
