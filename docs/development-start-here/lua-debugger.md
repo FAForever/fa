@@ -1,7 +1,7 @@
 ---
 layout: page
 nav_order: 2
-title: Lua debugger
+title: 02. Lua debugger
 parent: Development - Start here
 permalink: development/start-here/lua-debugger
 ---

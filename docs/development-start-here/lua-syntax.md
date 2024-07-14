@@ -1,7 +1,7 @@
 ---
 layout: page
 nav_order: 3
-title: Lua version and syntax
+title: 03. Lua version and syntax
 parent: Development - Start here
 permalink: development/start-here/lua-syntax
 ---
