@@ -1,7 +1,7 @@
 ---
 layout: page
 nav_order: 1
-title: Lua development environment
+title: 01. Lua development environment
 parent: Development - Start here
 permalink: development/start-here/lua-setup
 ---
