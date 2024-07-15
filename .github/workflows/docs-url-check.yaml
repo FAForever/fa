@@ -25,6 +25,9 @@ on:
     branches: ["develop"]
     paths: ["docs/**"]
 
+  pull_request: 
+    paths: ["docs/**"]
+
   workflow_dispatch:
 
 jobs:
@@ -44,4 +47,7 @@ jobs:
           subfolder: docs
           file_types: .md
           exclude_files: docs/README.md
+
+          # URLs are excluded because not all type of URLs are supported, see also:
+          # - https://github.com/urlstechie/urlchecker-action/issues/105
           exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments
