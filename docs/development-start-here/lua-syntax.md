@@ -27,7 +27,7 @@ One useful exception is the following statement.
 
 And another useful exception is the following syntax:
 
-- The `{h&a&}` is new syntax to create a table with a pre-allocated hash and array sections. The value `h` pre-allocates `math.pow(2, h)` entries in the hash section of a table. The value `a` pre-allocates `a` entries in the array section of a table. 
+- The `{h&a&}` is new syntax to create a table with a pre-allocated hash and array sections. The value `h` pre-allocates `math.pow(2, h)` entries in the hash section of a table. The value `a` pre-allocates `a` entries in the array section of a table.
 
 It is for example applied in [#4539](https://github.com/FAForever/fa/issues/4539) to significantly improve the performance of the game.
 
@@ -37,4 +37,4 @@ Due to safety concerns various modules and/or functions that are part of the def
 
 ## Tips and tricks
 
-In general the white paper '[The Implementation of Lua 5.0](https://www.lua.org/doc/jucs05.pdf)' is a great introduction on understanding the Lua interpreter of Supreme Commander: Forged Alliance. 
+In general the white paper '[The Implementation of Lua 5.0](https://www.lua.org/doc/jucs05.pdf)' is a great introduction on understanding the Lua interpreter of Supreme Commander: Forged Alliance.

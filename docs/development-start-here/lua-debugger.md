@@ -64,3 +64,4 @@ Similar to the locals tab, except that it represents the values that are accessi
 - The debugger can be 'offscreen', if that is the case then you can reset its coordinates in the preference file. Backup your preference file before editing it manually. Removing the `Windows` entry is sufficient.
 
 We highly suggest reading [The implementation of Lua 5.0](https://www.lua.org/doc/jucs05.pdf) for a deeper understanding. In particular chapter 5 is useful to read to better understand the debugger window.
+
