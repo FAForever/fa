@@ -7,11 +7,6 @@
 
 ---@alias UEFSCUEnhancementBuffType
 ---| "SCUBuildRate"
----| "SCUHealthBonus"
-
-
----@alias UEFSCUEnhancementBuffName
----| "UEFHealthBonus"
 
 
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
@@ -208,25 +203,6 @@ UEL0301 = ClassUnit(CommandUnit) {
             end
             KillThread(self.RebuildThread)
         elseif enh == 'Shield' then
-            if not Buffs['UEFSCUHealthBonus'] then
-                BuffBlueprint {
-                    Name = 'UEFSCUHealthBonus',
-                    DisplayName = 'UEFSCUHealthBonus',
-                    BuffType = 'SCUHealthBonus',
-                    Stacks = "ALWAYS",
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            if Buff.HasBuff(self, 'UEFSCUHealthBonus') then
-                Buff.RemoveBuff(self, 'UEFSCUHealthBonus')
-            end
-            Buff.ApplyBuff(self, 'UEFSCUHealthBonus')
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -236,9 +212,6 @@ UEL0301 = ClassUnit(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-            if Buff.HasBuff(self, 'UEFSCUHealthBonus') then
-                Buff.RemoveBuff(self, 'UEFSCUHealthBonus')
-            end
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
             self:ForkThread(function()
