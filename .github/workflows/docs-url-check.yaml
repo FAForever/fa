@@ -44,3 +44,4 @@ jobs:
           subfolder: docs
           file_types: .md
           exclude_files: docs/README.md
+          exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments
