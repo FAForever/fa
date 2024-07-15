@@ -43,3 +43,4 @@ jobs:
         with:
           subfolder: docs
           file_types: .md
+          exclude_files: docs/README.md
