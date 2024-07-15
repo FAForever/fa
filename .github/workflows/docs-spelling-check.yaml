@@ -44,4 +44,5 @@ jobs:
         with:
           checkout: false
           experimental_path: docs
+          only_check_changed_files: true
           
