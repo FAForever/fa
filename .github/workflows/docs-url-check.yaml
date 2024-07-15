@@ -37,6 +37,8 @@ jobs:
         with:
           sparse-checkout: |
             docs
+            *.html
+            *.md
 
       - name: urlchecker-action
         uses: urlstechie/urlchecker-action@0.0.34
