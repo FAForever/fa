@@ -227,11 +227,17 @@ UEL0301 = ClassUnit(CommandUnit) {
         elseif enh =='ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
+            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+            wep:AddDamageMod(bp.NewDamageMod or 300)
+            wep:ChangeDamageRadius(bp.NewDamageRadius or 35)
             if not bp then return end
             self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
             self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
+            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+            wep:AddDamageMod(-self.Blueprint.Enhancements['HighExplosiveOrdnance'].NewDamageMod)
+            wep:ChangeMaxRadius(self.Blueprint.Weapon[1].MaxRadius or 25)
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'SensorRangeEnhancer' then
@@ -255,13 +261,15 @@ UEL0301 = ClassUnit(CommandUnit) {
         elseif enh =='AdvancedCoolingUpgrade' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(bp.NewRateOfFire)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh =='AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         elseif enh =='HighExplosiveOrdnance' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            wep:AddDamageMod(bp.NewMaxDamage or 300)
         elseif enh =='HighExplosiveOrdnanceRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
