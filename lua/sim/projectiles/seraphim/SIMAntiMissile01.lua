@@ -20,7 +20,7 @@
 -- SOFTWARE.
 ---------------------------------------------------------------------------------------
 
-local MultiPolyTrailProjectile = import('/lua/sim/projectiles.lua').MultiPolyTrailProjectile
+local MultiPolyTrailProjectile = import('/lua/sim/defaultprojectiles.lua').MultiPolyTrailProjectile
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---  SERAPHIM ELECTRUM TACTICAL MISSILE DEFENSE

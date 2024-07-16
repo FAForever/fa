@@ -20,8 +20,8 @@
 -- SOFTWARE.
 ---------------------------------------------------------------------------------------
 
-local NukeProjectile = import('/lua/nomadprojectiles.lua').NukeProjectile
-local MultiPolyTrailProjectile = import('/lua/nomadprojectiles.lua').MultiPolyTrailProjectile
+local NukeProjectile = import('/lua/sim/defaultprojectiles.lua').NukeProjectile
+local MultiPolyTrailProjectile = import('/lua/sim/defaultprojectiles.lua').MultiPolyTrailProjectile
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---  SERAPHIM EXPERIMENTAL STRATEGIC MISSILE
