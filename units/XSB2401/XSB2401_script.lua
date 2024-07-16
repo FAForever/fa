@@ -1,7 +1,7 @@
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/XSB2401/XSB2401_script.lua
 -- Author(s):  John Comes, David Tomandl, Matt Vainio
--- Summary  :  Seraphim Tactical Missile Launcher Script
+-- Summary  :  Seraphim Experimental Strategic Missile Launcher Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
@@ -32,6 +32,19 @@ XSB2401 = ClassUnit(SStructureUnit) {
         DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
+    --- Run any OnGiven callbacks then update the missile slider on the new unit to the correct position.
+    ---@param self XSB2401
+    ---@param newUnit Unit
+    OnGiven = function(self, newUnit)
+        SStructureUnit.OnGiven(self, newUnit)
+        if self.MissileBuilt then
+            newUnit.MissileSlider:SetGoal(0, 0, 115)
+            newUnit.MissileBuilt = true
+        else
+            newUnit.MissileSlider:SetGoal(0, 0, 115 * self:GetWorkProgress())
+        end
+    end,
+
     ---@param self XSB2401
     ---@param builder Unit
     ---@param layer string
@@ -57,7 +70,8 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
         -- Convey to the player how the launcher reloads by showing the effect right when it is built
         -- Also creates the initial pulsing glow for when the launcher is reloaded and missile is built
-        self.PlayReloadEffects(self:GetWeapon(1))
+        -- Though this doesn't mean that the launcher is unable to fire, since the weapon's state starts reloaded.
+        self.PlayReloadEffects(self.WeaponInstances[1])
     end,
 
     ---@param self XSB2401
@@ -70,20 +84,20 @@ XSB2401 = ClassUnit(SStructureUnit) {
         SStructureUnit.OnSiloBuildStart(self, weapon)
     end,
 
-    --- @param self XSB2401
-    --- @param weapon SIFExperimentalStrategicMissile
+    ---@param self XSB2401
+    ---@param weapon SIFExperimentalStrategicMissile
     OnSiloBuildEnd = function(self, weapon)
         self.MissileBuilt = true
         SStructureUnit.OnSiloBuildEnd(self,weapon)
     end,
 
-    --- @param self XSB2401
+    ---@param self XSB2401
     PlayBuildEffects = function(self)
         self:PlayUnitSound('Construct')
         self:PlayUnitAmbientSound('ConstructLoop')
     end,
 
-    --- @param self XSB2401
+    ---@param self XSB2401
     StopBuildEffects = function(self)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
@@ -106,7 +120,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
-    --- @param self XSB2401
+    ---@param self XSB2401
     DestroyReloadEmitters = function(self)
         local effectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         for bidx, bone in self.MissileEffect do
@@ -117,7 +131,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     -- Keep this function here instead of in the weapon so OnStopBeingBuilt can call it.
-    --- @param weapon SIFExperimentalStrategicMissile
+    ---@param weapon SIFExperimentalStrategicMissile
     PlayReloadEffects = function(weapon)
         local bp = weapon.Blueprint
         local muzzleBones = bp.RackBones[weapon.CurrentRackSalvoNumber].MuzzleBones
@@ -135,15 +149,18 @@ XSB2401 = ClassUnit(SStructureUnit) {
         -- Create the reload stage effects: 3 effects in the middle column and a blue glow when the missile is built and launcher is reloaded
         local reloadTime = bp.RackSalvoReloadTime
         weapon.Trash:Add(ForkThread(function()
+            -- stage effects
             local stage = 0
             while stage < 3 do
                 WaitSeconds(reloadTime/3)
                 stage = stage + 1
                 unit:CreateReloadEmitter(stage)
             end
+            -- wait until the missile is built
             while not unit.MissileBuilt do
                 WaitTicks(1)
             end
+            -- play the "missile built and launcher reloaded" effects
             local template = EffectTemplate.SIFExperimentalStrategicLauncherLoaded01
             for i, effect in template do
                 if not unit.MissileEffect[stage + 1] then
@@ -158,7 +175,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     --- Raises the missile depending on completion progress.
-    --- @param self XSB2401
+    ---@param self XSB2401
     RaiseMissileThread = function(self)
         self.NotCancelled = true
         WaitTicks(6)
@@ -180,13 +197,13 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
-    --- @param self XSB2401
+    ---@param self XSB2401
     HideMissile = function(self)
         WaitTicks(2)
         self:RetractMissile()
     end,
 
-    --- @param self XSB2401
+    ---@param self XSB2401
     RetractMissile = function(self)
         local missileBone = self.Blueprint.Display.MissileBone
         if missileBone then
@@ -198,7 +215,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
     end,
 
     --- Hides the missile if building is cancelled.
-    --- @param self XSB2401
+    ---@param self XSB2401
     WatchBuild = function(self)
         while true do
             if not self:IsUnitState('SiloBuildingAmmo') and not self.MissileBuilt then
@@ -211,7 +228,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
-    --- @param self XSB2401
+    ---@param self XSB2401
     ChargeNukeSound = function(self)
         WaitTicks(16)
         self:PlayUnitAmbientSound('NukeCharge')

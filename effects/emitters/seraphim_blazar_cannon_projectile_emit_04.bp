@@ -1,13 +1,11 @@
 TrailEmitterBlueprint {
-	BlueprintId = 'seraphim_blazar_cannon_projectile04',
-	Lifetime = -1.00,
-    TrailLength = 0.4,
+    BlendMode = 3,
+    LODCutoff = 160,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_trail_04.dds",
+    RepeatTexture = "/textures/particles/trail_white_02.dds",
     Size = 0.045,
     SortOrder = 0,
-    BlendMode = 3,
     TextureRepeatRate = 0.22,
-    LODCutoff = 160,
-	RepeatTexture = '/textures/particles/trail_white_02.dds',
-	RampTexture = '/textures/particles/ramp_trail_04.dds',
+    TrailLength = 0.4,
 }
-

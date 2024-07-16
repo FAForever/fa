@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,9 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 500,
-                    ShaderName = 'TMeshNoNormals',
+                    LODCutoff = 170,
+                    ShaderName = "TMeshNoNormals",
                 },
             },
         },
@@ -25,9 +24,7 @@ PropBlueprint {
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Small Rock',
-    },
+    Interface = { HelpText = "Small Rock" },
     SizeX = 0.5,
     SizeY = 0.5,
     SizeZ = 1,

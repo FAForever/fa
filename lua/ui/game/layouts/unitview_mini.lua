@@ -3,6 +3,9 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
+local controls = import("/lua/ui/game/unitview.lua").controls
+local consControl = import("/lua/ui/game/construction.lua").controls.constructionGroup
+local ordersControls = import("/lua/ui/game/orders.lua").controls
 
 local iconPositions = {
     [1] = {Left = 70, Top = 55},
@@ -28,8 +31,6 @@ local iconTextures = {
 }
 
 function SetLayout()
-    local controls = import("/lua/ui/game/unitview.lua").controls
-    
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
@@ -165,14 +166,19 @@ function SetBG(controls)
 end
 
 function PositionWindow()
-    local controls = import("/lua/ui/game/unitview.lua").controls
-    local consControl = import("/lua/ui/game/construction.lua").controls.constructionGroup
     if consControl:IsHidden() then
         LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
         LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 24)
     else
-        LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 120)
-        LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 42)
+        if ordersControls.bg then
+            LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 120)
+            LayoutHelpers.AtBottomIn(controls.abilities, controls.bg, 42)
+        else
+            -- Replay? Anyway, the orders control does not exist so the construction control is all the way to the left.
+            -- The construction control is taller than the orders control, so we have to move unit view higher.
+            LayoutHelpers.AtBottomIn(controls.bg, controls.parent, 140)
+            LayoutHelpers.AtLeftIn(controls.bg, controls.parent, 18)
+        end
     end
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent, 17)
 end

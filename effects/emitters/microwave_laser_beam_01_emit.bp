@@ -1,13 +1,23 @@
-BeamBlueprint {
-    Lifetime = 10,
-    TextureName = '/textures/particles/beam_red_06.dds',
-    Thickness = 0.55,
-    StartColor = {x=1,y=1,z=1,w=0.2}, -- R,G,B,A
-    EndColor = {x=1,y=1,z=1,w=0.2}, -- R,G,B,A
+BeamBlueprint{
     Blendmode = 3.0,
-    RepeatRate = 0.01,
+    EndColor = {
+        w = 0.2,
+        x = 1,
+        y = 1,
+        z = 1,
+    },
+    LODCutoff = 400,
     Length = 2000,
+    Lifetime = 10,
+    RepeatRate = 0.01,
+    StartColor = {
+        w = 0.2,
+        x = 1,
+        y = 1,
+        z = 1,
+    },
+    TextureName = "/textures/particles/beam_red_06.dds",
+    Thickness = 0.55,
     UShift = 0.0,
     VShift = -0.25,
-    LODCutoff = 400,
 }

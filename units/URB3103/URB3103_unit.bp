@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC urb3103_desc>Scout-Deployed Land Sensor",
+    AverageDensity = 1,
     Categories = {
         "CYBRAN",
         "INTELLIGENCE",

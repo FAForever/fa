@@ -1741,7 +1741,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        local time  = time / 2
+        local time  = time * 2
 
         local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
 

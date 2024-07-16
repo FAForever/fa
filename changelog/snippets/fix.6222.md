@@ -1,1 +1,0 @@
-- (#6222) Fix not being able to kick observers in team games that are not using the "Fixed" spawn setting.

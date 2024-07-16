@@ -1,0 +1,1 @@
+- (#6321) Fix the Yolona's missile staying underground after being shared to another player.

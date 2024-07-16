@@ -20,6 +20,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'URS',        Cue = 'URS0303_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 20000,
     BuildIconSortPriority = 40,
     Categories = {
         "AIRSTAGINGPLATFORM",

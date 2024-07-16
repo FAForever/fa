@@ -9,6 +9,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Stop',        LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Vehicle',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 400,
     Buffs = {
         Stun = {
             Add = {

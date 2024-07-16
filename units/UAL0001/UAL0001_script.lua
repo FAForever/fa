@@ -48,6 +48,10 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
+        -- Set initial range of Chrono here so that max range can be displayed in the UI
+        local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+        local cd = self:GetWeaponByLabel('ChronoDampener')
+        cd:ChangeMaxRadius(bpDisrupt)
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
@@ -218,6 +222,8 @@ UAL0001 = ClassUnit(ACUUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
+            local cd = self:GetWeaponByLabel('ChronoDampener')
+            cd:ChangeMaxRadius(bp.NewMaxRadius or 30)
         elseif enh == 'CrysalisBeamRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
@@ -226,6 +232,8 @@ UAL0001 = ClassUnit(ACUUnit) {
             oc:ChangeMaxRadius(bpDisrupt or 22)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bpDisrupt or 22)
+            local cd = self:GetWeaponByLabel('ChronoDampener')
+            cd:ChangeMaxRadius(bpDisrupt or 22)
         -- Advanced Cryslised Beam
         elseif enh == 'FAF_CrysalisBeamAdvanced' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
@@ -234,6 +242,8 @@ UAL0001 = ClassUnit(ACUUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            local cd = self:GetWeaponByLabel('ChronoDampener')
+            cd:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh == 'FAF_CrysalisBeamAdvancedRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
@@ -242,6 +252,8 @@ UAL0001 = ClassUnit(ACUUnit) {
             oc:ChangeMaxRadius(bpDisrupt or 22)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bpDisrupt or 22)
+            local cd = self:GetWeaponByLabel('ChronoDampener')
+            cd:ChangeMaxRadius(bpDisrupt or 22)
         -- Heat Sink Augmentation
         elseif enh == 'HeatSink' then
             local wep = self:GetWeaponByLabel('RightDisruptor')

@@ -1,27 +1,10 @@
-PropBlueprint {
+PropBlueprint{
     Audio = {
-        BurnLoop = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        BurnStart = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        TreeFall = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Tree_Crush',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        BurnLoop  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
+        BurnStart = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        TreeFall  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Tree_Crush', LodCutoff = 'UnitMove_LodCutoff' },
     },
-    Categories = {
-        'RECLAIMABLE',
-    },
-    CollisionOffsetX = 0,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = 0,
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -31,10 +14,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'aeon_street_light_Albedo.dds',
-                    SpecName = 'aeon_street_light_SpecTeam.dds',
-                    LODCutoff = 300,
-                    ShaderName = 'Aeon',
+                    LODCutoff = 330,
+                    ShaderName = "Aeon",
+                    SpecName = "aeon_street_light_SpecTeam.dds",
+                    AlbedoName = "aeon_street_light_Albedo.dds",
                 },
             },
         },
@@ -45,11 +28,12 @@ PropBlueprint {
         ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Aeon Streetlight',
-    },
-    ScriptClass = 'Tree',
-    ScriptModule = '/lua/proptree.lua',
+    Interface = { HelpText = "Aeon Streetlight" },
+    ScriptClass = "Tree",
+    ScriptModule = "/lua/proptree.lua",
+    CollisionOffsetX = 0,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = 0,
     SizeX = 0.5,
     SizeY = 1.5,
     SizeZ = 0.5,

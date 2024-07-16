@@ -1,15 +1,12 @@
--- not used by faf
 TrailEmitterBlueprint {
-    BlueprintId = 'hrailgunsd_polytrail_01',
-    Lifetime = -1.00,
-    TrailLength = 1.50,
-    Size = 0.135,
-    SortOrder = 0,
     BlendMode = 3,
     EmitIfVisible = true,
+    LODCutoff = 300.0,
+    Lifetime = -1.0,
+    RampTexture = "/textures/particles/ramp_railgun_01.dds",
+    RepeatTexture = "/textures/particles/hrailgunsd_trail_01.dds",
+    Size = 0.135,
+    SortOrder = 0,
     TextureRepeatRate = 0.5,
-    LODCutoff = 300.00,
-    RepeatTexture = '/textures/particles/hrailgunsd_trail_01.dds',
-    RampTexture = '/textures/particles/ramp_railgun_01.dds',
+    TrailLength = 1.5,
 }
-

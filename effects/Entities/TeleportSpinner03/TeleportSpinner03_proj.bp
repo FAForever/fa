@@ -1,4 +1,4 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Physics = {
         Acceleration = 0,
         AccelerationRange = 0,
