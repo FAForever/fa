@@ -1,0 +1,1 @@
+- (#5669) Move the Classes of Seraphim Projectiles to separate Files.
