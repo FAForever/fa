@@ -124,11 +124,13 @@ StorageManagerBrainComponent = ClassSimple {
             self.MassStorageState = state
 
             for _, unit in self.UnitMassStorage do
-                local onMassStorageStateChange = unit.OnMassStorageStateChange
-                if onMassStorageStateChange then
-                    local ok, msg = pcall(onMassStorageStateChange, unit, state)
-                    if not ok then
-                        -- WARN("")
+                if not IsDestroyed(unit) then
+                    local onMassStorageStateChange = unit.OnMassStorageStateChange
+                    if onMassStorageStateChange then
+                        local ok, msg = pcall(onMassStorageStateChange, unit, state)
+                        if not ok then
+                            -- WARN("")
+                        end
                     end
                 end
             end
@@ -164,11 +166,13 @@ StorageManagerBrainComponent = ClassSimple {
             self.EnergyStorageState = state
 
             for _, unit in self.UnitEnergyStorage do
-                local onEnergyStorageStateChange = unit.OnEnergyStorageStateChange
-                if onEnergyStorageStateChange then
-                    local ok, msg = pcall(onEnergyStorageStateChange, unit, state)
-                    if not ok then
-                        -- WARN("")
+                if not IsDestroyed(unit) then
+                    local onEnergyStorageStateChange = unit.OnEnergyStorageStateChange
+                    if onEnergyStorageStateChange then
+                        local ok, msg = pcall(onEnergyStorageStateChange, unit, state)
+                        if not ok then
+                            -- WARN("")
+                        end
                     end
                 end
             end

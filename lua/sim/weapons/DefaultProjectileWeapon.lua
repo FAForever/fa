@@ -296,6 +296,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- now that we know roughly when we'll land, we can find a better guess for where
             -- we'll land, and thus guess the true falling height better as well
             halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX + time * projVelX, projPosX + time * projVelX))
+            if halfHeight < 0.01 then return 4.9 end
             time = MathSqrt(0.816326530612 * halfHeight) + spread
 
             local acc = halfHeight / (time * time)

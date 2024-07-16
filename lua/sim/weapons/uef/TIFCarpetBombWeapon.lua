@@ -43,7 +43,11 @@ TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
                 -- we don't want to keep updating this location, so remove the target.
                 data.target = nil
             end
-            self:SetTargetGround(data.targetPos)
+
+            -- may be missing when the engine switches between attack ground commands, see also the blueprint field `AttackGroundTries`
+            if data.targetPos then
+                self:SetTargetGround(data.targetPos)
+            end
         end
         return DefaultProjectileWeaponCreateProjectileAtMuzzle(self, muzzle)
     end,
