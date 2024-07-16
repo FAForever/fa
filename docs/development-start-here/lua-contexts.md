@@ -18,7 +18,7 @@ There are various Lua contexts in Supreme Commander. Each context is isolated fr
 
 This is run at the start of the game. It is responsible for running the init files, such as [init_faf.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/init_faf.lua). Unlike other contexts the `io` and `os` modules are available.
 
-- (2) Blueprint loading context
+- (2) Blueprint loading conwtext
 
 This is run when preparing a game session. It is responsible for loading and processing all the blueprint files. The [globalInit.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/globalInit.lua) is run to initialize the context and then proceeds to call functions in [blueprints.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/system/Blueprints.lua) to process the blueprints.
 
