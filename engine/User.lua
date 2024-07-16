@@ -1152,6 +1152,11 @@ end
 function SetVolume(category, volume)
 end
 
+--- If set, inverts the middle mouse button
+---@param flag boolean
+function SetInvertMidMouseButton(flag)
+end
+
 --- Performs a callback with the given identifier from `callback.Func` in `/lua/simcallbacks.lua`.
 --- Optionally appends the unit selection to the arguments.
 ---@param callback SimCallback where `Func` represents the callback function and `Args` is additional data

@@ -1061,12 +1061,12 @@ PlatoonTemplates = {
         T2LandAmphibious1={
             "T2LandAmphibious1",
             "PatrolBaseVectorsAI",
-            { "ual0201", 1, 6, "attack", "GrowthFormation" }
+            { "xal0203", 1, 6, "attack", "GrowthFormation" }
         },
         T2LandAmphibious2={
             "T2LandAmphibious2",
             "PatrolBaseVectorsAI",
-            { "ual0201", -1, 4, "attack", "GrowthFormation" }
+            { "xal0203", -1, 4, "attack", "GrowthFormation" }
         },
         T2LandArtillery1={
             "T2LandArtillery1",

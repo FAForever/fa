@@ -1,21 +1,21 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 75.0,
+        MaxHealth = 75.0,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'aeon_car_02_Albedo.dds',
-                    SpecName = 'aeon_car_02_SpecTeam.dds',
-                    LODCutoff = 500,
-                    ShaderName = 'Aeon',
+                    LODCutoff = 150,
+                    ShaderName = "Aeon",
+                    SpecName = "aeon_car_02_SpecTeam.dds",
+                    AlbedoName = "aeon_car_02_Albedo.dds",
                 },
             },
         },
@@ -26,9 +26,7 @@ PropBlueprint {
         ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Aeon Car 02',
-    },
+    Interface = { HelpText = "Aeon Car 02" },
     SizeX = 0.5,
     SizeY = 0.5,
     SizeZ = 0.5,

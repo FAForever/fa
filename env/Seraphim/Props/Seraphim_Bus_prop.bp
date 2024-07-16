@@ -1,22 +1,22 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'seraphim_bus_Albedo.dds',
-                    SpecName = 'seraphim_bus_SpecTeam.dds',
-                    LODCutoff = 750,
-                    LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',
-                    ShaderName = 'Seraphim',
+                    LODCutoff = 400,
+                    LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
+                    ShaderName = "Seraphim",
+                    SpecName = "seraphim_bus_SpecTeam.dds",
+                    AlbedoName = "seraphim_bus_Albedo.dds",
                 },
             },
         },
@@ -27,15 +27,9 @@ PropBlueprint {
         ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Seraphim Bus',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Seraphim Bus" },
+    Physics = { BlockPath = true },
     SizeX = 3,
     SizeY = 2,
     SizeZ = 5.5,

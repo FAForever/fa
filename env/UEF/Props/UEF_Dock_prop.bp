@@ -1,27 +1,27 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'UEF_dock_Albedo.dds',
-                    SpecName = 'UEF_dock_SpecTeam.dds',
-                    LODCutoff = 225,
-                    ShaderName = 'Unit',
+                    LODCutoff = 130,
+                    ShaderName = "Unit",
+                    SpecName = "UEF_dock_SpecTeam.dds",
+                    AlbedoName = "UEF_dock_Albedo.dds",
                 },
                 {
-                    AlbedoName = 'UEF_dock_lod1_albedo.dds',
-                    LODCutoff = 750,
-                    ShaderName = 'Unit',
-                    SpecularName = 'UEF_dock_lod1_specteam.dds',
+                    LODCutoff = 490,
+                    ShaderName = "Unit",
+                    AlbedoName = "UEF_dock_lod1_albedo.dds",
+                    SpecularName = "UEF_dock_lod1_specteam.dds",
                 },
             },
         },
@@ -32,15 +32,9 @@ PropBlueprint {
         ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'UEF Dock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "UEF Dock" },
+    Physics = { BlockPath = true },
     SizeX = 8.5,
     SizeY = 0.1,
     SizeZ = 6,

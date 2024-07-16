@@ -1,24 +1,10 @@
-PropBlueprint {
+PropBlueprint{
     Audio = {
-        BurnLoop = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        BurnStart = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        TreeFall = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Tree_Crush',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        BurnLoop  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
+        BurnStart = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        TreeFall  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Tree_Crush', LodCutoff = 'UnitMove_LodCutoff' },
     },
-    Categories = {
-        'RECLAIMABLE',
-    },
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -28,9 +14,9 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 400,
-                    ShaderName = 'TMeshAlpha',
-					NormalsName = 'eg_bush02_normalsTS.dds',
+                    LODCutoff = 110,
+                    ShaderName = "TMeshAlpha",
+                    NormalsName = "eg_bush02_normalsTS.dds",
                 },
             },
         },
@@ -41,9 +27,7 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Small Bush',
-    },
+    Interface = { HelpText = "Small Bush" },
     SizeX = 0.3,
     SizeY = 0.25,
     SizeZ = 0.3,

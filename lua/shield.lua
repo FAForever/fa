@@ -214,17 +214,23 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- attach us to the owner
         EntityAttachBoneTo(self, -1, spec.Owner, -1)
 
-        -- lookup as to whether we're static or a commander shield
+
+        -- lookup whether we're a static shield for absorbing deathnukes with modded shields that don't have the value set
+        local absorptionType = spec.AbsorptionType
+        -- lookup whether we're a static or a commander shield for overcharge's fixed damage
         local ownerBp = self.Owner.Blueprint
         local ownerCategories = ownerBp.CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
+            if not absorptionType then
+                absorptionType = "StaticShield"
+            end
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
         end
 
         -- lookup our damage absorption type's table
-        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[ownerBp.Defense.Shield.AbsorptionType or "Default"]
+        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[absorptionType or "Default"]
 
         -- use trashbag of the unit that owns us
         self.Trash = self.Owner.Trash

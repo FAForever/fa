@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,8 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 500,
-                    ShaderName = 'VertexNormal',
+                    LODCutoff = 140,
+                    ShaderName = "VertexNormal",
                 },
             },
         },
@@ -24,12 +24,8 @@ PropBlueprint {
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Sphere',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "Sphere" },
+    Physics = { BlockPath = false },
     SizeX = 0.5,
     SizeY = 0.25,
     SizeZ = 0.5,

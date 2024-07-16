@@ -1,7 +1,5 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
-    },
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -11,8 +9,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 300,
-                    ShaderName = 'Unit',
+                    LODCutoff = 80,
+                    ShaderName = "Unit",
                 },
             },
         },
@@ -23,12 +21,8 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'A dude - DDS missing',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "A dude - DDS missing" },
+    Physics = { BlockPath = false },
     SizeX = 0.1,
     SizeY = 0.25,
     SizeZ = 0.1,

@@ -1,24 +1,10 @@
-PropBlueprint {
+PropBlueprint{
     Audio = {
-        BurnLoop = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        BurnStart = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        TreeFall = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Tree_Crush',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        BurnLoop  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
+        BurnStart = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        TreeFall  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Tree_Crush', LodCutoff = 'UnitMove_LodCutoff' },
     },
-    Categories = {
-        'RECLAIMABLE',
-    },
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -28,9 +14,9 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'Clutter01_albedo.dds',
-                    LODCutoff = 300,
-                    ShaderName = 'Clutter',
+                    LODCutoff = 110,
+                    ShaderName = "Clutter",
+                    AlbedoName = "Clutter01_albedo.dds",
                 },
             },
         },
@@ -41,12 +27,8 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Clutter',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "Clutter" },
+    Physics = { BlockPath = false },
     SizeX = 0.25,
     SizeY = 0.25,
     SizeZ = 0.25,

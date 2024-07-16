@@ -21,7 +21,7 @@ UnitBlueprint{
         KTurn = 2,
         KTurnDamping = 4,
         LiftFactor = 8,
-        MaxAirspeed = 13.5,
+        MaxAirspeed = 14.5,
         StartTurnDistance = 10,
         TransportHoverHeight = 4,
     },
@@ -40,7 +40,7 @@ UnitBlueprint{
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
         Unload             = Sound { Bank = 'XSA',            Cue = 'XSA0104_Unit_Unload',        LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 1625,
     BuildIconSortPriority = 40,
     Categories = {
         "AIR",

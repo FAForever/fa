@@ -1,32 +1,28 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-		'WALL',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
+        "WALL",
     },
     Defense = {
-        Health = 2000,
-        MaxHealth = 2000,
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    AlbedoName = 'jwall01_albedo.dds',
-					NormalsName = 'jwall01_normalsts.dds',
-	  	    		ShaderName = 'NormalMappedTerrain',
-                    LODCutoff = 200,
-                    
+                    LODCutoff = 50,
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "jwall01_albedo.dds",
+                    NormalsName = "jwall01_normalsts.dds",
                 },
-				{
-
-                    AlbedoName = 'jwall01_albedo.dds',
-					NormalsName = 'jwall01_normalsts.dds',
-	  	    		ShaderName = 'NormalMappedTerrain',
-                    LODCutoff = 3000,
-                    
+                {
+                    LODCutoff = 170,
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "jwall01_albedo.dds",
+                    NormalsName = "jwall01_normalsts.dds",
                 },
             },
         },
@@ -37,16 +33,10 @@ PropBlueprint {
         ReclaimMassMax = 2,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Japanese Wall Tower',
-    },
-    Physics = {
-        BlockPath = true,
-    },
-    SizeX = .6,
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Japanese Wall Tower" },
+    Physics = { BlockPath = true },
+    SizeX = 0.6,
     SizeY = 1,
-    SizeZ = .6,
+    SizeZ = 0.6,
 }

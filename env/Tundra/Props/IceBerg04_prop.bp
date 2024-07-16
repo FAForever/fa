@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,8 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 500,
-                    ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 170,
+                    ShaderName = "NormalMappedTerrain",
                 },
             },
         },
@@ -24,9 +24,7 @@ PropBlueprint {
         ReclaimMassMax = 10,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Small Rock - Ice',
-    },
+    Interface = { HelpText = "Small Rock - Ice" },
     SizeX = 0.75,
     SizeY = 0.25,
     SizeZ = 0.75,

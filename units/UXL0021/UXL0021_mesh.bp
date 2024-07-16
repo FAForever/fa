@@ -1,10 +1,10 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 4,
     LODs = {
         {
-            ShaderName = 'Metal',
-            AlbedoName = '',
             LODCutoff = 350,
+            ShaderName = "Metal",
+            AlbedoName = "",
         },
     },
-    IconFadeInZoom = 4,
 }

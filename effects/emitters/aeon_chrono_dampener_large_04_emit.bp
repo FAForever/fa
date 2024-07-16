@@ -1,5 +1,5 @@
 EmitterBlueprint {
-	BlueprintId = 'aeon_chrono_dampener_04',
+	BlueprintId = 'aeon_chrono_dampener_large_04',
 	Lifetime = 1.00,
 	Repeattime = 1.00,
 	TextureFramecount = 1.00,
@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = 250.00,
+	LODCutoff = 1100.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -130,7 +130,7 @@ EmitterBlueprint {
 	RotationRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.0,y=-3.000,z=0.000 },
+			{ x=0.000,y=-3.000,z=0.000 },
 		},
 	},
 	FrameRateCurve = {

@@ -1,45 +1,27 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Explosions',
-            Cue = 'Explosion_Bomb',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'Explosion_Bomb',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_AEON',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact        = Sound { Bank = 'Explosions', Cue = 'Explosion_Bomb',           LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Explosions', Cue = 'Explosion_Bomb',           LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts',    Cue = 'Impact_Water_Splash_AEON', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'IGNOREASFONCOLLISION',
+        "AEON",
+        "IGNOREASFONCOLLISION",
+        "INDIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Large01',
-        },
+        ImpactEffects = { Type = "Large01" },
         StrategicIconSize = 2,
-
-        -- MeshBlueprint = '/meshes/projectiles/bomb_default_mesh.bp',
         UniformScale = 0.3,
     },
     General = {
-        Category = 'Bomb',
-        Faction = 'Aeon',
-        Weapon = 'Quark Bomb',
+        Category = "Bomb",
+        Faction = "Aeon",
+        Weapon = "Quark Bomb",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         RealisticOrdinance = true,

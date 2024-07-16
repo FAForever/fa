@@ -1,10 +1,10 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         ImpactEffects = {
-            Type = 'Small01',
             Scale = 2.0,
+            Type = "Small01",
         },
-        MeshBlueprint = '/meshes/projectiles/debris_misc_07_mesh.bp',
+        MeshBlueprint = "/meshes/projectiles/debris_misc_07_mesh.bp",
         UniformScale = 1.2,
     },
     Physics = {
