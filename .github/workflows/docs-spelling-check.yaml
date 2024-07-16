@@ -28,8 +28,6 @@ on:
   pull_request: 
     paths: ["docs/**"]
 
-  workflow_dispatch:
-
 jobs:
   verify:
     name: Verify spelling
@@ -45,4 +43,6 @@ jobs:
         uses: check-spelling/check-spelling@main
         with:
           checkout: false
+          experimental_path: docs
+          only_check_changed_files: true
           
