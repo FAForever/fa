@@ -21,7 +21,7 @@
 ------------------------------------------------------------------------------------
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local OnWaterEntryEmitterProjectile = import('/lua/sim/OnWaterEntryEmitterProjectile.lua').OnWaterEntryEmitterProjectile
+local OnWaterEntryEmitterProjectile = import('/lua/sim/projectiles/OnWaterEntryEmitterProjectile.lua').OnWaterEntryEmitterProjectile
 
 ---  Cybran DEPTH CHARGE PROJECTILES
 ---@class CDepthChargeProjectile : OnWaterEntryEmitterProjectile
