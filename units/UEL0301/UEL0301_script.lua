@@ -4,17 +4,11 @@
 -- Summary  :  UEF Sub Commander Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
----@alias UEFSCUEnhancementBuffType
----| "SCUBuildRate"
-
-
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
-local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0301 : CommandUnit
 UEL0301 = ClassUnit(CommandUnit) {
@@ -227,7 +221,7 @@ UEL0301 = ClassUnit(CommandUnit) {
         elseif enh =='ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
-            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
+            local wep = self:GetWeaponByLabel('DeathWeapon')
             wep:AddDamageMod(bp.NewDamageMod or 300)
             wep:ChangeDamageRadius(bp.NewDamageRadius or 35)
             if not bp then return end
@@ -235,8 +229,8 @@ UEL0301 = ClassUnit(CommandUnit) {
             self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
-            wep:AddDamageMod(-self.Blueprint.Enhancements['HighExplosiveOrdnance'].NewDamageMod)
+            local wep = self:GetWeaponByLabel('DeathWeapon')
+            wep:AddDamageMod(-self.Blueprint.Enhancements['ResourceAllocation'].NewDamageMod)
             wep:ChangeMaxRadius(self.Blueprint.Weapon[1].MaxRadius or 25)
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)

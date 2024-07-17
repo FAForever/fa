@@ -190,51 +190,51 @@ UnitBlueprint{
         TeleportTimeMod = 0.0001,
     },
     EnhancementPresets = {
-        Engineer = {
-            Description = "<LOC uel0301_Engineer_desc>SACU (Engineer preset)",
-            BuildIconSortPriority = 20,
-            Enhancements = { "Pod" },
-            HelpText = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_Engineer_name>SACU (Engineer preset)",
-        },
-        RAS = {
-            Description = "<LOC uel0301_RAS_desc>SACU (RAS preset)",
-            BuildIconSortPriority = 10,
-            Enhancements = { "ResourceAllocation" },
-            HelpText = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_RAS_name>SACU (RAS preset)",
-        },
-        Support = {
-            Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
-            BuildIconSortPriority = 25,
-            Enhancements = {
-                "AdvancedCoolingUpgrade",
-                "HighExplosiveOrdnance",
-                "Shield",
-            },
-            HelpText = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
-            SelectionPriority = 1,
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_Rambo_name>SACU (Rambo preset)",
-        },
-        Rambo = {
-            Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
-            BuildIconSortPriority = 25,
-            Enhancements = {
-                "AdvancedCoolingUpgrade",
-                "HighExplosiveOrdnance",
-                "Shield",
-            },
-            HelpText = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
-            SelectionPriority = 1,
-            SortCategory = "SORTOTHER",
-            UnitName = "<LOC uel0301_Rambo_name>SACU (Rambo preset)",
-        },
+--        Engineer = {
+--            Description = "<LOC uel0301_Engineer_desc>SACU (Engineer preset)",
+--            BuildIconSortPriority = 20,
+--            Enhancements = { "Pod" },
+--            HelpText = "<LOC uel0301_Engineer_help>Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
+--            SortCategory = "SORTOTHER",
+--            UnitName = "<LOC uel0301_Engineer_name>SACU (Engineer preset)",
+--        },
+--        RAS = {
+--            Description = "<LOC uel0301_RAS_desc>SACU (RAS preset)",
+--            BuildIconSortPriority = 10,
+--            Enhancements = { "ResourceAllocation" },
+--            HelpText = "<LOC uel0301_RAS_help>Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
+--            SortCategory = "SORTOTHER",
+--            UnitName = "<LOC uel0301_RAS_name>SACU (RAS preset)",
+--        },
+--        Support = {
+--            Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
+--            BuildIconSortPriority = 25,
+--            Enhancements = {
+--                "AdvancedCoolingUpgrade",
+--                "HighExplosiveOrdnance",
+--                "Shield",
+--            },
+--            HelpText = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
+--            SelectionPriority = 1,
+--            SortCategory = "SORTOTHER",
+--            UnitName = "<LOC uel0301_Rambo_name>SACU (Rambo preset)",
+--        },
+--        Rambo = {
+--            Description = "<LOC uel0301_Rambo_desc>SACU (Rambo preset)",
+--            BuildIconSortPriority = 25,
+--            Enhancements = {
+--                "AdvancedCoolingUpgrade",
+--                "HighExplosiveOrdnance",
+--                "Shield",
+--            },
+--            HelpText = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
+--            SelectionPriority = 1,
+--            SortCategory = "SORTOTHER",
+--            UnitName = "<LOC uel0301_Rambo_name>SACU (Rambo preset)",
+--        },
     },
     Enhancements = {
-        -- Left Upgrade
+        --#region Left Upgrade
         AdvancedCoolingUpgrade = {
             BuildCostEnergy = 44700,
             BuildCostMass = 750,
@@ -242,7 +242,7 @@ UnitBlueprint{
             Icon = "acu",
             Name = "<LOC enhancements_0061>Energy Accelerator",
             NewRateOfFire = 2,
-            NewRangeMod = 35,
+            NewMaxRadius = 35,
             Slot = "LCH",
             UpgradeUnitAmbientBones = { "UEL0301" },
         },
@@ -287,8 +287,8 @@ UnitBlueprint{
             },
             Slot = "LCH",
         },
-
-        -- Back Upgrade
+        --#endregion
+        --#region Back Upgrade
         Shield = {
             BuildCostEnergy = 100200,
             BuildCostMass = 2000,
@@ -390,8 +390,8 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
-
-        -- Right Upgrade
+        --#endregion
+        --#region Right Upgrade
         HighExplosiveOrdnance = {
             BuildCostEnergy = 46875,
             BuildCostMass = 1250,
@@ -480,7 +480,7 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
-
+        --#endregion
         Slots = {
             Back = {
                 name = "<LOC _Back>",
