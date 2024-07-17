@@ -131,7 +131,7 @@ UnitBlueprint{
         Icon = "amph",
         UnitName = "<LOC xal0203_name>Blaze",
     },
-    Intel = { VisionRadius = 24 },
+    Intel = { VisionRadius = 22 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.6,
     LifeBarSize = 0.8,
