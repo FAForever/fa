@@ -136,7 +136,7 @@ UnitBlueprint{
         Icon = "amph",
         UnitName = "<LOC xsl0203_name>Yenzyne",
     },
-    Intel = { VisionRadius = 20 },
+    Intel = { VisionRadius = 18 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,
     LifeBarSize = 0.75,
