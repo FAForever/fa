@@ -8,7 +8,7 @@
 
 local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 
-local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY
+local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.STRUCTURE
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
 
@@ -66,7 +66,7 @@ end
 --- replaces the units with new ones)
 ---@param units Unit[]
 ---@param toArmy number
----@param captured boolean
+---@param captured boolean?
 ---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured)
     local toBrain = GetArmyBrain(toArmy)
