@@ -25,37 +25,49 @@ local UIRenderableCircle = import('/lua/ui/game/renderable/circle.lua').UIRender
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local DraggerInit = Dragger.__init
 
-local TrashAdd = TrashBag.Add
-
 ---@class UIRadialDragger : Dragger
 ---@field Origin Vector
----@field RadiusCircle UIRenderableCircle
+---@field Destination Vector
+---@field ShapeStart UIRenderableCircle
 ---@field MinimumDistance number
+---@field MaximumDistance number
+---@field Width number
 ---@field WorldView WorldView
 ---@field Callback fun(origin: Vector, radius: number)
 RadialDragger = Class(Dragger) {
+
+    Size = 0.2,
+    Thickness = 0.05,
+    Color = 'ffffff',
+
     ---@param self UIRadialDragger
     ---@param view WorldView
     ---@param callback fun(origin: Vector, radius: number)
     ---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
+    ---@param maximumWidth number
     ---@param minimumDistance number
-    __init = function(self, view, callback, keycode, minimumDistance)
+    ---@param maximumDistance number
+    __init = function(self, view, callback, keycode, maximumWidth, minimumDistance, maximumDistance)
         DraggerInit(self)
 
         -- store parameters
+        self.Width = maximumWidth
         self.MinimumDistance = minimumDistance
+        self.MaximumDistance = maximumDistance
         self.WorldView = view
         self.Callback = callback
 
         -- prepare visuals
         local mouseWorldPosition = GetMouseWorldPos()
 
-        -- default 0.2 radius, `'ffffff'` (White) color, and 0.05 minimum thickness
-        self.RadiusCircle = TrashAdd(self.Trash, UIRenderableCircle(view, 'radialDragger' .. keycode, mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], 0.2, 'ffffff', 0.05))
+        local size = self.Size
+        local trash = self.Trash
+        local thickness = self.Thickness
+        self.ShapeStart = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-start', mouseWorldPosition[1],
+            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
 
         if minimumDistance > 0 then
-            self.RadiusCircle:Hide()
+            self.ShapeStart:Hide()
         end
 
         self.Origin = mouseWorldPosition
@@ -69,6 +81,7 @@ RadialDragger = Class(Dragger) {
     ---@param x number  # x coordinate of screen position
     ---@param y number  # y coordinate of screen position
     OnMove = function(self, x, y)
+        local width = self.Width
         local view = self.WorldView
 
         local ps = self.Origin
@@ -79,11 +92,11 @@ RadialDragger = Class(Dragger) {
         local distance = math.sqrt(dx * dx + dz * dz)
 
         if distance > self.MinimumDistance then
-            self.RadiusCircle:Show()
-            self.RadiusCircle.Size = distance
+            self.ShapeStart:Show()
+            self.ShapeStart.Size = distance
         else
             -- try to hide it
-            self.RadiusCircle:Hide()
+            self.ShapeStart:Hide()
         end
     end,
 

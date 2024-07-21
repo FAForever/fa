@@ -352,8 +352,8 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
     return -- unsuccessful build
 end
 
----@param baseTemplate any
----@param location Vector
+---@param baseTemplate? any
+---@param location? Vector
 ---@return table
 function AIBuildBaseTemplateFromLocation(baseTemplate, location)
     local baseT = {}
@@ -847,25 +847,6 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
         end
     end
     return false
-end
-
----@param aiBrain AIBrain
----@param unit Unit
----@param category EntityCategory
----@return table
-function GetBuildableUnitId(aiBrain, unit, category)
-    local Game = import("/lua/game.lua")
-    local armyIndex = aiBrain:GetArmyIndex()
-    local bluePrints = EntityCategoryGetUnitList(category)
-    local blueprintOptions = {}
-    if unit.CanBuild then
-        for _, v in bluePrints do
-            if unit:CanBuild(v) and not(Game.IsRestricted(v, armyIndex)) then
-                table.insert(blueprintOptions, v)
-            end
-        end
-    end
-    return blueprintOptions
 end
 
 -- Kept for Mod Support

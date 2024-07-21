@@ -723,10 +723,6 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
-            return
-        end
-
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
@@ -777,8 +773,7 @@ do
 
         local start = GetSystemTimeSecondsOnlyForProfileUse()
         import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimProps(selection, ps, pe, Width, true)
-        SPEW("Time taken for area reclaim order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start),
-            "miliseconds")
+        SPEW("Time taken for area reclaim order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
     end
 
     ---@param data table
@@ -800,10 +795,10 @@ do
         end
 
         local target = lastCommand.target --[[@as Unit | Prop]]
-
+        
         local start = GetSystemTimeSecondsOnlyForProfileUse()
         import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection,
-            { lastCommand.x, lastCommand.y, lastCommand.z }, data.Radius)
+            { lastCommand.x, lastCommand.y, lastCommand.z }, true, data.Radius)
         SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
     end
 
