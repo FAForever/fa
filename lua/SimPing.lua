@@ -4,7 +4,7 @@ local PingLimit = 1 -- Maximum number of pings per army, within PingTimeout seco
 local PingTimeout = 1 -- How many seconds a ping counts toward an army's limit
 local PingsRemaining = {}
 local PingMarkers = {}
-MaxPingMarkers = 15
+MaxPingMarkers = 7
 --On first ping, send data to the user layer telling it the maximum allowable markers per army
 Sync.MaxPingMarkers = MaxPingMarkers
 

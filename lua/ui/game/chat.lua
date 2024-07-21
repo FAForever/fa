@@ -31,6 +31,35 @@ local commandHistory = {}
 
 local ChatTo = import("/lua/lazyvar.lua").Create()
 
+
+local function parseCommandlineArguments()
+    local CMDLINE_ARGUMENT_KEYS = {
+        ["/foe"] = true,
+    }
+
+    local function GetCommandLineArgOrDefault(argname, default)
+        local arg = GetCommandLineArg(argname, 1)
+        if arg and not CMDLINE_ARGUMENT_KEYS[arg[1]] then
+            return arg[1]
+        end
+
+        return default
+    end
+
+   return {
+        foe_list = tostring(GetCommandLineArgOrDefault("/foe", "")),
+    }
+end
+local argv = parseCommandlineArguments()
+local foe_list_ = {}
+local foe_it = 1
+for it in string.gmatch(argv.foe_list, "[^,]+") do
+   foe_list_[foe_it] = it
+   foe_it = foe_it + 1
+end
+-- kazbek peredai privet cucleusu
+
+
 local defOptions = { all_color = 1,
         allies_color = 2,
         priv_color = 3,
@@ -42,7 +71,7 @@ local defOptions = { all_color = 1,
         feed_background = false,
         feed_persist = true}
 
-local ChatOptions = Prefs.GetFieldFromCurrentProfile("chatoptions") or {}
+local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions") or {}
 for option, value in defOptions do
      if ChatOptions[option] == nil then
         ChatOptions[option] = value
@@ -789,7 +818,7 @@ end
 
 function ChatPageUp(mod)
     if GUI.bg:IsHidden() then
-        ForkThread(ToggleChat)
+        ForkThread(function() ToggleChat() end)
     else
         local newTop = GUI.chatContainer.top - mod
         GUI.chatContainer:ScrollSetTop(nil, newTop)
@@ -801,7 +830,7 @@ function ChatPageDown(mod)
     local newTop = GUI.chatContainer.top + mod
     GUI.chatContainer:ScrollSetTop(nil, newTop)
     if GUI.bg:IsHidden() or oldTop == GUI.chatContainer.top then
-        ForkThread(ToggleChat)
+        ForkThread(function() ToggleChat() end)
     end
 end
 
@@ -1160,9 +1189,26 @@ function CreateChat()
         GUI.bg:SetNeedsFrameUpdate(false)
 
     end
+
+
+    -- local test123 = ''
+    -- local file_test123 = io.open('C:\\ProgramData\\GapForever\\cache\\test.txt', 'r')
+    -- if file_test123 then
+    --     test123 = file_test123:read()
+    --     file12:close()
+    -- end
+
+
+
     for i, v in GetArmiesTable().armiesTable do
         if not v.civilian then
             ChatOptions[i] = true
+            for it, value1230 in foe_list_ do
+                if v.nickname == value1230 then
+                    ChatOptions[i] = false
+                    break
+                end
+            end
         end
     end
     GUI.bg:SetAlpha(ChatOptions.win_alpha, true)
@@ -1259,7 +1305,7 @@ function CreateConfigWindow()
         borderColor = 'ff415055',
     }
 
-    local defPosition = Prefs.GetFieldFromCurrentProfile('chat_config') or nil
+    local defPosition = Prefs.GetFromCurrentProfile('chat_config') or nil
     GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', defPosition, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
@@ -1407,6 +1453,9 @@ function CreateConfigWindow()
     for i, v in armyData.armiesTable do
         if not v.civilian then
             table.insert(options.filters, {type = 'filter', name = v.nickname, key = i})
+            -- for it, value12344 in foe_list_ do
+            --     table.insert(options.filters, {type = 'filter', name = foe_list_[it], key = it})
+            -- end
         end
     end
 
