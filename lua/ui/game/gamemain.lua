@@ -358,19 +358,35 @@ function ExperimentalGraphicsSettingsThread()
     end
 end
 
--- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
--- Let's find out max Hz capability of adapter so we don't render unnecessary frames, should help a bit with render thread at 100%
+--- Find out the max Hz capability of the adapter so we don't render unnecessary frames, reducing the load on the render thread.
+--- Some users might set SC_FrameTimeClamp to 0 which would be counterproductive for fps.
 function AdjustFrameRate()
     if options.vsync == 1 then return end
 
     local video = options.video
+    -- SC_FrameTimeClamp defaults to 10ms, which is 100 fps
     local fps = 100
 
-    if type(options.primary_adapter) == 'string' then
-        local data = utils.StringSplit(options.primary_adapter, ',')
-        local hz = tonumber(data[3])
-        if hz then
-            fps = math.max(60, hz)
+    local primaryAdapter = options.primary_adapter
+    if type(primaryAdapter) == 'string' then
+        if primaryAdapter ~= 'windowed' then
+            -- the value for the option is formatted as `width,height,fps`
+            local data = utils.StringSplit(primaryAdapter, ',')
+            local hz = tonumber(data[3])
+            if hz then
+                fps = hz
+            end
+        else
+            -- if we're in windowed mode, maximize the framerate based on the engine-generated possible adapter settings
+            -- can't use `Prefs` because `options_overrides` isn't stored in a profile
+            local allAdapterOptions = GetPreference('options_overrides.primary_adapter.custom.states')
+            for _, option in allAdapterOptions do
+                local data = utils.StringSplit(option.key, ',')
+                local hz = tonumber(data[3])
+                if hz and hz > fps then
+                    fps = hz
+                end
+            end
         end
     end
 
