@@ -1,9 +1,9 @@
 ---
 layout: page
 nav_order: 1
-title: 01. Setup
-parent: Development
-permalink: development/setup
+title: 01. Lua development environment
+parent: Development - Start here
+permalink: development/start-here/lua-setup
 ---
 
 # Setup of a development environment
@@ -77,3 +77,4 @@ $RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_dev.lua /showlog /
 ```
 
 Now you can start the game by executing the batch/bash script file. If all is good then the game starts as usual and you'll be in the main menu. If something is off then the game usually does not start. In that case you likely made a typo.
+

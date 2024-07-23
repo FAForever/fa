@@ -17,7 +17,7 @@ All three branches originate from the `develop` branch, which is the default bra
 
 ## Deployment procedures for the FAF game type
 
-The following (manual) steps are relevant to create a valid deployment to the FAF game type.
+The following (manual) stepz are relevant to create a valid deployment to the FAF game type.
 
 - (1) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/version.lua).
 - (2) Update the game executable. This needs to be done by a server administrator. This is only required when there are changes to the executable.
