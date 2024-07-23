@@ -236,7 +236,7 @@ IsAbilityExist = {
     ability_omni = function(bp)
         return bp.Intel.OmniRadius > 0
     end,
-    ability_maxvisionradius = function(bp)
+    ability_visionfield = function(bp)
         return bp.Intel.MaxVisionRadius > 0
     end,
     ability_scry = function(bp)
@@ -355,8 +355,8 @@ GetAbilityDesc = {
     ability_omni = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.OmniRadius)
     end,
-    ability_maxvisionradius = function(bp)
-        return LOCF('<LOC uvd_MaximumVisionRadius>', bp.Intel.MaxVisionRadius)
+    ability_visionfield = function(bp)
+        return LOCF('<LOC uvd_VisionField>', bp.Intel.MaxVisionRadius)
     end,
     ability_scry = function(bp)
         return LOCF('<LOC uvd_Scry>', bp.Intel.RemoteViewingRadius, bp.Economy.InitialRemoteViewingEnergyDrain, bp.Economy.MaintenanceConsumptionPerSecondEnergy)
