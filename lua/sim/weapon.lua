@@ -114,17 +114,6 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
 
         self.CollideFriendly = bp.CollideFriendly or false
-
-        ForkThread(
-            function()
-                WaitTicks(10)
-                LOG("Hello!")
-                self:DebugLog("OnCreate")
-                self:DebugSpew("OnCreate")
-                self:DebugWarn("OnCreate")
-                self:DebugError("OnCreate")
-            end
-        )
     end,
 
     ---@param self Weapon
