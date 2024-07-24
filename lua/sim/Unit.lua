@@ -23,6 +23,7 @@ local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
+local LogUnitComponent = import("/lua/sim/units/components/LogUnitComponent.lua").LogUnitComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
 
@@ -112,7 +113,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields, LogUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -145,7 +146,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, LogUnitComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -1114,6 +1115,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -- any other change that might affect our build rate or resource use.
     ---@param self Unit
     UpdateConsumptionValues = function(self)
+        LOG(debug.traceback())
         local energy_rate = 0
         local mass_rate = 0
 
@@ -2766,6 +2768,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
+        LOG("OnStartBuild", self, built, order)
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions
@@ -3910,6 +3913,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param target_bp UnitBlueprint
     ---@return number
     GetBuildCosts = function(self, target_bp)
+        LOG(self, target_bp.BlueprintId)
         return Game.GetConstructEconomyModel(self, target_bp.Economy)
     end,
 
@@ -5440,12 +5444,12 @@ local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
----@class DummyUnit : moho.unit_methods
+---@class DummyUnit : moho.unit_methods, LogUnitComponent
 ---@field EntityId EntityId
 ---@field Army Army
 ---@field Layer Layer
 ---@field Blueprint UnitBlueprint
-DummyUnit = ClassDummyUnit(moho.unit_methods) {
+DummyUnit = ClassDummyUnit(moho.unit_methods, LogUnitComponent) {
 
     IsUnit = true,
 
