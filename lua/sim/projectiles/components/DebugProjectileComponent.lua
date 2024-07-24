@@ -102,7 +102,7 @@ DebugProjectileComponent = ClassSimple {
         )
     end,
 
-    ---@param self DebugUnitComponent | Unit
+    ---@param self DebugProjectileComponent | Projectile
     ---@param color? Color
     DebugDraw = function(self, color)
         if not self.EnabledDrawing then

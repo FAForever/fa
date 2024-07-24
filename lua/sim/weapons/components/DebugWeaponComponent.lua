@@ -107,7 +107,7 @@ DebugWeaponComponent = ClassSimple {
         )
     end,
 
-    ---@param self DebugUnitComponent | Weapon
+    ---@param self DebugWeaponComponent | Weapon
     ---@param color? Color
     DebugDraw = function(self, color)
         if not self.EnabledDrawing then
