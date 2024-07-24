@@ -24,6 +24,8 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local EntityCategoryContains = EntityCategoryContains
 
+local LogProjectileComponent = import("/lua/sim/projectiles/components/LogProjectileComponent.lua").LogProjectileComponent
+
 local ProjectileMethods = moho.projectile_methods
 local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
 local ProjectileMethodsGetMaxZigZag = ProjectileMethods.GetMaxZigZag
@@ -82,7 +84,7 @@ local OnImpactPreviousZ = 0
 
 local VectorCached = Vector(0, 0, 0)
 
----@class Projectile : moho.projectile_methods, InternalObject
+---@class Projectile : moho.projectile_methods, InternalObject, LogProjectileComponent
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
@@ -93,7 +95,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
 ---@field OuterRing? NukeAOE
-Projectile = ClassProjectile(ProjectileMethods) {
+Projectile = ClassProjectile(ProjectileMethods, LogProjectileComponent) {
     IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
@@ -149,6 +151,8 @@ Projectile = ClassProjectile(ProjectileMethods) {
         if blueprint.Physics.TrackTargetGround then
             TrashBagAdd(trash, ForkThread(self.OnTrackTargetGround, self))
         end
+
+        self:Error("Hello!")
     end,
 
     --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
