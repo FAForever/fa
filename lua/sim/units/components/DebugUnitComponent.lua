@@ -97,7 +97,7 @@ DebugUnitComponent = ClassSimple {
     end,
 
     ---@param self DebugUnitComponent | Unit
-    ---@param color? Color
+    ---@param color? Color  # Defaults to white
     DebugDraw = function(self, color)
         if not self.EnabledDrawing then
             return
