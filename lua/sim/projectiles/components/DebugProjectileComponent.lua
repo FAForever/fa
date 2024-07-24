@@ -24,6 +24,7 @@
 DebugProjectileComponent = ClassSimple {
 
     EnabledLogging = true,
+    EnabledDrawing = true,
 
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any
@@ -33,9 +34,10 @@ DebugProjectileComponent = ClassSimple {
         end
 
         local unit = self.Launcher
-        if unit and IsUnit(unit) then
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
+            self:DebugDraw('gray')
         end
 
         SPEW(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
@@ -49,9 +51,10 @@ DebugProjectileComponent = ClassSimple {
         end
 
         local unit = self.Launcher
-        if unit and IsUnit(unit) then
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
+            self:DebugDraw('white')
         end
 
         _ALERT(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
@@ -65,9 +68,10 @@ DebugProjectileComponent = ClassSimple {
         end
 
         local unit = self.Launcher
-        if unit and IsUnit(unit) then
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
+            self:DebugDraw('orange')
         end
 
         WARN(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
@@ -81,9 +85,10 @@ DebugProjectileComponent = ClassSimple {
         end
 
         local unit = self.Launcher
-        if unit and IsUnit(unit) then
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
+            self:DebugDraw('red')
         end
 
         error(
@@ -95,5 +100,33 @@ DebugProjectileComponent = ClassSimple {
                 tostring(message)
             )
         )
+    end,
+
+    ---@param self DebugUnitComponent | Unit
+    ---@param color? Color
+    DebugDraw = function(self, color)
+        if not self.EnabledDrawing then
+            return
+        end
+
+        -- we can't draw dead things
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- do not draw everything, just what the developer may be interested in
+        if not (GetFocusArmy() == -1 or GetFocusArmy() == self.Army) then
+            return
+        end
+
+        color = color or 'ffffff'
+
+        local launcher = self.Launcher
+        if launcher and not IsDestroyed(launcher) then
+            launcher:DebugDraw(color)
+            DrawLine(launcher:GetPosition(), self:GetPosition(), color)
+        end
+
+        DrawCircle(self:GetPosition(), 0.25, color)
     end,
 }

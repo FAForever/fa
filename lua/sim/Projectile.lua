@@ -154,7 +154,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
         ForkThread(
             function()
-                WaitTicks(10)
+                WaitTicks(2)
                 LOG("Hello!")
                 self:DebugLog("OnCreate")
                 self:DebugSpew("OnCreate")
