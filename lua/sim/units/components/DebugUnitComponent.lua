@@ -24,6 +24,7 @@
 DebugUnitComponent = ClassSimple {
 
     EnabledLogging = true,
+    EnabledDrawing = true,
 
     ---@param self DebugUnitComponent | Unit
     ---@param ... any
@@ -32,10 +33,15 @@ DebugUnitComponent = ClassSimple {
             return
         end
 
-        -- allows us to track down the unit
-        self:SetCustomName(tostring(self.EntityId))
-
         SPEW(self.UnitId, self.EntityId, unpack(arg))
+
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- allows us the developer track down the unit
+        self:SetCustomName(tostring(self.EntityId))
+        self:DebugDraw('gray')
     end,
 
     ---@param self DebugUnitComponent | Unit
@@ -45,10 +51,15 @@ DebugUnitComponent = ClassSimple {
             return
         end
 
-        -- allows us to track down the unit
-        self:SetCustomName(tostring(self.EntityId))
-
         _ALERT(self.UnitId, self.EntityId, unpack(arg))
+
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- allows the developer to track down the unit
+        self:SetCustomName(tostring(self.EntityId))
+        self:DebugDraw('white')
     end,
 
     ---@param self DebugUnitComponent | Unit
@@ -58,10 +69,15 @@ DebugUnitComponent = ClassSimple {
             return
         end
 
-        -- allows us to track down the unit
-        self:SetCustomName(tostring(self.EntityId))
-
         WARN(self.UnitId, self.EntityId, unpack(arg))
+
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- allows the developer to track down the unit
+        self:SetCustomName(tostring(self.EntityId))
+        self:DebugDraw('orange')
     end,
 
     ---@param self DebugUnitComponent | Unit
@@ -71,9 +87,36 @@ DebugUnitComponent = ClassSimple {
             return
         end
 
-        -- allows us to track down the unit
-        self:SetCustomName(tostring(self.EntityId))
+        if not IsDestroyed(self) then
+            -- allows the developer to track down the unit
+            self:SetCustomName(tostring(self.EntityId))
+            self:DebugDraw('red')
+        end
 
         error(string.format("%s\t%s\t%s", tostring(self.UnitId), tostring(self.EntityId), tostring(message)))
+    end,
+
+    ---@param self DebugUnitComponent | Unit
+    ---@param color? Color
+    DebugDraw = function(self, color)
+        if not self.EnabledDrawing then
+            return
+        end
+
+        -- we can't draw dead units
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- do not draw everything, just what the developer may be interested in
+        if not (GetFocusArmy() == -1 or GetFocusArmy() == self.Army) then
+            return
+        end
+
+
+        color = color or 'ffffff'
+
+        local blueprint = self.Blueprint
+        DrawCircle(self:GetPosition(), math.max(blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ), color)
     end,
 }
