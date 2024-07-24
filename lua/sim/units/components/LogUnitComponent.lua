@@ -23,7 +23,7 @@
 ---@class LogUnitComponent
 LogUnitComponent = ClassSimple {
 
-    EnabledLogging = false,
+    EnabledLogging = true,
 
     ---@param self LogUnitComponent | Unit
     ---@param ... any
@@ -33,7 +33,7 @@ LogUnitComponent = ClassSimple {
         end
 
         -- allows us to track down the unit
-        self:SetCustomName(self.EntityId)
+        self:SetCustomName(tostring(self.EntityId))
 
         SPEW(self.UnitId, self.EntityId, unpack(arg))
     end,
@@ -46,7 +46,7 @@ LogUnitComponent = ClassSimple {
         end
 
         -- allows us to track down the unit
-        self:SetCustomName(self.EntityId)
+        self:SetCustomName(tostring(self.EntityId))
 
         _ALERT(self.UnitId, self.EntityId, unpack(arg))
     end,
@@ -59,21 +59,21 @@ LogUnitComponent = ClassSimple {
         end
 
         -- allows us to track down the unit
-        self:SetCustomName(self.EntityId)
+        self:SetCustomName(tostring(self.EntityId))
 
         WARN(self.UnitId, self.EntityId, unpack(arg))
     end,
 
     ---@param self LogUnitComponent | Unit
-    ---@param ... any
-    Error = function(self, ...)
+    ---@param message any
+    Error = function(self, message)
         if not self.EnabledLogging then
             return
         end
 
         -- allows us to track down the unit
-        self:SetCustomName(self.EntityId)
+        self:SetCustomName(tostring(self.EntityId))
 
-        error(self.UnitId, self.EntityId, unpack(arg))
+        error(string.format("%s\t%s\t%s", tostring(self.UnitId), tostring(self.EntityId), tostring(message)))
     end,
 }

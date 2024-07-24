@@ -2331,6 +2331,17 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, LogUnitC
             self:CreateIdleEffects()
         end
 
+        ForkThread(
+            function()
+                WaitTicks(10)
+                LOG("Hello!")
+                self:Log("OnCreate")
+                self:Spew("OnCreate")
+                self:Warn("OnCreate")
+                self:Error("OnCreate")
+            end
+        )
+
         IntelComponent.OnStopBeingBuilt(self, builder, layer)
 
         local bp = self.Blueprint

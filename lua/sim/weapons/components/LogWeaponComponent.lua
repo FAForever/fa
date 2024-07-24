@@ -23,7 +23,7 @@
 ---@class LogWeaponComponent
 LogWeaponComponent = ClassSimple {
 
-    EnabledLogging = false,
+    EnabledLogging = true,
 
     ---@param self LogWeaponComponent | Weapon
     ---@param ... any
@@ -35,7 +35,7 @@ LogWeaponComponent = ClassSimple {
         local unit = self.unit
 
         -- allows us to track down the unit
-        unit:SetCustomName(self.EntityId)
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
 
         SPEW(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
@@ -50,7 +50,7 @@ LogWeaponComponent = ClassSimple {
         local unit = self.unit
 
         -- allows us to track down the unit
-        unit:SetCustomName(self.EntityId)
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
 
         _ALERT(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
@@ -65,14 +65,14 @@ LogWeaponComponent = ClassSimple {
         local unit = self.unit
 
         -- allows us to track down the unit
-        unit:SetCustomName(self.EntityId)
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
 
         WARN(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
 
     ---@param self LogWeaponComponent | Weapon
-    ---@param ... any
-    Error = function(self, ...)
+    ---@param message any
+    Error = function(self, message)
         if not self.EnabledLogging then
             return
         end
@@ -80,8 +80,16 @@ LogWeaponComponent = ClassSimple {
         local unit = self.unit
 
         -- allows us to track down the unit
-        unit:SetCustomName(self.EntityId)
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
 
-        error(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
+        error(
+            string.format(
+                "%s\t%s\t%s\t%s",
+                tostring(unit.UnitId),
+                tostring(unit.EntityId),
+                tostring(self.Label),
+                tostring(message)
+            )
+        )
     end,
 }

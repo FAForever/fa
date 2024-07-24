@@ -86,6 +86,14 @@ LogProjectileComponent = ClassSimple {
             unit:SetCustomName(unit.EntityId or 'unknown')
         end
 
-        error(string.format("%s\t%s\t%s\t%s", tostring(unit.UnitId), tostring(unit.EntityId), tostring(self.Blueprint.BlueprintId), tostring(message)))
+        error(
+            string.format(
+                "%s\t%s\t%s\t%s",
+                tostring(unit.UnitId),
+                tostring(unit.EntityId),
+                tostring(self.Blueprint.BlueprintId),
+                tostring(message)
+            )
+        )
     end,
 }
