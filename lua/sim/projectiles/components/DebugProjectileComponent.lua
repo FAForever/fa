@@ -33,14 +33,14 @@ DebugProjectileComponent = ClassSimple {
             return
         end
 
-        local unit = self.Launcher
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
+        local launcher = self.Launcher
+        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+            -- allows the developer to track down the launcher
+            launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('gray')
         end
 
-        SPEW(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
+        SPEW(launcher.UnitId, launcher.EntityId, self.Blueprint.BlueprintId, unpack(arg))
     end,
 
     ---@param self DebugProjectileComponent | Projectile
@@ -50,14 +50,14 @@ DebugProjectileComponent = ClassSimple {
             return
         end
 
-        local unit = self.Launcher
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
+        local launcher = self.Launcher
+        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+            -- allows the developer to track down the launcher
+            launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('white')
         end
 
-        _ALERT(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
+        _ALERT(launcher.UnitId, launcher.EntityId, self.Blueprint.BlueprintId, unpack(arg))
     end,
 
     ---@param self DebugProjectileComponent | Projectile
@@ -67,14 +67,14 @@ DebugProjectileComponent = ClassSimple {
             return
         end
 
-        local unit = self.Launcher
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
+        local launcher = self.Launcher
+        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+            -- allows the developer to track down the launcher
+            launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('orange')
         end
 
-        WARN(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
+        WARN(launcher.UnitId, launcher.EntityId, self.Blueprint.BlueprintId, unpack(arg))
     end,
 
     ---@param self DebugProjectileComponent | Projectile
@@ -84,18 +84,18 @@ DebugProjectileComponent = ClassSimple {
             return
         end
 
-        local unit = self.Launcher
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
+        local launcher = self.Launcher
+        if launcher and IsUnit(launcher) and (not IsDestroyed(launcher)) then
+            -- allows the developer to track down the launcher
+            launcher:SetCustomName(launcher.EntityId or 'unknown')
             self:DebugDraw('red')
         end
 
         error(
             string.format(
                 "%s\t%s\t%s\t%s",
-                tostring(unit.UnitId),
-                tostring(unit.EntityId),
+                tostring(launcher.UnitId),
+                tostring(launcher.EntityId),
                 tostring(self.Blueprint.BlueprintId),
                 tostring(message)
             )
