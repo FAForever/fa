@@ -24,6 +24,7 @@
 DebugWeaponComponent = ClassSimple {
 
     EnabledLogging = true,
+    EnabledDrawing = true,
 
     ---@param self DebugWeaponComponent | Weapon
     ---@param ... any
@@ -33,9 +34,13 @@ DebugWeaponComponent = ClassSimple {
         end
 
         local unit = self.unit
+        self:DebugDraw('gray')
 
-        -- allows us to track down the unit
-        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
+            -- allows the developer to track down the unit
+            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+            self:DebugDraw('gray')
+        end
 
         SPEW(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
@@ -49,8 +54,11 @@ DebugWeaponComponent = ClassSimple {
 
         local unit = self.unit
 
-        -- allows us to track down the unit
-        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
+            -- allows the developer to track down the unit
+            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+            self:DebugDraw('white')
+        end
 
         _ALERT(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
@@ -64,8 +72,11 @@ DebugWeaponComponent = ClassSimple {
 
         local unit = self.unit
 
-        -- allows us to track down the unit
-        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
+            -- allows the developer to track down the unit
+            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+            self:DebugDraw('orange')
+        end
 
         WARN(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
@@ -79,8 +90,11 @@ DebugWeaponComponent = ClassSimple {
 
         local unit = self.unit
 
-        -- allows us to track down the unit
-        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
+            -- allows the developer to track down the unit
+            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+            self:DebugDraw('red')
+        end
 
         error(
             string.format(
@@ -91,5 +105,36 @@ DebugWeaponComponent = ClassSimple {
                 tostring(message)
             )
         )
+    end,
+
+    ---@param self DebugUnitComponent | Weapon
+    ---@param color? Color
+    DebugDraw = function(self, color)
+        if not self.EnabledDrawing then
+            return
+        end
+
+        -- we can't draw dead things
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- do not draw everything, just what the developer may be interested in
+        if not (GetFocusArmy() == -1 or GetFocusArmy() == self.Army) then
+            return
+        end
+
+        color = color or 'ffffff'
+
+        local owner = self.unit
+        if owner and not IsDestroyed(owner) then
+            owner:DebugDraw(color)
+
+            local racks = self.Blueprint.RackBones
+            for k, rack in ipairs(racks) do
+                DrawLine(owner:GetPosition(), owner:GetPosition(rack.MuzzleBones[1]), color)
+                DrawCircle(owner:GetPosition(rack.MuzzleBones[1]), 0.25, color)
+            end
+        end
     end,
 }
