@@ -27,7 +27,7 @@ DebugUnitComponent = ClassSimple {
 
     ---@param self DebugUnitComponent | Unit
     ---@param ... any
-    Spew = function(self, ...)
+    DebugSpew = function(self, ...)
         if not self.EnabledLogging then
             return
         end
@@ -40,7 +40,7 @@ DebugUnitComponent = ClassSimple {
 
     ---@param self DebugUnitComponent | Unit
     ---@param ... any
-    Log = function(self, ...)
+    DebugLog = function(self, ...)
         if not self.EnabledLogging then
             return
         end
@@ -53,7 +53,7 @@ DebugUnitComponent = ClassSimple {
 
     ---@param self DebugUnitComponent | Unit
     ---@param ... any
-    Warn = function(self, ...)
+    DebugWarn = function(self, ...)
         if not self.EnabledLogging then
             return
         end
@@ -66,7 +66,7 @@ DebugUnitComponent = ClassSimple {
 
     ---@param self DebugUnitComponent | Unit
     ---@param message any
-    Error = function(self, message)
+    DebugError = function(self, message)
         if not self.EnabledLogging then
             return
         end

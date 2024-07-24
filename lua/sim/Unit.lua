@@ -2335,10 +2335,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             function()
                 WaitTicks(10)
                 LOG("Hello!")
-                self:Log("OnCreate")
-                self:Spew("OnCreate")
-                self:Warn("OnCreate")
-                self:Error("OnCreate")
+                self:DebugLog("OnCreate")
+                self:DebugSpew("OnCreate")
+                self:DebugWarn("OnCreate")
+                self:DebugError("OnCreate")
             end
         )
 

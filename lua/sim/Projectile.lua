@@ -152,7 +152,16 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             TrashBagAdd(trash, ForkThread(self.OnTrackTargetGround, self))
         end
 
-        self:Error("Hello!")
+        ForkThread(
+            function()
+                WaitTicks(10)
+                LOG("Hello!")
+                self:DebugLog("OnCreate")
+                self:DebugSpew("OnCreate")
+                self:DebugWarn("OnCreate")
+                self:DebugError("OnCreate")
+            end
+        )
     end,
 
     --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,

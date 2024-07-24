@@ -27,12 +27,12 @@ DebugProjectileComponent = ClassSimple {
 
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any
-    Spew = function(self, ...)
+    DebugSpew = function(self, ...)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
+        local unit = self.Launcher
         if unit and IsUnit(unit) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
@@ -43,12 +43,12 @@ DebugProjectileComponent = ClassSimple {
 
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any
-    Log = function(self, ...)
+    DebugLog = function(self, ...)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
+        local unit = self.Launcher
         if unit and IsUnit(unit) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
@@ -59,12 +59,12 @@ DebugProjectileComponent = ClassSimple {
 
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any
-    Warn = function(self, ...)
+    DebugWarn = function(self, ...)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
+        local unit = self.Launcher
         if unit and IsUnit(unit) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
@@ -75,12 +75,12 @@ DebugProjectileComponent = ClassSimple {
 
     ---@param self DebugProjectileComponent | Projectile
     ---@param message any
-    Error = function(self, message)
+    DebugError = function(self, message)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
+        local unit = self.Launcher
         if unit and IsUnit(unit) then
             -- allows us to track down the unit
             unit:SetCustomName(unit.EntityId or 'unknown')
