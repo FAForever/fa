@@ -33,16 +33,16 @@ DebugWeaponComponent = ClassSimple {
             return
         end
 
-        local unit = self.unit
+        local owner = self.unit
         self:DebugDraw('gray')
 
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows the developer to track down the unit
-            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if owner and IsUnit(owner) and (not IsDestroyed(owner)) then
+            -- allows the developer to track down the owner
+            owner:SetCustomName(string.format("%s - %s", tostring(owner.EntityId), tostring(self.Label)))
             self:DebugDraw('gray')
         end
 
-        SPEW(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
+        SPEW(owner.UnitId, owner.EntityId, self.Label, unpack(arg))
     end,
 
     ---@param self DebugWeaponComponent | Weapon
@@ -52,15 +52,15 @@ DebugWeaponComponent = ClassSimple {
             return
         end
 
-        local unit = self.unit
+        local owner = self.unit
 
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows the developer to track down the unit
-            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if owner and IsUnit(owner) and (not IsDestroyed(owner)) then
+            -- allows the developer to track down the owner
+            owner:SetCustomName(string.format("%s - %s", tostring(owner.EntityId), tostring(self.Label)))
             self:DebugDraw('white')
         end
 
-        _ALERT(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
+        _ALERT(owner.UnitId, owner.EntityId, self.Label, unpack(arg))
     end,
 
     ---@param self DebugWeaponComponent | Weapon
@@ -70,15 +70,15 @@ DebugWeaponComponent = ClassSimple {
             return
         end
 
-        local unit = self.unit
+        local owner = self.unit
 
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows the developer to track down the unit
-            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if owner and IsUnit(owner) and (not IsDestroyed(owner)) then
+            -- allows the developer to track down the owner
+            owner:SetCustomName(string.format("%s - %s", tostring(owner.EntityId), tostring(self.Label)))
             self:DebugDraw('orange')
         end
 
-        WARN(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
+        WARN(owner.UnitId, owner.EntityId, self.Label, unpack(arg))
     end,
 
     ---@param self DebugWeaponComponent | Weapon
@@ -88,19 +88,19 @@ DebugWeaponComponent = ClassSimple {
             return
         end
 
-        local unit = self.unit
+        local owner = self.unit
 
-        if unit and IsUnit(unit) and (not IsDestroyed(unit)) then
-            -- allows the developer to track down the unit
-            unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+        if owner and IsUnit(owner) and (not IsDestroyed(owner)) then
+            -- allows the developer to track down the owner
+            owner:SetCustomName(string.format("%s - %s", tostring(owner.EntityId), tostring(self.Label)))
             self:DebugDraw('red')
         end
 
         error(
             string.format(
                 "%s\t%s\t%s\t%s",
-                tostring(unit.UnitId),
-                tostring(unit.EntityId),
+                tostring(owner.UnitId),
+                tostring(owner.EntityId),
                 tostring(self.Label),
                 tostring(message)
             )
