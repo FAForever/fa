@@ -24,7 +24,7 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local EntityCategoryContains = EntityCategoryContains
 
-local LogProjectileComponent = import("/lua/sim/projectiles/components/LogProjectileComponent.lua").LogProjectileComponent
+local DebugProjectileComponent = import("/lua/sim/projectiles/components/DebugProjectileComponent.lua").DebugProjectileComponent
 
 local ProjectileMethods = moho.projectile_methods
 local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
@@ -84,7 +84,7 @@ local OnImpactPreviousZ = 0
 
 local VectorCached = Vector(0, 0, 0)
 
----@class Projectile : moho.projectile_methods, InternalObject, LogProjectileComponent
+---@class Projectile : moho.projectile_methods, InternalObject, DebugProjectileComponent
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
@@ -95,7 +95,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
 ---@field OuterRing? NukeAOE
-Projectile = ClassProjectile(ProjectileMethods, LogProjectileComponent) {
+Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,

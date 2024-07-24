@@ -20,12 +20,12 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class LogUnitComponent
-LogUnitComponent = ClassSimple {
+---@class DebugUnitComponent
+DebugUnitComponent = ClassSimple {
 
     EnabledLogging = true,
 
-    ---@param self LogUnitComponent | Unit
+    ---@param self DebugUnitComponent | Unit
     ---@param ... any
     Spew = function(self, ...)
         if not self.EnabledLogging then
@@ -38,7 +38,7 @@ LogUnitComponent = ClassSimple {
         SPEW(self.UnitId, self.EntityId, unpack(arg))
     end,
 
-    ---@param self LogUnitComponent | Unit
+    ---@param self DebugUnitComponent | Unit
     ---@param ... any
     Log = function(self, ...)
         if not self.EnabledLogging then
@@ -51,7 +51,7 @@ LogUnitComponent = ClassSimple {
         _ALERT(self.UnitId, self.EntityId, unpack(arg))
     end,
 
-    ---@param self LogUnitComponent | Unit
+    ---@param self DebugUnitComponent | Unit
     ---@param ... any
     Warn = function(self, ...)
         if not self.EnabledLogging then
@@ -64,7 +64,7 @@ LogUnitComponent = ClassSimple {
         WARN(self.UnitId, self.EntityId, unpack(arg))
     end,
 
-    ---@param self LogUnitComponent | Unit
+    ---@param self DebugUnitComponent | Unit
     ---@param message any
     Error = function(self, message)
         if not self.EnabledLogging then

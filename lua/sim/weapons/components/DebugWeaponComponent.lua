@@ -20,78 +20,74 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class LogProjectileComponent
-LogProjectileComponent = ClassSimple {
+---@class DebugWeaponComponent
+DebugWeaponComponent = ClassSimple {
 
     EnabledLogging = true,
 
-    ---@param self LogProjectileComponent | Projectile
+    ---@param self DebugWeaponComponent | Weapon
     ---@param ... any
     Spew = function(self, ...)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
-        if unit and IsUnit(unit) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
-        end
+        local unit = self.unit
 
-        SPEW(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
+        -- allows us to track down the unit
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+
+        SPEW(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
 
-    ---@param self LogProjectileComponent | Projectile
+    ---@param self DebugWeaponComponent | Weapon
     ---@param ... any
     Log = function(self, ...)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
-        if unit and IsUnit(unit) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
-        end
+        local unit = self.unit
 
-        _ALERT(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
+        -- allows us to track down the unit
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+
+        _ALERT(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
 
-    ---@param self LogProjectileComponent | Projectile
+    ---@param self DebugWeaponComponent | Weapon
     ---@param ... any
     Warn = function(self, ...)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
-        if unit and IsUnit(unit) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
-        end
+        local unit = self.unit
 
-        WARN(unit.UnitId, unit.EntityId, self.Blueprint.BlueprintId, unpack(arg))
+        -- allows us to track down the unit
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
+
+        WARN(unit.UnitId, unit.EntityId, self.Label, unpack(arg))
     end,
 
-    ---@param self LogProjectileComponent | Projectile
+    ---@param self DebugWeaponComponent | Weapon
     ---@param message any
     Error = function(self, message)
         if not self.EnabledLogging then
             return
         end
 
-        local unit = self:GetLauncher()
-        if unit and IsUnit(unit) then
-            -- allows us to track down the unit
-            unit:SetCustomName(unit.EntityId or 'unknown')
-        end
+        local unit = self.unit
+
+        -- allows us to track down the unit
+        unit:SetCustomName(string.format("%s - %s", tostring(unit.EntityId), tostring(self.Label)))
 
         error(
             string.format(
                 "%s\t%s\t%s\t%s",
                 tostring(unit.UnitId),
                 tostring(unit.EntityId),
-                tostring(self.Blueprint.BlueprintId),
+                tostring(self.Label),
                 tostring(message)
             )
         )
