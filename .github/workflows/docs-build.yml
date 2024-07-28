@@ -55,13 +55,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafdevelop
-          path: generated
+          path: docs/generated
 
       - name: Download artifact changelog of FAF Beta
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafbeta
-          path: generated
+          path: docs/generated
 
       - name: Append the generated changelogs
         run: |
