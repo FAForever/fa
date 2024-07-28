@@ -38,6 +38,7 @@ jobs:
       reference: deploy/fafbeta
     
   build:
+    needs: [changelog-develop, changelog-beta]
     runs-on: ubuntu-latest
     defaults:
       run:
