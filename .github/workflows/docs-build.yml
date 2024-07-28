@@ -65,6 +65,8 @@ jobs:
 
       - name: Append the generated changelogs
         run: |
+          ls ..
+          ls ../raw-changelog-fafdevelop
           cat ../raw-changelog-fafdevelop >> changelogs/fafdevelop.md
           cat ../raw-changelog-fafbeta >> changelogs/fafbeta.md
 
