@@ -28,7 +28,7 @@ DebugWeaponComponent = Class(DebugComponent) {
     ---@param self DebugWeaponComponent | Weapon
     ---@param ... any
     DebugSpew = function(self, ...)
-        if not self.EnabledLogging then
+        if not self.EnabledSpewing then
             return
         end
 
@@ -65,7 +65,7 @@ DebugWeaponComponent = Class(DebugComponent) {
     ---@param self DebugWeaponComponent | Weapon
     ---@param ... any
     DebugWarn = function(self, ...)
-        if not self.EnabledLogging then
+        if not self.EnabledWarnings then
             return
         end
 
@@ -83,7 +83,7 @@ DebugWeaponComponent = Class(DebugComponent) {
     ---@param self DebugWeaponComponent | Weapon
     ---@param message any
     DebugError = function(self, message)
-        if not self.EnabledLogging then
+        if not self.EnabledErrors then
             return
         end
 

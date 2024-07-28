@@ -28,7 +28,7 @@ DebugProjectileComponent = Class(DebugComponent) {
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any
     DebugSpew = function(self, ...)
-        if not self.EnabledLogging then
+        if not self.EnabledSpewing then
             return
         end
 
@@ -62,7 +62,7 @@ DebugProjectileComponent = Class(DebugComponent) {
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any
     DebugWarn = function(self, ...)
-        if not self.EnabledLogging then
+        if not self.EnabledWarnings then
             return
         end
 
@@ -79,7 +79,7 @@ DebugProjectileComponent = Class(DebugComponent) {
     ---@param self DebugProjectileComponent | Projectile
     ---@param message any
     DebugError = function(self, message)
-        if not self.EnabledLogging then
+        if not self.EnabledErrors then
             return
         end
 
