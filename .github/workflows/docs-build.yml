@@ -52,13 +52,13 @@ jobs:
             docs
 
       - name: Download artifact changelog of FAF Develop
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: changelog-fafdevelop
           path: changelog-fafdevelop
 
       - name: Download artifact changelog of FAF Beta
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: changelog-fafbeta
           path: changelog-fafbeta
