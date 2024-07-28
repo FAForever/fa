@@ -63,8 +63,12 @@ jobs:
 
       - name: Append the generated changelogs
         run: |
+          ls 
+          echo "check"
           ls ..
+          echo "check"
           ls ../raw-changelog-fafdevelop
+          echo "check"
           cat ../raw-changelog-fafdevelop >> changelogs/fafdevelop.md
           cat ../raw-changelog-fafbeta >> changelogs/fafbeta.md
 
