@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: Create changelog
+name: Documentation - Generate changelog
 
 on:
   workflow_dispatch:
