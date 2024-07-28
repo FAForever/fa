@@ -20,11 +20,10 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class DebugProjectileComponent
-DebugProjectileComponent = ClassSimple {
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
-    EnabledLogging = true,
-    EnabledDrawing = true,
+---@class DebugProjectileComponent: DebugComponent
+DebugProjectileComponent = Class(DebugComponent) {
 
     ---@param self DebugProjectileComponent | Projectile
     ---@param ... any

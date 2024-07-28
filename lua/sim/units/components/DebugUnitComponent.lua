@@ -20,11 +20,10 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class DebugUnitComponent
-DebugUnitComponent = ClassSimple {
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
-    EnabledLogging = true,
-    EnabledDrawing = true,
+---@class DebugUnitComponent : DebugComponent
+DebugUnitComponent = Class(DebugComponent) {
 
     ---@param self DebugUnitComponent | Unit
     ---@param ... any
