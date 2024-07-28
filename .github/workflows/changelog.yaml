@@ -22,6 +22,25 @@ name: Create changelog
 
 on:
   workflow_dispatch:
+    inputs:
+      reference: 
+        required: true
+        type: choice
+        default: develop
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+        options:
+          - develop
+          - deploy/fafbeta
+          - deploy/fafdevelop
+
+  workflow_call:
+    inputs:
+      reference: 
+        required: true
+        type: string
+        default: develop
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+        
   pull_request:
     paths:
       - "changelog/snippets/*.md"
@@ -37,6 +56,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.reference }}
           sparse-checkout: |
             .github/workflows/scripts
             changelog/snippets
@@ -74,6 +94,6 @@ jobs:
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: changelog
+          name: changelog-${{ inputs.reference }}
           path: |
             changelog/snippets/faf-develop.md

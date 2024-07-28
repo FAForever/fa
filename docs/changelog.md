@@ -2,6 +2,7 @@
 layout: page
 title: Changelog
 permalink: changelog
+has_children: true
 nav_order: 5
 ---
 

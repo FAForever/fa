@@ -27,6 +27,16 @@ concurrency:
 
 jobs:
   # Build job
+  changelog-develop:
+    uses: ./.github/workflows/changelog.yaml
+    with:
+      reference: deploy/fafdevelop
+
+  changelog-beta:
+    uses: ./.github/workflows/changelog.yaml
+    with:
+      reference: deploy/fafbeta
+    
   build:
     runs-on: ubuntu-latest
     defaults:
@@ -35,6 +45,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: develop
+          sparse-checkout: | 
+            - 'docs/'
+
+      - name: Download artifact changelog of FAF Develop
+        uses: actions/download-artifact@v3
+        with:
+          name: changelog-deploy/fafdevelop
+          path: changelog-fafdevelop
+
+      - name: Download artifact changelog of FAF Beta
+        uses: actions/download-artifact@v3
+        with:
+          name: changelog-deploy/fafbeta
+          path: changelog-fafbeta
+
+      - name: Append the generated changelogs
+        run: |
+          cat changelog-fafdevelop >> docs/changelogs/fafdevelop.md
+          cat changelog-fafbeta >> docs/changelogs/fafbeta.md
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
