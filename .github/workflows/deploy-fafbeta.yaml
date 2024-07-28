@@ -44,6 +44,13 @@ jobs:
             repository: FAForever/fa
             ref: develop
 
+      # Disable debugging statements
+      # 
+      # You can overwrite these adjustments by setting up a `Debug` folder
+      - name: Update references
+        run: |
+          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "/lua/shared/components/DebugComponent.lua"
+
       # Update the deploy/fafbeta branch, we force push here because 
       # we're not interested in fixing conflicts
       - name: Update deploy/fafbeta
