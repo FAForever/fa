@@ -43,7 +43,9 @@ jobs:
 
       - name: Create environment paths
         run: | 
-          echo ".github/workflows/scripts" >> $GITHUB_PATH
+          echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
+          ls .github/workflows/scripts
+          ls "${{ github.workspace }}/.github/workflows/scripts"
 
       - name: Verify the changelog snippets
         working-directory: changelog/snippets # script assumes it is in this directory
