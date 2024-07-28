@@ -48,7 +48,7 @@ jobs:
       - name: Verify the changelog snippets
         working-directory: changelog/snippets # script assumes it is in this directory
         run: |
-          ./changelog-verify.sh
+          changelog-verify.sh
 
   bundle:
     name: Bundle snippets
@@ -68,7 +68,7 @@ jobs:
       - name: Create the changelog
         working-directory: changelog/snippets # script assumes it is in this directory
         run: |
-          ./changelog-combine.sh
+          changelog-combine.sh
 
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
