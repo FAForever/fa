@@ -56,6 +56,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          path: scripts
+          ref: develop
+          sparse-checkout: |
+            .github/workflows/scripts
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: fa
           ref: ${{ inputs.reference }}
           sparse-checkout: |
             .github/workflows/scripts
@@ -63,10 +72,11 @@ jobs:
 
       - name: Update environment path
         run: | 
-          echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
+          ls
+          echo "${{ github.workspace }}/scripts/.github/workflows/scripts" >> $GITHUB_PATH
 
       - name: Verify the changelog snippets
-        working-directory: changelog/snippets # script assumes it is in this directory
+        working-directory: fa/changelog/snippets # script assumes it is in this directory
         run: |
           changelog-verify.sh
 
@@ -78,22 +88,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          path: scripts
+          ref: develop
+          sparse-checkout: |
+            .github/workflows/scripts
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: fa
           sparse-checkout: |
             .github/workflows/scripts
             changelog/snippets
 
       - name: Update environment path
         run: | 
-          echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
+          echo "${{ github.workspace }}/scripts/.github/workflows/scripts" >> $GITHUB_PATH
 
       - name: Create the changelog
-        working-directory: changelog/snippets # script assumes it is in this directory
+        working-directory: fa/changelog/snippets # script assumes it is in this directory
         run: |
           changelog-combine.sh
 
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: changelog-${{ inputs.reference }}
+          # we need to remove `deploy/` from the reference
+          name: changelog-${{ (inputs.reference == 'deploy/fafdevelop' && 'fafdevelop') || (inputs.reference == 'deploy/fafbeta' && 'fafbeta') || inputs.reference }}
           path: |
-            changelog/snippets/faf-develop.md
+            fa/changelog/snippets/faf-develop.md
