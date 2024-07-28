@@ -55,18 +55,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafdevelop
-          path: changelog-fafdevelop
+          path: raw-changelog-fafdevelop
 
       - name: Download artifact changelog of FAF Beta
         uses: actions/download-artifact@v4
         with:
           name: changelog-fafbeta
-          path: changelog-fafbeta
+          path: raw-changelog-fafbeta
 
       - name: Append the generated changelogs
         run: |
-          cat changelog-fafdevelop >> docs/changelogs/fafdevelop.md
-          cat changelog-fafbeta >> docs/changelogs/fafbeta.md
+          cat raw-changelog-fafdevelop >> changelogs/fafdevelop.md
+          cat raw-changelog-fafbeta >> changelogs/fafbeta.md
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
