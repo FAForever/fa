@@ -53,13 +53,13 @@ jobs:
       - name: Download artifact changelog of FAF Develop
         uses: actions/download-artifact@v3
         with:
-          name: changelog-deploy/fafdevelop
+          name: changelog-fafdevelop
           path: changelog-fafdevelop
 
       - name: Download artifact changelog of FAF Beta
         uses: actions/download-artifact@v3
         with:
-          name: changelog-deploy/fafbeta
+          name: changelog-fafbeta
           path: changelog-fafbeta
 
       - name: Append the generated changelogs

@@ -112,6 +112,7 @@ jobs:
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: changelog-${{ inputs.reference }}
+          # we need to remove `deploy/` from the reference
+          name: changelog-${{ (inputs.reference == 'deploy/fafdevelop' && 'fafdevelop') || (inputs.reference == 'deploy/fafbeta' && 'fafbeta') || inputs.reference }}
           path: |
             fa/changelog/snippets/faf-develop.md
