@@ -49,7 +49,7 @@ jobs:
         with:
           ref: develop
           sparse-checkout: | 
-            - 'docs/'
+            - docs
 
       - name: Download artifact changelog of FAF Develop
         uses: actions/download-artifact@v3
