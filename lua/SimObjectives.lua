@@ -1118,7 +1118,7 @@ function MakeListFromTarget(Target)
             if armyName == "HumanPlayers" then
                 for iArmy, strArmy in pairs(tblArmy) do
                     --In campaign, if an AI mod is being used to provide an AI 'player', then this should also be included otherwise it can render some missions impossible to complete
-                    if ScenarioInfo.ArmySetup[strArmy].Human or (ScenarioInfo.type == 'campaign_coop' and (strArmy == 'Player2' or strArmy == 'Player3' or strArmy == 'Player4')) then
+                    if ScenarioInfo.ArmySetup[strArmy].Human or (ScenarioInfo.type == 'campaign_coop' and string.sub(strArmy, 1, 6)  == 'Player') then
                         resultList[GetArmyBrain(iArmy)] = true
                     end
                 end
