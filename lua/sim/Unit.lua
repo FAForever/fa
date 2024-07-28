@@ -1115,7 +1115,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- any other change that might affect our build rate or resource use.
     ---@param self Unit
     UpdateConsumptionValues = function(self)
-        LOG(debug.traceback())
         local energy_rate = 0
         local mass_rate = 0
 
@@ -2768,7 +2767,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
-        LOG("OnStartBuild", self, built, order)
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions
@@ -3913,7 +3911,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param target_bp UnitBlueprint
     ---@return number
     GetBuildCosts = function(self, target_bp)
-        LOG(self, target_bp.BlueprintId)
         return Game.GetConstructEconomyModel(self, target_bp.Economy)
     end,
 
