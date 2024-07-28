@@ -65,9 +65,8 @@ jobs:
 
       - name: Append the generated changelogs
         run: |
-          ls
-          cat raw-changelog-fafdevelop >> changelogs/fafdevelop.md
-          cat raw-changelog-fafbeta >> changelogs/fafbeta.md
+          cat ../raw-changelog-fafdevelop >> changelogs/fafdevelop.md
+          cat ../raw-changelog-fafbeta >> changelogs/fafbeta.md
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
