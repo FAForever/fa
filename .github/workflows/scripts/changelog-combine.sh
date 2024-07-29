@@ -118,7 +118,11 @@ process_snippets() {
 }
 
 # Output file name
-output="faf-develop.md"
+output="changelog.md"
+if ["$1" ]; then
+    output="$1.md"
+fi
+
 rm -f "$output"
 
 # Add the initial header
