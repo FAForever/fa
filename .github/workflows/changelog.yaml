@@ -108,7 +108,8 @@ jobs:
       # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
       - name: Update reference
         run: |
-          echo "NAME=${{ inputs.reference }}#deploy/" >> $GITHUB_ENV
+          NAME="${${{ inputs.reference }}#deploy/}"
+          echo "NAME=$NAME" >> $GITHUB_ENV
 
       - name: Create the changelog
         working-directory: fa/changelog/snippets # script assumes it is in this directory
