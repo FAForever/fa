@@ -96,9 +96,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.reference }}
           path: fa
           sparse-checkout: |
-            .github/workflows/scripts
             changelog/snippets
 
       - name: Update environment path
