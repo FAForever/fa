@@ -6,4 +6,6 @@ nav_order: 1
 parent: Changelog
 ---
 
-Open changes on FAF Develop
+<!--
+    This is a template, content is appended automatically based on changelog snippets.
+-->
