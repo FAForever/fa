@@ -108,8 +108,8 @@ jobs:
       # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
       - name: Update reference
         run: |
-          NAME="${${{ inputs.reference }}#deploy/}"
-          echo $NAME
+          REFERENCE="${{ inputs.reference }}"
+          NAME="${REFERENCE#deploy/}"
           echo "NAME=$NAME" >> $GITHUB_ENV
 
       - name: Create the changelog
@@ -122,7 +122,6 @@ jobs:
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
-          # we need to remove `deploy/` from the reference
-          name: changelog-${{ (inputs.reference == 'deploy/fafdevelop' && 'fafdevelop') || (inputs.reference == 'deploy/fafbeta' && 'fafbeta') || inputs.reference }}
+          name: changelog-${{ env.NAME }}
           path: |
             fa/changelog/snippets/${{ env.NAME }}.md
