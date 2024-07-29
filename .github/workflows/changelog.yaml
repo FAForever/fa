@@ -23,7 +23,7 @@ name: Documentation - Generate changelog
 on:
   workflow_dispatch:
     inputs:
-      reference: 
+      reference:
         required: true
         type: choice
         default: develop
@@ -35,19 +35,19 @@ on:
 
   workflow_call:
     inputs:
-      reference: 
+      reference:
         required: true
         type: string
         default: develop
         description: The reference (branch or tag) to use to compile the changelog snippets from
-        
+
   pull_request:
     paths:
       - "changelog/snippets/*.md"
   push:
     branches:
       - deploy/fafdevelop
-      
+
 jobs:
   verify:
     name: Verify snippets
@@ -71,7 +71,7 @@ jobs:
             changelog/snippets
 
       - name: Update environment path
-        run: | 
+        run: |
           ls
           echo "${{ github.workspace }}/scripts/.github/workflows/scripts" >> $GITHUB_PATH
 
@@ -102,18 +102,26 @@ jobs:
             changelog/snippets
 
       - name: Update environment path
-        run: | 
+        run: |
           echo "${{ github.workspace }}/scripts/.github/workflows/scripts" >> $GITHUB_PATH
+
+      # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
+      - name: Update reference
+        run: |
+          REFERENCE="${{ inputs.reference }}"
+          NAME="${REFERENCE#deploy/}"
+          echo "NAME=$NAME" >> $GITHUB_ENV
 
       - name: Create the changelog
         working-directory: fa/changelog/snippets # script assumes it is in this directory
         run: |
-          changelog-combine.sh
+          echo $NAME
+          echo ${{ env.NAME }}
+          changelog-combine.sh ${{ env.NAME }}
 
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
-          # we need to remove `deploy/` from the reference
-          name: changelog-${{ (inputs.reference == 'deploy/fafdevelop' && 'fafdevelop') || (inputs.reference == 'deploy/fafbeta' && 'fafbeta') || inputs.reference }}
+          name: changelog-${{ env.NAME }}
           path: |
-            fa/changelog/snippets/faf-develop.md
+            fa/changelog/snippets/${{ env.NAME }}.md
