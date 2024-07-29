@@ -109,13 +109,13 @@ jobs:
       - name: Update reference
         run: |
           echo "NAME=${{ inputs.reference }}#deploy/" >> $GITHUB_ENV
-          echo $NAME
-          echo ${{ env.NAME }}
 
       - name: Create the changelog
         working-directory: fa/changelog/snippets # script assumes it is in this directory
         run: |
-          changelog-combine.sh $NAME
+          echo $NAME
+          echo ${{ env.NAME }}
+          changelog-combine.sh ${{ env.NAME }}
 
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
@@ -123,4 +123,4 @@ jobs:
           # we need to remove `deploy/` from the reference
           name: changelog-${{ (inputs.reference == 'deploy/fafdevelop' && 'fafdevelop') || (inputs.reference == 'deploy/fafbeta' && 'fafbeta') || inputs.reference }}
           path: |
-            fa/changelog/snippets/$NAME.md
+            fa/changelog/snippets/${{ env.NAME }}.md
