@@ -109,6 +109,7 @@ jobs:
       - name: Update reference
         run: |
           NAME="${${{ inputs.reference }}#deploy/}"
+          echo $NAME
           echo "NAME=$NAME" >> $GITHUB_ENV
 
       - name: Create the changelog
