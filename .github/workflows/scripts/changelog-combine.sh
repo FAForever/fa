@@ -119,7 +119,7 @@ process_snippets() {
 
 # Output file name
 output="changelog.md"
-if ["$1" ]; then
+if [ "$1" ]; then
     output="$1.md"
 fi
 
