@@ -26,7 +26,6 @@ on:
       reference:
         required: true
         type: choice
-        default: develop
         description: The reference (branch or tag) to use to compile the changelog snippets from
         options:
           - develop
@@ -38,7 +37,6 @@ on:
       reference:
         required: true
         type: string
-        default: develop
         description: The reference (branch or tag) to use to compile the changelog snippets from
 
   pull_request:
@@ -57,7 +55,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: scripts
-          ref: develop
           sparse-checkout: |
             .github/workflows/scripts
 
@@ -67,7 +64,6 @@ jobs:
           path: fa
           ref: ${{ inputs.reference }}
           sparse-checkout: |
-            .github/workflows/scripts
             changelog/snippets
 
       - name: Update environment path
@@ -89,7 +85,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: scripts
-          ref: develop
           sparse-checkout: |
             .github/workflows/scripts
 
