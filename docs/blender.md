@@ -2,7 +2,7 @@
 layout: page
 title: Blender & PBR
 permalink: /blender
-nav_order: 4
+nav_order: 7
 ---
 
 # How to Import Units & add PBR Texture
