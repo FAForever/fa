@@ -2,14 +2,12 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
 name: Documentation - Build and deploy
 
 on:
   push:
-    branches: ['develop']
-    paths: ['docs/**']
+    branches: ['develop', 'deploy/fafdevelop', 'deploy/fafbeta', 'deploy/faf']
+    paths: ['docs/**', 'changelog/snippets/*.md']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,18 +24,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Build job
   changelog-develop:
+    name: Create changelog of FAF Develop
     uses: ./.github/workflows/changelog.yaml
     with:
       reference: deploy/fafdevelop
 
   changelog-beta:
+    name: Create changelog of FAF Beta
     uses: ./.github/workflows/changelog.yaml
     with:
       reference: deploy/fafbeta
     
   build:
+    name: Build the documentation
     needs: [changelog-develop, changelog-beta]
     runs-on: ubuntu-latest
     defaults:
@@ -47,10 +47,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: develop
           sparse-checkout: | 
             docs
 
+      # Retrieve the generated changelogs
       - name: Download artifact changelog of FAF Develop
         uses: actions/download-artifact@v4
         with:
@@ -63,9 +63,9 @@ jobs:
           name: changelog-fafbeta
           path: docs/generated
 
+      # Merge the generated changelogs into the templates
       - name: Append the generated changelogs
         run: |
-          ls -Rla generated
           cat generated/fafdevelop.md >> changelogs/fafdevelop.md
           cat generated/fafbeta.md >> changelogs/fafbeta.md
 

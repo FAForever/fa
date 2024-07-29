@@ -6,4 +6,7 @@ nav_order: 2
 parent: Changelog
 ---
 
-Open changes on FAF Beta Balance
+<!--
+    This is a template, content is appended automatically based on changelog snippets.
+-->
+
