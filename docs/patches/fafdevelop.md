@@ -1,9 +1,9 @@
 ---
 layout: page
-title: Open changes on FAF Develop
-permalink: changelog/fafdevelop
-nav_order: 1
-parent: Changelog
+title: FAF Develop
+permalink: patches/fafdevelop
+nav_order: 2
+parent: Patches
 ---
 
 <!--

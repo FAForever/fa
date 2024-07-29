@@ -66,8 +66,8 @@ jobs:
       # Merge the generated changelogs into the templates
       - name: Append the generated changelogs
         run: |
-          cat generated/fafdevelop.md >> changelogs/fafdevelop.md
-          cat generated/fafbeta.md >> changelogs/fafbeta.md
+          cat generated/fafdevelop.md >> patches/fafdevelop.md
+          cat generated/fafbeta.md >> patches/fafbeta.md
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
