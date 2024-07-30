@@ -8,16 +8,14 @@ nav_order: 8
 
 # Overview of game patches
 
-
-
 ## Deployment branches
 
 <ul>
   <li>
-    <a class="preview-title" href="fafbeta">FAF Beta Balance</a>
+    <a class="preview-title" href="{{ 'patches/fafbeta' | relative_url }}">FAF Beta Balance</a>
   </li>
   <li>
-    <a class="preview-title" href="fafdevelop">FAF Develop</a>
+    <a class="preview-title" href="{{ 'patches/fafdevelop' | relative_url }}">FAF Develop</a>
   </li>
 </ul>
 
@@ -36,8 +34,8 @@ nav_order: 8
     {% endif %}
 
     <li>
-      <a class="preview-title" href="{{ post.url }}">{{ post.title }}</a>
+      <a class="preview-title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
       <span>{{ post.date | date: "%b %Y" }}</span>
     </li>
-  {% endfor %}
+{% endfor %}
 </ul>
