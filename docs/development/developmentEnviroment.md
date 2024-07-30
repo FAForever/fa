@@ -93,7 +93,7 @@ Useful extensions if you intent to work with shaders:
 Releases can be found [here](https://github.com/FAForever/fa-lua-vscode-extension/releases).
 
 To setup you will want to download the `.vsix` file and install it in VS Code. Follow the steps in the image and you will be able to select the extension file downloaded.  
-![Extension install](../assets/extension-install.png)
+![Extension install]({{ 'assets/images/development/lua/extension-01.png' | relative_url }})
 
 > Note: Whenever there is a new version of the extension you will have to download it and install it again
 
