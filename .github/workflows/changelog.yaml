@@ -47,18 +47,25 @@ on:
       - deploy/fafdevelop
 
 jobs:
+
+  # By verifying the snippets we ensure that they're compatible with the bundling  
+  # process. In the future we can also add spell checking and/or checks for foul words.
+
   verify:
     name: Verify snippets
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+
+      # We check out the scripts separate because the branch that we use to 
+      # generate the changelog may not contain the scripts that we want to work with.
+      - name: Checkout scripts
         uses: actions/checkout@v4
         with:
           path: scripts
           sparse-checkout: |
             .github/workflows/scripts
 
-      - name: Checkout code
+      - name: Checkout snippets
         uses: actions/checkout@v4
         with:
           path: fa
@@ -76,19 +83,25 @@ jobs:
         run: |
           changelog-verify.sh
 
+  # During the bundling process we combine the templates, the sections and the snippets
+  # into a single changelog. 
+
   bundle:
     name: Bundle snippets
     runs-on: ubuntu-latest
     needs: [verify]
     steps:
-      - name: Checkout code
+
+      # We check out the scripts separate because the branch that we use to 
+      # generate the changelog may not contain the scripts that we want to work with.
+      - name: Checkout scripts
         uses: actions/checkout@v4
         with:
           path: scripts
           sparse-checkout: |
             .github/workflows/scripts
 
-      - name: Checkout code
+      - name: Checkout snippets
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.reference }}
