@@ -26,13 +26,13 @@ concurrency:
 jobs:
   changelog-develop:
     name: Create changelog of FAF Develop
-    uses: ./.github/workflows/changelog.yaml
+    uses: ./.github/workflows/docs-changelog.yaml
     with:
       reference: deploy/fafdevelop
 
   changelog-beta:
     name: Create changelog of FAF Beta
-    uses: ./.github/workflows/changelog.yaml
+    uses: ./.github/workflows/docs-changelog.yaml
     with:
       reference: deploy/fafbeta
     
