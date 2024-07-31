@@ -8,4 +8,4 @@ logo: "./assets/FAF_Logo.png"
 favlogo_ico: "./assets/favicon.ico"
 sass:
   style: expanded
-  ./assets/css/custom.css
+  ./assets/scss/base.scss
