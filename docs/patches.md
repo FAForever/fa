@@ -29,13 +29,13 @@ nav_order: 8
     {% if last_year != current_year %}
       {% assign last_year = current_year %}
       <h2 id="{{current_year}}">
-        {{ current_year }}
+        Year {{ current_year }}
       </h2>
     {% endif %}
 
     <li>
       <a class="preview-title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      <span>{{ post.date | date: "%b %Y" }}</span>
+      <span>({{ post.date | date: "%b %d" }})</span>
     </li>
 {% endfor %}
 </ul>
