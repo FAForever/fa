@@ -4,7 +4,7 @@ theme: just-the-docs
 url: https://FAForever.github.io
 nav_enabled: true
 search_enabled: false
-logo: "./assets/FAF_Logo.png"
+logo: "./assets/images/logo.png"
 favlogo_ico: "./assets/favicon.ico"
 sass:
   style: expanded
