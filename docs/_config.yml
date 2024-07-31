@@ -8,4 +8,4 @@ logo: "./assets/images/logo.png"
 favlogo_ico: "./assets/favicon.ico"
 sass:
   style: expanded
-  ./assets/scss/base.scss
+  scss: ./assets/scss/base.scss
