@@ -6,7 +6,4 @@ nav_enabled: true
 search_enabled: false
 logo: "./assets/images/logo.png"
 favlogo_ico: "./assets/favicon.ico"
-sass:
-  style: faf
-  load_paths:
-    - "./assets/scss/faf.scss"
+color_scheme: faf
