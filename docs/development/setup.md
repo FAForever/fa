@@ -62,7 +62,7 @@ For Linux users you can use the following bash script file instead:
 ```bash
 #! /bin/sh
 
-# Change this to the location of your run proton run script (you will have copied this into your client folder https://wiki.faforever.com/en/FAQ/Client-Setup)
+# Change this to the location of your run proton run script
 RunProton="$HOME/Applications/FAF/downlords-faf-client-1.6.0/run"
 $RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_dev.lua /showlog /log "dev.log" /EnableDiskWatch /nomovie
 
