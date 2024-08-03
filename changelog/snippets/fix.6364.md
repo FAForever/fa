@@ -1,1 +1,0 @@
-- (#6364) Fix the game crashing when enabling auto-overcharge with a non-Seraphim SACU selected.
