@@ -25,6 +25,7 @@ The following (manual) steps are relevant to create a valid deployment to the FA
 - (4) Update the game version in [changelogData.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/ui/lobby/changelogData.lua).
 - (5) Push everything that you want to release to the [master](https://github.com/FAForever/fa/tree/master) branch.
 - (6) Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
+- (7) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [master](https://github.com/FAForever/fa/tree/master) branch.
 
 The last step allows us to systematically post process what we deploy. You can learn more about this by inspecting the workflow file.
 
