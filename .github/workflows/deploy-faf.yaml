@@ -46,10 +46,10 @@ jobs:
       # Disable debugging statements
       - name: Update references
         run: |
-          sed -i 's/EnabledSpewing = true,/EnabledSpewing = false,/' "/lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledLogging = true,/EnabledLogging = false,/' "/lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledWarnings = true,/EnabledWarnings = false,/' "/lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "/lua/shared/components/DebugComponent.lua"
+          sed -i 's/EnabledSpewing = true,/EnabledSpewing = false,/' "lua/shared/components/DebugComponent.lua"
+          sed -i 's/EnabledLogging = true,/EnabledLogging = false,/' "lua/shared/components/DebugComponent.lua"
+          sed -i 's/EnabledWarnings = true,/EnabledWarnings = false,/' "lua/shared/components/DebugComponent.lua"
+          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "lua/shared/components/DebugComponent.lua"
 
       # Update the deploy/faf branch, we force push here because 
       # we're not interested in fixing conflicts
