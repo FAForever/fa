@@ -47,11 +47,11 @@ jobs:
     with:
       reference: deploy/fafdevelop
 
-  changelog-beta:
-    name: Create changelog of FAF Beta
-    uses: ./.github/workflows/docs-changelog.yaml
-    with:
-      reference: deploy/fafbeta
+  #changelog-beta:
+  #  name: Create changelog of FAF Beta
+  #  uses: ./.github/workflows/docs-changelog.yaml
+  #  with:
+  #    reference: deploy/fafbeta
 
   build:
     name: Build the documentation
