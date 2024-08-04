@@ -74,7 +74,7 @@ jobs:
         run: |
           echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
 
-       Retrieve the generated changelogs
+      # Retrieve the generated changelogs
       - name: Download artifact changelog of FAF Develop
         uses: actions/download-artifact@v4
         with:
