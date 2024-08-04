@@ -74,18 +74,18 @@ jobs:
         run: |
           echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
 
-      # Retrieve the generated changelogs
-      #- name: Download artifact changelog of FAF Develop
-      #  uses: actions/download-artifact@v4
-      #  with:
-      #    name: changelog-fafdevelop
-      #    path: docs/generated
-
-      - name: Download artifact changelog of FAF Beta
+       Retrieve the generated changelogs
+      - name: Download artifact changelog of FAF Develop
         uses: actions/download-artifact@v4
         with:
-          name: changelog-fafbeta
+          name: changelog-fafdevelop
           path: docs/generated
+
+      #- name: Download artifact changelog of FAF Beta
+      #  uses: actions/download-artifact@v4
+      #  with:
+      #    name: changelog-fafbeta
+      #    path: docs/generated
 
       # Append the generated changelogs to the Jekyll-compatible templates
       - name: Append the generated changelogs
