@@ -22,9 +22,8 @@ name: Documentation - Build and deploy
 
 on:
   push:
-    branches: ["feat/pages-link-rewrite"]
-    #branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta", "deploy/faf"]
-    #paths: ["docs/**", "changelog/snippets/*.md"]
+    branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta", "deploy/faf"]
+    paths: ["docs/**", "changelog/snippets/*.md"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -47,16 +46,15 @@ jobs:
     with:
       reference: deploy/fafdevelop
 
-  #changelog-beta:
-  #  name: Create changelog of FAF Beta
-  #  uses: ./.github/workflows/docs-changelog.yaml
-  #  with:
-  #    reference: deploy/fafbeta
+  changelog-beta:
+    name: Create changelog of FAF Beta
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafbeta
 
   build:
     name: Build the documentation
-    #needs: [changelog-develop, changelog-beta]
-    needs: [changelog-develop]
+    needs: [changelog-develop, changelog-beta]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -81,11 +79,11 @@ jobs:
           name: changelog-fafdevelop
           path: docs/generated
 
-      #- name: Download artifact changelog of FAF Beta
-      #  uses: actions/download-artifact@v4
-      #  with:
-      #    name: changelog-fafbeta
-      #    path: docs/generated
+      - name: Download artifact changelog of FAF Beta
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: docs/generated
 
       # Append the generated changelogs to the Jekyll-compatible templates
       - name: Append the generated changelogs
