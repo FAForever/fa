@@ -21,6 +21,38 @@
 --**********************************************************************************
 
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
+local IssueOrderQueue = import("/lua/sim/commands/copy-queue.lua").IssueOrderQueue
+
+---Because the rally point orders are applied after 1 tick, we need
+---to wait 1 tick before clearing them and adding our own
+---@param transport AirTransport
+---@param unitToLoad Unit
+local AutoLoadThread = function(transport, unitToLoad)
+    WaitTicks(1)
+    if transport.Dead or unitToLoad.Dead then
+        return
+    end
+    local rallyQueue = transport:GetCommandQueue()
+    IssueClearCommands({transport, unitToLoad})
+    IssueTransportLoad({unitToLoad}, transport)
+    IssueOrderQueue({transport}, rallyQueue)
+end
 
 ---@class AirFactoryUnit : FactoryUnit
-AirFactoryUnit = ClassUnit(FactoryUnit) {}
+AirFactoryUnit = ClassUnit(FactoryUnit) {
+
+    ---@param self AirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        FactoryUnit.OnStopBuild(self, unitBeingBuilt, order)
+        if EntityCategoryContains(categories.TRANSPORTATION, unitBeingBuilt) then
+            local guards = EntityCategoryFilterDown(categories.MOBILE * categories.LAND - categories.ENGINEER, self:GetGuards())
+            if not table.empty(guards) then
+                local unitToBeLoaded = guards[1]
+                ForkThread(AutoLoadThread, unitBeingBuilt, unitToBeLoaded)
+                --IssueTransportLoad({unitToBeLoaded}, unitBeingBuilt)
+            end
+        end
+    end,
+}
