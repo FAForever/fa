@@ -22,7 +22,7 @@ name: Documentation - Build and deploy
 
 on:
   push:
-    branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta", "deploy/faf"]
+    branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta"]
     paths: ["docs/**", "changelog/snippets/*.md"]
 
   # Allows you to run this workflow manually from the Actions tab
