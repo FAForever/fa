@@ -1,6 +1,12 @@
 UnitBlueprint{
     Description = "<LOC uas0102_desc>Air Attack Boat",
-    AI = { GuardReturnRadius = 40 },
+    AI = {
+        GuardReturnRadius = 40,
+        TargetBones = {
+            "Turret_Muzzle01",
+			"UAS0102",
+        },
+    },
     Audio = {
         AmbientMove = Sound { Bank = 'UAS',        Cue = 'UAS0102_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
         Killed      = Sound { Bank = 'UASDestroy', Cue = 'UAS0102_Destroy',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -135,7 +141,7 @@ UnitBlueprint{
     CollisionOffsetY = -0.375,
     CollisionOffsetZ = 0.1,
     SizeX = 0.8,
-    SizeY = 1.05,
+    SizeY = 1.0,
     SizeZ = 1.75,
     StrategicIconName = "icon_ship1_antiair",
     StrategicIconSortPriority = 165,
