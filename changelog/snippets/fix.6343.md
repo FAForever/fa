@@ -1,0 +1,1 @@
+- (#6343) Remove the `INSIGNIFICANTUNIT` category from the HARMS, to enable them to be shared to other players. This also fixes the bug which caused them to get destroyed when their original owner died in a full share game.
