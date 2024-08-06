@@ -145,7 +145,7 @@ UnitBlueprint{
     SelectionThickness = 0.31,
     CollisionOffsetY = -0.375,
     SizeX = 0.6,
-    SizeY = 0.925,
+    SizeY = 1.05,
     SizeZ = 2,
     StrategicIconName = "icon_ship2_antinavy",
     StrategicIconSortPriority = 165,
