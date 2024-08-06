@@ -4,7 +4,7 @@ UnitBlueprint{
         GuardReturnRadius = 40,
         TargetBones = {
             "Turret_Muzzle01",
-			"UAS0102",
+            "UAS0102",
         },
     },
     Audio = {
