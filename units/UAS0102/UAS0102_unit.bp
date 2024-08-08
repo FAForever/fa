@@ -141,7 +141,7 @@ UnitBlueprint{
     CollisionOffsetY = -0.375,
     CollisionOffsetZ = 0.1,
     SizeX = 0.8,
-    SizeY = 1.0,
+    SizeY = 0.9,
     SizeZ = 1.75,
     StrategicIconName = "icon_ship1_antiair",
     StrategicIconSortPriority = 165,
