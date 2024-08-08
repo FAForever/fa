@@ -4,8 +4,8 @@ UnitBlueprint{
         GuardReturnRadius = 0,
         InitialAutoMode = false,
         TargetBones = {
-			"Projectile_Center",
-			"URS0304",
+            "Projectile_Center",
+            "URS0304",
         },
     },
     Audio = {
