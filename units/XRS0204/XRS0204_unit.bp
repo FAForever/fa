@@ -1,6 +1,12 @@
 UnitBlueprint{
     Description = "<LOC xrs0204_desc>Submarine Killer",
-    AI = { GuardReturnRadius = 30 },
+    AI = {
+        GuardReturnRadius = 30,
+        TargetBones = {
+            "Flare_Muzzle01",
+            "XRS0204",
+        },
+    },
     Audio = {
         AmbientMove    = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop_UW',  LodCutoff = 'UnitMove_LodCutoff' },
