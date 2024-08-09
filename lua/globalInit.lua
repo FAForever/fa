@@ -48,14 +48,32 @@ end
 
 -- Inform the developer that a Lua environment is created
 local version, gametype, commit = import("/lua/version.lua").GetVersionData()
-SPEW(
-    string.format(
-        "Lua environment initialized with game version %s, game type %s and at commit hash %s",
-        version,
-        gametype,
-        commit
+local trace = debug.traceback():lower()
+if trace:find("siminit.lua") then
+    SPEW(
+        string.format(
+            "Lua sim environment initialized with game version %s, game type %s and at commit hash %s",
+            version,
+            gametype,
+            commit
+        )
     )
-)
-
--- Helps the developer understand the type of environment created
-SPEW(debug.traceback())
+elseif trace:find("sessioninit.lua") then
+    SPEW(
+        string.format(
+            "Lua session environment initialized with game version %s, game type %s and at commit hash %s",
+            version,
+            gametype,
+            commit
+        )
+    )
+elseif trace:find("userinit.lua") then
+    SPEW(
+        string.format(
+            "Lua user environment initialized with game version %s, game type %s and at commit hash %s",
+            version,
+            gametype,
+            commit
+        )
+    )
+end
