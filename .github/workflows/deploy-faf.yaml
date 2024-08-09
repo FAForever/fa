@@ -20,9 +20,12 @@
 
 name: Deploy to FAF
 
+# Prevent simultaneous deployments across all deployment branches as 
+# the server is unable to process multiple deployments at the same time.
+
 concurrency:
   cancel-in-progress: true
-  group: deploy/faf
+  group: deployment
 
 on:
   workflow_dispatch:
