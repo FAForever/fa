@@ -71,16 +71,6 @@ jobs:
           git add .
           git commit -m "Post-process deployment"
 
-      # Create a commit with the changes of the workflow in it
-      - name: Create a commit
-        run: |
-          # Configure git
-          git config user.email "administrator@faforever.com"
-          git config user.name "FAForever"
-
-          git add .
-          git commit -m "Post-process deployment"
-
       # Update the deploy/fafdevelop branch, we force push here because 
       # we're not interested in fixing conflicts
       - name: Update deploy/fafdevelop
