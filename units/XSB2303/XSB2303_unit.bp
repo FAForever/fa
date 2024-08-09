@@ -158,8 +158,8 @@ UnitBlueprint{
             MuzzleChargeDelay = 1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 26.13,
-            MuzzleVelocityReduceDistance = 120,
+            MuzzleVelocity = 27.8,
+            MuzzleVelocityReduceDistance = 115,
             ProjectileId = "/projectiles/SIFZthuthaamArtilleryShell02/SIFZthuthaamArtilleryShell02_proj.bp",
             ProjectilesPerOnFire = 1,
             RackBones = {
