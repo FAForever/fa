@@ -377,7 +377,8 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unbuiltUnits = {}
     local unbuiltUnitCount = 0
     for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
-        if unit:IsBeingBuilt() then
+        -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
+        if unit:IsBeingBuilt() and not unit.IsUpgrade then
             unbuiltUnitCount = unbuiltUnitCount + 1
             unbuiltUnits[unbuiltUnitCount] = unit
         end
