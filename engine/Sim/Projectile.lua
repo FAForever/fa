@@ -9,14 +9,14 @@ end
 
 --- Change the detonate above height for the projectile, relative to the terrain
 ---
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param height number
 function Projectile:ChangeDetonateAboveHeight(height)
 end
 
 --- Change the detonate below height for the projectile, relative to the terrain
 ---
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param height number
 function Projectile:ChangeDetonateBelowHeight(height)
 end
@@ -24,7 +24,7 @@ end
 --- Change the amount of zig-zag in degrees per second
 ---
 --- You can use `Projectile:GetMaxZigZag()` to retrieve the current zig zag distance.
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param max number
 function Projectile:ChangeMaxZigZag(max)
 end
@@ -32,7 +32,7 @@ end
 --- Change the frequency of the zig-zag
 ---
 --- You can use `Projectile:GetZigZagFrequency()` to retrieve the current zig zag frequency.
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param freq number
 function Projectile:ChangeZigZagFrequency(freq)
 end
@@ -131,7 +131,7 @@ end
 function Projectile:SetCollision(collide)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param flag boolean
 function Projectile:SetDestroyOnWater(flag)
 end
@@ -159,17 +159,17 @@ end
 function Projectile:SetMaxSpeed(speed)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param object Blip | Entity | Unit | Projectile
 function Projectile:SetNewTarget(object)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param location Vector
 function Projectile:SetNewTargetGround(location)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param x number
 ---@param y number
 ---@param z number
@@ -185,7 +185,7 @@ end
 function Projectile:SetScaleVelocity(svx, svy, svz)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param upright boolean
 function Projectile:SetStayUpright(upright)
 end
@@ -206,12 +206,12 @@ end
 function Projectile:SetVelocity(velX, velY, velZ)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@param align boolean
 function Projectile:SetVelocityAlign(align)
 end
 
---- Note: does **not** support chained calls
+--- Note: does **not** support method chaining
 ---@unknown
 function Projectile:SetVelocityRandomUpVector()
 end
