@@ -28,9 +28,9 @@
 -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml
 -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml
 
-local GameType = "unknown"
+local GameType = "FAF Develop"
 
-local Commit = "unknown"
+local Commit = "${COMMITHASH}"
 
 --#endregion
 
