@@ -3146,11 +3146,15 @@ function CreateUI(maxPlayers)
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
-    -- Version texts
-    local bool ShowPatch = false
-    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game version " .. version, 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
+
+    Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
+        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit
+    ))
+
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
 
     -- Player Slots
