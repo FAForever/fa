@@ -52,7 +52,7 @@ jobs:
         run: |
           COMMITHASH=$(git rev-parse HEAD)
           sed -i "s/local Commit = 'unknown'/local Commit = \"${COMMITHASH}\"/" "lua/version.lua"
-          sed -i "s/local GameType = \'unknown\'/local GameType = \"FAF Develop\"/" "lua/version.lua"
+          sed -i "s/local GameType = 'unknown'/local GameType = \"FAF Develop\"/" "lua/version.lua"
 
           # debugging
           cat lua/version.lua
