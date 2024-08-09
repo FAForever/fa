@@ -20,9 +20,12 @@
 
 name: Deploy to FAF Beta Balance
 
+# Prevent simultaneous deployments across all deployment branches as 
+# the server is unable to process multiple deployments at the same time.
+
 concurrency:
   cancel-in-progress: true
-  group: deploy/fafbeta
+  group: deployment
 
 on:
   workflow_dispatch:
@@ -49,7 +52,7 @@ jobs:
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Update references
         run: |
-          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "/lua/shared/components/DebugComponent.lua"
+          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "lua/shared/components/DebugComponent.lua"
 
       # Update the deploy/fafbeta branch, we force push here because 
       # we're not interested in fixing conflicts
