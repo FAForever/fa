@@ -1,5 +1,11 @@
 UnitBlueprint{
     Description = "<LOC uab3202_desc>Sonar System",
+    AI = {
+        TargetBones = {
+            "Tower_02",
+            "UAB3202",
+        },
+    },
     Audio = {
         Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Land',  LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB3102_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -120,9 +126,9 @@ UnitBlueprint{
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.55,
     SelectionThickness = 0.7,
-    CollisionOffsetY = -0.375,
+    CollisionOffsetY = -0.4,
     SizeX = 0.7,
-    SizeY = 0.825,
+    SizeY = 1.0,
     SizeZ = 0.7,
     StrategicIconName = "icon_structure2_intel",
     StrategicIconSortPriority = 230,
