@@ -50,16 +50,26 @@ jobs:
       - name: Update version references
         run: |
           COMMITHASH=$(git rev-parse HEAD)
-          sed -i 's/local Commit = \"unknown\"/local Commit = \"${COMMITHASH}\"/' "lua/version.lua"
-          sed -i 's/local GameType = \"unknown\"/local GameType = \"FAF\"/' "lua/version.lua"
+          sed -i "s/local Commit = 'unknown'/local Commit = \"${COMMITHASH}\"/" "lua/version.lua"
+          sed -i "s/local GameType = \'unknown\'/local GameType = \"FAF\"/" "lua/version.lua"
 
       # Disable debugging statements
       - name: Overwrite debug references
         run: |
-          sed -i 's/EnabledSpewing = true,/EnabledSpewing = false,/' "lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledLogging = true,/EnabledLogging = false,/' "lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledWarnings = true,/EnabledWarnings = false,/' "lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledSpewing = true,/EnabledSpewing = false,/" "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledLogging = true,/EnabledLogging = false,/" "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledWarnings = true,/EnabledWarnings = false,/" "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledDrawing = true,/EnabledDrawing = false,/" "lua/shared/components/DebugComponent.lua"
+
+      # Create a commit with the changes of the workflow in it
+      - name: Create a commit
+        run: |
+          # Configure git
+          git config user.email "administrator@faforever.com"
+          git config user.name "FAForever"
+
+          git add .
+          git commit -m "Post-process deployment"
 
       # Create a commit with the changes of the workflow in it
       - name: Create a commit
