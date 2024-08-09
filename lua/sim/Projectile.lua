@@ -1016,8 +1016,9 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- - https://stackoverflow.com/questions/19107302/in-lua-what-is-inf-and-ind
 
         -- guard to prevent invalid numbers (#IND) and infinite numbers (#INF) from reaching the engine function
-        if tostring(acceleration):find('#') then
-            acceleration = 4.9
+        local stringified = tostring(acceleration)
+        if stringified:find('#') then
+            error("Invalid acceleration value: " .. stringified)
         end
 
         return ProjectileMethodsSetBallisticAcceleration(self, acceleration)
