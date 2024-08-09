@@ -371,7 +371,6 @@ function UpgradeTransferredKennels(kennels)
 end
 
 --- Takes the units and tries to rebuild them for each army (in order).
---- The transfer procedure is fairly expensive, so it is filtered to important units (EXPs and T3 arty).
 ---@param units Unit[]
 ---@param armies Army[]
 function TransferUnfinishedUnitsAfterDeath(units, armies)
