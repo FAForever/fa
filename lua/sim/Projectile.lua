@@ -152,11 +152,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if blueprint.Physics.TrackTargetGround then
             TrashBagAdd(trash, ForkThread(self.OnTrackTargetGround, self))
         end
-
-        self:SetBallisticAcceleration(0/0)
-        self:SetBallisticAcceleration(1/0)
-        self:SetBallisticAcceleration(-1/0)
-        self:SetBallisticAcceleration(-0/0)
     end,
 
     --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
