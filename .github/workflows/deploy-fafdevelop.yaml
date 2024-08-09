@@ -51,15 +51,15 @@ jobs:
       - name: Update version references
         run: |
           COMMITHASH=$(git rev-parse HEAD)
-          sed -i 's/local Commit = \"unknown\"/local Commit = \"${COMMITHASH}\"/' "lua/version.lua"
-          sed -i 's/local GameType = \"unknown\"/local GameType = \"FAF Develop\"/' "lua/version.lua"
+          sed -i "s/local Commit = 'unknown'/local Commit = \"${COMMITHASH}\"/" "lua/version.lua"
+          sed -i "s/local GameType = \'unknown\'/local GameType = \"FAF Develop\"/" "lua/version.lua"
 
       # Disable debugging statements
       # 
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Overwrite debug references
         run: |
-          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledDrawing = true,/EnabledDrawing = false,/" "lua/shared/components/DebugComponent.lua"
 
       # Create a commit with the changes of the workflow in it
       - name: Create a commit
