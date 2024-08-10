@@ -1,0 +1,1 @@
+- (#6404) Fix upgrading units being duplicated when transferred after death.

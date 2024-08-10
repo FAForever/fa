@@ -1,1 +1,0 @@
-- (#6337) Fixed a bug where HotBuild keybinds did not reset to the first unit/building in the cycle when the key was pressed again.

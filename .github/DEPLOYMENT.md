@@ -16,6 +16,9 @@ The following (manual) steps are relevant to create a valid deployment to the FA
 - (2) Update the game executable. This needs to be done by a server administrator. This is only required when there are changes to the executable.
 - (3) Update the changelog in [changelog.md](/CHANGELOG.md) and [changelogData.lua](../lua/ui/lobby/changelogData.lua).
 - (4) Update the game version in [changelogData.lua](../lua/ui/lobby/changelogData.lua).
+- (5) Push all the commits that you want to release to the [master](https://github.com/FAForever/fa/tree/master) branch.
+- (6) Trigger the [deployment workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) for the FAF game type.
+- (7) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [master](https://github.com/FAForever/fa/tree/master) branch.
 
 ## Automated deployments
 
