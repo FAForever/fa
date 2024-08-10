@@ -439,6 +439,9 @@ end
 
 --- Get a PlayerData object for the local player, configured using data from their profile.
 function GetLocalPlayerData()
+
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
     return PlayerData(
         {
             PlayerName = localPlayerName,
@@ -452,6 +455,11 @@ function GetLocalPlayerData()
             MEAN = argv.playerMean,
             DEV = argv.playerDeviation,
             Country = argv.PrefLanguage,
+
+            Version = version,
+            GameType = gametype,
+            Commit = commit,
+
         }
 )
 end
