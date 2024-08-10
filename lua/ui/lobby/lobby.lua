@@ -5322,10 +5322,6 @@ local MessageHandlers = {
             else
                 HostUtils.TryAddPlayer(data.SenderID, 0, PlayerData(data.PlayerOptions))
             end
-
-
-
-
             if HasCommandLineArg('/gpgnet') then
                 PlayVoice(Sound{Bank = 'XGG',Cue = 'XGG_Computer__04716'}, true)
             end
