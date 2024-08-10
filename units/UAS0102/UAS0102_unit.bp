@@ -3,7 +3,7 @@ UnitBlueprint{
     AI = {
         GuardReturnRadius = 40,
         TargetBones = {
-            "Turret_Muzzle01",
+            "Turret",
             "UAS0102",
         },
     },
