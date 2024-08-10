@@ -3152,7 +3152,7 @@ function CreateUI(maxPlayers)
     GUI.gameVersionText:SetDropShadow(true)
 
     Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
-        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit
+        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit:sub(1, 8)
     ))
 
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
