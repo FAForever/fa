@@ -4709,6 +4709,8 @@ lobui_CAUDesc="Each player has their own army and their own resources. Allied pl
 lobui_CACommon="Single army, union control"
 lobui_CACDesc="Each team is one army. All units and resources are shared, all team members can issue commands."
 
+lobui_666="Game version missmatch detected with %s. \r\n - host: %s (@%s)\r\n - %s: %s (@%s). \r\n\r\nTo prevent desyncs, %s is ejected automatically. It is possible that a new game version is released. If this keeps happening then it is better to rehost."
+
 AutoLobbyHeaderText="Connection status"
 AutoLobbyConnectionsTextSingular="%s / %s players are connected"
 AutoLobbyConnectionsTextPlural="%s / %s players are connected"
