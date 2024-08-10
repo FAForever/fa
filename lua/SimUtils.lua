@@ -8,7 +8,7 @@
 
 local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 
-local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY
+local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
 
@@ -66,7 +66,7 @@ end
 --- replaces the units with new ones)
 ---@param units Unit[]
 ---@param toArmy number
----@param captured boolean
+---@param captured boolean?
 ---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured)
     local toBrain = GetArmyBrain(toArmy)
@@ -569,12 +569,16 @@ end
 ---@param blockingEntities RevertibleCollisionShapeEntity[]
 function FinalizeRebuiltUnits(trackers, blockingEntities)
     for _, tracker in trackers do
-        if not tracker.Success and tracker.CanCreateWreck then -- create 50% wreck. Copied from Unit:CreateWreckageProp()
+        if not tracker.Success and tracker.CanCreateWreck then
             local bp = tracker.UnitBlueprint
             local pos = tracker.UnitPos
             local orientation = tracker.UnitOrientation
-            local mass = bp.Economy.BuildCostMass * 0.57 --0.57 to compensate some multipliers in CreateWreckage()
+            -- Refund exactly how much mass was put into the unit
+            local completionFactor = tracker.TargetBuildTime / bp.Economy.BuildTime
+            local mass = bp.Economy.BuildCostMass * completionFactor 
+            -- Don't refund energy because it would be counterintuitive for wreckage
             local energy = 0
+            -- global 2x time multiplier for unit wrecks, see `Unit:CreateWreckageProp`
             local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
             CreateWreckage(bp, pos, orientation, mass, energy, time)
         end
