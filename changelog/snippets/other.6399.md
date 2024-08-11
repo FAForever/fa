@@ -1,1 +1,0 @@
-- (#6399) Document method chaining of projectile engine functions
