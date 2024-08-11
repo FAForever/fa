@@ -35,8 +35,8 @@ The last step allows us to systematically post process what we deploy. You can l
 There are three workflows to help with deployment:
 
 - [FAF game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
-- [FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
-- [FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
+- [FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml)
+- [FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml)
 
 The workflows for Beta Balance and Develop trigger periodically. You can review when by evaluating the [cron expression](https://crontab.cronhub.io/). The [API of FAForever](https://github.com/FAForever/faf-java-api/blob/develop/src/main/java/com/faforever/api/deployment/GitHubDeploymentService.java) registers the push to a deployment branch via a webhook. The server creates (and updates) a [deployment status](https://github.com/FAForever/fa/deployments). During that process the server retrieves the game related files, processes it and when everything is fine the new game version will be available in roughly 5 to 10 minutes.
 
