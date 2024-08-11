@@ -23,6 +23,7 @@ local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
+local DebugUnitComponent = import("/lua/sim/units/components/DebugUnitComponent.lua").DebugUnitComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
 
@@ -112,7 +113,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields, DebugUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -145,7 +146,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -5440,12 +5441,12 @@ local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
----@class DummyUnit : moho.unit_methods
+---@class DummyUnit : moho.unit_methods, DebugUnitComponent
 ---@field EntityId EntityId
 ---@field Army Army
 ---@field Layer Layer
 ---@field Blueprint UnitBlueprint
-DummyUnit = ClassDummyUnit(moho.unit_methods) {
+DummyUnit = ClassDummyUnit(moho.unit_methods, DebugUnitComponent) {
 
     IsUnit = true,
 

@@ -14,6 +14,8 @@ local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEn
 local cachedPriorities = false
 local RecycledPriTable = {}
 
+local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComponent.lua").DebugWeaponComponent
+
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
@@ -47,7 +49,7 @@ end
 
 local WeaponMethods = moho.weapon_methods
 
----@class Weapon : moho.weapon_methods, InternalObject
+---@class Weapon : moho.weapon_methods, InternalObject, DebugWeaponComponent
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
@@ -66,7 +68,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field unit Unit
 ---@field MaxRadius? number
 ---@field MinRadius? number
-Weapon = ClassWeapon(WeaponMethods) {
+Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
     DamageMod = 0,

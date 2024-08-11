@@ -18,7 +18,7 @@ There are various approaches to enabling the debugger:
 
 ## Overview
 
-![Screenshot of the debugger where it hit a breakpoint](/assets/development/lua-debugger-01.png)
+![Screenshot of the debugger where it hit a breakpoint]({{ 'assets/images/development/lua/debugger-01.png' | relative_url }} )
 
 In general there are three distinct panels:
 
