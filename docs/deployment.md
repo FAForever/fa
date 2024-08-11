@@ -22,15 +22,21 @@ The following (manual) steps are relevant to create a valid deployment to the FA
 - (1) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/version.lua).
 - (2) Update the game executable. This needs to be done by a server administrator. This is only required when there are changes to the executable.
 - (3) Update the changelog in [changelog.md](/changelog) and [changelogData.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/ui/lobby/changelogData.lua).
+- (3.1) Delete all of the changelog snippets.
 - (4) Update the game version in [changelogData.lua](https://github.com/FAForever/fa/blob/c36404675c7a95cda20fe867d78bd1c01c7df103/lua/ui/lobby/changelogData.lua).
+- (5) Push everything that you want to release to the [master](https://github.com/FAForever/fa/tree/master) branch.
+- (6) Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
+- (7) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [master](https://github.com/FAForever/fa/tree/master) branch.
+
+The last step allows us to systematically post process what we deploy. You can learn more about this by inspecting the workflow file.
 
 ## Automated deployments
 
 There are three workflows to help with deployment:
 
 - [FAF game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
-- [FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
-- [FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
+- [FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml)
+- [FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml)
 
 The workflows for Beta Balance and Develop trigger periodically. You can review when by evaluating the [cron expression](https://crontab.cronhub.io/). The [API of FAForever](https://github.com/FAForever/faf-java-api/blob/develop/src/main/java/com/faforever/api/deployment/GitHubDeploymentService.java) registers the push to a deployment branch via a webhook. The server creates (and updates) a [deployment status](https://github.com/FAForever/fa/deployments). During that process the server retrieves the game related files, processes it and when everything is fine the new game version will be available in roughly 5 to 10 minutes.
 
