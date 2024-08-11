@@ -255,7 +255,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
         -- allow regular air units and satellites to be destroyed by the projectiles of SMDs and SMLs
         if otherBlueprintCategoriesHashed["KILLAIRONCOLLISION"] then
-	        if selfBlueprintCategoriesHashed["SATELLITE"] and self.Dead or not selfBlueprintCategoriesHashed["EXPERIMENTAL"] then
+            if selfBlueprintCategoriesHashed["SATELLITE"] and self.Dead or not selfBlueprintCategoriesHashed["EXPERIMENTAL"] then
                 self:Kill()
                 return false
             end
