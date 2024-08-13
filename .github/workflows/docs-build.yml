@@ -97,12 +97,11 @@ jobs:
         run: |
           changelog-links.sh _posts FAForever fa github.com
 
-      # Update the patches directory contents
-      - name: Update changelog patches directory
+      # Update the changelog directory contents
+      - name: Update changelog directory
         shell: bash
         run: |
           changelog-links.sh changelog FAForever fa github.com
-          changelog-links.sh _posts FAForever fa github.com
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
