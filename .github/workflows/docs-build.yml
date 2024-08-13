@@ -89,7 +89,7 @@ jobs:
       - name: Append the generated changelogs
         run: |
           cat generated/fafdevelop.md >> changelog/fafdevelop.md
-
+          cat generated/fafbeta.md >> changelog/fafbeta.md
       
       # Update the posts directory contents
       - name: Update changelog posts directory
@@ -101,7 +101,8 @@ jobs:
       - name: Update changelog patches directory
         shell: bash
         run: |
-          changelog-links.sh patches FAForever fa github.com
+          changelog-links.sh changelog FAForever fa github.com
+          changelog-links.sh _posts FAForever fa github.com
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
