@@ -1520,7 +1520,7 @@ local function GenerateCullLabels()
                 node = stack[count]
                 count = count - 1
                 for k = 1, TableGetn(node) do
-                    local neighbor = node[k]
+                    local neighbor = NavLeaves[node[k]]
                     if neighbor.Label > 0 then
                         neighbor.Label = -1
                         count = count + 1
