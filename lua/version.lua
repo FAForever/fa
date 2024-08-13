@@ -20,6 +20,11 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+---@alias GameType
+--- | "FAF"                 # as defined in: https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml
+--- | "FAF Beta Balance"    # as defined in: https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml
+--- | "FAF Develop"         # as defined in: https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml
+
 ---------------------------------------------------------------------------
 --#region Workflow automation
 
@@ -28,9 +33,10 @@
 -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml
 -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml
 
-local GameType = 'unknown'  -- The use of `'` instead of `"` is **intentional**
+---@type GameType
+local GameType = 'unknown' -- The use of `'` instead of `"` is **intentional**
 
-local Commit = 'unknown'    -- The use of `'` instead of `"` is **intentional**
+local Commit = 'unknown' -- The use of `'` instead of `"` is **intentional**
 
 --#endregion
 
@@ -44,7 +50,7 @@ function GetVersion()
 end
 
 ---@return PATCH
----@return string # game type
+---@return GameType # game type
 ---@return string # commit hash
 function GetVersionData()
     return Version, GameType, Commit
