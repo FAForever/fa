@@ -317,19 +317,17 @@ do
     ---@param url string
     _G.OpenURL = function(url, dialogParent)
         local UIUtil = import("/lua/ui/uiutil.lua")
+            if not dialogParent then
+                dialogParent = GetFrame(0)
+            end
 
-        if GetCurrentUIState() == 'game' then
-            if not dialogParent then dialogParent = GetFrame(0) end
             UIUtil.QuickDialog(
                 dialogParent,
                 string.format("You're about to open a browser to:\r\n\r\n%s", url),
-                'Open browser',
+                'Open',
                 function() OldOpenURL(url) end,
                 'Cancel'
             )
-        else
-            OldOpenURL(url)
-        end
     end
 
     --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
