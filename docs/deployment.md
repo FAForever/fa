@@ -44,7 +44,7 @@ You can continue the deployment steps but you can not finalize it until the serv
 ---
 layout: post
 title: Game version 3811
-permalink: patches/3811
+permalink: changelog/3811
 ---
 ```
 

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Development - Changelog
-permalink: changelog
+permalink: development/changelog
 has_children: true
 nav_order: 5
 ---

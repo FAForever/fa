@@ -2,7 +2,7 @@
 layout: page
 title: Balance snippet
 parent: Development - Changelog
-permalink: changelog/balance-snippet
+permalink: development/changelog/balance-snippet
 published: true
 ---
 
