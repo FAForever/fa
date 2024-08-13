@@ -2,7 +2,7 @@
 layout: page
 title: Other snippets
 parent: Development - Changelog
-permalink: changelog/other-snippet
+permalink: development/changelog/other-snippet
 published: true
 ---
 
