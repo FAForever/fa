@@ -1,12 +1,11 @@
 ---
 layout: page
-title: FAF Beta Balance
-permalink: patches/fafbeta
-nav_order: 1
+title: FAF Develop
+permalink: changelog/fafdevelop
+nav_order: 2
 parent: Patches
 ---
 
 <!--
     This is a template, content is appended automatically based on changelog snippets.
 -->
-
