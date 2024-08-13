@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Patches
+title: Changelogs
 has_children: true
-permalink: /patches
+permalink: /changelog
 nav_order: 8
 ---
 
@@ -12,10 +12,10 @@ nav_order: 8
 
 <ul>
   <li>
-    <a class="preview-title" href="{{ 'patches/fafbeta' | relative_url }}">FAF Beta Balance</a>
+    <a class="preview-title" href="{{ 'changelog/fafbeta' | relative_url }}">FAF Beta Balance</a>
   </li>
   <li>
-    <a class="preview-title" href="{{ 'patches/fafdevelop' | relative_url }}">FAF Develop</a>
+    <a class="preview-title" href="{{ 'changelog/fafdevelop' | relative_url }}">FAF Develop</a>
   </li>
 </ul>
 
