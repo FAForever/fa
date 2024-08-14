@@ -31,7 +31,7 @@ The workflow requires an approval of another maintainer. Once approved, wait for
 - (3) Verify the executable on the `FAF Develop` game type.
 - (4) Ask a server administrator to prepare the executable to be updated upon the next game release. This practically involves a copy operation where the server administrator verifies the executable of FAF Develop and copies it to a different location.
 
-You can continue the deployment steps but you can not finalize it until the server administrator got back to you that it is set. This may take an arbitrary amount of time so make sure this is done well in advance.
+You can continue the deployment steps, but you can not finalize it until the server administrator got back to you that it is set. This may take an arbitrary amount of time so make sure this is done well in advance.
 
 ### Changelog for a deployment
 
