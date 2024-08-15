@@ -37,7 +37,7 @@ local dummyUnitTable = {}
 ---@param target Unit               # the unit that we read the queue of
 ---@param clearCommands boolean     # if true, copied orders are applied immediately
 ---@param doPrint boolean           # if true, prints the total distributed orders
-CopyOrders = function(units, target, clearCommands, doPrint)
+CopyOrders = function(units, target, clearCommands, queueOverride, doPrint)
 
     ---------------------------------------------------------------------------
     -- defensive programming
@@ -56,7 +56,7 @@ CopyOrders = function(units, target, clearCommands, doPrint)
     -- retrieve the queue of the target
 
     local unitCount = table.getn(units)
-    local queue = target:GetCommandQueue()
+    local queue = queueOverride or target:GetCommandQueue()
 
     ---------------------------------------------------------------------------
     -- clear existing orders
@@ -68,8 +68,22 @@ CopyOrders = function(units, target, clearCommands, doPrint)
     ---------------------------------------------------------------------------
     -- copy the orders
 
-    local copiedOrders = 0
+    local copiedOrders = IssueOrderQueue(units, queue)
 
+    ---------------------------------------------------------------------------
+    -- inform user and observers
+
+    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+        print(string.format("Copied %d orders", tostring(copiedOrders)))
+    end
+end
+
+---Applies a queue of orders retrieved with GetCommandQueue to a group of units
+---@param units Unit[]
+---@param queue table
+---@return integer copiedOrders -- The number of orders we copied
+IssueOrderQueue = function(units, queue)
+    local copiedOrders = 0
     for _, order in queue do
         local commandInfo = UnitQueueDataToCommand[order.commandType]
         local commandName = commandInfo.Type
@@ -84,11 +98,5 @@ CopyOrders = function(units, target, clearCommands, doPrint)
             copiedOrders = copiedOrders + 1
         end
     end
-
-    ---------------------------------------------------------------------------
-    -- inform user and observers
-
-    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
-        print(string.format("Copied %d orders", tostring(copiedOrders)))
-    end
+    return copiedOrders
 end
