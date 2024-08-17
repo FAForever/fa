@@ -1,5 +1,11 @@
 UnitBlueprint{
     Description = "<LOC uas0305_desc>Sonar Platform",
+    AI = {
+        TargetBones = {
+            "Tower_01",
+            "UAS0305",
+        },
+    },
     Audio = {
         Killed      = Sound { Bank = 'UASDestroy', Cue = 'UAS0305_Destroy',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Sonar', LodCutoff = 'UnitMove_LodCutoff' },
