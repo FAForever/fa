@@ -1,4 +1,4 @@
-- (#6414) Adjust the Cooper's stats to compensate for previous changes to its hitbox.
+- (#6414) Adjust the Cooper's stats to compensate for previous changes to its hitbox, which allowed torpedoes to hit it more reliably.
   
   - Cooper: T2 Torpedo Boat (XES0102)
     - MaxHealth: 2000 --> 2100
