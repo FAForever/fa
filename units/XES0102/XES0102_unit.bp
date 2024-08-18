@@ -31,8 +31,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 2000,
-        MaxHealth = 2000,
+        Health = 2100,
+        MaxHealth = 2100,
         SubThreatLevel = 10,
     },
     Display = {
@@ -251,7 +251,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 10/25, --10/integer interval in ticks
+            RateOfFire = 10/22, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
