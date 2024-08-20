@@ -1,0 +1,139 @@
+# Copyright (c) FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Documentation - Build and deploy
+
+on:
+  push:
+    branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta"]
+    paths: ["docs/**", "changelog/snippets/*.md"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  changelog-develop:
+    name: Create changelog of FAF Develop
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafdevelop
+
+  changelog-beta:
+    name: Create changelog of FAF Beta
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafbeta
+
+  build:
+    name: Build the documentation
+    needs: [changelog-develop, changelog-beta]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs
+            .github/workflows/scripts
+
+      # Set environment path for scripts so we can access it later
+      - name: Update environment path
+        run: |
+          echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
+
+      # Retrieve the generated changelogs
+      - name: Download artifact changelog of FAF Develop
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: docs/generated
+
+      - name: Download artifact changelog of FAF Beta
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: docs/generated
+
+      # Append the generated changelogs to the Jekyll-compatible templates
+      - name: Append the generated changelogs
+        run: |
+          cat generated/fafdevelop.md >> changelog/fafdevelop.md
+          cat generated/fafbeta.md >> changelog/fafbeta.md
+      
+      # Update the posts directory contents
+      - name: Update changelog posts directory
+        shell: bash
+        run: |
+          changelog-links.sh _posts FAForever fa github.com
+
+      # Update the changelog directory contents
+      - name: Update changelog directory
+        shell: bash
+        run: |
+          changelog-links.sh changelog FAForever fa github.com
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          cache-version: 0
+          working-directory: "${{ github.workspace }}/docs"
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build with Jekyll
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Upload artifact
+        # Automatically uploads an artifact from the './_site' directory by default
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "docs/_site/"
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
