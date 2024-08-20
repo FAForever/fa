@@ -400,11 +400,13 @@ GetAbilityDesc = {
              ..LOCF('<LOC uvd_Blips>', bp.Intel.JammerBlips)
     end,
     ability_personalshield = function(bp)
-        return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
+        return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
+             ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
     end,
     ability_shielddome = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize/2)..', '
-             ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
+             ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
+             ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
     end,
     ability_stealthfield = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.RadarStealthFieldRadius)
