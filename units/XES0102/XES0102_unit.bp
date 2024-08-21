@@ -31,8 +31,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 2100,
-        MaxHealth = 2100,
+        Health = 2000,
+        MaxHealth = 2000,
         SubThreatLevel = 10,
     },
     Display = {
@@ -95,9 +95,9 @@ UnitBlueprint{
         UniformScale = 0.065,
     },
     Economy = {
-        BuildCostEnergy = 6480,
-        BuildCostMass = 810,
-        BuildTime = 3240,
+        BuildCostEnergy = 6000,
+        BuildCostMass = 750,
+        BuildTime = 3000,
     },
     Footprint = {
         SizeX = 3,
