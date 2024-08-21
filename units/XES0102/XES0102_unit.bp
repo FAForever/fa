@@ -189,7 +189,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 10/33, --10/integer interval in ticks
+            RateOfFire = 10/32, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -251,7 +251,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 10/22, --10/integer interval in ticks
+            RateOfFire = 10/25, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
