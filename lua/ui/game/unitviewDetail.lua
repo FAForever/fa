@@ -343,7 +343,7 @@ IsAbilityExist = {
     ability_personal_teleporter = function(bp)
         return DecimalToBinary(bp.General.CommandCaps)[12] == 1 -- RULEUCC_Teleport
     end,
-    ability_snipemode_focus_acu = function(bp)
+    ability_snipemode_prioritizes_acu = function(bp)
         return bp.CategoriesHash.SNIPEMODE
     end
 }
