@@ -51,8 +51,8 @@ permalink: changelog/3811
 ---
 ```
 
-- - (5.1) Add an introduction at the top of the changelog.
-- - (5.2) Add the contributors at the bottom.
+- - (5.2) Add an introduction at the top of the changelog.
+- - (5.3) Add the contributors at the bottom.
 
 - (6) Stage, commit and push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull request points to `develop`.
 - (7) Delete the current snippets and stage, commit and push the changes to GitHub.
