@@ -109,7 +109,7 @@ UnitBlueprint{
     },
     Intel = {
         VisionRadius = 20,
-        WaterVisionRadius = 18,
+        WaterVisionRadius = 20,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.3,
