@@ -4,4 +4,4 @@
     - Iridium Rocket Pack (x2):
       - DamageRadius: 0 --> 3
       - Damage: 190 --> 150
-      - DPS: 295 --> 225
+      - DPS: 285 --> 225
