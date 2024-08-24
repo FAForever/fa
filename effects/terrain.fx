@@ -389,16 +389,16 @@ float ComputeShadow( float4 vShadowCoord )
 }
 
 // apply the water color
-float3 ApplyWaterColor(float terrainHeight, float depth, float3 inColor)
+float3 ApplyWaterColor(float terrainHeight, float waterDepth, float3 color)
 {
-    if (depth > 0) {
+    if (waterDepth > 0) {
         // With this extra check we get rid of unwanted coloration on steep cliffs when zoomed in,
         // but we prevent that terrain tesselation swallows too much of the water when zoomed out
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
-        float4 wcolor = tex1D(WaterRampSampler, depth);
-        inColor = lerp(inColor.xyz, wcolor.xyz, wcolor.w * opacity);
+        float4 waterColor = tex1D(WaterRampSampler, waterDepth);
+        color = lerp(color.xyz, waterColor.rgb, waterColor.a * opacity);
     }
-    return inColor;
+    return color;
 }
 
 float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, float waterDepth, float3 color)
@@ -422,19 +422,19 @@ float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, f
 }
 
 // calculate the lit pixels
-float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbedo, float specAmount, float waterDepth, float4 inShadow, uniform bool inShadows)
+float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo, float specAmount, float waterDepth, float4 inShadow, uniform bool inShadows)
 {
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
     if (IsExperimentalShader()) {
-        float3 position = TerrainScale * inViewPosition;
+        float3 position = TerrainScale * worldTerrain;
         float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w;
         shadow = shadow * mapShadow;
     }
 
     // calculate some specular
-    float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
+    float3 viewDirection = normalize(worldTerrain.xzy-CameraPosition);
 
     float SunDotNormal = dot( SunDirection, inNormal);
     float3 R = SunDirection - 2.0f * SunDotNormal * inNormal;
@@ -445,9 +445,9 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     color.rgb = light * inAlbedo;
 
     if (IsExperimentalShader()) {
-        color.rgb = ApplyWaterColorExponentially(-viewDirection, inViewPosition.z, waterDepth, color);
+        color.rgb = ApplyWaterColorExponentially(-viewDirection, worldTerrain.z, waterDepth, color);
     } else {
-        color.rgb = ApplyWaterColor(inViewPosition.z, waterDepth, color);
+        color.rgb = ApplyWaterColor(worldTerrain.z, waterDepth, color);
     }
 
     color.a = 0.01f + (specular*SpecularColor.w);
