@@ -2075,17 +2075,17 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | L  | R             G               B              unused          | X               Y               Z               unused       |
+// | L  | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | S0 | R             G               B              unused          | X               Y               Z               unused       |
-// | S1 | R             G               B              unused          | X               Y               Z               unused       |
-// | S2 | R             G               B              unused          | X               Y               Z               unused       |
-// | S3 | R             G               B              unused          | X               Y               Z               unused       |
+// | S0 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S1 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S2 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S3 | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---            ---               ---             ---             ---             ---            ---
-// | S4 | R             G               B              unused          | X               Y               Z               unused       |
-// | S5 | R             G               B              unused          | X               Y               Z               unused       |
-// | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | R             G               B              unused          | X               Y               Z               unused       |
+// | S4 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S5 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S6 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S7 | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        unused         shadow  | 
 
