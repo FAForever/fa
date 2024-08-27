@@ -217,7 +217,7 @@ UnitBlueprint{
             Audio = {
                 Fire = Sound { Bank = 'URAWeapon', Cue = 'URA0401_Rock_Pack', LodCutoff = 'Weapon_LodCutoff' },
             },
-            BallisticArc = "RULEUBA_HighArc",
+            BallisticArc = "RULEUBA_LowArc",
             Buffs = {
                 {
                     Add = { OnImpact = true },
@@ -232,7 +232,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageFriendly = false,
-            DamageRadius = 2,
+            DamageRadius = 1,
             DamageToShields = 323,
             DamageType = "Normal",
             DisplayName = "Othismash EMP Missile Barrage",
@@ -253,7 +253,7 @@ UnitBlueprint{
             MuzzleVelocityRandom = 0.4,
             MuzzleVelocityReduceDistance = 60,
             ProjectileId = "/projectiles/CIFOthismashEMPMissile01/CIFOthismashEMPMissile01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 3,
+            ProjectileLifetimeUsesMultiplier = 1.2,
             RackBones = {
                 {
                     HideMuzzle = true,
@@ -294,6 +294,7 @@ UnitBlueprint{
             TurretYawRange = 180,
             TurretYawSpeed = 120,
             Turreted = true,
+            UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = "Missile",
             YawOnlyOnTarget = true,
         },
