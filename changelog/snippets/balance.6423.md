@@ -6,5 +6,6 @@
       - `SNIPEMODE`
     - Othismash EMP Missile Barrage:
       - DamageRadius: 0 --> 1 (same as its EMP weapon)
-      - TurretPitchRange: 15 --> 25 (required against nearby units)
-      - Introduce a taller firing arc to allow the Pulsar to shoot over obstacles more easily.
+      - TurretPitchRange: 15 --> 40 (required against nearby units and units on top of mountains)
+      - TurretPitchSpeed: 20 --> 50 (improves the responsiveness of the turret)
+      - Introduce a taller firing arc to allow the Pulsar to shoot over obstacles more easily
