@@ -549,6 +549,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     if not table.empty(v.normal) or not table.empty(v.death) then
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {LOC('<LOC uvd_'..k..'>')..':'}})
                     end
+                    local totalDPS = 0
                     for name, weapon in v.normal do
                         local info = weapon.info
                         local weaponDetails1 = LOCStr(name)..' ('..LOCStr(info.WeaponCategory)..') '
@@ -634,10 +635,14 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 CycleTime = CycleTime + FiringCooldown
                             end
 
+                            local DPS = 0
                             if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' and info.WeaponCategory ~= 'Defense' then
                                 --Round DPS, or else it gets floored in string.format.
-                                local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
+                                DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
+                                if info.WeaponCategory ~= 'Anti Air' and info.WeaponCategory ~= 'Anti Navy' then
+                                    totalDPS = totalDPS + DPS * weapon.count
+                                end
                             end
 
                             -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
@@ -661,7 +666,6 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                 Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
-
 
                         end
                         if weapon.count > 1 then
@@ -705,10 +709,13 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
                         table.insert(lines, weaponDetails)
                     end
-                    if not table.empty(v.normal) or not table.empty(v.death) then
-                        table.insert(lines, '')
-                    end
                     table.insert(blocks, {color = 'FFFF0000', lines = lines})
+
+                    if totalDPS and v == weapons.basic then
+                        table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDPS, totalDPS / bp.Economy.BuildCostMass)}})
+                    end
+
+                    table.insert(blocks, {color = UIUtil.fontColor, lines = {''}})
                 end
             end
         end

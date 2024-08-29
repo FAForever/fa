@@ -6764,6 +6764,7 @@ uvd_0014="Damage: %.8g - %.8g, Splash: %.3g - %.3g"
 uvd_0015="Damage: %.8g x%d, Splash: %.3g"
 uvd_0016="Enhancements: %d"
 uvd_0017="Transport Speed Reduction: %.3g"
+uvd_0018="Total ground DPS: %d, DPS/M: %.2g"
 
 uvd_DPS="(DPS: %d)"
 uvd_ManualFire="(Manual Fire)"
