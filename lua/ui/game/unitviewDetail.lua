@@ -708,14 +708,21 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails = weaponDetails..' x'..weapon.count
                         end
                         table.insert(lines, weaponDetails)
+                        table.insert(blocks, {color = 'FFFF0000', lines = lines})
                     end
-                    table.insert(blocks, {color = 'FFFF0000', lines = lines})
-
-                    if totalDPS and v == weapons.basic then
+                    
+                    -- Display DPS stats if totalDPS is greater than 0 and add empty lines where necessary.
+                    local upgradesAvailable = not table.empty(weapons.upgrades.normal) or not table.empty(weapons.upgrades.death)
+                    if totalDPS > 0 and k == 'basic' then
                         table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDPS, totalDPS / bp.Economy.BuildCostMass)}})
+                        
+                        if upgradesAvailable then
+                            table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
+                        end
+                    
+                    elseif k == 'upgrades' then
+                        table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
                     end
-
-                    table.insert(blocks, {color = UIUtil.fontColor, lines = {''}})
                 end
             end
         end
