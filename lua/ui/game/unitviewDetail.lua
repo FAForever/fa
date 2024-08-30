@@ -550,8 +550,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {LOC('<LOC uvd_'..k..'>')..':'}})
                     end
                     local totalDPS = 0
-                    local totalAADPS = 0
                     local totalNavalDPS = 0
+                    local totalAADPS = 0
                     for name, weapon in v.normal do
                         local info = weapon.info
                         local weaponDetails1 = LOCStr(name)..' ('..LOCStr(info.WeaponCategory)..') '
@@ -644,10 +644,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
                                 if info.WeaponCategory ~= 'Anti Air' and info.WeaponCategory ~= 'Anti Navy' then
                                     totalDPS = totalDPS + DPS * weapon.count
-                                elseif info.WeaponCategory == 'Anti Air' then
-                                    totalAADPS = totalAADPS + DPS * weapon.count
                                 elseif info.WeaponCategory == 'Anti Navy' then
                                     totalNavalDPS = totalNavalDPS + DPS * weapon.count
+                                elseif info.WeaponCategory == 'Anti Air' then
+                                    totalAADPS = totalAADPS + DPS * weapon.count
                                 end
                             end
 
@@ -723,11 +723,11 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         if totalDPS > 0 then
                             table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDPS, totalDPS / bp.Economy.BuildCostMass)}})
                         end
-                        if totalAADPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalAADPS, totalAADPS / bp.Economy.BuildCostMass)}})
-                        end
                         if totalNavalDPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
+                        end
+                        if totalAADPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalAADPS, totalAADPS / bp.Economy.BuildCostMass)}})
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
                     end
