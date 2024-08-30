@@ -101,3 +101,30 @@ xsb2302: 0.675 / sqrt(229/193) = 0.620
 uab2302: baseline
 ueb2302: 0.525 / sqrt(229/210) = 0.503
 urb2302: 0.750 / sqrt(229/198) = 0.697
+
+New Results:
+```
+info: urb2302: 1836 DPS (209%) over 9808 seconds.
+info: uab2302: 2316 DPS (232%) over 9793 seconds.
+info: xsb2302: 1933 DPS (208%) over 9808 seconds.
+info: ueb2302: 2103 DPS (214%) over 9800 seconds.
+```
+```
+info: urb2302: 1873 DPS (213%) over 17238 seconds.
+info: uab2302: 2256 DPS (226%) over 17233 seconds.
+info: xsb2302: 1943 DPS (209%) over 17236 seconds.
+info: ueb2302: 2091 DPS (213%) over 17240 seconds.
+```
+```
+info: urb2302: 1845 DPS (210%) over 45111 seconds.
+info: uab2302: 2277 DPS (228%) over 45109 seconds.
+info: xsb2302: 1930 DPS (208%) over 45105 seconds.
+info: ueb2302: 2114 DPS (215%) over 45112 seconds.
+```
+
+Further Adjustments:
+uab2302	0.35
+ueb2302	0.503 -> 0.488
+urb2302	0.697 -> 0.670
+xsb2302	0.62 -> 0.592
+
