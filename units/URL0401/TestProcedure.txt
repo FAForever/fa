@@ -52,3 +52,52 @@ CreateUnitAtMouse('ueb1301', 1,  -27.38,   -3.88,  0.00006)
 ```
 
 Groundfire the arty in the middle of the base and speed up the game, then turn off the T3 shields to print the damage stats in the log.
+
+Results:
+   Firing in the middle (where arty is most likely to hit as much air grid as possible) of the Sera T3 shields of the air grid above:
+   ```
+   info: Damage stats:
+   info: xsb2302: 1792 DPS (193%) over 361360 seconds.
+   info: uab2302: 2287 DPS (229%) over 361356 seconds.
+   info: ueb2302: 2066 DPS (210%) over 361368 seconds.
+   info: urb2302: 1739 DPS (198%) over 361371 seconds.
+   ```
+   ```
+   info: Damage stats:
+   info: xsb2302: 1834 DPS (197%) over 4402 seconds.
+   info: uab2302: 2303 DPS (230%) over 4403 seconds.
+   info: ueb2302: 2067 DPS (210%) over 4399 seconds.
+   info: urb2302: 1754 DPS (199%) over 4407 seconds.
+   ```
+
+   Firing at an 8x8 target (Yolona) with T3 shields on the corners:
+   ```
+   info: Damage stats:
+   info: xsb2302: 1618 DPS (174%) over 11556 seconds.
+   info: uab2302: 2209 DPS (221%) over 11545 seconds.
+   info: ueb2302: 1939 DPS (197%) over 11551 seconds.
+   info: urb2302: 1582 DPS (180%) over 11553 seconds.
+   ```
+   ```
+   info: Damage stats:
+   info: xsb2302: 1649 DPS (177%) over 3620 seconds.
+   info: uab2302: 2291 DPS (229%) over 3625 seconds.
+   info: ueb2302: 1848 DPS (188%) over 3624 seconds.
+   info: urb2302: 1553 DPS (177%) over 3629 seconds.
+   ```
+   ```
+   info: xsb2302: 1588 DPS (171%) over 168001 seconds.
+   info: uab2302: 2221 DPS (222%) over 168001 seconds.
+   info: ueb2302: 1903 DPS (194%) over 167999 seconds.
+   info: urb2302: 1595 DPS (181%) over 167987 seconds.
+   ```
+
+Conclusion:
+Buff the firing randomness by dividing it by `sqrt(bestDPSmult/artyMult)`. Square root because changes in randomness affect spread area by the square of the changes.
+Use the air grid example of shielding because it is a more realistic scenario, as arty targets are rarely built spaced away from everything else. It also results in a smaller magnitude of changes, so it is safer.
+
+Adjustments:
+xsb2302: 0.675 / sqrt(229/193) = 0.620
+uab2302: baseline
+ueb2302: 0.525 / sqrt(229/210) = 0.503
+urb2302: 0.750 / sqrt(229/198) = 0.697
