@@ -719,20 +719,16 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     
                     -- Display DPS stats if totalDPS is greater than 0 and add empty lines where necessary.
                     local upgradesAvailable = not table.empty(weapons.upgrades.normal) or not table.empty(weapons.upgrades.death)
-                    if totalDPS > 0 and k == 'basic' then
-                        table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDPS, totalDPS / bp.Economy.BuildCostMass)}})
-                        if totalAADPS > 0 and k == 'basic' then
+                    if k == 'basic' then
+                        if totalDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDPS, totalDPS / bp.Economy.BuildCostMass)}})
+                        end
+                        if totalAADPS > 0 then
                             table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalAADPS, totalAADPS / bp.Economy.BuildCostMass)}})
-                            if totalNavalDPS > 0 and k == 'basic' then
-                                table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
-                            end
                         end
-                        if upgradesAvailable then
-                            table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- empty line
+                        if totalNavalDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
                         end
-                    end
-                    
-                    elseif k == 'upgrades' then
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
                     end
                 end
