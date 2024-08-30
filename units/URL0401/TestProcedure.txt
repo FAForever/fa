@@ -177,3 +177,48 @@ uab2302	0.35
 ueb2302	0.476 -> 0.467
 urb2302	0.652 -> 0.646
 xsb2302	0.570 -> 0.560
+
+New Results (4):
+```
+xsb2302: 2048 DPS (220%) over 25097 seconds.
+urb2302: 1966 DPS (224%) over 25099 seconds.
+uab2302: 2291 DPS (229%) over 25093 seconds.
+ueb2302: 2166 DPS (220%) over 25095 seconds.
+```
+
+The largest difference is now less than 5%, so further adjustments are not necessary.
+
+Overall firing randomness changes:
+uab2302	0.35
+ueb2302	0.525 ->	0.476 (-9.3%)
+urb2302	0.750 ->	0.652 (-13.1%)
+xsb2302	0.675 ->	0.570 (-15.6%)
+
+Results vs other targets:
+vs a diagonal wall of 7 sera shields, shooting slightly behind it:
+```
+xsb2302: 2952 DPS (318%) over 3844 seconds.
+urb2302: 2882 DPS (328%) over 3844 seconds.
+uab2302: 3534 DPS (353%) over 3841 seconds.
+ueb2302: 3279 DPS (334%) over 3848 seconds.
+```
+vs a square of 9 shields, shooting in the middle (groundfire):
+```
+xsb2302: 4762 DPS (512%) over 3056 seconds.
+urb2302: 4639 DPS (527%) over 3044 seconds.
+uab2302: 5707 DPS (571%) over 3049 seconds.
+ueb2302: 4996 DPS (509%) over 3055 seconds.
+```
+Aeon arty is especially strong because it can hit the middle for 4x-9x damage more often, but of course there is nothing defended in the middle so it's not very realistic.
+
+vs the corners of the 3x3 shield square:
+```
+xsb2302: 2195 DPS (236%) over 1110 seconds.
+urb2302: 1994 DPS (227%) over 1109 seconds.
+uab2302: 2314 DPS (231%) over 1104 seconds.
+ueb2302: 2341 DPS (238%) over 1111 seconds.
+```
+
+Other unlisted formations: It generally seems to be much more fair if the shields are protecting each other at the edges of their own ranges, and the arty is targeted in the middle. Aeon arty still gets an advantage against other formations, such as lines of shields, but in my opinion those formations are not as common and have their own drawbacks in not protecting a larger area and taking more damage from all arties overall for the same shield count.
+
+Vs recharging shields the new stats make Aeon arty worse than others because it has terrible luck hitting the shield itself to take it down, but this aspect is heavily reliant on RNG and shield formation so I don't really want to test it.
