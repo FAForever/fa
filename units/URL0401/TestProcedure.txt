@@ -4,16 +4,16 @@ Spawn army 0 all faction artillery setup (1 arty with full t3 pgen adjacency) wi
 Note: the artillery must be respawned for firing randomness blueprint changes to take effect.
 Command:
 ```
-   CreateUnitAtMouse('ueb1301', 0,    0.00,    8.00,  0.00000)
-   CreateUnitAtMouse('ueb1301', 0,   -8.00,    0.00,  0.00000)
-   CreateUnitAtMouse('xsb2302', 0,    0.00,    0.00,  3.14159)
-   CreateUnitAtMouse('ueb2302', 0,    0.00,    0.00,  3.14159)
-   CreateUnitAtMouse('urb2302', 0,    0.00,    0.00,  3.14159)
-   CreateUnitAtMouse('uab2302', 0,    0.00,    0.00,  3.14159)
-   CreateUnitAtMouse('ueb1301', 0,    8.00,    0.00,  0.00000)
-   CreateUnitAtMouse('ueb1301', 0,    0.00,   -8.00,  0.00000)
-   CreateUnitAtMouse('xab1401', 0,   -9.00,   -9.00, -0.00003)
-   CreateUnitAtMouse('urb2302', 1,    8.00,    0.00, -1.57080)
+CreateUnitAtMouse('ueb1301', 0,    0.00,    8.00,  0.00000)
+CreateUnitAtMouse('ueb1301', 0,   -8.00,    0.00,  0.00000)
+CreateUnitAtMouse('xsb2302', 0,    0.00,    0.00,  3.14159)
+CreateUnitAtMouse('ueb2302', 0,    0.00,    0.00,  3.14159)
+CreateUnitAtMouse('urb2302', 0,    0.00,    0.00,  3.14159)
+CreateUnitAtMouse('uab2302', 0,    0.00,    0.00,  3.14159)
+CreateUnitAtMouse('ueb1301', 0,    8.00,    0.00,  0.00000)
+CreateUnitAtMouse('ueb1301', 0,    0.00,   -8.00,  0.00000)
+CreateUnitAtMouse('xab1401', 0,   -9.00,   -9.00, -0.00003)
+CreateUnitAtMouse('urb2302', 1,    8.00,    0.00, -1.57080)
 ```
 
 Spawn army 1 UEF structure/Seraphim shield air grid test target at the edge of the arty range so that the top shield edge is roughly at max range of the army 1 artillery:
