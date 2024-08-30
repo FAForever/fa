@@ -51,11 +51,4 @@ CreateUnitAtMouse('xsb4301', 1,  -20.38,  -10.88,  0.00018)
 CreateUnitAtMouse('ueb1301', 1,  -27.38,   -3.88,  0.00006)
 ```
 
-Orders given to arty:
-attack pgen in the middle of 3 pgens on the right side
-attack pgen to bottom right of previous
-attack pgen in top right corner
-attack remaining pgens from right to left
-groundfire in the middle of the map to not mess with other artys' tests
-
-Repeat 4 times, using the same test target spawn locations but rotating which faction arty shoots at which target (placing markers is helpful).
+Groundfire the arty in the middle of the base and speed up the game, then turn off the T3 shields to print the damage stats in the log.
