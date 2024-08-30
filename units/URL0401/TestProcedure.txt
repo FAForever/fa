@@ -123,8 +123,22 @@ info: ueb2302: 2114 DPS (215%) over 45112 seconds.
 ```
 
 Further Adjustments:
+Using the same `randomness = randomness / sqrt(bestDPS/selfDPS)`
 uab2302	0.35
 ueb2302	0.503 -> 0.488
 urb2302	0.697 -> 0.670
 xsb2302	0.62 -> 0.592
 
+New Results (1):
+```
+info: urb2302: 1913 DPS (217%) over 83204 seconds.
+info: uab2302: 2294 DPS (229%) over 83196 seconds.
+info: xsb2302: 1970 DPS (212%) over 83203 seconds.
+info: ueb2302: 2138 DPS (218%) over 83192 seconds.
+```
+
+Further Adjustments (1):
+uab2302	0.35
+ueb2302	0.488 ->	0.476
+urb2302	0.670 ->	0.652
+xsb2302	0.592 ->	0.57
