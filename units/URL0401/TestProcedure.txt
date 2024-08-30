@@ -164,3 +164,16 @@ ueb2302	0.488 ->	0.476
 urb2302	0.670 ->	0.652
 xsb2302	0.592 ->	0.57
 
+New Results (3):
+```
+info: xsb2302: 2055 DPS (221%) over 22245 seconds.
+info: uab2302: 2297 DPS (230%) over 22237 seconds.
+info: urb2302: 1975 DPS (225%) over 22248 seconds.
+info: ueb2302: 2167 DPS (221%) over 22239 seconds.
+```
+
+Further Adjustments (3):
+uab2302	0.35
+ueb2302	0.476 -> 0.467
+urb2302	0.652 -> 0.646
+xsb2302	0.570 -> 0.560
