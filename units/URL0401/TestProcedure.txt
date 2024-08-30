@@ -56,40 +56,40 @@ Groundfire the arty in the middle of the base (specifically centered horizontall
 Results:
    Firing in the middle (where arty is most likely to hit as much air grid as possible) of the Sera T3 shields of the air grid above:
    ```
-   info: Damage stats:
-   info: xsb2302: 1792 DPS (193%) over 361360 seconds.
-   info: uab2302: 2287 DPS (229%) over 361356 seconds.
-   info: ueb2302: 2066 DPS (210%) over 361368 seconds.
-   info: urb2302: 1739 DPS (198%) over 361371 seconds.
+   Damage stats:
+   xsb2302: 1792 DPS (193%) over 361360 seconds.
+   uab2302: 2287 DPS (229%) over 361356 seconds.
+   ueb2302: 2066 DPS (210%) over 361368 seconds.
+   urb2302: 1739 DPS (198%) over 361371 seconds.
    ```
    ```
-   info: Damage stats:
-   info: xsb2302: 1834 DPS (197%) over 4402 seconds.
-   info: uab2302: 2303 DPS (230%) over 4403 seconds.
-   info: ueb2302: 2067 DPS (210%) over 4399 seconds.
-   info: urb2302: 1754 DPS (199%) over 4407 seconds.
+   Damage stats:
+   xsb2302: 1834 DPS (197%) over 4402 seconds.
+   uab2302: 2303 DPS (230%) over 4403 seconds.
+   ueb2302: 2067 DPS (210%) over 4399 seconds.
+   urb2302: 1754 DPS (199%) over 4407 seconds.
    ```
 
    Firing at an 8x8 target (Yolona) with T3 shields on the corners:
    ```
-   info: Damage stats:
-   info: xsb2302: 1618 DPS (174%) over 11556 seconds.
-   info: uab2302: 2209 DPS (221%) over 11545 seconds.
-   info: ueb2302: 1939 DPS (197%) over 11551 seconds.
-   info: urb2302: 1582 DPS (180%) over 11553 seconds.
+   Damage stats:
+   xsb2302: 1618 DPS (174%) over 11556 seconds.
+   uab2302: 2209 DPS (221%) over 11545 seconds.
+   ueb2302: 1939 DPS (197%) over 11551 seconds.
+   urb2302: 1582 DPS (180%) over 11553 seconds.
    ```
    ```
-   info: Damage stats:
-   info: xsb2302: 1649 DPS (177%) over 3620 seconds.
-   info: uab2302: 2291 DPS (229%) over 3625 seconds.
-   info: ueb2302: 1848 DPS (188%) over 3624 seconds.
-   info: urb2302: 1553 DPS (177%) over 3629 seconds.
+   Damage stats:
+   xsb2302: 1649 DPS (177%) over 3620 seconds.
+   uab2302: 2291 DPS (229%) over 3625 seconds.
+   ueb2302: 1848 DPS (188%) over 3624 seconds.
+   urb2302: 1553 DPS (177%) over 3629 seconds.
    ```
    ```
-   info: xsb2302: 1588 DPS (171%) over 168001 seconds.
-   info: uab2302: 2221 DPS (222%) over 168001 seconds.
-   info: ueb2302: 1903 DPS (194%) over 167999 seconds.
-   info: urb2302: 1595 DPS (181%) over 167987 seconds.
+   xsb2302: 1588 DPS (171%) over 168001 seconds.
+   uab2302: 2221 DPS (222%) over 168001 seconds.
+   ueb2302: 1903 DPS (194%) over 167999 seconds.
+   urb2302: 1595 DPS (181%) over 167987 seconds.
    ```
 
 Conclusion:
@@ -104,22 +104,22 @@ urb2302: 0.750 / sqrt(229/198) = 0.697
 
 New Results:
 ```
-info: urb2302: 1836 DPS (209%) over 9808 seconds.
-info: uab2302: 2316 DPS (232%) over 9793 seconds.
-info: xsb2302: 1933 DPS (208%) over 9808 seconds.
-info: ueb2302: 2103 DPS (214%) over 9800 seconds.
+urb2302: 1836 DPS (209%) over 9808 seconds.
+uab2302: 2316 DPS (232%) over 9793 seconds.
+xsb2302: 1933 DPS (208%) over 9808 seconds.
+ueb2302: 2103 DPS (214%) over 9800 seconds.
 ```
 ```
-info: urb2302: 1873 DPS (213%) over 17238 seconds.
-info: uab2302: 2256 DPS (226%) over 17233 seconds.
-info: xsb2302: 1943 DPS (209%) over 17236 seconds.
-info: ueb2302: 2091 DPS (213%) over 17240 seconds.
+urb2302: 1873 DPS (213%) over 17238 seconds.
+uab2302: 2256 DPS (226%) over 17233 seconds.
+xsb2302: 1943 DPS (209%) over 17236 seconds.
+ueb2302: 2091 DPS (213%) over 17240 seconds.
 ```
 ```
-info: urb2302: 1845 DPS (210%) over 45111 seconds.
-info: uab2302: 2277 DPS (228%) over 45109 seconds.
-info: xsb2302: 1930 DPS (208%) over 45105 seconds.
-info: ueb2302: 2114 DPS (215%) over 45112 seconds.
+urb2302: 1845 DPS (210%) over 45111 seconds.
+uab2302: 2277 DPS (228%) over 45109 seconds.
+xsb2302: 1930 DPS (208%) over 45105 seconds.
+ueb2302: 2114 DPS (215%) over 45112 seconds.
 ```
 
 Further Adjustments:
@@ -131,10 +131,10 @@ xsb2302	0.62 -> 0.592
 
 New Results (1):
 ```
-info: urb2302: 1913 DPS (217%) over 83204 seconds.
-info: uab2302: 2294 DPS (229%) over 83196 seconds.
-info: xsb2302: 1970 DPS (212%) over 83203 seconds.
-info: ueb2302: 2138 DPS (218%) over 83192 seconds.
+urb2302: 1913 DPS (217%) over 83204 seconds.
+uab2302: 2294 DPS (229%) over 83196 seconds.
+xsb2302: 1970 DPS (212%) over 83203 seconds.
+ueb2302: 2138 DPS (218%) over 83192 seconds.
 ```
 
 Further Adjustments (1):
@@ -145,17 +145,17 @@ xsb2302	0.592 ->	0.57
 
 New Results (2):
 ```
-info: urb2302: 1954 DPS (222%) over 49153 seconds.
-info: uab2302: 2262 DPS (226%) over 49153 seconds.
-info: xsb2302: 2016 DPS (217%) over 49147 seconds.
-info: ueb2302: 2160 DPS (220%) over 49144 seconds.
+urb2302: 1954 DPS (222%) over 49153 seconds.
+uab2302: 2262 DPS (226%) over 49153 seconds.
+xsb2302: 2016 DPS (217%) over 49147 seconds.
+ueb2302: 2160 DPS (220%) over 49144 seconds.
 ```
 VS 4 shield setup:
 ```
-info: urb2302: 1824 DPS (207%) over 20046 seconds.
-info: uab2302: 2180 DPS (218%) over 20041 seconds.
-info: xsb2302: 1849 DPS (199%) over 20050 seconds.
-info: ueb2302: 2018 DPS (205%) over 20055 seconds.
+urb2302: 1824 DPS (207%) over 20046 seconds.
+uab2302: 2180 DPS (218%) over 20041 seconds.
+xsb2302: 1849 DPS (199%) over 20050 seconds.
+ueb2302: 2018 DPS (205%) over 20055 seconds.
 ```
 
 Further Adjustments (2):
@@ -166,10 +166,10 @@ xsb2302	0.592 ->	0.57
 
 New Results (3):
 ```
-info: xsb2302: 2055 DPS (221%) over 22245 seconds.
-info: uab2302: 2297 DPS (230%) over 22237 seconds.
-info: urb2302: 1975 DPS (225%) over 22248 seconds.
-info: ueb2302: 2167 DPS (221%) over 22239 seconds.
+xsb2302: 2055 DPS (221%) over 22245 seconds.
+uab2302: 2297 DPS (230%) over 22237 seconds.
+urb2302: 1975 DPS (225%) over 22248 seconds.
+ueb2302: 2167 DPS (221%) over 22239 seconds.
 ```
 
 Further Adjustments (3):
