@@ -142,3 +142,25 @@ uab2302	0.35
 ueb2302	0.488 ->	0.476
 urb2302	0.670 ->	0.652
 xsb2302	0.592 ->	0.57
+
+New Results (2):
+```
+info: urb2302: 1954 DPS (222%) over 49153 seconds.
+info: uab2302: 2262 DPS (226%) over 49153 seconds.
+info: xsb2302: 2016 DPS (217%) over 49147 seconds.
+info: ueb2302: 2160 DPS (220%) over 49144 seconds.
+```
+VS 4 shield setup:
+```
+info: urb2302: 1824 DPS (207%) over 20046 seconds.
+info: uab2302: 2180 DPS (218%) over 20041 seconds.
+info: xsb2302: 1849 DPS (199%) over 20050 seconds.
+info: ueb2302: 2018 DPS (205%) over 20055 seconds.
+```
+
+Further Adjustments (2):
+uab2302	0.35
+ueb2302	0.488 ->	0.476
+urb2302	0.670 ->	0.652
+xsb2302	0.592 ->	0.57
+
