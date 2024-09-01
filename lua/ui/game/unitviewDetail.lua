@@ -549,7 +549,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     if not table.empty(v.normal) or not table.empty(v.death) then
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {LOC('<LOC uvd_'..k..'>')..':'}})
                     end
-                    local totalDPS = 0
+                    local totalDirectFireDPS = 0
+                    local totalIndirectFireDPS = 0
                     local totalNavalDPS = 0
                     local totalAADPS = 0
                     for name, weapon in v.normal do
@@ -642,8 +643,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 --Round DPS, or else it gets floored in string.format.
                                 DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
-                                if info.WeaponCategory ~= 'Anti Air' and info.WeaponCategory ~= 'Anti Navy' then
-                                    totalDPS = totalDPS + DPS * weapon.count
+                                if info.WeaponCategory == 'Direct Fire' or info.WeaponCategory == 'Direct Fire Naval' or info.WeaponCategory == 'Direct Fire Experimental' then
+                                    totalDirectFireDPS = totalDirectFireDPS + DPS * weapon.count
+                                elseif info.WeaponCategory == 'Indirect Fire' or info.WeaponCategory == 'Missile' or info.WeaponCategory == 'Artillery' or info.WeaponCategory == 'Bomb' then
+                                    totalIndirectFireDPS = totalIndirectFireDPS + DPS * weapon.count
                                 elseif info.WeaponCategory == 'Anti Navy' then
                                     totalNavalDPS = totalNavalDPS + DPS * weapon.count
                                 elseif info.WeaponCategory == 'Anti Air' then
@@ -721,14 +724,17 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     -- Prevent the totalDPS stats from being displayed under the 'Upgrades' tab and avoid the doubling of empty lines.
                     local upgradesAvailable = not table.empty(weapons.upgrades.normal) or not table.empty(weapons.upgrades.death)
                     if k == 'basic' then
-                        if totalDPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDPS, totalDPS / bp.Economy.BuildCostMass)}})
+                        if totalDirectFireDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDirectFireDPS, totalDirectFireDPS / bp.Economy.BuildCostMass)}})
+                        end
+                        if totalIndirectFireDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalIndirectFireDPS, totalIndirectFireDPS / bp.Economy.BuildCostMass)}})
                         end
                         if totalNavalDPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
                         end
                         if totalAADPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalAADPS, totalAADPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0021>', totalAADPS, totalAADPS / bp.Economy.BuildCostMass)}})
                         end
                         if not upgradesAvailable then
                             table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
