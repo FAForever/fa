@@ -159,7 +159,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
         local aimControl, aimRight, aimLeft
         if yawBone and pitchBone and muzzleBone then
-            local trashManipulators = self.Trash
+            local selfTrash = self.Trash
             if bp.TurretDualManipulators then
                 aimControl = CreateAimController(self, 'Torso', yawBone)
                 aimRight = CreateAimController(self, 'Right', pitchBone, pitchBone, muzzleBone)
@@ -173,15 +173,15 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                     aimControl:SetResetPoseTime(9999999)
                 end
                 self:SetFireControl('Right')
-                trashManipulators:Add(aimControl)
-                trashManipulators:Add(aimRight)
-                trashManipulators:Add(aimLeft)
+                selfTrash:Add(aimControl)
+                selfTrash:Add(aimRight)
+                selfTrash:Add(aimLeft)
             else
                 aimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, unit) then
                     aimControl:SetResetPoseTime(9999999)
                 end
-                trashManipulators:Add(aimControl)
+                selfTrash:Add(aimControl)
                 aimControl:SetPrecedence(precedence)
                 if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for _, v in bp.RackBones do
@@ -189,7 +189,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                         if rackBone ~= pitchBone then
                             local slaver = CreateSlaver(unit, rackBone, pitchBone)
                             slaver:SetPrecedence(precedence - 1)
-                            trashManipulators:Add(slaver)
+                            selfTrash:Add(slaver)
                         end
                     end
                 end
