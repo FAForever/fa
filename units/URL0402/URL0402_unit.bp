@@ -310,6 +310,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/1, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 180,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
