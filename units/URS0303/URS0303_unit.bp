@@ -248,6 +248,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "NAVAL MOBILE",
                 "ALLUNITS",
@@ -310,6 +312,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",
@@ -377,6 +381,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",
@@ -444,6 +450,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",
