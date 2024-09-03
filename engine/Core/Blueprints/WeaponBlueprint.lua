@@ -142,10 +142,10 @@
 ---@field Flare WeaponBlueprintFlare
 --- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
---- controls what the weapon is allowed to target in reference to the heading of the unit
+--- controls what the weapon is allowed to target in reference to the heading of the unit. Defaults to 0
 ---@field HeadingArcCenter number
 --- controls what the weapon is allowed to target in reference to the arc center,
---- this is degrees on either side
+--- this is degrees on either side. Defaults to 180
 ---@field HeadingArcRange number
 --- does not consider the weapon when attacking targets if it is disabled
 ---@field IgnoreIfDisabled? boolean
