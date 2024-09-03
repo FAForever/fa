@@ -41,12 +41,12 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
                 return projectile
             end,
         },
-        RightArmTractor = ClassWeapon(ADFPhasonLaser) {
+        RightArmTractor = ClassWeapon(ADFTractorClaw) {
             DisabledFiringBones = {
                 'Right_Arm_B02',
             },
         },
-        LeftArmTractor = ClassWeapon(ADFPhasonLaser) {
+        LeftArmTractor = ClassWeapon(ADFTractorClaw) {
             DisabledFiringBones = {
                 'Left_Arm_B02',
             },
