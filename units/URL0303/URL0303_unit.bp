@@ -277,6 +277,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,
             NotExclusive = true,
+            PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/CDFBolter02/CDFBolter02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
