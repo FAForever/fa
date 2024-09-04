@@ -495,7 +495,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                             units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         end
                         if units and not table.empty(units) then
-                            local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+                            local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index) or {})
 
                             -- only show message when we actually gift that player some units
                             if givenUnitCount > 0 then
@@ -808,7 +808,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                 for _, brain in brains do
                     local units = self:GetListOfUnits(cat, false)
                     if units and units[1] then
-                        local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+                        local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index) or {})
 
                         -- only show message when we actually gift that player some units
                         if givenUnitCount > 0 then
