@@ -495,10 +495,10 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                             units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         end
                         if units and not table.empty(units) then
-                            local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index) or {})
+                            local givenUnits = TransferUnitsOwnership(units, brain.index)
 
                             -- only show message when we actually gift that player some units
-                            if givenUnitCount > 0 then
+                            if givenUnits and next(givenUnits) then
                                 Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
                             end
 
