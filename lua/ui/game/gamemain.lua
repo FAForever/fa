@@ -363,7 +363,6 @@ end
 function AdjustFrameRate()
     if options.vsync == 1 then return end
 
-    local video = options.video
     -- SC_FrameTimeClamp defaults to 10ms, which is 100 fps
     local fps = 100
 
