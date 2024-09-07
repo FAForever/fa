@@ -1700,10 +1700,6 @@ options = {
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
-                update = function(control, value)
-                    logic = import("/lua/options/optionslogic.lua")
-                    logic.SetValue('frametime', 16)
-                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))

@@ -361,6 +361,7 @@ end
 --- Find out the max Hz capability of the adapter so we don't render unnecessary frames, reducing the load on the render thread.
 --- Some users might set SC_FrameTimeClamp to 0 which would be counterproductive for fps.
 function AdjustFrameRate()
+    -- vsync will automatically sync to max adapter framerate
     if options.vsync == 1 then return end
 
     local frametimeOption = Prefs.GetFromCurrentProfile('options.frametime')
