@@ -1,0 +1,5 @@
+- (#6434) Fix and improve the frametime (FPS cap) option:
+  - Now properly applies when starting a new game session.
+  - Windowed mode is no longer forced to 100 fps.
+  - Fullscreen is no longer capped at 60 fps.
+  - Decrease the minimum frametime from 4 ms (250 fps) to 2 ms (500 fps).
