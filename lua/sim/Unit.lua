@@ -2142,7 +2142,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             if self:IsValidBone(v) then
                 self:ShowBone(v, children)
             else
-                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self.UnitId), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
+                WARN('*TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self.UnitId), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
             end
         end
     end,
@@ -3096,11 +3096,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper prerequisite. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] - Needed: ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] - Installed: ['..(tempEnhanceBp.Prerequisite or 'nil')..']')
+                WARN('*Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper prerequisite. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] - Needed: ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] - Installed: ['..(tempEnhanceBp.Prerequisite or 'nil')..']')
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper slot available. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] has already ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] installed.')
+            WARN('*Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper slot available. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] has already ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] installed.')
             return false
         end
 
@@ -3655,7 +3655,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         for _, typeGroup in effectTypeGroups do
             local bones = typeGroup.Bones
             if table.empty(bones) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
+                WARN('*No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
                 continue
             end
 
@@ -3721,8 +3721,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local effectTypeGroups = bpTable.Effects
 
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
-                if not self.Footfalls and bpTable.Footfall then
-                    WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
+                if not self.Footfalls and not bpTable.Footfall then
+                    WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
                 end
                 return false
             end
@@ -3833,7 +3833,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     CreateBeamExhaust = function(self, bpTable, beamBP)
         local effectBones = bpTable.Bones
         if not effectBones or (effectBones and table.empty(effectBones)) then
-            WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
+            WARN('*No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
         for kb, vb in effectBones do
@@ -3852,7 +3852,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     CreateContrails = function(self, tableData)
         local effectBones = tableData.Bones
         if not effectBones or (effectBones and table.empty(effectBones)) then
-            WARN('*WARNING: No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
+            WARN('*No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
         local ZOffset = tableData.ZOffset or 0.0
@@ -3883,7 +3883,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@return boolean
     CreateFootFallManipulators = function(self, footfall)
         if not footfall.Bones or (footfall.Bones and (table.empty(footfall.Bones))) then
-            WARN('*WARNING: No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
+            WARN('*No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
             return false
         end
 
