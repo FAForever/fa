@@ -363,6 +363,11 @@ end
 function AdjustFrameRate()
     if options.vsync == 1 then return end
 
+    local frametimeOption = Prefs.GetFromCurrentProfile('options.frametime')
+    if frametimeOption then
+        ConExecute("SC_FrameTimeClamp " .. frametimeOption)
+    end
+
     -- SC_FrameTimeClamp defaults to 10ms, which is 100 fps
     local fps = 100
 
