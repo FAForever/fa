@@ -33,15 +33,47 @@ doscript '/lua/system/BuffBlueprints.lua'
 import("/lua/sim/buffdefinitions.lua")
 
 EmptyTable = {}
-setmetatable(EmptyTable, {__newindex = function()
+setmetatable(EmptyTable, { __newindex = function()
     WARN("Attempt to set field of the empty table")
-end})
+end })
 
 InitialRegistration = false
 
 -- Classes exported from the engine are in the 'moho' table. But they aren't full
 -- classes yet, just lists of exported methods and base classes. Turn them into
 -- real classes.
-for name,cclass in moho do
+for name, cclass in moho do
     ConvertCClassToLuaSimplifiedClass(cclass, name)
+end
+
+-- Inform the developer that a Lua environment is created
+local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+local trace = debug.traceback():lower()
+if trace:find("siminit.lua") then
+    SPEW(
+        string.format(
+            "Lua sim environment initialized with game version %s, game type %s and at commit hash %s",
+            version,
+            gametype,
+            commit
+        )
+    )
+elseif trace:find("sessioninit.lua") then
+    SPEW(
+        string.format(
+            "Lua session environment initialized with game version %s, game type %s and at commit hash %s",
+            version,
+            gametype,
+            commit
+        )
+    )
+elseif trace:find("userinit.lua") then
+    SPEW(
+        string.format(
+            "Lua user environment initialized with game version %s, game type %s and at commit hash %s",
+            version,
+            gametype,
+            commit
+        )
+    )
 end
