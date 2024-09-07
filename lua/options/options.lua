@@ -1690,7 +1690,7 @@ options = {
                     end
                 end,
                 custom = {
-                    min = 4,
+                    min = 2,
                     max = 16,
                     inc = 1,
                 },
