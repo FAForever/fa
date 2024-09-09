@@ -391,7 +391,9 @@ function Cross(v1, v2)
     )
 end
 
-DotP = VDot
+function DotP(v1, v2)
+    return v1[1] * v2[1] + v1[2] * v[2] + v[3] * v[3]
+end
 
 --- Gets the angle between two vectors in degrees
 ---@param v1 Vector
