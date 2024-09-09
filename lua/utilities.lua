@@ -193,8 +193,8 @@ function GetTrueEnemyUnitsInSphere(allyUnit, position, radius, categories)
     return unitsInRadius
 end
 
----@see VDist2(x1, z1, x2, z2) # for a 2D option
----@see VDist3(v1, v2) # for a vector option
+---@see GetDistanceBetweenTwoPoints2(x1, z1, x2, z2) # for a 2D option
+---@see GetDistanceBetweenTwoVectors(v1, v2) # for a vector option
 ---@param x1 number
 ---@param y1 number
 ---@param z1 number
@@ -209,10 +209,29 @@ function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
     return MathSqrt(dx*dx + dy*dy + dz*dz)
 end
 
-GetDistanceBetweenTwoVectors = VDist3
+---@see GetDistanceBetweenTwoPoints(x1, z1, x2, z2) # for a 3D option
+---@see XZDistanceTwoVectors(v1, v2) # for a vector option
+---@param x1 number
+---@param z1 number
+---@param x2 number
+---@param z2 number
+---@return number
+function GetDistanceBetweenTwoPoints2(x1, z1, x2, z2)
+    local dx, dz = x2 - x1, z2 - z1
+    return MathSqrt(dx*dx + dz*dz)
+end
+
+--- Returns the distance between two vectors
+---@see XZDistanceTwoVectors(v1, v2) # for horizontal distance option
+---@param v1 Vector
+---@param v2 Vector
+GetDistanceBetweenTwoVectors = function(v1, v2)
+    local dx, dy, dz = v2[1] - v1[1], v2[2] - v1[2], v2[3] - v1[3]
+    return MathSqrt(dx*dx + dy*dy + dz*dz)
+end
 
 --- Returns the horizontal distance between two vectors without considering the y-axis
----@see VDist(v1, v2) # for 3D option
+---@see GetDistanceBetweenTwoVectors(v1, v2) # for 3D option
 ---@param v1 Vector
 ---@param v2 Vector
 ---@return number
