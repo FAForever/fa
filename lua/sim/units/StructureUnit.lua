@@ -126,7 +126,81 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
             -- do not orientate structures that are on flat ground
             if roll ~= 0 or pitch ~= 0 then
-                self:SetOrientation(self:GetOrientation() * EulerToQuaternion(-roll, pitch, 0), true)
+
+                local newQuat = EulerToQuaternion(-roll, pitch, 0)
+                -- w, z, y, x -> w,x,y,z
+                -- newQuat[1], newQuat[2], newQuat[3], newQuat[4] = newQuat[4], newQuat[3], newQuat[2], newQuat[1]
+                LOG('New terrain quat: ' .. repr(newQuat)) -- eulertoquat rpy
+                local newQuat = newQuat * self:GetOrientation()
+                LOG('New orient quat: ' .. repr(newQuat))
+                self:SetOrientation(newQuat, true)
+
+                local cos, sin = math.cos, math.sin
+                local function qmul(lhs, rhs)
+                    local lhs1, lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3], lhs[4]
+                    local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
+                    return Quaternion(
+                        lhs1 * rhs1 - lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
+                        lhs1 * rhs2 + lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3,
+                        lhs1 * rhs3 + lhs3 * rhs1 + lhs4 * rhs2 - lhs2 * rhs4,
+                        lhs1 * rhs4 + lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
+                    )
+                end
+
+                -- --     return UnsafeQuaternion(
+                -- --     a4 * b1 + a1 * b4 +  + a2 * b3 - a3 * b2,
+                -- --     a2 * b4 + a3 * b1 + a4 * b2 - a1 * b3,
+                -- --     a3 * b4 + a1 * b2 + a4 * b3 - a2 * b1,
+                -- --     a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3
+                -- -- )
+                -- --     return UnsafeQuaternion(
+                -- --     a1 * b4 + a4 * b1 - a3 * b2 + a2 * b3,
+                -- --     a2 * b4 + a3 * b1 + a4 * b2 - a1 * b3,
+                -- --     a3 * b4 - a2 * b1 + a1 * b2 + a4 * b3,
+                -- --     a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3
+                -- -- )
+
+                local function QuatfromAngle(roll, pitch, yaw)
+                    pitch = pitch*0.5
+                    yaw = yaw*0.5
+                    roll = roll*0.5
+                    local qr = {cos(roll), sin(roll), 0, 0}
+                    local qp = {cos(pitch), 0, sin(pitch), 0}
+                    local qy = {cos(yaw), 0, 0, sin(yaw)}
+                    return qmul(qy,qmul(qp,qr))
+                    -- local qr = Quaternion(cos(roll), sin(roll), 0, 0)
+                    -- local qp = Quaternion(cos(pitch), 0, sin(pitch), 0)
+                    -- local qy = Quaternion(cos(yaw), 0, 0, sin(yaw))
+                    -- return qy * (qp * qr)
+                end
+                
+                local quatSlope = QuatfromAngle(-roll, 0, -pitch)
+                LOG('Old terrain quat: ' .. repr(quatSlope)) -- eulertoquat rpy
+                local quatOrient = self:GetOrientation()
+                local quat = qmul(quatOrient, quatSlope)
+                LOG('old orient quat: ' .. repr(quat))
+                -- self:SetOrientation(quat, true)
+
+
+
+                --[[
+                function Quaternion.fromAngle(pitch, yaw, roll)
+                    pitch = pitch*deg2rad*0.5
+                    yaw = yaw*deg2rad*0.5
+                    roll = roll*deg2rad*0.5
+                    local qr = {cos(roll), sin(roll), 0, 0}
+                    local qp = {cos(pitch), 0, sin(pitch), 0}
+                    local qy = {cos(yaw), 0, 0, sin(yaw)}
+                    return qmul(qy,qmul(qp,qr))
+                end
+                
+                roll, pitch = roll, pitch
+                local quatSlope = Quaternion.fromAngle(0, 0 - pitch,-1 * roll)
+                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
+                local quat = quatOrient * quatSlope
+                self:SetOrientation(quat, true)
+                ]]
+
 
                 -- technically obsolete, but as this is part of an integration we don't want to break
                 -- the mod package that it originates from. Originates from the BrewLan mod suite

@@ -999,6 +999,30 @@ function vector_metatable.__mul(a, b)
                 a3 * b4 - a2 * b1 + a1 * b2 + a4 * b3,
                 a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3
             )
+            -- return UnsafeQuaternion(
+            --     a1 * b4 + a4 * b1 - a3 * b2 + a2 * b3, --x
+            --     a4 * b2 - a1 * b3 + a2 * b4 + a3 * b1, --y
+            --     a4 * b3 + a1 * b2 - a2 * b1 + a3 * b4, --z
+            --     a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3  --w
+            -- )
+            -- return UnsafeQuaternion(
+            --     a4 * b1 + a1 * b4 + a2 * b3 - a3 * b2, --x
+            --     a4 * b2 - a1 * b3 + a2 * b1 + a3 * b1, --y
+            --     a4 * b3 + a1 * b2 - a2 * b2 + a3 * b4, --z
+            --     a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3  --w
+            -- )
+            --[[ w, z, x, y
+                a1 * b4 + a4 * b1 - a3 * b2 + a2 * b3,
+                a2 * b4 + a3 * b1 + a4 * b2 - a1 * b3,
+                a3 * b4 - a2 * b1 + a1 * b2 + a4 * b3,
+                a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3
+            ]]
+            --[[ 1,2,3,4 = x,y,z,w
+                a1 * b1 - a2 * b2 - a3 * b3 - a4 * b4,
+                a1 * b2 + a2 * b1 + a3 * b4 - a4 * b3,
+                a1 * b3 + a3 * b1 + a4 * b2 - a2 * b4,
+                a1 * b4 + a4 * b1 + a2 * b3 - a3 * b2
+            ]]
         end
 
         -- Quaternion * Vector (Quaternion with no spin)
