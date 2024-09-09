@@ -157,12 +157,12 @@ function GetEnemyUnitsInSphere(unit, position, radius)
 end
 
 --- Gets all units in a sphere that are an enemy to a given unit and contained in a category.
----@param unit Unit
+---@param allyUnit Unit
 ---@param position Vector
 ---@param radius number
 ---@param categories? EntityCategory
 ---@return Unit[] | nil
-function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
+function GetTrueEnemyUnitsInSphere(allyUnit, position, radius, categories)
     local posX, posZ = position[1], position[3]
     local unitsInRec = GetUnitsInRect(posX - radius, posZ - radius, posX + radius, posZ + radius)
     -- Check for empty rectangle
@@ -171,19 +171,19 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
     end
 
     local posY = position[2]
-    local army = unit.Army
+    local army = allyUnit.Army
     local radiusSq = radius*radius
     local k = 1
     local unitsInRadius = {}
-    for _, v in unitsInRec do
-        local vArmy = v.Army
-        if army ~= v.Army or IsAlly(army, vArmy) then
+    for _, unit in unitsInRec do
+        local unitArmy = unit.Army
+        if army ~= unit.Army or IsAlly(army, unitArmy) then
             continue
         end
-        local vPos = v:GetPosition()
-        local dx, dy, dz = posX - vPos[1], posY - vPos[2], posZ - vPos[3]
-        if dx*dx + dy*dy + dz*dz <= radiusSq and categories and EntityCategoryContains(categories, v) then
-            unitsInRadius[k] = v
+        local unitPos = unit:GetPosition()
+        local dx, dy, dz = posX - unitPos[1], posY - unitPos[2], posZ - unitPos[3]
+        if dx*dx + dy*dy + dz*dz <= radiusSq and categories and EntityCategoryContains(categories, unit) then
+            unitsInRadius[k] = unit
             k = k + 1
         end
     end
