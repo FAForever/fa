@@ -378,31 +378,32 @@ function GetClosestVector(from, list)
 end
 
 --- Returns the cross product of `a` across `b`
----@param a Vector
----@param b Vector
+---@param v1 Vector
+---@param v2 Vector
 ---@return Vector
-function Cross(a, b)
-    local ax, ay, az = a[1], a[2], a[3]
-    local bx, by, bz = b[1], b[2], b[3]
+function Cross(v1, v2)
+    local x1, y1, z2 = v1[1], v1[2], v1[3]
+    local x2, y2, z2 = v2[1], v2[2], v2[3]
     return Vector(
-        ay * bz - az * by,
-        az * bx - ax * bz,
-        ax * by - ay * bx
+        y1 * z2 - z2 * y2,
+        z2 * x2 - x1 * z2,
+        x1 * y2 - y1 * x2
     )
 end
 
 DotP = VDot
 
 --- Gets the angle between two vectors in degrees
----@param a Vector
----@param b Vector
+---@param v1 Vector
+---@param v2 Vector
 ---@return number
-function GetAngleInBetween(a, b)
-    local ax, ay, az = a[1], a[2], a[3]
-    local bx, by, bz = b[1], b[2], b[3]
-    -- arccos((a . b) / (|a| |b|))
-    local dot = ax*bx + ay*by + az*bz
-    local len2 = MathSqrt((ax*ax + ay*ay + az*az) * (bx*bx + by*by + bz*bz))
+function GetAngleInBetween(v1, v2)
+    local x1, y1, z2 = v1[1], v1[2], v1[3]
+    local x2, y2, z2 = v2[1], v2[2], v2[3]
+    -- arccos((v1 . v2) / (|v1| |v2|))
+    local z2Sq = z2 * z2
+    local dot = x1*x2 + y1*y2 + z2Sq
+    local len2 = MathSqrt((x1*x1 + y1*y1 + z2Sq) * (x2*x2 + y2*y2 + z2Sq))
     return math.acos(dot / len2) * 180 / math.pi
 end
 
