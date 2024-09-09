@@ -177,12 +177,14 @@ function GetTrueEnemyUnitsInSphere(allyUnit, position, radius, categories)
     local unitsInRadius = {}
     for _, unit in unitsInRec do
         local unitArmy = unit.Army
-        if army ~= unit.Army or IsAlly(army, unitArmy) then
+        if army == unitArmy or IsAlly(army, unitArmy)
+            or categories and not EntityCategoryContains(categories, unit)
+        then
             continue
         end
-        local unitPos = unit:GetPosition()
-        local dx, dy, dz = posX - unitPos[1], posY - unitPos[2], posZ - unitPos[3]
-        if dx*dx + dy*dy + dz*dz <= radiusSq and categories and EntityCategoryContains(categories, unit) then
+        local unitPosX, unitPosY, unitPosZ = unit:GetPositionXYZ()
+        local dx, dy, dz = posX - unitPosX, posY - unitPosY, posZ - unitPosZ
+        if dx*dx + dy*dy + dz*dz <= radiusSq then
             unitsInRadius[k] = unit
             k = k + 1
         end
