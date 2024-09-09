@@ -141,14 +141,14 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     local radiusSq = radius*radius
     local k = 1
     local unitsInRadius = {}
-    for _, v in unitsInRec do
-        if army ~= v.Army then
+    for _, unit in unitsInRec do
+        if army ~= unit.Army then
             continue
         end
-        local vPos = v:GetPosition()
-        local dx, dy, dz = posX - vPos[1], posY - vPos[2], posZ - vPos[3]
+        local unitPos = unit:GetPosition()
+        local dx, dy, dz = posX - unitPos[1], posY - unitPos[2], posZ - unitPos[3]
         if dx*dx + dy*dy + dz*dz <= radiusSq then
-            unitsInRadius[k] = v
+            unitsInRadius[k] = unit
             k = k + 1
         end
     end
