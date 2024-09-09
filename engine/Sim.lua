@@ -444,7 +444,7 @@ end
 ---@see CreateUnitHPR() # heading-pitch-roll version
 ---@param blueprintId string
 ---@param army Army
----@param layer? number
+---@param layer Layer
 ---@param x number
 ---@param z number
 ---@param heading number
