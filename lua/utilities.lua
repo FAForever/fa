@@ -320,8 +320,7 @@ function GetRandomOffset(sx, sy, sz, scalar)
 end
 
 --- Returns a random offset given bounds where the X and Z components are in the range
---- `[-1.5*v, 0.5*v)`, and Y is in `[-v, v)`. Everything is multiplied by the scalar multiplied by
---- the scalar.
+--- `[-1.5*v, 0.5*v)`, and Y is in `[-v, v)`. Everything is multiplied by the scalar.
 ---@see GetRandomOffset(sx, sy, sz, scalar) # for a size version
 ---@param sx number
 ---@param sy number
