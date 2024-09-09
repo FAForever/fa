@@ -1496,7 +1496,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 self:PlayUnitSound('Killed')
             end
 
-            -- apply death animation on half built units (do not apply for ML and mega)
+            -- apply death animation on half built units (do not apply for half-built units that may animate underground like Monkeylord and Megalith)
             local FractionThreshold = bp.General.FractionThreshold or 0.5
             if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
                 self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
