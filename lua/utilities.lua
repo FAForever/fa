@@ -366,9 +366,9 @@ function GetClosestVector(from, list)
         return nil
     end
     local closest = list[1]
-    local closestDist = GetDistanceBetweenTwoVectors(from, closest)
+    local closestDist = GetDistanceBetweenTwoVectorsSquared(from, closest)
     for _, vec in list do
-        local dist = GetDistanceBetweenTwoVectors(from, vec)
+        local dist = GetDistanceBetweenTwoVectorsSquared(from, vec)
         if dist < closestDist then
             closestDist = dist
             closest = vec
