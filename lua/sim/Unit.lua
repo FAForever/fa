@@ -2244,18 +2244,21 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.Brain:OnUnitBeingBuiltProgress(self, builder, oldProg, newProg)
     end,
 
+    --- Set the unit's Yaw rotation and reset its roll/pitch
     ---@param self Unit
     ---@param angle number
     SetRotation = function(self, angle)
         self:SetOrientation(utilities.QuatFromRotation(angle), true)
     end,
 
+    --- Rotate the unit on its Yaw axis
     ---@param self Unit
     ---@param angle number
     Rotate = function(self, angle)
         self:SetOrientation(self:GetOrientation() * utilities.QuatFromRotation(angle), true)
     end,
 
+    --- Set the unit's Yaw rotation towards a point and reset its roll/pitch
     ---@param self Unit
     ---@param tpos number
     RotateTowards = function(self, tpos)
@@ -2264,6 +2267,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
+    --- Set the unit's Yaw rotation towards the middle of the map (not playable area) and reset its roll/pitch
     ---@param self Unit
     RotateTowardsMid = function(self)
         local x, y = GetMapSize()
