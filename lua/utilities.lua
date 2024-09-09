@@ -5,6 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local MathACos = math.acos
 local MathCos = math.cos
 local MathMod = math.mod
 local MathSin = math.sin
@@ -406,7 +407,7 @@ function GetAngleInBetween(v1, v2)
     local z2Sq = z2 * z2
     local dot = x1*x2 + y1*y2 + z2Sq
     local len2 = MathSqrt((x1*x1 + y1*y1 + z2Sq) * (x2*x2 + y2*y2 + z2Sq))
-    return math.acos(dot / len2) * 180 / math.pi
+    return MathACos(dot / len2) * 180 / math.pi
 end
 
 --- Computes the full angle between the two vectors in two dimensions: the y dimension is not taken into account. Angle
@@ -421,7 +422,7 @@ function GetAngleCCW(base, direction)
     local ort = { bn[3], 0, -bn[1] }
 
     -- compute the radians, correct it accordingly
-    local rads = math.acos(bn[1] * dn[1] + bn[3] * dn[3])
+    local rads = MathACos(bn[1] * dn[1] + bn[3] * dn[3])
     if ort[1] * dn[1] + ort[3] * dn[3] < 0 then
         rads = 2 * math.pi - rads
     end
