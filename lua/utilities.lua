@@ -11,8 +11,9 @@ local MathSin = math.sin
 local MathSqrt = math.sqrt
 
 function GetDistanceBetweenTwoEntities(entity1, entity2)
-    local pos1, pos2 = entity1:GetPosition(), entity2:GetPosition()
-    local dx, dy, dz = pos2[1] - pos1[1], pos2[2] - pos1[2], pos2[3] - pos1[3]
+    local pos1x, pos1y, pos1z = entity1:GetPositionXYZ()
+    local pos2x, pos2y, pos2z = entity2:GetPositionXYZ()
+    local dx, dy, dz = pos2x - pos1x, pos2y - pos1y, pos2z - pos1z
     return MathSqrt(dx*dx + dy*dy + dz*dz)
 end
 
