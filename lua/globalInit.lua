@@ -17,11 +17,6 @@ doscript '/lua/system/config.lua'
 -- Load system modules
 doscript '/lua/system/import.lua'
 doscript '/lua/system/utils.lua'
-
--- replace with assembly implementations
-table.getsize = table.getsize2 or table.getsize
-table.empty = table.empty2 or table.empty
-
 doscript '/lua/system/repr.lua'
 doscript '/lua/system/debug.lua'
 doscript '/lua/system/class.lua'

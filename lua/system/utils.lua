@@ -879,3 +879,7 @@ function CreateTimer()
          end
     }
 end
+
+-- replace with assembly implementations
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
