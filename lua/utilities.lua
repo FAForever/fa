@@ -225,10 +225,20 @@ end
 ---@see XZDistanceTwoVectors(v1, v2) # for horizontal distance option
 ---@param v1 Vector
 ---@param v2 Vector
-GetDistanceBetweenTwoVectors = function(v1, v2)
+function GetDistanceBetweenTwoVectors(v1, v2)
     local dx, dy, dz = v2[1] - v1[1], v2[2] - v1[2], v2[3] - v1[3]
     return MathSqrt(dx*dx + dy*dy + dz*dz)
 end
+
+--- Returns the squared distance between two vectors
+---@see XZDistanceTwoVectorsSquared(v1, v2) # for horizontal distance option
+---@param v1 Vector
+---@param v2 Vector
+function GetDistanceBetweenTwoVectorsSquared(v1, v2)
+    local dx, dy, dz = v2[1] - v1[1], v2[2] - v1[2], v2[3] - v1[3]
+    return dx*dx + dy*dy + dz*dz
+end
+
 
 --- Returns the horizontal distance between two vectors without considering the y-axis
 ---@see GetDistanceBetweenTwoVectors(v1, v2) # for 3D option
@@ -238,6 +248,16 @@ end
 function XZDistanceTwoVectors(v1, v2)
     local dx, dz = v2[1] - v1[1], v2[3] - v1[3]
     return MathSqrt(dx*dx + dz*dz)
+end
+
+--- Returns the horizontal distance between two vectors without considering the y-axis
+---@see GetDistanceBetweenTwoVectorsSquared(v1, v2) # for 3D option
+---@param v1 Vector
+---@param v2 Vector
+---@return number
+function XZDistanceTwoVectorsSquared(v1, v2)
+    local dx, dz = v2[1] - v1[1], v2[3] - v1[3]
+    return dx*dx + dz*dz
 end
 
 --- Returns the vector length
