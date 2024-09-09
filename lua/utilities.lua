@@ -252,10 +252,12 @@ end
 ---@param v Vector
 ---@return Vector
 function NormalizeVector(v)
-    local length = GetVectorLength(v)
+    local x, y, z = v[1], v[2], v[3]
+    local length = MathSqrt(x*x + y*y + z*z)
+
     if length > 0 then
         local invlength = 1 / length
-        return Vector(v[1] * invlength, v[2] * invlength, v[3] * invlength)
+        return Vector(x * invlength, y * invlength, z * invlength)
     else
         return Vector(0, 0, 0)
     end
