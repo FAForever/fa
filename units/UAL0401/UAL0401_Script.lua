@@ -156,6 +156,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         if self:GetFractionComplete() >= FractionThreshold then
             for _, weapon in bp.Weapon do
                 if weapon.Label == 'CollossusDeath' then
+                    -- move the death damage away from its feet towards where the colossus will fall
                     local position = Utilities.TranslateInXZDirection(self:GetPosition(), self:GetOrientation(), 5)
                     DamageArea(self, position, weapon.DamageRadius, weapon.Damage,
                             weapon.DamageType, weapon.DamageFriendly)
