@@ -461,7 +461,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
         if type == "TreeForce" or type == "TreeFire" then
-            return
+            return amount
         end
         -- Allow decoupling the shield from the owner's armor multiplier
         local absorptionMulti = self.AbsorptionTypeDamageTypeToMulti[type] or self.Owner:GetArmorMult(type)
