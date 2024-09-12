@@ -449,7 +449,7 @@ local function OnGuardUnpause(guardees, target)
                                         target.ThreadUnpauseCandidates = nil
                                         target.ThreadUnpause = nil
                                         SetPaused({ target }, false)
-                                        break
+                                        return
                                     end
                                     -- engineer is idle, died, we switch armies, ...
                                 else
@@ -459,7 +459,7 @@ local function OnGuardUnpause(guardees, target)
                         else
                             target.ThreadUnpauseCandidates = nil
                             target.ThreadUnpause = nil
-                            break
+                            return
                         end
 
                         WaitSeconds(1.0)
