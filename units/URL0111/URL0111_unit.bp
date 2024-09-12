@@ -155,7 +155,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
             CountedProjectile = false,
-            Damage = 0,
+            Damage = 200,
             DamageRadius = 1.0,
             DamageType = "Normal",
             DisplayName = "Loa Tactical Missile",
@@ -169,7 +169,7 @@ UnitBlueprint{
             Label = "MissileRack",
             MaxRadius = 65,
             MinRadius = 4,
-            MuzzleChargeDelay = 0,
+            MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 3,
@@ -190,7 +190,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/1, --10/integer interval in ticks
+            RateOfFire = 10/33, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             TargetPriorities = {

@@ -177,7 +177,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             end
 
             local physics = self.Blueprint.Physics
-            local fuzziness = physics.TrackTargetGroundFuzziness or 1
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
             sz = sz + offset
@@ -187,17 +187,10 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             local dz = sz * (Random() - 0.5) * fuzziness + cz
 
             local orientation = EntityGetOrientation(target)
-            
-            -- offsetVector = Vector(dx, dy, dz)
-            -- offsetVector = Vector(px,py,pz) + RotateVectorByQuat(offsetVector, orientation)
-            -- self:SetNewTargetGround(offsetVector)
-            -- DrawLine(Vector(px, py, pz), offsetVector, 'ffffff')
 
             local dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
             
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
-
-            DrawLine(Vector(px, py, pz), Vector(px + dx, py + dy, pz + dz), 'ffffff')
         else
             local px, _, pz = self:GetCurrentTargetPositionXYZ()
 
