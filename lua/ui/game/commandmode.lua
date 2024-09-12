@@ -436,8 +436,10 @@ local function OnGuardUnpause(guardees, target)
                             for id, _ in candidates do
                                 local engineer = GetUnitById(id)
                                 if engineer and not engineer:IsIdle() then
-                                    local focus = engineer:GetFocus()
-                                    if focus == target:GetFocus() then
+                                    -- ensure the target focus exists, since this thread may be targeted at something that is not building anything,
+                                    -- but might start to build something after some network delay, which you won't want to unpause due to `nil == nil`
+                                    local targetFocus = target:GetFocus()
+                                    if targetFocus and targetFocus == engineer:GetFocus() then
                                         target.ThreadUnpauseCandidates = nil
                                         target.ThreadUnpause = nil
                                         WARN('UNPaused the unit: ', engineer, GameTick(), debug.getinfo(1, 'l')['currentline'])
