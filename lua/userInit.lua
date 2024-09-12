@@ -119,16 +119,16 @@ do
     -- The following hooks and/or overloads exist to assist moderators in evaluation faul play
 
     local invalidConsoleCommands = {
-    --     "net_MinResendDelay",
-    --     "net_SendDelay",
-    --     "net_ResendPingMultiplier",
-    --     "net_ResendDelayBias",
-    --     "net_CompressionMethod",
-    --     "net_MaxSendRate",
-    --     "net_MaxResendDelay",
-    --     "net_MaxBacklog",
-    --     "net_AckDelay",
-    --     "net_Lag",
+        "net_MinResendDelay",
+        "net_SendDelay",
+        "net_ResendPingMultiplier",
+        "net_ResendDelayBias",
+        "net_CompressionMethod",
+        "net_MaxSendRate",
+        "net_MaxResendDelay",
+        "net_MaxBacklog",
+        "net_AckDelay",
+        "net_Lag",
     }
 
     -- upvalue scope for security reasons

@@ -338,14 +338,12 @@ local function UpgradeUnit(unit)
 
     -- paused units do not start upgrades
     if GetIsPaused(units) then
-        WARN('Paused the unit: ', unit, GameTick(), debug.getinfo(1, 'l')['currentline'])
         SetPaused(units, false)
         WaitTicks(5)
     end
 
     -- check if unit still exists
     if IsDestroyed(unit) then
-        WARN('Unit DESTROYED: ', unit, GameTick(), debug.getinfo(1, 'l')['currentline'])
         return
     end
 
@@ -362,11 +360,8 @@ local function UpgradeUnit(unit)
     -- pause it
     WaitTicks(5)
     if IsDestroyed(unit) then
-        WARN('Unit DESTROYED: ', unit, GameTick(), debug.getinfo(1, 'l')['currentline'])
         return
     end
-
-    WARN('Paused the unit: ', unit, GameTick(), debug.getinfo(1, 'l')['currentline'])
 
     SetPaused(units, true)
 end
@@ -442,7 +437,6 @@ local function OnGuardUnpause(guardees, target)
                                     if targetFocus and targetFocus == engineer:GetFocus() then
                                         target.ThreadUnpauseCandidates = nil
                                         target.ThreadUnpause = nil
-                                        WARN('UNPaused the unit: ', engineer, GameTick(), debug.getinfo(1, 'l')['currentline'])
                                         SetPaused({ target }, false)
                                         break
                                     end
