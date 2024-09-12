@@ -1002,12 +1002,6 @@ function vector_metatable.__mul(a, b)
         end
 
         -- Quaternion * Vector (Quaternion with no spin)
-        local len = b1*b1 + b2*b2 + b3*b3
-        if len ~= 1 then
-            -- normalize any vectors that might not represent a direction cosine
-            len = math.sqrt(len)
-            b1, b2, b3 = b1 / len, b2 / len, b3 / len
-        end
         return UnsafeQuaternion(
              a4 * b1 - a3 * b2 + a2 * b3,
              a3 * b1 + a4 * b2 - a1 * b3,
@@ -1018,12 +1012,6 @@ function vector_metatable.__mul(a, b)
 
     if b4 then
         -- Vector (Quaternion with no spin) * Quaternion
-        local len = a1*a1 + a2*a2 + a3*a3
-        if len ~= 1 then
-            -- normalize any vectors that might not represent a direction cosine
-            len = math.sqrt(len)
-            a1, a2, a3 = a1 / len, a2 / len, a3 / len
-        end
         return UnsafeQuaternion(
              a1 * b4 - a3 * b2 + a2 * b3,
              a2 * b4 + a3 * b1 - a1 * b3,
