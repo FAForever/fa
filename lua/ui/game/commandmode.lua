@@ -410,10 +410,21 @@ end
 ---@param target UserUnit
 local function OnGuardUnpause(guardees, target)
     local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_unpause
-    if prefs == 'On' or
-        (
-        prefs == 'ExtractorsAndRadars' and
-            EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
+    local bp = __blueprints[target:GetUnitId()]
+    -- only create the unpause thread for units that have the ability to unpause
+    if  (
+            prefs == 'On' and 
+            (
+                EntityCategoryContains(categories.REPAIR + categories.FACTORY + categories.SILO, target)  -- REPAIR includes mantis and harbs, compared to ENGINEER category
+                or (bp.General.UpgradesTo and bp.General.UpgradesTo ~= '') -- upgradeables can also be assisted
+            )
+        )
+        or
+        (   
+            prefs == 'ExtractorsAndRadars'
+            and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target) 
+            and (bp.General.UpgradesTo and bp.General.UpgradesTo ~= '') -- use `and` to make sure the mex/radar is upgradeable
+        )
     then
 
         -- start a single thread to keep track of when to unpause, logic feels a bit convoluted
