@@ -1,4 +1,4 @@
-- (#6445) Fix overcharge dealing half damage to static shields.
+- (#6445) Fix overcharge dealing half damage to static and ACU shields.
 
 - (#6445) Shields now block damage from knocking down/setting fire to trees.
 
