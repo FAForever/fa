@@ -400,6 +400,13 @@ function DotP(v1, v2)
     return v1[1] * v2[1] + v1[2] * v[2] + v[3] * v[3]
 end
 
+--- Returns the conjugate of a quaternion
+---@param q Quaternion
+---@return Quaternion
+function ConjugateQuat(q)
+    return UnsafeQuaternion({-q[1], -q[2], -q[3], q[4]})
+end
+
 --- Gets the angle between two vectors in degrees
 ---@param v1 Vector
 ---@param v2 Vector
@@ -511,4 +518,40 @@ function TranslateInXZDirection(pos, orientation, length)
         pos[2],
         pos[3] + length * dirZ
     )
+end
+
+--- Rotates a vector representing a 3D point by a quaternion rotation
+---@param v Vector
+---@param q Quaternion
+---@return Vector
+function RotateVectorByQuat(v, q)
+    -- Formula: v' = q * v * conjugate(q)
+    v = q * v * UnsafeQuaternion(-q[1], -q[2], -q[3], q[4])
+    return Vector(v[1], v[2], v[3])
+end
+
+--- Rotates the components of a vector representing a 3D point by a quaternion rotation
+---@param vX number
+---@param vY number
+---@param vZ number
+---@param q Quaternion
+---@return Vector
+function RotateVectorXYZByQuat(vX, vY, vZ, q)
+    local vW
+    local qX, qY, qZ, qW = unpack(q)
+
+    -- q * v
+    vX, vY, vZ, vW = 
+        qW * vX - qZ * vY + qY * vZ,
+        qZ * vX + qW * vY - qX * vZ,
+        -qY * vX + qX * vY + qW * vZ,
+        -qX * vX - qY * vY - qZ * vZ
+
+    -- q -> conjugate(q)
+    qX, qY, qZ = -qX, -qY, -qZ
+
+    -- v * conjugate(q) -- discard W component  -- return without setting variables
+    return  vX * qW + vW * qX - vZ * qY + vY * qZ,
+            vY * qW + vZ * qX + vW * qY - vX * qZ,
+            vZ * qW - vY * qX + vX * qY + vW * qZ
 end
