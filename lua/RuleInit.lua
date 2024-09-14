@@ -9,6 +9,7 @@ __blueprints = {}
 
 doscript '/lua/system/config.lua'
 doscript '/lua/system/utils.lua'
+-- repr depends on utils creating string.match
 doscript '/lua/system/repr.lua'
 doscript '/lua/system/debug.lua'
 
