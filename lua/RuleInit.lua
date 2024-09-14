@@ -8,9 +8,9 @@
 __blueprints = {}
 
 doscript '/lua/system/config.lua'
+doscript '/lua/system/utils.lua'
 doscript '/lua/system/repr.lua'
 doscript '/lua/system/debug.lua'
-doscript '/lua/system/utils.lua'
 
 LOG('Active game mods for blueprint loading: ',repr(__active_mods))
 
