@@ -3719,6 +3719,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         if bpTable[layer] then
             bpTable = bpTable[layer]
+
+            if bpTable.CameraShake then
+                self.CamShakeT1 = self:ForkThread(self.MovementCameraShakeThread, bpTable.CameraShake)
+            end
+
             local effectTypeGroups = bpTable.Effects
 
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
@@ -3727,10 +3732,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects.', layer, '.Effects table in unit blueprint.')
                 end
                 return false
-            end
-
-            if bpTable.CameraShake then
-                self.CamShakeT1 = self:ForkThread(self.MovementCameraShakeThread, bpTable.CameraShake)
             end
 
             self:CreateTerrainTypeEffects(effectTypeGroups, 'FXMovement', layer, TypeSuffix, EffectsBag, TerrainType)
