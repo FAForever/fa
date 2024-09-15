@@ -1,0 +1,1 @@
+- (#6447) Fix `repr` causing an "attempt to call upval 'match' (a nil value)" error when used in the blueprint loading scripts.
