@@ -1,6 +1,6 @@
 import mdformat
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser
 from pathlib import Path
 
 MAX_LINE_LENGTH = 150
@@ -17,10 +17,7 @@ LUA_FILE = """{{
 
 
 def get_parser():
-    ap = ArgumentParser(
-        description="Converts Markdown release file to Lua.",
-        formatter_class=RawDescriptionHelpFormatter,
-    )
+    ap = ArgumentParser(description="Converts Markdown release file to Lua.")
     ap.add_argument(
         "input_file",
         help="Markdown file",
