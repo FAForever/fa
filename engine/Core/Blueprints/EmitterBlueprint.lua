@@ -1,12 +1,12 @@
 ---@meta
 
----@alias BlendType
----| '0' # Alpha Blend
----| '1' # Modulate Inverse
----| '2' # Modulate2x Inverse
----| '3' # Add
----| '4' # Premodulated Alpha
----| '5' # Refract
+---@alias EmitterBlendMode
+---| 0 # Alpha Blend
+---| 1 # Modulate Inverse
+---| 2 # Modulate2x Inverse
+---| 3 # Add
+---| 4 # Premodulated Alpha
+---| 5 # Refract
 
 ---@class EmitterBlueprint : EffectBlueprint
 ---@field SizeCurve             EffectCurve  Radius around emitter in the XZ plane where particles randomly spawn
@@ -47,6 +47,6 @@
 ---@field LODCutoff             number       Distance at which emission cuts out.
 ---@field Repeattime            number       Repeat/cycle time of the emitter in ticks
 ---@field TextureFramecount     number       How many columns (frames) to divide the texture into for particle animation.
----@field Blendmode             BlendType    Blendmode for this emitter.
+---@field Blendmode             EmitterBlendMode    Blendmode for this emitter.
 ---@field TextureName           FileName     Texture Name of texture we are using for this particle
 ---@field RampTexture           FileName     Name of ramp we are using for this particle. The particle's texture changes color over its lifetime by traversing the selected ramp row from left to right (with interpolation).
