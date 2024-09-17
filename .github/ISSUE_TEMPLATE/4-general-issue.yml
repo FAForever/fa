@@ -10,8 +10,8 @@ body:
 
         - This repository is maintained by volunteers, it may take a while for them to come back to you.
         - Remember to include sufficient details and context.
-        - If you have multiple issue or suggestions, please submit them in separate issues.
-        - We accept pull request. If you know how to fix it - go ahead!
+        - If you have multiple problems or suggestions, please submit them in separate issues.
+        - We accept pull requests. If you know how to fix it - go ahead!
   - type: textarea
     id: describe
     attributes:
@@ -23,7 +23,7 @@ body:
     id: behavior
     attributes:
       label: Expected Behavior
-      description: If applicable, a clear and concise description of what you expect to happen in various scenario's.
+      description: If applicable, a clear and concise description of what you expect to happen in various scenarios.
     validations:
       required: false
   - type: textarea
@@ -36,4 +36,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        _This issue will be read by people that are unable to look into your thoughts - this request is all they have to determine the viability of the feature. The more precise your request, the easier it becomes for us to help you._
+        _This issue will be read by people that are unable to look into your thoughts - this request is all they have to understand the situation. The more precise your request, the easier it becomes for us to help you._
