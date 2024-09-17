@@ -29,7 +29,7 @@
 ---@field XPosCurve             EffectCurve  X position of emitter
 ---@field YPosCurve             EffectCurve  Y position of emitter
 ---@field ZPosCurve             EffectCurve  Z position of emitter
----@field RampSelectionCurve    EffectCurve  Vertical 1px line of the ramp that is used. Value is [0,1] relative to the full height of the ramp texture.
+---@field RampSelectionCurve    EffectCurve  1px horizontal line (row) of the ramp that is used (interpolates between rows). Value is [0,1] relative to the full height of the ramp texture.
 ---@field LocalVelocity         boolean      Is velocity attached to bone. Doesn't work?
 ---@field LocalAcceleration     boolean      Is acceleration attached to bone. Doesn't work?
 ---@field Gravity               boolean      Gravity enabled? -4.9 ogrids/s/s
@@ -49,4 +49,4 @@
 ---@field TextureFramecount     number       How many columns (frames) to divide the texture into for particle animation.
 ---@field Blendmode             BlendType    Blendmode for this emitter.
 ---@field TextureName           FileName     Texture Name of texture we are using for this particle
----@field RampTexture           FileName     Name of ramp texture we are using for this particle
+---@field RampTexture           FileName     Name of ramp we are using for this particle. The particle's texture changes color over its lifetime by traversing the selected ramp row from left to right (with interpolation).
