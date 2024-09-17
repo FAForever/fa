@@ -483,8 +483,9 @@
 ---@field AnimationIdle? FileName
 --- used by several transports' scripts
 ---@field AnimationLand? FileName
----@field AnimationLoop? FileName used but present on the Cybran builder bot
 --- Animation open file is linked here: '/units/UnitID/UnitID_aopen.sca'
+--- unused but present on the Cybran builder bot
+---@field AnimationLoop? FileName
 ---@field AnimationOpen? FileName
 --- The animation that is played when the unit is done building
 ---@field AnimationPermOpen? FileName
@@ -568,9 +569,9 @@
 ---@field AnimationRateMax number
 --- the minimum speed this animation is played at
 ---@field AnimationRateMin number
---- this number affects how often a death animation is used when there are more than one. This value is relative rather than absolute
 ---@field Mesh? FileName
 ---@field HitBox? HitBox
+--- this number affects how often a death animation is used when there are more than one. This value is relative rather than absolute
 ---@field Weight? number
 
 ---@class UnitBlueprintDamageEffect
