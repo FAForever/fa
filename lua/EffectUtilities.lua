@@ -404,7 +404,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
 
     if faction == 'Aeon' then
         nodeMesh = '/effects/entities/aeonadjacencynode/aeonadjacencynode_mesh'
-        beamEffect = '/effects/emitters/adjacency_aeon_beam_01_emit.bp'
+        beamEffect = '/effects/emitters/adjacency_aeon_beam_0' .. UtilGetRandomInt(1, 3) .. '_emit.bp'
         numNodes = 3
     elseif faction == 'Cybran' then
         nodeMesh = '/effects/entities/cybranadjacencynode/cybranadjacencynode_mesh'
