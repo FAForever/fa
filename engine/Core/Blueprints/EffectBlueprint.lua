@@ -15,7 +15,7 @@
 ---@field z number
 
 ---@class NamedQuaternion
----@field x number
----@field y number
----@field z number
----@field w number
+---@field x number # Red
+---@field y number # Green
+---@field z number # Blue
+---@field w number # Alpha
