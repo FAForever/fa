@@ -3,7 +3,7 @@
 ---@class moho.AnimationManipulator : moho.manipulator_methods
 local CAnimationManipulator = {}
 
----
+--- Returns 0 for an invalid animation.
 ---@return number
 function CAnimationManipulator:GetAnimationDuration()
 end

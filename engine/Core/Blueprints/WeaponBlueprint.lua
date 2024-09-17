@@ -47,7 +47,7 @@
 --- Ballistic arcs that should be used on the projectile
 ---@field BallisticArc? WeaponBallisticArc
 --- every `X/10+1` game ticks, this beam will collide and do damage - using `0` will cause beams to
---- damage every tick
+--- damage every tick. Beams also always collide an extra time on the first tick.
 ---@field BeamCollisionDelay number
 --- the amount of time the beam exists
 ---@field BeamLifetime number
