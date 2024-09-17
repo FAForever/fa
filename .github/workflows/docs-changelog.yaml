@@ -1,0 +1,135 @@
+# Copyright (c) 2024 Willem 'Jip' Wijnia
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Documentation - Generate changelog
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: choice
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+        options:
+          - develop
+          - deploy/fafbeta
+          - deploy/fafdevelop
+
+  workflow_call:
+    inputs:
+      reference:
+        required: true
+        type: string
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+
+  pull_request:
+    paths:
+      - "changelog/snippets/*.md"
+  push:
+    branches:
+      - deploy/fafdevelop
+
+jobs:
+
+  # By verifying the snippets we ensure that they're compatible with the bundling  
+  # process. In the future we can also add spell checking and/or checks for foul words.
+
+  verify:
+    name: Verify snippets
+    runs-on: ubuntu-latest
+    steps:
+
+      # We check out the scripts separate because the branch that we use to 
+      # generate the changelog may not contain the scripts that we want to work with.
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          path: scripts
+          sparse-checkout: |
+            .github/workflows/scripts
+
+      - name: Checkout snippets
+        uses: actions/checkout@v4
+        with:
+          path: fa
+          ref: ${{ inputs.reference }}
+          sparse-checkout: |
+            changelog/snippets
+
+      - name: Update environment path
+        run: |
+          ls
+          echo "${{ github.workspace }}/scripts/.github/workflows/scripts" >> $GITHUB_PATH
+
+      - name: Verify the changelog snippets
+        working-directory: fa/changelog/snippets # script assumes it is in this directory
+        run: |
+          changelog-verify.sh
+
+  # During the bundling process we combine the templates, the sections and the snippets
+  # into a single changelog. 
+
+  bundle:
+    name: Bundle snippets
+    runs-on: ubuntu-latest
+    needs: [verify]
+    steps:
+
+      # We check out the scripts separate because the branch that we use to 
+      # generate the changelog may not contain the scripts that we want to work with.
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          path: scripts
+          sparse-checkout: |
+            .github/workflows/scripts
+
+      - name: Checkout snippets
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.reference }}
+          path: fa
+          sparse-checkout: |
+            changelog/snippets
+
+      - name: Update environment path
+        run: |
+          echo "${{ github.workspace }}/scripts/.github/workflows/scripts" >> $GITHUB_PATH
+
+      # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
+      - name: Update reference
+        run: |
+          REFERENCE="${{ inputs.reference }}"
+          NAME="${REFERENCE#deploy/}"
+          echo "NAME=$NAME" >> $GITHUB_ENV
+
+      - name: Create the changelog
+        working-directory: fa/changelog/snippets # script assumes it is in this directory
+        run: |
+          echo $NAME
+          echo ${{ env.NAME }}
+          changelog-combine.sh ${{ env.NAME }}
+
+      - name: Add the changelog as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-${{ env.NAME }}
+          path: |
+            fa/changelog/snippets/${{ env.NAME }}.md

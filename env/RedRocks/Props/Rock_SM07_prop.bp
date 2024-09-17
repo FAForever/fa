@@ -12,7 +12,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 300,
+                    LODCutoff = 110,
                     ShaderName = "NormalMappedTerrain",
                     AlbedoName = "Rock_SM06_albedo.dds",
                     NormalsName = "Rock_SM01_normalsTS.dds",

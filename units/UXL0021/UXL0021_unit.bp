@@ -1,5 +1,6 @@
 UnitBlueprint{
     Description = "<LOC gameui_0000>Test Unit Arc Projectile",
+    AverageDensity = 25,
     Categories = {
         "ARTILLERY",
         "DEBUG",

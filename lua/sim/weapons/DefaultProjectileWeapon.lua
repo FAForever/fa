@@ -296,6 +296,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- now that we know roughly when we'll land, we can find a better guess for where
             -- we'll land, and thus guess the true falling height better as well
             halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX + time * projVelX, projPosX + time * projVelX))
+            if halfHeight < 0.01 then return 4.9 end
             time = MathSqrt(0.816326530612 * halfHeight) + spread
 
             local acc = halfHeight / (time * time)
@@ -1111,8 +1112,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
-            local hasTarget = self:WeaponHasTarget()
-
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
                 self.CurrentRackSalvoNumber = 1
@@ -1120,7 +1119,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile or not hasTarget then
+                elseif countedProjectile then
                     if bp.WeaponUnpacks then
                         ChangeState(self, self.WeaponPackingState)
                     else
@@ -1129,7 +1128,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
                 end
-            elseif countedProjectile or not hasTarget then
+            elseif countedProjectile then
                 if bp.WeaponUnpacks then
                     ChangeState(self, self.WeaponPackingState)
                 else
@@ -1141,7 +1140,39 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            self.HaltFireOrdered = true
+            -- Override the default OnLostTarget but not inherited ones
+            -- the inherited ones are needed for beam weapons to stop firing: https://github.com/FAForever/fa/pull/4863
+            -- and for ythotha storm to not instantly stop firing: https://github.com/FAForever/fa/pull/5291
+            local baseOnLostTarget = self.__base.OnLostTarget
+            if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
+                baseOnLostTarget(self)
+            else
+                local unit = self.unit
+                if unit then
+                    unit:OnLostTarget(self)
+                end
+                Weapon.OnLostTarget(self)
+
+                -- Some weapons look too ridiculous shooting into the air, so stop them from firing
+                -- stopping firing will cause the last shot of AttackGroundTries to not fire
+                local bp = self.Blueprint
+                if bp.WeaponUnpacks then
+                    -- since we're stopping firing anyway, also prevent skipping the reload state here
+                    if bp.RackSalvoReloadTime > 0 then
+                        self.CurrentRackSalvoNumber = 1
+                        ChangeState(self, self.RackSalvoReloadState)
+                    else
+                        ChangeState(self, self.WeaponPackingState)
+                    end
+                elseif bp.MuzzleChargeDelay > 0.5 then
+                    if bp.RackSalvoReloadTime > 0 then
+                        self.CurrentRackSalvoNumber = 1
+                        ChangeState(self, self.RackSalvoReloadState)
+                    else
+                        ChangeState(self, self.IdleState)
+                    end
+                end
+            end
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
@@ -1169,9 +1200,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if notExclusive then
                 unit:SetBusy(false)
             end
-            self.ReloadEndTime = GetGameTick() + MATH_IRound(bp.RackSalvoReloadTime * 10)
+
             WaitSeconds(bp.RackSalvoReloadTime)
-            self.ReloadEndTime = nil
 
             self:WaitForAndDestroyManips()
 
@@ -1196,6 +1226,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
+            -- Override default OnLostTarget to prevent bypassing reload time by switching to idle state immediately
+            local unit = self.unit
+            if unit then
+                unit:OnLostTarget(self)
+            end
+
+            Weapon.OnLostTarget(self)
         end,
     },
 

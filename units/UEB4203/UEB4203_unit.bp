@@ -6,6 +6,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB4203_Activate', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Radar', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 225,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER2COMMANDER",

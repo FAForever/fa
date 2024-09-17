@@ -19,6 +19,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'URS',        Cue = 'URS0302_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 44500,
     BuildIconSortPriority = 30,
     Categories = {
         "ANTIMISSILE",

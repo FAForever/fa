@@ -1,1 +1,0 @@
-- (#6245) Improve details of warnings when a map's scenario file specifies invalid map/save/script files.

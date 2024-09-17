@@ -6,6 +6,7 @@ UnitBlueprint{
         Killed         = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_gun',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2850,
     BuildIconSortPriority = 140,
     Categories = {
         "ARTILLERY",
@@ -157,8 +158,8 @@ UnitBlueprint{
             MuzzleChargeDelay = 1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 26.13,
-            MuzzleVelocityReduceDistance = 120,
+            MuzzleVelocity = 27.8,
+            MuzzleVelocityReduceDistance = 115,
             ProjectileId = "/projectiles/SIFZthuthaamArtilleryShell02/SIFZthuthaamArtilleryShell02_proj.bp",
             ProjectilesPerOnFire = 1,
             RackBones = {

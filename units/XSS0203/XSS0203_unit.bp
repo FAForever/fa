@@ -13,6 +13,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'XSS',            Cue = 'XSS_Sub_Surface',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Sub', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 550,
     BuildIconSortPriority = 30,
     Categories = {
         "ANTINAVY",

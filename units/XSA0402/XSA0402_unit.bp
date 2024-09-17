@@ -49,6 +49,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'XSA',            Cue = 'XSA0402_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Air',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 52000,
     BuildIconSortPriority = 10,
     Categories = {
         "AIR",
@@ -507,7 +508,7 @@ UnitBlueprint{
         },
         {
             AboveWaterTargetsOnly = true,
-            Damage = 7000,
+            Damage = 8000,
             DamageFriendly = true,
             DamageRadius = 10,
             DamageType = "Normal",

@@ -1,5 +1,5 @@
 EmitterBlueprint {
-	BlueprintId = 'aeon_chrono_dampener_02',
+	BlueprintId = 'aeon_chrono_dampener_large_02',
 	Lifetime = 1.00,
 	Repeattime = 1.00,
 	TextureFramecount = 1.00,
@@ -10,8 +10,8 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = 250.00,
-	EmitIfVisible = false,
+	LODCutoff = 1100.00,
+	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
 	SnapToWaterline = false,
@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = '/textures/particles/ring_white_06.dds',
-	RampTexture = '/textures/particles/ramp_chrono_dampener.dds',
+	Texture = [[/textures/particles/ring_white_06.dds]],
+	RampTexture = [[/textures/particles/ramp_chrono_dampener.dds]],
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
@@ -130,7 +130,7 @@ EmitterBlueprint {
 	RotationRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.0,y=3.0,z=0.000 },
+			{ x=0.000,y=3.000,z=0.000 },
 		},
 	},
 	FrameRateCurve = {

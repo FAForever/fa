@@ -161,6 +161,7 @@ local function PostProcessUnit(unit)
     local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
     local isAir = unit.CategoriesHash['AIR']
+    local isNaval = unit.CategoriesHash['NAVAL']
     local isBomber = unit.CategoriesHash['BOMBER']
     local isGunship = unit.CategoriesHash['GROUNDATTACK'] and isAir and (not isBomber)
     local isTransport = unit.CategoriesHash['TRANSPORTATION']
@@ -170,6 +171,8 @@ local function PostProcessUnit(unit)
     local isTech2 = unit.CategoriesHash['TECH2']
     local isTech3 = unit.CategoriesHash['TECH3']
     local isExperimental = unit.CategoriesHash['EXPERIMENTAL']
+    local isACU = unit.CategoriesHash['COMMAND']
+    local isSACU = unit.CategoriesHash['SUBCOMMANDER']
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
     -- the factory-reclaim-bug that we're keen in keeping that at this point
@@ -221,6 +224,28 @@ local function PostProcessUnit(unit)
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
             end
         end
+    end
+
+    -- Build range overlay
+    -- only for engineers, excluding insignificant units such as Cybran build drones or air staging that has its own radius set
+    if isEngineer and not (unit.CategoriesHash['INSIGNIFICANTUNIT'] or unit.CategoriesHash['AIRSTAGINGPLATFORM']) then
+        -- guarantee that the table exists
+        if not unit.AI then unit.AI = {} end
+
+        -- Engine allows building +2 range outside the max distance (or even more for large buildings)
+        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+
+        -- Display auto-assist range for engineer stations instead of max build distance if it is smaller
+        if unit.CategoriesHash['ENGINEERSTATION'] then
+            local guardScanRadius = unit.AI.GuardScanRadius
+            if guardScanRadius < overlayRadius then
+                overlayRadius = guardScanRadius
+            end
+        end
+
+        unit.AI.StagingPlatformScanRadius = overlayRadius
+        table.insert(unit.Categories, 'OVERLAYMISC')
+        unit.CategoriesHash.OVERLAYMISC = true
     end
 
     -- sanitize air unit footprints
@@ -521,6 +546,27 @@ local function PostProcessUnit(unit)
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
 
+    -- Define a specific TransportSpeedReduction for all land and naval units.
+    -- Experimentals have a TransportSpeedReduction of 1 due to transports gaining 1 speed and some survival maps loading experimentals into transports.
+    -- Naval units also gain a TransportSpeedReduction of 1 to ensure mod compatibility.
+    if not unit.Physics.TransportSpeedReduction and not isStructure then    
+        if isLand and isTech1 then
+            unit.Physics.TransportSpeedReduction = 0.15
+        elseif isLand and isTech2 then
+            unit.Physics.TransportSpeedReduction = 0.3
+        elseif isSACU then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isLand and isTech3 then
+            unit.Physics.TransportSpeedReduction = 0.6
+        elseif isLand and isExperimental then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isACU then
+            unit.Physics.TransportSpeedReduction = 1
+        elseif isNaval then
+            unit.Physics.TransportSpeedReduction = 1
+        end
+    end
+
     ---------------------------------------------------------------------------
     --#region (Re) apply the ability to land on water
 
@@ -737,6 +783,29 @@ function VerifyBlinkingLights(unit)
     end
 end
 
+--- Feature: Unit weight based on the maximum health of a unit
+---
+--- Affects the behavior of units when they bump into each other. Units 
+--- with more weight push units with less weight. As a result units with
+--- more health will receive less to no pushback from units with less health.
+---@param unit UnitBlueprint
+local function ProcessUnitDensity(unit)
+    local averageDensity = 10
+    if unit.Defense and unit.Defense.MaxHealth then
+        averageDensity = unit.Defense.MaxHealth
+
+        if unit.Physics and unit.Physics.MotionType == "RULEUMT_Hover" then
+            averageDensity = 0.50 * averageDensity
+        end
+    end
+
+    if averageDensity ~= unit.AverageDensity then
+        WARN(string.format("Overwriting the average density of %s from %s to %s", tostring(unit.BlueprintId), unit.AverageDensity, averageDensity))
+    end
+
+    unit.AverageDensity = averageDensity
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
@@ -754,6 +823,18 @@ function PostProcessUnits(allBlueprints, units)
     for _, unit in pairs(units) do
         if unit.CategoriesHash['EXTERNALFACTORY'] then
             PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
+    end
+end
+
+--- Batch process all units
+---@param blueprints BlueprintsTable
+function BatchProcessUnits(blueprints)
+    LOG("Batch processing units")
+    if blueprints.Unit then
+        for _, unit in pairs(blueprints.Unit) do
+            ProcessCanLandOnWater(unit)
+            ProcessUnitDensity(unit)
         end
     end
 end

@@ -1,1 +1,0 @@
-- (#6256) Fix billy nuke dealing 25 outer damage instead of 250.
