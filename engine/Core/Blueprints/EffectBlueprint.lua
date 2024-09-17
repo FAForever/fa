@@ -18,7 +18,7 @@
 
 --- Used by beam blueprints to interpolate the color/alpha of the beam between the start point and end point
 ---@class NamedQuaternion
----@field x number R
----@field y number G
----@field z number B
----@field w number A
+---@field x number # Red
+---@field y number # Green
+---@field z number # Blue
+---@field w number # Alpha
