@@ -1,3 +1,3 @@
 - (#6437) Automatically rotate Cybran Carrier, Othuum, and Monkeylord towards their targets when idle or attacking so that all their weapons can fire.
-    - Monkeylord will not automatically rotate when the laser is firing, to make it get in the way of micro less.
-    - The units rotate in place when aiming like this.
+    - Monkeylord does not automatically rotate when the laser is firing, to avoid interfering with micro.
+    - Units rotate in place while aiming, so formations do not get disrupted.
