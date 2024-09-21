@@ -20,11 +20,11 @@ local WaitTicks = WaitTicks
 local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 
---- Performs damage over time on a unit.
+--- Performs damage over time on a unit, waiting the interval *after* dealing damage.
 ---@param instigator Unit
 ---@param unit Unit
----@param pulses any
----@param pulseInterval integer
+---@param pulses number
+---@param pulseInterval number
 ---@param damage number
 ---@param damType DamageType
 ---@param friendly boolean
@@ -35,7 +35,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType
     local DamageArea = DamageArea
     local WaitTicks = WaitTicks
 
-    -- convert time to ticks
+    -- convert seconds to ticks, avoid waiting 0 ticks
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
@@ -49,7 +49,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType
     end
 end
 
---- Performs damage over time in a given area.
+--- Performs damage over time in a given area, waiting the interval *after* dealing damage.
 ---@param instigator Unit
 ---@param position Vector
 ---@param pulses number
@@ -64,7 +64,7 @@ function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, dam
     local DamageArea = DamageArea
     local WaitTicks = WaitTicks
 
-    -- compute ticks between pulses
+    -- convert seconds to ticks, avoid waiting 0 ticks
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
@@ -73,7 +73,7 @@ function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, dam
     end
 end
 
--- Deprecated functionality -- 
+--#region Deprecated functionality 
 
 -- SCALABLE RADIUS AREA DOT
 -- - Allows for a scalable damage radius that begins with DamageStartRadius and ends
@@ -102,3 +102,4 @@ function ScalableRadiusAreaDoT(entity)
     end
     entity:Destroy()
 end
+--#endregion
