@@ -415,7 +415,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
             DoTPulses = 5,
-            DoTTime = 0.5,
+            DoTTime = 0.4,
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 2,
             Label = "TorpedoL",
