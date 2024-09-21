@@ -81,6 +81,7 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
         marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(self.Army, 5, 'WaterVision', true)
         ADepthChargeProjectileOnImpact(self, TargetType, TargetEntity)
     end,
 }
