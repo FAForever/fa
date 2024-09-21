@@ -287,8 +287,8 @@
 --- if the weapon goes directly from its `IdleState` to its `RackSalvoFiringState` without
 --- going through its `RackSalvoFireReadyState` first
 ---@field SkipReadyState? boolean
---- If the weapon causes the unit to rotate towards the weapon's target. With multiple slaved weapons,
---- the first slaved weapon in the blueprint that currently has a target is used for turning.
+--- If the weapon causes the unit to rotate towards the weapon's target when the target is outside of `SlavedToBodyArcRange`.
+--- With multiple slaved weapons, the first slaved weapon in the blueprint that currently has a target is used for turning.
 --- If `UnitBlueprintAI.AttackAngle` is true, then this causes the unit to rotate when attacking while idle.
 ---@field SlavedToBody? boolean
 --- Degrees to either side of the unit's heading outside of which the weapon will rotate the unit towards the target.
