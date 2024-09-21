@@ -624,16 +624,11 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     end,
 
     --- Called by Lua to process the damage logic of a projectile
-    -- @param self The projectile itself
-    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
-    -- @param DamageData The damage data passed by the weapon
-    -- @param targetEntity The entity we hit, is nil if we hit terrain
-    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self Projectile
-    ---@param instigator Unit
-    ---@param DamageData table
-    ---@param targetEntity Unit | Prop | nil
-    ---@param cachedPosition Vector
+    ---@param instigator Unit # The launcher, and if it doesn't exist, the projectile itself
+    ---@param DamageData table # passed by the weapon
+    ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
+    ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
