@@ -32,7 +32,8 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damageT
 
     -- localize for performance
     local position = VectorCache
-    local DamageArea = DamageArea
+    local Damage = Damage
+    local EntityGetPositionXYZ = EntityGetPositionXYZ
     local WaitTicks = WaitTicks
 
     -- convert seconds to ticks, avoid waiting 0 ticks
