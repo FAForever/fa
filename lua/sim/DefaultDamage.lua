@@ -24,11 +24,11 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param instigator Unit
 ---@param unit Unit
 ---@param pulses any
----@param pulseTime integer
+---@param pulseInterval integer
 ---@param damage number
 ---@param damType DamageType
 ---@param friendly boolean
-function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, friendly)
+function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType, friendly)
 
     -- localize for performance
     local position = VectorCache
@@ -36,7 +36,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, fr
     local CoroutineYield = CoroutineYield
 
     -- convert time to ticks
-    pulseTime = 10 * pulseTime + 1
+    pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
         if unit and not EntityBeenDestroyed(unit) then
@@ -45,7 +45,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, fr
         else
             break
         end
-        CoroutineYield(pulseTime)
+        CoroutineYield(pulseInterval)
     end
 end
 
@@ -53,23 +53,23 @@ end
 ---@param instigator Unit
 ---@param position Vector
 ---@param pulses number
----@param pulseTime number
+---@param pulseInterval number
 ---@param radius number
 ---@param damage number
 ---@param damType DamageType
 ---@param friendly boolean
-function AreaDoTThread (instigator, position, pulses, pulseTime, radius, damage, damType, friendly)
+function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, damage, damType, friendly)
 
     -- localize for performance
     local DamageArea = DamageArea
     local CoroutineYield = CoroutineYield
 
     -- compute ticks between pulses
-    pulseTime = 10 * pulseTime + 1
+    pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
         DamageArea(instigator, position, radius, damage, damType, friendly)
-        CoroutineYield(pulseTime)
+        CoroutineYield(pulseInterval)
     end
 end
 
