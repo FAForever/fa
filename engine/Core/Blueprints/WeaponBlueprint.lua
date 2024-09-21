@@ -287,10 +287,12 @@
 --- if the weapon goes directly from its `IdleState` to its `RackSalvoFiringState` without
 --- going through its `RackSalvoFireReadyState` first
 ---@field SkipReadyState? boolean
---- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
+--- If the weapon causes the unit to rotate towards the weapon's target. With multiple slaved weapons,
+--- the first slaved weapon in the blueprint that currently has a target is used for turning.
+--- If `UnitBlueprintAI.AttackAngle` is true, then this causes the unit to rotate when attacking while idle.
 ---@field SlavedToBody? boolean
---- Range of arc in both directions to be considered "slaved" to a target. With multiple weapons, 
---- the first weapon in the blueprint that currently has a target is used for turning.
+--- Degrees to either side of the unit's heading outside of which the weapon will rotate the unit towards the target.
+--- Defaults to 1. Behavior gets overriden by `UnitBlueprintAI.AttackAngle`.
 ---@field SlavedToBodyArcRange? number
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean
