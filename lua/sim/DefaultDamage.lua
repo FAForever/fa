@@ -27,8 +27,8 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param pulseInterval number
 ---@param damage number
 ---@param damType DamageType
----@param friendly boolean
-function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType, friendly)
+---@param damageFriendly boolean
+function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType, damageFriendly)
 
     -- localize for performance
     local position = VectorCache
@@ -57,8 +57,8 @@ end
 ---@param radius number
 ---@param damage number
 ---@param damType DamageType
----@param friendly boolean
-function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, damage, damType, friendly)
+---@param damageFriendly boolean
+function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, damage, damType, damageFriendly)
 
     -- localize for performance
     local DamageArea = DamageArea
@@ -68,7 +68,7 @@ function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, dam
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
-        DamageArea(instigator, position, radius, damage, damType, friendly)
+        DamageArea(instigator, position, radius, damage, damType, damageFriendly)
         WaitTicks(pulseInterval)
     end
 end
