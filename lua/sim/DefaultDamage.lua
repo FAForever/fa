@@ -26,9 +26,9 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param pulses number
 ---@param pulseInterval number
 ---@param damage number
----@param damType DamageType
+---@param damageType DamageType
 ---@param damageFriendly boolean
-function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType, damageFriendly)
+function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damageType, damageFriendly)
 
     -- localize for performance
     local position = VectorCache
@@ -41,7 +41,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType
     for i = 1, pulses do
         if unit and not EntityBeenDestroyed(unit) then
             position[1], position[2], position[3] = EntityGetPositionXYZ(unit)
-            Damage(instigator, position, unit, damage, damType )
+            Damage(instigator, position, unit, damage, damageType )
         else
             break
         end
@@ -56,9 +56,9 @@ end
 ---@param pulseInterval number
 ---@param radius number
 ---@param damage number
----@param damType DamageType
+---@param damageType DamageType
 ---@param damageFriendly boolean
-function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, damage, damType, damageFriendly)
+function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly)
 
     -- localize for performance
     local DamageArea = DamageArea
@@ -68,7 +68,7 @@ function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, dam
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
-        DamageArea(instigator, position, radius, damage, damType, damageFriendly)
+        DamageArea(instigator, position, radius, damage, damageType, damageFriendly)
         WaitTicks(pulseInterval)
     end
 end
