@@ -14,11 +14,88 @@ local DamageArea = DamageArea
 
 -- cache for performance
 local VectorCache = Vector(0, 0, 0)
-local MathFloor = math.floor
+local MathMod = math.mod
+local MATH_IRound = MATH_IRound
 local WaitTicks = WaitTicks
 
 local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
+
+--- Performs damage over time on a target, waiting the interval *before* dealing damage.
+---@param instigator Unit
+---@param target Unit | Prop | Projectile
+---@param pulses number
+---@param pulseInterval number
+---@param damage number
+---@param damageType DamageType
+function EntityDoTThread2(instigator, target, pulses, pulseInterval, damage, damageType)
+    -- localize for performance
+    local position = VectorCache
+    local Damage = Damage
+    local EntityGetPositionXYZ = EntityGetPositionXYZ
+    local WaitTicks = WaitTicks
+    local MathMod = MathMod
+
+    -- convert seconds to ticks, have to "wait" 1 extra tick to get to the end of the current tick
+    pulseInterval = 10 * pulseInterval + 1
+    -- accumulator to compensate for error caused by `WaitTicks` only working with integers
+    local accum = 0
+
+    for i = 1, pulses do
+        if target and not EntityBeenDestroyed(target) then
+            position[1], position[2], position[3] = EntityGetPositionXYZ(target)
+            Damage(instigator, position, target, damage, damageType)
+        else
+            break
+        end
+        accum = accum + pulseInterval
+        if accum > 1 then
+            -- final accumulator value may be #.999 which needs to be rounded
+            if i == pulses then
+                WaitTicks(MATH_IRound(accum))
+            else
+                WaitTicks(accum)
+                accum = MathMod(accum, 1)
+            end
+        end
+    end
+end
+
+--- Performs damage over time in a given area, waiting the interval *before* dealing damage.
+---@param instigator Unit
+---@param position Vector
+---@param pulses number
+---@param pulseInterval number
+---@param radius number
+---@param damage number
+---@param damageType DamageType
+---@param damageFriendly boolean
+---@param damageSelf boolean
+function AreaDoTThread2(instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly, damageSelf)
+    -- localize for performance
+    local DamageArea = DamageArea
+    local WaitTicks = WaitTicks
+    local MathMod = MathMod
+
+    -- convert seconds to ticks, have to "wait" 1 extra tick to get to the end of the current tick
+    pulseInterval = 10 * pulseInterval + 1
+    -- accumulator to compensate for error caused by `WaitTicks` only working with integers
+    local accum = 0
+
+    for i = 1, pulses do
+        accum = accum + pulseInterval
+        if accum > 1 then
+            -- final accumulator value may be #.999 which needs to be rounded
+            if i == pulses then
+                WaitTicks(MATH_IRound(accum))
+            else
+                WaitTicks(accum)
+                accum = MathMod(accum, 1)
+            end
+        end
+        DamageArea(instigator, position, radius, damage, damageType, damageFriendly, damageSelf)
+    end
+end
 
 --- Performs damage over time on a unit, waiting the interval *after* dealing damage.
 ---@param instigator Unit
@@ -36,7 +113,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damageT
     local EntityGetPositionXYZ = EntityGetPositionXYZ
     local WaitTicks = WaitTicks
 
-    -- convert seconds to ticks, avoid waiting 0 ticks
+    -- convert seconds to ticks, have to "wait" 1 extra tick to get to the end of the current tick
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
@@ -65,7 +142,7 @@ function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, dam
     local DamageArea = DamageArea
     local WaitTicks = WaitTicks
 
-    -- convert seconds to ticks, avoid waiting 0 ticks
+    -- convert seconds to ticks, have to "wait" 1 extra tick to get to the end of the current tick
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
