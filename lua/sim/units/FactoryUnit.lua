@@ -138,9 +138,6 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
-            if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
-                self:RollOffUnit()
-            end
             self:StopBuildFx()
             self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order)
         end
@@ -222,6 +219,12 @@ FactoryUnit = ClassUnit(StructureUnit) {
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
         end
+
+        -- engineers can only be rotated during rolloff after the "build finished" animation ends
+        if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
+            self:RollOffUnit()
+        end
+
         if unitBeingBuilt and not unitBeingBuilt.Dead then
             unitBeingBuilt:DetachFrom(true)
         end
@@ -249,6 +252,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         return target_bp.General.Category ~= 'Factory'
     end,
 
+    --- Rotates engineers towards the nearest roll off point and then orders the unit to move off the factory build site
     ---@param self FactoryUnit
     RollOffUnit = function(self)
         local rollOffPoint = self.RollOffPoint
