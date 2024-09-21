@@ -15,7 +15,7 @@ local DamageArea = DamageArea
 -- cache for performance
 local VectorCache = Vector(0, 0, 0)
 local MathFloor = math.floor
-local CoroutineYield = coroutine.yield
+local WaitTicks = WaitTicks
 
 local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
@@ -33,7 +33,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType
     -- localize for performance
     local position = VectorCache
     local DamageArea = DamageArea
-    local CoroutineYield = CoroutineYield
+    local WaitTicks = WaitTicks
 
     -- convert time to ticks
     pulseInterval = 10 * pulseInterval + 1
@@ -45,7 +45,7 @@ function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damType
         else
             break
         end
-        CoroutineYield(pulseInterval)
+        WaitTicks(pulseInterval)
     end
 end
 
@@ -62,14 +62,14 @@ function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, dam
 
     -- localize for performance
     local DamageArea = DamageArea
-    local CoroutineYield = CoroutineYield
+    local WaitTicks = WaitTicks
 
     -- compute ticks between pulses
     pulseInterval = 10 * pulseInterval + 1
 
     for i = 1, pulses do
         DamageArea(instigator, position, radius, damage, damType, friendly)
-        CoroutineYield(pulseInterval)
+        WaitTicks(pulseInterval)
     end
 end
 
