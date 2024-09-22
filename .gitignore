@@ -24,3 +24,4 @@ textures/ui/common/BUTTON/BACKUP/
 *.DS_Store
 act.exe
 *.venv
+lua_changelog
