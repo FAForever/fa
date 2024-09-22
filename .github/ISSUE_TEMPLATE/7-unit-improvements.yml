@@ -13,7 +13,7 @@ body:
         - This repository is maintained by volunteers, it may take a while for them to come back to you.
         - Remember to include sufficient details and context.
         - If you have multiple Idea's or suggestions, please submit them in separate issues.
-        - We accept pull request. If you know how to fix it - go ahead!
+        - We accept pull requests. If you know how to fix it - go ahead!
 
   # Faction Selection
   - type: dropdown
