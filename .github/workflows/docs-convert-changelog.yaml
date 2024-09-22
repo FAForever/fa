@@ -44,18 +44,11 @@ jobs:
     name: Convert changelog
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout scripts
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: scripts
           sparse-checkout: |
             scripts
-
-      - name: Checkout changelog
-        uses: actions/checkout@v4
-        with:
-          path: changelog
-          sparse-checkout: |
             changelog
 
       - name: Setup python
@@ -70,10 +63,11 @@ jobs:
 
       - name: Convert changelog to Lua
         run: |
-          mkdir lua_changelog
+          out_dir=lua_changelog
+          mkdir $out_dir
           for file in changelog/*.md; do
-            output_file = $(basename ${file%.md}.lua)
-            python3 scripts/markdown2lua.py "${file}" "lua_changelog/${output_file}"
+            out_file=$(basename ${file%.md}.lua)
+            python3 scripts/markdown2lua.py "${file}" "${out_dir}/${out_file}"
           done
 
       - name: Add the Lua changelog as an artifact
