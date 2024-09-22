@@ -1,0 +1,84 @@
+# Copyright (c) 2024 Daniel 'Zjonn' Dubiel
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Convert Markdown changelog to Lua
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: choice
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+        options:
+          - develop
+          - deploy/fafbeta
+          - deploy/fafdevelop
+
+  workflow_call:
+    inputs:
+      reference:
+        required: true
+        type: string
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+
+jobs:
+  convert_changlog:
+    name: Convert changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          path: scripts
+          sparse-checkout: |
+            scripts
+
+      - name: Checkout changelog
+        uses: actions/checkout@v4
+        with:
+          path: changelog
+          sparse-checkout: |
+            changelog
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+
+      - name: Convert changelog to Lua
+        run: |
+          mkdir lua_changelog
+          for file in changelog/*.md; do
+            output_file = $(basename ${file%.md}.lua)
+            python3 scripts/markdown2lua.py "${file}" "lua_changelog/${output_file}"
+          done
+
+      - name: Add the Lua changelog as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lua_changelog
+          path: |
+            lua_changelog
