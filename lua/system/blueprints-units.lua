@@ -235,10 +235,10 @@ local function PostProcessUnit(unit)
         -- Engine allows building +2 range outside the max distance (or even more for large buildings)
         local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
 
-        -- Display auto-assist range for engineer stations instead of max build distance if it is smaller
+        -- Display auto-assist range for engineer stations instead of max build distance if it is smaller and exists
         if unit.CategoriesHash['ENGINEERSTATION'] then
             local guardScanRadius = unit.AI.GuardScanRadius
-            if guardScanRadius < overlayRadius then
+            if guardScanRadius and guardScanRadius < overlayRadius then
                 overlayRadius = guardScanRadius
             end
         end
