@@ -218,7 +218,7 @@ local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
         EnergyActive=       {-0.1875, -0.1875,  -0.1875, -0.1562,  -0.05},
         EnergyMaintenance=  {-0.1875, -0.1875,  -0.1875, -0.1875,  -0.1875},
         EnergyWeapon=       {-0.075,  -0.075,   -0.075,  -0.075,   -0.075},
-        RateOfFire=         {-0.1,    -0.1,     -0.1,    -0.1,     -0.045},
+        RateOfFire=         {-0.1,    -0.1,     -0.1,    -0.1,     -0.040},
     },
     T1MassExtractor={
         MassActive=         {-0.1, -0.05, -0.0333, -0.075, -0.075},
