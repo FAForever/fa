@@ -1058,7 +1058,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
-        self.CollideFriendly = self.DamageData.CollideFriendly
+        self.CollideFriendly = DamageData.CollideFriendly
     end,
 
     ---root of all performance evil
