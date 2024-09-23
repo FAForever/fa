@@ -1,10 +1,10 @@
-- (#6423) The Pulsar receives various tweaks in anticipation of its future introduction into the game.
+- (#6423) The Pulsar receives various tweaks to its stats in anticipation of its future introduction into the game. Additionally, the Pulsar's files have been updated to remove the last remnants of its former name. Initially, the unit was called Othismash.
 
   - Pulsar: T3 Mobile EMP Missile Launcher (SRL0310):
     - Categories added:
       - `PRODUCTDL`
       - `SNIPEMODE`
-    - Othismash EMP Missile Barrage:
+    - Pulsar EMP Missile Barrage:
       - DamageRadius: 0 --> 1 (same as its EMP weapon)
       - TurretPitchRange: 15 --> 40 (required against nearby units and units on top of mountains)
       - TurretPitchSpeed: 20 --> 50 (improves the responsiveness of the turret)

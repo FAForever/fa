@@ -40,9 +40,9 @@ ProjectileBlueprint{
             "MISSILE",
         },
         Faction = "Cybran",
-        Weapon = "Othismash EMP Missile",
+        Weapon = "Pulsar EMP Missile",
     },
-    Interface = { HelpText = "Othismash EMP Missile" },
+    Interface = { HelpText = "Pulsar EMP Missile" },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 21,

@@ -235,7 +235,7 @@ UnitBlueprint{
             DamageRadius = 1,
             DamageToShields = 323,
             DamageType = "Normal",
-            DisplayName = "Othismash EMP Missile Barrage",
+            DisplayName = "Pulsar EMP Missile Barrage",
             EffectiveRadius = 60,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
@@ -252,7 +252,7 @@ UnitBlueprint{
             MuzzleVelocity = 21,
             MuzzleVelocityRandom = 0.4,
             MuzzleVelocityReduceDistance = 60,
-            ProjectileId = "/projectiles/CIFOthismashEMPMissile01/CIFOthismashEMPMissile01_proj.bp",
+            ProjectileId = "/projectiles/CIFPulsarEMPMissile01/CIFPulsarEMPMissile01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.2,
             RackBones = {
                 {
