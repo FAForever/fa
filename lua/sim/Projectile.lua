@@ -91,7 +91,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Trash TrashBag
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
----@field DamageData table
+---@field DamageData WeaponDamageTable
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
@@ -617,7 +617,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to pass the damage data as a metatable
     ---@param self Projectile
-    ---@param data table
+    ---@param data WeaponDamageTable
     PassMetaDamage = function(self, data)
         self.DamageData = {}
         setmetatable(self.DamageData, data)
@@ -631,7 +631,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self Projectile
     ---@param instigator Unit
-    ---@param DamageData table
+    ---@param DamageData WeaponDamageTable # passed by the weapon
     ---@param targetEntity Unit | Prop | nil
     ---@param cachedPosition Vector
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
@@ -1045,7 +1045,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     ---@deprecated
     ---@param self Projectile
-    ---@param DamageData table
+    ---@param DamageData WeaponDamageTable
     PassDamageData = function(self, DamageData)
         self.DamageData = {}
         self.DamageData.DamageRadius = DamageData.DamageRadius
