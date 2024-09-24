@@ -8,11 +8,7 @@ jobs:
   convert_to_draft:
     runs-on: ubuntu-latest
     steps:
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh -y
-
-      - name: Authenticate GitHub CLI
-        run: gh auth login --with-token ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Convert PR to Draft
-        run: gh pr ready --undo ${{ github.event.pull_request.number }}
+      - run: gh pr ready --undo ${{ github.event.pull_request.number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
