@@ -2,7 +2,7 @@ name: Convert PRs to Draft on Opening
 
 on:
   pull_request:
-    types: [opened]
+    types: [synchronize]
 
 jobs:
   convert_to_draft:
