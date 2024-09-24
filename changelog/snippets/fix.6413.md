@@ -1,0 +1,1 @@
+(#6613) Fixed a couple of error messages that would appear when a projectile and a unit were destroyed
