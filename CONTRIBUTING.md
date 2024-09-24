@@ -56,44 +56,47 @@ If the branch was in the FAForever repository, delete it after the merge, so it 
 These are people knowledgeable of the indicated areas, that are good candidates to request a review from.
 
 **lua (ui)**  
-4z0t  
-basilisk3  
-Nomander  
-Jip  
-Hdt80bro  
-clyf  
-speed2
+@4z0t  
+@Basilisk3  
+@lL1l1  
+@Garanas  
+@Hdt80bro  
+@clyfordv  
+@speed2CZ  
 
 **lua (sim)**  
-Nomander  
-4z0t  
-basilisk3  
-Jip  
-Hdt80bro  
-clyf  
-speed2
+@lL1l1  
+@4z0t  
+@Basilisk3  
+@Garanas  
+@Hdt80bro  
+@clyfordv  
+@speed2CZ  
+@The-Balthazar  
 
 **AI**  
-relentor  
-Jip
+@relent0r  
+@Garanas  
 
 **blueprints**  
-basilisk3  
-Jip  
-Hdt80bro
+@Basilisk3  
+@Garanas  
+@Hdt80bro  
+@lL1l1  
+@The-Balthazar  
 
 **mapping**  
-speed2
+@speed2CZ  
 
 **modeling**  
-MadMax  
-Balthazar  
-Nomander
+@MadMaxFAF  
+@The-Balthazar  
+@lL1l1  
 
 **graphics**  
-BlackYps  
-Jip
+@BlackYps  
+@Garanas  
 
 **binary patches**  
-4z0t  
-Hdt80bro  
+@4z0t  
+@Hdt80bro  
