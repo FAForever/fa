@@ -33,10 +33,10 @@ The workflow requires an approval of another maintainer. Once approved, wait for
 
 You can continue the deployment steps, but you can not finalize it until the server administrator got back to you that it is set. This may take an arbitrary amount of time so make sure this is done well in advance.
 
-### Changelog for a deployment
+### Deployment of Lua
 
-- (0) Checkout on the `develop` branch and pull in the latest version. Make sure that there are no other open changes.
-- (1) Create a new branch that originates from `develop`. We'll refer to this branch as the `changelog branch`.
+- (0) Checkout on the [develop](https://github.com/FAForever/fa/tree/develop) branch and pull in the latest version. Make sure that there are no other open changes.
+- (1) Create a new branch that originates from [develop](https://github.com/FAForever/fa/tree/develop). We'll refer to this branch as the `changelog branch`.
 - (2) Generate the changelog using the [Changelog generation workflow](https://github.com/FAForever/fa/actions/workflows/docs-changelog.yaml).
 - (3) Once the workflow is completed, navigate to the summary section and download the artifact that is created by the workflow.
 - (4) Save the generated changelog to a new file in the format `yyyy-mm-dd-game-version.md` in `docs/_posts`. As an example for a file name: `2024-08-03-3811.md`.
@@ -54,19 +54,13 @@ permalink: changelog/3811
 - - (5.2) Add an introduction at the top of the changelog.
 - - (5.3) Add the contributors at the bottom.
 
-- (6) Stage, commit and push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull request points to `develop`.
+- (6) Stage, commit and push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull request points to [develop](https://github.com/FAForever/fa/tree/develop).
 - (7) Delete the current snippets and stage, commit and push the changes to GitHub.
-
-You can re-use the same branch and pull request in the next phase of the deployment.
-
-### Deployment of Lua
-
-- (1) Checkout on the `changelog branch` branch created in the previous step and pull in the latest version.
-- (2) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/develop/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/develop/lua/version.lua).
+- (8) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/develop/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/develop/lua/version.lua) and stage, commit and push the changes to GitHub.
 
 At this point you need to wait until the `changelog branch` is merged.
 
-- (3) Push everything that you want to release to the [master](https://github.com/FAForever/fa/tree/master) branch.
+- (9) Push everything that you want to release from [develop](https://github.com/FAForever/fa/tree/develop) to the [master](https://github.com/FAForever/fa/tree/master) branch.
 
 ### Deployment - final steps
 
