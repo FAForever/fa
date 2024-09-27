@@ -32,6 +32,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
+                ---@type CollisionBeam
                 local beam = self.BeamType {
                     Weapon = self,
                     BeamBone = 0,
