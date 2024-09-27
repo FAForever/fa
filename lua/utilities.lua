@@ -383,11 +383,11 @@ end
 ---@param v2 Vector
 ---@return Vector
 function Cross(v1, v2)
-    local x1, y1, z2 = v1[1], v1[2], v1[3]
+    local x1, y1, z1 = v1[1], v1[2], v1[3]
     local x2, y2, z2 = v2[1], v2[2], v2[3]
     return Vector(
-        y1 * z2 - z2 * y2,
-        z2 * x2 - x1 * z2,
+        y1 * z2 - z1 * y2,
+        z1 * x2 - x1 * z2,
         x1 * y2 - y1 * x2
     )
 end
