@@ -1,4 +1,3 @@
-
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
@@ -33,12 +32,11 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
-                local beam
-                beam = self.BeamType {
+                local beam = self.BeamType {
                     Weapon = self,
                     BeamBone = 0,
                     OtherBone = muzzle,
-                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- Why is this multiplied by 10? IceDreamer
+                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
                 }
                 local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
                 table.insert(self.Beams, beamTable)
