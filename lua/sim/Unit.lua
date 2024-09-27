@@ -148,6 +148,8 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field PlatoonHandle? Platoon
 ---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
 ---@field Sync { id: string, army: Army } # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
+---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
+---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
