@@ -288,21 +288,6 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param impactType ImpactType
     ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
-        -- LOG('*DEBUG: COLLISION BEAM ONIMPACT ', repr(self))
-        -- LOG('*DEBUG: COLLISION BEAM ONIMPACT, WEAPON =  ', repr(self.Weapon), 'Type = ', impactType)
-        -- LOG('CollisionBeam impacted with: ' .. impactType)
-        -- Possible 'type' values are:
-        --  'Unit'
-        --  'Terrain'
-        --  'Water'
-        --  'Air'
-        --  'UnitAir'
-        --  'Underwater'
-        --  'UnitUnderwater'
-        --  'Projectile'
-        --  'Prop'
-        --  'Shield'
-
         if impactType == 'Unit' or impactType == 'UnitAir' or impactType == 'UnitUnderwater' then
             if not self:GetLauncher() then
                 return
