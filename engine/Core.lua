@@ -486,7 +486,6 @@ function VDist2Sq(x1, y1, x2, y2)
 end
 
 --- Computes the distance between vectors `a` and `b`
---- It is always faster to compute it in Lua.
 ---@param a Vector
 ---@param b Vector
 ---@return number
