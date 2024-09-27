@@ -516,10 +516,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local tick = GetGameTick()
 
         -- damage correction for overcharge
-        -- If the absorption multi is less than 1, then the shield will get hit by two instances of area damage, one of which is the remainder.
-        -- This means that the following code requires a multiplier to correct the total damage amount since both instances will be overriden.
-        -- In the past it used to be 0.25 absorption for static shields (due to structure armor) and needed a 2x multiplier.
-        -- Currently the absorption multi is 1, so it doesn't need a multiplier.
+
+        -- If the absorption multiplier is less than 1, then the shield will get hit by two instances of area damage, the absorbed amount and the remainder.
+        -- This means that the following code then requires a multiplier to correct the total damage amount since both instances will be overriden.
+        -- For example with 0.25 absorption we would have a 0.25 damage and 0.75 damage instance hitting the shield. Both get set to 800 OC structure damage,
+        -- but then 0.25x armor is applied again (second OnGetDamageAbsorption call), reducing it to 2x200 damage, which requires a 2x multiplication to bring it to the expected 800.
+        -- Currently the absorption multiplier is 1, so we don't need a multiplier on the damage to balance it out.
+
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then
