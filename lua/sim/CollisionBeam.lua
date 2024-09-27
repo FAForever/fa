@@ -19,7 +19,17 @@ local GetTerrainType = GetTerrainType
 local DefaultTerrainType = GetTerrainType(-1, -1)
 
 ---@class CollisionBeam : moho.CollisionBeamEntity
+---@field unit Unit
+---@field Weapon Weapon
+---@field Army Army
 ---@field DamageTable WeaponDamageTable
+---@field BeamEffectsBag moho.IEffect[]
+---@field TerrainEffectsBag moho.IEffect[]
+---@field FxImpactWater FileName[]?
+---@field FxImpactUnderWater FileName[]?
+---@field FxImpactUnit FileName[]?
+---@field FxImpactAirUnit FileName[]?
+---@field FxImpactLand FileName[]?
 ---@field Trash TrashBag
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
@@ -103,7 +113,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param instigator Unit
     ---@param damageData table
-    ---@param targetEntity? Unit
+    ---@param targetEntity Unit | Projectile | Prop | nil
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
@@ -160,7 +170,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             AttachBeamToEntity(fxBeam, self, 0, self.Army)
 
             -- collide on start if it's a continuous beam
-            local weaponBlueprint = self.Weapon:GetBlueprint()
+            local weaponBlueprint = self.Weapon.Blueprint
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
 
@@ -180,9 +190,9 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     ---@param self CollisionBeam
-    ---@param army number
-    ---@param EffectTable string[]
-    ---@param EffectScale number
+    ---@param army Army
+    ---@param EffectTable FileName[]?
+    ---@param EffectScale number?
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         EffectTable = EffectTable or {}
@@ -196,8 +206,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     ---@param self CollisionBeam
-    ---@param army number
-    ---@param EffectTable string[]
+    ---@param army Army
+    ---@param EffectTable FileName[]
     ---@param EffectScale number
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
@@ -271,13 +281,12 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         end
     end,
 
-    -- This is called when the collision beam hits something new. Because the beam
-    -- is continuously detecting collisions it only executes this function when the
-    -- thing it is touching changes. Expect Impacts with non-physical things like
-    -- 'Air' (hitting nothing) and 'Underwater' (hitting nothing underwater).
+    --- Called by the engine while the beam is active every `CollisionCheckInterval + 1` ticks 
+    --- or when `SetBeamFx(beamEmitter, checkCollision)` is called with `CheckCollision = true`.
+    --- Expect Impacts with non-physical things like 'Air' (hitting nothing) and 'Underwater' (hitting nothing underwater).
     ---@param self CollisionBeam
     ---@param impactType ImpactType
-    ---@param targetEntity? Unit | Prop
+    ---@param targetEntity Unit | Projectile | Prop | nil
     OnImpact = function(self, impactType, targetEntity)
         -- LOG('*DEBUG: COLLISION BEAM ONIMPACT ', repr(self))
         -- LOG('*DEBUG: COLLISION BEAM ONIMPACT, WEAPON =  ', repr(self.Weapon), 'Type = ', impactType)
@@ -299,7 +308,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
                 return
             end
 
-            self:ShowBeamSource(targetEntity)
+            self:ShowBeamSource(targetEntity --[[@as Unit]])
         else
             self:HideBeamSource()
         end
@@ -312,7 +321,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
         -- Buffs (Stun, etc)
         if targetEntity and IsUnit(targetEntity) then
-            self:DoUnitImpactBuffs(targetEntity)
+            self:DoUnitImpactBuffs(targetEntity --[[@as Unit]])
         end
 
         -- Do Damage
