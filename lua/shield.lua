@@ -559,7 +559,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- do damage logic for shield
 
-        if self.Owner ~= instigator then
+        local owner = self.Owner
+        if owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
@@ -567,9 +568,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 EntityAdjustHealth(self, instigator, -absorbed)
 
                 -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
-                if tick > self.Owner.tickIssuedShieldRepair then
-                    self.Owner.tickIssuedShieldRepair = tick
-                    local owner = self.Owner
+                if tick > owner.tickIssuedShieldRepair then
+                    owner.tickIssuedShieldRepair = tick
                     local guards = owner:GetGuards()
                     if not table.empty(guards) then
                         for k, guard in guards do
