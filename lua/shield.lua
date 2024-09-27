@@ -566,7 +566,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             -- take some damage
             if absorbed then
                 EntityAdjustHealth(self, instigator, -absorbed)
-
+                LOG('Shield damaged: ', GetGameTick())
                 -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
                 if tick > owner.tickIssuedShieldRepair then
                     owner.tickIssuedShieldRepair = tick

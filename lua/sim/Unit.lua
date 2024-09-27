@@ -2768,6 +2768,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param order string
     ---@return boolean
     OnStartBuild = function(self, built, order)
+        LOG('OnStartBuild', GetGameTick())
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
 
         -- Prevent UI mods from violating game/scenario restrictions
