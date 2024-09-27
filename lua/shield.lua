@@ -356,7 +356,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
     -- @param self A shield that we're computing the overlapping shields for
-    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cash
+    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
     GetOverlappingShields = function(self, tick)
 
         -- allow the game tick to be send to us, saves cycles
@@ -458,7 +458,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param instigator Unit
     ---@param amount number
     ---@param type DamageType
-    ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
+    ---@return number? damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
         if type == "TreeForce" or type == "TreeFire" then
             return
@@ -678,8 +678,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
-    -- @param self The shield we're checking the collision for
-    -- @param other The projectile we're checking the collision with
+    ---@param self Shield The shield we're checking the collision for
+    ---@param other Projectile The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         -- special logic when it is a projectile to simulate air crashes
