@@ -19,6 +19,7 @@
 ---@field z number
 
 ---@class Vector : VectorBase
+---@operator add(Vector): Vector
 ---@operator mul(Quaternion): Quaternion
 ---@operator mul(Vector): Vector
 ---@operator mul(number): Vector
@@ -27,6 +28,7 @@
 ---@field z number
 
 ---@class Vector2 : VectorBase
+---@operator add(Vector2): Vector2
 ---@operator mul(number): Vector2
 ---@operator unm: Vector2
 
