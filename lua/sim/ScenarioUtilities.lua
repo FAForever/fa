@@ -508,7 +508,7 @@ function CreateWreckage(unit, needToRotate)
         local roll = 0.5 + Random() - 2 * Random() -- Random angle +-(0.5->1.5) radian
         local pitch = 0.5 + Random() - 2 * Random()
         local yaw = 0
-        prop:SetOrientation(unit:GetOrientation() * EulerToQuaternion(roll, pitch, yaw), true)
+        prop:SetOrientation(EulerToQuaternion(roll, pitch, yaw) * unit:GetOrientation(), true)
     end
     unit:Destroy()
 end
