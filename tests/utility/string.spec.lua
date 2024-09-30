@@ -1,6 +1,35 @@
 -- Test framework
 local luft = require "./tests/packages/luft"
 
+-- Needed in utils but not provided outside the game, so it has to be created here
+Vector2Meta = {
+    __index = function(t, k)
+        if k == 'x' then
+            return t[1]
+        elseif k == 'y' then
+            return t[2]
+        elseif k == 'z' then
+            return t[3]
+        else
+            error("bad argument #2 to `?' ('x', 'y', or 'z' expected)", 1)
+        end
+    end,
+
+    __newindex = function(t, k, v)
+        if k == 'x' then
+            t[1] = v
+        elseif k == 'y' then
+            t[2] = v
+        elseif k == 'z' then
+            t[3] = v
+        else
+            error("bad argument #2 to `?' ('x', 'y', or 'z' expected)", 1)
+        end
+    end,
+}
+Vector2 = {}
+setmetatable(Vector2, Vector2Meta)
+
 -- Functions are imported to the global scope...
 require "./lua/system/utils.lua"
 
