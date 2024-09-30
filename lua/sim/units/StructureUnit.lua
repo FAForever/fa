@@ -128,8 +128,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
             if roll ~= 0 or pitch ~= 0 then
                 -- "q′ = q2 * q1  in which q′ corresponds to the rotation q1 followed by the rotation q2" (wikipedia)
                 -- the unit's orientation comes first, and then is rotated by the terrain angle
-                -- roll is negated because ?
-                self:SetOrientation(EulerToQuaternion(-roll, pitch, 0) * self:GetOrientation(), true)
+                self:SetOrientation(EulerToQuaternion(roll, pitch, 0) * self:GetOrientation(), true)
 
                 -- technically obsolete, but as this is part of an integration we don't want to break
                 -- the mod package that it originates from. Originates from the BrewLan mod suite
