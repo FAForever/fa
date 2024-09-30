@@ -2255,7 +2255,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param degrees number
     Rotate = function(self, degrees)
-        self:SetOrientation(self:GetOrientation() * utilities.QuatFromRotation(degrees), true)
+        self:SetOrientation(utilities.QuatFromRotation(degrees) * self:GetOrientation(), true)
     end,
 
     --- Set the unit's Yaw rotation towards a point and reset its roll/pitch
