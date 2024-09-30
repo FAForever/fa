@@ -73,6 +73,10 @@ function table.getsize(t)
     return size
 end
 
+-- replace with assembly implementations
+table.empty = table.empty2 or table.empty
+table.getsize = table.getsize2 or table.getsize
+
 --- Returns a shallow copy of t
 ---@generic T
 ---@param t T

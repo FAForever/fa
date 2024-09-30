@@ -1,0 +1,1 @@
+- (#6450) Improve beam blueprint annotations with thorough descriptions of beam parameters.
