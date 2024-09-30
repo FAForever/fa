@@ -2260,7 +2260,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Set the unit's Yaw rotation towards a point and reset its roll/pitch
     ---@param self Unit
-    ---@param tpos number
+    ---@param tpos Vector
     RotateTowards = function(self, tpos)
         local pos = self:GetPosition()
         local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
