@@ -865,7 +865,7 @@ end
 ---@param velX number
 ---@param velY number
 ---@param velZ number
----@param orientRot number
+---@param orientRot number # degrees
 ---@param orientX number
 ---@param orientY number
 ---@param orientZ number

@@ -468,16 +468,16 @@ function TableCat(...)
 end
 
 
----@overload fun(rotation: number): Quaternion
+---@overload fun(degrees: number): Quaternion
 --- Creates a quaternion from an orientation axis and rotation angle. The orientation axis defaults
 --- to up (the y-axis).
----@param rotation number
+---@param degrees number
 ---@param x number
 ---@param y number
 ---@param z number
 ---@return Quaternion
-function QuatFromRotation(rotation, x, y, z)
-    local halfAngle = 0.00872664625997 * rotation -- math.rad(rotation / 2)
+function QuatFromRotation(degrees, x, y, z)
+    local halfAngle = 0.00872664625997 * degrees -- math.rad(rotation / 2)
     local angleRot = MathSin(halfAngle)
     local qw = MathCos(halfAngle)
     if not x then
