@@ -15,20 +15,20 @@ function GetTerrainSlopeAngles(pos, sizeX, sizeZ)
     local posX, posY, posZ = pos[1], pos[2], pos[3]
     local lenX, lenZ = sizeX * 0.5, sizeZ * 0.5
 
-    -- Get angles, starting from the upper-left edges
-    -- negate angleX since its axis of rotation is -z
-    local angleX = -MathAtan2(GetTerrainHeight(posX - lenX, posZ) - posY, lenX)
+    -- Get angles, starting from the upper-right edges
+    local angleX = MathAtan2(GetTerrainHeight(posX + lenX, posZ) - posY, lenX)
     local angleZ = MathAtan2(GetTerrainHeight(posX, posZ - lenZ) - posY, lenZ)
 
     -- If it has the other edges to sample, average those
     if sizeX >= 2 then
-        local rightX = MathAtan2(GetTerrainHeight(posX + lenX, posZ) - posY, lenX)
-        angleX = (rightX + angleX) * 0.5
+        -- negate rightX when adding in average since its axis of rotation is -z
+        local rightX = MathAtan2(GetTerrainHeight(posX - lenX, posZ) - posY, lenX)
+        angleX = (angleX - rightX) * 0.5
     end
     if sizeZ >= 2 then
-        -- negate lowerZ since its axis of rotation is -x
-        local lowerZ = -MathAtan2(GetTerrainHeight(posX, posZ + lenZ) - posY, lenZ)
-        angleZ = (lowerZ + angleZ) * 0.5
+        -- negate lowerZ when adding in average since its axis of rotation is -x
+        local lowerZ = MathAtan2(GetTerrainHeight(posX, posZ + lenZ) - posY, lenZ)
+        angleZ = (angleZ - lowerZ) * 0.5
     end
 
     return angleX, angleZ
