@@ -1,0 +1,1 @@
+- (#6465) Increase the `StrategicIconSize` of the projectile of the Seraphim Sniper Bot's secondary firing mode.
