@@ -139,6 +139,7 @@ UnitBlueprint{
         MeshExtentsY = 0.25,
         MeshExtentsZ = 0.65,
         MotionType = "RULEUMT_Land",
+        TransportSpeedReduction = 0.15,
         TurnRadius = 4,
         TurnRate = 200,
     },
