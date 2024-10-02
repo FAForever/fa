@@ -744,16 +744,16 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     local upgradesAvailable = not table.empty(weapons.upgrades.normal) or not table.empty(weapons.upgrades.death)
                     if k == 'basic' then
                         if totalDirectFireDPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDirectFireDPS, totalDirectFireDPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDirectFireDPS)}})
                         end
                         if totalIndirectFireDPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalIndirectFireDPS, totalIndirectFireDPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalIndirectFireDPS)}})
                         end
                         if totalNavalDPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS, totalNavalDPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS)}})
                         end
                         if totalAADPS > 0 then
-                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0021>', totalAADPS, totalAADPS / bp.Economy.BuildCostMass)}})
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0021>', totalAADPS)}})
                         end
                         if not upgradesAvailable then
                             table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
