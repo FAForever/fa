@@ -1391,6 +1391,35 @@ options = {
                     end
                 end,
             },
+
+            {
+                title = 'Gesture control',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_0315>Gesture to delete commands",
+                key = 'gesture_delete_commands',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 'off' },
+                        { text = "<LOC gesture_build>Build commands only", key = 'build' },
+                        { text = "<LOC gesture_build>Engineer related commands only", key = 'engineering' },
+                        { text = "<LOC gesture_build>All commands", key = 'all' },
+                    },
+                },
+
+                set = function(control, value, startup)
+                    LOG(value)
+                    import("/lua/ui/game/cursor/deletebuildcommand.lua").SetGestureDetectionCommandType(value)
+                end,
+            },
         },
     },
     video = {
