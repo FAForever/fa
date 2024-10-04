@@ -1416,7 +1416,6 @@ options = {
                 },
 
                 set = function(control, value, startup)
-                    LOG(value)
                     import("/lua/ui/game/cursor/deletebuildcommand.lua").SetGestureDetectionCommandType(value)
                 end,
             },
