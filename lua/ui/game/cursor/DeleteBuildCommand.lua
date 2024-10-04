@@ -118,6 +118,7 @@ StartGestureDetectionThread = function()
     ModuleTrash:Add(ForkThread(GestureDetectionThread))
 end
 
+--- Sets the gesture detection command type and attempts to restart the gesture detection thread.
 ---@param commandType UIGestureDetectionCommandType
 SetGestureDetectionCommandType = function(commandType)
     GestureDetectionCommandType = commandType
