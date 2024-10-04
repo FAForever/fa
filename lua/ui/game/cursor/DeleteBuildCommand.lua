@@ -22,6 +22,9 @@
 
 ---@alias UIGestureDetectionCommandType 'off' | 'build' | 'engineering' | 'all'
 
+---@type TrashBag
+local ModuleTrash = TrashBag()
+
 --- See also:  https://github.com/FAForever/FA-Binary-Patches/pull/22
 local BuildCommandTypes = {
     [8] = true, -- BuildMobile
@@ -44,9 +47,6 @@ local GestureDetectionCommandType = import("/lua/user/prefs.lua").GetOption('ges
 
 ---@type number
 local GestureDetectionSuccessionThreshold = 3
-
----@type thread?
-local GestureDetectionThreadInstance = nil;
 
 --- Starts a basic gesture detection thread to delete a (build) command
 local GestureDetectionThread = function()
@@ -88,7 +88,7 @@ local GestureDetectionThread = function()
                 gestureTargetId = command.commandId
                 gestureSuccessive = 0
             end
-            
+
             if gestureSuccessive == GestureDetectionSuccessionThreshold then
                 DeleteCommand(gestureTargetId)
                 gestureTargetId = 0
@@ -99,15 +99,16 @@ local GestureDetectionThread = function()
     end
 end
 
----@return thread
+--- Starts the gesture detection thread. Function is idempotent.
 StartGestureDetectionThread = function()
-    -- prevent duplicate threads
-    if GestureDetectionThreadInstance and type(GestureDetectionThreadInstance) == "thread" then
-        KillThread(GestureDetectionThreadInstance)
+    ModuleTrash:Destroy()
+
+    -- logic requires an active session
+    if SessionIsActive() then
+        return
     end
 
-    GestureDetectionThreadInstance = ForkThread(GestureDetectionThread)
-    return GestureDetectionThreadInstance
+    ModuleTrash:Add(ForkThread(GestureDetectionThread))
 end
 
 ---@param commandType UIGestureDetectionCommandType
@@ -127,12 +128,7 @@ end
 
 --- Called by the module manager when this module becomes dirty
 function __moduleinfo.OnDirty()
-    reprsl(__moduleinfo, { depth = 2 })
-
-    -- kill current thread
-    if GestureDetectionThreadInstance and type(GestureDetectionThreadInstance) == "thread" then
-        KillThread(GestureDetectionThreadInstance)
-    end
+    ModuleTrash:Destroy()
 
     -- trigger a reload
     ForkThread(

@@ -1416,7 +1416,9 @@ options = {
                 },
 
                 set = function(control, value, startup)
-                    import("/lua/ui/game/cursor/deletebuildcommand.lua").SetGestureDetectionCommandType(value)
+                    if SessionIsActive() then
+                        import("/lua/ui/game/cursor/deletebuildcommand.lua").SetGestureDetectionCommandType(value)
+                    end
                 end,
             },
         },
