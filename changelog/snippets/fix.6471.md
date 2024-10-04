@@ -1,0 +1,1 @@
+- (#6471) Fix Seraphim wall not orientating towards the terrain
