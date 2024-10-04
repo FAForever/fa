@@ -51,6 +51,13 @@ local GestureDetectionSuccessionThreshold = 3
 --- Starts a basic gesture detection thread to delete a (build) command
 local GestureDetectionThread = function()
 
+    -- local scope for performance
+    local WaitFrames = WaitFrames
+    local GetHighlightCommand = GetHighlightCommand
+    local GetGameTimeSeconds = GetGameTimeSeconds
+    local DeleteCommand = DeleteCommand
+
+    -- internal state
     local gestureStart = 0
     local gestureTargetId = nil
     local gestureSuccessive = 0
