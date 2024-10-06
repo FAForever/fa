@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Willem 'Jip' Wijnia
+# Copyright (c) 2024 FAForever
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,36 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: Documentation - Verify URLs
+name: Convert PRs to Draft on Opening
 
 on:
-  push:
-    branches: ["develop"]
-    paths: ["docs/**"]
-
-  pull_request: 
-    paths: ["docs/**"]
-
-  workflow_dispatch:
+  pull_request:
+    types: [opened]
 
 jobs:
-  verify:
-    name: Verify URLs
+  convert_to_draft:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            docs
-
-      - name: urlchecker-action
-        uses: urlstechie/urlchecker-action@0.0.34
-        with:
-          subfolder: docs
-          file_types: .md
-          exclude_files: docs/README.md
-
-          # URLs are excluded because not all type of URLs are supported, see also:
-          # - https://github.com/urlstechie/urlchecker-action/issues/105
-          exclude_urls: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf,https://github.com/FAForever/fa/deployments,https://github.com/FAForever/fa/deployments/production
+      - run: gh pr ready --undo ${{ github.event.pull_request.number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
