@@ -100,4 +100,4 @@ jobs:
 
       - name: Validate changelog files
         run: |
-          tests/run-syntax-test.sh
+          ./tests/run-syntax-test.sh
