@@ -2,6 +2,9 @@
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Layouter = LayoutHelpers.ReusedLayoutFor
+
 ---@alias MauiCheckboxState "normal" | "over" | "disabled"
 
 ---@class MauiCheckboxTexture
@@ -164,5 +167,56 @@ Checkbox = ClassUI(Bitmap) {
     ---@param modifiers EventModifiers
     OnClick = function(self, modifiers)
         self:ToggleCheck()
+    end,
+}
+
+---A class that adds an icon to the center of a normal bitmap, for buttons that are composites of multiple textures
+---@class IconCheckbox : MauiCheckbox
+---@field iconEnabled FileName -- The icon texture to display when the button is enabled
+---@field iconDisabled FileName -- The icon texture to display when the button is disabled
+---@field icon Bitmap
+IconCheckbox = Class(Checkbox) {
+
+    SetIconTextures = function(self, iconEnabled, iconDisabled)
+        LOG('IconCheckbox:SetIconTextures('..tostring(iconEnabled)..', '..tostring(iconDisabled)..')')
+        if iconEnabled and iconDisabled then
+            self.iconEnabled = iconEnabled
+            self.iconDisabled = iconDisabled
+            if not self.icon then
+                self.icon = Bitmap(self)
+                self.icon:SetTexture(self:IsDisabled() and iconDisabled or iconEnabled)
+                self:Layout()
+            else
+                self.icon:SetTexture(self:IsDisabled() and iconDisabled or iconEnabled)
+                self.icon:SetAlpha(1)
+            end
+        else
+            self.icon:SetAlpha(0)
+        end
+    end,
+
+    ---@param self IconCheckbox
+    Layout = function(self)
+        if self.icon then
+            Layouter(self.icon)
+                :AtCenterIn(self)
+                :DisableHitTest()
+        end
+    end,
+
+    ---@param self IconCheckbox
+    OnEnable = function(self)
+        if self.icon then
+            self.icon:SetTexture(self.iconEnabled)
+        end
+        Checkbox.OnEnable(self)
+    end,
+
+    ---@param self IconCheckbox
+    OnDisable = function(self)
+        if self.icon then
+            self.icon:SetTexture(self.iconDisabled)
+        end
+        Checkbox.OnDisable(self)
     end,
 }
