@@ -34,10 +34,10 @@ float WaterElevation;
 float WaterElevationDeep;
 float WaterElevationAbyss;
 
-// masks of stratum layers 1 - 4
+// masks of stratum layers 0 - 3 (lower stratum has no mask)
 texture        UtilityTextureA;
 
-// masks of stratum layers 5 - 8
+// masks of stratum layers 4 - 7
 texture        UtilityTextureB;
 
 // red: wave normal strength
