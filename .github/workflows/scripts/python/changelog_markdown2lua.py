@@ -13,7 +13,7 @@ LUA_FILE = """Changelog = {{
     description = {{
 {description}
     }}
-}},
+}}
 """
 
 HEADER_SEPARATOR = "--" * (MAX_LINE_LENGTH // len("--"))
