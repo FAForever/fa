@@ -88,18 +88,19 @@ jobs:
     needs: convert_changelog
     steps:
       - name: Install tooling
-        run: apk add bash git findutils
-
-      - name: Download the Lua changelog artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: lua_changelog
+        run: |
+          apk add bash git findutil
 
       - name: Checkout
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            tests
+            tests/run-syntax-test.sh
+
+      - name: Download the Lua changelog artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lua_changelog
 
       - name: Validate changelog files
         run: |
