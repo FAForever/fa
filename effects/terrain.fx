@@ -782,11 +782,11 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
     // sample all the textures we'll need
     float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale));
 
-    float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT  * TerrainScale * LowerNormalTile ) * 2 - 1);
-    float4 stratum0Normal = normalize(tex2D( Stratum0NormalSampler, inV.mTexWT  * TerrainScale * Stratum0NormalTile ) * 2 - 1);
-    float4 stratum1Normal = normalize(tex2D( Stratum1NormalSampler, inV.mTexWT  * TerrainScale * Stratum1NormalTile ) * 2 - 1);
-    float4 stratum2Normal = normalize(tex2D( Stratum2NormalSampler, inV.mTexWT  * TerrainScale * Stratum2NormalTile ) * 2 - 1);
-    float4 stratum3Normal = normalize(tex2D( Stratum3NormalSampler, inV.mTexWT  * TerrainScale * Stratum3NormalTile ) * 2 - 1);
+    float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT * TerrainScale * LowerNormalTile ) * 2 - 1);
+    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, inV.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
+    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, inV.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
+    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, inV.mTexWT * TerrainScale * Stratum2NormalTile) * 2 - 1);
+    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, inV.mTexWT * TerrainScale * Stratum3NormalTile) * 2 - 1);
 
     // blend all normals together
     float4 normal = lowerNormal;
@@ -890,13 +890,13 @@ float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
 {
     // sample all the textures we'll need
-    float4 mask = saturate(tex2Dproj( UtilitySamplerA, inV.mTexWT  * TerrainScale)* 2 - 1 );
-    float4 upperAlbedo = tex2Dproj( UpperAlbedoSampler, inV.mTexWT  * TerrainScale* UpperAlbedoTile );
-    float4 lowerAlbedo = tex2Dproj( LowerAlbedoSampler, inV.mTexWT  * TerrainScale* LowerAlbedoTile );
-    float4 stratum0Albedo = tex2Dproj( Stratum0AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum0AlbedoTile );
-    float4 stratum1Albedo = tex2Dproj( Stratum1AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum1AlbedoTile );
-    float4 stratum2Albedo = tex2Dproj( Stratum2AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum2AlbedoTile );
-    float4 stratum3Albedo = tex2Dproj( Stratum3AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum3AlbedoTile );
+    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale) * 2 - 1);
+    float4 upperAlbedo = tex2D( UpperAlbedoSampler, inV.mTexWT * TerrainScale * UpperAlbedoTile);
+    float4 lowerAlbedo = tex2D( LowerAlbedoSampler, inV.mTexWT * TerrainScale * LowerAlbedoTile);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, inV.mTexWT * TerrainScale * Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, inV.mTexWT * TerrainScale * Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, inV.mTexWT * TerrainScale * Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, inV.mTexWT * TerrainScale * Stratum3AlbedoTile);
 
     float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz*2-1;
 
@@ -909,7 +909,7 @@ float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
     albedo.xyz = lerp( albedo.xyz, upperAlbedo.xyz, upperAlbedo.w );
 
     // get the water depth
-    float waterDepth = tex2Dproj( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+    float waterDepth = tex2D( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
     // calculate the lit pixel
     float4 outColor = CalculateLighting( normal, inV.mTexWT.xyz, albedo.xyz, 1-albedo.w, waterDepth, inV.mShadow, inShadows);
@@ -921,19 +921,19 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
 {
     float4 position = TerrainScale*pixel.mTexWT;
 
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
+    float4 mask0 = saturate(tex2D(UtilitySamplerA,position)*2-1);
+    float4 mask1 = saturate(tex2D(UtilitySamplerB,position)*2-1);
 
-    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
-    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
-    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
-    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
-    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
-    float4 upperAlbedo = tex2Dproj(UpperAlbedoSampler,position*UpperAlbedoTile);
+    float4 lowerAlbedo = tex2D(LowerAlbedoSampler,position*LowerAlbedoTile);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
+    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
+    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
+    float4 upperAlbedo = tex2D(UpperAlbedoSampler,position*UpperAlbedoTile);
 
     float4 albedo = lowerAlbedo;
     albedo = lerp(albedo,stratum0Albedo,mask0.x);
@@ -958,7 +958,7 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     light = LightingMultiplier*light + ShadowFillColor*(1-light);
     albedo.rgb = light * ( albedo.rgb + specular.rgb );
 
-    float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
+    float waterDepth = tex2D(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
     albedo.rgb = ApplyWaterColor(pixel.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
