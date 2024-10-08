@@ -1,5 +1,11 @@
 UnitBlueprint{
     Description = "<LOC urb3202_desc>Sonar System",
+    AI = {
+        TargetBones = {
+            "Deck02",
+            "URB3202",
+        },
+    },
     Audio = {
         Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Huge',    LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB3202_Activate',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -116,9 +122,9 @@ UnitBlueprint{
     SelectionSizeX = 0.45,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.88,
-    CollisionOffsetY = -0.375,
+    CollisionOffsetY = -0.4,
     SizeX = 0.6,
-    SizeY = 0.825,
+    SizeY = 0.85,
     SizeZ = 0.6,
     StrategicIconName = "icon_structure2_intel",
     StrategicIconSortPriority = 230,
