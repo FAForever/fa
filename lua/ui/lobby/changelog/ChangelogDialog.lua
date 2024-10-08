@@ -49,22 +49,13 @@ local PreferenceKeys = {
 ---@field Name string
 ---@field Description string[]
 
---- Test if we should display the changelog of the new game version.
----@return boolean
-function OpenChangelog()
-    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
-
-    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.GameVersion) or 0
-    return LastChangelogVersion < version
-end
+--- A set of preference keys that are used.
+PreferenceKeys = {
+    GameVersion = "ChangelogGameVersion",
+}
 
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false
-
---- A bit of a hack, but allows us to keep track of whether the changelog is open or not. The lobby
--- is (almost aggressively) trying to keep control of the keyboard on the chat box to prevent hotkeys
--- from working :sad:
-isOpen = false
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -118,7 +109,6 @@ local ChangelogDialog = ClassUI(Group) {
 
         -- allow us to use escape to quickly get out
 
-        isOpen = true
         EscapeHandler.PushEscapeHandler(
             function()
                 self:Close()
@@ -351,46 +341,78 @@ local ChangelogDialog = ClassUI(Group) {
         -- prevent the dialog from popping up again
         Prefs.SetToCurrentProfile(PreferenceKeys.GameVersion, version)
 
-        isOpen = false
         EscapeHandler.PopEscapeHandler()
 
         -- go into oblivion
-        self:Destroy()
+        CloseChangelogDialog()
     end,
 }
+
+---@type UIChangelogDialog | false
+ChangelogInstance = false
+
+--- Closes the dialog. Function is idempotent.
+CloseChangelogDialog = function()
+    ModuleTrash:Destroy()
+    ChangelogInstance = false
+end
 
 --- Opens the changelog dialog. Function is idempotent.
 ---@param parent Control
 ---@return UIChangelogDialog
 CreateChangelogDialog = function(parent)
-    ModuleTrash:Destroy()
+    CloseChangelogDialog()
 
     ---@type UIChangelogDialog
-    local changelogDialog = ChangelogDialog(parent)
-    ModuleTrash:Add(changelogDialog)
-    return changelogDialog
+    ChangelogInstance = ChangelogDialog(parent)
+    ModuleTrash:Add(ChangelogInstance)
+    return ChangelogInstance
+end
+
+--- Returns iff the changelog is open.
+---@return boolean
+IsOpen = function()
+    if not ChangelogInstance then
+        return false
+    end
+
+    if IsDestroyed(ChangelogInstance) then
+        return false
+    end
+
+    return true
+end
+
+--- Returns true iff we should open the changelog.
+---@return boolean
+function ShouldOpenChangelog()
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.GameVersion) or 0
+    return LastChangelogVersion < version
 end
 
 -------------------------------------------------------------------------------
 --#region Debugging
 
---- Called by the module manager when this module is reloaded
----@param newModule any
-function __moduleinfo.OnReload(newModule)
-    newModule.CreateChangelogDialog(GetFrame(0))
-end
-
 --- Called by the module manager when this module becomes dirty
 function __moduleinfo.OnDirty()
-    ModuleTrash:Destroy()
+    -- keep track of whether the changelog was open
+    local openAgain = IsOpen()
 
-    -- trigger a reload
-    ForkThread(
-        function()
-            WaitSeconds(1.0)
-            import(__moduleinfo.name)
-        end
-    )
+    -- clear all trash related to the dialog, including the dialog itself
+    CloseChangelogDialog()
+
+    -- if the dialog was open, wait a second and then automatically re-open it
+    if openAgain then
+        ForkThread(
+            function()
+                WaitSeconds(1.0)
+                local module = import(__moduleinfo.name)
+                module.CreateChangelogDialog(GetFrame(0))
+            end
+        )
+    end
 end
 
 --#endregion
