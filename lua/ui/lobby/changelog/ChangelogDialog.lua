@@ -44,7 +44,7 @@ local PreferenceKeys = {
 ---@field URL string
 ---@field Name string
 
----@class UIChangelogData 
+---@class UIChangelogData
 ---@field Version number
 ---@field Name string
 ---@field Description string[]
