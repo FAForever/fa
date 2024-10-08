@@ -7,6 +7,7 @@
 ---@field targetId? EntityId
 ---@field blueprintId? UnitId
 ---@field commandType number
+---@field commandId number
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
@@ -480,7 +481,7 @@ end
 
 ---
 ---@param key string
----@return string[]
+---@return string
 function GetOptions(key)
 end
 
