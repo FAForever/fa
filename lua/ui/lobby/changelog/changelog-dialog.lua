@@ -77,7 +77,10 @@ isOpen = false
 ---@field descriptionRU string[]        # Russian translation
 ---@field description string[]          # Default changelog in English
 
----@class UIChangelog : Group
+---@type TrashBag
+local ModuleTrash = TrashBag()
+
+---@class UIChangelogDialog : Group
 ---@field Debug Group
 ---@field CommonUI Group
 ---@field Border Border
@@ -101,9 +104,9 @@ isOpen = false
 ---@field ContentPatchesDebug Bitmap
 ---@field ContentDivider Bitmap
 ---@field ContentPatchesList ItemList
-Changelog = ClassUI(Group) {
+local ChangelogDialog = ClassUI(Group) {
 
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -287,7 +290,7 @@ Changelog = ClassUI(Group) {
     end,
 
     --- Populates the dialog with the given patch
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     ---@param index number
     PopulateWithPatch = function(self, index)
         ---@type UIChangelogMetadata
@@ -331,7 +334,7 @@ Changelog = ClassUI(Group) {
     end,
 
     --- Populates the list of patches
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
         for _, patch in pairs(ChangelogOverview.Overview.Changelogs) do
@@ -340,7 +343,7 @@ Changelog = ClassUI(Group) {
     end,
 
     --- Destroys the dialog
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     Close = function(self)
 
         local version, gametype, commit = import("/lua/version.lua").GetVersionData()
@@ -355,3 +358,39 @@ Changelog = ClassUI(Group) {
         self:Destroy()
     end,
 }
+
+--- Opens the changelog dialog. Function is idempotent.
+---@param parent Control
+---@return UIChangelogDialog
+CreateChangelogDialog = function(parent)
+    ModuleTrash:Destroy()
+
+    ---@type UIChangelogDialog
+    local changelogDialog = ChangelogDialog(parent)
+    ModuleTrash:Add(changelogDialog)
+    return changelogDialog
+end
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Called by the module manager when this module is reloaded
+---@param newModule any
+function __moduleinfo.OnReload(newModule)
+    newModule.CreateChangelogDialog(GetFrame(0))
+end
+
+--- Called by the module manager when this module becomes dirty
+function __moduleinfo.OnDirty()
+    ModuleTrash:Destroy()
+
+    -- trigger a reload
+    ForkThread(
+        function()
+            WaitSeconds(1.0)
+            import(__moduleinfo.name)
+        end
+    )
+end
+
+--#endregion
