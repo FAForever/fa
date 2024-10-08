@@ -310,6 +310,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/1, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 180,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -378,7 +380,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 10/7, --10/integer interval in ticks
-            SlavedToBody = false,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 39,
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -444,7 +447,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 10/7, --10/integer interval in ticks
-            SlavedToBody = false,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 39,
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",

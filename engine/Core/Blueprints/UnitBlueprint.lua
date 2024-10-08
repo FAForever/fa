@@ -127,7 +127,9 @@
 
 
 ---@class UnitBlueprintAI
---- under what angle the unit attacks its target after getting an attack order
+--- At what angle (to either side) the unit attacks its target after getting an attack order. 
+--- If one of the unit's weapons has a target and has `SlavedToBody = true`, it will rotate when idle and attacking.
+--- Overrides Weapon `SlavedToBody` and `SlavedToBodyArcRange` behavior.
 ---@field AttackAngle number
 --- automatically surface to attack ground targets
 ---@field AutoSurfaceToAttack boolean
