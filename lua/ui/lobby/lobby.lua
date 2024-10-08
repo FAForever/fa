@@ -1054,7 +1054,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
         -- Changelog, if necessary.
         if Changelog.OpenChangelog() then
-            Changelog.Changelog(GetFrame(0))
+            Changelog.CreateChangelogDialog(GetFrame(0))
         end
     end
 
@@ -3342,7 +3342,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
-        Changelog.Changelog(GUI)
+        Changelog.CreateChangelogDialog(GUI)
     end
 
     -- Create mission briefing button
