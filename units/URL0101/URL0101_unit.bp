@@ -146,7 +146,6 @@ UnitBlueprint{
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
-            WeaponCategory = "Missile",
         },
     },
     Wreckage = {
