@@ -29,7 +29,12 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-local data = import("/lua/ui/lobby/changelogdata.lua")
+---@class UIChangelogOverview
+---@field Changelogs UIChangelogMetadata[]
+
+---@class UIChangelogMetadata
+---@field Path string
+---@field URL string
 
 --- Test if we should display the changelog of the new game version.
 ---@return boolean
