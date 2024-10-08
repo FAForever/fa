@@ -44,6 +44,7 @@ jobs:
       - name: Checkout FA repository
         uses: actions/checkout@v4
         with:
+            ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
             repository: FAForever/fa
             ref: develop
 
