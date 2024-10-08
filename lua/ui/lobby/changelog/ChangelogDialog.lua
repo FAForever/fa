@@ -57,17 +57,6 @@ PreferenceKeys = {
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false
 
----@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
-
----@class PatchNotes
----@field version number | string       # Patch version
----@field hasPrettyGithubRelease boolean  # URL to the release on Github
----@field name PatchNotesType           # Patch type
----@field hasPrettyPatchnotes boolean   # Refers to patchnotes.faforever.com, defaults to false
----@field descriptionFR string[]        # French translation
----@field descriptionRU string[]        # Russian translation
----@field description string[]          # Default changelog in English
-
 ---@type TrashBag
 local ModuleTrash = TrashBag()
 
