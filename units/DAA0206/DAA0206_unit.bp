@@ -170,7 +170,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Kamikaze",
             DoTPulses = 20,
-            DoTTime = 10,
+            DoTTime = 9.5,
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",

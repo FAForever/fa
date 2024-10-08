@@ -346,7 +346,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Napalm Carpet Bomb",
             DoTPulses = 10,
-            DoTTime = 6,
+            DoTTime = 5.4,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",
                 Land = "Land|Seabed|Water",

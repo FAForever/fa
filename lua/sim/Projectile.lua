@@ -6,8 +6,8 @@
 ------------------------------------------------------------------
 
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
-local UnitDoTThread = DefaultDamage.UnitDoTThread
-local AreaDoTThread = DefaultDamage.AreaDoTThread
+local EntityDoTThread2 = DefaultDamage.EntityDoTThread2
+local AreaDoTThread2 = DefaultDamage.AreaDoTThread2
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
@@ -624,16 +624,11 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     end,
 
     --- Called by Lua to process the damage logic of a projectile
-    -- @param self The projectile itself
-    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
-    -- @param DamageData The damage data passed by the weapon
-    -- @param targetEntity The entity we hit, is nil if we hit terrain
-    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self Projectile
-    ---@param instigator Unit
-    ---@param DamageData table
-    ---@param targetEntity Unit | Prop | nil
-    ---@param cachedPosition Vector
+    ---@param instigator Unit # The launcher, and if it doesn't exist, the projectile itself
+    ---@param DamageData table # passed by the weapon
+    ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
+    ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
@@ -649,65 +644,62 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 local damageFriendly =  DamageData.DamageFriendly
                 local damageSelf = DamageData.DamageSelf or false
 
-                -- check for damage-over-time
-                local DoTTime = DamageData.DoTTime
-                if DoTTime <= 0 then
-                    -- no damage over time, do radius-based damage
+                -- do initial damage in a radius
+                DamageArea(
+                    instigator,
+                    cachedPosition,
+                    radius,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType,
+                    damageFriendly,
+                    damageSelf
+                )
+
+                local damageToShields = DamageData.DamageToShields
+                if damageToShields then
                     DamageArea(
                         instigator,
                         cachedPosition,
                         radius,
-                        damage,
-                        damageType,
+                        damageToShields,
+                        "FAF_AntiShield",
                         damageFriendly,
                         damageSelf
                     )
+                end
 
-                    local damageToShields = DamageData.DamageToShields
-                    if damageToShields then
-                        DamageArea(
+                -- check for and deal damage over time
+                local DoTTime = DamageData.DoTTime
+                if DoTTime > 0 then
+                    -- initial damage pulse was already dealt so subtract 1
+                    local DoTPulses = DamageData.DoTPulses - 1
+                    if DoTPulses >= 1 then
+                        ForkThread(
+                            AreaDoTThread2,
                             instigator,
-                            cachedPosition,
+                            self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                            DoTPulses,
+                            (DoTTime / (DoTPulses)),
                             radius,
-                            damageToShields,
-                            "FAF_AntiShield",
-                            damageFriendly,
-                            damageSelf
-                        )
-                    end
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount
-                    if initialDmg > 0 then
-                        DamageArea(
-                            instigator,
-                            cachedPosition,
-                            radius,
-                            initialDmg,
+                            damage,
                             damageType,
-                            damageFriendly,
-                            damageSelf
+                            damageFriendly
                         )
                     end
-
-                    -- apply damage over time
-                    local DoTPulses = DamageData.DoTPulses or 1
-                    ForkThread(
-                        AreaDoTThread,
-                        instigator,
-                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                        DoTPulses,
-                        (DoTTime / (DoTPulses)),
-                        radius,
-                        damage,
-                        damageType,
-                        damageFriendly
-                    )
                 end
 
             -- damage a single entity
             elseif targetEntity then
                 local damageType = DamageData.DamageType
+
+                -- do initial damage
+                Damage(
+                    instigator,
+                    cachedPosition,
+                    targetEntity,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType
+                )
 
                 local damageToShields = DamageData.DamageToShields
                 if damageToShields then
@@ -720,43 +712,22 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     )
                 end
 
-                -- check for damage-over-time
+                -- check for and apply damage over time
                 local DoTTime = DamageData.DoTTime
-                if DoTTime <= 0 then
-
-                    -- no damage over time, do single target damage
-                    Damage(
-                        instigator,
-                        cachedPosition,
-                        targetEntity,
-                        damage,
-                        damageType
-                    )
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        Damage(
+                if DoTTime > 0 then
+                    -- initial damage pulse was already dealt so subtract 1
+                    local DoTPulses = DamageData.DoTPulses - 1
+                    if DoTPulses >= 1 then
+                        ForkThread(
+                            EntityDoTThread2,
                             instigator,
-                            cachedPosition,
                             targetEntity,
-                            initialDmg,
+                            DoTPulses,
+                            (DoTTime / (DoTPulses)),
+                            damage,
                             damageType
                         )
                     end
-
-                    -- apply damage over time
-                    local DoTPulses = DamageData.DoTPulses or 1
-                    ForkThread(
-                        UnitDoTThread,
-                        instigator,
-                        targetEntity,
-                        DoTPulses,
-                        (DoTTime / (DoTPulses)),
-                        damage,
-                        damageType,
-                        DamageData.DamageFriendly
-                    )
                 end
             end
         end
@@ -1104,3 +1075,5 @@ DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
 
 local Explosion = import("/lua/defaultexplosions.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
+local UnitDoTThread = DefaultDamage.UnitDoTThread
+local AreaDoTThread = DefaultDamage.AreaDoTThread
