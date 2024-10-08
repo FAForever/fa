@@ -29,18 +29,33 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
+local ChangelogOverview = import("/lua/ui/lobby/changelog/generated/overview.lua")
+
+local PreferenceKeys = {
+    GameVersion = "ChangelogGameVersion",
+}
+
 ---@class UIChangelogOverview
 ---@field Changelogs UIChangelogMetadata[]
 
 ---@class UIChangelogMetadata
+---@field Version number
 ---@field Path string
 ---@field URL string
+---@field Name string
+
+---@class UIChangelogData 
+---@field Version number
+---@field Name string
+---@field Description string[]
 
 --- Test if we should display the changelog of the new game version.
 ---@return boolean
 function OpenChangelog()
-    local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-    return LastChangelogVersion < data.last_version
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.GameVersion) or 0
+    return LastChangelogVersion < version
 end
 
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
@@ -275,7 +290,11 @@ Changelog = ClassUI(Group) {
     ---@param self UIChangelog
     ---@param index number
     PopulateWithPatch = function(self, index)
-        local patch = data.gamePatches[index + 1]
+        ---@type UIChangelogMetadata
+        local changelog = ChangelogOverview.Overview.Changelogs[index + 1]
+
+        ---@type UIChangelogData
+        local patch = import(changelog.Path).Changelog
 
         if patch then
 
@@ -298,11 +317,11 @@ Changelog = ClassUI(Group) {
             end
 
             self.ContentPatchesList:SetSelection(index)
-            self.HeaderSubtitle:SetText(patch.name)
+            self.HeaderSubtitle:SetText(patch.Name)
             self.ContentNotesList:DeleteAllItems()
 
             local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
-            for k, line in patch[altDescription] or patch.description do
+            for k, line in patch[altDescription] or patch.Description do
                 self.ContentNotesList:AddItem(line)
             end
         else
@@ -315,8 +334,8 @@ Changelog = ClassUI(Group) {
     ---@param self UIChangelog
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
-        for k, patch in data.gamePatches do
-            self.ContentPatchesList:AddItem(patch.version .. " - " .. patch.name)
+        for _, patch in pairs(ChangelogOverview.Overview.Changelogs) do
+            self.ContentPatchesList:AddItem(patch.Version .. " - " .. patch.Name)
         end
     end,
 
@@ -324,8 +343,10 @@ Changelog = ClassUI(Group) {
     ---@param self UIChangelog
     Close = function(self)
 
+        local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
         -- prevent the dialog from popping up again
-        Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
+        Prefs.SetToCurrentProfile(PreferenceKeys.GameVersion, version)
 
         isOpen = false
         EscapeHandler.PopEscapeHandler()
