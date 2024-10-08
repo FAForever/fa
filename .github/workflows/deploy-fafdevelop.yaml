@@ -72,8 +72,8 @@ jobs:
       - name: Create a commit
         run: |
           # Configure git
-          git config user.email "administrator@faforever.com"
-          git config user.name "FAForever"
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
 
           git add .
           git commit -m "Post-process deployment"
