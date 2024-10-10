@@ -92,8 +92,9 @@ local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
 
+    -- Game must have factions for players or else it won't start, so default to UEF.
+    result.Faction = 1
     local factionData = import("/lua/factions.lua")
-
     for index, tbl in factionData.Factions do
         if HasCommandLineArg("/" .. tbl.Key) then
             result.Faction = index
