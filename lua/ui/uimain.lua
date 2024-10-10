@@ -64,15 +64,15 @@ function StartFrontEndUI()
 end
 
 --- Hosts a multiplayer LAN lobby.
---- Called by the engine with the command line argument `/hostgame <protocol> <port> <playerName> <gameName> <mapName>`
+--- Called by the engine with the command line argument `/hostgame <protocol> <port> <playerName> <gameName> <mapFile>`
 --- Add the argument `/players <number>` to use the auto lobby. `/<factionName>` to choose a faction.
 ---@param protocol UILobbyProtocols
 ---@param port number
 ---@param playerName string
 ---@param gameName string
----@param mapName FileName
+---@param mapFile FileName
 ---@param natTraversalProvider userdata?
-function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTraversalProvider)
+function StartHostLobbyUI(protocol, port, playerName, gameName, mapFile, natTraversalProvider)
     LOG("Hosting lobby from the command line")
     local lobby
     -- auto lobby only works with 2+ players
@@ -83,7 +83,7 @@ function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTrav
         lobby = import("/lua/ui/lobby/lobby.lua")
     end
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
-    lobby.HostGame(gameName, mapName, false)
+    lobby.HostGame(gameName, mapFile, false)
 end
 
 --- Joins a multiplayer LAN lobby.
