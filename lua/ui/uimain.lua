@@ -63,11 +63,17 @@ function StartFrontEndUI()
     end
 end
 
-
---Used by command line to host a game
+--- Hosts a multiplayer LAN lobby.
+--- Called by the engine with the command line argument `/hostgame <protocol> <port> <playerName> <gameName> <mapName>`
+--- Add the argument `/players <number>` to use the auto lobby. `/<factionName>` to choose a faction.
+---@param protocol UILobbyProtocols
+---@param port number
+---@param playerName string
+---@param gameName string
+---@param mapName FileName
+---@param natTraversalProvider userdata?
 function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTraversalProvider)
-    LOG("Command line hostlobby")
-    LOG(protocol, port, playerName, gameName, mapName, natTraversalProvider)
+    LOG("Hosting lobby from the command line")
     local lobby
     -- auto lobby only works with 2+ players
     local autoStart = GetCommandLineArg("/players", 1)[1] >= 2
@@ -80,8 +86,15 @@ function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTrav
     lobby.HostGame(gameName, mapName, false)
 end
 
---Used by command line to join a game
+--- Joins a multiplayer LAN lobby.
+--- Called by the engine with the command line argument `/joingame <protocol> <address> <playerName>`
+--- Add the argument `/players <number>` to use the auto lobby. `/<factionName>` to choose a faction.
+---@param protocol UILobbyProtocols
+---@param address string
+---@param playerName string
+---@param natTraversalProvider userdata?
 function StartJoinLobbyUI(protocol, address, playerName, natTraversalProvider)
+    LOG("Joining lobby from the command line") -- can also be from lobby.lua ReturnToMenu(true), but that never gets called
     local lobby
     -- auto lobby only works with 2+ players
     local autoStart = GetCommandLineArg("/players", 1)[1] >= 2
