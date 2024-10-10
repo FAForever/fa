@@ -67,14 +67,26 @@ end
 --Used by command line to host a game
 function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTraversalProvider)
     LOG("Command line hostlobby")
-    local lobby = import("/lua/ui/lobby/lobby.lua")
+    LOG(protocol, port, playerName, gameName, mapName, natTraversalProvider)
+    local lobby
+    local autoStart = GetCommandLineArg("/players", 1)
+    if autoStart then
+        lobby = import("/lua/ui/lobby/autolobby.lua")
+    else
+        lobby = import("/lua/ui/lobby/lobby.lua")
+    end
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
     lobby.HostGame(gameName, mapName, false)
 end
 
 --Used by command line to join a game
 function StartJoinLobbyUI(protocol, address, playerName, natTraversalProvider)
-    local lobby = import("/lua/ui/lobby/lobby.lua")
+    local autoStart = GetCommandLineArg("/players", 1)
+    if autoStart then
+        lobby = import("/lua/ui/lobby/autolobby.lua")
+    else
+        lobby = import("/lua/ui/lobby/lobby.lua")
+    end
     local port = 0
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
     lobby.JoinGame(address, false)
