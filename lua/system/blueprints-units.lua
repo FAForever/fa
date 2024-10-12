@@ -395,17 +395,19 @@ local function PostProcessUnit(unit)
 
         -- usual case: find all remaining intel
         status.AllIntel = {}
-        for name, value in pairs(intelBlueprint) do
-
-            -- may contain tables, such as `JamRadius`
-            if type(value) ~= 'table' then
-                if value == true or value > 0 then
-                    local intel = BlueprintNameToIntel[name]
-                    if intel and not activeIntel[intel] then
-                        if allIntelIsFree then
-                            status.AllIntelMaintenanceFree[intel] = true
-                        else
-                            status.AllIntel[intel] = true
+        if intelBlueprint then
+            for name, value in pairs(intelBlueprint) do
+    
+                -- may contain tables, such as `JamRadius`
+                if type(value) ~= 'table' then
+                    if value == true or value > 0 then
+                        local intel = BlueprintNameToIntel[name]
+                        if intel and not activeIntel[intel] then
+                            if allIntelIsFree then
+                                status.AllIntelMaintenanceFree[intel] = true
+                            else
+                                status.AllIntel[intel] = true
+                            end
                         end
                     end
                 end
