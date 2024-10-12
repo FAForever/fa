@@ -9,7 +9,7 @@
 $gameExecutable = "C:\ProgramData\FAForever\bin\FAFDebugger.exe"
 
 # Command-line arguments common for all instances
-$baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind'
+$baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /gameoptions CheatsEnabled:true'
 
 # Game-specific settings
 $hostProtocol = "udp"  # Protocol for hostgame and joingame
