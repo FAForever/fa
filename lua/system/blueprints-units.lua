@@ -507,6 +507,10 @@ local function PostProcessUnit(unit)
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
         local factor = array[1].Damage
 
+        if not unit.Categories then
+            unit.Categories = {}
+        end
+
         for category, damage in pairs(damagePerRangeCategory) do
             if damage > 0 then
                 local cat = "OVERLAY" .. category
