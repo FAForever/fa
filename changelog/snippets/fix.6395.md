@@ -1,1 +1,1 @@
-- (#6395) Hitbox improvements for a wide range of amphibious and naval units to ensure torpedoes and laser weapons can hit them reliably.
+- (#6395) Hitbox improvements for a wide range of amphibious and naval units to ensure torpedoes and beam weapons can hit them reliably.
