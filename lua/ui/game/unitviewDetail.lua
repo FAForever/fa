@@ -236,6 +236,14 @@ IsAbilityExist = {
     ability_omni = function(bp)
         return bp.Intel.OmniRadius > 0
     end,
+    ability_visionfield = function(bp)
+        return bp.Intel.MaxVisionRadius > 0
+    end,
+    ability_scry = function(bp)
+        return bp.Intel.RemoteViewingRadius > 0
+           and bp.Economy.InitialRemoteViewingEnergyDrain > 0
+           and bp.Economy.MaintenanceConsumptionPerSecondEnergy > 0
+    end,
     ability_flying = function(bp)
         return bp.Air.CanFly
     end,
@@ -334,6 +342,9 @@ IsAbilityExist = {
     end,
     ability_personal_teleporter = function(bp)
         return DecimalToBinary(bp.General.CommandCaps)[12] == 1 -- RULEUCC_Teleport
+    end,
+    ability_snipemode_prioritizes_acu = function(bp)
+        return bp.CategoriesHash.SNIPEMODE
     end
 }
 
@@ -346,6 +357,12 @@ GetAbilityDesc = {
     end,
     ability_omni = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.OmniRadius)
+    end,
+    ability_visionfield = function(bp)
+        return LOCF('<LOC uvd_VisionField>', bp.Intel.MaxVisionRadius)
+    end,
+    ability_scry = function(bp)
+        return LOCF('<LOC uvd_Scry>', bp.Intel.RemoteViewingRadius, bp.Economy.InitialRemoteViewingEnergyDrain, bp.Economy.MaintenanceConsumptionPerSecondEnergy)
     end,
     ability_flying = function(bp)
         return LOCF("<LOC uvd_0011>Speed: %0.1f, Turning: %0.1f", bp.Air.MaxAirspeed, bp.Air.TurnSpeed)
@@ -383,11 +400,13 @@ GetAbilityDesc = {
              ..LOCF('<LOC uvd_Blips>', bp.Intel.JammerBlips)
     end,
     ability_personalshield = function(bp)
-        return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
+        return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
+             ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
     end,
     ability_shielddome = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize/2)..', '
-             ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
+             ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
+             ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
     end,
     ability_stealthfield = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.RadarStealthFieldRadius)
@@ -714,13 +733,21 @@ function WrapAndPlaceText(bp, builder, descID, control)
         end
         --Other parameters
         lines = {}
-        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %0.1f, Cap Cost: %0.1f",
+        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %.3g, Cap Cost: %.3g",
             bp.Intel.VisionRadius, bp.Intel.WaterVisionRadius, bp.Defense.RegenRate, bp.General.CapCost))
 
         if (bp.Physics.MotionType ~= 'RULEUMT_Air' and bp.Physics.MotionType ~= 'RULEUMT_None')
         or (bp.Physics.AltMotionType ~= 'RULEUMT_Air' and bp.Physics.AltMotionType ~= 'RULEUMT_None') then
-            table.insert(lines, LOCF("<LOC uvd_0012>Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d",
+            table.insert(lines, LOCF("<LOC uvd_0012>Speed: %.3g, Reverse: %.3g, Acceleration: %.3g, Turning: %d",
                 bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
+        end
+        
+        -- Display the TransportSpeedReduction stat in the UI.
+        -- Naval units and land experimentals also have this stat, but it since it is not relevant for non-modded games, we do not display it by default.
+        -- If a mod wants to display the TransportSpeedReduction stat for naval units or experimentals, this file can be hooked.
+        if bp.Physics.TransportSpeedReduction and not (bp.CategoriesHash.NAVAL or bp.CategoriesHash.EXPERIMENTAL) then
+            table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
+            bp.Physics.TransportSpeedReduction))
         end
 
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})

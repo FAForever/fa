@@ -35,6 +35,7 @@ UnitBlueprint{
         TeleportIn                    = Sound { Bank = 'Impacts',     Cue = 'XSA_Bomb_Explosion_01',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection                   = Sound { Bank = 'Interface',   Cue = 'Cybran_Select_Commander', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 10000,
     BuildBotTotal = 2,
     Categories = {
         "AMPHIBIOUS",

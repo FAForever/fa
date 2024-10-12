@@ -6,6 +6,7 @@ UnitBlueprint{
         Killed         = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Structure',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 160,
     Categories = {
         "BENIGN",
@@ -69,7 +70,6 @@ UnitBlueprint{
         RebuildBonusIds = { "xsb5101" },
     },
     General = {
-        AlwaysAlignToTerrain = true,
         CapCost = 0.1,
         FactionName = "Seraphim",
         Icon = "land",
@@ -81,6 +81,7 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 0.8,
     Physics = {
+        AlwaysAlignToTerrain = true,
         DragCoefficient = 0.2,
         MaxGroundVariation = 50,
         MeshExtentsX = 1.5,

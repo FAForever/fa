@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UAS',        Cue = 'UAS0201_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Naval',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 7200,
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
@@ -23,6 +24,7 @@ UnitBlueprint{
         "OVERLAYANTINAVY",
         "OVERLAYDEFENSE",
         "OVERLAYDIRECTFIRE",
+        "OVERLAYINDIRECTFIRE",
         "OVERLAYRADAR",
         "OVERLAYSONAR",
         "PRODUCTSC1",

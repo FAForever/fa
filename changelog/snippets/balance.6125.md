@@ -1,3 +1,0 @@
-- (#6125) Increase the hitpoints of the Aeon Tech 1 MAA so that it can survive a single bomb from a Seraphim Tech 1 bomber.
-  - Thistle: T1 Mobile Anti-Air Gun (UAL0104):
-    - MaxHealth: 250 --> 265

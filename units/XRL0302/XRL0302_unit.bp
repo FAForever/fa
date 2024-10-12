@@ -9,6 +9,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Stop',        LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Vehicle',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 400,
     Buffs = {
         Stun = {
             Add = {
@@ -138,6 +139,7 @@ UnitBlueprint{
         MeshExtentsY = 0.25,
         MeshExtentsZ = 0.65,
         MotionType = "RULEUMT_Land",
+        TransportSpeedReduction = 0.15,
         TurnRadius = 4,
         TurnRate = 200,
     },

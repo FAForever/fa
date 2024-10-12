@@ -24,10 +24,13 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local EntityCategoryContains = EntityCategoryContains
 
+local DebugProjectileComponent = import("/lua/sim/projectiles/components/DebugProjectileComponent.lua").DebugProjectileComponent
+
 local ProjectileMethods = moho.projectile_methods
 local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
 local ProjectileMethodsGetMaxZigZag = ProjectileMethods.GetMaxZigZag
 local ProjectileMethodsGetZigZagFrequency = ProjectileMethods.GetZigZagFrequency
+local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
 
 local EntityMethods = _G.moho.entity_methods
 local EntityGetBlueprint = EntityMethods.GetBlueprint
@@ -82,7 +85,7 @@ local OnImpactPreviousZ = 0
 
 local VectorCached = Vector(0, 0, 0)
 
----@class Projectile : moho.projectile_methods, InternalObject
+---@class Projectile : moho.projectile_methods, InternalObject, DebugProjectileComponent
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
@@ -93,7 +96,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
 ---@field OuterRing? NukeAOE
-Projectile = ClassProjectile(ProjectileMethods) {
+Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
@@ -992,6 +995,28 @@ Projectile = ClassProjectile(ProjectileMethods) {
         end
 
         return frequency
+    end,
+
+    --- Set the vertical (gravitational) acceleration of the projectile. Default is -4.9, which is expected by the engine's weapon targeting and firing
+    ---@param acceleration number
+    SetBallisticAcceleration = function(self, acceleration)
+
+        -- Fix an engine bug where the values `1.#INF` or `-1.#IND` passed 
+        -- into this particular engine function can cause the simulation to freeze up.
+        --
+        -- Since `math.huge` does not exist (and does not cover the #IND case) I see
+        -- no other approach than this to try and 'fix' it.
+        --
+        -- Related sources:
+        -- - https://stackoverflow.com/questions/19107302/in-lua-what-is-inf-and-ind
+
+        -- guard to prevent invalid numbers (#IND) and infinite numbers (#INF) from reaching the engine function
+        local stringified = tostring(acceleration)
+        if stringified:find('#') then
+            error("Invalid acceleration value: " .. stringified)
+        end
+
+        return ProjectileMethodsSetBallisticAcceleration(self, acceleration)
     end,
 
     ---------------------------------------------------------------------------

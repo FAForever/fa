@@ -16,6 +16,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB0103_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3200,
     BuildIconSortPriority = 30,
     Categories = {
         "BUILTBYCOMMANDER",

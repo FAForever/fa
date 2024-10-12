@@ -1,1 +1,0 @@
-- (#6258) Fix overcharge hitting units standing at the edge of a shield.

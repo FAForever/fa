@@ -13,6 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XRB',        Cue = 'XRB3301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Radar',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 200,
     Categories = {
         "BUILTBYTIER3COMMANDER",

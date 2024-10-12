@@ -5,6 +5,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XEB',        Cue = 'XEB2306_Activate',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Gun',       LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 6500,
     BuildIconSortPriority = 110,
     Categories = {
         "BUILTBYTIER3COMMANDER",

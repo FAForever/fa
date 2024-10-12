@@ -35,7 +35,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'XRA',        Cue = 'XRA0105_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Air',      LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 350,
     BuildIconSortPriority = 40,
     Categories = {
         "AIR",

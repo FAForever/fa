@@ -1,1 +1,0 @@
-- (#6102) Fix Ahwassa's bomb dealing full damage to ASF.

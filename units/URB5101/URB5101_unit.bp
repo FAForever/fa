@@ -5,6 +5,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB5101_Activate',        LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 200,
     Categories = {
         "BENIGN",

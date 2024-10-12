@@ -641,3 +641,6 @@ MountDirectory(fa_path .. "/movies", '/movies')
 MountDirectory(fa_path .. "/sounds", '/sounds')
 MountDirectory(fa_path .. "/maps", '/maps')
 MountDirectory(fa_path .. "/fonts", '/fonts')
+
+-- Allows developers to embed code to debug a replay
+table.insert(path, 1, { dir = InitFileDir .. '\\..\\Debug', mountpoint = '/' })
