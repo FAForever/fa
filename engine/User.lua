@@ -355,9 +355,9 @@ end
 function GetCamera(name)
 end
 
---- Gets the following arguments to a commandline option. For example, if `/arg -flag key:value drop`
---- was passed to the commandline, then `GetCommandLineArg("/arg", 2)` would return
---- `{"-flag", "key:value"}`
+--- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
+--- disregarding if they start with `/` like other commandline options.  
+--- Returns nil if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
