@@ -4,8 +4,6 @@
     [int]$port = 15000  # Default port for hosting the game
 )
 
-Add-Type -AssemblyName System.Windows.Forms
-
 # Path to the game executable
 $gameExecutable = "C:\ProgramData\FAForever\bin\FAFDebugger.exe"
 
@@ -22,6 +20,7 @@ $numPlayers = $InstanceCount  # Total number of players equals the number of ins
 $factions = @("UEF", "Seraphim", "Cybran", "Aeon")
 
 # Get the screen resolution (for placing and resizing the windows)
+Add-Type -AssemblyName System.Windows.Forms
 $screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
 $screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
 
@@ -31,7 +30,7 @@ $rows = [math]::Ceiling($InstanceCount / $columns)
 
 # Calculate the size of each window based on the grid
 # Limit the window size to 1024x768 as the game session will not launch if it is smaller
-$windowWidth = [math]::Max([math]::Floor($screenWidth / $columns), 1024); 
+$windowWidth = [math]::Max([math]::Floor($screenWidth / $columns), 1024)
 $windowHeight = [math]::Max([math]::Floor($screenHeight / $rows), 768)
 
 # Function to launch a single game instance
