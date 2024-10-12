@@ -4,6 +4,8 @@
     [int]$port = 15000  # Default port for hosting the game
 )
 
+Add-Type -AssemblyName System.Windows.Forms
+
 # Path to the game executable
 $gameExecutable = "C:\ProgramData\FAForever\bin\FAFDebugger.exe"
 
