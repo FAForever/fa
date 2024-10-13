@@ -395,17 +395,19 @@ local function PostProcessUnit(unit)
 
         -- usual case: find all remaining intel
         status.AllIntel = {}
-        for name, value in pairs(intelBlueprint) do
-
-            -- may contain tables, such as `JamRadius`
-            if type(value) ~= 'table' then
-                if value == true or value > 0 then
-                    local intel = BlueprintNameToIntel[name]
-                    if intel and not activeIntel[intel] then
-                        if allIntelIsFree then
-                            status.AllIntelMaintenanceFree[intel] = true
-                        else
-                            status.AllIntel[intel] = true
+        if intelBlueprint then
+            for name, value in pairs(intelBlueprint) do
+    
+                -- may contain tables, such as `JamRadius`
+                if type(value) ~= 'table' then
+                    if value == true or value > 0 then
+                        local intel = BlueprintNameToIntel[name]
+                        if intel and not activeIntel[intel] then
+                            if allIntelIsFree then
+                                status.AllIntelMaintenanceFree[intel] = true
+                            else
+                                status.AllIntel[intel] = true
+                            end
                         end
                     end
                 end
@@ -504,6 +506,10 @@ local function PostProcessUnit(unit)
 
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
         local factor = array[1].Damage
+
+        if not unit.Categories then
+            unit.Categories = {}
+        end
 
         for category, damage in pairs(damagePerRangeCategory) do
             if damage > 0 then
