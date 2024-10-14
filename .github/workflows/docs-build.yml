@@ -65,12 +65,12 @@ jobs:
         with:
           sparse-checkout: |
             docs
-            .github/workflows/scripts
+            .github/workflows/scripts/bash
 
       # Set environment path for scripts so we can access it later
       - name: Update environment path
         run: |
-          echo "${{ github.workspace }}/.github/workflows/scripts" >> $GITHUB_PATH
+          echo "${{ github.workspace }}/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
       # Retrieve the generated changelogs
       - name: Download artifact changelog of FAF Develop
@@ -90,7 +90,7 @@ jobs:
         run: |
           cat generated/fafdevelop.md >> changelog/fafdevelop.md
           cat generated/fafbeta.md >> changelog/fafbeta.md
-      
+
       # Update the posts directory contents
       - name: Update changelog posts directory
         shell: bash
