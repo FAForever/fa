@@ -357,11 +357,11 @@ end
 
 --- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
 --- disregarding if they start with `/` like other commandline options.  
---- Returns nil if there are not `maxArgs` tokens after the `option`.
+--- Returns `false` if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
----@return string[]?
+---@return string[] | false
 function GetCommandLineArg(option, maxArgs)
 end
 
