@@ -5,8 +5,24 @@
     [int]$teams = 2  # Default to two teams, 0 for FFA
 )
 
-# Path to the game executable
-$gameExecutable = "C:\ProgramData\FAForever\bin\FAFDebugger.exe"
+# Base path to the bin directory
+$binPath = "C:\ProgramData\FAForever\bin"
+
+# Paths to the potential executables within the base path
+$debuggerExecutable = Join-Path $binPath "FAFDebugger.exe"
+$regularExecutable = Join-Path $binPath "ForgedAlliance.exe"
+
+# Check for the existence of the executables and choose accordingly
+if (Test-Path $debuggerExecutable) {
+    $gameExecutable = $debuggerExecutable
+    Write-Output "Using debugger executable: $gameExecutable"
+} elseif (Test-Path $regularExecutable) {
+    $gameExecutable = $regularExecutable
+    Write-Output "Debugger not found, using regular executable: $gameExecutable"
+} else {
+    Write-Output "Neither debugger nor regular executable found in $binPath. Exiting script."
+    exit 1
+}
 
 # Command-line arguments common for all instances
 $baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /gameoptions CheatsEnabled:true'
