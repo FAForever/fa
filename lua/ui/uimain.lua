@@ -86,7 +86,7 @@ function StartHostLobbyUI(protocol, port, playerName, gameName, mapFile, natTrav
     lobby.HostGame(gameName, mapFile, false)
 end
 
---- Joins a multiplayer LAN lobby.
+--- Joins a multiplayer lobby.
 --- Called by the engine with the command line argument `/joingame <protocol> <address> <playerName>`
 --- Add the argument `/players <number>` to use the auto lobby. `/<factionName>` to choose a faction.
 ---@param protocol UILobbyProtocols
