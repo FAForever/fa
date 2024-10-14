@@ -29,7 +29,7 @@ $baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind
 
 # Game-specific settings
 $hostProtocol = "udp"
-$hostPlayerName = "HostPlayer"
+$hostPlayerName = "HostPlayer_1"
 $gameName = "MyGame"
 
 # Array of factions to choose from
@@ -88,7 +88,7 @@ if ($players -eq 1) {
     $logFile = "dev.log"
     Launch-GameInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments "/log $logFile /showlog /map $map $baseArguments"
 } else {
-    $hostLogFile = "host_dev.log"
+    $hostLogFile = "host_dev_1.log"
     $hostFaction = $factions | Get-Random
     $hostTeamArgument = Get-TeamArgument -instanceNumber 0
     $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /players $players /$hostFaction $hostTeamArgument $baseArguments"
