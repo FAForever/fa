@@ -737,7 +737,7 @@ function GetCommandLineArgTable(option)
         nextArgs, args = GetCommandLineArg(option, nextMax), nextArgs
         nextMax = nextMax + 1
         -- GetCommandLineArg tokenizes without being limited by `/`, so we need to stop manually
-    until not nextArgs or nextArgs[nextMax - 1]:sub(0,1) ~= "/"
+    until not nextArgs or nextArgs[nextMax - 1]:sub(0,1) == "/"
 
     -- Construct result table
     local result = {}
