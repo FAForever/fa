@@ -164,6 +164,7 @@ function CreateUI(isReplay)
     import("/lua/system/performance.lua")
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
+    import("/lua/ui/game/cursor/DeleteBuildCommand.lua").StartGestureDetectionThread()
 
     -- casting tools
 
