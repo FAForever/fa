@@ -666,6 +666,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 --Round DPS, or else it gets floored in string.format.
                                 DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
+                                -- Do not calulcate the DPS total if the unit only has one valid weapon.
                                 if totalWeaponCount > 1 then
                                     if (info.WeaponCategory == 'Direct Fire' or info.WeaponCategory == 'Direct Fire Naval' or info.WeaponCategory == 'Direct Fire Experimental') and not info.IgnoreIfDisabled then
                                         totalDirectFireDPS = totalDirectFireDPS + DPS * weapon.count
