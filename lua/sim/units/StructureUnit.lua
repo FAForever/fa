@@ -19,7 +19,6 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
-local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
 local FactionToTarmacIndex = {
     UEF = 1,
@@ -34,7 +33,7 @@ local Rect = Rect
 local WaitTicks = WaitTicks
 local ForkThread = ForkThread
 local FlattenMapRect = FlattenMapRect
-local FlattenGradientMapRect = import('/lua/sim/terrainutils.lua').FlattenGradientMapRect
+local FlattenGradientMapRect = import("/lua/sim/terrainutils.lua").FlattenGradientMapRect
 local GetTerrainHeight = GetTerrainHeight
 local GetReclaimablesInRect = GetReclaimablesInRect
 local EntityCategoryContains = EntityCategoryContains
@@ -119,20 +118,17 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
             and (layer == 'Land' or layer == 'Seabed')
         then
             -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+            local roll, pitch = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
                 blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
                 blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
             -- do not orientate structures that are on flat ground
-            if a1 != 0 or a2 != 0 then
-                -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
-                -- re-inverted again by multiplying it with the original orientation
-                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
-                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
-                local quat = quatOrient * quatSlope
-                self:SetOrientation(quat, true)
+            if roll ~= 0 or pitch ~= 0 then
+                -- "q′ = q2 * q1  in which q′ corresponds to the rotation q1 followed by the rotation q2" (wikipedia)
+                -- the unit's orientation comes first, and then is rotated by the terrain angle
+                self:SetOrientation(EulerToQuaternion(roll, pitch, 0) * self:GetOrientation(), true)
 
                 -- technically obsolete, but as this is part of an integration we don't want to break
                 -- the mod package that it originates from. Originates from the BrewLan mod suite
