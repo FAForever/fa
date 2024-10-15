@@ -547,6 +547,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
             if not table.empty(bp.Weapon) then
                 local weapons = {upgrades = {normal = {}, death = {}},
                                     basic = {normal = {}, death = {}}}
+                local totalWeaponCount = 0
                 for _, weapon in bp.Weapon do
                     if not weapon.WeaponCategory then continue end
                     local dest = weapons.basic
@@ -563,11 +564,18 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     else
                         dest[weapon.DisplayName] = {info = weapon, count = 1}
                     end
+                    if not dest.death then
+                        totalWeaponCount = totalWeaponCount + 1
+                    end
                 end
                 for k, v in weapons do
                     if not table.empty(v.normal) or not table.empty(v.death) then
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {LOC('<LOC uvd_'..k..'>')..':'}})
                     end
+                    local totalDirectFireDPS = 0
+                    local totalIndirectFireDPS = 0
+                    local totalNavalDPS = 0
+                    local totalAADPS = 0
                     for name, weapon in v.normal do
                         local info = weapon.info
                         local weaponDetails1 = LOCStr(name)..' ('..LOCStr(info.WeaponCategory)..') '
@@ -653,10 +661,23 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 CycleTime = CycleTime + FiringCooldown
                             end
 
+                            local DPS = 0
                             if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' and info.WeaponCategory ~= 'Defense' then
                                 --Round DPS, or else it gets floored in string.format.
-                                local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
+                                DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
+                                -- Do not calulcate the DPS total if the unit only has one valid weapon.
+                                if totalWeaponCount > 1 then
+                                    if (info.WeaponCategory == 'Direct Fire' or info.WeaponCategory == 'Direct Fire Naval' or info.WeaponCategory == 'Direct Fire Experimental') and not info.IgnoreIfDisabled then
+                                        totalDirectFireDPS = totalDirectFireDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Indirect Fire' or info.WeaponCategory == 'Missile' or info.WeaponCategory == 'Artillery' or info.WeaponCategory == 'Bomb' then
+                                        totalIndirectFireDPS = totalIndirectFireDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Anti Navy' then
+                                        totalNavalDPS = totalNavalDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Anti Air' then
+                                        totalAADPS = totalAADPS + DPS * weapon.count
+                                    end
+                                end
                             end
 
                             -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
@@ -680,7 +701,6 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                 Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
-
 
                         end
                         if weapon.count > 1 then
@@ -723,11 +743,33 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails = weaponDetails..' x'..weapon.count
                         end
                         table.insert(lines, weaponDetails)
+                        table.insert(blocks, {color = 'FFFF0000', lines = lines})
                     end
-                    if not table.empty(v.normal) or not table.empty(v.death) then
-                        table.insert(lines, '')
+                    
+                    -- Only display the totalDPS stats if they are greater than 0.
+                    -- Prevent the totalDPS stats from being displayed under the 'Upgrades' tab and avoid the doubling of empty lines.
+                    local upgradesAvailable = not table.empty(weapons.upgrades.normal) or not table.empty(weapons.upgrades.death)
+                    if k == 'basic' then
+                        if totalDirectFireDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDirectFireDPS)}})
+                        end
+                        if totalIndirectFireDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalIndirectFireDPS)}})
+                        end
+                        if totalNavalDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS)}})
+                        end
+                        if totalAADPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0021>', totalAADPS)}})
+                        end
+                        if not upgradesAvailable then
+                            table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
+                        end
                     end
-                    table.insert(blocks, {color = 'FFFF0000', lines = lines})
+                    -- Avoid the doubling of empty lines when the unit has upgrades.
+                    if upgradesAvailable then
+                        table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
+                    end
                 end
             end
         end
