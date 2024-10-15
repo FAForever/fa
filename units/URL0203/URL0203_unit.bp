@@ -108,7 +108,7 @@ UnitBlueprint{
         UnitName = "<LOC url0203_name>Wagner",
     },
     Intel = {
-        VisionRadius = 22,
+        VisionRadius = 20,
         WaterVisionRadius = 20,
     },
     LifeBarHeight = 0.075,

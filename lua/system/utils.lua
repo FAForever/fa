@@ -73,6 +73,10 @@ function table.getsize(t)
     return size
 end
 
+-- replace with assembly implementations
+table.empty = table.empty2 or table.empty
+table.getsize = table.getsize2 or table.getsize
+
 --- Returns a shallow copy of t
 ---@generic T
 ---@param t T
@@ -727,12 +731,13 @@ end
 --  GetCommandLineArgTable("/arg") -> {key1="value1", key2="value2"}
 function GetCommandLineArgTable(option)
     -- Find total number of args
-    local next = 1
+    local nextMax = 1
     local args, nextArgs = nil, nil
     repeat
-        nextArgs, args = GetCommandLineArg(option, next), nextArgs
-        next = next + 1
-    until not nextArgs
+        nextArgs, args = GetCommandLineArg(option, nextMax), nextArgs
+        nextMax = nextMax + 1
+        -- GetCommandLineArg tokenizes without being limited by `/`, so we need to stop manually
+    until not nextArgs or nextArgs[nextMax - 1]:sub(0,1) == "/"
 
     -- Construct result table
     local result = {}

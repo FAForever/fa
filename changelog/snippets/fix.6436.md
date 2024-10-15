@@ -1,0 +1,1 @@
+- (#6436) Prevent the logging of an unecessary warning when certain units make landfall.
