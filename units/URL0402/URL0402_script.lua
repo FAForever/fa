@@ -18,6 +18,7 @@ local utilities = import("/lua/utilities.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
+local TranslateInXZDirection = import("/lua/utilities.lua").TranslateInXZDirection
 
 ---@class URL0402 : CWalkingLandUnit
 ---@field AmbientExhaustEffectsBag TrashBag
@@ -201,13 +202,9 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         local FractionThreshold = bp.General.FractionThreshold or 0.99
         if self:GetFractionComplete() >= FractionThreshold then
             local bp = self.Blueprint
-            local position = self:GetPosition()
-            local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'SpiderDeath' then
-                    position[3] = position[3] + 3 * math.cos(a)
-                    position[1] = position[1] + 3 * math.sin(a)
+                    local position = TranslateInXZDirection(self:GetPosition(), self:GetOrientation(), 3)
                     DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType,
                         bp.Weapon[i].DamageFriendly)
                     break

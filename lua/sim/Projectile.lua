@@ -11,6 +11,8 @@ local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
+local RotateVectorXYZByQuat =  import("/lua/utilities.lua").RotateVectorXYZByQuat
+
 -- upvalue scope for performance
 local unpack = unpack
 local Damage = Damage
@@ -183,25 +185,11 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             local dx = sx * (Random() - 0.5) * fuzziness
             local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy / 2 + cy
             local dz = sz * (Random() - 0.5) * fuzziness + cz
-            local dw
 
-            -- Rotate a vector by a quaternion: q * v * conjugate(q)
-            -- Supreme Commander quaternions use y,z,x,w!
-            local ty, tz, tx, tw = unpack(EntityGetOrientation(target))
+            local orientation = EntityGetOrientation(target)
 
-            -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dw, dx, dy, dz = -tx * dx - tz * dy - ty * dz,
-                tw * dx + tz * dz - ty * dy,
-                tw * dy + ty * dx - tx * dz,
-                tw * dz + tx * dy - tz * dx
-
-            tx, tz, ty = -tx, -tz, -ty
-
-            -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dx, dy, dz = dw * tx + dx * tw + dy * ty - dz * tz,
-                dw * tz + dy * tw + dz * tx - dx * ty,
-                dw * ty + dz * tw + dx * tz - dy * tx
-
+            local dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
+            
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
             local px, _, pz = self:GetCurrentTargetPositionXYZ()
