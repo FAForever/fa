@@ -132,7 +132,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Miasma Artillery",
             DoTPulses = 5,
-            DoTTime = 1,
+            DoTTime = 0.8,
             EnergyDrainPerSecond = 145,
             EnergyRequired = 1450,
             FireTargetLayerCapsTable = {
