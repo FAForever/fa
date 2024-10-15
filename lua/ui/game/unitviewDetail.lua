@@ -547,6 +547,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
             if not table.empty(bp.Weapon) then
                 local weapons = {upgrades = {normal = {}, death = {}},
                                     basic = {normal = {}, death = {}}}
+                local totalWeaponCount = 0
                 for _, weapon in bp.Weapon do
                     if not weapon.WeaponCategory then continue end
                     local dest = weapons.basic
@@ -562,6 +563,9 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         dest[weapon.DisplayName].count = dest[weapon.DisplayName].count + 1
                     else
                         dest[weapon.DisplayName] = {info = weapon, count = 1}
+                    end
+                    if not dest.death then
+                        totalWeaponCount = totalWeaponCount + 1
                     end
                 end
                 for k, v in weapons do
@@ -662,14 +666,16 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 --Round DPS, or else it gets floored in string.format.
                                 DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
-                                if (info.WeaponCategory == 'Direct Fire' or info.WeaponCategory == 'Direct Fire Naval' or info.WeaponCategory == 'Direct Fire Experimental') and not info.IgnoreIfDisabled then
-                                    totalDirectFireDPS = totalDirectFireDPS + DPS * weapon.count
-                                elseif info.WeaponCategory == 'Indirect Fire' or info.WeaponCategory == 'Missile' or info.WeaponCategory == 'Artillery' or info.WeaponCategory == 'Bomb' then
-                                    totalIndirectFireDPS = totalIndirectFireDPS + DPS * weapon.count
-                                elseif info.WeaponCategory == 'Anti Navy' then
-                                    totalNavalDPS = totalNavalDPS + DPS * weapon.count
-                                elseif info.WeaponCategory == 'Anti Air' then
-                                    totalAADPS = totalAADPS + DPS * weapon.count
+                                if totalWeaponCount > 1 then
+                                    if (info.WeaponCategory == 'Direct Fire' or info.WeaponCategory == 'Direct Fire Naval' or info.WeaponCategory == 'Direct Fire Experimental') and not info.IgnoreIfDisabled then
+                                        totalDirectFireDPS = totalDirectFireDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Indirect Fire' or info.WeaponCategory == 'Missile' or info.WeaponCategory == 'Artillery' or info.WeaponCategory == 'Bomb' then
+                                        totalIndirectFireDPS = totalIndirectFireDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Anti Navy' then
+                                        totalNavalDPS = totalNavalDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Anti Air' then
+                                        totalAADPS = totalAADPS + DPS * weapon.count
+                                    end
                                 end
                             end
 
