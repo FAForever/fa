@@ -12,7 +12,7 @@ ProjectileBlueprint{
     Display = {
         CameraFollowsProjectile = true,
         ImpactEffects = { Type = "Medium01" },
-        StrategicIconSize = 1,
+        StrategicIconSize = 4,
     },
     General = {
         Category = "Direct Fire",

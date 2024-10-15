@@ -1,0 +1,3 @@
+- (#6465) Adjust the `StrategicIconSize` of several projectiles to make them more visible.
+    - Seraphim Sniper Bot: increase the `StrategicIconSize` of its secondary firing mode's projectile from `1` to `4`. 
+    - Othuum and Yenzyne: increase the `StrategicIconSize` of their Thau Cannon's projectile from `1` to `2`.
