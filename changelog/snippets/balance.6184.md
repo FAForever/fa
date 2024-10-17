@@ -6,4 +6,4 @@
         - BuildTime = 2200
         - ShieldMaxHealth = 20000
         - ShieldRechargeTime = 120
-        - ShieldRegenRate = 60
+        - ShieldRegenRate = 80
