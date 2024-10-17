@@ -85,6 +85,7 @@ local AutolobbyCommunicationsInstance = false
 ---@field LocalConnectedTo table<UILobbyPlayerId, boolean>                              # list of other player identifiers that we're connected to
 ---@field OthersConnectedTo table<UILobbyPlayerId, table<UILobbyPlayerId, boolean>>     # list of list ofother player identifiers that other players are connected to
 ---@field HostID UILobbyPlayerId
+---@field PlayerCount number
 ---@field GameOptions UILobbyLaunchGameOptionsConfiguration     # Is synced from the host to the others.
 ---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
 AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
@@ -104,7 +105,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         self.LocalID = "-1"
         self.LocalPlayerName = "Charlie"
-        self.ConnectedTo = {}
+        self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
+        self.LocalConnectedTo = {}
         self.OthersConnectedTo = {}
         self.HostID = "-1"
 
@@ -203,6 +205,36 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     IsAliveThread = function(self)
         while not IsDestroyed(self) do
             self:BroadcastData({ Type = "IsAlive" })
+            WaitSeconds(1.0)
+        end
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    CheckForLaunchThread = function(self)
+        while not IsDestroyed(self) do
+
+            -- true iff we are connected to all peers
+            local allLocalConnected = table.getsize(self:GetPeers()) == self.PlayerCount - 1
+
+            -- true iff all peers are connected to every of their peers
+            local allPeersConnected = true
+            for peerId, otherConnectedTo in self.OthersConnectedTo do
+                allPeersConnected = allPeersConnected and table.getsize(otherConnectedTo) == self.PlayerCount - 1
+            end
+
+            if allLocalConnected and allPeersConnected then
+                ---@type UILobbyLaunchConfiguration
+                local gameConfiguration = {
+                    GameMods = {},
+                    GameOptions = self.GameOptions,
+                    PlayerOptions = self.PlayerOptions,
+                    Observers = {},
+                }
+
+                self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
+                self:LaunchGame(gameConfiguration)
+            end
+
             WaitSeconds(1.0)
         end
     end,
@@ -307,8 +339,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return MohoLobbyMethods.JoinGame(self, address, remotePlayerName, remotePlayerUID)
     end,
 
+    ---@param self UIAutolobbyCommunications
+    ---@param gameConfig UILobbyLaunchConfiguration
+    ---@return nil
     LaunchGame = function(self, gameConfig)
-        self:DebugSpew("LaunchGame", gameConfig)
+        self:DebugSpew("LaunchGame")
+        self:DebugSpew(reprs(gameConfig, { depth = 10 }))
         return MohoLobbyMethods.LaunchGame(self, gameConfig)
     end,
 
@@ -350,8 +386,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.LocalPlayerName = self:GetLocalPlayerName()
         self.HostID = self:GetLocalPlayerID()
 
+        -- give ourself a seat at the table
+        local hostPlayerOptions = self:CreateLocalPlayer()
+        hostPlayerOptions.OwnerID = self.LocalID
+        hostPlayerOptions.PlayerName = self:MakeValidPlayerName(self.LocalID, self.LocalPlayerName)
+        self.PlayerOptions[hostPlayerOptions.StartSpot] = hostPlayerOptions
+
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.IsAliveThread, self))
+        self.Trash:Add(ForkThread(self.CheckForLaunchThread, self))
+
+        -- start prefetching the scenario
+        PrefetchSession(self.GameOptions.ScenarioFile, {}, true)
 
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
@@ -392,6 +438,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param playerConnectedTo string[]    # all established conenctions for the given player
     EstablishedPeers = function(self, playerId, playerConnectedTo)
         self:DebugSpew("EstablishedPeers", playerId, reprs(playerConnectedTo))
+        self.OthersConnectedTo[playerId] = playerConnectedTo
     end,
 
     --#endregion
@@ -458,13 +505,16 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param self UIAutolobbyCommunications
     GameLaunched = function(self)
         self:DebugSpew("GameLaunched")
+
+        -- GpgNetSend('GameState', 'Launching')
+        self:Destroy()
     end,
 
     --- Called by the engine when the launch failed.
     ---@param self UIAutolobbyCommunications
     ---@param reasonKey string
     LaunchFailed = function(self, reasonKey)
-        self:DebugSpew("LaunchFailed", reasonKey)
+        self:DebugSpew("LaunchFailed", LOC(reasonKey))
     end,
 
     --#endregion
@@ -532,7 +582,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     )
 
     -- create the singleton for the interface
-    import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+    local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+    AutolobbyCommunicationsInstance.Trash:Add(interface)
 end
 
 --- Instantiates a lobby instance by hosting one.
@@ -551,9 +602,9 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         AutolobbyCommunicationsInstance:HostGame()
     end
 
-    -- start with a loading dialog
-    import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-        :CreateLoadingDialog()
+    -- -- start with a loading dialog
+    -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+    --     :CreateLoadingDialog()
 end
 
 --- Joins an instantiated lobby instance.
@@ -570,9 +621,9 @@ function JoinGame(address, asObserver, playerName, uid)
         AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
     end
 
-    -- start with a loading dialog
-    import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-        :CreateLoadingDialog()
+    -- -- start with a loading dialog
+    -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+    --     :CreateLoadingDialog()
 end
 
 --- Called by the engine.

@@ -119,7 +119,6 @@ local AutolobbyInterface = Class(Group) {
     end,
 
     --#endregion
-
 }
 
 --- A trashbag that should be destroyed upon reload.

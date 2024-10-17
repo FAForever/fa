@@ -154,9 +154,33 @@ AutolobbyMessageHandlers = {
         Handler = function(lobby, data)
             lobby.GameOptions = data.GameOptions
 
+            PrefetchSession(lobby.GameOptions.ScenarioFile, {}, true)
+
             -- update UI for game options
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
                 :UpdateGameOptions(lobby.GameOptions)
+        end
+    },
+
+    Launch = {
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UILobbyReceivedMessage
+        ---@return boolean
+        Accept = function(lobby, data)
+            if not IsFromHost(lobby, data) then
+                lobby:DebugWarn("Received message from non-host peer of type ", data.Type)
+                return false
+            end
+
+            -- TODO: verify integrity of the message
+
+            return true
+        end,
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UILobbyReceivedMessage
+        Handler = function(lobby, data)
+            lobby:LaunchGame(data.GameConfig)
         end
     }
 }
