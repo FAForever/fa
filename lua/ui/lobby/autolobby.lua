@@ -12,497 +12,588 @@
 --* through command line arguments.
 --*****************************************************************************
 
-local UIUtil = import("/lua/ui/uiutil.lua")
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local Group = import("/lua/maui/group.lua").Group
-local MenuCommon = import("/lua/ui/menus/menucommon.lua")
-local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
-local gameColors = import("/lua/gamecolors.lua").GameColors
-local utils = import("/lua/system/utils.lua")
+--******************************************************************************************************
+--** Copyright (c) 2024 Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
-local ConnectionStatus = import("/lua/ui/lobby/autolobby-classes.lua").ConnectionStatus
+local Utils = import("/lua/system/utils.lua")
 
+local MohoLobbyMethods = moho.lobby_methods
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
+local AutolobbyMessageHandlers = import("/lua/ui/lobby/autolobby/AutolobbyMessageHandlers.lua").AutolobbyMessageHandlers
 
-local parent = false
-local localPlayerName = false
-local requiredPlayers = false
+local AutolobbyEngineStrings = {
+    --  General info strings
+    ['Connecting'] = "<LOC lobui_0083>Connecting to Game",
+    ['AbortConnect'] = "<LOC lobui_0204>Abort Connect",
+    ['TryingToConnect'] = "<LOC lobui_0331>Connecting...",
+    ['TimedOut'] = "<LOC lobui_0205>%s timed out.",
+    ['TimedOutToHost'] = "<LOC lobui_0206>Timed out to host.",
+    ['Ejected'] = "<LOC lob_0000>You have been ejected: %s",
+    ['ConnectionFailed'] = "<LOC lob_0001>Connection failed: %s",
+    ['LaunchFailed'] = "<LOC lobui_0207>Launch failed: %s",
+    ['LobbyFull'] = "<LOC lobui_0279>The game lobby is full.",
 
-local currentDialog = false
-local connectionStatusGUI = false 
-
-local localPlayerID = false
-
-
---- The default game information for an automatch. This should typically never be changed directly
--- as the server can change game options as it wishes since PR 3385.
-local gameInfo = {
-    GameOptions = {
-        Score = 'no',
-        TeamSpawn = 'fixed',
-        TeamLock = 'locked',
-        Victory = 'demoralization',
-        Timeouts = '3',
-        CheatsEnabled = 'false',
-        CivilianAlliance = 'enemy',
-        RevealCivilians = 'Yes',
-        GameSpeed = 'normal',
-        FogOfWar = 'explored',
-        UnitCap = '1500',
-        PrebuiltUnits = 'Off',
-        Share = 'FullShare',
-        ShareUnitCap = 'allies',
-        DisconnectionDelay02 = '90',
-
-        -- yep, great
-        Ranked = true,
-        Unranked = 'No',
-    },
-    PlayerOptions = {},
-    Observers = {},
-    GameMods = {},
+    --  Error reasons
+    ['StartSpots'] = "<LOC lob_0002>The map does not support this number of players.",
+    ['NoConfig'] = "<LOC lob_0003>No valid game configurations found.",
+    ['NoObservers'] = "<LOC lob_0004>Observers not allowed.",
+    ['KickedByHost'] = "<LOC lob_0005>Kicked by host.",
+    ['GameLaunched'] = "<LOC lob_0008>Game was launched.",
+    ['NoLaunchLimbo'] = "<LOC lob_0006>No clients allowed in limbo at launch",
+    ['HostLeft'] = "<LOC lob_0007>Host abandoned lobby",
+    ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
-local Strings = LobbyComm.Strings
+---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
+---@field StartSpot number
+---@field DEV number    # Related to rating/divisions
+---@field MEAN number   # Related to rating/divisions
+---@field NG number     # Related to rating/divisions
+---@field DIV string    # Related to rating/divisions
+---@field SUBDIV string # Related to rating/divisions
+---@field PL number     # Related to rating/divisions
 
-local lobbyComm = false
+---@type UIAutolobbyCommunications | false
+local AutolobbyCommunicationsInstance = false
 
-local connectedTo = {}
-local peerLaunchStatuses = {}
+--- Responsible for the behavior of the automated lobby.
+---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent
+---@field Trash TrashBag
+---@field InterfaceTrash TrashBag
+---@field LocalID UILobbyPlayerId                           # a number that is stringified
+---@field LocalPlayerName string                            # nickname
+---@field LocalConnectedTo table<UILobbyPlayerId, boolean>                              # list of other player identifiers that we're connected to
+---@field OthersConnectedTo table<UILobbyPlayerId, table<UILobbyPlayerId, boolean>>     # list of list ofother player identifiers that other players are connected to
+---@field HostID UILobbyPlayerId
+---@field GameOptions UILobbyLaunchGameOptionsConfiguration     # Is synced from the host to the others.
+---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
+AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
--- Cancels automatching and closes the game
-local function CleanupAndExit()
-    if lobbyComm then
-        lobbyComm:Destroy()
-    end
-    ExitApplication()
-end
+    BackgroundTextures = {
+        "/menus02/background-paint01_bmp.dds",
+        "/menus02/background-paint02_bmp.dds",
+        "/menus02/background-paint03_bmp.dds",
+        "/menus02/background-paint04_bmp.dds",
+        "/menus02/background-paint05_bmp.dds",
+    },
 
--- Replace the currently displayed dialog (there is only 1).
-local function SetDialog(...)
-    if currentDialog then
-        currentDialog:Destroy()
-    end
+    ---@param self UIAutolobbyCommunications
+    __init = function(self)
+        self.Trash = TrashBag()
+        self.InterfaceTrash = self.Trash:Add(TrashBag())
 
-    currentDialog = UIUtil.ShowInfoDialog(unpack(arg))
-end
+        self.LocalID = "-1"
+        self.LocalPlayerName = "Charlie"
+        self.ConnectedTo = {}
+        self.OthersConnectedTo = {}
+        self.HostID = "-1"
 
--- Create PlayerInfo for our local player from command line options
-local function MakeLocalPlayerInfo(name)
-    local result = LobbyComm.GetDefaultPlayerOptions(name)
-    result.Human = true
+        self.GameOptions = self:CreateLocalGameOptions()
+        self.PlayerOptions = {}
+    end,
 
-    -- Game must have factions for players or else it won't start, so default to UEF.
-    result.Faction = 1
-    local factionData = import("/lua/factions.lua")
-    for index, tbl in factionData.Factions do
-        if HasCommandLineArg("/" .. tbl.Key) then
-            result.Faction = index
-            break
-        end
-    end
+    ---@param self UIAutolobbyCommunications
+    __init_post = function(self)
 
-    result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-    result.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or false
+    end,
 
-    result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1] or 500)
-    result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1] or 1500)
-    result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1] or 0)
-    result.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
-    result.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
-    result.PL = math.floor(result.MEAN - 3 * result.DEV)
-    LOG('Local player info: ' .. repr(result))
-    return result
-end
+    --- Creates a table that represents the local player settings. This represents the initial player. It can be edited by the host accordingly.
+    ---@param self UIAutolobbyCommunications
+    ---@return UIAutolobbyPlayer
+    CreateLocalPlayer = function(self)
+        ---@type UIAutolobbyPlayer
+        local info = {}
 
-function wasConnected(peer)
-    return table.find(connectedTo, peer) ~= nil
-end
+        info.Team = 1
+        info.PlayerColor = 1
+        info.ArmyColor = 1
+        info.Human = true
+        info.Civilian = false
 
-function FindSlotForID(id)
-    for k,player in gameInfo.PlayerOptions do
-        if player.OwnerID == id and player.Human then
-            return k
-        end
-    end
-    return nil
-end
+        -- determine player name
+        info.PlayerName = self.LocalPlayerName or self:GetLocalPlayerName() or "player"
 
-function IsPlayer(id)
-    return FindSlotForID(id) ~= nil
-end
-
-local function HostAddPlayer(senderId, playerInfo)
-    playerInfo.OwnerID = senderId
-
-    local slot = playerInfo.StartSpot or 1
-    if not playerInfo.StartSpot then
-        while gameInfo.PlayerOptions[slot] do
-            slot = slot + 1
-        end
-        playerInfo.StartSpot = slot
-    end
-
-    playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
-    -- TODO: Should colors be based on teams?
-    playerInfo.PlayerColor = gameColors.TMMColorOrder[slot]
-
-    gameInfo.PlayerOptions[slot] = playerInfo
-end
-
---- Waits to receive confirmation from all players as to whether they share the same
--- game options. Is used to reject a game when this is not the case. Typically
--- this happens when the players do not share the same (FAF) client.
-local function WaitLaunchAccepted()
-    while true do
-        local allAccepted = true
-        for _, status in peerLaunchStatuses do
-            if status == 'Rejected' then
-                return false
-            elseif not status or status ~= 'Accepted' then
-                allAccepted = false
+        -- retrieve faction
+        info.Faction = 1
+        local factionData = import("/lua/factions.lua")
+        for index, tbl in factionData.Factions do
+            if HasCommandLineArg("/" .. tbl.Key) then
+                info.Faction = index
                 break
             end
         end
-        if allAccepted then
-            return true
-        end
-        WaitSeconds(1)
-    end
-end
 
--- Check if we can launch the game and then do so. To launch the game we need
--- to be connected to the correct number of players as configured by the
--- command line args.
-local function CheckForLaunch()
-    local important = {}
-    for slot,player in gameInfo.PlayerOptions do
-        GpgNetSend('PlayerOption', player.OwnerID, 'StartSpot', slot)
-        GpgNetSend('PlayerOption', player.OwnerID, 'Army', slot)
-        GpgNetSend('PlayerOption', player.OwnerID, 'Faction', player.Faction)
-        GpgNetSend('PlayerOption', player.OwnerID, 'Color', player.PlayerColor)
+        -- retrieve team and start spot
+        info.Team = tonumber(GetCommandLineArg("/team", 1)[1])
+        info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or false
 
-        if not table.find(important, player.OwnerID) then
-            table.insert(important, player.OwnerID)
-        end
-    end
+        -- retrieve rating
+        info.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or 500
+        info.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or 1500
+        info.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or 0
+        info.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
+        info.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
+        info.PL = math.floor(info.MEAN - 3 * info.DEV)
 
-    -- counts the number of players in the game. Include yourself by default.
-    local playercount = 1
-    for k,id in important do
-        if id ~= localPlayerID then
-            local peer = lobbyComm:GetPeer(id)
-            if peer.status ~= 'Established' then
-                return
+        return info
+    end,
+
+    --- Creates a table that represents the local game options.
+    ---@param self UIAutolobbyCommunications
+    ---@return UILobbyLaunchGameOptionsConfiguration
+    CreateLocalGameOptions = function(self)
+        ---@type UILobbyLaunchGameOptionsConfiguration
+        local options = {
+            Score = 'no',
+            TeamSpawn = 'fixed',
+            TeamLock = 'locked',
+            Victory = 'demoralization',
+            Timeouts = '3',
+            CheatsEnabled = 'false',
+            CivilianAlliance = 'enemy',
+            RevealCivilians = 'Yes',
+            GameSpeed = 'normal',
+            FogOfWar = 'explored',
+            UnitCap = '1500',
+            PrebuiltUnits = 'Off',
+            Share = 'FullShare',
+            ShareUnitCap = 'allies',
+            DisconnectionDelay02 = '90',
+
+            -- yep, great
+            Ranked = true,
+            Unranked = 'No',
+        }
+
+        -- process game options from the command line
+        for name, value in Utils.GetCommandLineArgTable("/gameoptions") do
+            if name and value then
+                options[name] = value
+            else
+                LOG("Malformed gameoption. ignoring name: " .. repr(name) .. " and value: " .. repr(value))
             end
-            if not table.find(peer.establishedPeers, localPlayerID) then
-                return
-            end
-            playercount = playercount + 1
-            for k2,other in important do
-                if id ~= other and not table.find(peer.establishedPeers, other) then
-                    return
-                end
-            end
         end
-    end
 
-    if playercount < requiredPlayers then
-       return
-    end
+        return options
+    end,
 
-    local allRatings = {}
-    local allDivisions = {}
-    for k,v in gameInfo.PlayerOptions do
-        if v.Human and v.PL then
-            allRatings[v.PlayerName] = v.PL
-            if v.DIV ~= "unlisted" then
-                local divisiontext = v.DIV
-                if v.SUBDIV and v.SUBDIV ~="" then
-                    divisiontext = divisiontext .. ' ' .. v.SUBDIV
-                end
-                allDivisions[v.PlayerName]= divisiontext
-            end
-            -- Initialize peer launch statuses
-            peerLaunchStatuses[v.OwnerID] = false
+    --- A thread to indicate that we're still around. Various properties such as ping are not updated
+    --- until a message is received. This thread introduces occasional traffic between players.
+    ---@param self UIAutolobbyCommunications
+    IsAliveThread = function(self)
+        while not IsDestroyed(self) do
+            self:BroadcastData({ Type = "IsAlive" })
+            WaitSeconds(1.0)
         end
-    end
-    -- We don't need to wait for a launch status from ourselves
-    peerLaunchStatuses[localPlayerID] = nil
-    gameInfo.GameOptions['Ratings'] = allRatings
-    gameInfo.GameOptions['Divisions'] = allDivisions
+    end,
 
-    LOG("Host launching game.")
-    lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
-    LOG(repr(gameInfo))
+    ---------------------------------------------------------------------------
+    --#region Engine interface
 
-    ForkThread(function()
-        if WaitLaunchAccepted() then
-            lobbyComm:LaunchGame(gameInfo)
+    --- Broadcasts data to all (connected) peers.
+    ---@param self UIAutolobbyCommunications
+    ---@param data UILobbyData
+    BroadcastData = function(self, data)
+        self:DebugSpew("BroadcastData", data.Type)
+        if not AutolobbyMessageHandlers[data.Type] then
+            self:DebugWarn("Broadcasting unknown message type", data.Type)
+        end
+
+        return MohoLobbyMethods.BroadcastData(self, data)
+    end,
+
+    --- (Re)Connects to a peer.
+    ---@param self any
+    ---@param address any
+    ---@param name any
+    ---@param uid any
+    ---@return nil
+    ConnectToPeer = function(self, address, name, uid)
+        self:DebugSpew("ConnectToPeer", address, name, uid)
+        return MohoLobbyMethods.ConnectToPeer(self, address, name, uid)
+    end,
+
+    --- ???
+    ---@param self UIAutolobbyCommunications
+    ---@return nil
+    DebugDump = function(self)
+        self:DebugSpew("DebugDump")
+        return MohoLobbyMethods.DebugDump(self)
+    end,
+
+    --- Destroys the C-object and all the (UI) entities in the trash bag.
+    ---@param self UIAutolobbyCommunications
+    ---@return nil
+    Destroy = function(self)
+        self:DebugSpew("Destroy")
+
+        self.Trash:Destroy()
+        return MohoLobbyMethods.Destroy(self)
+    end,
+
+    --- Disconnects from a peer.
+    --- See also `ConnectToPeer` to connect
+    ---@param self UIAutolobbyCommunications
+    ---@param uid any
+    ---@return nil
+    DisconnectFromPeer = function(self, uid)
+        self:DebugSpew("DisconnectFromPeer", uid)
+        return MohoLobbyMethods.DisconnectFromPeer(self, uid)
+    end,
+
+
+    EjectPeer = function(self, uid, reason)
+        self:DebugSpew("EjectPeer", uid, reason)
+        return MohoLobbyMethods.EjectPeer(self, uid, reason)
+    end,
+
+    GetLocalPlayerID = function(self)
+        self:DebugSpew("GetLocalPlayerID")
+        return MohoLobbyMethods.GetLocalPlayerID(self)
+    end,
+
+    GetLocalPlayerName = function(self)
+        self:DebugSpew("GetLocalPlayerName")
+        return MohoLobbyMethods.GetLocalPlayerName(self)
+    end,
+
+    GetLocalPort = function(self)
+        self:DebugSpew("GetLocalPort")
+        return MohoLobbyMethods.GetLocalPort(self)
+    end,
+
+    GetPeer = function(self, uid)
+        self:DebugSpew("GetPeer", uid)
+        return MohoLobbyMethods.GetPeer(self, uid)
+    end,
+
+    GetPeers = function(self)
+        self:DebugSpew("GetPeers")
+        return MohoLobbyMethods.GetPeers(self)
+    end,
+
+    HostGame = function(self)
+        self:DebugSpew("HostGame")
+        return MohoLobbyMethods.HostGame(self)
+    end,
+
+    IsHost = function(self)
+        self:DebugSpew("IsHost")
+        return MohoLobbyMethods.IsHost(self)
+    end,
+
+    JoinGame = function(self, address, remotePlayerName, remotePlayerUID)
+        self:DebugSpew("JoinGame", address, remotePlayerName, remotePlayerUID)
+        return MohoLobbyMethods.JoinGame(self, address, remotePlayerName, remotePlayerUID)
+    end,
+
+    LaunchGame = function(self, gameConfig)
+        self:DebugSpew("LaunchGame", gameConfig)
+        return MohoLobbyMethods.LaunchGame(self, gameConfig)
+    end,
+
+    MakeValidGameName = function(self, name)
+
+        self:DebugSpew("MakeValidGameName", name)
+        return MohoLobbyMethods.MakeValidGameName(self, name)
+    end,
+
+    MakeValidPlayerName = function(self, uid, name)
+        self:DebugSpew("MakeValidPlayerName", uid, name)
+        return MohoLobbyMethods.MakeValidPlayerName(self, uid, name)
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param uid UILobbyPlayerId
+    ---@param data UILobbyData
+    ---@return nil
+    SendData = function(self, uid, data)
+        self:DebugSpew("SendData", uid, data.Type)
+        if not AutolobbyMessageHandlers[data.Type] then
+            self:DebugWarn("Sending unknown message type", data.Type, "to", uid)
+        end
+
+        return MohoLobbyMethods.SendData(self, uid, data)
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Connection events
+
+    --- Called by the engine as we're trying to host a lobby.
+    ---@param self UIAutolobbyCommunications
+    Hosting = function(self)
+        self:DebugSpew("Hosting")
+
+        self.LocalID = self:GetLocalPlayerID()
+        self.LocalPlayerName = self:GetLocalPlayerName()
+        self.HostID = self:GetLocalPlayerID()
+
+        -- occasionally send data over the network to create pings on screen
+        self.Trash:Add(ForkThread(self.IsAliveThread, self))
+
+        -- update UI for game options
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            :UpdateGameOptions(self.GameOptions)
+    end,
+
+    --- Called by the engine as we're trying to join a lobby.
+    ---@param self UIAutolobbyCommunications
+    Connecting = function(self)
+        self:DebugSpew("Connecting")
+    end,
+
+    --- Called by the engine when the connection fails.
+    ---@param self UIAutolobbyCommunications
+    ---@param reason string     # reason for connection failure, populated by the engine
+    ConnectionFailed = function(self, reason)
+        self:DebugSpew("ConnectionFailed", reason)
+    end,
+
+    --- Called by the engine when the connection succeeds with the host.
+    ---@param self UIAutolobbyCommunications
+    ---@param localId string
+    ---@param hostId string
+    ConnectionToHostEstablished = function(self, localId, newLocalName, hostId)
+        self:DebugSpew("ConnectionToHostEstablished", localId, newLocalName, hostId)
+        self.LocalPlayerName = newLocalName
+        self.LocalID = localId
+        self.HostID = hostId
+
+        -- occasionally send data over the network to create pings on screen
+        self.Trash:Add(ForkThread(self.IsAliveThread, self))
+        self:SendData(self.HostID, { Type = "AddPlayer", PlayerOptions = self:CreateLocalPlayer() })
+    end,
+
+    --- Called by the engine when a peer establishes a connection.
+    ---@param self UIAutolobbyCommunications
+    ---@param playerId string
+    ---@param playerConnectedTo string[]    # all established conenctions for the given player
+    EstablishedPeers = function(self, playerId, playerConnectedTo)
+        self:DebugSpew("EstablishedPeers", playerId, reprs(playerConnectedTo))
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Lobby events
+
+    --- Called by the engine when you are ejected from a lobby.
+    ---@param self UIAutolobbyCommunications
+    ---@param reason string     # reason for disconnection, populated by the host
+    Ejected = function(self, reason)
+        self:DebugSpew("Ejected", reason)
+    end,
+
+    --- ???
+    ---@param self UIAutolobbyCommunications
+    ---@param text string
+    SystemMessage = function(self, text)
+        self:DebugSpew("SystemMessage", text)
+    end,
+
+    --- Called by the engine when we receive data from other players. There is no checking to see if the data is legitimate, these need to be done in Lua.
+    ---
+    --- Data can be send via `BroadcastData` and/or `SendData`.
+    ---@param self UIAutolobbyCommunications
+    ---@param data UILobbyReceivedMessage
+    DataReceived = function(self, data)
+        self:DebugSpew("DataReceived", data.Type, data.SenderID, data.SenderName)
+
+        ---@type UIAutolobbyMessageHandler?
+        local messageType = AutolobbyMessageHandlers[data.Type]
+
+        -- verify that the message type exists
+        if not messageType then
+            self:DebugError('Unknown message received: ', data.Type)
             return
         end
 
-        LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
-        SetDialog(parent, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
-    end)
-end
-
-
-local function CreateUI()
-
-    LOG("Don't mind me x2")
-
-    if currentDialog ~= false then
-        MenuCommon.MenuCleanup()
-        currentDialog:Destroy()
-        currentDialog = false
-    end
-
-    -- control layout
-    if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "Lobby CreateUI ScreenGroup") end
-
-    local background = MenuCommon.SetupBackground(GetFrame(0))
-
-    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...")
-
-    -- construct the connection status GUI and position it right below the dialog
-    connectionStatusGUI = ConnectionStatus(GetFrame(0))
-    LayoutHelpers.CenteredBelow(connectionStatusGUI, currentDialog, 20)
-    LayoutHelpers.DepthOverParent(connectionStatusGUI, background, 1)
-end
-
-
---  LobbyComm Callbacks
-local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    local LobCreateFunc = import("/lua/ui/lobby/lobbycomm.lua").CreateLobbyComm
-    local lob = LobCreateFunc(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    if not lob then
-        error('Creating lobby using protocol ' .. repr(protocol) .. ' and port ' .. tostring(localPort) .. ' failed.')
-    end
-    lobbyComm = lob
-
-    lobbyComm.Connecting = function(self)
-        SetDialog(parent, Strings.Connecting, "<LOC _Cancel>", CleanupAndExit)
-    end
-
-    lobbyComm.ConnectionFailed = function(self, reason)
-        LOG("CONNECTION FAILED " .. reason)
-        SetDialog(parent, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
-    end
-
-    lobbyComm.LaunchFailed = function(self, reasonKey)
-        LOG("LAUNCH FAILED")
-        SetDialog(parent, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
-    end
-
-    lobbyComm.Ejected = function(self, reason)
-        LOG("EJECTED " .. reason)
-        SetDialog(parent, Strings.Ejected, "<LOC _OK>", CleanupAndExit)
-    end
-
-    lobbyComm.ConnectionToHostEstablished = function(self, myID, newLocalName, theHostID)
-        LOG("CONNECTED TO HOST")
-        hostID = theHostID
-        localPlayerName = newLocalName
-        localPlayerID = myID
-
-        -- Ok, I'm connected to the host. Now request to become a player
-        self:SendData(hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), })
-    end
-
-    lobbyComm.DataReceived = function(self, data)
-        LOG('DATA RECEIVED: ', reprsl(data))
-
-        if data.Type == 'LaunchStatus' then
-            peerLaunchStatuses[data.SenderID] = data.Status
+        -- verify that we can accept it
+        if not messageType.Accept(self, data) then
+            self:DebugWarn("Message rejected: ", data.Type)
             return
         end
 
-        if self:IsHost() then
-            --  Host Messages
-            if data.Type == 'AddPlayer' then
-                HostAddPlayer(data.SenderID, data.PlayerInfo)
-            end
-        else
-            --  Non-Host Messages
-            if data.Type == 'Launch' then
-                -- The client compares the game options with those of the host. They both look like the local 'gameInfo' as defined 
-                -- above, but the host adds these fields upon launch (see: CheckForLaunch) so that we can display them on the scoreboard. 
-                -- A client won't have this information attached, and therefore we remove it manually here
-                local hostOptions = table.copy(data.GameInfo.GameOptions)
-                hostOptions['Ratings'] = nil
-                hostOptions['ScenarioFile'] = nil
-                hostOptions['Divisions'] = nil
+        -- handle the message
+        messageType.Handler(self, data)
+    end,
 
-                -- This is a sanity check so we don't accidentally launch games
-                -- with the wrong game settings because the host is using a
-                -- client that doesn't support game options for matchmaker.
-                if not table.equal(gameInfo.GameOptions, hostOptions) then
-                    WARN("Game options missmatch!")
+    --- Called by the engine when the game configuration is requested by the discovery service.
+    ---@param self UIAutolobbyCommunications
+    GameConfigRequested = function(self)
+        self:DebugSpew("GameConfigRequested")
+    end,
 
-                    LOG("Client settings: ")
-                    reprsl(gameInfo.GameOptions)
+    --- Called by the engine when a peer disconnects.
+    ---@param self UIAutolobbyCommunications
+    ---@param peerName string
+    ---@param otherId string
+    PeerDisconnected = function(self, peerName, otherId)
+        self:DebugSpew("PeerDisconnected", peerName, otherId)
+    end,
 
-                    LOG("Host settings: ")
-                    reprsl(hostOptions)
+    --- Called by the engine when the game is launched.
+    ---@param self UIAutolobbyCommunications
+    GameLaunched = function(self)
+        self:DebugSpew("GameLaunched")
+    end,
 
-                    SetDialog(parent, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
+    --- Called by the engine when the launch failed.
+    ---@param self UIAutolobbyCommunications
+    ---@param reasonKey string
+    LaunchFailed = function(self, reasonKey)
+        self:DebugSpew("LaunchFailed", reasonKey)
+    end,
 
-                    self:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
-                    -- To distinguish this from regular failed connections
-                    GpgNetSend('LaunchStatus', 'Rejected')
-                else
-                    self:BroadcastData({ Type = 'LaunchStatus', Status = 'Accepted' })
-                    self:LaunchGame(data.GameInfo)
-                end
-            end
-        end
-    end
+    --#endregion
 
-    lobbyComm.SystemMessage = function(self, text)
-        LOG("System: ",text)
-    end
+    --#region Debugging
 
-    lobbyComm.GameLaunched = function(self)
-        GpgNetSend('GameState', 'Launching')
-        parent:Destroy()
-        parent = false
-        MenuCommon.MenuCleanup()
-        lobbyComm:Destroy()
-        lobbyComm = false
-    end
-
-    lobbyComm.Hosting = function(self)
-        localPlayerID = self:GetLocalPlayerID()
-        hostID = localPlayerID
-
-        --  Give myself the first slot
-        HostAddPlayer(hostID, MakeLocalPlayerInfo(localPlayerName))
-
-        --  Fill in the desired scenario.
-        gameInfo.GameOptions.ScenarioFile = self.desiredScenario
-    end
-
-    lobbyComm.EstablishedPeers = function(self, uid, peers)
-        if not wasConnected(uid) then
-            table.insert(connectedTo, uid)
+    ---@param self UIAutolobbyCommunications
+    ---@param ... any
+    DebugSpew = function(self, ...)
+        if not self.EnabledSpewing then
+            return
         end
 
-        -- update ui to inform players
-        connectionStatusGUI:SetPlayersConnectedCount(table.getn(connectedTo))
+        SPEW("Autolobby communications", unpack(arg))
+    end,
 
-        if self:IsHost() then
-            CheckForLaunch()
+
+    ---@param self UIAutolobbyCommunications
+    ---@param ... any
+    DebugLog = function(self, ...)
+        if not self.EnabledLogging then
+            return
         end
-    end
 
-    lobbyComm.PeerDisconnected = function(self, peerName, peerID)
-        LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
-        if IsPlayer(peerID) then
-            local slot = FindSlotForID(peerID)
-            if slot and self:IsHost() then
-                gameInfo.PlayerOptions[slot] = nil
-            end
+        LOG("Autolobby communications", unpack(arg))
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param ... any
+    DebugWarn = function(self, ...)
+        if not self.EnabledWarnings then
+            return
         end
-    end
 
-end
+        WARN("Autolobby communications", unpack(arg))
+    end,
 
+    ---@param self UIAutolobbyCommunications
+    ---@param ... any
+    DebugError = function(self, ...)
+        if not self.EnabledErrors then
+            return
+        end
 
--- Create a new unconnected lobby.
+        error("Autolobby communications", unpack(arg))
+    end,
+
+    --#endregion
+}
+
+--- Creates the lobby communications, called (indirectly) by the engine.
+---@param protocol any
+---@param localPort any
+---@param desiredPlayerName any
+---@param localPlayerUID any
+---@param natTraversalProvider any
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "CreateLobby ScreenGroup") end
-    -- don't parent background to screen group so it doesn't get destroyed until we leave the menus
-    local background = MenuCommon.SetupBackground(GetFrame(0))
+    LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
-    -- construct the initial dialog
-    SetDialog(parent, Strings.TryingToConnect)
+    local maxConnections = 16
+    AutolobbyCommunicationsInstance = InternalCreateLobby(
+        AutolobbyCommunications,
+        protocol, localPort, maxConnections, desiredPlayerName,
+        localPlayerUID, natTraversalProvider
+    )
 
-    InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-
-    localPlayerName = lobbyComm:GetLocalPlayerName()
+    -- create the singleton for the interface
+    import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
 end
 
-
--- create the lobby as a host
+--- Instantiates a lobby instance by hosting one.
+---
+--- Assumes that the lobby communications to be initialized by calling `CreateLobby`.
+---@param gameName any
+---@param scenarioFileName any
+---@param singlePlayer any
 function HostGame(gameName, scenarioFileName, singlePlayer)
-    CreateUI()
+    LOG("HostGame", gameName, scenarioFileName, singlePlayer)
 
-    requiredPlayers = 2
-    local args = GetCommandLineArg("/players", 1)
-    if args then
-        requiredPlayers = tonumber(args[1])
-        LOG("requiredPlayers was set to: "..requiredPlayers)
+    if AutolobbyCommunicationsInstance then
+        AutolobbyCommunicationsInstance.GameOptions.ScenarioFile = string.gsub(scenarioFileName,
+            ".v%d%d%d%d_scenario.lua",
+            "_scenario.lua")
+        AutolobbyCommunicationsInstance:HostGame()
     end
 
-    SetGameOptionsFromCommandLine()
-
-    -- update the connection status GUI
-    connectionStatusGUI:SetTotalPlayersCount(requiredPlayers)
-
-    -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
-    lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
-
-    lobbyComm:HostGame()
+    -- start with a loading dialog
+    import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        :CreateLoadingDialog()
 end
 
--- join an already existing lobby
+--- Joins an instantiated lobby instance.
+---
+--- Assumes that the lobby communications to be initialized by calling `CreateLobby`.
+---@param address any
+---@param asObserver any
+---@param playerName any
+---@param uid any
 function JoinGame(address, asObserver, playerName, uid)
-    LOG("Joingame (name=" .. tostring(playerName) .. ", uid=" .. tostring(uid) .. ", address=" .. tostring(address) ..")")
-    CreateUI()
+    LOG("JoinGame", address, asObserver, playerName, uid)
 
-    -- TODO: I'm not sure if this argument is passed along when you are joining a lobby
-    requiredPlayers = 2
-    local args = GetCommandLineArg("/players", 1)
-    if args then
-        requiredPlayers = tonumber(args[1])
-        LOG("requiredPlayers was set to: "..requiredPlayers)
+    if AutolobbyCommunicationsInstance then
+        AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
     end
 
-    SetGameOptionsFromCommandLine()
-
-    -- update the connection status GUI
-    connectionStatusGUI:SetTotalPlayersCount(requiredPlayers)
-
-    lobbyComm:JoinGame(address, playerName, uid)
+    -- start with a loading dialog
+    import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        :CreateLoadingDialog()
 end
 
-function ConnectToPeer(addressAndPort,name,uid)
-    if not string.find(addressAndPort, '127.0.0.1') then
-        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
-    else
-        DisconnectFromPeer(uid, true)
-        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
+--- Called by the engine.
+---@param addressAndPort any
+---@param name any
+---@param uid any
+function ConnectToPeer(addressAndPort, name, uid)
+    LOG("ConnectToPeer", addressAndPort, name, uid)
+
+    if AutolobbyCommunicationsInstance then
+        AutolobbyCommunicationsInstance:ConnectToPeer(addressAndPort, name, uid)
     end
-
-    -- update ui to inform players
-    connectionStatusGUI:AddConnectedPlayer()
-
-    lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
+--- Called by the engine.
+---@param uid any
+---@param doNotUpdateView any
 function DisconnectFromPeer(uid, doNotUpdateView)
-    LOG("DisconnectFromPeer (uid=" .. uid ..")")
-    if wasConnected(uid) then
-        table.remove(connectedTo, uid)
-    end
-    GpgNetSend('Disconnected', string.format("%d", uid))
+    LOG("DisconnectFromPeer", uid, doNotUpdateView)
 
-    -- sometimes we disconnect immediately, but secretly connect through a proxy
-    if not doNotUpdateView then 
-        connectionStatusGUI:RemoveConnectedPlayer()
-    end
-
-    lobbyComm:DisconnectFromPeer(uid)
-end
-
-
-function SetGameOptionsFromCommandLine()
-    for name, value in utils.GetCommandLineArgTable("/gameoptions") do
-        if name and value then
-            gameInfo.GameOptions[name] = value
-        else
-            LOG("Malformed gameoption. ignoring name: " .. repr(name) .. " and value: " .. repr(value))
-        end
+    if AutolobbyCommunicationsInstance then
+        AutolobbyCommunicationsInstance:DisconnectFromPeer(uid)
     end
 end

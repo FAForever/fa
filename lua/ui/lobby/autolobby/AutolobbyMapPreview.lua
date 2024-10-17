@@ -21,15 +21,11 @@
 --******************************************************************************************************
 
 local UIUtil = import("/lua/ui/uiutil.lua")
+local MapUtil = import("/lua/ui/maputil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+
 local Group = import("/lua/maui/group.lua").Group
 local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local MapUtil = import("/lua/ui/maputil.lua")
-local TexturePool = import("/lua/ui/texturepool.lua").TexturePool
-local ACUButton = import("/lua/ui/controls/acubutton.lua").ACUButton
-local gameColors = import("/lua/gamecolors.lua").GameColors
-
-local MapUtil = import("/lua/ui/maputil.lua")
 
 ---@class UIAutolobbyMapPreview : Group
 ---@field Preview MapPreview
@@ -43,7 +39,7 @@ local MapUtil = import("/lua/ui/maputil.lua")
 ---@field MassIcons Bitmap[]
 ---@field EnergyIcons Bitmap[]
 ---@field WreckageIcons Bitmap[]
-AutolobbyMapPreview = ClassUI(Group) {
+local AutolobbyMapPreview = ClassUI(Group) {
 
     ---@param self UIAutolobbyMapPreview
     ---@param parent Control
@@ -95,7 +91,6 @@ AutolobbyMapPreview = ClassUI(Group) {
     ---@return Bitmap
     _CreateIcon = function(self, scenarioWidth, scenarioHeight, px, pz, source)
         local size = self.Width()
-
         local xOffset = 0
         local xFactor = 1
         local yOffset = 0
@@ -215,4 +210,25 @@ AutolobbyMapPreview = ClassUI(Group) {
             self:_UpdateSpawnLocations(self.ScenarioInfo)
         end
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Engine hooks
+
+    ---@param self UIAutolobbyMapPreview
+    Show = function(self)
+        Group.Show(self)
+
+        -- do not show the pooled icons
+        self.EnergyIcon:Hide()
+        self.MassIcon:Hide()
+        self.WreckageIcon:Hide()
+    end,
+
+    --#endregion
 }
+
+---@param parent Control
+---@return UIAutolobbyMapPreview
+GetInstance = function(parent)
+    return AutolobbyMapPreview(parent)
+end

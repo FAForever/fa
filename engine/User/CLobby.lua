@@ -1,7 +1,12 @@
 ---@meta
 
----@class moho.lobby_methods : Destroyable
+
+
+---@class moho.lobby_methods : Destroyable, InternalObject
 local CLobby = {}
+
+--- "0", "1", "2", etc.
+---@alias UILobbyPlayerId string
 
 ---@alias GPGNetAddress string | number
 
@@ -13,8 +18,56 @@ local CLobby = {}
 ---@field quiet number
 ---@field status string
 
+--- A piece of data that is one can send with `BroadcastData` or `SendData` to other player(s) in the lobby.
+---@class UILobbyReceivedMessage : table
+---@field SenderID UILobbyPlayerId  # Set by the engine, allows us to identify the source.
+---@field SenderName string         # Set by the engine, nickname of the source.
+---@field Type string               # Type of message
+
+--- A piece of data that is one can send with `BroadcastData` or `SendData` to other player(s) in the lobby.
+---@class UILobbyData : table
+---@field Type string               # Type of message
+
+--- All the following fields are read by the engine upon launching the lobby to setup the scenario.
+---@class UILobbyLaunchGameOptionsConfiguration
+---@field UnitCap any           # Read by the engine to determine the initial unit cap. See also the globals `GetArmyUnitCap`, `GetArmyUnitCostTotal` and `SetArmyUnitCap` to manipulate it throughout the scenario.
+---@field CheatsEnabled any     # Read by the engine to determine whether cheats are enabled.
+---@field FogOfWar any          # Read by the engine to determine how to manage the fog of war.
+---@field NoRushOption any      # Read by the engine to create the anti-rush mechanic.
+---@field PrebuiltUnits any     # Read by the engine to create initial, prebuilt units.
+---@field ScenarioFile any      # Read by the engine to load the scenario of the game.
+---@field Timeouts any          # Read by the engine to determine the behavior of time outs.
+---@field CivilianAlliance any  # Read by the engine to determine the alliance towards civilians.
+---@field GameSpeed any         # Read by the engine to determine the behavior of game speed (adjustments). 
+
+---@class UILobbyLaunchGameModsConfiguration
+---@field name string           # Read by the engine, TODO
+---@field uid string            # Read by the engine, TODO
+
+---@class UILobbyLaunchObserverConfiguration
+---@field OwnerID UILobbyPlayerId   # Read by the engine, TODO
+---@field PlayerName string         # Read by the engine, TODO
+
+---@class UILobbyLaunchPlayerConfiguration
+---@field ArmyName string           # Read by the engine, TODO
+---@field PlayerName string         # Read by the engine, TODO
+---@field Civilian boolean          # Read by the engine, TODO
+---@field Human boolean             # Read by the engine, TODO
+---@field AIPersonality string      # Read by the engine iff Human is false
+---@field ArmyColor number          # Read by the engine, is mapped to a color by reading the values of `lua\GameColors.lua`.
+---@field PlayerColor number        # Read by the engine, is mapped to a color by reading the values of `lua\GameColors.lua`
+---@field Faction number            # Read by the engine to determine the faction of the player.
+---@field OwnerID UILobbyPlayerId   # Read by the engine, TODO
+
+--- All the following fields are read by the engine upon launching the lobby.
+---@class UILobbyLaunchConfiguration
+---@field GameMods UILobbyLaunchGameModsConfiguration[] # ModInfo[]
+---@field GameOptions UILobbyLaunchGameOptionsConfiguration #  GameOptions
+---@field Observers UILobbyLaunchObserverConfiguration # PlayerData[]
+---@field PlayerOptions UILobbyLaunchPlayerConfiguration[] # PlayerData[]
+
 --- Broadcasts information to all peers. See `SendData` for sending to a specific peer.
----@param data CommunicationData
+---@param data UILobbyData
 function CLobby:BroadcastData(data)
 end
 
@@ -45,7 +98,7 @@ function CLobby:EjectPeer(targetID, reason)
 end
 
 --- Retrieves the local client identifier.
----@return number
+---@return UILobbyPlayerId
 function CLobby:GetLocalPlayerID()
 end
 
@@ -87,7 +140,7 @@ function CLobby:JoinGame(address, remotePlayerName, remotePlayerUID)
 end
 
 ---
----@param gameConfig GameData
+---@param gameConfig UILobbyLaunchConfiguration
 function CLobby:LaunchGame(gameConfig)
 end
 
@@ -106,7 +159,7 @@ end
 
 --- Sends data to a specific peer. See `BroadcastData` for sending to all peers.
 ---@param targetID string
----@param data CommunicationData
+---@param data UILobbyData
 function CLobby:SendData(targetID, data)
 end
 
