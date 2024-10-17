@@ -2,9 +2,9 @@
 
   - UEF Armored Command Unit (UEL0001):
     - AdvancedShieldGeneratorField
-        - BuildCostEnergy = 110000
-        - BuildCostMass = 2200
-        - BuildTime = 2200
-        - ShieldMaxHealth = 20000
-        - ShieldRechargeTime = 120
-        - ShieldRegenRate = 80
+      - BuildCostEnergy = 110000
+      - BuildCostMass = 2200
+      - BuildTime = 2200
+      - ShieldMaxHealth = 20000
+      - ShieldRechargeTime = 120
+      - ShieldRegenRate = 80
