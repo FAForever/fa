@@ -34,7 +34,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- This module exists because the engine expects this particular file to exist with 
+-- This module exists because the engine expects this particular file to exist with
 -- the provided functionality. It now acts as a wrapper for the autolobby controller
 -- that can be found at: lua\ui\lobby\autolobby\AutolobbyController.lua
 
@@ -123,8 +123,4 @@ function DisconnectFromPeer(uid, doNotUpdateView)
     if AutolobbyCommunicationsInstance then
         AutolobbyCommunicationsInstance:DisconnectFromPeer(uid)
     end
-end
-
-function SendNatPacket (...)
-    reprsl(arg, {depth = 5})
 end
