@@ -466,7 +466,7 @@ function VDiff(a, b)
 end
 
 --- Computes the distance between two points.
---- It is always faster to compute it in Lua.
+---@deprecated It is faster to compute it in Lua.
 ---@param x1 number
 ---@param y1 number
 ---@param x2 number
@@ -476,7 +476,7 @@ function VDist2(x1, y1, x2, y2)
 end
 
 --- Computes the squared distance between two points.
---- It is faster to compute it in Lua.
+---@deprecated It is faster to compute it in Lua.
 ---@param x1 number
 ---@param y1 number
 ---@param x2 number
