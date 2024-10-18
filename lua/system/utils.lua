@@ -11,6 +11,9 @@ local type = type
 local pcall = pcall 
 local unpack = unpack 
 local next = next
+local getmetatable = getmetatable
+local rawget = rawget
+local setmetatable = setmetatable
 
 -- local Random = Random
 
