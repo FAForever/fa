@@ -277,52 +277,84 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return MohoLobbyMethods.DisconnectFromPeer(self, uid)
     end,
 
-
+    --- Ejects a peer from the lobby.
+    ---@param self UIAutolobbyCommunications
+    ---@param uid UILobbyPlayerId
+    ---@param reason string
+    ---@return nil
     EjectPeer = function(self, uid, reason)
         self:DebugSpew("EjectPeer", uid, reason)
         return MohoLobbyMethods.EjectPeer(self, uid, reason)
     end,
 
+    --- Retrieves the local identifier.
+    ---@param self UIAutolobbyCommunications
+    ---@return UILobbyPlayerId
     GetLocalPlayerID = function(self)
         self:DebugSpew("GetLocalPlayerID")
         return MohoLobbyMethods.GetLocalPlayerID(self)
     end,
 
+    --- Retrieves the local name. Note that this name can be overwritten by the host via `MakeValidPlayerName`
+    ---@param self UIAutolobbyCommunications
+    ---@return string
     GetLocalPlayerName = function(self)
         self:DebugSpew("GetLocalPlayerName")
         return MohoLobbyMethods.GetLocalPlayerName(self)
     end,
 
+    --- Retrieves the local port.
+    ---@param self any
+    ---@return number|nil
     GetLocalPort = function(self)
         self:DebugSpew("GetLocalPort")
         return MohoLobbyMethods.GetLocalPort(self)
     end,
 
+    --- Retrieves information about a peer. See `GetPeers` to get the same information for all connected peers.
+    ---@param self UIAutolobbyCommunications
+    ---@param uid UILobbyPlayerId
+    ---@return Peer
     GetPeer = function(self, uid)
         self:DebugSpew("GetPeer", uid)
         return MohoLobbyMethods.GetPeer(self, uid)
     end,
 
+    --- Retrieves information about all connected peers. See `GetPeer` to get information for a specific peer.
+    ---@param self UIAutolobbyCommunications
     GetPeers = function(self)
         self:DebugSpew("GetPeers")
         return MohoLobbyMethods.GetPeers(self)
     end,
 
+    --- Transforms the lobby to be discoveryable and joinable for other players.
+    ---@param self UIAutolobbyCommunications
+    ---@return nil
     HostGame = function(self)
         self:DebugSpew("HostGame")
         return MohoLobbyMethods.HostGame(self)
     end,
 
+    --- Retrieves whether the local client is the host.
+    ---@param self any
+    ---@return boolean
     IsHost = function(self)
         self:DebugSpew("IsHost")
         return MohoLobbyMethods.IsHost(self)
     end,
 
+    --- Join a lobby that is set to be a host.
+    ---@param self UIAutolobbyCommunications
+    ---@param address GPGNetAddress
+    ---@param remotePlayerName string
+    ---@param remotePlayerUID UILobbyPlayerId
+    ---@return nil
     JoinGame = function(self, address, remotePlayerName, remotePlayerUID)
         self:DebugSpew("JoinGame", address, remotePlayerName, remotePlayerUID)
         return MohoLobbyMethods.JoinGame(self, address, remotePlayerName, remotePlayerUID)
     end,
 
+    --- Launches the game for the local client. The game configuration that is passed in should originate from the host.
     ---@param self UIAutolobbyCommunications
     ---@param gameConfig UILobbyLaunchConfiguration
     ---@return nil
@@ -332,12 +364,21 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return MohoLobbyMethods.LaunchGame(self, gameConfig)
     end,
 
+    --- Returns a valid game name.
+    ---@param self UIAutolobbyCommunications
+    ---@param name string
+    ---@return string
     MakeValidGameName = function(self, name)
 
         self:DebugSpew("MakeValidGameName", name)
         return MohoLobbyMethods.MakeValidGameName(self, name)
     end,
 
+    --- Returns a valid player name.
+    ---@param self UIAutolobbyCommunications
+    ---@param uid UILobbyPlayerId
+    ---@param name string
+    ---@return string
     MakeValidPlayerName = function(self, uid, name)
         self:DebugSpew("MakeValidPlayerName", uid, name)
         return MohoLobbyMethods.MakeValidPlayerName(self, uid, name)
