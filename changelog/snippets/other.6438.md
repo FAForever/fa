@@ -1,0 +1,2 @@
+- (#5061, #6438) Add metamethods and utility functions for Vectors and Quaternions to simplify and clean up the code involving operations with them.
+  - This **removes** the file `/lua/shared/quaternions.lua`, which was added in #4768 (Mar 4, 2023), so mods that use that file will have to be updated.
