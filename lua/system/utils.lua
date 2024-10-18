@@ -950,14 +950,24 @@ function vector_metatable.__add(a, b)
     end
 
     if rawget(a, 4) or rawget(b, 4) then
-        -- tranlating orientation???
+        --- translating orientation doesn't make sense
         error("incompatible vector type for addition: quaternion")
     end
 
-    if not a.z ~= not b.z then
-        error("incompatible vector types for addition: Vector2 and Vector")
+    local a3, b3 = a.z, b.z
+    if a3 then
+        if b3 then
+            return setmetatable({b[1] + a[1], b[2] + a[2], b3 + a3}, vector_metatable)
+        else
+            error("incompatible vector types for addition: Vector + Vector2")
+        end
+    else
+        if b3 then
+            error("incompatible vector types for addition: Vector2 + Vector")
+        end
+
+        return setmetatable({b[1] + a[1], b[2] + a[2]}, vector_metatable)
     end
-    return VAdd(a, b)
 end
 
 ---@overload fun(a: Quaternion, b: Vector): Quaternion   rotation composition
