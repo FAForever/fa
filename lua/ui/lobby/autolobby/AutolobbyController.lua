@@ -360,6 +360,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     LaunchGame = function(self, gameConfig)
         self:DebugSpew("LaunchGame")
         self:DebugSpew(reprs(gameConfig, { depth = 10 }))
+        GpgNetSendGameState('Launching')
         return MohoLobbyMethods.LaunchGame(self, gameConfig)
     end,
 
@@ -423,6 +424,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         -- start prefetching the scenario
         PrefetchSession(self.GameOptions.ScenarioFile, {}, true)
 
+        GpgNetSendGameState('Lobby')
+
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
             :UpdateGameOptions(self.GameOptions)
@@ -450,6 +453,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.LocalPlayerName = newLocalName
         self.LocalID = localId
         self.HostID = hostId
+
+        GpgNetSendGameState('Lobby')
 
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.IsAliveThread, self))

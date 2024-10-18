@@ -50,6 +50,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         localPlayerUID, natTraversalProvider
     )
 
+    GpgNetSendGameState('Idle')
+
     -- create the singleton for the interface
     local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
     AutolobbyCommunicationsInstance.Trash:Add(interface)
@@ -79,10 +81,10 @@ end
 --- Joins an instantiated lobby instance.
 ---
 --- Assumes that the lobby communications is initialized by calling `CreateLobby`.
----@param address any
----@param asObserver any
----@param playerName any
----@param uid any
+---@param address GPGNetAddress
+---@param asObserver boolean
+---@param playerName string
+---@param uid UILobbyPlayerId
 function JoinGame(address, asObserver, playerName, uid)
     LOG("JoinGame", address, asObserver, playerName, uid)
 
@@ -96,9 +98,9 @@ function JoinGame(address, asObserver, playerName, uid)
 end
 
 --- Called by the engine.
----@param addressAndPort any
+---@param addressAndPort GPGNetAddress
 ---@param name any
----@param uid any
+---@param uid UILobbyPlayerId
 function ConnectToPeer(addressAndPort, name, uid)
     LOG("ConnectToPeer", addressAndPort, name, uid)
 
@@ -108,10 +110,13 @@ function ConnectToPeer(addressAndPort, name, uid)
 end
 
 --- Called by the engine.
----@param uid any
+---@param uid UILobbyPlayerId
 ---@param doNotUpdateView any
 function DisconnectFromPeer(uid, doNotUpdateView)
     LOG("DisconnectFromPeer", uid, doNotUpdateView)
+
+    -- inform the server of the event
+    GpgNetSendDisconnected(uid)
 
     if AutolobbyCommunicationsInstance then
         AutolobbyCommunicationsInstance:DisconnectFromPeer(uid)

@@ -95,7 +95,14 @@ end
 
 --- Sends game status to the lobby server. For more context:
 --- - https://github.com/search?q=repo%3AFAForever%2Fserver+GameState&type=code
----@param value 'None' | 'Idle' | 'Launching' | 'Ended'
+---@param value 'None' | 'Idle' | 'Lobby' | 'Launching' | 'Ended'
 GpgNetSendGameState = function(value)
     _G.GpgNetSend('GameState', value)
+end
+
+--- Sends game status to the lobby server. For more context:
+--- - https://github.com/search?q=repo%3AFAForever%2Fserver+GameState&type=code
+---@param peerId UILobbyPlayerId
+GpgNetSendDisconnected = function(peerId)
+    GpgNetSend('Disconnected', peerId)
 end
