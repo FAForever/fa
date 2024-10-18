@@ -34,10 +34,14 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- This module exists because the engine expects this particular file to exist with 
+-- the provided functionality. It now acts as a wrapper for the autolobby controller
+-- that can be found at: lua\ui\lobby\autolobby\AutolobbyController.lua
+
 ---@type UIAutolobbyCommunications | false
 local AutolobbyCommunicationsInstance = false
 
---- Creates the lobby communications, called (indirectly) by the engine.
+--- Creates the lobby communications, called (indirectly) by the engine to setup the module state.
 ---@param protocol any
 ---@param localPort any
 ---@param desiredPlayerName any
@@ -60,7 +64,7 @@ end
 
 --- Instantiates a lobby instance by hosting one.
 ---
---- Assumes that the lobby communications to be initialized by calling `CreateLobby`.
+--- Assumes that the lobby communications is initialized by calling `CreateLobby`.
 ---@param gameName any
 ---@param scenarioFileName any
 ---@param singlePlayer any
@@ -81,7 +85,7 @@ end
 
 --- Joins an instantiated lobby instance.
 ---
---- Assumes that the lobby communications to be initialized by calling `CreateLobby`.
+--- Assumes that the lobby communications is initialized by calling `CreateLobby`.
 ---@param address any
 ---@param asObserver any
 ---@param playerName any
@@ -119,4 +123,8 @@ function DisconnectFromPeer(uid, doNotUpdateView)
     if AutolobbyCommunicationsInstance then
         AutolobbyCommunicationsInstance:DisconnectFromPeer(uid)
     end
+end
+
+function SendNatPacket (...)
+    reprsl(arg, {depth = 5})
 end
