@@ -49,6 +49,7 @@ local CLobby = {}
 ---@field PlayerName string         # Read by the engine, TODO
 
 ---@class UILobbyLaunchPlayerConfiguration
+---@field StartSpot number          # Read by Lua code to determine start locations
 ---@field ArmyName string           # Read by the engine, TODO
 ---@field PlayerName string         # Read by the engine, TODO
 ---@field Civilian boolean          # Read by the engine, TODO

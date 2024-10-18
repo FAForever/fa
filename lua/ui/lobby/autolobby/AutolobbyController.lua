@@ -20,7 +20,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-
 local Utils = import("/lua/system/utils.lua")
 
 local MohoLobbyMethods = moho.lobby_methods
