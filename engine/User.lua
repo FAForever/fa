@@ -709,14 +709,15 @@ end
 ---@alias UILobbyProtocols "UDP" | "TCP" | "None
 
 --- For internal use by `CreateLobbyComm()`
----@param lobbyComClass fa-class
+---@generic T
+---@param lobbyComClass T
 ---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
 ---@param playerUID? string
 ---@param natTraversalProvider? userdata
----@return UILobbyCommunication
+---@return T
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
