@@ -248,7 +248,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         local peers = self:GetPeers()
 
         -- check number of peers
-        if not table.getsize(peers) == self.PlayerCount -1 then
+        if table.getsize(peers) ~= self.PlayerCount -1 then
             return false
         end
 
@@ -261,7 +261,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         -- check confirmed established connections of peers
         for _, peer in peers do
-            if not table.getsize(peer.establishedPeers) == self.PlayerCount - 1 then
+            if table.getsize(peer.establishedPeers) ~= self.PlayerCount - 1 then
                 return false
             end
         end
