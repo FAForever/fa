@@ -20,12 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local UIUtil = import("/lua/ui/uiutil.lua")
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EnumColors = import("/lua/shared/color.lua").EnumColors
 
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-
-local EnumColors = import("/lua/shared/color.lua").EnumColors
 
 --- A small dot that represents the connection status between players.
 ---@class UIAutolobbyConnectionMatrixDot : Bitmap
