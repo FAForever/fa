@@ -246,13 +246,20 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     CheckForLaunch = function(self, peers)
         -- true iff we are connected to all peers
         local peers = self:GetPeers()
-        local allLocalConnected = table.getsize(peers) == self.PlayerCount - 1
 
-        if not allLocalConnected then
+        -- check number of peers
+        if not table.getsize(peers) == self.PlayerCount -1 then
             return false
         end
 
-        -- true iff all peers are connected to every of their peers
+        -- check connection status
+        for k, peer in peers do
+            if peer.status ~= "Established" then
+                return false
+            end
+        end
+
+        -- check confirmed established connections of peers
         for _, peer in peers do
             if not table.getsize(peer.establishedPeers) == self.PlayerCount - 1 then
                 return false
@@ -308,7 +315,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
                 :UpdateConnectionStatuses(statuses)
 
-            WaitFrames(1)
+            WaitFrames(10)
         end
     end,
 
