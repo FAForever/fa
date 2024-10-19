@@ -88,27 +88,21 @@ end
 function JoinGame(address, asObserver, playerName, uid)
     LOG("JoinGame", address, asObserver, playerName, uid)
 
-    if AutolobbyCommunicationsInstance then
-        AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
-    end
+    -- if AutolobbyCommunicationsInstance then
+    --     AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
+    -- end
 
-    -- ForkThread(
-    --     function()
+    -- join over time
+    ForkThread(
+        function()
+            local seconds = tonumber(GetCommandLineArg("/startspot", 1)[1]) or 1
+            WaitSeconds(seconds)
 
-    --         local seconds = tonumber(GetCommandLineArg("/startspot", 1)[1]) or 1
-    --         WaitSeconds(seconds)
-    --         if AutolobbyCommunicationsInstance then
-    --             AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
-
-    --             if seconds == 2 then
-    --             WaitSeconds(seconds)
-    --             DisconnectFromPeer(AutolobbyCommunicationsInstance:GetPeers()[2].id, false)
-    --             end
-    --         end
-
-
-    --     end
-    -- )
+            if AutolobbyCommunicationsInstance then
+                AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
+            end
+        end
+    )
 
     -- -- start with a loading dialog
     -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
