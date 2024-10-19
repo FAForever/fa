@@ -1352,7 +1352,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     float3 color;
     // We want the decals to behave consistently with the rest of the ground
     if (ShaderUsesPbrRendering()) {
-        color = PBR(inV, decalAlbedo.rgb, normal, 1-decalSpec.r, waterDepth);
+        color = PBR(inV, decalAlbedo.rgb, normal, 0.9 * (1-decalSpec.r), waterDepth);
     } else {
         color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
     }
