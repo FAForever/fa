@@ -209,14 +209,7 @@ end
 --- Called by the module manager when this module becomes dirty
 function __moduleinfo.OnDirty()
     ModuleTrash:Destroy()
-
-    -- trigger a reload
-    ForkThread(
-        function()
-            WaitSeconds(1.0)
-            import(__moduleinfo.name)
-        end
-    )
+    import(__moduleinfo.name)
 end
 
 --#endregionGetSingleton
