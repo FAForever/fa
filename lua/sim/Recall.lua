@@ -347,10 +347,11 @@ function SetRecallVote(data)
         if not lastVote then
             if vote then
                 -- will succeed with our vote
-                lastVote = RecallRequestAccepted(likeVotes + 1, teammates)
+                lastVote = RecallRequestAccepted(likeVotes + 1, teammates + 1)
             else
                 -- won't ever be able to succeed
-                lastVote = not RecallRequestAccepted(teammates - (likeVotes + 1), teammates)
+                -- teammates - votes against = teammates that could vote for recall
+                lastVote = not RecallRequestAccepted(teammates + 1 - (likeVotes + 1), teammates + 1)
             end
         end
         ArmyVoteRecall(army, vote, lastVote)
