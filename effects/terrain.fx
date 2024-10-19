@@ -422,11 +422,11 @@ float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, f
 }
 
 // calculate the lit pixels
-float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo, float specAmount, float waterDepth, float4 inShadow, uniform bool inShadows)
+float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo, float specAmount, float waterDepth, float4 shadowCoords, uniform bool inShadows)
 {
     float4 color = float4( 0, 0, 0, 0 );
 
-    float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
+    float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow(shadowCoords) : 1;
     if (IsExperimentalShader()) {
         float3 position = TerrainScale * worldTerrain;
         float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w;
