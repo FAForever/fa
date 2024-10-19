@@ -29,3 +29,14 @@
     - DPS with 4 T3 pgens: 804 -> 884 (+9.87%)
       - Damage: 3700 -> 3800
       - Base Reload: 7.7s -> 7.2s
+
+- (#6482) Balance accuracy of T3 static artillery:
+  The accuracy is balanced for DPS dealt to multiple Seraphim T3 shields (accounts for splash damage), a scenario similar to how a high value target would be protected late-game where T3 artillery plays a role.
+  - Aeon Emissary:
+    - Firing Randomness: 0.35
+  - UEF Duke:
+    - Firing Randomness: 0.525 -> 0.467
+  - Seraphim Hovatham:
+    - Firing Randomness: 0.675 -> 0.560
+  - Cybran Disruptor:
+    - Firing Randomness: 0.75 -> 0.646
