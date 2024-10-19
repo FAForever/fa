@@ -36,7 +36,7 @@ local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/AutolobbyMapPreview.
 local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/AutolobbyConnectionMatrix.lua")
 
 ---@class UIAutolobbyInterfaceState
----@field PlayerOptions? table<UILobbyPlayerId, UIAutolobbyPlayer>
+---@field PlayerOptions? table<UILobbyPeerId, UIAutolobbyPlayer>
 ---@field GameOptions? UILobbyLaunchGameOptionsConfiguration
 ---@field Connections? UIAutolobbyConnections
 ---@field Statuses? UIAutolobbyStatus
@@ -113,7 +113,7 @@ local AutolobbyInterface = Class(Group) {
     end,
 
     ---@param self UIAutolobbyInterface
-    ---@param playerOptions table<UILobbyPlayerId, UIAutolobbyPlayer>
+    ---@param playerOptions table<UILobbyPeerId, UIAutolobbyPlayer>
     UpdatePlayerOptions = function(self, playerOptions)
         self.State.PlayerOptions = playerOptions
     end,

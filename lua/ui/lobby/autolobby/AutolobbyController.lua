@@ -67,9 +67,9 @@ local AutolobbyEngineStrings = {
 ---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent
 ---@field Trash TrashBag
 ---@field InterfaceTrash TrashBag
----@field LocalID UILobbyPlayerId                           # a number that is stringified
+---@field LocalID UILobbyPeerId                           # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
----@field HostID UILobbyPlayerId
+---@field HostID UILobbyPeerId
 ---@field PlayerCount number
 ---@field GameOptions UILobbyLaunchGameOptionsConfiguration     # Is synced from the host to the others.
 ---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
@@ -416,11 +416,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param self any
     ---@param address any
     ---@param name any
-    ---@param uid any
+    ---@param peerId UILobbyPeerId
     ---@return nil
-    ConnectToPeer = function(self, address, name, uid)
-        self:DebugSpew("ConnectToPeer", address, name, uid)
-        return MohoLobbyMethods.ConnectToPeer(self, address, name, uid)
+    ConnectToPeer = function(self, address, name, peerId)
+        self:DebugSpew("ConnectToPeer", address, name, peerId)
+        return MohoLobbyMethods.ConnectToPeer(self, address, name, peerId)
     end,
 
     --- ???
@@ -444,26 +444,26 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     --- Disconnects from a peer.
     --- See also `ConnectToPeer` to connect
     ---@param self UIAutolobbyCommunications
-    ---@param uid any
+    ---@param peerId UILobbyPeerId
     ---@return nil
-    DisconnectFromPeer = function(self, uid)
-        self:DebugSpew("DisconnectFromPeer", uid)
-        return MohoLobbyMethods.DisconnectFromPeer(self, uid)
+    DisconnectFromPeer = function(self, peerId)
+        self:DebugSpew("DisconnectFromPeer", peerId)
+        return MohoLobbyMethods.DisconnectFromPeer(self, peerId)
     end,
 
     --- Ejects a peer from the lobby.
     ---@param self UIAutolobbyCommunications
-    ---@param uid UILobbyPlayerId
+    ---@param peerId UILobbyPeerId
     ---@param reason string
     ---@return nil
-    EjectPeer = function(self, uid, reason)
-        self:DebugSpew("EjectPeer", uid, reason)
-        return MohoLobbyMethods.EjectPeer(self, uid, reason)
+    EjectPeer = function(self, peerId, reason)
+        self:DebugSpew("EjectPeer", peerId, reason)
+        return MohoLobbyMethods.EjectPeer(self, peerId, reason)
     end,
 
     --- Retrieves the local identifier.
     ---@param self UIAutolobbyCommunications
-    ---@return UILobbyPlayerId
+    ---@return UILobbyPeerId
     GetLocalPlayerID = function(self)
         self:DebugSpew("GetLocalPlayerID")
         return MohoLobbyMethods.GetLocalPlayerID(self)
@@ -487,11 +487,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     --- Retrieves information about a peer. See `GetPeers` to get the same information for all connected peers.
     ---@param self UIAutolobbyCommunications
-    ---@param uid UILobbyPlayerId
+    ---@param peerId UILobbyPeerId
     ---@return Peer
-    GetPeer = function(self, uid)
-        self:DebugSpew("GetPeer", uid)
-        return MohoLobbyMethods.GetPeer(self, uid)
+    GetPeer = function(self, peerId)
+        self:DebugSpew("GetPeer", peerId)
+        return MohoLobbyMethods.GetPeer(self, peerId)
     end,
 
     --- Retrieves information about all connected peers. See `GetPeer` to get information for a specific peer.
@@ -521,11 +521,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param self UIAutolobbyCommunications
     ---@param address GPGNetAddress
     ---@param remotePlayerName string
-    ---@param remotePlayerUID UILobbyPlayerId
+    ---@param remotePlayerPeerId UILobbyPeerId
     ---@return nil
-    JoinGame = function(self, address, remotePlayerName, remotePlayerUID)
-        self:DebugSpew("JoinGame", address, remotePlayerName, remotePlayerUID)
-        return MohoLobbyMethods.JoinGame(self, address, remotePlayerName, remotePlayerUID)
+    JoinGame = function(self, address, remotePlayerName, remotePlayerPeerId)
+        self:DebugSpew("JoinGame", address, remotePlayerName, remotePlayerPeerId)
+        return MohoLobbyMethods.JoinGame(self, address, remotePlayerName, remotePlayerPeerId)
     end,
 
     --- Launches the game for the local client. The game configuration that is passed in should originate from the host.
@@ -551,25 +551,25 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     --- Returns a valid player name.
     ---@param self UIAutolobbyCommunications
-    ---@param uid UILobbyPlayerId
+    ---@param peerId UILobbyPeerId
     ---@param name string
     ---@return string
-    MakeValidPlayerName = function(self, uid, name)
-        self:DebugSpew("MakeValidPlayerName", uid, name)
-        return MohoLobbyMethods.MakeValidPlayerName(self, uid, name)
+    MakeValidPlayerName = function(self, peerId, name)
+        self:DebugSpew("MakeValidPlayerName", peerId, name)
+        return MohoLobbyMethods.MakeValidPlayerName(self, peerId, name)
     end,
 
     ---@param self UIAutolobbyCommunications
-    ---@param uid UILobbyPlayerId
+    ---@param peerId UILobbyPeerId
     ---@param data UILobbyData
     ---@return nil
-    SendData = function(self, uid, data)
-        self:DebugSpew("SendData", uid, data.Type)
+    SendData = function(self, peerId, data)
+        self:DebugSpew("SendData", peerId, data.Type)
         if not AutolobbyMessages[data.Type] then
-            self:DebugWarn("Sending unknown message type", data.Type, "to", uid)
+            self:DebugWarn("Sending unknown message type", data.Type, "to", peerId)
         end
 
-        return MohoLobbyMethods.SendData(self, uid, data)
+        return MohoLobbyMethods.SendData(self, peerId, data)
     end,
 
     --#endregion
@@ -622,13 +622,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     --- Called by the engine when the connection succeeds with the host.
     ---@param self UIAutolobbyCommunications
-    ---@param localId string
-    ---@param hostId string
-    ConnectionToHostEstablished = function(self, localId, newLocalName, hostId)
-        self:DebugSpew("ConnectionToHostEstablished", localId, newLocalName, hostId)
+    ---@param localPeerId UILobbyPeerId
+    ---@param hostPeerId string
+    ConnectionToHostEstablished = function(self, localPeerId, newLocalName, hostPeerId)
+        self:DebugSpew("ConnectionToHostEstablished", localPeerId, newLocalName, hostPeerId)
         self.LocalPlayerName = newLocalName
-        self.LocalID = localId
-        self.HostID = hostId
+        self.LocalID = localPeerId
+        self.HostID = hostPeerId
 
         GpgNetSendGameState('Lobby')
 
@@ -641,10 +641,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     --- Called by the engine when a peer establishes a connection.
     ---@param self UIAutolobbyCommunications
-    ---@param playerId string
-    ---@param playerConnectedTo string[]    # all established conenctions for the given player
-    EstablishedPeers = function(self, playerId, playerConnectedTo)
-        self:DebugSpew("EstablishedPeers", playerId, reprs(playerConnectedTo))
+    ---@param peerId UILobbyPeerId
+    ---@param peerConnectedTo UILobbyPeerId[]    # all established conenctions for the given player
+    EstablishedPeers = function(self, peerId, peerConnectedTo)
+        self:DebugSpew("EstablishedPeers", peerId, reprs(peerConnectedTo))
     end,
 
     --#endregion
@@ -702,9 +702,9 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     --- Called by the engine when a peer disconnects.
     ---@param self UIAutolobbyCommunications
     ---@param peerName string
-    ---@param otherId string
-    PeerDisconnected = function(self, peerName, otherId)
-        self:DebugSpew("PeerDisconnected", peerName, otherId)
+    ---@param peerId UILobbyPeerId
+    PeerDisconnected = function(self, peerName, peerId)
+        self:DebugSpew("PeerDisconnected", peerName, peerId)
     end,
 
     --- Called by the engine when the game is launched.

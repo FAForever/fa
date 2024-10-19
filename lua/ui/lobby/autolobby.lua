@@ -84,7 +84,7 @@ end
 ---@param address GPGNetAddress
 ---@param asObserver boolean
 ---@param playerName string
----@param uid UILobbyPlayerId
+---@param uid UILobbyPeerId
 function JoinGame(address, asObserver, playerName, uid)
     LOG("JoinGame", address, asObserver, playerName, uid)
 
@@ -118,7 +118,7 @@ end
 --- Called by the engine.
 ---@param addressAndPort GPGNetAddress
 ---@param name any
----@param uid UILobbyPlayerId
+---@param uid UILobbyPeerId
 function ConnectToPeer(addressAndPort, name, uid)
     LOG("ConnectToPeer", addressAndPort, name, uid)
 
@@ -128,7 +128,7 @@ function ConnectToPeer(addressAndPort, name, uid)
 end
 
 --- Called by the engine.
----@param uid UILobbyPlayerId
+---@param uid UILobbyPeerId
 ---@param doNotUpdateView any
 function DisconnectFromPeer(uid, doNotUpdateView)
     LOG("DisconnectFromPeer", uid, doNotUpdateView)

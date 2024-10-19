@@ -70,7 +70,7 @@ end
 
 --- Sends player options to the lobby server. For more context:
 --- - https://github.com/search?q=org%3AFAForever+player_option&type=code
----@param peerId UILobbyPlayerId
+---@param peerId UILobbyPeerId
 ---@param key 'Team' | 'Army' | 'StartSpot' | 'Faction' | 'Color'
 ---@param value string | number
 GpgNetSendPlayerOption = function(peerId, key, value)
@@ -102,7 +102,7 @@ end
 
 --- Sends game status to the lobby server. For more context:
 --- - https://github.com/search?q=repo%3AFAForever%2Fserver+GameState&type=code
----@param peerId UILobbyPlayerId
+---@param peerId UILobbyPeerId
 GpgNetSendDisconnected = function(peerId)
     GpgNetSend('Disconnected', peerId)
 end
