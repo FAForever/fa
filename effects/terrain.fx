@@ -344,7 +344,7 @@ VS_OUT FixedFuncVS( VS_IN In )
     return Out;
 }
 
-bool IsExperimentalShader() {
+bool ShaderUsesTerrainInfoTexture() {
     // The tile value basically says how often the texture gets repeated on the map.
     // A value less than one doesn't make sense under normal conditions, so it is
     // relatively save to use it as our switch.
@@ -427,10 +427,10 @@ float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo,
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow(shadowCoords) : 1;
-    if (IsExperimentalShader()) {
+    if (ShaderUsesTerrainInfoTexture()) {
         float3 position = TerrainScale * worldTerrain;
-        float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w;
-        shadow = shadow * mapShadow;
+        float terrainShadow = tex2D(UpperAlbedoSampler, position.xy).w;
+        shadow = shadow * terrainShadow;
     }
 
     // calculate some specular
@@ -495,9 +495,9 @@ float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughn
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
+        float terrainShadow = tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-        shadow *= mapShadow;
+        shadow *= terrainShadow;
     }
 
     float facingSpecular = 0.04;
@@ -835,7 +835,7 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    if (IsExperimentalShader()) {
+    if (ShaderUsesTerrainInfoTexture()) {
         float4 position = TerrainScale * inV.mTexWT;
         result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
     } else {
@@ -2165,14 +2165,14 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // x = normals-x
     // y = normals-z
-    // z = unused
+    // z = water depth
     // w = shadows
-    float4 utility = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float mapShadow = utility.w;
+    float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
+    float terrainShadow = terrainInfo.w;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
-        mapShadow = 1.0f;
+        terrainShadow = 1.0f;
     }
 
     // sample the albedo's
@@ -2199,7 +2199,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * mapShadow;
+    shadow = shadow * terrainShadow;
 
     // normalize the pre-computed normal
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
@@ -2391,14 +2391,14 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // x = normals-x
     // y = normals-z
-    // z = unused
+    // z = water depth
     // w = shadows
-    float4 utility01 = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float mapShadow = utility01.w;
+    float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
+    float terrainShadow = terrainInfo.w;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
-        mapShadow = 1.0f;
+        terrainShadow = 1.0f;
     }
 
     // x = specular
@@ -2433,7 +2433,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; 
-    shadow = shadow * mapShadow;
+    shadow = shadow * terrainShadow;
 
     // normalize the pre-computed normal
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
