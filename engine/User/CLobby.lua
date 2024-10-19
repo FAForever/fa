@@ -14,7 +14,7 @@ local CLobby = {}
 
 ---@class Peer
 ---@field establishedPeers UILobbyPeerId[]
----@field id UILobbyPeerId
+---@field id UILobbyPeerId          # Is -1 when the status is pending
 ---@field ping number
 ---@field name string
 ---@field quiet number

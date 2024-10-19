@@ -74,6 +74,7 @@ local AutolobbyEngineStrings = {
 ---@field PlayerCount number
 ---@field GameOptions UILobbyLaunchGameOptionsConfiguration     # Is synced from the host to the others.
 ---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
+---@field PeerToIndexMapping table<UILobbyPeerId, number>      
 AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     BackgroundTextures = {
@@ -89,14 +90,15 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.Trash = TrashBag()
         self.InterfaceTrash = self.Trash:Add(TrashBag())
 
-        self.LocalID = "-1"
+        self.LocalID = "-2"
         self.LocalPlayerName = "Charlie"
         self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
         self.Connections = {}
-        self.HostID = "-1"
+        self.HostID = "-2"
 
         self.GameOptions = self:CreateLocalGameOptions()
         self.PlayerOptions = {}
+        self.PeerToIndexMapping = {}
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -203,11 +205,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             end
         end
 
+        -- reprsl(peers, { depth = 3})
+
         -- populate the matrix
         for _, peer in peers do
-            local peerIdNumber = tonumber(peer.id) + 1
+            local peerIdNumber = self:PeerIdToIndex(peer.id)
             for _, peerConnectedToId in peer.establishedPeers do
-                local peerConnectedToIdNumber = tonumber(peerConnectedToId) + 1
+                local peerConnectedToIdNumber = self:PeerIdToIndex(peerConnectedToId)
 
                 -- connection works both ways
                 connections[peerIdNumber][peerConnectedToIdNumber] = true
@@ -228,11 +232,36 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         end
 
         for _, peer in peers do
-            local peerIdNumber = tonumber(peer.id) + 1
+            local peerIdNumber = self:PeerIdToIndex(peer.id)
             statuses[peerIdNumber] = peer.status
         end
 
         return statuses
+    end,
+
+    --- Maps a peer id to an index that can be used in the interface.
+    ---@param self UIAutolobbyCommunications
+    ---@param peerId UILobbyPeerId
+    ---@return number
+    PeerIdToIndex = function(self, peerId)
+        if type(peerId) ~= 'string' then
+            self:DebugWarn("Invalid peer id", peerId)
+            return 1
+        end
+
+        -- happens before the connection is established
+        if peerId == "-1" then
+            -- just return some index, but do not store it
+            return table.getsize(self.PeerToIndexMapping) + 1
+        end
+
+        local index = self.PeerToIndexMapping[peerId]
+        if not index then
+            index = table.getsize(self.PeerToIndexMapping) + 1
+            self.PeerToIndexMapping[peerId] = index
+        end
+
+        return index
     end,
 
     ---------------------------------------------------------------------------
@@ -248,7 +277,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ProcessIsAliveMessage = function(self, data)
         -- update UI for player options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            :UpdateIsAliveStamp(tonumber(data.SenderID) + 1)
+            :UpdateIsAliveStamp(self:PeerIdToIndex(data.SenderID))
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -322,6 +351,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@return boolean
     CheckForLaunch = function(self, peers)
 
+        do return false end
+
         -- true iff we are connected to all peers
         local peers = self:GetPeers()
 
@@ -393,7 +424,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
                 :UpdateConnectionStatuses(statuses)
 
-            WaitFrames(10)
+            WaitFrames(1)
         end
     end,
 
@@ -499,7 +530,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     --- Retrieves information about all connected peers. See `GetPeer` to get information for a specific peer.
     ---@param self UIAutolobbyCommunications
     GetPeers = function(self)
-        self:DebugSpew("GetPeers")
+        -- self:DebugSpew("GetPeers")
         return MohoLobbyMethods.GetPeers(self)
     end,
 
@@ -767,7 +798,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             return
         end
 
-        error("Autolobby communications", unpack(arg))
+        local message = "Autolobby communications"
+        for _, arg in ipairs(arg) do
+            message = message .. "\t" .. tostring(arg)
+        end
+
+        error(message)
     end,
 
     --#endregion
