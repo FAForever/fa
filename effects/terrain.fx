@@ -348,10 +348,24 @@ bool ShaderUsesTerrainInfoTexture() {
     // The tile value basically says how often the texture gets repeated on the map.
     // A value less than one doesn't make sense under normal conditions, so it is
     // relatively save to use it as our switch.
+    // We use the upper layer slot to store the terrain info texture, so we don't need
+    // the tile value for anything else.
 
-    // in order to trigger this you can set the albedo scale to be bigger than the map 
-    // size. Use the value 10000 to be safe for any map
+    // In order to trigger this you need to set the albedo scale to be bigger than the 
+    // map size. Use the value 10000 to be safe for any map
     return UpperAlbedoTile.x < 1.0;
+}
+
+bool ShaderUsesPbrRendering() {
+    // The tile value basically says how often the texture gets repeated on the map.
+    // A value less than one doesn't make sense under normal conditions, so it is
+    // relatively save to use it as our switch.
+    // We use the stratum 7 normal slot to store the roughness texture, so we don't need
+    // the tile value for anything else.
+
+    // In order to trigger this you need to set the normal scale to be bigger than the 
+    // map size. Use the value 10000 to be safe for any map
+    return Stratum7NormalTile.x < 1.0;
 }
 
 bool MapUsesAdvancedWater() {
@@ -1335,7 +1349,13 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
-    float3 color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    float3 color;
+    // We want the decals to behave consistently with the rest of the ground
+    if (ShaderUsesPbrRendering()) {
+        color = PBR(inV, TerrainScale * inV.mTexWT, decalAlbedo.rgb, normal, 1-decalSpec.r, waterDepth);
+    } else {
+        color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    }
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
@@ -2021,7 +2041,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
-    // SpecularColor.ba, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
+    // SpecularColor.ba, LowerNormalTile and Stratum7AlbedoTile are unused now
     // Candidates for configurable values are the rotation matrix values
 }
 
