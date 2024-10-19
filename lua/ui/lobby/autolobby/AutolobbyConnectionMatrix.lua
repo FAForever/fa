@@ -55,19 +55,19 @@ local AutolobbyConnectionMatrix = Class(Group) {
     ---@param self UIAutolobbyConnectionMatrix
     ---@param parent Control
     __post_init = function(self, parent)
-        LayoutHelpers.LayoutFor(self)
+        LayoutHelpers.ReusedLayoutFor(self)
             :Width(self.PlayerCount * 24)
             :Height(self.PlayerCount * 24)
             :End()
 
-        LayoutHelpers.LayoutFor(self.Background)
+        LayoutHelpers.ReusedLayoutFor(self.Background)
             :Fill(self)
             :End()
 
         -- layout the matrix
         for y = 1, self.PlayerCount do
             for x = 1, self.PlayerCount do
-                LayoutHelpers.LayoutFor(self.Elements[y][x])
+                LayoutHelpers.ReusedLayoutFor(self.Elements[y][x])
                     :Width(22)
                     :Height(22)
                     :AtLeftTopIn(self, 2 + 24 * (x - 1), 2 + 24 * (y - 1))

@@ -244,6 +244,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param peers any
     ---@return boolean
     CheckForLaunch = function(self, peers)
+
+        do return false end
         -- true iff we are connected to all peers
         local peers = self:GetPeers()
 

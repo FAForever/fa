@@ -62,19 +62,19 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---@param self UIAutolobbyMapPreview
     ---@param parent Control
     __post_init = function(self, parent)
-        LayoutHelpers.LayoutFor(self.Preview)
+        LayoutHelpers.ReusedLayoutFor(self.Preview)
             :Fill(self)
             :End()
 
-        LayoutHelpers.LayoutFor(self.EnergyIcon)
+        LayoutHelpers.ReusedLayoutFor(self.EnergyIcon)
             :Hide()
             :End()
 
-        LayoutHelpers.LayoutFor(self.MassIcon)
+        LayoutHelpers.ReusedLayoutFor(self.MassIcon)
             :Hide()
             :End()
 
-        LayoutHelpers.LayoutFor(self.WreckageIcon)
+        LayoutHelpers.ReusedLayoutFor(self.WreckageIcon)
             :Hide()
             :End()
     end,
@@ -115,7 +115,7 @@ local AutolobbyMapPreview = ClassUI(Group) {
         local z = yOffset + (pz / scenarioHeight) * (size - 2) * yFactor - 4
 
         -- position it
-        LayoutHelpers.LayoutFor(icon)
+        LayoutHelpers.ReusedLayoutFor(icon)
             :Width(14)
             :Height(14)
             :AtLeftTopIn(self, x, z)

@@ -67,28 +67,28 @@ local AutolobbyInterface = Class(Group) {
 
         self.Background = UIUtil.CreateBitmap(self, self.BackgroundTextures[math.random(1, 5)])
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 8) -- TODO: determine this number dynamically
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 4) -- TODO: determine this number dynamically
     end,
 
     ---@param self UIAutolobbyInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        LayoutHelpers.LayoutFor(self)
+        LayoutHelpers.ReusedLayoutFor(self)
             :Fill(parent)
             :End()
 
-        LayoutHelpers.LayoutFor(self.Background)
+        LayoutHelpers.ReusedLayoutFor(self.Background)
             :Fill(self)
             :End()
 
-        LayoutHelpers.LayoutFor(self.Preview)
+        LayoutHelpers.ReusedLayoutFor(self.Preview)
             :AtCenterIn(self, -100, 0)
             :Width(400)
             :Height(400)
             :Hide()
             :End()
 
-        LayoutHelpers.LayoutFor(self.ConnectionMatrix)
+        LayoutHelpers.ReusedLayoutFor(self.ConnectionMatrix)
             :CenteredBelow(self.Preview, 20)
             :Hide()
             :End()
