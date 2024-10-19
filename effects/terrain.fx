@@ -504,12 +504,12 @@ float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughness, float waterDepth) {
+float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness, float waterDepth) {
     // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float terrainShadow = tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
+        float terrainShadow = tex2D(UpperAlbedoSampler, TerrainScale * inV.mTexWT).w; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
         shadow *= terrainShadow;
     }
@@ -1352,7 +1352,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     float3 color;
     // We want the decals to behave consistently with the rest of the ground
     if (ShaderUsesPbrRendering()) {
-        color = PBR(inV, TerrainScale * inV.mTexWT, decalAlbedo.rgb, normal, 1-decalSpec.r, waterDepth);
+        color = PBR(inV, decalAlbedo.rgb, normal, 1-decalSpec.r, waterDepth);
     } else {
         color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
     }
@@ -2037,7 +2037,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
 
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
@@ -2631,7 +2631,7 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
 
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
@@ -2816,7 +2816,7 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
     
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
