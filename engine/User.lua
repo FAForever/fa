@@ -919,7 +919,7 @@ end
 
 --- Start a background load with the given map and mods.
 --- If `hipri` is true, this will interrupt any previous loads in progress.
----@param mapname string
+---@param mapname string        # path to the `scmap` file
 ---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)

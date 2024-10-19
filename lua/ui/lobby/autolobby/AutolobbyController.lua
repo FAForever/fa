@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local Utils = import("/lua/system/utils.lua")
+local MapUtil = import("/lua/ui/maputil.lua")
 
 local GameColors = import("/lua/GameColors.lua")
 local MohoLobbyMethods = moho.lobby_methods
@@ -72,6 +73,7 @@ local AutolobbyEngineStrings = {
 ---@field LocalPlayerName string                            # nickname
 ---@field HostID UILobbyPeerId
 ---@field PlayerCount number
+---@field GameMods UILobbyLaunchGameModsConfiguration[]
 ---@field GameOptions UILobbyLaunchGameOptionsConfiguration     # Is synced from the host to the others.
 ---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
 ---@field PeerToIndexMapping table<UILobbyPeerId, number>      
@@ -96,6 +98,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.Connections = {}
         self.HostID = "-2"
 
+        self.GameMods = {}
         self.GameOptions = self:CreateLocalGameOptions()
         self.PlayerOptions = {}
         self.PeerToIndexMapping = {}
@@ -267,6 +270,19 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return index
     end,
 
+    ---@param self UIAutolobbyCommunications
+    ---@param gameOptions UILobbyLaunchGameOptionsConfiguration
+    ---@param gameMods UILobbyLaunchGameModsConfiguration[]
+    Prefetch = function(self, gameOptions, gameMods)
+        local scenarioPath = gameOptions.ScenarioFile
+        if not scenarioPath then
+            return
+        end
+
+        local scenarioFile = MapUtil.LoadScenario(gameOptions.ScenarioFile)
+        PrefetchSession(scenarioFile.map, gameMods, true)
+    end,
+
     ---------------------------------------------------------------------------
     --#region Message Handlers
     --
@@ -319,7 +335,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ProcessUpdateGameOptionsMessage = function(self, data)
         self.GameOptions = data.GameOptions
 
-        PrefetchSession(self.GameOptions.ScenarioFile, {}, true)
+        self:Prefetch(self.GameOptions, self.GameMods)
 
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
@@ -331,8 +347,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ProcessLaunchMessage = function(self, data)
         self:LaunchGame(data.GameConfig)
     end,
-
-    --#endregion
 
     --#endregion
 
@@ -354,7 +368,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@return boolean
     CheckForLaunch = function(self, peers)
 
-        do return false end
+        -- for debugging :)
+        -- do return false end
 
         -- true iff we are connected to all peers
         local peers = self:GetPeers()
@@ -389,10 +404,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             local peers = self:GetPeers()
             local canLaunch = self:CheckForLaunch(peers)
 
+            LOG("CanLaunch", canLaunch)
             if canLaunch then
                 ---@type UILobbyLaunchConfiguration
                 local gameConfiguration = {
-                    GameMods = {},
+                    GameMods = self.GameMods,
                     GameOptions = self.GameOptions,
                     PlayerOptions = self.PlayerOptions,
                     Observers = {},
@@ -634,7 +650,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.Trash:Add(ForkThread(self.CheckForLaunchThread, self))
 
         -- start prefetching the scenario
-        PrefetchSession(self.GameOptions.ScenarioFile, {}, true)
+        self:Prefetch(self.GameOptions, self.GameMods)
 
         GpgNetSendGameState('Lobby')
 

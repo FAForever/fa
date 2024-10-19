@@ -1,5 +1,5 @@
 ﻿param (
-    [int]$players = 8,  # Default to 2 instances (1 host, 1 client)
+    [int]$players = 4,  # Default to 2 instances (1 host, 1 client)
     [string]$map = "/maps/scmp_009/SCMP_009_scenario.lua",  # Default map: Seton's Clutch
     [int]$port = 15000,  # Default port for hosting the game
     [int]$teams = 2  # Default to two teams, 0 for FFA
