@@ -20,6 +20,12 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- This module represents all valid messages that the autolobby accepts from other
+-- peers. Messages can be send with `lobby:SendData` or with `lobby:BroadcastData`.
+-- Messages are automatically checked to exist and then verified with the `Accept`
+-- function. If the message is accepted the handler is called, which is just a
+-- wrapper to another function in the autolobby.
+
 ---@class UIAutolobbyMessageHandler
 ---@field Accept fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean   # Responsible for filtering out non-sense
 ---@field Handler fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage)           # Responsible for handling the message
@@ -38,29 +44,32 @@ end
 
 --- Represents all valid message types that can be sent between peers.
 ---@type table<string, UIAutolobbyMessageHandler>
-AutolobbyMessageHandlers = {
+AutolobbyMessages = {
     IsAlive = {
+
+        ---@class UIAutolobbyIsAliveMessage : UILobbyReceivedMessage
+
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyIsAliveMessage
         ---@return boolean
         Accept = function(lobby, data)
             return true
         end,
 
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyIsAliveMessage
         Handler = function(lobby, data)
-            lobby:DebugSpew("IsAlive handler")
-
-            -- update UI for player options
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateIsAliveStamp(tonumber(data.SenderID) + 1)
+            lobby:ProcessIsAliveMessage(data)
         end
     },
 
     AddPlayer = {
+
+        ---@class UIAutolobbyAddPlayerMessage : UILobbyReceivedMessage
+        ---@field PlayerOptions UIAutolobbyPlayer
+
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyAddPlayerMessage
         ---@return boolean
         Accept = function(lobby, data)
             if not IsHost(lobby, data) then
@@ -88,31 +97,19 @@ AutolobbyMessageHandlers = {
         end,
 
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyAddPlayerMessage
         Handler = function(lobby, data)
-
-            ---@type UIAutolobbyPlayer
-            local playerOptions = data.PlayerOptions
-
-            -- override some data
-            playerOptions.OwnerID = data.SenderID
-            playerOptions.PlayerName = lobby:MakeValidPlayerName(playerOptions.OwnerID, playerOptions.PlayerName)
-
-            -- TODO: verify that the StartSpot is not occupied
-            -- put the player where it belongs
-            lobby.PlayerOptions[playerOptions.StartSpot] = playerOptions
-
-            -- sync game options with the connected peer
-            lobby:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = lobby.GameOptions })
-
-            -- sync player options to all connected peers
-            lobby:BroadcastData({ Type = "UpdatePlayerOptions", GameOptions = lobby.PlayerOptions })
+            lobby:ProcessAddPlayerMessage(data)
         end
     },
 
     UpdatePlayerOptions = {
+
+        ---@class UIAutolobbyUpdatePlayerOptionsMessage : UILobbyReceivedMessage
+        ---@field PlayerOptions UIAutolobbyPlayer[]
+
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyUpdatePlayerOptionsMessage
         ---@return boolean
         Accept = function(lobby, data)
             if not IsFromHost(lobby, data) then
@@ -126,19 +123,19 @@ AutolobbyMessageHandlers = {
         end,
 
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyUpdatePlayerOptionsMessage
         Handler = function(lobby, data)
-            lobby.PlayerOptions = data.PlayerOptions
-
-            -- update UI for player options
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdatePlayerOptions(lobby.PlayerOptions)
+            lobby:ProcessUpdatePlayerOptionsMessage(data)
         end
     },
 
     UpdateGameOptions = {
+
+        ---@class UIAutolobbyUpdateGameOptionsMessage : UILobbyReceivedMessage
+        ---@field GameOptions UILobbyLaunchGameOptionsConfiguration
+
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyUpdateGameOptionsMessage
         ---@return boolean
         Accept = function(lobby, data)
             if not IsFromHost(lobby, data) then
@@ -152,21 +149,19 @@ AutolobbyMessageHandlers = {
         end,
 
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyUpdateGameOptionsMessage
         Handler = function(lobby, data)
-            lobby.GameOptions = data.GameOptions
-
-            PrefetchSession(lobby.GameOptions.ScenarioFile, {}, true)
-
-            -- update UI for game options
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateGameOptions(lobby.GameOptions)
+            lobby:ProcessUpdateGameOptionsMessage(data)
         end
     },
 
     Launch = {
+
+        ---@class UIAutolobbyLaunchMessage : UILobbyReceivedMessage
+        ---@field GameConfig UILobbyLaunchConfiguration
+
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyLaunchMessage
         ---@return boolean
         Accept = function(lobby, data)
             if not IsFromHost(lobby, data) then
@@ -180,9 +175,9 @@ AutolobbyMessageHandlers = {
         end,
 
         ---@param lobby UIAutolobbyCommunications
-        ---@param data UILobbyReceivedMessage
+        ---@param data UIAutolobbyLaunchMessage
         Handler = function(lobby, data)
-            lobby:LaunchGame(data.GameConfig)
+            lobby:ProcessLaunchMessage(data)
         end
     }
 }

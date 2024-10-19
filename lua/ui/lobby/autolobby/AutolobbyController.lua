@@ -25,7 +25,7 @@ local Utils = import("/lua/system/utils.lua")
 local MohoLobbyMethods = moho.lobby_methods
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
-local AutolobbyMessageHandlers = import("/lua/ui/lobby/autolobby/AutolobbyMessageHandlers.lua").AutolobbyMessageHandlers
+local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
     --  General info strings
@@ -183,6 +183,9 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return options
     end,
 
+    ---------------------------------------------------------------------------
+    --#region Utilities
+
     ---@param self UIAutolobbyCommunications
     ---@param peers Peer[]
     ---@return UIAutolobbyConnections
@@ -230,6 +233,78 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return statuses
     end,
 
+    ---------------------------------------------------------------------------
+    --#region Message Handlers
+    --
+    -- All the message functions in this section run asynchroniously on each
+    -- client. They are responsible for processing the data received from
+    -- other peers. Validation is done in `AutolobbyMessages` before the message
+    -- processed.
+
+    ---@param self UIAutolobbyCommunications
+    ---@param data UIAutolobbyIsAliveMessage
+    ProcessIsAliveMessage = function(self, data)
+        -- update UI for player options
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            :UpdateIsAliveStamp(tonumber(data.SenderID) + 1)
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param data UIAutolobbyAddPlayerMessage
+    ProcessAddPlayerMessage = function(self, data)
+        ---@type UIAutolobbyPlayer
+        local playerOptions = data.PlayerOptions
+
+        -- override some data
+        playerOptions.OwnerID = data.SenderID
+        playerOptions.PlayerName = self:MakeValidPlayerName(playerOptions.OwnerID, playerOptions.PlayerName)
+
+        -- TODO: verify that the StartSpot is not occupied
+        -- put the player where it belongs
+        self.PlayerOptions[playerOptions.StartSpot] = playerOptions
+
+        -- sync game options with the connected peer
+        self:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = self.GameOptions })
+
+        -- sync player options to all connected peers
+        self:BroadcastData({ Type = "UpdatePlayerOptions", GameOptions = self.PlayerOptions })
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param data UIAutolobbyUpdatePlayerOptionsMessage
+    ProcessUpdatePlayerOptionsMessage = function(self, data)
+        self.PlayerOptions = data.PlayerOptions
+
+        -- update UI for player options
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            :UpdatePlayerOptions(self.PlayerOptions)
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param data UIAutolobbyUpdateGameOptionsMessage
+    ProcessUpdateGameOptionsMessage = function(self, data)
+        self.GameOptions = data.GameOptions
+
+        PrefetchSession(self.GameOptions.ScenarioFile, {}, true)
+
+        -- update UI for game options
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            :UpdateGameOptions(self.GameOptions)
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param data UIAutolobbyLaunchMessage
+    ProcessLaunchMessage = function(self, data)
+        self:LaunchGame(data.GameConfig)
+    end,
+
+    --#endregion
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Threads
+
     --- A thread to indicate that we're still around. Various properties such as ping are not updated
     --- until a message is received. This thread introduces occasional traffic between players.
     ---@param self UIAutolobbyCommunications
@@ -245,12 +320,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@return boolean
     CheckForLaunch = function(self, peers)
 
-        do return false end
         -- true iff we are connected to all peers
         local peers = self:GetPeers()
 
         -- check number of peers
-        if table.getsize(peers) ~= self.PlayerCount -1 then
+        if table.getsize(peers) ~= self.PlayerCount - 1 then
             return false
         end
 
@@ -321,6 +395,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         end
     end,
 
+    --#endregion
+
     ---------------------------------------------------------------------------
     --#region Engine interface
 
@@ -329,7 +405,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param data UILobbyData
     BroadcastData = function(self, data)
         self:DebugSpew("BroadcastData", data.Type)
-        if not AutolobbyMessageHandlers[data.Type] then
+        if not AutolobbyMessages[data.Type] then
             self:DebugWarn("Broadcasting unknown message type", data.Type)
         end
 
@@ -489,7 +565,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@return nil
     SendData = function(self, uid, data)
         self:DebugSpew("SendData", uid, data.Type)
-        if not AutolobbyMessageHandlers[data.Type] then
+        if not AutolobbyMessages[data.Type] then
             self:DebugWarn("Sending unknown message type", data.Type, "to", uid)
         end
 
@@ -599,7 +675,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self:DebugSpew("DataReceived", data.Type, data.SenderID, data.SenderName)
 
         ---@type UIAutolobbyMessageHandler?
-        local messageType = AutolobbyMessageHandlers[data.Type]
+        local messageType = AutolobbyMessages[data.Type]
 
         -- verify that the message type exists
         if not messageType then
