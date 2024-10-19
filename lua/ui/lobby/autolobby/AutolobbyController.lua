@@ -239,7 +239,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return statuses
     end,
 
-    --- Maps a peer id to an index that can be used in the interface.
+    --- Maps a peer id to an index that can be used in the interface. In 
+    --- practice the peer id can be all over the place, ranging from -1 
+    --- to numbers such as 35240. With this function we map it to a sane 
+    --- index that we can use in the interface.
     ---@param self UIAutolobbyCommunications
     ---@param peerId UILobbyPeerId
     ---@return number
