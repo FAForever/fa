@@ -33,16 +33,20 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/AutolobbyMapPreview.lua")
+local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/AutolobbyConnectionMatrix.lua")
 
 ---@class UIAutolobbyInterfaceState
 ---@field PlayerOptions? table<UILobbyPlayerId, UIAutolobbyPlayer>
 ---@field GameOptions? UILobbyLaunchGameOptionsConfiguration
+---@field Connections? UIAutolobbyConnections
+---@field Statuses? UIAutolobbyStatus
 
 ---@class UIAutolobbyInterface : Group
 ---@field State UIAutolobbyInterfaceState
 ---@field BackgroundTextures string[]
 ---@field Background Bitmap
 ---@field Preview UIAutolobbyMapPreview
+---@field ConnectionMatrix UIAutolobbyConnectionMatrix
 local AutolobbyInterface = Class(Group) {
 
     BackgroundTextures = {
@@ -63,6 +67,7 @@ local AutolobbyInterface = Class(Group) {
 
         self.Background = UIUtil.CreateBitmap(self, self.BackgroundTextures[math.random(1, 5)])
         self.Preview = AutolobbyMapPreview.GetInstance(self)
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 4)
     end,
 
     ---@param self UIAutolobbyInterface
@@ -77,11 +82,34 @@ local AutolobbyInterface = Class(Group) {
             :End()
 
         LayoutHelpers.LayoutFor(self.Preview)
-            :AtCenterIn(self)
+            :AtCenterIn(self, -100, 0)
             :Width(400)
             :Height(400)
             :Hide()
             :End()
+
+        LayoutHelpers.LayoutFor(self.ConnectionMatrix)
+            :CenteredBelow(self.Preview, 20)
+            :Hide()
+            :End()
+    end,
+
+    ---@param self UIAutolobbyInterface
+    ---@param connections UIAutolobbyConnections
+    UpdateConnections = function(self, connections)
+        self.State.Connections = connections
+
+        self.ConnectionMatrix:Show()
+        self.ConnectionMatrix:UpdateConnections(connections)
+    end,
+
+    ---@param self UIAutolobbyInterface
+    ---@param statuses UIAutolobbyStatus
+    UpdateConnectionStatuses = function(self, statuses)
+        self.State.Statuses = statuses
+
+        self.ConnectionMatrix:Show()
+        self.ConnectionMatrix:UpdateStatuses(statuses)
     end,
 
     ---@param self UIAutolobbyInterface
@@ -104,17 +132,45 @@ local AutolobbyInterface = Class(Group) {
         end
     end,
 
+    ---@param self UIAutolobbyInterface
+    ---@param id number
+    UpdateIsAliveStamp = function(self, id)
+        self.ConnectionMatrix:UpdateIsAliveTimestamp(id)
+    end,
+
     --#region Debugging
 
     ---@param self UIAutolobbyInterface
     ---@param state UIAutolobbyInterfaceState
     RestoreState = function(self, state)
+        self.State = state
+
         if state.PlayerOptions then
-            self:UpdatePlayerOptions(state.PlayerOptions)
+            local ok, msg = pcall(self.UpdatePlayerOptions, self, state.PlayerOptions)
+            if not ok then
+                WARN(msg)
+            end
         end
 
         if state.GameOptions then
-            self:UpdateGameOptions(state.GameOptions)
+            local ok, msg = pcall(self.UpdateGameOptions, self, state.GameOptions)
+            if not ok then
+                WARN(msg)
+            end
+        end
+
+        if state.Connections then
+            local ok, msg = pcall(self.UpdateConnections, self, state.Connections)
+            if not ok then
+                WARN(msg)
+            end
+        end
+
+        if state.Statuses then
+            local ok, msg = pcall(self.UpdateConnectionStatuses, self, state.Statuses)
+            if not ok then
+                WARN(msg)
+            end
         end
     end,
 

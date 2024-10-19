@@ -5,10 +5,12 @@
 ---@class moho.lobby_methods : Destroyable, InternalObject
 local CLobby = {}
 
---- "0", "1", "2", etc.
+--- "0", "1", "2", but also "32254" and the like.
 ---@alias UILobbyPlayerId string
 
 ---@alias GPGNetAddress string | number
+
+---@alias UIPeerStatus 'None' | 'Pending' | 'Connecting' | 'Answering' | 'Established' | 'TimedOut' | 'Errored'
 
 ---@class Peer
 ---@field establishedPeers string[]
@@ -16,7 +18,7 @@ local CLobby = {}
 ---@field ping number
 ---@field name string
 ---@field quiet number
----@field status string
+---@field status UIPeerStatus
 
 --- A piece of data that is one can send with `BroadcastData` or `SendData` to other player(s) in the lobby.
 ---@class UILobbyReceivedMessage : table

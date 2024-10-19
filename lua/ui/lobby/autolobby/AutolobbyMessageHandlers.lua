@@ -52,7 +52,9 @@ AutolobbyMessageHandlers = {
         Handler = function(lobby, data)
             lobby:DebugSpew("IsAlive handler")
 
-            -- TODO: process the alive tick
+            -- update UI for player options
+            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                :UpdateIsAliveStamp(tonumber(data.SenderID) + 1)
         end
     },
 
