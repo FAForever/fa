@@ -543,9 +543,13 @@ function SetupPlayerLines()
     end
 
     -- add replay ID
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
     mapData.MapDescription = LOC(description) ..
         "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(sessionInfo.map_version) ..
-        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
+        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId()) .. 
+        "\r\n" ..
+        "\r\n" .. "Game version: " .. version .. "\r\n" .. "Game type: " .. gametype .. "\r\n" .. "Commit: " .. commit:sub(1, 8)
 
     -- add ladder icon
     mapData.Ranked = sessionInfo.Options.Ranked or false

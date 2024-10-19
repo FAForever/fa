@@ -27,4 +27,4 @@ In addition we recommend the following tooling:
 To run the documentations website on the localhost you need a command line where the current directory is the `docs` folder. From there you run the following commands:
 
 - `bundle install`: Similar to `npm install` if you're familiar with the Node Package Manager. Should be necessary only once. Installs all relevant packages.
-- `bundle exec jekyll server --incremental`: Once completed the website should be available on your localhost. It runs the website from the `_site` folder. The website is updated automagically on every file change but it is not refreshed automagically. You'll need to refresh the page manually.
+- `bundle exec jekyll serve --config _config.yml,_config_debug.ym`: Once completed the website should be available on your localhost. It runs the website from the `_site` folder. The website is updated automagically on every file change but it is not refreshed automagically. You'll need to refresh the page manually.

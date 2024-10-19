@@ -1,0 +1,1 @@
+- (#6429) Fix the aim of the GC's claws being disrupted by the walking animation.

@@ -371,14 +371,14 @@ function UpgradeTransferredKennels(kennels)
 end
 
 --- Takes the units and tries to rebuild them for each army (in order).
---- The transfer procedure is fairly expensive, so it is filtered to important units (EXPs and T3 arty).
 ---@param units Unit[]
 ---@param armies Army[]
 function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unbuiltUnits = {}
     local unbuiltUnitCount = 0
     for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
-        if unit:IsBeingBuilt() then
+        -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
+        if unit:IsBeingBuilt() and not unit.IsUpgrade then
             unbuiltUnitCount = unbuiltUnitCount + 1
             unbuiltUnits[unbuiltUnitCount] = unit
         end
