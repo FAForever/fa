@@ -130,6 +130,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         -- retrieve team and start spot
         info.Team = tonumber(GetCommandLineArg("/team", 1)[1])
         info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1])
+
+        -- determine army color based on start location
         info.PlayerColor = GameColors.MapToWarmCold(info.StartSpot)
         info.ArmyColor = GameColors.MapToWarmCold(info.StartSpot)
 
