@@ -22,6 +22,7 @@
 
 local Utils = import("/lua/system/utils.lua")
 
+local GameColors = import("/lua/GameColors.lua")
 local MohoLobbyMethods = moho.lobby_methods
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
@@ -110,9 +111,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         ---@type UIAutolobbyPlayer
         local info = {}
 
-        info.Team = 1
-        info.PlayerColor = 1
-        info.ArmyColor = 1
         info.Human = true
         info.Civilian = false
 
@@ -131,7 +129,9 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         -- retrieve team and start spot
         info.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-        info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or false
+        info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1])
+        info.PlayerColor = GameColors.MapToWarmCold(info.StartSpot)
+        info.ArmyColor = GameColors.MapToWarmCold(info.StartSpot)
 
         -- retrieve rating
         info.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or 500
