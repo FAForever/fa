@@ -529,13 +529,15 @@ end
 ---@param vY number
 ---@param vZ number
 ---@param q Quaternion
----@return Vector
+---@return number # v'X
+---@return number # v'Y
+---@return number # v'Z
 function RotateVectorXYZByQuat(vX, vY, vZ, q)
     local vW
     local qX, qY, qZ, qW = unpack(q)
 
     -- q * v
-    vX, vY, vZ, vW = 
+    vX, vY, vZ, vW =
         qW * vX - qZ * vY + qY * vZ,
         qZ * vX + qW * vY - qX * vZ,
         -qY * vX + qX * vY + qW * vZ,
