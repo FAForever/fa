@@ -59,7 +59,7 @@ AutolobbyMessages = {
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyIsAliveMessage
         Handler = function(lobby, data)
-            lobby:ProcessIsAliveMessage(data)
+            -- do nothing, we're interested in the side effect
         end
     },
 

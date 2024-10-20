@@ -340,18 +340,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     -- processed.
 
     ---@param self UIAutolobbyCommunications
-    ---@param data UIAutolobbyIsAliveMessage
-    ProcessIsAliveMessage = function(self, data)
-        -- update UI for player options
-
-        local peerIndex = self:PeerIdToIndex(data.SenderID)
-        if peerIndex then
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateIsAliveStamp(peerIndex)
-        end
-    end,
-
-    ---@param self UIAutolobbyCommunications
     ---@param data UIAutolobbyAddPlayerMessage
     ProcessAddPlayerMessage = function(self, data)
         ---@type UIAutolobbyPlayer
@@ -793,6 +781,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         ---@type UIAutolobbyMessageHandler?
         local messageType = AutolobbyMessages[data.Type]
+
+        -- signal UI that we received something
+        local peerIndex = self:PeerIdToIndex(data.SenderID)
+        if peerIndex then
+            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                :UpdateIsAliveStamp(peerIndex)
+        end
 
         -- verify that the message type exists
         if not messageType then

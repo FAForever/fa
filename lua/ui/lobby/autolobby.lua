@@ -40,6 +40,7 @@ local AutolobbyCommunicationsInstance = false
 ---@param desiredPlayerName string
 ---@param localPlayerUID UILobbyPeerId
 ---@param natTraversalProvider any
+---@return UIAutolobbyCommunications
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
@@ -63,6 +64,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     -- create the singleton for the interface
     local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
     AutolobbyCommunicationsInstance.Trash:Add(interface)
+
+    return AutolobbyCommunicationsInstance
 end
 
 --- Instantiates a lobby instance by hosting one.
