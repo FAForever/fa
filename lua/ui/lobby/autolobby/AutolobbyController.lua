@@ -210,11 +210,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             end
         end
 
-        -- reprsl(peers, { depth = 3})
-
         -- populate the matrix
         for _, peer in peers do
-            local peerIdNumber = self:PeerIdToIndex(peer.id)
             for _, peerConnectedToId in peer.establishedPeers do
                 local peerIdNumber = self:PeerIdToIndex(peer.id)
                 local peerConnectedToIdNumber = self:PeerIdToIndex(peerConnectedToId)
