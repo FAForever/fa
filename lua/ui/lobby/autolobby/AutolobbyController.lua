@@ -534,7 +534,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     Destroy = function(self)
         self:DebugSpew("Destroy")
 
-        -- self.Trash:Destroy()
+        self.Trash:Destroy()
         return MohoLobbyMethods.Destroy(self)
     end,
 
@@ -828,8 +828,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     GameLaunched = function(self)
         self:DebugSpew("GameLaunched")
 
-        -- GpgNetSend('GameState', 'Launching')
+        -- clear out the interface
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton():Destroy()
+
+        -- destroy ourselves, the game takes over the management of peers
         self:Destroy()
+
+        GpgNetSend('GameState', 'Launching')
     end,
 
     --- Called by the engine when the launch failed.

@@ -63,8 +63,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
     -- create the singleton for the interface
     local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-    AutolobbyCommunicationsInstance.Trash:Add(interface)
-
     return AutolobbyCommunicationsInstance
 end
 
