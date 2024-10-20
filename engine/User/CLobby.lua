@@ -10,6 +10,8 @@ local CLobby = {}
 
 ---@alias GPGNetAddress string | number
 
+---@alias UILobbyProtocol 'UDP' | 'TCP'
+
 ---@alias UIPeerStatus 'None' | 'Pending' | 'Connecting' | 'Answering' | 'Established' | 'TimedOut' | 'Errored'
 
 ---@class Peer
@@ -136,6 +138,8 @@ function CLobby:IsHost()
 end
 
 --- Joins a lobby hosted by another peer. See `HostGame` to host a game.
+---
+--- Is not idempotent - joining twice will generate an error.
 ---@param address GPGNetAddress
 ---@param remotePlayerName? string | nil
 ---@param remotePlayerPeerId? UILobbyPeerId

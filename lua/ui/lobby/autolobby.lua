@@ -35,10 +35,10 @@
 local AutolobbyCommunicationsInstance = false
 
 --- Creates the lobby communications, called (indirectly) by the engine to setup the module state.
----@param protocol any
----@param localPort any
----@param desiredPlayerName any
----@param localPlayerUID any
+---@param protocol UILobbyProtocol
+---@param localPort number
+---@param desiredPlayerName string
+---@param localPlayerUID UILobbyPeerId
 ---@param natTraversalProvider any
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -49,6 +49,14 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         protocol, localPort, maxConnections, desiredPlayerName,
         localPlayerUID, natTraversalProvider
     )
+
+    AutolobbyCommunicationsInstance.LobbyParameters = AutolobbyCommunicationsInstance.LobbyParameters or {}
+    AutolobbyCommunicationsInstance.LobbyParameters.Protocol = protocol
+    AutolobbyCommunicationsInstance.LobbyParameters.LocalPort = localPort
+    AutolobbyCommunicationsInstance.LobbyParameters.MaxConnections = maxConnections
+    AutolobbyCommunicationsInstance.LobbyParameters.DesiredPlayerName = desiredPlayerName
+    AutolobbyCommunicationsInstance.LobbyParameters.LocalPlayerPeerId = localPlayerUID
+    AutolobbyCommunicationsInstance.LobbyParameters.NatTraversalProvider = natTraversalProvider
 
     GpgNetSendGameState('Idle')
 
@@ -67,6 +75,12 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
     LOG("HostGame", gameName, scenarioFileName, singlePlayer)
 
     if AutolobbyCommunicationsInstance then
+
+        AutolobbyCommunicationsInstance.HostParameters = AutolobbyCommunicationsInstance.HostParameters or {}
+        AutolobbyCommunicationsInstance.HostParameters.GameName = gameName
+        AutolobbyCommunicationsInstance.HostParameters.ScenarioFile = scenarioFileName
+        AutolobbyCommunicationsInstance.HostParameters.SinglePlayer = singlePlayer
+
         AutolobbyCommunicationsInstance.GameOptions.ScenarioFile = string.gsub(scenarioFileName,
             ".v%d%d%d%d_scenario.lua",
             "_scenario.lua")
@@ -88,9 +102,13 @@ end
 function JoinGame(address, asObserver, playerName, uid)
     LOG("JoinGame", address, asObserver, playerName, uid)
 
-    -- if AutolobbyCommunicationsInstance then
-    --     AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
-    -- end
+    if AutolobbyCommunicationsInstance then
+        AutolobbyCommunicationsInstance.JoinParameters = AutolobbyCommunicationsInstance.JoinParameters or {}
+        AutolobbyCommunicationsInstance.JoinParameters.Address = address
+        AutolobbyCommunicationsInstance.JoinParameters.AsObserver = asObserver
+        AutolobbyCommunicationsInstance.JoinParameters.DesiredPlayerName = playerName
+        AutolobbyCommunicationsInstance.JoinParameters.DesiredPeerId = uid
+    end
 
     -- join over time
     ForkThread(

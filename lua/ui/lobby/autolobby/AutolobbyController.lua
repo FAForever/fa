@@ -64,12 +64,29 @@ local AutolobbyEngineStrings = {
 ---@alias UIAutolobbyConnections boolean[][]
 ---@alias UIAutolobbyStatus UIPeerStatus[]
 
+---@class UIAutolobbyParameters
+---@field Protocol UILobbyProtocol 
+---@field LocalPort number
+---@field MaxConnections number
+---@field DesiredPlayerName string
+---@field LocalPlayerPeerId UILobbyPeerId
+---@field NatTraversalProvider any
+
+---@class UIAutolobbyHostParameters
+---@field GameName string
+---@field ScenarioFile string   # path to the _scenario.lua file
+---@field SinglePlayer boolean
+
+---@class UIAutolobbyJoinParameters
+---@field Address GPGNetAddress
+---@field AsObserver boolean
+---@field DesiredPlayerName string
+---@field DesiredPeerId UILobbyPeerId
 
 --- Responsible for the behavior of the automated lobby.
 ---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent
 ---@field Trash TrashBag
----@field InterfaceTrash TrashBag
----@field LocalID UILobbyPeerId                           # a number that is stringified
+---@field LocalID UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
 ---@field HostID UILobbyPeerId
 ---@field PlayerCount number
@@ -78,6 +95,9 @@ local AutolobbyEngineStrings = {
 ---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
 ---@field PeerToIndexMapping table<UILobbyPeerId, number>
 ---@field DisconnectedPeers table<UILobbyPeerId, number>        #
+---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
+---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
+---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
 AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     BackgroundTextures = {
