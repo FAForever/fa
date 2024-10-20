@@ -120,38 +120,6 @@ function JoinGame(address, asObserver, playerName, uid)
             if AutolobbyCommunicationsInstance then
                 AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
             end
-
-            if seconds == 2 then
-
-                WaitSeconds(1.0)
-
-                if AutolobbyCommunicationsInstance then
-
-                    AutolobbyCommunicationsInstance:Destroy()
-
-                    WaitSeconds(1.0)
-
-                    LOG("Rejoining...")
-
-                    local joinParameters = AutolobbyCommunicationsInstance.JoinParameters
-
-                    CreateLobby(
-                        AutolobbyCommunicationsInstance.LobbyParameters.Protocol,
-                        AutolobbyCommunicationsInstance.LobbyParameters.LocalPort,
-                        AutolobbyCommunicationsInstance.LobbyParameters.DesiredPlayerName,
-                        AutolobbyCommunicationsInstance.LobbyParameters.LocalPlayerPeerId,
-                        AutolobbyCommunicationsInstance.LobbyParameters.NatTraversalProvider
-                    )
-
-                    JoinGame(
-                        joinParameters.Address,
-                        joinParameters.AsObserver,
-                        joinParameters.DesiredPlayerName,
-                        joinParameters.DesiredPeerId
-                    )
-                end
-
-            end
         end
     )
 
