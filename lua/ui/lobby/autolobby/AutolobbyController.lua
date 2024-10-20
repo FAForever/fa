@@ -311,6 +311,26 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         PrefetchSession(scenarioFile.map, gameMods, true)
     end,
 
+    ---@param self UIAutolobbyCommunications
+    ---@param lobbyParameters UIAutolobbyParameters
+    ---@param joinParameters UIAutolobbyJoinParameters
+    RejoinThread = function(self, lobbyParameters, joinParameters)
+        local autolobbyModule = import("/lua/ui/lobby/autolobby.lua")
+
+        WaitSeconds(2.0)
+
+        self:Destroy()
+        local newLobby = autolobbyModule.CreateLobby(
+            lobbyParameters.Protocol,
+            lobbyParameters.LocalPort,
+            lobbyParameters.DesiredPlayerName,
+            lobbyParameters.LocalPlayerPeerId,
+            lobbyParameters.NatTraversalProvider
+        )
+
+        autolobbyModule.JoinGame(joinParameters.Address, joinParameters.AsObserver, joinParameters.DesiredPlayerName, joinParameters.DesiredPeerId)
+    end,
+
     ---------------------------------------------------------------------------
     --#region Message Handlers
     --
