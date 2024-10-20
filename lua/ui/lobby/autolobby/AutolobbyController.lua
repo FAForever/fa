@@ -111,7 +111,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param self UIAutolobbyCommunications
     __init = function(self)
         self.Trash = TrashBag()
-        self.InterfaceTrash = self.Trash:Add(TrashBag())
 
         self.LocalID = "-2"
         self.LocalPlayerName = "Charlie"
@@ -402,10 +401,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     CheckForLaunch = function(self, peers)
 
         -- for debugging :)
-        -- do return false end
+        do return false end
 
         -- true iff we are connected to all peers
         local peers = self:GetPeers()
+
+
 
         -- check number of peers
         if table.getsize(peers) ~= self.PlayerCount - 1 then
@@ -525,7 +526,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     Destroy = function(self)
         self:DebugSpew("Destroy")
 
-        self.Trash:Destroy()
+        -- self.Trash:Destroy()
         return MohoLobbyMethods.Destroy(self)
     end,
 
@@ -536,6 +537,9 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@return nil
     DisconnectFromPeer = function(self, peerId)
         self:DebugSpew("DisconnectFromPeer", peerId)
+
+        -- inform the server of the event
+        GpgNetSendDisconnected(peerId)
 
         -- reset mapping
         self.PeerToIndexMapping = {}
