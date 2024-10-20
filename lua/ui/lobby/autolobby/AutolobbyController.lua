@@ -447,6 +447,9 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
     ---@param self UIAutolobbyCommunications
     ConnectionMatrixThread = function(self)
+        -- right at the start it can be a little jumpy, so we wait a second
+        WaitSeconds(1)
+
         while not IsDestroyed(self) do
             local peers = self:GetPeers()
 
@@ -459,7 +462,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
                 :UpdateConnectionStatuses(statuses)
 
-            WaitFrames(1)
+            WaitFrames(10)
         end
     end,
 
