@@ -3635,7 +3635,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXImpact", impactType: ImpactType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXMotionChange", motionChange: MotionChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXLayerChange", layerChange: LayerChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
-    ---
+    --- Creates effects defined in `TerrainTypes.lua` based on the terrain that a movement is moving on.
     ---@param self Unit
     ---@param effectTypeGroups UnitBlueprintEffect[]
     ---@param fxBlockType LayerTerrainEffectType
@@ -3708,11 +3708,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Creates camera shake effects and also movement effects for the terrain a unit is moving on.
     ---@param self Unit
     ---@param EffectsBag TrashBag
     ---@param TypeSuffix string
-    ---@param TerrainType string
-    ---@return boolean
+    ---@param TerrainType TerrainType?
+    ---@return boolean?
     CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
         local layer = self.Layer
         local bpTable = self.Blueprint.Display.MovementEffects
@@ -3727,8 +3728,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local effectTypeGroups = bpTable.Effects
 
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
-                -- warning isn't needed if this layer's table is used for Footfall without terrain effects
-                if not bpTable.Footfall then
+                -- warning isn't needed if this layer's table is used for Footfall or Contrails without terrain effects
+                if not bpTable.Footfall and not bpTable.Contrails then
                     WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects.', layer, '.Effects table in unit blueprint.')
                 end
                 return false
