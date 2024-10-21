@@ -1,0 +1,14 @@
+- (#5061, #6438) Add metamethods and utility functions for Vectors and Quaternions to simplify and clean up the code involving operations with them.
+  - This **removes** the file `/lua/shared/quaternions.lua`, which was added in #4768 (Mar 4, 2023), so mods that use that file will have to be updated.
+  - The metamethods (defined globally in `/lua/system/utils.lua`) include:
+    - Vector/Vector2 addition/subtraction/negation
+    - Vector/Vector2 * Scalar multiplication
+    - Quaternion/Vector * Vector/Quaternion multiplication
+    - Vector * Vector multiplication (cross product)
+  - Since these are metamethods, they work on all instances of Vector/Vector2/Quaternion, without having to import anything.
+  - The utility functions (have to be imported from `/lua/utilities.lua`) include:
+    - Faster Lua versions of VDist2, VDist2Sq, VDot
+    - `QuatFromRotation`: Creates a quaternion from an orientation axis and rotation angle.
+    - `QuatFromXZDirection`: Returns the orientation quaternion given an XZ direction
+    - `TranslateInXZDirection`: Translates the XZ coordinates of a position by a length in a given quaternion orientation.
+    - `RotateVectorByQuat`: Rotates a vector representing a 3D point by a quaternion rotation.

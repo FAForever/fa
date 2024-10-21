@@ -66,7 +66,6 @@ local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
 local MathAbs = math.abs
 
