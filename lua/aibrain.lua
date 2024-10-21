@@ -436,6 +436,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
         import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
+        import("/lua/sim/Recall.lua").OnArmyDefeat(self:GetArmyIndex())
 
         local function KillArmy()
             local shareOption = ScenarioInfo.Options.Share
@@ -717,8 +718,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     RecallAllCommanders = function(self)
-        local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
+        LOG("AIBrain RecallAllCommanders")
+        -- local commandCat = categories.COMMAND + categories.SUBCOMMANDER
+        -- self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
     end,
 
     ---@param self AIBrain
