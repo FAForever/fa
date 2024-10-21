@@ -378,7 +378,7 @@ struct SHIELDIMPACT_VERTEX
 ///
 ///////////////////////////////////////
 
-bool IsExperimentalShader() {
+bool MapUsesAdvancedWater() {
     // lightMultiplier is one of the few variables that is driven by the map,
     // but accessible by the mesh shader.
     return lightMultiplier > 2.1;
@@ -602,7 +602,7 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
     // disable the whole thing on land-only maps
     if (surfaceElevation > 0) {
         // we need this switch to make it consistent with the terrain shader coloration
-        if (IsExperimentalShader()) {
+        if (MapUsesAdvancedWater()) {
             // We need to multiply by 2 to match the terrain shader.
             float scaledDepth = (-depth / (surfaceElevation - abyssElevation)) * 2;
             float3 up = float3(0,1,0);
