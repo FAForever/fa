@@ -1,0 +1,2 @@
+- (#6466) Fix Ythotha being able to walk backwards.
+  - `MaxSpeedReverse`: 2.5 -> 0
