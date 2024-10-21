@@ -319,6 +319,8 @@
 ---@field TurretBoneDualMuzzle? Bone
 --- the second pitch bone for a turret, used for arms on bots as weapons
 ---@field TurretBoneDualPitch? Bone
+--- The second yaw bone for a turret, used for the torso of the Loyalist's secondary weapon that is on a turret connected to the torso.
+---@field TurretBoneDualYaw? Bone
 --- The bone used as the muzzle bone for turrets. This is used for aiming as where the projectile
 --- would come out
 ---@field TurretBoneMuzzle? Bone
@@ -342,6 +344,12 @@
 ---@field TurretYawRange number
 --- the speed at which the turret can turn in its yaw direction
 ---@field TurretYawSpeed number
+--- the center angle for determining secondary yaw, based off the rest pose of the model
+---@field TurretDualYaw number
+--- the angle +/- off the secondary yaw that is a valid angle to turn to
+---@field TurretDualYawRange number
+--- the speed at which the secondary turret can turn in its yaw direction
+---@field TurretDualYawSpeed number
 --- if this weapon uses the recent firing solution to create projectile instead of the
 --- aim bone transform
 ---@field UseFiringSolutionInsteadOfAimBone? boolean
