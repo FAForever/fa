@@ -352,7 +352,7 @@ bool ShaderUsesTerrainInfoTexture() {
     // the tile value for anything else.
 
     // In order to trigger this you need to set the albedo scale to be bigger than the 
-    // map size. Use the value 10000 to be safe for any map
+    // map size in the editor. Use the value 10000 to be safe for any map
     return UpperAlbedoTile.x < 1.0;
 }
 
@@ -364,7 +364,7 @@ bool ShaderUsesPbrRendering() {
     // the tile value for anything else.
 
     // In order to trigger this you need to set the normal scale to be bigger than the 
-    // map size. Use the value 10000 to be safe for any map
+    // map size in the editor. Use the value 10000 to be safe for any map
     return Stratum7NormalTile.x < 1.0;
 }
 
