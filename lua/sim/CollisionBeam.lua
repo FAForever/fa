@@ -19,6 +19,7 @@ local GetTerrainType = GetTerrainType
 local DefaultTerrainType = GetTerrainType(-1, -1)
 
 ---@class CollisionBeam : moho.CollisionBeamEntity
+---@field DamageTable WeaponDamageTable
 ---@field Trash TrashBag
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
@@ -358,9 +359,11 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         return self.CollideFriendly
     end,
 
+    --- Creates a new `WeaponDamageTable` in `self.DamageTable` using the weapon blueprint
     ---@param self CollisionBeam
     SetDamageTable = function(self)
         local weaponBlueprint = self.Weapon:GetBlueprint()
+        ---@type WeaponDamageTable
         self.DamageTable = {}
         self.DamageTable.DamageRadius = weaponBlueprint.DamageRadius
         self.DamageTable.DamageAmount = weaponBlueprint.Damage

@@ -16,6 +16,24 @@ local RecycledPriTable = {}
 
 local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComponent.lua").DebugWeaponComponent
 
+--- Table of damage information passed from the weapon to the projectile
+--- Can be assigned as a meta table to the projectile's damage table to reduce memory usage for unchanged values
+---@class WeaponDamageTable
+---@field DamageToShields number        # weaponBlueprint.DamageToShields 
+---@field InitialDamageAmount number    # weaponBlueprint.InitialDamage or 0
+---@field DamageRadius number           # weaponBlueprint.DamageRadius + Weapon.DamageRadiusMod
+---@field DamageAmount number           # weaponBlueprint.Damage + Weapon.DamageMod
+---@field DamageType DamageType         # weaponBlueprint.DamageType
+---@field DamageFriendly boolean        # weaponBlueprint.DamageFriendly or true
+---@field CollideFriendly boolean       # weaponBlueprint.CollideFriendly or false
+---@field DoTTime number                # weaponBlueprint.DoTTime
+---@field DoTPulses number              # weaponBlueprint.DoTPulses
+---@field MetaImpactAmount any          # weaponBlueprint.MetaImpactAmount
+---@field MetaImpactRadius any          # weaponBlueprint.MetaImpactRadius
+---@field ArtilleryShieldBlocks boolean # weaponBlueprint.ArtilleryShieldBlocks
+---@field Buffs BlueprintBuff[]         # Active buffs for the weapon
+---@field __index WeaponDamageTable
+
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
@@ -59,6 +77,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field CollideFriendly boolean
 ---@field DamageMod number
 ---@field DamageRadiusMod number
+---@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
 ---@field DisabledBuffs table
 ---@field EnergyRequired? number
 ---@field EnergyDrainPerSecond? number
@@ -410,8 +429,9 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self.Blueprint
+        ---@type WeaponDamageTable
         local damageTable = {}
-        
+
         damageTable.DamageToShields = weaponBlueprint.DamageToShields
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
@@ -445,12 +465,12 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     damageTableCache = false,
     ---@param self Weapon
-    ---@return table | boolean
+    ---@return WeaponDamageTable
     GetDamageTable = function(self)
         if not self.damageTableCache then
             self.damageTableCache = self:GetDamageTableInternal()
         end
-        return self.damageTableCache
+        return self.damageTableCache --[[@as WeaponDamageTable]]
     end,
 
     ---@param self Weapon
