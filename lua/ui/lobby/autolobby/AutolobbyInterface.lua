@@ -68,7 +68,8 @@ local AutolobbyInterface = Class(Group) {
             PlayerCount = playerCount
         }
 
-        self.Background = UIUtil.CreateBitmap(self, self.BackgroundTextures[math.random(1, 5)])
+        local backgroundTexture = self.BackgroundTextures[math.random(1, 5)] --[[@as FileName]]
+        self.Background = UIUtil.CreateBitmap(self, backgroundTexture)
         self.Preview = AutolobbyMapPreview.GetInstance(self)
         self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount) -- TODO: determine this number dynamically
     end,
