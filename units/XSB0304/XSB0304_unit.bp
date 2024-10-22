@@ -32,8 +32,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Structure",
         EconomyThreatLevel = 440,
-        Health = 10000,
-        MaxHealth = 10000,
+        Health = 7500,
+        MaxHealth = 7500,
     },
     Display = {
         AnimationDeath = {
@@ -96,10 +96,10 @@ UnitBlueprint{
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 30000,
-        BuildCostMass = 3000,
-        BuildRate = 120,
-        BuildTime = 4097,
+        BuildCostEnergy = 25500,
+        BuildCostMass = 2550,
+        BuildRate = 135,
+        BuildTime = 4100,
         BuildableCategory = { "BUILTBYQUANTUMGATE SERAPHIM" },
         RebuildBonusIds = { "xsb0304" },
     },
