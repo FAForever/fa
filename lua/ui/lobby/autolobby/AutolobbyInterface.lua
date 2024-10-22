@@ -67,7 +67,7 @@ local AutolobbyInterface = Class(Group) {
 
         self.Background = UIUtil.CreateBitmap(self, self.BackgroundTextures[math.random(1, 5)])
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 4) -- TODO: determine this number dynamically
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 6) -- TODO: determine this number dynamically
     end,
 
     ---@param self UIAutolobbyInterface

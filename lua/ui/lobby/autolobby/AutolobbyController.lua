@@ -56,7 +56,7 @@ local AutolobbyEngineStrings = {
 --- | 'Missing local peers'
 --- | 'Not all local peers are established'
 --- | 'Not all peers are connected'
---- | 'Ready for launch'
+--- | 'Ready'
 
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
 ---@field StartSpot number
@@ -300,7 +300,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             end
         end
 
-        return 'Ready for launch'
+        return 'Ready'
     end,
 
     --- Verifies whether we can launch the game.
@@ -315,7 +315,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         -- check if all peers are ready for launch
         for k, launchStatus in peerStatus do
-            if launchStatus ~= 'Ready for launch' then
+            if launchStatus ~= 'Ready' then
                 return false
             end
         end
@@ -356,6 +356,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         return index
     end,
 
+    --- Prefetches a scenario to try and reduce the loading screen time.
     ---@param self UIAutolobbyCommunications
     ---@param gameOptions UILobbyLaunchGameOptionsConfiguration
     ---@param gameMods UILobbyLaunchGameModsConfiguration[]
@@ -397,6 +398,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     --- Passes the local launch status to all peers.
     ---@param self UIAutolobbyCommunications
     ShareLaunchStatusThread = function(self)
+        WaitSeconds(1.0)
+
         while not IsDestroyed(self) do
             local peers = self:GetPeers()
             local launchStatus = self:CreateLaunchStatus(peers)
@@ -442,11 +445,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         WaitSeconds(1.0)
 
         while not IsDestroyed(self) do
-            local peers = self:GetPeers()
+            -- local peers = self:GetPeers()
 
-            local connections = self:CreateConnectionsMatrix(peers)
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateConnections(connections)
+            -- local connections = self:CreateConnectionsMatrix(peers)
+            -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            --     :UpdateConnections(connections)
 
             WaitFrames(10)
         end

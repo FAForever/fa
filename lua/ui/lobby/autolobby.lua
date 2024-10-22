@@ -115,7 +115,7 @@ function JoinGame(address, asObserver, playerName, uid)
     ForkThread(
         function()
             local seconds = tonumber(GetCommandLineArg("/startspot", 1)[1]) or 1
-            WaitSeconds(seconds)
+            WaitSeconds(0.25 * seconds)
 
             if AutolobbyCommunicationsInstance then
                 AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
