@@ -56,6 +56,7 @@ local AutolobbyEngineStrings = {
 --- | 'Missing local peers'
 --- | 'Not all local peers are established'
 --- | 'Not all peers are connected'
+--- | 'Rejoining'
 --- | 'Ready'
 
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
@@ -373,27 +374,80 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param self UIAutolobbyCommunications
     ---@param lobbyParameters UIAutolobbyParameters
     ---@param joinParameters UIAutolobbyJoinParameters
-    RejoinThread = function(self, lobbyParameters, joinParameters)
+    Rejoin = function(self, lobbyParameters, joinParameters)
         local autolobbyModule = import("/lua/ui/lobby/autolobby.lua")
 
-        WaitSeconds(2.0)
+        LOG("Rejoining!")
 
-        self:Destroy()
-        local newLobby = autolobbyModule.CreateLobby(
-            lobbyParameters.Protocol,
-            lobbyParameters.LocalPort,
-            lobbyParameters.DesiredPlayerName,
-            lobbyParameters.LocalPlayerPeerId,
-            lobbyParameters.NatTraversalProvider
+        -- start disposing threads to prevent race conditions
+        self.Trash:Destroy()
+
+        ForkThread(
+            function()
+                -- give time for any messages that are already send
+                WaitSeconds(0.5)
+
+                -- inform peers that we're rejoining
+                self:BroadcastData({ Type = "UpdateLaunchStatus", LaunchStatus = 'Rejoining' })
+
+                -- give the message time to arrive
+                WaitSeconds(0.5)
+
+                -- replace ourselves with the new lobby and rejoin
+                self:Destroy()
+                local newLobby = autolobbyModule.CreateLobby(
+                    lobbyParameters.Protocol,
+                    lobbyParameters.LocalPort,
+                    lobbyParameters.DesiredPlayerName,
+                    lobbyParameters.LocalPlayerPeerId,
+                    lobbyParameters.NatTraversalProvider
+                )
+
+                autolobbyModule.JoinGame(joinParameters.Address, joinParameters.AsObserver,
+                    joinParameters.DesiredPlayerName,
+                    joinParameters.DesiredPeerId)
+            end
         )
-
-        autolobbyModule.JoinGame(joinParameters.Address, joinParameters.AsObserver, joinParameters.DesiredPlayerName,
-            joinParameters.DesiredPeerId)
     end,
 
 
     ---------------------------------------------------------------------------
     --#region Threads
+
+    ---@param self UIAutolobbyCommunications
+    CheckForRejoinThread = function(self)
+
+        local rejoinThreshold = 3
+        local rejoinCount = 0
+
+        while not IsDestroyed(self) do
+
+            -- check if we're ready to launch
+            if self.LaunchStatutes[self.LocalPeerId] ~= 'Ready' then
+
+                -- if we're not, check if a peer is ready to launch
+                local onePeerIsReady = false
+                for k, launchStatus in self.LaunchStatutes do
+                    if launchStatus == 'Ready' then
+                        onePeerIsReady = true
+                    end
+                end
+
+                if onePeerIsReady then
+                    rejoinCount = rejoinCount + 1
+                end
+            else
+                rejoinCount = 0
+            end
+
+            -- if we reached the threshold, time to rejoin!
+            if rejoinCount > rejoinThreshold then
+                self:Rejoin(self.LobbyParameters, self.JoinParameters)
+            end
+
+            WaitSeconds(1.0)
+        end
+    end,
 
     --- Passes the local launch status to all peers.
     ---@param self UIAutolobbyCommunications
@@ -418,8 +472,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     LaunchThread = function(self)
         while not IsDestroyed(self) do
 
-            do return end
-
             if self:CanLaunch(self.LaunchStatutes) then
 
                 WaitSeconds(5.0)
@@ -437,21 +489,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             end
 
             WaitSeconds(1.0)
-        end
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ConnectionMatrixThread = function(self)
-        WaitSeconds(1.0)
-
-        while not IsDestroyed(self) do
-            -- local peers = self:GetPeers()
-
-            -- local connections = self:CreateConnectionsMatrix(peers)
-            -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            --     :UpdateConnections(connections)
-
-            WaitFrames(10)
         end
     end,
 
@@ -731,7 +768,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.PlayerOptions[hostPlayerOptions.StartSpot] = hostPlayerOptions
 
         -- occasionally send data over the network to create pings on screen
-        self.Trash:Add(ForkThread(self.ConnectionMatrixThread, self))
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
         self.Trash:Add(ForkThread(self.LaunchThread, self))
 
@@ -756,6 +792,9 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param reason string     # reason for connection failure, populated by the engine
     ConnectionFailed = function(self, reason)
         self:DebugSpew("ConnectionFailed", reason)
+
+        -- try to rejoin
+        -- self:Rejoin(self.LobbyParameters, self.JoinParameters)
     end,
 
     --- Called by the engine when the connection succeeds with the host.
@@ -771,8 +810,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         GpgNetSendGameState('Lobby')
 
         -- occasionally send data over the network to create pings on screen
-        self.Trash:Add(ForkThread(self.ConnectionMatrixThread, self))
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
+        self.Trash:Add(ForkThread(self.CheckForRejoinThread, self))
 
         self:SendData(self.HostID, { Type = "AddPlayer", PlayerOptions = self:CreateLocalPlayer() })
     end,
@@ -783,6 +822,16 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ---@param peerConnectedTo UILobbyPeerId[]    # all established conenctions for the given player
     EstablishedPeers = function(self, peerId, peerConnectedTo)
         self:DebugSpew("EstablishedPeers", peerId, reprs(peerConnectedTo))
+
+        ForkThread(
+            function()
+                WaitFrames(4)
+                local peers = self:GetPeers()
+                local connections = self:CreateConnectionsMatrix(peers)
+                import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                    :UpdateConnections(connections)
+            end
+        )
     end,
 
     --#endregion

@@ -36,6 +36,7 @@ local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/AutolobbyMapPreview.
 local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/AutolobbyConnectionMatrix.lua")
 
 ---@class UIAutolobbyInterfaceState
+---@field PlayerCount number
 ---@field PlayerOptions? table<UILobbyPeerId, UIAutolobbyPlayer>
 ---@field GameOptions? UILobbyLaunchGameOptionsConfiguration
 ---@field Connections? UIAutolobbyConnections
@@ -59,15 +60,17 @@ local AutolobbyInterface = Class(Group) {
 
     ---@param self UIAutolobbyInterface
     ---@param parent Control
-    __init = function(self, parent)
+    __init = function(self, parent, playerCount)
         Group.__init(self, parent, "AutolobbyInterface")
 
         -- initial, empty state
-        self.State = {}
+        self.State = {
+            PlayerCount = playerCount
+        }
 
         self.Background = UIUtil.CreateBitmap(self, self.BackgroundTextures[math.random(1, 5)])
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 6) -- TODO: determine this number dynamically
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount) -- TODO: determine this number dynamically
     end,
 
     ---@param self UIAutolobbyInterface
@@ -98,7 +101,7 @@ local AutolobbyInterface = Class(Group) {
     ---@param connections UIAutolobbyConnections
     UpdateConnections = function(self, connections)
         self.State.Connections = connections
-        
+
         self.ConnectionMatrix:Show()
         self.ConnectionMatrix:UpdateConnections(connections)
     end,
@@ -183,13 +186,32 @@ local ModuleTrash = TrashBag()
 ---@type UIAutolobbyInterface | false
 local AutolobbyInterfaceInstance = false
 
+---@param playerCount? number
 ---@return UIAutolobbyInterface
-GetSingleton = function()
+GetSingleton = function(playerCount)
     if AutolobbyInterfaceInstance then
         return AutolobbyInterfaceInstance
     end
 
-    AutolobbyInterfaceInstance = AutolobbyInterface(GetFrame(0))
+    -- default
+    playerCount = playerCount or 8
+
+    AutolobbyInterfaceInstance = AutolobbyInterface(GetFrame(0), playerCount)
+    ModuleTrash:Add(AutolobbyInterfaceInstance)
+    return AutolobbyInterfaceInstance
+end
+
+---@param playerCount? number
+---@return UIAutolobbyInterface
+SetupSingleton = function(playerCount)
+    if AutolobbyInterfaceInstance then
+        AutolobbyInterfaceInstance:Destroy()
+    end
+
+    -- default
+    playerCount = playerCount or tonumber(GetCommandLineArg("/players", 1)[1]) or 8
+
+    AutolobbyInterfaceInstance = AutolobbyInterface(GetFrame(0), playerCount)
     ModuleTrash:Add(AutolobbyInterfaceInstance)
     return AutolobbyInterfaceInstance
 end
@@ -201,7 +223,7 @@ end
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if AutolobbyInterfaceInstance then
-        local handle = newModule.GetSingleton(GetFrame(0))
+        local handle = newModule.SetupSingleton(GetFrame(0), AutolobbyInterfaceInstance.State.PlayerCount)
         handle:RestoreState(AutolobbyInterfaceInstance.State)
     end
 end

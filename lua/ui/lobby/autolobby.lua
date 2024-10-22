@@ -44,6 +44,11 @@ local AutolobbyCommunicationsInstance = false
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
+    -- create the interface, needs to be done before the lobby is
+    local playerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 8
+    local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").SetupSingleton(playerCount)
+
+    -- create the lobby
     local maxConnections = 16
     AutolobbyCommunicationsInstance = InternalCreateLobby(
         import("/lua/ui/lobby/autolobby/AutolobbyController.lua").AutolobbyCommunications,
@@ -61,8 +66,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
     GpgNetSendGameState('Idle')
 
-    -- create the singleton for the interface
-    local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
     return AutolobbyCommunicationsInstance
 end
 
@@ -93,6 +96,8 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
     --     :CreateLoadingDialog()
 end
 
+local rejoinTest = true
+
 --- Joins an instantiated lobby instance.
 ---
 --- Assumes that the lobby communications is initialized by calling `CreateLobby`.
@@ -119,6 +124,15 @@ function JoinGame(address, asObserver, playerName, uid)
 
             if AutolobbyCommunicationsInstance then
                 AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
+            end
+
+            if rejoinTest and seconds == 2 then
+                rejoinTest = false
+
+                WaitSeconds(4)
+                if AutolobbyCommunicationsInstance then
+                    AutolobbyCommunicationsInstance:DisconnectFromPeer("0")
+                end
             end
         end
     )

@@ -68,13 +68,15 @@ local AutolobbyConnectionMatrixDot = Class(Bitmap) {
     ---@param self UIAutolobbyConnectionMatrixDot
     ---@param status UIAutolobbyLaunchStatus
     SetStatus = function(self, status)
-        if status == 'Missing local peers' then
+        if status == 'Rejoining' then
+            self:SetSolidColor(EnumColors.HotPink)
+        elseif status == 'Missing local peers' then
             self:SetSolidColor(EnumColors.Orange)
         elseif status == 'Not all local peers are established' then
             self:SetSolidColor(EnumColors.Yellow)
         elseif status == 'Not all peers are connected' then
             self:SetSolidColor(EnumColors.YellowGreen)
-        elseif status == 'Ready for launch' then
+        elseif status == 'Ready' then
             self:SetSolidColor(EnumColors.Green)
         end
     end,
