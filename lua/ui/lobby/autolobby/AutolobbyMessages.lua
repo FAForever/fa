@@ -63,6 +63,25 @@ AutolobbyMessages = {
         end
     },
 
+    UpdateLaunchStatus = {
+        ---@class UIAutolobbyUpdateLaunchStatusMessage : UILobbyReceivedMessage
+        ---@field LaunchStatus UIAutolobbyLaunchStatus
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyUpdateLaunchStatusMessage
+        ---@return boolean
+        Accept = function(lobby, data)
+            return true
+        end,
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyUpdateLaunchStatusMessage
+        Handler = function(lobby, data)
+            lobby:ProcessUpdateLaunchStatusMessage(data)
+        end
+    },
+
+
     AddPlayer = {
 
         ---@class UIAutolobbyAddPlayerMessage : UILobbyReceivedMessage

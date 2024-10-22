@@ -52,6 +52,12 @@ local AutolobbyEngineStrings = {
     ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
+---@alias UIAutolobbyLaunchStatus
+--- | 'Missing local peers'
+--- | 'Not all local peers are established'
+--- | 'Not all peers are connected'
+--- | 'Ready for launch'
+
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
 ---@field StartSpot number
 ---@field DEV number    # Related to rating/divisions
@@ -62,10 +68,10 @@ local AutolobbyEngineStrings = {
 ---@field PL number     # Related to rating/divisions
 
 ---@alias UIAutolobbyConnections boolean[][]
----@alias UIAutolobbyStatus UIPeerStatus[]
+---@alias UIAutolobbyStatus UIAutolobbyLaunchStatus[]
 
 ---@class UIAutolobbyParameters
----@field Protocol UILobbyProtocol 
+---@field Protocol UILobbyProtocol
 ---@field LocalPort number
 ---@field MaxConnections number
 ---@field DesiredPlayerName string
@@ -86,7 +92,7 @@ local AutolobbyEngineStrings = {
 --- Responsible for the behavior of the automated lobby.
 ---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent
 ---@field Trash TrashBag
----@field LocalID UILobbyPeerId                             # a number that is stringified
+---@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
 ---@field HostID UILobbyPeerId
 ---@field PlayerCount number
@@ -95,6 +101,7 @@ local AutolobbyEngineStrings = {
 ---@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
 ---@field PeerToIndexMapping table<UILobbyPeerId, number>
 ---@field DisconnectedPeers table<UILobbyPeerId, number>        #
+---@field LaunchStatutes table<UILobbyPeerId, UIAutolobbyLaunchStatus>
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
@@ -112,7 +119,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     __init = function(self)
         self.Trash = TrashBag()
 
-        self.LocalID = "-2"
+        self.LocalPeerId = "-2"
         self.LocalPlayerName = "Charlie"
         self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
         self.Connections = {}
@@ -123,6 +130,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.PlayerOptions = {}
         self.PeerToIndexMapping = {}
         self.DisconnectedPeers = {}
+        self.LaunchStatutes = {}
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -247,22 +255,72 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     end,
 
     ---@param self UIAutolobbyCommunications
-    ---@param peers Peer[]
-    ---@return UIPeerStatus[]
-    CreateConnectionStatuses = function(self, peers)
-        local statuses = {}
-        for k = 1, self.PlayerCount do
-            statuses[k] = 'None'
-        end
-
-        for _, peer in peers do
-            local peerIdNumber = self:PeerIdToIndex(peer.id)
+    ---@param statuses table<UILobbyPeerId, UIAutolobbyLaunchStatus>
+    ---@return UIAutolobbyStatus
+    CreateConnectionStatuses = function(self, statuses)
+        local output = {}
+        for peerId, launchStatus in statuses do
+            local peerIdNumber = self:PeerIdToIndex(peerId)
             if peerIdNumber then
-                statuses[peerIdNumber] = peer.status
+                output[peerIdNumber] = launchStatus
             end
         end
 
-        return statuses
+        return output
+    end,
+
+    --- Determines the launch status of the local peer.
+    ---@param self UIAutolobbyCommunications
+    ---@param peers Peer[]
+    ---@return UIAutolobbyLaunchStatus
+    CreateLaunchStatus = function(self, peers)
+
+        -- check number of peers
+        local validPeerCount = self.PlayerCount - 1
+        if table.getsize(peers) < validPeerCount then
+            return 'Missing local peers'
+        end
+
+        -- check number of established peers
+        local establishedPeerCount = 0
+        for k, peer in peers do
+            if peer.status == "Established" then
+                establishedPeerCount = establishedPeerCount + 1
+            end
+        end
+
+        if establishedPeerCount < validPeerCount then
+            return 'Not all local peers are established'
+        end
+
+        -- check confirmed established connections of peers
+        for _, peer in peers do
+            if table.getsize(peer.establishedPeers) ~= self.PlayerCount - 1 then
+                return 'Not all peers are connected'
+            end
+        end
+
+        return 'Ready for launch'
+    end,
+
+    --- Verifies whether we can launch the game.
+    ---@param self UIAutolobbyCommunications
+    ---@param peerStatus UIAutolobbyStatus
+    ---@return boolean
+    CanLaunch = function(self, peerStatus)
+        -- check if we know of all peers
+        if table.getsize(peerStatus) ~= self.PlayerCount then
+            return false
+        end
+
+        -- check if all peers are ready for launch
+        for k, launchStatus in peerStatus do
+            if launchStatus ~= 'Ready for launch' then
+                return false
+            end
+        end
+
+        return true
     end,
 
     --- Maps a peer id to an index that can be used in the interface. In
@@ -328,8 +386,73 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             lobbyParameters.NatTraversalProvider
         )
 
-        autolobbyModule.JoinGame(joinParameters.Address, joinParameters.AsObserver, joinParameters.DesiredPlayerName, joinParameters.DesiredPeerId)
+        autolobbyModule.JoinGame(joinParameters.Address, joinParameters.AsObserver, joinParameters.DesiredPlayerName,
+            joinParameters.DesiredPeerId)
     end,
+
+
+    ---------------------------------------------------------------------------
+    --#region Threads
+
+    --- Passes the local launch status to all peers.
+    ---@param self UIAutolobbyCommunications
+    ShareLaunchStatusThread = function(self)
+        while not IsDestroyed(self) do
+            local peers = self:GetPeers()
+            local launchStatus = self:CreateLaunchStatus(peers)
+            self.LaunchStatutes[self.LocalPeerId] = launchStatus
+            self:BroadcastData({ Type = "UpdateLaunchStatus", LaunchStatus = launchStatus })
+
+            -- update UI for launch statuses
+            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.LaunchStatutes))
+
+            WaitSeconds(0.5)
+        end
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    LaunchThread = function(self)
+        while not IsDestroyed(self) do
+
+            do return end
+
+            if self:CanLaunch(self.LaunchStatutes) then
+
+                WaitSeconds(5.0)
+                if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
+                    local gameConfiguration = {
+                        GameMods = self.GameMods,
+                        GameOptions = self.GameOptions,
+                        PlayerOptions = self.PlayerOptions,
+                        Observers = {},
+                    }
+
+                    self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
+                    self:LaunchGame(gameConfiguration)
+                end
+            end
+
+            WaitSeconds(1.0)
+        end
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ConnectionMatrixThread = function(self)
+        WaitSeconds(1.0)
+
+        while not IsDestroyed(self) do
+            local peers = self:GetPeers()
+
+            local connections = self:CreateConnectionsMatrix(peers)
+            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                :UpdateConnections(connections)
+
+            WaitFrames(10)
+        end
+    end,
+
+    --#endregion
 
     ---------------------------------------------------------------------------
     --#region Message Handlers
@@ -388,105 +511,14 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self:LaunchGame(data.GameConfig)
     end,
 
-    --#endregion
-
-    ---------------------------------------------------------------------------
-    --#region Threads
-
-    --- A thread to indicate that we're still around. Various properties such as ping are not updated
-    --- until a message is received. This thread introduces occasional traffic between players.
     ---@param self UIAutolobbyCommunications
-    IsAliveThread = function(self)
-        while not IsDestroyed(self) do
-            self:BroadcastData({ Type = "IsAlive" })
-            WaitSeconds(0.5)
-        end
-    end,
+    ---@param data UIAutolobbyUpdateLaunchStatusMessage
+    ProcessUpdateLaunchStatusMessage = function(self, data)
+        self.LaunchStatutes[data.SenderID] = data.LaunchStatus
 
-    ---@param self any
-    ---@param peers any
-    ---@return boolean
-    CheckForLaunch = function(self, peers)
-
-        -- for debugging :)
-        do return false end
-
-        -- true iff we are connected to all peers
-        local peers = self:GetPeers()
-
-
-
-        -- check number of peers
-        if table.getsize(peers) ~= self.PlayerCount - 1 then
-            return false
-        end
-
-        -- check connection status
-        for k, peer in peers do
-            if peer.status ~= "Established" then
-                return false
-            end
-        end
-
-        -- check confirmed established connections of peers
-        for _, peer in peers do
-            if table.getsize(peer.establishedPeers) ~= self.PlayerCount - 1 then
-                return false
-            end
-        end
-
-        return true
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    CheckForLaunchThread = function(self)
-
-        while not IsDestroyed(self) do
-
-            local peers = self:GetPeers()
-            local canLaunch = self:CheckForLaunch(peers)
-
-            LOG("CanLaunch", canLaunch)
-            if canLaunch then
-                ---@type UILobbyLaunchConfiguration
-                local gameConfiguration = {
-                    GameMods = self.GameMods,
-                    GameOptions = self.GameOptions,
-                    PlayerOptions = self.PlayerOptions,
-                    Observers = {},
-                }
-
-                -- delay slightly
-                WaitSeconds(5)
-
-                -- check again and if still good, we launch
-                local peers = self:GetPeers()
-                if self:CheckForLaunch(peers) then
-                    self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
-                    self:LaunchGame(gameConfiguration)
-                end
-            end
-
-            WaitSeconds(5.0)
-        end
-    end,
-
-    ---@param self UIAutolobbyCommunications
-    ConnectionMatrixThread = function(self)
-        while not IsDestroyed(self) do
-            local peers = self:GetPeers()
-
-            local connections = self:CreateConnectionsMatrix(peers)
-            local statuses = self:CreateConnectionStatuses(peers)
-
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateConnections(connections)
-
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateConnectionStatuses(statuses)
-
-            WaitFrames(1)
-        end
+        -- update UI for launch statuses
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.LaunchStatutes))
     end,
 
     --#endregion
@@ -548,6 +580,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         -- reset mapping
         self.PeerToIndexMapping = {}
+        self.LaunchStatutes = {}
         self.DisconnectedPeers[peerId] = GetSystemTimeSeconds()
 
         return MohoLobbyMethods.DisconnectFromPeer(self, peerId)
@@ -684,20 +717,20 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     Hosting = function(self)
         self:DebugSpew("Hosting")
 
-        self.LocalID = self:GetLocalPlayerID()
+        self.LocalPeerId = self:GetLocalPlayerID()
         self.LocalPlayerName = self:GetLocalPlayerName()
         self.HostID = self:GetLocalPlayerID()
 
         -- give ourself a seat at the table
         local hostPlayerOptions = self:CreateLocalPlayer()
-        hostPlayerOptions.OwnerID = self.LocalID
-        hostPlayerOptions.PlayerName = self:MakeValidPlayerName(self.LocalID, self.LocalPlayerName)
+        hostPlayerOptions.OwnerID = self.LocalPeerId
+        hostPlayerOptions.PlayerName = self:MakeValidPlayerName(self.LocalPeerId, self.LocalPlayerName)
         self.PlayerOptions[hostPlayerOptions.StartSpot] = hostPlayerOptions
 
         -- occasionally send data over the network to create pings on screen
-        self.Trash:Add(ForkThread(self.IsAliveThread, self))
         self.Trash:Add(ForkThread(self.ConnectionMatrixThread, self))
-        self.Trash:Add(ForkThread(self.CheckForLaunchThread, self))
+        self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
+        self.Trash:Add(ForkThread(self.LaunchThread, self))
 
         -- start prefetching the scenario
         self:Prefetch(self.GameOptions, self.GameMods)
@@ -729,14 +762,14 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     ConnectionToHostEstablished = function(self, localPeerId, newLocalName, hostPeerId)
         self:DebugSpew("ConnectionToHostEstablished", localPeerId, newLocalName, hostPeerId)
         self.LocalPlayerName = newLocalName
-        self.LocalID = localPeerId
+        self.LocalPeerId = localPeerId
         self.HostID = hostPeerId
 
         GpgNetSendGameState('Lobby')
 
         -- occasionally send data over the network to create pings on screen
-        self.Trash:Add(ForkThread(self.IsAliveThread, self))
         self.Trash:Add(ForkThread(self.ConnectionMatrixThread, self))
+        self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
 
         self:SendData(self.HostID, { Type = "AddPlayer", PlayerOptions = self:CreateLocalPlayer() })
     end,
@@ -817,6 +850,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
 
         -- reset mapping
         self.PeerToIndexMapping = {}
+        self.LaunchStatutes = {}
         self.DisconnectedPeers[peerId] = GetSystemTimeSeconds()
     end,
 

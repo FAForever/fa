@@ -67,7 +67,7 @@ local AutolobbyInterface = Class(Group) {
 
         self.Background = UIUtil.CreateBitmap(self, self.BackgroundTextures[math.random(1, 5)])
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 8) -- TODO: determine this number dynamically
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, 4) -- TODO: determine this number dynamically
     end,
 
     ---@param self UIAutolobbyInterface
@@ -105,7 +105,7 @@ local AutolobbyInterface = Class(Group) {
 
     ---@param self UIAutolobbyInterface
     ---@param statuses UIAutolobbyStatus
-    UpdateConnectionStatuses = function(self, statuses)
+    UpdateLaunchStatuses = function(self, statuses)
         self.State.Statuses = statuses
 
         self.ConnectionMatrix:Show()
@@ -167,7 +167,7 @@ local AutolobbyInterface = Class(Group) {
         end
 
         if state.Statuses then
-            local ok, msg = pcall(self.UpdateConnectionStatuses, self, state.Statuses)
+            local ok, msg = pcall(self.UpdateLaunchStatuses, self, state.Statuses)
             if not ok then
                 WARN(msg)
             end
