@@ -443,7 +443,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
                 self:Rejoin(self.LobbyParameters, self.JoinParameters)
             end
 
-            WaitSeconds(2.0 + 2 * Random())
+            WaitSeconds(1.0 + 1 * Random())
         end
     end,
 
