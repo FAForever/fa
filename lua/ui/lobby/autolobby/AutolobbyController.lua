@@ -377,8 +377,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     Rejoin = function(self, lobbyParameters, joinParameters)
         local autolobbyModule = import("/lua/ui/lobby/autolobby.lua")
 
-        LOG("Rejoining!")
-
         -- start disposing threads to prevent race conditions
         self.Trash:Destroy()
 
