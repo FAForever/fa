@@ -6,8 +6,8 @@
 ------------------------------------------------------------------
 
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
-local EntityDoTThread2 = DefaultDamage.EntityDoTThread2
-local AreaDoTThread2 = DefaultDamage.AreaDoTThread2
+local UnitDoTThread = DefaultDamage.UnitDoTThread
+local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
@@ -675,7 +675,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     local DoTPulses = DamageData.DoTPulses - 1
                     if DoTPulses >= 1 then
                         ForkThread(
-                            AreaDoTThread2,
+                            AreaDoTThread,
                             instigator,
                             self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                             DoTPulses,
@@ -719,7 +719,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     local DoTPulses = DamageData.DoTPulses - 1
                     if DoTPulses >= 1 then
                         ForkThread(
-                            EntityDoTThread2,
+                            UnitDoTThread,
                             instigator,
                             targetEntity,
                             DoTPulses,
@@ -1075,5 +1075,3 @@ DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
 
 local Explosion = import("/lua/defaultexplosions.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
-local UnitDoTThread = DefaultDamage.UnitDoTThread
-local AreaDoTThread = DefaultDamage.AreaDoTThread

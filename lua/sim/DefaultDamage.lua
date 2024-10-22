@@ -28,7 +28,7 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param pulseInterval number
 ---@param damage number
 ---@param damageType DamageType
-function EntityDoTThread2(instigator, target, pulses, pulseInterval, damage, damageType)
+function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damageType)
     -- localize for performance
     local position = VectorCache
     local Damage = Damage
@@ -71,7 +71,7 @@ end
 ---@param damageType DamageType
 ---@param damageFriendly boolean
 ---@param damageSelf boolean
-function AreaDoTThread2(instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly, damageSelf)
+function AreaDoTThread(instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly, damageSelf)
     -- localize for performance
     local DamageArea = DamageArea
     local WaitTicks = WaitTicks
@@ -94,60 +94,6 @@ function AreaDoTThread2(instigator, position, pulses, pulseInterval, radius, dam
             end
         end
         DamageArea(instigator, position, radius, damage, damageType, damageFriendly, damageSelf)
-    end
-end
-
---- Performs damage over time on a unit, waiting the interval *after* dealing damage.
----@param instigator Unit
----@param unit Unit
----@param pulses number
----@param pulseInterval number
----@param damage number
----@param damageType DamageType
----@param damageFriendly boolean
-function UnitDoTThread (instigator, unit, pulses, pulseInterval, damage, damageType, damageFriendly)
-
-    -- localize for performance
-    local position = VectorCache
-    local Damage = Damage
-    local EntityGetPositionXYZ = EntityGetPositionXYZ
-    local WaitTicks = WaitTicks
-
-    -- convert seconds to ticks, have to "wait" 1 extra tick to get to the end of the current tick
-    pulseInterval = 10 * pulseInterval + 1
-
-    for i = 1, pulses do
-        if unit and not EntityBeenDestroyed(unit) then
-            position[1], position[2], position[3] = EntityGetPositionXYZ(unit)
-            Damage(instigator, position, unit, damage, damageType )
-        else
-            break
-        end
-        WaitTicks(pulseInterval)
-    end
-end
-
---- Performs damage over time in a given area, waiting the interval *after* dealing damage.
----@param instigator Unit
----@param position Vector
----@param pulses number
----@param pulseInterval number
----@param radius number
----@param damage number
----@param damageType DamageType
----@param damageFriendly boolean
-function AreaDoTThread (instigator, position, pulses, pulseInterval, radius, damage, damageType, damageFriendly)
-
-    -- localize for performance
-    local DamageArea = DamageArea
-    local WaitTicks = WaitTicks
-
-    -- convert seconds to ticks, have to "wait" 1 extra tick to get to the end of the current tick
-    pulseInterval = 10 * pulseInterval + 1
-
-    for i = 1, pulses do
-        DamageArea(instigator, position, radius, damage, damageType, damageFriendly)
-        WaitTicks(pulseInterval)
     end
 end
 
