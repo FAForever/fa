@@ -116,22 +116,23 @@ function JoinGame(address, asObserver, playerName, uid)
         AutolobbyCommunicationsInstance.JoinParameters.DesiredPeerId = uid
     end
 
+    if AutolobbyCommunicationsInstance then
+        AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
+    end
+
+
     -- join over time
     ForkThread(
         function()
-            local seconds = tonumber(GetCommandLineArg("/startspot", 1)[1]) or 1
-            WaitSeconds(0.25 * seconds)
+            local startSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or 1
 
-            if AutolobbyCommunicationsInstance then
-                AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
-            end
-
-            if rejoinTest and seconds == 2 then
+            if rejoinTest and startSpot == 2 then
                 rejoinTest = false
 
                 WaitSeconds(4)
+                LOG(" -- REJOIN TEST -- ")
                 if AutolobbyCommunicationsInstance then
-                    AutolobbyCommunicationsInstance:DisconnectFromPeer("0")
+                    AutolobbyCommunicationsInstance:DisconnectFromPeer("3")
                 end
             end
         end
