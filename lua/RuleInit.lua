@@ -13,7 +13,10 @@ doscript '/lua/system/utils.lua'
 doscript '/lua/system/repr.lua'
 doscript '/lua/system/debug.lua'
 
-LOG('Active game mods for blueprint loading: ',repr(__active_mods))
+LOG('Active game mods for blueprint loading:')
+for _, mod in __active_mods do
+    LOG(string.format('\t"%-30s v%02d (%-37s by %s', tostring(mod.name) .. '"', tostring(mod.version), tostring(mod.uid) .. ')', tostring(mod.author)))
+end
 
 doscript '/lua/footprints.lua'
 doscript '/lua/system/Blueprints.lua'
