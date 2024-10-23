@@ -11,6 +11,9 @@ local type = type
 local pcall = pcall 
 local unpack = unpack 
 local next = next
+local getmetatable = getmetatable
+local rawget = rawget
+local setmetatable = setmetatable
 
 -- local Random = Random
 
@@ -731,12 +734,13 @@ end
 --  GetCommandLineArgTable("/arg") -> {key1="value1", key2="value2"}
 function GetCommandLineArgTable(option)
     -- Find total number of args
-    local next = 1
+    local nextMax = 1
     local args, nextArgs = nil, nil
     repeat
-        nextArgs, args = GetCommandLineArg(option, next), nextArgs
-        next = next + 1
-    until not nextArgs
+        nextArgs, args = GetCommandLineArg(option, nextMax), nextArgs
+        nextMax = nextMax + 1
+        -- GetCommandLineArg tokenizes without being limited by `/`, so we need to stop manually
+    until not nextArgs or nextArgs[nextMax - 1]:sub(0,1) == "/"
 
     -- Construct result table
     local result = {}
@@ -882,4 +886,193 @@ function CreateTimer()
             end
          end
     }
+end
+
+
+
+local vector_metatable = getmetatable(Vector2(0, 0))
+
+function UnsafeQuaternion(x, y, z, w)
+    return setmetatable({x, y, z, w}, vector_metatable)
+end
+
+--- Constructs a quaternion with the given components. Absent ones default to `0`.
+--- If the quaternion isn't of unit length, then it is normalized.
+---@param x? number
+---@param y? number
+---@param z? number
+---@param w? number
+---@return Quaternion
+function Quaternion(x, y, z, w)
+    x, y, z, w = x or 0, y or 0, z or 0, w or 0
+    local lenSq = x*x + y*y + z*z + w*w
+    local dif = 1 - lenSq
+    -- maximum residual to unit length from `EulerToQuaternion` magnitude squared appears to be about 3.5e-7
+    -- squaring this is easier than using `math.abs`
+    if dif*dif > 1.6e-13 then
+        -- normalize any quaternions that break the unit length invariant
+        lenSq = math.sqrt(lenSq)
+        x, y, z, w = x / lenSq, y / lenSq, z / lenSq, w / lenSq -- let any divide-by-zero fail
+    end
+    return UnsafeQuaternion(x, y, z, w)
+end
+
+
+-- In these functions, we use `z` instead of `3` when we don't know which type of vector it is
+-- because the builtin `__index` method throws a fit if it can't find the field for a Vector2
+-- (but it handles `z` fine as it knows that it maps to `3`, which happens to be nil).
+-- Similarly, we `rawget` index 4 so that non-quaternions don't crash the game.
+
+---@overload fun(self: Vector2): Vector2
+---@param self Vector
+---@return Vector
+function vector_metatable.__unm(self)
+    if rawget(self, 4) then
+        -- negative orientation???
+        error("incompatible vector type for negation: quaternion")
+    end
+
+    local newX, newY, z = -self[1], -self[2], self.z
+    if z then
+        return Vector(newX, newY, -z)
+    end
+
+    ---@diagnostic disable-next-line: return-type-mismatch
+    return Vector2(newX, newY)
+end
+
+---@overload fun(a: Vector2, b: Vector2): Vector2
+---@param a Vector
+---@param b Vector
+---@return Vector
+function vector_metatable.__add(a, b)
+    if getmetatable(a) ~= getmetatable(b) then
+        error("invalid argument for vector addition")
+    end
+
+    if rawget(a, 4) or rawget(b, 4) then
+        --- translating orientation doesn't make sense
+        error("incompatible vector type for addition: quaternion")
+    end
+
+    local a3, b3 = a.z, b.z
+    if a3 then
+        if b3 then
+            return setmetatable({b[1] + a[1], b[2] + a[2], b3 + a3}, vector_metatable)
+        else
+            error("incompatible vector types for addition: Vector + Vector2")
+        end
+    else
+        if b3 then
+            error("incompatible vector types for addition: Vector2 + Vector")
+        end
+
+        return setmetatable({b[1] + a[1], b[2] + a[2]}, vector_metatable)
+    end
+end
+
+---@overload fun(a: Vector2, b: Vector2): Vector2
+---@param a Vector
+---@param b Vector
+---@return Vector
+function vector_metatable.__sub(a, b)
+    if getmetatable(a) ~= getmetatable(b) then
+        error("invalid argument for vector subtraction")
+    end
+
+    if rawget(a, 4) or rawget(b, 4) then
+        --- translating orientation doesn't make sense
+        error("incompatible vector type for subtraction: quaternion")
+    end
+
+    local a3, b3 = a.z, b.z
+    if a3 then
+        if b3 then
+            return setmetatable({b[1] - a[1], b[2] - a[2], b3 - a3}, vector_metatable)
+        else
+            error("incompatible vector types for subtraction: Vector - Vector2")
+        end
+    else
+        if b3 then
+            error("incompatible vector types for subtraction: Vector2 - Vector")
+        end
+
+        return setmetatable({b[1] - a[1], b[2] - a[2]}, vector_metatable)
+    end
+end
+
+---@overload fun(a: Quaternion, b: Vector): Quaternion   rotation composition
+---@overload fun(a: Quaternion, b: number): Quaternion   scaling
+---@overload fun(a: Vector, b: Quaternion): Quaternion   rotation composition
+---@overload fun(a: Vector, b: Vector): Vector           cross product
+---@overload fun(a: Vector, b: number): Vector           scaling
+---@overload fun(a: Vector2, b: number): Vector2         scaling
+---@param a Quaternion
+---@param b Quaternion
+---@return Quaternion
+function vector_metatable.__mul(a, b)
+    local a3 = a.z
+    if type(b) == "number" then
+        if rawget(a, 4) then
+            -- Even though we could multiply each component by the scalar, scaling an orientation
+            -- doesn't make sense and would break the unit length invariant
+            error("incompatible vector type for scalar multiplication: quaternion")
+        end
+        if a3 then
+            -- Vector * Scalar
+            ---@diagnostic disable-next-line: return-type-mismatch
+            return Vector(a[1] * b, a[2] * b, a3 * b)
+        end
+        -- Vector2 * Scalar
+        ---@diagnostic disable-next-line: return-type-mismatch
+        return Vector2(a[1] * b, a[2] * b)
+    end
+
+    if getmetatable(a) ~= getmetatable(b) then
+        error("invalid argument for vector multiplication")
+    end
+    local b3 = b.z
+    if not a3 or not b3 then
+        error("incompatible vector type for multiplication: Vector2")
+    end
+
+    local a1, a2, a4 = a[1], a[2], rawget(a, 4)
+    local b1, b2, b4 = b[1], b[2], rawget(b, 4)
+    if a4 then
+        if b4 then
+            -- Quaternion * Quaternion
+            return UnsafeQuaternion(
+                a1 * b4 + a4 * b1 - a3 * b2 + a2 * b3,
+                a2 * b4 + a3 * b1 + a4 * b2 - a1 * b3,
+                a3 * b4 - a2 * b1 + a1 * b2 + a4 * b3,
+                a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3
+            )
+        end
+
+        -- Quaternion * Vector (Quaternion with no spin)
+        return UnsafeQuaternion(
+             a4 * b1 - a3 * b2 + a2 * b3,
+             a3 * b1 + a4 * b2 - a1 * b3,
+            -a2 * b1 + a1 * b2 + a4 * b3,
+            -a1 * b1 - a2 * b2 - a3 * b3
+        )
+    end
+
+    if b4 then
+        -- Vector (Quaternion with no spin) * Quaternion
+        return UnsafeQuaternion(
+             a1 * b4 - a3 * b2 + a2 * b3,
+             a2 * b4 + a3 * b1 - a1 * b3,
+             a3 * b4 - a2 * b1 + a1 * b2,
+            -a1 * b1 - a2 * b2 - a3 * b3
+        )
+    end
+
+    -- Vector x Vector (cross-product)
+    ---@diagnostic disable-next-line: return-type-mismatch
+    return Vector(
+        a2 * b3 - a3 * b2,
+        a3 * b1 - a1 * b3,
+        a1 * b2 - a2 * b1
+    )
 end
