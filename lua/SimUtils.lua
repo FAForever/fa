@@ -767,3 +767,28 @@ function OnAllianceResult(resultData)
 end
 
 import("/lua/simplayerquery.lua").AddResultListener("OfferAlliance", OnAllianceResult)
+
+local vectorCross = import('/lua/utilities.lua').Cross
+local upVector = Vector(0, 1, 0)
+
+--- Draw XYZ axes of an entity's bone for one tick
+---@param entity moho.entity_methods
+---@param bone Bone
+---@param length number? # length of axes, defaults to 0.2
+function DrawBone(entity, bone, length)
+    if not length then length = 0.2 end
+
+    local pos = entity:GetPosition(bone)
+    local dirX, dirY, dirZ = entity:GetBoneDirection(bone)
+
+    local forward = Vector(dirX, dirY, dirZ)
+    local left = vectorCross(upVector, forward)
+    local up = vectorCross(forward, left)
+
+    -- X axis
+    DrawLine(pos, pos + left * length, 'FF0000')
+    -- Y axis
+    DrawLine(pos, pos + up * length, '00ff00')
+    -- Z axis
+    DrawLine(pos, pos + forward * length, '0000ff')
+end
