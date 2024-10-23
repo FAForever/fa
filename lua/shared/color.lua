@@ -581,7 +581,6 @@ end
 
 --- Map of named colors the Moho engine can recognize and their representation
 ---@see EnumColorNames()
----@type table<EnumColor, Color>
 EnumColors = {
     AliceBlue = "F7FBFF",
     AntiqueWhite = "FFEBD6",

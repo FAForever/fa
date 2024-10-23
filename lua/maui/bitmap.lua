@@ -40,7 +40,7 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 Bitmap = ClassUI(moho.bitmap_methods, Control) {
     ---@param self Bitmap
     ---@param parent Control
-    ---@param filename Lazy<FileName>
+    ---@param filename? Lazy<FileName>
     ---@param debugname? string
     __init = function(self, parent, filename, debugname)
         InternalCreateBitmap(self, parent)
