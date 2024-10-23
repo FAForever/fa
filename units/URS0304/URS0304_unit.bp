@@ -3,6 +3,10 @@ UnitBlueprint{
     AI = {
         GuardReturnRadius = 0,
         InitialAutoMode = false,
+        TargetBones = {
+            "Projectile_Center",
+            "URS0304",
+        },
     },
     Audio = {
         AmbientMove           = Sound { Bank = 'URS',        Cue = 'URS0304_Move_Loop',                     LodCutoff = 'UnitMove_LodCutoff' },
@@ -243,10 +247,10 @@ UnitBlueprint{
     SelectionSizeX = 0.95,
     SelectionSizeZ = 2.6,
     SelectionThickness = 0.28,
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.4,
     CollisionOffsetZ = 0.25,
     SizeX = 1.5,
-    SizeY = 0.7,
+    SizeY = 0.9,
     SizeZ = 3.75,
     SplitDamage = {
         DamageAmount = 500,
