@@ -2244,31 +2244,30 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.Brain:OnUnitBeingBuiltProgress(self, builder, oldProg, newProg)
     end,
 
+    --- Set the unit's Yaw rotation and reset its roll/pitch
     ---@param self Unit
-    ---@param angle number
-    SetRotation = function(self, angle)
-        local qx, qy, qz, qw = Explosion.QuatFromRotation(angle, 0, 1, 0)
-        self:SetOrientation({qx, qy, qz, qw}, true)
+    ---@param degrees number
+    SetRotation = function(self, degrees)
+        self:SetOrientation(utilities.QuatFromRotation(degrees), true)
     end,
 
+    --- Rotate the unit on its Yaw axis
     ---@param self Unit
-    ---@param angle number
-    Rotate = function(self, angle)
-        local qx, qy, qz, qw = unpack(self:GetOrientation())
-        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        local current_yaw = math.floor(math.abs(a) * (180 / math.pi) + 0.5)
-
-        self:SetRotation(angle + current_yaw)
+    ---@param degrees number
+    Rotate = function(self, degrees)
+        self:SetOrientation(utilities.QuatFromRotation(degrees) * self:GetOrientation(), true)
     end,
 
+    --- Set the unit's Yaw rotation towards a point and reset its roll/pitch
     ---@param self Unit
-    ---@param tpos number
+    ---@param tpos Vector
     RotateTowards = function(self, tpos)
         local pos = self:GetPosition()
-        local rad = math.atan2(tpos[1] - pos[1], tpos[3] - pos[3])
-        self:SetRotation(rad * (180 / math.pi))
+        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
+    --- Set the unit's Yaw rotation towards the middle of the map (not playable area) and reset its roll/pitch
     ---@param self Unit
     RotateTowardsMid = function(self)
         local x, y = GetMapSize()
