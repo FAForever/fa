@@ -28,6 +28,7 @@ defaultMessages = {
         RightPod = "Right Drone",
         Shield = "Shield",
         ShieldGeneratorField = "Shield Field",
+        AdvancedShieldGeneratorField = "Advanced Shield Field",
     },
     cybran = {
         ResourceAllocation = "RAS",
