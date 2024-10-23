@@ -95,15 +95,15 @@ local AutolobbyEngineStrings = {
 ---@field Trash TrashBag
 ---@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
----@field HostID UILobbyPeerId
----@field PlayerCount number
----@field GameMods UILobbyLaunchGameModsConfiguration[]
----@field GameOptions UILobbyLaunchGameOptionsConfiguration     # Is synced from the host to the others.
----@field PlayerOptions UIAutolobbyPlayer[]                     # Is synced from the host to the others.
----@field ConnectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
+---@field HostID UILobbyPeerId          
+---@field PlayerCount number                                        # Originates from the command line
+---@field GameMods UILobbyLaunchGameModsConfiguration[]     
+---@field GameOptions UILobbyLaunchGameOptionsConfiguration         # Is synced from the host via `SendData` or `BroadcastData`.
+---@field PlayerOptions UIAutolobbyPlayer[]                         # Is synced from the host via `SendData` or `BroadcastData`.
+---@field ConnectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>    # Is synced between players via `EstablishedPeers`
 ---@field PeerToIndexMapping table<UILobbyPeerId, number>
 ---@field DisconnectedPeers table<UILobbyPeerId, number>        #
----@field LaunchStatutes table<UILobbyPeerId, UIAutolobbyLaunchStatus>
+---@field LaunchStatutes table<UILobbyPeerId, UIAutolobbyLaunchStatus>  # Is synced between players via `BroadcastData`
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
@@ -450,8 +450,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     --- Passes the local launch status to all peers.
     ---@param self UIAutolobbyCommunications
     ShareLaunchStatusThread = function(self)
-        WaitSeconds(1.0)
-
         while not IsDestroyed(self) do
             local launchStatus = self:CreateLaunchStatus(self.ConnectionMatrix)
             self.LaunchStatutes[self.LocalPeerId] = launchStatus
@@ -461,7 +459,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
                 :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.LaunchStatutes))
 
-            WaitSeconds(0.5)
+            WaitSeconds(2.0)
         end
     end,
 
