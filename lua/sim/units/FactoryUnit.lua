@@ -139,7 +139,21 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
             self:StopBuildFx()
-            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order)
+
+            -- Moving off factory has to be issued this tick so that rally points are issued after it
+            -- Air units don't need the move order since they fly off the factory by themselves
+            -- Pass the spin up so that engineers can be rotated towards the rolloff point after the "build finished" animation
+
+            local spin = nil
+            if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
+                local rollOffPoint = self.RollOffPoint
+                local x, y, z
+                spin, x, y, z = self:CalculateRollOffPoint()
+                rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
+                IssueToUnitMoveOffFactory(unitBeingBuilt, rollOffPoint)
+            end
+
+            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order, spin)
         end
 
     end,
@@ -208,7 +222,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order boolean
-    FinishBuildThread = function(self, unitBeingBuilt, order)
+    ---@param rollOffPointSpin number?
+    FinishBuildThread = function(self, unitBeingBuilt, order, rollOffPointSpin)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         local bp = self.Blueprint
@@ -221,8 +236,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- engineers can only be rotated during rolloff after the "build finished" animation ends
-        if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
-            self:RollOffUnit()
+        if rollOffPointSpin and unitBeingBuilt and EntityCategoryContains(categoriesENGINEER, unitBeingBuilt) then
+            unitBeingBuilt:SetRotation(rollOffPointSpin)
         end
 
         if unitBeingBuilt and not unitBeingBuilt.Dead then
@@ -250,20 +265,6 @@ FactoryUnit = ClassUnit(StructureUnit) {
         -- Note: We check for the primary category, since e.g. AircraftCarriers have the FACTORY category.
         -- TODO: This is a hotfix for --1043, remove when engymod design is properly fixed
         return target_bp.General.Category ~= 'Factory'
-    end,
-
-    --- Rotates engineers towards the nearest roll off point and then orders the unit to move off the factory build site
-    ---@param self FactoryUnit
-    RollOffUnit = function(self)
-        local rollOffPoint = self.RollOffPoint
-        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
-        if unitBeingBuilt and EntityCategoryContains(categoriesENGINEER, unitBeingBuilt) then
-            local spin, x, y, z = self:CalculateRollOffPoint()
-            unitBeingBuilt:SetRotation(spin)
-            rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
-        end
-
-        IssueToUnitMoveOffFactory(unitBeingBuilt, rollOffPoint)
     end,
 
     ---@param self FactoryUnit
