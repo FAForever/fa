@@ -48,6 +48,8 @@ _G.GpgNetSend = function(command, ...)
     --- Add a hook that generates sim callbacks for communication to the
     --- server. Useful for moderation purposes.
 
+    SPEW("GpgNetSend", command, unpack(arg))
+
     if SessionIsActive() and not SessionIsReplay() then
         local stringifiedArgs = ""
         for k = 1, table.getn(arg) do
