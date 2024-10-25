@@ -472,6 +472,17 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
                 WaitSeconds(5.0)
                 if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
+
+                    -- send player options to the server
+                    for slot, playerOptions in self.PlayerOptions do
+                        local ownerId = playerOptions.OwnerID
+                        self:SendPlayerOptionToServer(ownerId, 'Team', playerOptions.Team)
+                        self:SendPlayerOptionToServer(ownerId, 'Army', playerOptions.StartSpot)
+                        self:SendPlayerOptionToServer(ownerId, 'StartSpot', playerOptions.StartSpot)
+                        self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
+                    end
+
+                    -- create game configuration
                     local gameConfiguration = {
                         GameMods = self.GameMods,
                         GameOptions = self.GameOptions,
@@ -479,6 +490,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         Observers = {},
                     }
 
+                    -- send it to all players and tell them to launch
                     self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
                     self:LaunchGame(gameConfiguration)
                 end
