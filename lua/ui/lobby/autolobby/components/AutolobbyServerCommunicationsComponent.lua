@@ -30,9 +30,8 @@
 -- - Java Ice adapter: https://github.com/FAForever/java-ice-adapter
 -- - Kotlin Ice adapter: https://github.com/FAForever/kotlin-ice-adapter
 --
--- If we do not send this information then the client is unaware of changes made
--- to the lobby after hosting. These messages are usually only accepted from the
--- host of the lobby.
+-- Specifically, the following file processes these messages on the server:
+-- - https://github.com/FAForever/server/blob/98271c421412467fa387f3a6530fe8d24e360fa4/server/gameconnection.py
 
 -- upvalue scope for performance
 local GpgNetSend = GpgNetSend
