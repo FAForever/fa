@@ -66,7 +66,7 @@ local AutolobbyConnectionMatrixDot = Class(Bitmap) {
     end,
 
     ---@param self UIAutolobbyConnectionMatrixDot
-    ---@param status UIAutolobbyLaunchStatus
+    ---@param status UIPeerLaunchStatus
     SetStatus = function(self, status)
         if status == 'Unknown' then
             self:SetSolidColor(EnumColors.Blue)

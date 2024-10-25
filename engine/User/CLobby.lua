@@ -12,7 +12,7 @@ local CLobby = {}
 
 ---@alias UILobbyProtocol 'UDP' | 'TCP'
 
----@alias UIPeerStatus 'None' | 'Pending' | 'Connecting' | 'Answering' | 'Established' | 'TimedOut' | 'Errored'
+---@alias UIPeerConnectionStatus 'None' | 'Pending' | 'Connecting' | 'Answering' | 'Established' | 'TimedOut' | 'Errored'
 
 ---@class Peer
 ---@field establishedPeers UILobbyPeerId[]
@@ -20,7 +20,7 @@ local CLobby = {}
 ---@field ping number
 ---@field name string
 ---@field quiet number
----@field status UIPeerStatus
+---@field status UIPeerConnectionStatus
 
 --- A piece of data that is one can send with `BroadcastData` or `SendData` to other player(s) in the lobby.
 ---@class UILobbyReceivedMessage : table

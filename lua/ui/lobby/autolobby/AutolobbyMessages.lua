@@ -65,7 +65,7 @@ AutolobbyMessages = {
 
     UpdateLaunchStatus = {
         ---@class UIAutolobbyUpdateLaunchStatusMessage : UILobbyReceivedMessage
-        ---@field LaunchStatus UIAutolobbyLaunchStatus
+        ---@field LaunchStatus UIPeerLaunchStatus
 
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyUpdateLaunchStatusMessage

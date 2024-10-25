@@ -22,11 +22,13 @@
 
 local Utils = import("/lua/system/utils.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
-
 local GameColors = import("/lua/GameColors.lua")
+
 local MohoLobbyMethods = moho.lobby_methods
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
-
+local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyServerCommunicationsComponent.lua")
+    .AutolobbyServerCommunicationsComponent
+    
 local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
@@ -52,12 +54,6 @@ local AutolobbyEngineStrings = {
     ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
----@alias UIAutolobbyLaunchStatus
---- | 'Disconnected'
---- | 'Unknown'
---- | 'Missing local peers'
---- | 'Rejoining'
---- | 'Ready'
 
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
 ---@field StartSpot number
@@ -69,7 +65,7 @@ local AutolobbyEngineStrings = {
 ---@field PL number     # Related to rating/divisions
 
 ---@alias UIAutolobbyConnections boolean[][]
----@alias UIAutolobbyStatus UIAutolobbyLaunchStatus[]
+---@alias UIAutolobbyStatus UIPeerLaunchStatus[]
 
 ---@class UIAutolobbyParameters
 ---@field Protocol UILobbyProtocol
@@ -91,23 +87,23 @@ local AutolobbyEngineStrings = {
 ---@field DesiredPeerId UILobbyPeerId
 
 --- Responsible for the behavior of the automated lobby.
----@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent
+---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent
 ---@field Trash TrashBag
 ---@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
----@field HostID UILobbyPeerId          
+---@field HostID UILobbyPeerId
 ---@field PlayerCount number                                        # Originates from the command line
----@field GameMods UILobbyLaunchGameModsConfiguration[]     
+---@field GameMods UILobbyLaunchGameModsConfiguration[]
 ---@field GameOptions UILobbyLaunchGameOptionsConfiguration         # Is synced from the host via `SendData` or `BroadcastData`.
 ---@field PlayerOptions UIAutolobbyPlayer[]                         # Is synced from the host via `SendData` or `BroadcastData`.
 ---@field ConnectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>    # Is synced between players via `EstablishedPeers`
 ---@field PeerToIndexMapping table<UILobbyPeerId, number>
 ---@field DisconnectedPeers table<UILobbyPeerId, number>        #
----@field LaunchStatutes table<UILobbyPeerId, UIAutolobbyLaunchStatus>  # Is synced between players via `BroadcastData`
+---@field LaunchStatutes table<UILobbyPeerId, UIPeerLaunchStatus>  # Is synced between players via `BroadcastData`
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
-AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
+AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, DebugComponent) {
 
     BackgroundTextures = {
         "/menus02/background-paint01_bmp.dds",
@@ -263,7 +259,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     end,
 
     ---@param self UIAutolobbyCommunications
-    ---@param statuses table<UILobbyPeerId, UIAutolobbyLaunchStatus>
+    ---@param statuses table<UILobbyPeerId, UIPeerLaunchStatus>
     ---@return UIAutolobbyStatus
     CreateConnectionStatuses = function(self, statuses)
         local output = {}
@@ -280,7 +276,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     --- Determines the launch status of the local peer.
     ---@param self UIAutolobbyCommunications
     ---@param connectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
-    ---@return UIAutolobbyLaunchStatus
+    ---@return UIPeerLaunchStatus
     CreateLaunchStatus = function(self, connectionMatrix)
         -- check number of peers
         local validPeerCount = self.PlayerCount - 1
@@ -364,17 +360,17 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     Rejoin = function(self, lobbyParameters, joinParameters)
         local autolobbyModule = import("/lua/ui/lobby/autolobby.lua")
 
-        LOG("REJOINING")
-
         -- start disposing threads to prevent race conditions
         self.Trash:Destroy()
 
         ForkThread(
             function()
+                self:SendLaunchStatusToServer('Rejoining')
+
                 -- prevent race condition on network
                 WaitSeconds(1.0)
 
-                -- inform peers that we're rejoining
+                -- inform peers and server that we're rejoining
                 self:BroadcastData({ Type = "UpdateLaunchStatus", LaunchStatus = 'Rejoining' })
 
                 -- prevent race condition on network
@@ -453,7 +449,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         while not IsDestroyed(self) do
             local launchStatus = self:CreateLaunchStatus(self.ConnectionMatrix)
             self.LaunchStatutes[self.LocalPeerId] = launchStatus
+
+            -- update peers
             self:BroadcastData({ Type = "UpdateLaunchStatus", LaunchStatus = launchStatus })
+
+            -- update server
+            self:SendLaunchStatusToServer(launchStatus)
 
             -- update UI for launch statuses
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
@@ -468,7 +469,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         while not IsDestroyed(self) do
 
             if self:CanLaunch(self.LaunchStatutes) then
-                LOG("We can launch...")
 
                 WaitSeconds(5.0)
                 if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
@@ -479,7 +479,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
                         Observers = {},
                     }
 
-                    LOG("Launching!")
                     self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
                     self:LaunchGame(gameConfiguration)
                 end
@@ -612,9 +611,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     DisconnectFromPeer = function(self, peerId)
         self:DebugSpew("DisconnectFromPeer", peerId)
 
-        -- inform the server of the event
-        GpgNetSendDisconnected(peerId)
-
         -- reset mappings
         self.PeerToIndexMapping = {}
         self.ConnectionMatrix[peerId] = nil
@@ -706,7 +702,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     LaunchGame = function(self, gameConfig)
         self:DebugSpew("LaunchGame")
         self:DebugSpew(reprs(gameConfig, { depth = 10 }))
-        GpgNetSendGameState('Launching')
+
+        self:SendGameStateToServer('Launching')
         return MohoLobbyMethods.LaunchGame(self, gameConfig)
     end,
 
@@ -770,7 +767,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         -- start prefetching the scenario
         self:Prefetch(self.GameOptions, self.GameMods)
 
-        GpgNetSendGameState('Lobby')
+        self:SendGameStateToServer('Lobby')
 
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
@@ -803,7 +800,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         self.LocalPeerId = localPeerId
         self.HostID = hostPeerId
 
-        GpgNetSendGameState('Lobby')
+        self:SendGameStateToServer('Lobby')
 
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
@@ -819,6 +816,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
     EstablishedPeers = function(self, peerId, peerConnectedTo)
         self:DebugSpew("EstablishedPeers", peerId, reprs(peerConnectedTo))
 
+        -- update server
+        self:SendEstablishedPeers(peerId, peerConnectedTo)
 
         self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
         -- update UI for launch statuses
@@ -830,9 +829,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         local connections = self:CreateConnectionsMatrix(self.ConnectionMatrix)
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
             :UpdateConnections(connections)
-
-
-
     end,
 
     --#endregion
@@ -924,7 +920,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, DebugComponent) {
         -- destroy ourselves, the game takes over the management of peers
         self:Destroy()
 
-        GpgNetSend('GameState', 'Launching')
+        self:SendGameStateToServer('Launching')
     end,
 
     --- Called by the engine when the launch failed.

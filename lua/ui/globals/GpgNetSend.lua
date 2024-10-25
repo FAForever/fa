@@ -22,14 +22,31 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-------------------------------------------------------------------------------
+--#region Game <-> Server communications
+
+-- All the following logic is tightly coupled with functionality on either the
+-- lobby server, the ice adapter, the java server and/or the client. For more
+-- context you can search for the various keywords in the following repositories:
+-- - Lobby server: https://github.com/FAForever/server
+-- - Java server: https://github.com/FAForever/faf-java-server
+-- - Java Ice adapter: https://github.com/FAForever/java-ice-adapter
+-- - Kotlin Ice adapter: https://github.com/FAForever/kotlin-ice-adapter
+--
+-- If we do not send this information then the client is unaware of changes made
+-- to the lobby after hosting. These messages are usually only accepted from the
+-- host of the lobby.
+
 --- Original function that we should not use directly
 local oldGpgNetSend = GpgNetSend
 
---- Adds a hook that generates sim callbacks for communication to the
---- server. Useful for moderation purposes.
----@param command any
----@param ... unknown
+
+---@param command string
+---@param ... number | string
 _G.GpgNetSend = function(command, ...)
+
+    --- Add a hook that generates sim callbacks for communication to the
+    --- server. Useful for moderation purposes.
 
     if SessionIsActive() and not SessionIsReplay() then
         local stringifiedArgs = ""
@@ -53,56 +70,4 @@ _G.GpgNetSend = function(command, ...)
     oldGpgNetSend(command, unpack(arg))
 end
 
--------------------------------------------------------------------------------
---#region Game <-> Server communications
 
--- All the following logic is tightly coupled with functionality on either the
--- lobby server, the ice adapter, the java server and/or the client. For more
--- context you can search for the various keywords in the following repositories:
--- - Lobby server: https://github.com/FAForever/server
--- - Java server: https://github.com/FAForever/faf-java-server
--- - Java Ice adapter: https://github.com/FAForever/java-ice-adapter
--- - Kotlin Ice adapter: https://github.com/FAForever/kotlin-ice-adapter
---
--- If we do not send this information then the client is unaware of changes made
--- to the lobby after hosting. These messages are usually only accepted from the
--- host of the lobby.
-
---- Sends player options to the lobby server. For more context:
---- - https://github.com/search?q=org%3AFAForever+player_option&type=code
----@param peerId UILobbyPeerId
----@param key 'Team' | 'Army' | 'StartSpot' | 'Faction' | 'Color'
----@param value string | number
-GpgNetSendPlayerOption = function(peerId, key, value)
-    _G.GpgNetSend('PlayerOption', peerId, key, value)
-end
-
---- Sends AI options to the lobby server. For more context:
---- - https://github.com/search?q=org%3AFAForever+ai_option&type=code
----@param key string
----@param value string
-GpgNetSendAIOption = function(aiName, key, value)
-    _G.GpgNetSend('AIOption', aiName, key, value)
-end
-
---- Sends game options to the lobby server. For more context:
---- - https://github.com/search?q=repo%3AFAForever%2Fserver+game_option&type=code
----@param key 'ScenarioFile' | 'Slots' | 'RestrictedCategories'
----@param value string | number
-GpgNetSendGameOption = function(key, value)
-    _G.GpgNetSend('GameOption', key, value)
-end
-
---- Sends game status to the lobby server. For more context:
---- - https://github.com/search?q=repo%3AFAForever%2Fserver+GameState&type=code
----@param value 'None' | 'Idle' | 'Lobby' | 'Launching' | 'Ended'
-GpgNetSendGameState = function(value)
-    _G.GpgNetSend('GameState', value)
-end
-
---- Sends game status to the lobby server. For more context:
---- - https://github.com/search?q=repo%3AFAForever%2Fserver+GameState&type=code
----@param peerId UILobbyPeerId
-GpgNetSendDisconnected = function(peerId)
-    GpgNetSend('Disconnected', peerId)
-end

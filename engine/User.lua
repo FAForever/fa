@@ -624,9 +624,9 @@ end
 function GpgNetActive()
 end
 
----@param cmd string
----@param ... any
-function GpgNetSend(cmd, ...)
+---@param command string
+---@param ... number | string
+function GpgNetSend(command, ...)
 end
 
 ---
