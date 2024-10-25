@@ -28,7 +28,7 @@ local MohoLobbyMethods = moho.lobby_methods
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyServerCommunicationsComponent.lua")
     .AutolobbyServerCommunicationsComponent
-    
+
 local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
@@ -780,6 +780,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:Prefetch(self.GameOptions, self.GameMods)
 
         self:SendGameStateToServer('Lobby')
+        self:SendLaunchStatusToServer('Hosting')
 
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
@@ -790,6 +791,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     Connecting = function(self)
         self:DebugSpew("Connecting")
+        self:SendLaunchStatusToServer('Connecting')
     end,
 
     --- Called by the engine when the connection fails.
@@ -853,6 +855,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param reason string     # reason for disconnection, populated by the host
     Ejected = function(self, reason)
         self:DebugSpew("Ejected", reason)
+        self:SendLaunchStatusToServer('Ejected')
     end,
 
     --- ???
@@ -940,6 +943,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param reasonKey string
     LaunchFailed = function(self, reasonKey)
         self:DebugSpew("LaunchFailed", LOC(reasonKey))
+        self:SendLaunchStatusToServer('Failed')
     end,
 
     --#endregion

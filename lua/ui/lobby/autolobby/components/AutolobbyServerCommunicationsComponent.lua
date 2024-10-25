@@ -47,9 +47,11 @@ local GpgNetSend = GpgNetSend
 --- Interpretation of the lobby launch status of a single peer.
 ---@alias UIPeerLaunchStatus
 --- | 'Unknown'                 # Initial value, is never send.
+--- | 'Connecting'              # Send when the local peer is connecting to the lobby
 --- | 'Missing local peers'     # Send when the local peer is missing other peers
 --- | 'Rejoining'               # Send when the local peer is rejoining
---- | 'Ready'                   # Send when the local peer is ready to start
+--- | 'Ready'                   # Send when the local peer is ready to launch
+--- | 'Ejected'                 # Send when the local peer is ejected   
 --- | 'Rejected'                # Send when there is a game version missmatch
 --- | 'Failed'                  # Send when the game fails to launch
 
