@@ -229,7 +229,9 @@ function GetStartPositions(scenario)
     return armyPositions
 end
 
--- enumerates and returns to key name for all the armies for this map
+-- Retrieves all of the playable armies for a scenario
+---@param scenario UIScenarioInfo
+---@return string[] | nil
 function GetArmies(scenario)
     local retArmies = nil
 
