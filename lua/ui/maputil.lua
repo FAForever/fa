@@ -40,6 +40,7 @@
 ---@field Alliances table
 ---@field PlatoonBuilders { Builders: table }
 
+--- The scenario of a map that defines all areas, (resource) markers, marker chains and armies.
 ---@class UIScenario
 ---@field Props table       # Unknown
 ---@field Areas table<string, { rectangle: UIScenarioArea }>
