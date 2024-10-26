@@ -209,9 +209,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     --#region Utilities
 
     ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
     ---@param connectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
     ---@return UIAutolobbyConnections
-    CreateConnectionsMatrix = function(self, connectionMatrix)
+    CreateConnectionsMatrix = function(self, playerOptions, connectionMatrix)
         ---@type UIAutolobbyConnections
         local connections = {}
 
@@ -226,8 +227,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- populate the matrix
         for peerId, establishedPeers in connectionMatrix do
             for _, peerConnectedToId in establishedPeers do
-                local peerIdNumber = self:PeerIdToIndex(self.PlayerOptions, peerId)
-                local peerConnectedToIdNumber = self:PeerIdToIndex(self.PlayerOptions, peerConnectedToId)
+                local peerIdNumber = self:PeerIdToIndex(playerOptions, peerId)
+                local peerConnectedToIdNumber = self:PeerIdToIndex(playerOptions, peerConnectedToId)
 
                 -- connection works both ways
                 if peerIdNumber and peerConnectedToIdNumber then
@@ -245,12 +246,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     end,
 
     ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
     ---@param statuses table<UILobbyPeerId, UIPeerLaunchStatus>
     ---@return UIAutolobbyStatus
-    CreateConnectionStatuses = function(self, statuses)
+    CreateConnectionStatuses = function(self, playerOptions, statuses)
         local output = {}
         for peerId, launchStatus in statuses do
-            local peerIdNumber = self:PeerIdToIndex(self.PlayerOptions, peerId)
+            local peerIdNumber = self:PeerIdToIndex(playerOptions, peerId)
             if peerIdNumber then
                 output[peerIdNumber] = launchStatus
             end
@@ -439,7 +441,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
             -- update UI for launch statuses
             import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-                :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.LaunchStatutes))
+                :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
             WaitSeconds(2.0)
         end
@@ -547,7 +549,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- update UI for launch statuses
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.LaunchStatutes))
+            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
     end,
 
     --#endregion
@@ -833,11 +835,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
         -- update UI for launch statuses
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.LaunchStatutes))
+            :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
         -- update the matrix and the UI
         self.ConnectionMatrix[peerId] = peerConnectedTo
-        local connections = self:CreateConnectionsMatrix(self.ConnectionMatrix)
+        local connections = self:CreateConnectionsMatrix(self.PlayerOptions, self.ConnectionMatrix)
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
             :UpdateConnections(connections)
     end,
