@@ -27,7 +27,8 @@
 -- wrapper to another function in the autolobby.
 
 ---@class UIAutolobbyMessageHandler
----@field Accept fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean   # Responsible for filtering out non-sense
+---@field Validate fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean # Responsible for filtering out non-sense
+---@field Accept fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage): boolean   # Responsible for filtering out malicous messages
 ---@field Handler fun(lobby: UIAutolobbyCommunications, data: UILobbyReceivedMessage)           # Responsible for handling the message
 
 ---@param lobby UIAutolobbyCommunications
@@ -52,6 +53,13 @@ AutolobbyMessages = {
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyIsAliveMessage
         ---@return boolean
+        Validate = function(lobby, data)
+            return true
+        end,
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyIsAliveMessage
+        ---@return boolean
         Accept = function(lobby, data)
             return true
         end,
@@ -66,6 +74,17 @@ AutolobbyMessages = {
     UpdateLaunchStatus = {
         ---@class UIAutolobbyUpdateLaunchStatusMessage : UILobbyReceivedMessage
         ---@field LaunchStatus UIPeerLaunchStatus
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyUpdateLaunchStatusMessage
+        ---@return boolean
+        Validate = function(lobby, data)
+            if not data.LaunchStatus then
+                return false
+            end
+
+            return true
+        end,
 
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyUpdateLaunchStatusMessage
@@ -86,6 +105,17 @@ AutolobbyMessages = {
 
         ---@class UIAutolobbyAddPlayerMessage : UILobbyReceivedMessage
         ---@field PlayerOptions UIAutolobbyPlayer
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyAddPlayerMessage
+        ---@return boolean
+        Validate = function(lobby, data)
+            if not data.PlayerOptions then
+                return false
+            end
+
+            return true
+        end,
 
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyAddPlayerMessage
@@ -130,13 +160,22 @@ AutolobbyMessages = {
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyUpdatePlayerOptionsMessage
         ---@return boolean
+        Validate = function(lobby, data)
+            if not data.PlayerOptions then
+                return false
+            end
+
+            return true
+        end,
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyUpdatePlayerOptionsMessage
+        ---@return boolean
         Accept = function(lobby, data)
             if not IsFromHost(lobby, data) then
                 lobby:DebugWarn("Received message from non-host peer of type ", data.Type)
                 return false
             end
-
-            -- TODO: verify integrity of the message
 
             return true
         end,
@@ -152,6 +191,17 @@ AutolobbyMessages = {
 
         ---@class UIAutolobbyUpdateGameOptionsMessage : UILobbyReceivedMessage
         ---@field GameOptions UILobbyLaunchGameOptionsConfiguration
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyUpdateGameOptionsMessage
+        ---@return boolean
+        Validate = function(lobby, data)
+            if not data.GameOptions then
+                return false
+            end
+
+            return true
+        end,
 
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyUpdateGameOptionsMessage
@@ -178,6 +228,24 @@ AutolobbyMessages = {
 
         ---@class UIAutolobbyLaunchMessage : UILobbyReceivedMessage
         ---@field GameConfig UILobbyLaunchConfiguration
+
+        ---@param lobby UIAutolobbyCommunications
+        ---@param data UIAutolobbyLaunchMessage
+        ---@return boolean
+        Validate = function(lobby, data)
+            if not data.GameConfig then
+                return false
+            end
+
+            if not
+                (
+                data.GameConfig.GameMods and data.GameConfig.GameOptions and data.GameConfig.Observers and
+                    data.GameConfig.PlayerOptions) then
+                return false
+            end
+
+            return true
+        end,
 
         ---@param lobby UIAutolobbyCommunications
         ---@param data UIAutolobbyLaunchMessage

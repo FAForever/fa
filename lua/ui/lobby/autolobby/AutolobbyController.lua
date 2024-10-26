@@ -110,7 +110,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.LocalPeerId = "-2"
         self.LocalPlayerName = "Charlie"
         self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
-        self.Connections = {}
         self.HostID = "-2"
 
         self.GameMods = {}
@@ -561,8 +560,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param data UILobbyData
     BroadcastData = function(self, data)
         self:DebugSpew("BroadcastData", data.Type)
-        if not AutolobbyMessages[data.Type] then
-            self:DebugWarn("Broadcasting unknown message type", data.Type)
+
+        -- validate message type
+        local message = AutolobbyMessages[data.Type]
+        if not message then
+            self:DebugWarn("Blocked broadcasting unknown message type", data.Type)
+            return
+        end
+
+        -- validate message format
+        if not message.Validate(self, data) then
+            self:DebugWarn("Blocked broadcasting malformed message of type", data.Type)
+            return
         end
 
         return MohoLobbyMethods.BroadcastData(self, data)
@@ -723,8 +732,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@return nil
     SendData = function(self, peerId, data)
         self:DebugSpew("SendData", peerId, data.Type)
-        if not AutolobbyMessages[data.Type] then
-            self:DebugWarn("Sending unknown message type", data.Type, "to", peerId)
+
+        -- validate message type
+        local message = AutolobbyMessages[data.Type]
+        if not message then
+            self:DebugWarn("Blocked sending unknown message type", data.Type, "to", peerId)
+            return
+        end
+
+        -- validate message type
+        if not message.Validate(self, data) then
+            self:DebugWarn("Blocked sending malformed message of type", data.Type, "to", peerId)
+            return
         end
 
         return MohoLobbyMethods.SendData(self, peerId, data)
@@ -851,9 +870,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     DataReceived = function(self, data)
         self:DebugSpew("DataReceived", data.Type, data.SenderID, data.SenderName)
 
-        ---@type UIAutolobbyMessageHandler?
-        local messageType = AutolobbyMessages[data.Type]
-
         -- signal UI that we received something
         local peerIndex = self:PeerIdToIndex(self.PlayerOptions, data.SenderID)
         if peerIndex then
@@ -861,20 +877,27 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                 :UpdateIsAliveStamp(peerIndex)
         end
 
-        -- verify that the message type exists
-        if not messageType then
-            self:DebugError('Unknown message received: ', data.Type)
+        -- validate message type
+        local message = AutolobbyMessages[data.Type]
+        if not message then
+            self:DebugWarn("Ignoring unknown message type", data.Type, "from", data.SenderID)
             return
         end
 
-        -- verify that we can accept it
-        if not messageType.Accept(self, data) then
+        -- validate message data
+        if not message.Validate(self, data) then
+            self:DebugWarn("Ignoring malformed message of type", data.Type, "from", data.SenderID)
+            return
+        end
+
+        -- validate message source
+        if not message.Accept(self, data) then
             self:DebugWarn("Message rejected: ", data.Type)
             return
         end
 
         -- handle the message
-        messageType.Handler(self, data)
+        message.Handler(self, data)
     end,
 
     --- Called by the engine when the game configuration is requested by the discovery service.
