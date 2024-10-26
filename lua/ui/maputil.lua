@@ -132,6 +132,22 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
+--- Given the path to a scenario info file, returns the path to the scenario options file. The reference to this file is not stored in the _scenario.lua file.
+---@param pathToScenarioInfo FileName
+---@return FileName
+function GetPathToScenarioOptions(pathToScenarioInfo)
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua")) ..
+        "options.lua" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario strings file.  The reference to this file is not stored in the _scenario.lua file.
+---@param pathToScenarioInfo FileName
+---@return FileName
+function GetPathToScenarioStrings(pathToScenarioInfo)
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua")) ..
+        "strings.lua" --[[@as FileName]]
+end
+
 --- Loads in the scenario save.
 ---@param pathToScenarioSave FileName
 ---@return UIScenarioSaveFile | nil
