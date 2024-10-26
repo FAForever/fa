@@ -103,14 +103,6 @@ local AutolobbyEngineStrings = {
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
 AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, DebugComponent) {
 
-    BackgroundTextures = {
-        "/menus02/background-paint01_bmp.dds",
-        "/menus02/background-paint02_bmp.dds",
-        "/menus02/background-paint03_bmp.dds",
-        "/menus02/background-paint04_bmp.dds",
-        "/menus02/background-paint05_bmp.dds",
-    },
-
     ---@param self UIAutolobbyCommunications
     __init = function(self)
         self.Trash = TrashBag()
