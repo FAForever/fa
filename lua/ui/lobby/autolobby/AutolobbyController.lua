@@ -54,7 +54,6 @@ local AutolobbyEngineStrings = {
     ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
-
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
 ---@field StartSpot number
 ---@field DEV number    # Related to rating/divisions
