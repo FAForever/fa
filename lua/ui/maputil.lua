@@ -10,6 +10,45 @@
 ---@field teams {name: string, armies: string[]}
 ---@field customprops table<string, string>
 
+--- A basic area defined in the scenario.
+---@class UIScenarioArea
+---@field [1] number    # x0
+---@field [2] number    # z0
+---@field [3] number    # x1
+---@field [4] number    # z1
+---@field type 'RECTANGLE'
+
+--- A marker defined in the scenario.
+---@class UIScenarioMarker
+---@field color string
+---@field type string
+---@field prop BlueprintId  # path to blueprint
+---@field orientation Vector
+---@field position Vector
+
+--- A chain of markers defined in the scenario.
+---@class UIScenarioChain
+---@field Markers string[]  # key of marker in the master chain
+
+--- An army defined in the scenario.
+---@class UIScenarioArmy
+---@field personality string
+---@field plans string
+---@field color number
+---@field faction number
+---@field Economy { mass: number, energy: number }
+---@field Alliances table
+---@field PlatoonBuilders { Builders: table }
+
+---@class UIScenario
+---@field Props table       # Unknown
+---@field Areas table<string, { rectangle: UIScenarioArea }>
+---@field MasterChain { _MASTERCHAIN_ : table<string, UIScenarioMarker> }
+---@field Chains table<string, UIScenarioChain>
+---@field Orders table      # Unknown
+---@field Platoons table    # Unknown
+---@field Armies table<string, UIScenarioArmy>      
+
 ---@class UIScenarioInfo
 ---@field AdaptiveMap boolean
 ---@field description string
