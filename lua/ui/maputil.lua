@@ -97,7 +97,6 @@
 ---@field type string
 ---@field Configurations table<string, UIScenarioConfiguration>
 ---@field file string
----@field Outdated boolean
 --- Additional map options supplied by the map `options.lua` file, if it exists.
 --- These are the lobby option-factory type of options, not the actual `<key, value>` pairs
 --- that the lobby ends up defining.
@@ -110,7 +109,6 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
-local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
 local Utils = import("/lua/system/utils.lua")
 
 -- Loads in the entire scenario including the save and optional files such as _options.lua and _strings.lua.
