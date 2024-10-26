@@ -110,16 +110,13 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
-
 local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
 local Utils = import("/lua/system/utils.lua")
 
--- load a scenario based on a scenario file name
+-- Loads in the entire scenario including the save and optional files such as _options.lua and _strings.lua.
 ---@param scenName string
 ---@return UIScenarioInfo
 function LoadScenario(scenName)
-    -- TODO - expose FILE_IsAbsolute and if it's not, add the path and the _scenario.lua
-
     if not DiskGetFileInfo(scenName) then
         return nil
     end
@@ -161,7 +158,7 @@ function LoadScenario(scenName)
 
     -- Is this map flagged out of date? *CACKLES INSANELY*
     local pathBits = Utils.StringSplit(scenName, '/')
-    env.ScenarioInfo.Outdated = OutdatedMaps[pathBits[2]]
+
 
     env.ScenarioInfo.file = scenName -- stuff the file name in so we have that
     return env.ScenarioInfo
@@ -269,7 +266,9 @@ function GetStartPositions(scenario)
     return armyPositions
 end
 
--- enumerates and returns to key name for all the armies for this map
+-- Retrieves all of the playable armies for a scenario
+---@param scenario UIScenarioInfo
+---@return string[] | nil
 function GetArmies(scenario)
     local retArmies = nil
 
@@ -289,11 +288,12 @@ function GetArmies(scenario)
 
     return retArmies
 end
+
 function GetExtraArmies(scenario)
     if scenario.Configurations.standard and scenario.Configurations.standard.teams then
         local teams = scenario.Configurations.standard.teams
         if teams.ExtraArmies then
-            local armies = STR_GetTokens(teams.ExtraArmies,' ')
+            local armies = STR_GetTokens(teams.ExtraArmies, ' ')
             return armies
         end
     end
@@ -316,8 +316,8 @@ function ValidateScenarioOptions(scenarioOptions)
             table.print(optData)
             passed = false
         elseif type(optData.default) ~= "number" or
-                optData.default <= 0 or
-                optData.default > table.getn(optData.values) then
+            optData.default <= 0 or
+            optData.default > table.getn(optData.values) then
             WARN("Invalid default option value " .. tostring(optData.default))
             WARN("Remember: option defaults are 1-based indices into the `values' table, not values themselves")
             WARN("Offending option table:")
@@ -356,19 +356,20 @@ function CheckMapHasMarkers(scenario)
 
 
     local markers = saveData and
-                    saveData.Scenario and
-                    saveData.Scenario.MasterChain and
-                    saveData.Scenario.MasterChain['_MASTERCHAIN_'] and
-                    saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers or false
+        saveData.Scenario and
+        saveData.Scenario.MasterChain and
+        saveData.Scenario.MasterChain['_MASTERCHAIN_'] and
+        saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers or false
 
     if not markers then
-       WARN('Map '.. scenario.name..' has no markers') return false
+        WARN('Map ' .. scenario.name .. ' has no markers')
+        return false
     else
-       for marker, data in markers do
-          if data.adjacentTo and string.find(data.adjacentTo, ' ') then
-             return true
-          end
-       end
+        for marker, data in markers do
+            if data.adjacentTo and string.find(data.adjacentTo, ' ') then
+                return true
+            end
+        end
     end
     return false
 end
