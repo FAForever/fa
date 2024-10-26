@@ -216,7 +216,7 @@ function LoadScenarioInfoFile(pathToScenarioInfo)
     return data.ScenarioInfo
 end
 
--- Loads in the entire scenario including the save and optional files such as _options.lua and _strings.lua.
+--- Loads in the entire scenario including the save and optional files such as _options.lua and _strings.lua.
 ---@param pathToScenarioInfo FileName
 ---@return UILobbyScenarioInfo?
 function LoadScenario(pathToScenarioInfo)
@@ -226,15 +226,13 @@ function LoadScenario(pathToScenarioInfo)
     end
 
     -- optionally, add in the options
-    local optionsFileName = string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua")) .. "options.lua" --[[@as FileName]]
-    local scenarioOptions = LoadScenarioOptionsFile(optionsFileName)
+    local scenarioOptions = LoadScenarioOptionsFile(GetPathToScenarioOptions(pathToScenarioInfo))
     if scenarioOptions then
         scenarioInfo.options = scenarioOptions
     end
 
     -- optionally, add in briefing data flag
-    local stringsFileName = string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua")) .. "strings.lua" --[[@as FileName]]
-    local scenarioStrings = LoadScenarioStringsFile(stringsFileName)
+    local scenarioStrings = LoadScenarioStringsFile(GetPathToScenarioStrings(pathToScenarioInfo))
     if scenarioStrings then
         if scenarioStrings.BriefingData then
             scenarioInfo.hasBriefing = true
@@ -245,12 +243,17 @@ function LoadScenario(pathToScenarioInfo)
     return scenarioInfo --[[@as UILobbyScenarioInfo]]
 end
 
--- the default scenario enumerator sort method
+--- the default scenario enumerator sort method
+---@param compa string
+---@param compb string
+---@return boolean
 local function DefaultScenarioSorter(compa, compb)
     return string.upper(compa) < string.upper(compb)
 end
 
--- given a scenario, determines if it can be played in skirmish mode
+--- given a scenario, determines if it can be played in skirmish mode
+---@param scenario UIScenarioInfoFile
+---@return boolean
 function IsScenarioPlayable(scenario)
     if not scenario.Configurations.standard.teams[1].armies then
         return false
@@ -259,12 +262,15 @@ function IsScenarioPlayable(scenario)
     return true
 end
 
--- EnumerateScenarios returns an array of scenario names
---  nameFilter can be passed in to narrow the enumaration, for example
---      EnumerateScenarios("SCMP*") will find all maps that start with SCMP
---      if nameFilter is nil, all maps will be returned
---  sortFunc is a function which, given two scenario names, will return true for the file name to come first
---      if no sortFunc is defined the default sorter will be used
+--- EnumerateScenarios returns an array of scenario names
+---  nameFilter can be passed in to narrow the enumaration, for example
+---      EnumerateScenarios("SCMP*") will find all maps that start with SCMP
+---      if nameFilter is nil, all maps will be returned
+---  sortFunc is a function which, given two scenario names, will return true for the file name to come first
+---      if no sortFunc is defined the default sorter will be used
+---@param nameFilter? string            # defaults to '*'
+---@param sortFunc? fun(a, b): boolean  # defaults to alphabetical on name of map
+---@return table
 function EnumerateSkirmishScenarios(nameFilter, sortFunc)
     nameFilter = nameFilter or '*'
     sortFunc = sortFunc or DefaultScenarioSorter
@@ -290,6 +296,8 @@ end
 -- given a scenario table, loads the save file and puts all the start positions in a table
 -- I've made this function so it works with the old data format and the new
 -- Returning an empty table means scenario data was ill formed
+---@param scenario UIScenarioInfoFile
+---@return Vector2[]
 function GetStartPositions(scenario)
     local saveData = {}
     doscript('/lua/dataInit.lua', saveData)
@@ -348,7 +356,7 @@ function GetStartPositions(scenario)
 end
 
 -- Retrieves all of the playable armies for a scenario
----@param scenario UIScenarioInfo
+---@param scenario UIScenarioInfoFile
 ---@return string[] | nil
 function GetArmies(scenario)
     local retArmies = nil
@@ -370,6 +378,8 @@ function GetArmies(scenario)
     return retArmies
 end
 
+---@param scenario UIScenarioInfoFile
+---@return string[]
 function GetExtraArmies(scenario)
     if scenario.Configurations.standard and scenario.Configurations.standard.teams then
         local teams = scenario.Configurations.standard.teams
@@ -382,6 +392,8 @@ end
 
 --- Validate options provided by the scenario file.
 -- This function prints warnings about any defects and attempts to correct them with sane defaults.
+---@param scenarioOptions ScenarioOption[]
+---@return boolean
 function ValidateScenarioOptions(scenarioOptions)
     -- Most maps just don't have any options.
     if not scenarioOptions then
@@ -427,6 +439,8 @@ end
 --
 -- @param scenario Scenario info
 -- @return true if the map has Land Path nodes, false otherwise.
+---@param scenario UIScenarioInfoFile
+---@return boolean
 function CheckMapHasMarkers(scenario)
     if not DiskGetFileInfo(scenario.save) then
         return false
