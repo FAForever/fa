@@ -71,7 +71,7 @@ local AutolobbyInterface = Class(Group) {
         local backgroundTexture = self.BackgroundTextures[math.random(1, 5)] --[[@as FileName]]
         self.Background = UIUtil.CreateBitmap(self, backgroundTexture)
         self.Preview = AutolobbyMapPreview.GetInstance(self)
-        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount) -- TODO: determine this number dynamically
+        self.ConnectionMatrix = AutolobbyConnectionMatrix.Create(self, playerCount)
     end,
 
     ---@param self UIAutolobbyInterface
@@ -224,7 +224,7 @@ end
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
     if AutolobbyInterfaceInstance then
-        local handle = newModule.SetupSingleton(GetFrame(0), AutolobbyInterfaceInstance.State.PlayerCount)
+        local handle = newModule.SetupSingleton(AutolobbyInterfaceInstance.State.PlayerCount)
         handle:RestoreState(AutolobbyInterfaceInstance.State)
     end
 end

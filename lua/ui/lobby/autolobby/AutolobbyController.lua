@@ -116,6 +116,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.PlayerOptions = {}
         self.LaunchStatutes = {}
         self.ConnectionMatrix = {}
+
+        -- local meta = getmetatable(self)
+        -- meta.__index = function(self, key)
+        --     LOG(key)
+        --     return meta[key]
+        -- end
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -453,9 +459,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
     ---@param self UIAutolobbyCommunications
     LaunchThread = function(self)
-        while not IsDestroyed(self) do
+        while not IsDestroyed(self) and false do
 
             if self:CanLaunch(self.LaunchStatutes) then
+
 
                 WaitSeconds(5.0)
                 if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
