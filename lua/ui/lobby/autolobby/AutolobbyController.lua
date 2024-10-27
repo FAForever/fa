@@ -333,6 +333,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         local scenarioFile = MapUtil.LoadScenario(gameOptions.ScenarioFile)
+        if not scenarioFile then
+            -- ???
+            return
+        end
+
         PrefetchSession(scenarioFile.map, gameMods, true)
     end,
 

@@ -30,8 +30,8 @@ local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 ---@class UIAutolobbyMapPreview : Group
 ---@field Preview MapPreview
 ---@field Border Control
----@field Scenario? string
----@field ScenarioInfo? UIScenarioInfo
+---@field PathToScenarioFile? FileName
+---@field ScenarioInfo? UILobbyScenarioInfo
 ---@field EnergyIcon Bitmap     # Acts as a pool
 ---@field MassIcon Bitmap       # Acts as a pool
 ---@field WreckageIcon Bitmap   # Acts as a pool
@@ -130,7 +130,7 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
-    ---@param scenarioInfo UIScenarioInfo
+    ---@param scenarioInfo UILobbyScenarioInfo
     _UpdatePreview = function(self, scenarioInfo)
         if not self.Preview:SetTexture(scenarioInfo.preview) then
             self.Preview:SetTextureFromMap(scenarioInfo.map)
@@ -141,7 +141,7 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
-    ---@param scenarioInfo UIScenarioInfo
+    ---@param scenarioInfo UILobbyScenarioInfo
     _UpdateMarkers = function(self, scenarioInfo)
         local scenarioWidth = scenarioInfo.size[1]
         local scenarioHeight = scenarioInfo.size[2]
@@ -180,7 +180,7 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
-    ---@param scenarioInfo UIScenarioInfo
+    ---@param scenarioInfo UILobbyScenarioInfo
     _UpdateWreckages = function(self, scenarioInfo)
         -- TODO
     end,
@@ -189,20 +189,20 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
-    ---@param scenarioInfo UIScenarioInfo
+    ---@param scenarioInfo UILobbyScenarioInfo
     _UpdateSpawnLocations = function(self, scenarioInfo)
         -- TODO
     end,
 
     ---@param self UIAutolobbyMapPreview
-    ---@param scenario string   # a reference to a _scenario.lua file
-    UpdateScenario = function(self, scenario)
+    ---@param pathToScenarioInfo FileName   # a reference to a _scenario.lua file
+    UpdateScenario = function(self, pathToScenarioInfo)
         -- clear up previous iteration
         self.IconTrash:Destroy()
         self.Preview:ClearTexture()
 
-        self.Scenario = scenario
-        self.ScenarioInfo = MapUtil.LoadScenario(scenario)
+        self.PathToScenarioFile = pathToScenarioInfo
+        self.ScenarioInfo = MapUtil.LoadScenario(pathToScenarioInfo)
         if self.ScenarioInfo then
             self:_UpdatePreview(self.ScenarioInfo)
             self:_UpdateMarkers(self.ScenarioInfo)
