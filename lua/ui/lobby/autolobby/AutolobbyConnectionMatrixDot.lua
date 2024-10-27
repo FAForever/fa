@@ -38,7 +38,7 @@ local AutolobbyConnectionMatrixDot = Class(Bitmap) {
 
         -- initial state
         self:SetConnected(false)
-        self:SetSolidColor('ffffff')
+        self:SetSolidColor('999999')
     end,
 
     ---@param self UIAutolobbyConnectionMatrixDot
@@ -53,6 +53,16 @@ local AutolobbyConnectionMatrixDot = Class(Bitmap) {
         local time = GetSystemTimeSeconds()
         local diff = time - self.IsAliveTimestamp
         self:SetAlpha(math.max(0, 1 - (0.25 * diff)))
+    end,
+
+    ---@param self UIAutolobbyConnectionMatrixDot
+    ---@param relatedToLocalPeer boolean
+    SetOwnership = function(self, relatedToLocalPeer)
+        if relatedToLocalPeer then
+            self:SetSolidColor('ffffff')
+        else
+            self:SetSolidColor('999999')
+        end
     end,
 
     ---@param self UIAutolobbyConnectionMatrixDot

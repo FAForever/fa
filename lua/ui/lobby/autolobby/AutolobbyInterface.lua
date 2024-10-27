@@ -99,6 +99,15 @@ local AutolobbyInterface = Class(Group) {
     end,
 
     ---@param self UIAutolobbyInterface
+    ---@param ownership boolean[][]
+    UpdateOwnership = function(self, ownership)
+        self.State.OwnerShip = ownership
+
+        self.ConnectionMatrix:Show()
+        self.ConnectionMatrix:UpdateOwnership(ownership)
+    end,
+
+    ---@param self UIAutolobbyInterface
     ---@param connections UIAutolobbyConnections
     UpdateConnections = function(self, connections)
         self.State.Connections = connections

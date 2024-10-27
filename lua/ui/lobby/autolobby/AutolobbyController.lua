@@ -260,6 +260,26 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         return output
     end,
 
+    ---@param self UIAutolobbyCommunications
+    ---@param playerCount number
+    ---@param localIndex number
+    ---@return boolean[][]
+    CreateOwnershipMatrix = function(self, playerCount, localIndex)
+        local output = {}
+        for y = 1, playerCount do
+            output[y] = {}
+            for x = 1, playerCount do
+                output[y][x] = false
+            end
+        end
+
+        for k = 1, playerCount do
+            output[localIndex][k] = true
+            output[k][localIndex] = true
+        end
+        return output
+    end,
+
     --- Determines the launch status of the local peer.
     ---@param self UIAutolobbyCommunications
     ---@param connectionMatrix table<UILobbyPeerId, UILobbyPeerId[]>
@@ -453,7 +473,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
     ---@param self UIAutolobbyCommunications
     LaunchThread = function(self)
-        while not IsDestroyed(self) do
+        while not IsDestroyed(self) and false do
             if self:CanLaunch(self.LaunchStatutes) then
 
                 WaitSeconds(5.0)
@@ -515,6 +535,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- sync player options to all connected peers
         self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = self.PlayerOptions })
+
+        local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
+        if localIndex then
+            local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
+            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                :UpdateOwnership(ownershipMatrix)
+        end
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -525,6 +552,14 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- update UI for player options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
             :UpdatePlayerOptions(self.PlayerOptions)
+
+        local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
+        if localIndex then
+            local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
+            -- update UI for player options
+            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+                :UpdateOwnership(ownershipMatrix)
+        end
     end,
 
     ---@param self UIAutolobbyCommunications

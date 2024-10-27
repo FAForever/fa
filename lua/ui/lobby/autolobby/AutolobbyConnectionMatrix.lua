@@ -76,6 +76,20 @@ local AutolobbyConnectionMatrix = Class(Group) {
     end,
 
     ---@param self UIAutolobbyConnectionMatrix
+    ---@param ownershipMatrix boolean[][]
+    UpdateOwnership = function(self, ownershipMatrix)
+        for y, connectionRow in ownershipMatrix do
+            for x, isOwned in connectionRow do
+                ---@type UIAutolobbyConnectionMatrixDot
+                local dot = self.Elements[y][x]
+                if dot and y ~= x then
+                    dot:SetOwnership(isOwned)
+                end
+            end
+        end
+    end,
+
+    ---@param self UIAutolobbyConnectionMatrix
     ---@param connectionMatrix UIAutolobbyConnections
     UpdateConnections = function(self, connectionMatrix)
         for y, connectionRow in connectionMatrix do
