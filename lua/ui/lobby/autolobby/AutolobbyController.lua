@@ -116,12 +116,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.PlayerOptions = {}
         self.LaunchStatutes = {}
         self.ConnectionMatrix = {}
-
-        -- local meta = getmetatable(self)
-        -- meta.__index = function(self, key)
-        --     LOG(key)
-        --     return meta[key]
-        -- end
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -841,7 +835,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:DebugSpew("EstablishedPeers", peerId, reprs(peerConnectedTo))
 
         -- update server
-        self:SendEstablishedPeers(peerId, peerConnectedTo)
+        self:SendEstablishedPeers(peerId)
 
         self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
         -- update UI for launch statuses
@@ -925,6 +919,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param peerId UILobbyPeerId
     PeerDisconnected = function(self, peerName, peerId)
         self:DebugSpew("PeerDisconnected", peerName, peerId)
+        self:SendDisconnectedPeer(peerId)
     end,
 
     --- Called by the engine when the game is launched.
