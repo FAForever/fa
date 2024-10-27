@@ -835,7 +835,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:DebugSpew("EstablishedPeers", peerId, reprs(peerConnectedTo))
 
         -- update server
-        self:SendEstablishedPeers(peerId)
+        self:SendEstablishedPeer(peerId)
 
         self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
         -- update UI for launch statuses
