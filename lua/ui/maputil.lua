@@ -148,7 +148,7 @@ function GetPathToScenarioStrings(pathToScenarioInfo)
         "strings.lua" --[[@as FileName]]
 end
 
---- Loads in the scenario save.
+--- Loads in the scenario save. This function is expensive and should be used sparingly.
 ---@param pathToScenarioSave FileName
 ---@return UIScenarioSaveFile | nil
 function LoadScenarioSaveFile(pathToScenarioSave)
