@@ -121,7 +121,7 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param peerId UILobbyPeerId
     SendEstablishedPeer = function(self, peerId)
-        GpgNetSend('EstablishedPeers', peerId)
+        GpgNetSend('EstablishedPeer', peerId)
     end,
 
     --- Sends a message to the server that we disconnected from a peer. Note that a peer may be trying to rejoin. See also the launch status of the given peer. 
