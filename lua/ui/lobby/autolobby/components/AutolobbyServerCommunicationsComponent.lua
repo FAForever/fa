@@ -51,7 +51,7 @@ local GpgNetSend = GpgNetSend
 --- | 'Missing local peers'     # Send when the local peer is missing other peers
 --- | 'Rejoining'               # Send when the local peer is rejoining
 --- | 'Ready'                   # Send when the local peer is ready to launch
---- | 'Ejected'                 # Send when the local peer is ejected   
+--- | 'Ejected'                 # Send when the local peer is ejected
 --- | 'Rejected'                # Send when there is a game version missmatch
 --- | 'Failed'                  # Send when the game fails to launch
 
@@ -59,6 +59,7 @@ local GpgNetSend = GpgNetSend
 ---@class UIAutolobbyServerCommunicationsComponent
 AutolobbyServerCommunicationsComponent = ClassSimple {
 
+    --- Sends a message to the server to update relevant army options of a player.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param peerId UILobbyPeerId
     ---@param key 'Team' | 'Army' | 'StartSpot' | 'Faction'
@@ -66,12 +67,14 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     SendPlayerOptionToServer = function(self, peerId, key, value)
         -- message is only accepted by the server if it originates from the host
         if not self:IsHost() then
+            self:DebugWarn("Ignoring server message of type `PlayerOption` since that is only accepted when it originates from the host.")
             return
         end
 
         GpgNetSend('PlayerOption', peerId, key, value)
     end,
 
+    --- Sends a message to the server to update relevant army options of an AI.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param aiName string
     ---@param key 'Team' | 'Army' | 'StartSpot' | 'Faction'
@@ -79,53 +82,52 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     SendAIOptionToServer = function(self, aiName, key, value)
         -- message is only accepted by the server if it originates from the host
         if not self:IsHost() then
+            self:DebugWarn("Ignoring server message of type `AIOption` since that is only accepted when it originates from the host.")
             return
         end
 
         GpgNetSend('AIOption', aiName, key, value)
     end,
 
+    --- Sends a message to the server to update relevant game options.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param key 'Slots' | any
     ---@param value any
     SendGameOptionToServer = function(self, key, value)
         -- message is only accepted by the server if it originates from the host
         if not self:IsHost() then
+            self:DebugWarn("Ignoring server message of type `GameOption` since that is only accepted when it originates from the host.")
             return
         end
 
         GpgNetSend('GameOption', key, value)
     end,
 
+    --- Sends a message to the server indicating what the status of the lobby as a whole.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param value UILobbyState
     SendGameStateToServer = function(self, value)
         GpgNetSend('GameState', value)
     end,
 
+    --- sends a message to the server about the status of the local peer.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param value UIPeerLaunchStatus
     SendLaunchStatusToServer = function(self, value)
         GpgNetSend('LaunchStatus', value)
     end,
 
+    --- Sends a message to the server that we established a connection to a peer. This message can be send multiple times for the same peer and the server should be idempotent to it.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param peerId UILobbyPeerId
-    ---@param peers UILobbyPeerId[]
-    SendEstablishedPeers = function(self, peerId, peers)
-        local establishedPeers = ""
+    SendEstablishedPeer = function(self, peerId)
+        GpgNetSend('EstablishedPeers', peerId)
+    end,
 
-        local establishedPeersCount = table.getn(peers)
-        if establishedPeersCount == 1 then
-            establishedPeers = peers[1]
-        elseif establishedPeersCount > 1 then
-            establishedPeers = peers[1]
-
-            for k = 2, establishedPeersCount do
-                establishedPeers = establishedPeers .. " " .. peers[k]
-            end
-        end
-
-        GpgNetSend('EstablishedPeers', peerId, establishedPeers)
+    --- Sends a message to the server that we disconnected from a peer. Note that a peer may be trying to rejoin. See also the launch status of the given peer. 
+    ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
+    ---@param peerId UILobbyPeerId
+    SendDisconnectedPeer = function(self, peerId)
+        GpgNetSend('DisconnectedPeer', peerId)
     end,
 }
