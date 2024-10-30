@@ -26,19 +26,19 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
+local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/AutolobbyMapPreviewSpawn.lua")
 
 ---@class UIAutolobbyMapPreview : Group
 ---@field Preview MapPreview
----@field Border Control
+---@field Overlay Bitmap
 ---@field PathToScenarioFile? FileName
 ---@field ScenarioInfo? UILobbyScenarioInfo
+---@field ScenarioSave? UIScenarioSaveFile
 ---@field EnergyIcon Bitmap     # Acts as a pool
 ---@field MassIcon Bitmap       # Acts as a pool
 ---@field WreckageIcon Bitmap   # Acts as a pool
 ---@field IconTrash TrashBag    # Trashbag that contains all icons
----@field MassIcons Bitmap[]
----@field EnergyIcons Bitmap[]
----@field WreckageIcons Bitmap[]
+---@field SpawnIcons UIAutolobbyMapPreviewSpawn[]
 local AutolobbyMapPreview = ClassUI(Group) {
 
     ---@param self UIAutolobbyMapPreview
@@ -47,23 +47,28 @@ local AutolobbyMapPreview = ClassUI(Group) {
         Group.__init(self, parent)
 
         self.Preview = MapPreview(self)
-        self.Border = UIUtil.SurroundWithBorder(self.Preview, '/scx_menu/lan-game-lobby/frame/')
+
+        -- D:\SteamLibrary\steamapps\common\Supreme Commander Forged Alliance\gamedata\textures\textures\ui\common\game\mini-map-glow-brd ?
+        self.Overlay = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/map-panel-glow_bmp.dds')
 
         self.EnergyIcon = UIUtil.CreateBitmap(self, "/game/build-ui/icon-energy_bmp.dds")
         self.MassIcon = UIUtil.CreateBitmap(self, "/game/build-ui/icon-mass_bmp.dds")
         self.WreckageIcon = UIUtil.CreateBitmap(self, "/scx_menu/lan-game-lobby/mappreview/wreckage.dds")
+        self.SpawnIcons = {}
 
         self.IconTrash = TrashBag()
-        self.EnergyIcons = {}
-        self.MassIcons = {}
-        self.WreckageIcons = {}
     end,
 
     ---@param self UIAutolobbyMapPreview
     ---@param parent Control
     __post_init = function(self, parent)
-        LayoutHelpers.ReusedLayoutFor(self.Preview)
+        LayoutHelpers.ReusedLayoutFor(self.Overlay)
             :Fill(self)
+            :DisableHitTest(true)
+            :End()
+
+        LayoutHelpers.ReusedLayoutFor(self.Preview)
+            :FillFixedBorder(self.Overlay, 24)
             :End()
 
         LayoutHelpers.ReusedLayoutFor(self.EnergyIcon)
@@ -83,14 +88,13 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
+    ---@param icon Control
     ---@param scenarioWidth number
     ---@param scenarioHeight number
     ---@param px number
     ---@param pz number
-    ---@param source Bitmap
-    ---@return Bitmap
-    _CreateIcon = function(self, scenarioWidth, scenarioHeight, px, pz, source)
-        local size = self.Width()
+    PositionIcon = function(self, icon, scenarioWidth, scenarioHeight, px, pz)
+        local size = self.Preview.Width()
         local xOffset = 0
         local xFactor = 1
         local yOffset = 0
@@ -105,23 +109,13 @@ local AutolobbyMapPreview = ClassUI(Group) {
             xFactor = ratio
         end
 
-        -- create an icon
-        local icon = UIUtil.CreateBitmapColor(self, 'ffffff')
-
-        -- share the texture
-        icon:ShareTextures(source)
-
-        local x = xOffset + (px / scenarioWidth) * (size - 2) * xFactor - 4
-        local z = yOffset + (pz / scenarioHeight) * (size - 2) * yFactor - 4
+        local x = xOffset + (px / scenarioWidth) * (size - 2) * xFactor
+        local z = yOffset + (pz / scenarioHeight) * (size - 2) * yFactor
 
         -- position it
         LayoutHelpers.ReusedLayoutFor(icon)
-            :Width(14)
-            :Height(14)
-            :AtLeftTopIn(self, x, z)
-
-        -- make it disposable
-        self.IconTrash:Add(icon)
+            :AtLeftTopIn(self.Preview, x - 0.5 * icon.Width(), z - 0.5 * icon.Height())
+            :End()
 
         return icon
     end,
@@ -142,35 +136,40 @@ local AutolobbyMapPreview = ClassUI(Group) {
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
     ---@param scenarioInfo UILobbyScenarioInfo
-    _UpdateMarkers = function(self, scenarioInfo)
+    ---@param scenarioSave UIScenarioSaveFile
+    _UpdateMarkers = function(self, scenarioInfo, scenarioSave)
         local scenarioWidth = scenarioInfo.size[1]
         local scenarioHeight = scenarioInfo.size[2]
 
-        -- load in the save file
-        self.ScenarioSave = {}
-        doscript('/lua/dataInit.lua', self.ScenarioSave)
-        doscript(scenarioInfo.save, self.ScenarioSave)
-
-        local allmarkers = self.ScenarioSave.Scenario.MasterChain['_MASTERCHAIN_'].Markers
+        local allmarkers = scenarioSave.MasterChain['_MASTERCHAIN_'].Markers
         if not allmarkers then
             return
         end
-        for key, marker in allmarkers do
+
+        for _, marker in allmarkers do
             if marker['type'] == "Mass" then
-                table.insert(self.MassIcons,
-                    self:_CreateIcon(
-                        scenarioWidth, scenarioHeight,
-                        marker.position[1], marker.position[3],
-                        self.MassIcon
-                    )
+                ---@type Bitmap
+                local icon = LayoutHelpers.ReusedLayoutFor(self.IconTrash:Add(UIUtil.CreateBitmapColor(self, 'ffffff')))
+                    :Width(12)
+                    :Height(12)
+                    :End()
+
+                icon:ShareTextures(self.MassIcon)
+                self:PositionIcon(
+                    icon, scenarioWidth, scenarioHeight,
+                    marker.position[1], marker.position[3]
                 )
+
             elseif marker['type'] == "Hydrocarbon" then
-                table.insert(self.EnergyIcons,
-                    self:_CreateIcon(
-                        scenarioWidth, scenarioHeight,
-                        marker.position[1], marker.position[3],
-                        self.EnergyIcon
-                    )
+                ---@type Bitmap
+                local icon = LayoutHelpers.ReusedLayoutFor(self.IconTrash:Add(UIUtil.CreateBitmapColor(self, 'ffffff')))
+                    :Width(12)
+                    :Height(12)
+                    :End()
+                icon:ShareTextures(self.EnergyIcon)
+                self:PositionIcon(
+                    icon, scenarioWidth, scenarioHeight,
+                    marker.position[1], marker.position[3]
                 )
             end
         end
@@ -181,7 +180,8 @@ local AutolobbyMapPreview = ClassUI(Group) {
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
     ---@param scenarioInfo UILobbyScenarioInfo
-    _UpdateWreckages = function(self, scenarioInfo)
+    ---@param scenarioSave UIScenarioSaveFile
+    _UpdateWreckages = function(self, scenarioInfo, scenarioSave)
         -- TODO
     end,
 
@@ -190,25 +190,87 @@ local AutolobbyMapPreview = ClassUI(Group) {
     --- This function is private and should not be called from outside the class.
     ---@param self UIAutolobbyMapPreview
     ---@param scenarioInfo UILobbyScenarioInfo
-    _UpdateSpawnLocations = function(self, scenarioInfo)
-        -- TODO
+    ---@param scenarioSave UIScenarioSaveFile
+    ---@param playerOptions UIAutolobbyPlayer[]
+    _UpdateSpawnLocations = function(self, scenarioInfo, scenarioSave, playerOptions)
+        local spawnIcons = self.SpawnIcons
+        local positions = MapUtil.GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
+        if not positions then
+            -- clean up
+            for id, icon in spawnIcons do
+                icon:Destroy()
+            end
+
+            return
+        end
+
+        -- clean up
+        for id, icon in spawnIcons do
+            if not positions[id] then
+                icon:Destroy()
+            end
+        end
+
+        -- create/update icons
+        for id, position in positions do
+            local icon = spawnIcons[id]
+            if not icon then
+                icon = AutolobbyMapPreviewSpawn.Create(self)
+            end
+
+            spawnIcons[id] = icon
+
+            self:PositionIcon(
+                icon, scenarioInfo.size[1], scenarioInfo.size[2],
+                position[1], position[2]
+            )
+
+            local playerOptions = playerOptions[id]
+            if playerOptions then
+                icon:Update(playerOptions.Faction)
+            else
+                icon:Reset()
+            end
+        end
     end,
 
+    --- Updates the map preview, including the mass, energy and wreckage icons.
     ---@param self UIAutolobbyMapPreview
     ---@param pathToScenarioInfo FileName   # a reference to a _scenario.lua file
-    UpdateScenario = function(self, pathToScenarioInfo)
+    ---@param playerOptions UIAutolobbyPlayer[]
+    UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
+        -- -- make it idempotent
+        -- if self.PathToScenarioFile ~= pathToScenarioInfo then
+        --     return
+        -- end
+
         -- clear up previous iteration
         self.IconTrash:Destroy()
         self.Preview:ClearTexture()
-
         self.PathToScenarioFile = pathToScenarioInfo
-        self.ScenarioInfo = MapUtil.LoadScenario(pathToScenarioInfo)
-        if self.ScenarioInfo then
-            self:_UpdatePreview(self.ScenarioInfo)
-            self:_UpdateMarkers(self.ScenarioInfo)
-            self:_UpdateWreckages(self.ScenarioInfo)
-            self:_UpdateSpawnLocations(self.ScenarioInfo)
+
+        -- try and load the scenario info
+        local scenarioInfo = MapUtil.LoadScenario(pathToScenarioInfo)
+        if not scenarioInfo then
+            -- TODO: show default image that indicates something is off
+            return
         end
+
+        self.ScenarioInfo = scenarioInfo
+        self:_UpdatePreview(scenarioInfo)
+
+        -- try and load the scenario save
+        local scenarioSave = MapUtil.LoadScenarioSaveFile(scenarioInfo.save)
+        if not scenarioSave then
+            return
+        end
+
+        self.ScenarioSave = scenarioSave
+        self:_UpdateMarkers(scenarioInfo, scenarioSave)
+        self:_UpdateWreckages(scenarioInfo, scenarioSave)
+
+        self.PlayerOptions = playerOptions
+        self:_UpdateSpawnLocations(scenarioInfo, scenarioSave, playerOptions)
     end,
 
     ---------------------------------------------------------------------------

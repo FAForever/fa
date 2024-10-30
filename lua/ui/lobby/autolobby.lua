@@ -96,7 +96,7 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
     --     :CreateLoadingDialog()
 end
 
-local rejoinTest = true
+local rejoinTest = false
 
 --- Joins an instantiated lobby instance.
 ---
@@ -114,9 +114,6 @@ function JoinGame(address, asObserver, playerName, uid)
         AutolobbyCommunicationsInstance.JoinParameters.AsObserver = asObserver
         AutolobbyCommunicationsInstance.JoinParameters.DesiredPlayerName = playerName
         AutolobbyCommunicationsInstance.JoinParameters.DesiredPeerId = uid
-    end
-
-    if AutolobbyCommunicationsInstance then
         AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
     end
 

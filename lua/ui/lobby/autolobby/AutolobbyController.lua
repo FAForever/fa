@@ -536,6 +536,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- sync player options to all connected peers
         self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = self.PlayerOptions })
 
+        -- update UI for player options
+        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
+
         local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
         if localIndex then
             local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
@@ -551,7 +555,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- update UI for player options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            :UpdatePlayerOptions(self.PlayerOptions)
+            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
 
         local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
         if localIndex then
@@ -571,7 +575,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            :UpdateGameOptions(self.GameOptions)
+            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
     end,
 
     ---@param self UIAutolobbyCommunications
@@ -821,7 +825,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- update UI for game options
         import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-            :UpdateGameOptions(self.GameOptions)
+            :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
     end,
 
     --- Called by the engine as we're trying to join a lobby.

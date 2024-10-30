@@ -468,3 +468,73 @@ function CheckMapHasMarkers(scenario)
     end
     return false
 end
+
+-------------------------------------------------------------------------------
+--#region Efficient utility functions
+
+--- Retrieves all of the playable armies for a scenario. Does not allocate new memory.
+---@param scenarioInfo UIScenarioInfoFile
+---@return string[]?     # If defined, looks like: { 'ARMY_01', 'ARMY_02', ... }. Returns nil when the scenario is malformed.
+function GetArmiesFromScenario(scenarioInfo)
+
+    -- Usually the configuration looks like the following:
+    -- Configurations = {
+    --     ['standard'] = {
+    --         teams = {
+    --             { name = 'FFA', armies = { 'ARMY_1', 'ARMY_2', 'ARMY_3', 'ARMY_4', } },
+    --         },
+    --         customprops = {
+    --         },
+    --     },
+    -- }
+    --
+    -- It is clearly an unfinished design. There's not much we can do about that. We first check
+    -- if it looks like that and we just return that accordingly.
+
+    if scenarioInfo.Configurations.standard and scenarioInfo.Configurations.standard.teams then
+        for _, teamConfig in scenarioInfo.Configurations.standard.teams do
+            if teamConfig.name and (teamConfig.name == 'FFA') then
+                return teamConfig.armies
+            end
+        end
+    end
+
+    -- Scenario format is malformed, not much we can do about this.
+
+    return nil
+end
+
+--- Retrieves all the starting positions for a scenario. Allocates and returns new tables on each call.
+---@param scenarioInfo UIScenarioInfoFile
+---@param scenarioSave UIScenarioSaveFile
+---@return Vector2[]?
+function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
+    local armies = GetArmiesFromScenario(scenarioInfo)
+    if not armies then
+        return nil
+    end
+
+    local markers = scenarioSave.MasterChain._MASTERCHAIN_.Markers
+    if not markers then
+        return nil
+    end
+
+    local output = {}
+    for _, army in armies do
+        local marker = markers[army]
+        if marker then
+            table.insert(output, { marker.position[1], marker.position[3] })
+        else
+            table.insert(output, { 0, 0 })
+
+            WARN(
+                "MapUtil - no initial position marker for army", army, "found in",
+                scenarioInfo.name, "version", tostring(scenarioInfo.map_version)
+            )
+        end
+    end
+
+    return output
+end
+
+--#endregion

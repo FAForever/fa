@@ -38,6 +38,7 @@ local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/AutolobbyConne
 ---@class UIAutolobbyInterfaceState
 ---@field PlayerCount number
 ---@field PlayerOptions? table<UILobbyPeerId, UIAutolobbyPlayer>
+---@field PathToScenarioFile? FileName
 ---@field GameOptions? UILobbyLaunchGameOptionsConfiguration
 ---@field Connections? UIAutolobbyConnections
 ---@field Statuses? UIAutolobbyStatus
@@ -126,22 +127,15 @@ local AutolobbyInterface = Class(Group) {
     end,
 
     ---@param self UIAutolobbyInterface
-    ---@param playerOptions table<UILobbyPeerId, UIAutolobbyPlayer>
-    UpdatePlayerOptions = function(self, playerOptions)
+    ---@param pathToScenarioInfo FileName
+    ---@param playerOptions UIAutolobbyPlayer[]
+    UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
+        self.State.ScenarioFile = pathToScenarioInfo
         self.State.PlayerOptions = playerOptions
-    end,
 
-    ---@param self UIAutolobbyInterface
-    ---@param gameOptions UILobbyLaunchGameOptionsConfiguration
-    UpdateGameOptions = function(self, gameOptions)
-        self.State.GameOptions = gameOptions
-
-        local scenarioFile = self.State.GameOptions.ScenarioFile
-        if scenarioFile then
+        if pathToScenarioInfo and playerOptions then
             self.Preview:Show()
-            self.Preview:UpdateScenario(scenarioFile)
-        else
-            self.Preview:Hide()
+            self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
         end
     end,
 
@@ -158,15 +152,8 @@ local AutolobbyInterface = Class(Group) {
     RestoreState = function(self, state)
         self.State = state
 
-        if state.PlayerOptions then
-            local ok, msg = pcall(self.UpdatePlayerOptions, self, state.PlayerOptions)
-            if not ok then
-                WARN(msg)
-            end
-        end
-
-        if state.GameOptions then
-            local ok, msg = pcall(self.UpdateGameOptions, self, state.GameOptions)
+        if state.PathToScenarioFile and state.PlayerOptions then
+            local ok, msg = pcall(self.UpdateScenario, self, state.PathToScenarioFile, state.PlayerOptions)
             if not ok then
                 WARN(msg)
             end
