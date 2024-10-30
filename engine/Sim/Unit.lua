@@ -269,7 +269,6 @@ end
 ---@param statName string
 ---@param defaultVal? number
 ---@return number
--- Special case for the Salem: GetStat("h1_SetSalemAmph", 0 or 1) will Disable/Enable amphibious mode
 function Unit:GetStat(statName, defaultVal)
 end
 

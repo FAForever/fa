@@ -207,6 +207,13 @@ UnitBlueprint{
         BuildCostMass = 2250,
         BuildTime = 10000,
     },
+    AltFootprint = -- water only
+    {
+        SizeX = 2,
+        SizeZ = 8,
+        OccupancyCaps = 8,
+        MinWaterDepth = 1.5,
+    },
     Footprint = {
         SizeX = 2,
         SizeZ = 8,
