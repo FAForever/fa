@@ -306,6 +306,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Enhancements
 
     -- Drone Upgrades
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessLeftPodEnhancement = function(self, bp)
         local location = self:GetPosition('AttachSpecial02')
         local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
@@ -315,6 +318,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self.HasLeftPod = true
         self.LeftPod = pod
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessLeftPodRemoveEnhancement = function(self, bp)
         if self.HasLeftPod == true then
             self.HasLeftPod = false
@@ -329,6 +335,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
         KillThread(self.RebuildThread)
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessRightPodEnhancement = function(self, bp)
         local location = self:GetPosition('AttachSpecial01')
         local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
@@ -338,6 +347,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self.HasRightPod = true
         self.RightPod = pod
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessRightPodRemoveEnhancement = function(self, bp)
         if self.HasLeftPod == true then
             self.HasLeftPod = false
@@ -366,20 +378,32 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- Teleport Upgrade
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessTeleporterEnhancement = function(self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessTeleporterRemoveEnhancement = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Teleport')
     end,
 
     -- Personal Shield
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessShieldEnhancement = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessShieldRemoveEnhancement = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -388,6 +412,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- Bubble Shield
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessShieldGeneratorFieldEnhancement = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:DestroyShield()
@@ -400,6 +427,9 @@ UEL0001 = ClassUnit(ACUUnit) {
             end
         )
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessShieldGeneratorFieldRemoveEnhancement = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -407,6 +437,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- T2 Engineering Suite
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessAdvancedEngineeringEnhancement = function(self, bp)
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
         self:RemoveBuildRestriction(cat)
@@ -436,6 +469,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
 
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessAdvancedEngineeringRemoveEnhancement = function(self, bp)
         local bp = self:GetBlueprint().Economy.BuildRate
         if not bp then return end
@@ -450,6 +486,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- T3 Engineering Suite
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessT3EngineeringEnhancement = function(self, bp)
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
         self:RemoveBuildRestriction(cat)
@@ -479,6 +518,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
 
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessT3EngineeringRemoveEnhancement = function(self, bp)
         local bp = self:GetBlueprint().Economy.BuildRate
         if not bp then return end
@@ -490,6 +532,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- Nano Repair System
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessDamageStabilizationEnhancement = function(self, bp)
         if not Buffs['UEFACUDamageStabilization'] then
             BuffBlueprint {
@@ -513,6 +558,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
 
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessDamageStabilizationRemoveEnhancement = function(self, bp)
         if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
             Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
@@ -520,6 +568,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- Gun Upgrade
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessHeavyAntiMatterCannonEnhancement = function(self, bp)
         local wep = self:GetWeaponByLabel('RightZephyr')
         wep:AddDamageMod(bp.ZephyrDamageMod)
@@ -529,6 +580,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         local aoc = self:GetWeaponByLabel('AutoOverCharge')
         aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessHeavyAntiMatterCannonRemoveEnhancement= function(self, bp)
         local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
         if not bp then return end
@@ -543,6 +597,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- RAS
+
+    ---@param self UEL0001
+    ---@param bp Blueprint
     ProcessResourceAllocationEnhancement = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         if not bp then return end
@@ -550,6 +607,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
 
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessResourceAllocationRemoveEnhancement = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -557,11 +617,17 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- Tactical Missile Launcher
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessTacticalMissileEnhancement = function(self, bp)
         self:AddCommandCap('RULEUCC_Tactical')
         self:AddCommandCap('RULEUCC_SiloBuildTactical')
         self:SetWeaponEnabledByLabel('TacMissile', true)
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessTacticalMissileRemoveEnhancement = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Tactical')
         self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
@@ -572,6 +638,9 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     -- Billy Nuke
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessTacticalNukeMissileEnhancement = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Tactical')
         self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
@@ -583,6 +652,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:RemoveTacticalSiloAmmo(amt or 0)
         self:StopSiloBuild()
     end,
+
+    ---@param self UEL0001
+    ---@param bp Blueprint unused
     ProcessTacticalNukeMissileRemoveEnhancement = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Nuke')
         self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
