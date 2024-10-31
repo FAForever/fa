@@ -1,0 +1,1 @@
+- (#6498) Refactor the Enhancements section in the Unit script file to replace the long if/else chain with a more modular design. Each enhancement should have its own dedicated function, enabling cleaner code organization and easier maintenance. The CreateEnhancement function will then call the appropriate enhancement function based on specific enhancement criteria.
