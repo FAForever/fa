@@ -132,20 +132,54 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
+--- Given the path to a scenario info file, returns a path with the `_scenario.lua` bit removed.
+---@param pathToScenarioInfo any
+---@return string
+local function GetPathToFolder(pathToScenarioInfo)
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua"))
+end
+
+--- Given the path to a scenario info file, returns the path to the folder it resides in.
+---@param pathToScenarioInfo any
+---@return string
+local function GetPathToScenario(pathToScenarioInfo)
+    local splits = StringSplit(pathToScenarioInfo, "/")
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]))
+end
+
 --- Given the path to a scenario info file, returns the path to the scenario options file. The reference to this file is not stored in the _scenario.lua file.
 ---@param pathToScenarioInfo FileName
 ---@return FileName
 function GetPathToScenarioOptions(pathToScenarioInfo)
-    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua")) ..
-        "options.lua" --[[@as FileName]]
+    return GetPathToScenario(pathToScenarioInfo) .. "options.lua" --[[@as FileName]]
 end
 
 --- Given the path to a scenario info file, returns the path to the scenario strings file.  The reference to this file is not stored in the _scenario.lua file.
 ---@param pathToScenarioInfo FileName
 ---@return FileName
 function GetPathToScenarioStrings(pathToScenarioInfo)
-    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua")) ..
-        "strings.lua" --[[@as FileName]]
+    return GetPathToScenario(pathToScenarioInfo) .. "strings.lua" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario water mask. The water mask can help players understand where water is.
+---@param pathToScenarioInfo string
+---@return FileName
+function GetPathToWaterMask(pathToScenarioInfo)
+    return GetPathToFolder(pathToScenarioInfo) .. "/lobby/preview-water.dds" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario cliff mask. The cliffs mask can help players understand where units can go.
+---@param pathToScenarioInfo string
+---@return FileName
+function GetPathToCliffMask(pathToScenarioInfo)
+    return GetPathToFolder(pathToScenarioInfo) .. "/lobby/preview-cliffs.dds" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario buildable mask. The buildable mask can help players understand where they have large, buildable areas.
+---@param pathToScenarioInfo string
+---@return FileName
+function GetPathToBuildableMask(pathToScenarioInfo)
+    return GetPathToFolder(pathToScenarioInfo) .. "/lobby/preview-buildable.dds" --[[@as FileName]]
 end
 
 --- Loads in the scenario save. This function is expensive and should be used sparingly.
