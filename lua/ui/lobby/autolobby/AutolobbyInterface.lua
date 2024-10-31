@@ -130,7 +130,7 @@ local AutolobbyInterface = Class(Group) {
     ---@param pathToScenarioInfo FileName
     ---@param playerOptions UIAutolobbyPlayer[]
     UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
-        self.State.ScenarioFile = pathToScenarioInfo
+        self.State.PathToScenarioFile = pathToScenarioInfo
         self.State.PlayerOptions = playerOptions
 
         if pathToScenarioInfo and playerOptions then
