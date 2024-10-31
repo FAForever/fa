@@ -67,210 +67,298 @@ UAL0001 = ClassUnit(ACUUnit) {
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
-    CreateEnhancement = function(self, enh)
-        ACUUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
-        -- Resource Allocation
-        if enh == 'ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+
+    --================================================================================================================
+    -- Enhancements
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementResourceAllocation = function (self, bp)
+        local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
             self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-        elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh == 'ResourceAllocationAdvanced' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
-            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
-            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-        elseif enh == 'ResourceAllocationAdvancedRemove' then
-            local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        -- Shields
-        elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-            self:SetMaintenanceConsumptionActive()
-            self:CreateShield(bp)
-        elseif enh == 'ShieldRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh == 'ShieldHeavy' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:ForkThread(self.CreateHeavyShield, bp)
-        elseif enh == 'ShieldHeavyRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        -- Teleporter
-        elseif enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
-        elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
-        -- Chrono Dampener
-        elseif enh == 'ChronoDampener' then
-            self:SetWeaponEnabledByLabel('ChronoDampener', true)
-            if not Buffs['AeonACUChronoDampener'] then
-                BuffBlueprint {
-                    Name = 'AeonACUChronoDampener',
-                    DisplayName = 'AeonACUChronoDampener',
-                    BuffType = 'DamageStabilization',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementResourceAllocationRemove = function (self, bp)
+        local bpEcon = self:GetBlueprint().Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementResourceAllocationAdvanced = function (self, bp)
+        local bpEcon = self:GetBlueprint().Economy
+        if not bp then return end
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementResourceAllocationAdvancedRemove = function (self, bp)
+        local bpEcon = self:GetBlueprint().Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementShield = function (self, bp)
+        self:AddToggleCap('RULEUTC_ShieldToggle')
+        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+        self:SetMaintenanceConsumptionActive()
+        self:CreateShield(bp)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementShieldRemove = function (self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementShieldHeavy = function (self, bp)
+        self:AddToggleCap('RULEUTC_ShieldToggle')
+        self:ForkThread(self.CreateHeavyShield, bp)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementShieldHeavyRemove = function (self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementTeleporter = function(self, bp)
+        self:AddCommandCap('RULEUCC_Teleport')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementTeleporterRemove = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Teleport')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementChronoDampener = function(self, bp)
+        self:SetWeaponEnabledByLabel('ChronoDampener', true)
+        if not Buffs['AeonACUChronoDampener'] then
+            BuffBlueprint {
+                Name = 'AeonACUChronoDampener',
+                DisplayName = 'AeonACUChronoDampener',
+                BuffType = 'DamageStabilization',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
                     },
-                }
-            end
-            Buff.ApplyBuff(self, 'AeonACUChronoDampener')
-        elseif enh == 'ChronoDampenerRemove' then
-            if Buff.HasBuff(self, 'AeonACUChronoDampener') then
-                Buff.RemoveBuff(self, 'AeonACUChronoDampener')
-            end
-            self:SetWeaponEnabledByLabel('ChronoDampener', false)
-        -- T2 Engineering
-        elseif enh =='AdvancedEngineering' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
-            local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
-            self:RemoveBuildRestriction(cat)
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'AeonACUChronoDampener')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementChronoDampenerRemove = function(self, bp)
+        if Buff.HasBuff(self, 'AeonACUChronoDampener') then
+            Buff.RemoveBuff(self, 'AeonACUChronoDampener')
+        end
+        self:SetWeaponEnabledByLabel('ChronoDampener', false)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementAdvancedEngineering = function(self, bp)
+        if not bp then return end
+        local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
+        self:RemoveBuildRestriction(cat)
 
         if not Buffs['AeonACUT2BuildRate'] then
-                BuffBlueprint {
-                    Name = 'AeonACUT2BuildRate',
-                    DisplayName = 'AeonACUT2BuildRate',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
-                            Mult = 1,
-                        },
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
+            BuffBlueprint {
+                Name = 'AeonACUT2BuildRate',
+                DisplayName = 'AeonACUT2BuildRate',
+                BuffType = 'ACUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                        Mult = 1,
                     },
-                }
-            end
-            Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
-        elseif enh =='AdvancedEngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
-            self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
-                Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
-         end
-        -- T3 Engineering
-        elseif enh =='T3Engineering' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
-            local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
-            self:RemoveBuildRestriction(cat)
-            if not Buffs['AeonACUT3BuildRate'] then
-                BuffBlueprint {
-                    Name = 'AeonACUT3BuildRate',
-                    DisplayName = 'AeonCUT3BuildRate',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
-                            Mult = 1,
-                        },
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
                     },
-                }
-            end
-            Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
-        elseif enh =='T3EngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
-            self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
-                Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
-         end
-        -- Crysalis Beam
-        elseif enh == 'CrysalisBeam' then
-            local wep = self:GetWeaponByLabel('RightDisruptor')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            local cd = self:GetWeaponByLabel('ChronoDampener')
-            cd:ChangeMaxRadius(bp.NewMaxRadius or 30)
-        elseif enh == 'CrysalisBeamRemove' then
-            local wep = self:GetWeaponByLabel('RightDisruptor')
-            local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
-            wep:ChangeMaxRadius(bpDisrupt or 22)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bpDisrupt or 22)
-            local cd = self:GetWeaponByLabel('ChronoDampener')
-            cd:ChangeMaxRadius(bpDisrupt or 22)
-        -- Advanced Cryslised Beam
-        elseif enh == 'FAF_CrysalisBeamAdvanced' then
-            local wep = self:GetWeaponByLabel('RightDisruptor')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 35)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bp.NewMaxRadius or 35)
-            local cd = self:GetWeaponByLabel('ChronoDampener')
-            cd:ChangeMaxRadius(bp.NewMaxRadius or 35)
-        elseif enh == 'FAF_CrysalisBeamAdvancedRemove' then
-            local wep = self:GetWeaponByLabel('RightDisruptor')
-            local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
-            wep:ChangeMaxRadius(bpDisrupt or 22)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bpDisrupt or 22)
-            local cd = self:GetWeaponByLabel('ChronoDampener')
-            cd:ChangeMaxRadius(bpDisrupt or 22)
-        -- Heat Sink Augmentation
-        elseif enh == 'HeatSink' then
-            local wep = self:GetWeaponByLabel('RightDisruptor')
-            wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
-        elseif enh == 'HeatSinkRemove' then
-            local wep = self:GetWeaponByLabel('RightDisruptor')
-            local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
-            wep:ChangeRateOfFire(bpDisrupt or 1)
-        -- Enhanced Sensor Systems
-        elseif enh == 'EnhancedSensors' then
-            self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
-            self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
-        elseif enh == 'EnhancedSensorsRemove' then
-            local bpIntel = self:GetBlueprint().Intel
-            self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
-            self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
-      end
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
+        local bp = self:GetBlueprint().Economy.BuildRate
+        if not bp then return end
+        self:RestoreBuildRestrictions()
+        self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
+            Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
+        end
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementT3Engineering = function(self, bp)
+        if not bp then return end
+        local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
+        self:RemoveBuildRestriction(cat)
+        if not Buffs['AeonACUT3BuildRate'] then
+            BuffBlueprint {
+                Name = 'AeonACUT3BuildRate',
+                DisplayName = 'AeonCUT3BuildRate',
+                BuffType = 'ACUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                        Mult = 1,
+                    },
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementT3EngineeringRemove = function(self, bp)
+        local bp = self:GetBlueprint().Economy.BuildRate
+        if not bp then return end
+        self:RestoreBuildRestrictions()
+        self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
+            Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
+     end
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementCrysalisBeam = function (self, bp)
+        local wep = self:GetWeaponByLabel('RightDisruptor')
+        wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        local cd = self:GetWeaponByLabel('ChronoDampener')
+        cd:ChangeMaxRadius(bp.NewMaxRadius or 30)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementCrysalisBeamRemove = function (self, bp)
+        local wep = self:GetWeaponByLabel('RightDisruptor')
+        local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+        wep:ChangeMaxRadius(bpDisrupt or 22)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bpDisrupt or 22)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bpDisrupt or 22)
+        local cd = self:GetWeaponByLabel('ChronoDampener')
+        cd:ChangeMaxRadius(bpDisrupt or 22)
+    end,
+
+        ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementFAF_CrysalisBeamAdvanced = function (self, bp)
+        local wep = self:GetWeaponByLabel('RightDisruptor')
+        wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bp.NewMaxRadius or 35)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bp.NewMaxRadius or 35)
+        local cd = self:GetWeaponByLabel('ChronoDampener')
+        cd:ChangeMaxRadius(bp.NewMaxRadius or 35)
+    end,
+
+    ---@param self UAL0001
+    ---@param bp Blueprint
+    ProcessEnhancementFAF_CrysalisBeamAdvancedRemove = function (self, bp)
+        local wep = self:GetWeaponByLabel('RightDisruptor')
+        local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+        wep:ChangeMaxRadius(bpDisrupt or 22)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bpDisrupt or 22)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bpDisrupt or 22)
+        local cd = self:GetWeaponByLabel('ChronoDampener')
+        cd:ChangeMaxRadius(bpDisrupt or 22)
+    end,
+
+    ProcessEnhancementHeatSink = function (self, bp)
+        local wep = self:GetWeaponByLabel('RightDisruptor')
+        wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
+    end,
+
+    ProcessEnhancementHeatSinkRemove = function (self, bp)
+        local wep = self:GetWeaponByLabel('RightDisruptor')
+        local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
+        wep:ChangeRateOfFire(bpDisrupt or 1)
+    end,
+
+    ProcessEnhancementEnhancedSensors = function (self, bp)
+        self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
+        self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
+    end,
+
+    ProcessEnhancementEnhancedSensorsRemove = function (self, bp)
+        local bpIntel = self:GetBlueprint().Intel
+        self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
+        self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
+    end,
+
+    CreateEnhancement = function(self, enh)
+        ACUUnit.CreateEnhancement(self, enh)
+
+        local bp = self:GetBlueprint().Enhancements[enh]
+
+        if not bp then return end
+
+        local ref = 'ProcessEnhancement' .. enh
+        local handler = self[ref]
+        if handler then
+            handler(self, bp)
+        else
+            WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
+        end
     end,
 
     CreateHeavyShield = function(self, bp)
