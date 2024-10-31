@@ -296,7 +296,7 @@ UAL0001 = ClassUnit(ACUUnit) {
         cd:ChangeMaxRadius(bpDisrupt or 22)
     end,
 
-        ---@param self UAL0001
+    ---@param self UAL0001
     ---@param bp Blueprint
     ProcessEnhancementFAF_CrysalisBeamAdvanced = function (self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
@@ -345,6 +345,8 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
     end,
 
+    ---@param self UAL0001
+    ---@param enh AeonACUEnhancementBuffType
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
@@ -361,6 +363,8 @@ UAL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self any
+    ---@param bp any
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
