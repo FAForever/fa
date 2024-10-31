@@ -25,10 +25,11 @@ local MapUtil = import("/lua/ui/maputil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/AutolobbyMapPreviewSpawn.lua")
 
----@class UIAutolobbyMapPreview : Group
+---@class UIAutolobbyMapPreview : Bitmap
 ---@field Preview MapPreview
 ---@field Overlay Bitmap
 ---@field PathToScenarioFile? FileName
@@ -38,13 +39,13 @@ local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/AutolobbyMapPre
 ---@field MassIcon Bitmap       # Acts as a pool
 ---@field WreckageIcon Bitmap   # Acts as a pool
 ---@field IconTrash TrashBag    # Trashbag that contains all icons
----@field SpawnIcons UIAutolobbyMapPreviewSpawn[]
-local AutolobbyMapPreview = ClassUI(Group) {
+---@field ArmyIcons UIAutolobbyMapPreviewSpawn[]
+local AutolobbyMapPreview = ClassUI(Bitmap) {
 
     ---@param self UIAutolobbyMapPreview
     ---@param parent Control
     __init = function(self, parent)
-        Group.__init(self, parent)
+        Bitmap.__init(self, parent, UIUtil.UIFile('/scx_menu/autolobby/map_preview_panel.dds'), 'UIAutolobbyMapPreview')
 
         self.Preview = MapPreview(self)
 
@@ -54,7 +55,9 @@ local AutolobbyMapPreview = ClassUI(Group) {
         self.EnergyIcon = UIUtil.CreateBitmap(self, "/game/build-ui/icon-energy_bmp.dds")
         self.MassIcon = UIUtil.CreateBitmap(self, "/game/build-ui/icon-mass_bmp.dds")
         self.WreckageIcon = UIUtil.CreateBitmap(self, "/scx_menu/lan-game-lobby/mappreview/wreckage.dds")
-        self.SpawnIcons = {}
+        self.ArmyIcons = {}
+
+        UIUtil.CreateDialogBrackets(self, 40, 32, 40, 32)
 
         self.IconTrash = TrashBag()
     end,
@@ -63,7 +66,9 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         LayoutHelpers.ReusedLayoutFor(self.Overlay)
-            :Fill(self)
+            :Width(442)
+            :Height(442)
+            :AtLeftTopIn(self, 1, 1)
             :DisableHitTest(true)
             :End()
 
@@ -193,7 +198,7 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---@param scenarioSave UIScenarioSaveFile
     ---@param playerOptions UIAutolobbyPlayer[]
     _UpdateSpawnLocations = function(self, scenarioInfo, scenarioSave, playerOptions)
-        local spawnIcons = self.SpawnIcons
+        local spawnIcons = self.ArmyIcons
         local positions = MapUtil.GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
         if not positions then
             -- clean up
@@ -239,11 +244,6 @@ local AutolobbyMapPreview = ClassUI(Group) {
     ---@param pathToScenarioInfo FileName   # a reference to a _scenario.lua file
     ---@param playerOptions UIAutolobbyPlayer[]
     UpdateScenario = function(self, pathToScenarioInfo, playerOptions)
-        -- -- make it idempotent
-        -- if self.PathToScenarioFile ~= pathToScenarioInfo then
-        --     return
-        -- end
-
         -- clear up previous iteration
         self.IconTrash:Destroy()
         self.Preview:ClearTexture()
