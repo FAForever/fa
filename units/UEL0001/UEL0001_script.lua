@@ -302,8 +302,8 @@ UEL0001 = ClassUnit(ACUUnit) {
         attachee:SetDoNotTarget(false)
     end,
 
-    --==================================================================================================================================================================================
-    -- Enhancements
+    ---------------------------------------------------------------------------
+    --#region Enhancements
 
     -- Drone Upgrades
 
@@ -686,6 +686,8 @@ UEL0001 = ClassUnit(ACUUnit) {
             WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
         end
     end,
+
+    --#endregion
 }
 
 TypeClass = UEL0001
