@@ -31,6 +31,7 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
+---@class URL0001 : ACUUnit, CCommandUnit
 URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
@@ -57,10 +58,13 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         AutoOverCharge = ClassWeapon(CDFOverchargeWeapon) {},
     },
 
+    ---@param self URL0001
     __init = function(self)
         ACUUnit.__init(self, 'RightRipper')
     end,
 
+    ---
+    ---@param self URL0001
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         CCommandUnit.OnCreate(self)
@@ -85,6 +89,9 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         end
     end,
 
+    ---@param self URL0001
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetWeaponEnabledByLabel('RightRipper', true)
@@ -100,6 +107,9 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self.Trash:Add(ForkThread(self.GiveInitialResources,self))
     end,
 
+    ---@param self URL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.UnitBeingBuilt = unitBeingBuilt
@@ -107,274 +117,366 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self.BuildingUnit = true
     end,
 
+
+    --======================================================================================================
+    -- Enhancements
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementTeleporter = function(self, bp)
+        self:AddCommandCap('RULEUCC_Teleport')
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementTeleporterRemove = function(self, bp)
+        RemoveUnitEnhancement(self, 'Teleporter')
+        RemoveUnitEnhancement(self, 'TeleporterRemove')
+        self:RemoveCommandCap('RULEUCC_Teleport')
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementStealthGenerator = function(self, bp)
+        self:AddToggleCap('RULEUTC_StealthToggle')
+        self.StealthEnh = true
+        self:EnableUnitIntel('Enhancement', 'RadarStealth')
+        self:EnableUnitIntel('Enhancement', 'SonarStealth')
+        if not Buffs['CybranACUStealthBonus'] then
+            BuffBlueprint {
+                Name = 'CybranACUStealthBonus',
+                DisplayName = 'CybranACUStealthBonus',
+                BuffType = 'ACUSTEALTHBONUS',
+                Stacks = 'ALWAYS',
+                Duration = -1,
+                Affects = {
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    }
+                },
+            }
+        end
+        if not Buff.HasBuff(self, 'CybranACUStealthBonus') then
+            Buff.ApplyBuff(self, 'CybranACUStealthBonus')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementStealthGeneratorRemove = function(self, bp)
+        self:RemoveToggleCap('RULEUTC_StealthToggle')
+        self:DisableUnitIntel('Enhancement', 'RadarStealth')
+        self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        self.StealthEnh = nil
+        if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+            Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementFAF_SelfRepairSystem = function(self, bp)
+        if not Buffs['CybranACURegenerateBonus'] then
+            BuffBlueprint {
+                Name = 'CybranACURegenerateBonus',
+                DisplayName = 'CybranACURegenerateBonus',
+                BuffType = 'ACUNANO',
+                Stacks = 'ALWAYS',
+                Duration = -1,
+                Affects = {
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    }
+                },
+            }
+        end
+        if not Buff.HasBuff(self, 'CybranACURegenerateBonus') then
+            Buff.ApplyBuff(self, 'CybranACURegenerateBonus')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementFAF_SelfRepairSystemRemove = function(self, bp)
+        -- remove prerequisites
+        self:RemoveToggleCap('RULEUTC_StealthToggle')
+        self:DisableUnitIntel('Enhancement', 'RadarStealth')
+        self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        self.StealthEnh = nil
+        if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+            Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+        end
+
+        -- remove repair system
+        if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
+            Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementCloakingGenerator = function(self, bp)
+        if not bp then return end
+        self:RemoveToggleCap('RULEUTC_StealthToggle')
+        self:AddToggleCap('RULEUTC_CloakToggle')
+        self.StealthEnh = nil
+        self.CloakEnh = true
+        self:EnableUnitIntel('Enhancement', 'Cloak')
+        if not Buffs['CybranACUCloakBonus'] then
+            BuffBlueprint {
+                Name = 'CybranACUCloakBonus',
+                DisplayName = 'CybranACUCloakBonus',
+                BuffType = 'ACUCLOAKBONUS',
+                Stacks = 'ALWAYS',
+                Duration = -1,
+                Affects = {
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        if not Buff.HasBuff(self, 'CybranACUCloakBonus') then
+            Buff.ApplyBuff(self, 'CybranACUCloakBonus')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementCloakingGeneratorRemove = function(self, bp)
+        -- remove prerequisites
+        self:RemoveToggleCap('RULEUTC_CloakToggle')
+        self:DisableUnitIntel('Enhancement', 'RadarStealth')
+        self:DisableUnitIntel('Enhancement', 'SonarStealth')
+        self.StealthEnh = nil
+        if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+            Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+        end
+        if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
+            Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
+        end
+
+        -- remove cloak
+        self:RemoveToggleCap('RULEUTC_CloakToggle')
+        self:DisableUnitIntel('Enhancement', 'Cloak')
+        self.CloakEnh = nil
+        if Buff.HasBuff(self, 'CybranACUCloakBonus') then
+            Buff.RemoveBuff(self, 'CybranACUCloakBonus')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementResourceAllocation = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        if not bp then return end
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementResourceAllocationRemove = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementAdvancedEngineering = function(self, bp)
+        self.BuildBotTotal = 3
+        if not bp then return end
+        local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
+        self:RemoveBuildRestriction(cat)
+        if not Buffs['CybranACUT2BuildRate'] then
+            BuffBlueprint {
+                Name = 'CybranACUT2BuildRate',
+                DisplayName = 'CybranACUT2BuildRate',
+                BuffType = 'ACUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Mult = 1.0,
+                    },
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
+        self.BuildBotTotal = 2
+        local buildRate = self.Blueprint.Economy.BuildRate
+        if not buildRate then return end
+        self:RestoreBuildRestrictions()
+        self:AddBuildRestriction(categories.CYBRAN *
+            (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
+            Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementT3Engineering = function(self, bp)
+        self.BuildBotTotal = 4
+        if not bp then return end
+        local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
+        self:RemoveBuildRestriction(cat)
+        if not Buffs['CybranACUT3BuildRate'] then
+            BuffBlueprint {
+                Name = 'CybranACUT3BuildRate',
+                DisplayName = 'CybranCUT3BuildRate',
+                BuffType = 'ACUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Mult = 1.0,
+                    },
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementT3EngineeringRemove = function(self, bp)
+        self.BuildBotTotal = 2
+        local buildRate = self.Blueprint.Economy.BuildRate
+        if not buildRate then return end
+        self:RestoreBuildRestrictions()
+        if Buff.HasBuff(self, 'CybranACUT3BuildRate') then
+            Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
+        end
+        self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementCoolingUpgrade = function(self, bp)
+        local wep = self:GetWeaponByLabel('RightRipper')
+        wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        self.normalRange = bp.NewMaxRadius or 30
+        wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
+        local microwave = self:GetWeaponByLabel('MLG')
+        microwave:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
+        if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementCoolingUpgradeRemove = function(self, bp)
+        local wep = self:GetWeaponByLabel('RightRipper')
+        local wepBp = self.Blueprint.Weapon
+        for _, v in wepBp do
+            if v.Label == 'RightRipper' then
+                local newRange = v.MaxRadius or 22
+                wep:ChangeRateOfFire(v.RateOfFire or 1)
+                wep:ChangeMaxRadius(newRange)
+                self.normalRange = newRange
+                self:GetWeaponByLabel('MLG'):ChangeMaxRadius(newRange)
+                self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(newRange)
+                self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(newRange)
+                self.normalRange = newRange
+                if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+                    self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+                end
+                break
+            end
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementMicrowaveLaserGenerator = function(self, bp)
+        self:SetWeaponEnabledByLabel('MLG', true)
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementMicrowaveLaserGeneratorRemove = function(self, bp)
+        self:SetWeaponEnabledByLabel('MLG', false)
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementNaniteTorpedoTube = function(self, bp)
+        self:SetWeaponEnabledByLabel('Torpedo', true)
+        self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
+        self:EnableUnitIntel('Enhancement', 'Sonar')
+        if self.Layer == 'Seabed' then
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param bp Blueprint
+    ProcessEnhancementNaniteTorpedoTubeRemove = function(self, bp)
+        local bpIntel = self.Blueprint.Intel
+        self:SetWeaponEnabledByLabel('Torpedo', false)
+        self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
+        self:DisableUnitIntel('Enhancement', 'Sonar')
+        if self.Layer == 'Seabed' then
+            self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
+        end
+    end,
+
+    ---@param self URL0001
+    ---@param enh CybranACUEnhancementBuffType
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
         local bp = self.Blueprint.Enhancements[enh]
-        if enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
-        elseif enh == 'TeleporterRemove' then
-            RemoveUnitEnhancement(self, 'Teleporter')
-            RemoveUnitEnhancement(self, 'TeleporterRemove')
-            self:RemoveCommandCap('RULEUCC_Teleport')
-        elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_StealthToggle')
-            self.StealthEnh = true
-            self:EnableUnitIntel('Enhancement', 'RadarStealth')
-            self:EnableUnitIntel('Enhancement', 'SonarStealth')
-            if not Buffs['CybranACUStealthBonus'] then
-                BuffBlueprint {
-                    Name = 'CybranACUStealthBonus',
-                    DisplayName = 'CybranACUStealthBonus',
-                    BuffType = 'ACUSTEALTHBONUS',
-                    Stacks = 'ALWAYS',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        }
-                    },
-                }
-            end
-            if not Buff.HasBuff(self, 'CybranACUStealthBonus') then
-                Buff.ApplyBuff(self, 'CybranACUStealthBonus')
-            end
-        elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_StealthToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = nil
-            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
-                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
-            end
-        elseif enh == 'FAF_SelfRepairSystem' then
-            if not Buffs['CybranACURegenerateBonus'] then
-                BuffBlueprint {
-                    Name = 'CybranACURegenerateBonus',
-                    DisplayName = 'CybranACURegenerateBonus',
-                    BuffType = 'ACUNANO',
-                    Stacks = 'ALWAYS',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        }
-                    },
-                }
-            end
-            if not Buff.HasBuff(self, 'CybranACURegenerateBonus') then
-                Buff.ApplyBuff(self, 'CybranACURegenerateBonus')
-            end
-        elseif enh == 'FAF_SelfRepairSystemRemove' then
-            -- remove prerequisites
-            self:RemoveToggleCap('RULEUTC_StealthToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = nil
-            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
-                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
-            end
 
-            -- remove repair system
-            if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
-                Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
-            end
-        elseif enh == 'CloakingGenerator' then
-            if not bp then return end
-            self:RemoveToggleCap('RULEUTC_StealthToggle')
-            self:AddToggleCap('RULEUTC_CloakToggle')
-            self.StealthEnh = nil
-            self.CloakEnh = true
-            self:EnableUnitIntel('Enhancement', 'Cloak')
-            if not Buffs['CybranACUCloakBonus'] then
-                BuffBlueprint {
-                    Name = 'CybranACUCloakBonus',
-                    DisplayName = 'CybranACUCloakBonus',
-                    BuffType = 'ACUCLOAKBONUS',
-                    Stacks = 'ALWAYS',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            if not Buff.HasBuff(self, 'CybranACUCloakBonus') then
-                Buff.ApplyBuff(self, 'CybranACUCloakBonus')
-            end
-        elseif enh == 'CloakingGeneratorRemove' then
-            -- remove prerequisites
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = nil
-            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
-                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
-            end
-            if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
-                Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
-            end
+        if not bp then return end
 
-            -- remove cloak
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Enhancement', 'Cloak')
-            self.CloakEnh = nil
-            if Buff.HasBuff(self, 'CybranACUCloakBonus') then
-                Buff.RemoveBuff(self, 'CybranACUCloakBonus')
-            end
-        elseif enh == 'ResourceAllocation' then
-            local bpEcon = self.Blueprint.Economy
-            if not bp then return end
-            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
-            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-        elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self.Blueprint.Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh =='AdvancedEngineering' then
-            self.BuildBotTotal = 3
-            if not bp then return end
-            local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
-            self:RemoveBuildRestriction(cat)
-            if not Buffs['CybranACUT2BuildRate'] then
-                BuffBlueprint {
-                    Name = 'CybranACUT2BuildRate',
-                    DisplayName = 'CybranACUT2BuildRate',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
-                            Mult = 1.0,
-                        },
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
-        elseif enh == 'AdvancedEngineeringRemove' then
-            self.BuildBotTotal = 2
-            local buildRate = self.Blueprint.Economy.BuildRate
-            if not buildRate then return end
-            self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.CYBRAN *
-                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
-                Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
-            end
-        elseif enh =='T3Engineering' then
-            self.BuildBotTotal = 4
-            if not bp then return end
-            local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
-            self:RemoveBuildRestriction(cat)
-            if not Buffs['CybranACUT3BuildRate'] then
-                BuffBlueprint {
-                    Name = 'CybranACUT3BuildRate',
-                    DisplayName = 'CybranCUT3BuildRate',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
-                            Mult = 1.0,
-                        },
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
-        elseif enh == 'T3EngineeringRemove' then
-
-            self.BuildBotTotal = 2
-
-            local buildRate = self.Blueprint.Economy.BuildRate
-            if not buildRate then return end
-            self:RestoreBuildRestrictions()
-            if Buff.HasBuff(self, 'CybranACUT3BuildRate') then
-                Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
-            end
-            self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        elseif enh =='CoolingUpgrade' then
-            local wep = self:GetWeaponByLabel('RightRipper')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            self.normalRange = bp.NewMaxRadius or 30
-            wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
-            local microwave = self:GetWeaponByLabel('MLG')
-            microwave:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
-                self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
-            end
-        elseif enh == 'CoolingUpgradeRemove' then
-            local wep = self:GetWeaponByLabel('RightRipper')
-            local wepBp = self.Blueprint.Weapon
-            for _, v in wepBp do
-                if v.Label == 'RightRipper' then
-                    local newRange = v.MaxRadius or 22
-                    wep:ChangeRateOfFire(v.RateOfFire or 1)
-                    wep:ChangeMaxRadius(newRange)
-                    self.normalRange = newRange
-                    self:GetWeaponByLabel('MLG'):ChangeMaxRadius(newRange)
-                    self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(newRange)
-                    self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(newRange)
-                    self.normalRange = newRange
-                    if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
-                        self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
-                    end
-                    break
-                end
-            end
-        elseif enh == 'MicrowaveLaserGenerator' then
-            self:SetWeaponEnabledByLabel('MLG', true)
-        elseif enh == 'MicrowaveLaserGeneratorRemove' then
-            self:SetWeaponEnabledByLabel('MLG', false)
-        elseif enh == 'NaniteTorpedoTube' then
-            local enhbp = self.Blueprint.Enhancements[enh]
-            self:SetWeaponEnabledByLabel('Torpedo', true)
-            self:SetIntelRadius('Sonar', enhbp.NewSonarRadius or 60)
-            self:EnableUnitIntel('Enhancement', 'Sonar')
-            if self.Layer == 'Seabed' then
-                self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
-            end
-        elseif enh == 'NaniteTorpedoTubeRemove' then
-            local bpIntel = self.Blueprint.Intel
-            self:SetWeaponEnabledByLabel('Torpedo', false)
-            self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
-            self:DisableUnitIntel('Enhancement', 'Sonar')
-            if self.Layer == 'Seabed' then
-                self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
-            end
+        local ref = 'ProcessEnhancement' .. enh
+        local handler = self[ref]
+        if handler then
+            handler(self, bp)
+        else
+            WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
         end
     end,
 
@@ -424,6 +526,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         },
     },
 
+    ---@param self URL0001
+    ---@param intel string
     OnIntelEnabled = function(self, intel)
         ACUUnit.OnIntelEnabled(self, intel)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
@@ -445,6 +549,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         end
     end,
 
+    ---@param self URL0001
+    ---@param intel string
     OnIntelDisabled = function(self, intel)
         ACUUnit.OnIntelDisabled(self, intel)
         if self.IntelEffectsBag then
@@ -458,6 +564,9 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         end
     end,
 
+    ---@param self URL0001
+    ---@param new any
+    ---@param old any
     OnLayerChange = function(self, new, old)
         ACUUnit.OnLayerChange(self, new, old)
         if self:GetWeaponByLabel('DummyWeapon') == nil then return end
