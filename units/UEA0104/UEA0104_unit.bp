@@ -227,6 +227,7 @@ UnitBlueprint{
         MeshExtentsZ = 8.5,
         MotionType = "RULEUMT_Air",
     },
+    SelectionCenterOffsetY = 0.15,
     SelectionSizeX = 0.95,
     SelectionSizeZ = 5,
     SelectionThickness = 0.19,
