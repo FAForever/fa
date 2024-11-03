@@ -52,112 +52,142 @@ UAL0301 = ClassUnit(CommandUnit) {
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
-    CreateEnhancement = function(self, enh)
-        CommandUnit.CreateEnhancement(self, enh)
-        local bp = self.Blueprint.Enhancements[enh]
-        if not bp then return end
-        -- Teleporter
-        if enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
-        elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
-        -- Shields
-        elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-            self:SetMaintenanceConsumptionActive()
-            self:CreateShield(bp)
-        elseif enh == 'ShieldRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh == 'ShieldHeavy' then
-            self.Trash:Add(ForkThread(self.CreateHeavyShield, self, bp))
-        elseif enh == 'ShieldHeavyRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
-            -- ResourceAllocation
-        elseif enh == 'ResourceAllocation' then
-            local bp = self.Blueprint.Enhancements[enh]
-            local bpEcon = self.Blueprint.Economy
-            if not bp then return end
-            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
-            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-        elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self.Blueprint.Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-            -- Engineering Focus Module
-        elseif enh == 'EngineeringFocusingModule' then
-            if not Buffs['AeonSCUBuildRate'] then
-                BuffBlueprint {
-                    Name = 'AeonSCUBuildRate',
-                    DisplayName = 'AeonSCUBuildRate',
-                    BuffType = 'SCUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
-                            Mult = 1,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'AeonSCUBuildRate')
-        elseif enh == 'EngineeringFocusingModuleRemove' then
-            if Buff.HasBuff(self, 'AeonSCUBuildRate') then
-                Buff.RemoveBuff(self, 'AeonSCUBuildRate')
-            end
-            -- SystemIntegrityCompensator
-        elseif enh == 'SystemIntegrityCompensator' then
-            local name = 'AeonSCURegenRate'
-            if not Buffs[name] then
-                BuffBlueprint {
-                    Name = name,
-                    DisplayName = name,
-                    BuffType = 'SCUREGENRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        Regen = {
-                            Add = bp.NewRegenRate - self.Blueprint.Defense.RegenRate,
-                            Mult = 1,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, name)
-        elseif enh == 'SystemIntegrityCompensatorRemove' then
-            if Buff.HasBuff(self, 'AeonSCURegenRate') then
-                Buff.RemoveBuff(self, 'AeonSCURegenRate')
-            end
-            -- Sacrifice
-        elseif enh == 'Sacrifice' then
-            self:AddCommandCap('RULEUCC_Sacrifice')
-        elseif enh == 'SacrificeRemove' then
-            self:RemoveCommandCap('RULEUCC_Sacrifice')
-            -- StabilitySupressant
-        elseif enh == 'StabilitySuppressant' then
-            local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
-        elseif enh == 'StabilitySuppressantRemove' then
-            local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
-        end
+    -- ============================================================================================================================================
+    -- ENHANCEMENTS
+
+    ProcessEnhancementTeleporter = function (self, bp)
+        self:AddCommandCap('RULEUCC_Teleport')
     end,
 
-    CreateHeavyShield = function(self, bp)
+    ProcessEnhancementTeleporterRemove = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Teleport')
+    end,
+
+    ProcessEnhancementShield = function(self, bp)
+        self:AddToggleCap('RULEUTC_ShieldToggle')
+        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+        self:SetMaintenanceConsumptionActive()
+        self:CreateShield(bp)
+    end,
+
+    ProcessEnhancementShieldRemove = function(self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
+    ProcessEnhancementShieldHeavy = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
     end,
+
+    ProcessEnhancementShieldHeavyRemove = function(self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
+    ProcessEnhancementResourceAllocation = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        if not bp then return end
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+    end,
+
+    ProcessEnhancementResourceAllocationRemove = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+    end,
+
+    ProcessEnhancementEngineeringFocusModule = function(self, bp)
+        if not Buffs['AeonSCUBuildRate'] then
+            BuffBlueprint {
+                Name = 'AeonSCUBuildRate',
+                DisplayName = 'AeonSCUBuildRate',
+                BuffType = 'SCUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Mult = 1,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'AeonSCUBuildRate')
+    end,
+
+    ProcessEnhancementEngineeringFocusModuleRemove = function(self, bp)
+        if Buff.HasBuff(self, 'AeonSCUBuildRate') then
+            Buff.RemoveBuff(self, 'AeonSCUBuildRate')
+        end
+    end,
+
+    ProcessEnhancementSystemIntegrityCompensator = function(self, bp)
+        if not Buffs['AeonSCURegenRate'] then
+            BuffBlueprint {
+                Name = 'AeonSCURegenRate',
+                DisplayName = 'AeonSCURegenRate',
+                BuffType = 'SCUREGENRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    Regen = {
+                        Add = bp.NewRegenRate - self.Blueprint.Defense.RegenRate,
+                        Mult = 1,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'AeonSCURegenRate')
+    end,
+
+    ProcessEnhancementSystemIntegrityCompensatorRemove = function(self, bp)
+        if Buff.HasBuff(self, 'AeonSCURegenRate') then
+            Buff.RemoveBuff(self, 'AeonSCURegenRate')
+        end
+    end,
+
+    ProcessEnhancementSacrifice = function(self, bp)
+        self:AddCommandCap('RULEUCC_Sacrifice')
+    end,
+
+    ProcessEnhancementSacrificeRemove = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Sacrifice')
+    end,
+
+    ProcessEnhancementStabilitySuppressant = function(self, bp)
+        local wep = self:GetWeaponByLabel('RightReactonCannon')
+        wep:AddDamageMod(bp.NewDamageMod or 0)
+        wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+        wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+    end,
+
+    ProcessEnhancementStabilitySuppressantRemove = function(self, bp)
+        local wep = self:GetWeaponByLabel('RightReactonCannon')
+        wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
+        wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
+        wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+    end,
+
+    CreateEnhancement = function(self, enh)
+        CommandUnit.CreateEnhancement(self, enh)
+        local bp = self.Blueprint.Enhancements[enh]
+        if not bp then return end
+
+        local ref = 'ProcessEnhancement' .. enh
+        local handler = self[ref]
+        if handler then
+            handler(self, bp)
+        else
+            WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
+        end
+    end,
+
 }
 
 TypeClass = UAL0301
