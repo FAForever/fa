@@ -94,6 +94,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
 ---@field DamageData WeaponDamageTable
+---@field MyDepthCharge? DepthCharge
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
