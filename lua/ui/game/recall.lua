@@ -330,6 +330,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
                 self.reviewResultsThread = nil
             end, self)
         end
+        self.label:SetText(LOC("<LOC diplomacy_0018>Ready for recall"))
     end,
 
     CancelVote = function(self)
