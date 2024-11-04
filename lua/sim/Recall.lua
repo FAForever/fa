@@ -111,10 +111,10 @@ end
 ---@return CannotRecallReason
 ---@return number? cooldown no timeout/cooldown if absent
 function ArmyRecallRequestCooldown(army)
-    if army == -1 then
+    local brain = GetArmyBrain(army)
+    if army == -1 or brain:IsDefeated() then
         return "observer"
     end
-    local brain = GetArmyBrain(army)
     if ScenarioInfo.RecallDisabled then
         return "scenario"
     end
