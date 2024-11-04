@@ -367,11 +367,14 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
     AddVotes = function(self, yes, no)
         local votes = self.votes
         if not votes.blocks then return end
+
         local function SetTextures(vote, filename)
             vote._left:SetTexture(UIUtil.UIFile(filename .. "_bmp_l.dds"))
             vote._middle:SetTexture(UIUtil.UIFile(filename .. "_bmp_m.dds"))
             vote._right:SetTexture(UIUtil.UIFile(filename .. "_bmp_r.dds"))
         end
+
+        -- get where these new votes should be added on top of existing ones
         local index = 1
         for i = 1, votes.blocks do
             if not votes[i].cast then
@@ -379,6 +382,8 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
                 break
             end
         end
+
+        -- add the new votes
         if yes then
             for _ = 1, yes do
                 local vote = votes[index]
