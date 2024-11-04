@@ -79,7 +79,6 @@ end
 
 ---@param data RecallSyncData
 function RequestHandler(data)
-    LOG("Received recall sync data: ", repr(data, {depth = 2}))
     if data.CannotRequest ~= nil then
         import("/lua/ui/game/diplomacy.lua").SetCannotRequestRecallReason(data.CannotRequest)
     end

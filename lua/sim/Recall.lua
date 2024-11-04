@@ -372,7 +372,6 @@ local function GetRecallSyncTable()
 end
 
 function ResyncRecallVoting()
-    LOG("ResyncRecallVoting")
     local focus = GetFocusArmy()
     local teamSize = 0
     local yes, no = 0, 0
@@ -427,24 +426,20 @@ end
 
 ---@param reason CannotRecallReason
 function SyncCannotRequestRecall(reason)
-    LOG("SyncCannotRequestRecall")
     GetRecallSyncTable().CannotRequest = reason
 end
 
 ---@param result boolean
 function SyncCloseRecallVote(result)
-    LOG("SyncCloseRecallVote")
     GetRecallSyncTable().Close = result
 end
 
 function SyncCancelRecallVote()
-    LOG("SyncCancelRecallVote")
     GetRecallSyncTable().Cancel = true
 end
 
 ---@param vote boolean
 function SyncRecallVote(vote)
-    LOG("SyncRecallVote")
     local sync = GetRecallSyncTable()
     if vote then
         sync.Yes = (sync.Yes or 0) + 1
@@ -456,7 +451,6 @@ end
 ---@param teamSize number
 ---@param army number
 function SyncOpenRecallVote(teamSize, army)
-    LOG("SyncOpenRecallVote")
     local sync = GetRecallSyncTable()
     local focus = GetFocusArmy()
     sync.Open = VoteTime * 0.1 -- convert ticks to seconds
