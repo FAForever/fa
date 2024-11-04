@@ -392,8 +392,8 @@ function ResyncRecallVoting()
                 continue
             end
             teamSize = teamSize + 1
-            if brain.Vote ~= nil then
-                if brain.Vote then
+            if brain.RecallVote ~= nil then
+                if brain.RecallVote then
                     yes = yes + 1
                 else
                     no = no + 1
@@ -415,7 +415,7 @@ function ResyncRecallVoting()
             Blocks = teamSize,
             Yes = yes,
             No = no,
-            CanVote = GetArmyBrain(focus).Vote ~= nil,
+            CanVote = GetArmyBrain(focus).RecallVote ~= nil,
         }
     end
     SyncRecallStatus()
