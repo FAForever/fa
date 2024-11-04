@@ -3,16 +3,16 @@
 --**************************************************************************************************
 
 --- ticks before a player can start the first recall vote (5 minutes)
-PlayerGateCooldown = 0--5 * 60 * 10
+PlayerGateCooldown = 5 * 60 * 10
 
 --- ticks before a player can request another recall (3 minutes)
-PlayerRequestCooldown = 0--3 * 60 * 10
+PlayerRequestCooldown = 3 * 60 * 10
 
 --- ticks before a team can have another recall vote (1 minute)
-TeamVoteCooldown = 0--1 * 60 * 10
+TeamVoteCooldown = 1 * 60 * 10
 
 --- ticks that the recall vote is open (30 seconds)
-VoteTime = 30000--30 * 10
+VoteTime = 30 * 10
 
 ---@param acceptanceVotes number
 ---@param totalVotes number
