@@ -69,7 +69,7 @@ function OnAllianceChange(data)
     end
     if votingThreadBrain then
         SPEW("Canceling recall voting for team " .. table.concat(oldTeam, ", ") .. " due to alliance break")
-        votingThreadBrain.VoteCancelled = true
+        votingThreadBrain.RecallVoteCancelled = true
         ResumeThread(votingThreadBrain.recallVotingThread)
         if IsAlly(votingThreadBrain, GetFocusArmy()) then
             SyncCancelRecallVote()
@@ -149,12 +149,12 @@ local function RecallVotingThread(requestingArmy)
     WaitTicks(VoteTime) -- may be interrupted if the vote closes or is canceled by an alliance break
 
     local focus = GetFocusArmy()
-    if requestingBrain.VoteCancelled then
+    if requestingBrain.RecallVoteCancelled then
         if focus ~= -1 and IsAlly(requestingArmy, focus) then
             SyncCancelRecallVote()
             SyncRecallStatus()
         end
-        requestingBrain.VoteCancelled = nil
+        requestingBrain.RecallVoteCancelled = nil
         requestingBrain.RecallVoteStartTime = nil
         requestingBrain.recallVotingThread = nil
         return
@@ -358,9 +358,9 @@ function SetRecallVote(data)
 end
 
 
-----------
---- Sync
-----------
+--------------------
+--#region Sync
+--------------------
 
 local function GetRecallSyncTable()
     local sync = Sync.RecallRequest
@@ -481,3 +481,5 @@ function SyncRecallStatus()
         UserRecallStatusThread = ForkThread(SyncRecallStatusThread)
     end
 end
+
+--#endregion
