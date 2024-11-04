@@ -408,6 +408,9 @@ function ResyncRecallVoting()
         if teamSize <= 2 and not retainBlocks then
             teamSize = nil
         end
+
+        local focusBrain = GetArmyBrain(focus)
+
         -- no need to add changes from `GetRecallSyncTable`, we need to reset everything anyway
         Sync.RecallRequest = {
             StartTime = votingThreadBrain.RecallVoteStartTime * 0.1, -- convert ticks to seconds
@@ -415,7 +418,7 @@ function ResyncRecallVoting()
             Blocks = teamSize,
             Yes = yes,
             No = no,
-            CanVote = GetArmyBrain(focus).RecallVote ~= nil,
+            CanVote = focusBrain.RecallVote == nil and not focusBrain:IsDefeated(),
         }
     end
     SyncRecallStatus()
@@ -451,7 +454,7 @@ function SyncOpenRecallVote(teamSize, army)
     local sync = GetRecallSyncTable()
     local focus = GetFocusArmy()
     sync.Open = VoteTime * 0.1 -- convert ticks to seconds
-    sync.CanVote = focus ~= -1 and army ~= focus
+    sync.CanVote = focus ~= -1 and army ~= focus and not GetArmyBrain(focus):IsDefeated()
     if teamSize > 2 then
         sync.Blocks = teamSize
     end
