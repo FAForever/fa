@@ -9,8 +9,8 @@ doscript "/lua/shared/RecallParams.lua"
 
 local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 
-
----@alias CannotRecallReason false
+---@alias CannotRecallReason 
+---| false
 ---| "active"
 ---| "ai"
 ---| "gate"
@@ -18,7 +18,6 @@ local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 ---| "scenario"
 ---| "vote"
 ---| "observer"
-
 
 function init()
     -- setup sim recall state in the brains

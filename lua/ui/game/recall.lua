@@ -66,6 +66,18 @@ function ToggleControl()
     end
 end
 
+---@class RecallSyncData
+---@field StartTime number # When the recall vote started sim-side in seconds
+---@field Open number # Duration of the recall vote in seconds
+---@field Blocks number? # number of voters. `nil` if the block count does not need to be updated, due to the edge case of a 2 player team where neither player has voted due to the vote requester's defeat
+---@field Yes number # number of Yes votes
+---@field No number # number of No votes
+---@field CanVote boolean # Whether or not the focused army has voted or is defeated
+---@field Cancel true?
+---@field CannotRequest CannotRecallReason
+---@field Close boolean # boolean is the recall result
+
+---@param data RecallSyncData
 function RequestHandler(data)
     if data.CannotRequest ~= nil then
         import("/lua/ui/game/diplomacy.lua").SetCannotRequestRecallReason(data.CannotRequest)
@@ -168,7 +180,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         local currentBlocks = votes.blocks
         if blocks ~= currentBlocks then
             votes.blocks = blocks
-            for i = currentBlocks or 1, 1, -1 do
+            for i = (currentBlocks or 1), 1, -1 do
                 local block = votes[i]
                 if block then
                     block:Destroy()
