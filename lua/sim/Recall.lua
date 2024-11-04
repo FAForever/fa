@@ -410,8 +410,8 @@ function ResyncRecallVoting()
         end
         -- no need to add changes from `GetRecallSyncTable`, we need to reset everything anyway
         Sync.RecallRequest = {
-            StartTime = votingThreadBrain.RecallVoteStartTime,
-            Open = VoteTime * 0.1,
+            StartTime = votingThreadBrain.RecallVoteStartTime * 0.1, -- convert ticks to seconds
+            Open = VoteTime * 0.1, -- convert ticks to seconds
             Blocks = teamSize,
             Yes = yes,
             No = no,
@@ -450,7 +450,7 @@ end
 function SyncOpenRecallVote(teamSize, army)
     local sync = GetRecallSyncTable()
     local focus = GetFocusArmy()
-    sync.Open = VoteTime * 0.1
+    sync.Open = VoteTime * 0.1 -- convert ticks to seconds
     sync.CanVote = focus ~= -1 and army ~= focus
     if teamSize > 2 then
         sync.Blocks = teamSize
