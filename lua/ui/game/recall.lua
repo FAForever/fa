@@ -212,6 +212,18 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             end
             -- manual dirtying of the lazyvar
             votes.Height[1] = nil
+        elseif currentBlocks then
+            local function SetTextures(vote, filename)
+                vote._left:SetTexture(UIUtil.UIFile(filename .. "_bmp_l.dds"))
+                vote._middle:SetTexture(UIUtil.UIFile(filename .. "_bmp_m.dds"))
+                vote._right:SetTexture(UIUtil.UIFile(filename .. "_bmp_r.dds"))
+            end
+
+            -- reset the status of existing blocks
+            for i = 1, currentBlocks do
+                votes[i].cast = nil
+                SetTextures(votes[i], "/game/recall-panel/recall-vote")
+            end
         end
     end,
 
