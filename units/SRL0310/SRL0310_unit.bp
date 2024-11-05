@@ -103,16 +103,6 @@ UnitBlueprint{
                     Scrolling = true,
                     ShaderName = "Insect",
                 },
-                {
-                    LODCutoff = 512,
-                    Scrolling = true,
-                    ShaderName = "Insect",
-                },
-                {
-                    LODCutoff = 1024,
-                    Scrolling = true,
-                    ShaderName = "Insect",
-                },
             },
         },
         MovementEffects = {
