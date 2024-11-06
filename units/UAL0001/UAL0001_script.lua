@@ -323,22 +323,30 @@ UAL0001 = ClassUnit(ACUUnit) {
         cd:ChangeMaxRadius(bpDisrupt or 22)
     end,
 
+    ---@param self UAL0001
+    ---@param bp Blueprint
     ProcessEnhancementHeatSink = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
     end,
 
+    ---@param self UAL0001
+    ---@param bp Blueprint
     ProcessEnhancementHeatSinkRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
         wep:ChangeRateOfFire(bpDisrupt or 1)
     end,
 
+    ---@param self UAL0001
+    ---@param bp Blueprint
     ProcessEnhancementEnhancedSensors = function(self, bp)
         self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
         self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
     end,
 
+    ---@param self UAL0001
+    ---@param bp Blueprint
     ProcessEnhancementEnhancedSensorsRemove = function(self, bp)
         local bpIntel = self:GetBlueprint().Intel
         self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
@@ -363,8 +371,8 @@ UAL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
-    ---@param self any
-    ---@param bp any
+    ---@param self UAL0001
+    ---@param bp Blueprint
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
