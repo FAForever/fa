@@ -31,6 +31,8 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 
 ---@class URL0001 : ACUUnit, CCommandUnit
+---@field StealthEnh? true
+---@field CloakEnh? true
 URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
