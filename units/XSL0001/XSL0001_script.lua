@@ -32,6 +32,7 @@ local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLaunch
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@class XSL0001 : ACUUnit
+---@field ShieldEffectsBag moho.IEffect[] # stores the regen aura effects (level 1 has 1 effect, level 2 has 2 effects)
 XSL0001 = ClassUnit(ACUUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
