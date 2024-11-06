@@ -42,7 +42,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
 
             SetOnTransport = function(self, transportstate)
                 CDFHeavyMicrowaveLaserGeneratorCom.SetOnTransport(self, transportstate)
-                self.Trash:Add(ForkThread(self.OnTransportWatch,self))
+                self.Trash:Add(ForkThread(self.OnTransportWatch, self))
             end,
 
             OnTransportWatch = function(self)
@@ -104,7 +104,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self:DisableUnitIntel('Enhancement', 'Sonar')
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
-        self.Trash:Add(ForkThread(self.GiveInitialResources,self))
+        self.Trash:Add(ForkThread(self.GiveInitialResources, self))
     end,
 
     ---@param self URL0001
@@ -309,7 +309,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Duration = -1,
                 Affects = {
                     BuildRate = {
-                        Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                         Mult = 1.0,
                     },
                     MaxHealth = {
@@ -356,7 +356,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Duration = -1,
                 Affects = {
                     BuildRate = {
-                        Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                         Mult = 1.0,
                     },
                     MaxHealth = {
