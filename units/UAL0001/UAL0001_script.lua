@@ -75,9 +75,9 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
-            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
-            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+        if not bp then return end
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
     end,
 
     ---@param self UAL0001
@@ -196,7 +196,7 @@ UAL0001 = ClassUnit(ACUUnit) {
                 Duration = -1,
                 Affects = {
                     BuildRate = {
-                        Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                        Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                         Mult = 1,
                     },
                     MaxHealth = {
@@ -240,7 +240,7 @@ UAL0001 = ClassUnit(ACUUnit) {
                 Duration = -1,
                 Affects = {
                     BuildRate = {
-                        Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                        Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                         Mult = 1,
                     },
                     MaxHealth = {
@@ -266,7 +266,7 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
             Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
-     end
+        end
     end,
 
     ---@param self UAL0001
