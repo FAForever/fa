@@ -33,6 +33,8 @@ local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 ---@class URL0001 : ACUUnit, CCommandUnit
 ---@field HasStealthEnh? true
 ---@field HasCloakEnh? true
+---@field normalRange number # caches gun range to adjust the unit AI controller dummy weapon's range on layer change depending on active enhancements
+---@field torpRange number # caches torpedo range to adjust the unit AI controller dummy weapon's range on layer change depending on active enhancements
 URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
@@ -564,6 +566,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         end
     end,
 
+    --- Makes sure the ACU walks into the correct range for the target when it has/doesn't have the torpedo enhancement.
     ---@param self URL0001
     ---@param new any
     ---@param old any
