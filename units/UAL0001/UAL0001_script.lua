@@ -216,8 +216,6 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
-        local bp = self:GetBlueprint().Economy.BuildRate
-        if not bp then return end
         self:RestoreBuildRestrictions()
         self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
@@ -260,8 +258,6 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3EngineeringRemove = function(self, bp)
-        local bp = self:GetBlueprint().Economy.BuildRate
-        if not bp then return end
         self:RestoreBuildRestrictions()
         self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
