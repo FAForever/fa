@@ -327,7 +327,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Drone Upgrades
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementLeftPod = function(self, bp)
         local location = self:GetPosition('AttachSpecial02')
         ---@type UEA0001
@@ -341,7 +341,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementLeftPodRemove = function(self, bp)
         if self.HasLeftPod == true then
             self.HasLeftPod = false
@@ -358,7 +358,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRightPod = function(self, bp)
         local location = self:GetPosition('AttachSpecial01')
         ---@type UEA0001
@@ -372,7 +372,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementRightPodRemove = function(self, bp)
         if self.HasLeftPod == true then
             self.HasLeftPod = false
@@ -403,13 +403,13 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Teleport Upgrade
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTeleporter = function(self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTeleporterRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Teleport')
     end,
@@ -417,7 +417,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Personal Shield
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:CreateShield(bp)
@@ -426,7 +426,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -437,7 +437,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Bubble Shield
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldGeneratorField = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:DestroyShield()
@@ -452,7 +452,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldGeneratorFieldRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -462,7 +462,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- T2 Engineering Suite
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineering = function(self, bp)
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
         self:RemoveBuildRestriction(cat)
@@ -494,7 +494,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
         local bp = self:GetBlueprint().Economy.BuildRate
         if not bp then return end
@@ -511,7 +511,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- T3 Engineering Suite
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3Engineering = function(self, bp)
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
         self:RemoveBuildRestriction(cat)
@@ -543,7 +543,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3EngineeringRemove = function(self, bp)
         local bp = self:GetBlueprint().Economy.BuildRate
         if not bp then return end
@@ -557,7 +557,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Nano Repair System
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementDamageStabilization = function(self, bp)
         if not Buffs['UEFACUDamageStabilization'] then
             BuffBlueprint {
@@ -583,7 +583,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementDamageStabilizationRemove = function(self, bp)
         if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
             Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
@@ -593,7 +593,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Gun Upgrade
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeavyAntiMatterCannon = function(self, bp)
         local wep = self:GetWeaponByLabel('RightZephyr')
         wep:AddDamageMod(bp.ZephyrDamageMod)
@@ -605,7 +605,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeavyAntiMatterCannonRemove = function(self, bp)
         local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
         if not bp then return end
@@ -622,7 +622,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- RAS
 
     ---@param self UEL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         if not bp then return end
@@ -632,7 +632,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationRemove = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -642,7 +642,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Tactical Missile Launcher
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTacticalMissile = function(self, bp)
         self:AddCommandCap('RULEUCC_Tactical')
         self:AddCommandCap('RULEUCC_SiloBuildTactical')
@@ -650,7 +650,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTacticalMissileRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Tactical')
         self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
@@ -663,7 +663,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     -- Billy Nuke
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTacticalNukeMissile = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Tactical')
         self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
@@ -677,7 +677,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param bp Blueprint unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTacticalNukeMissileRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Nuke')
         self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
