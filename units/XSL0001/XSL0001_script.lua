@@ -179,7 +179,7 @@ XSL0001 = ClassUnit(ACUUnit) {
             self.RegenThreadHandle = nil
         end
 
-        self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, bp)
+        self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, "RegenAura")
     end,
 
     ProcessEnhancementRegenAuraRemove = function (self, bp)
@@ -257,7 +257,7 @@ XSL0001 = ClassUnit(ACUUnit) {
             self.RegenThreadHandle = nil
         end
 
-        self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, bp)
+        self.RegenThreadHandle = self:ForkThread(self.RegenBuffThread, "AdvancedRegenAura")
     end,
 
     ProcessEnhancementAdvancedRegenAuraRemove = function (self, bp)
