@@ -232,7 +232,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     ---@param self URL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCloakingGenerator = function(self, bp)
-        if not bp then return end
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:AddToggleCap('RULEUTC_CloakToggle')
         self.HasStealthEnh = nil
@@ -286,7 +285,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self.Blueprint.Economy
-        if not bp then return end
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
     end,
@@ -303,7 +301,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineering = function(self, bp)
         self.BuildBotTotal = 3
-        if not bp then return end
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
         self:RemoveBuildRestriction(cat)
         if not Buffs['CybranACUT2BuildRate'] then
@@ -350,7 +347,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3Engineering = function(self, bp)
         self.BuildBotTotal = 4
-        if not bp then return end
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
         self:RemoveBuildRestriction(cat)
         if not Buffs['CybranACUT3BuildRate'] then
