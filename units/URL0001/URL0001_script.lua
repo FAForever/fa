@@ -31,8 +31,8 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 
 ---@class URL0001 : ACUUnit, CCommandUnit
----@field StealthEnh? true
----@field CloakEnh? true
+---@field HasStealthEnh? true
+---@field HasCloakEnh? true
 URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
@@ -139,7 +139,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStealthGenerator = function(self, bp)
         self:AddToggleCap('RULEUTC_StealthToggle')
-        self.StealthEnh = true
+        self.HasStealthEnh = true
         self:EnableUnitIntel('Enhancement', 'RadarStealth')
         self:EnableUnitIntel('Enhancement', 'SonarStealth')
         if not Buffs['CybranACUStealthBonus'] then
@@ -172,7 +172,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
-        self.StealthEnh = nil
+        self.HasStealthEnh = nil
         if Buff.HasBuff(self, 'CybranACUStealthBonus') then
             Buff.RemoveBuff(self, 'CybranACUStealthBonus')
         end
@@ -212,7 +212,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
-        self.StealthEnh = nil
+        self.HasStealthEnh = nil
         if Buff.HasBuff(self, 'CybranACUStealthBonus') then
             Buff.RemoveBuff(self, 'CybranACUStealthBonus')
         end
@@ -229,8 +229,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         if not bp then return end
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:AddToggleCap('RULEUTC_CloakToggle')
-        self.StealthEnh = nil
-        self.CloakEnh = true
+        self.HasStealthEnh = nil
+        self.HasCloakEnh = true
         self:EnableUnitIntel('Enhancement', 'Cloak')
         if not Buffs['CybranACUCloakBonus'] then
             BuffBlueprint {
@@ -259,7 +259,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self:RemoveToggleCap('RULEUTC_CloakToggle')
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
-        self.StealthEnh = nil
+        self.HasStealthEnh = nil
         if Buff.HasBuff(self, 'CybranACUStealthBonus') then
             Buff.RemoveBuff(self, 'CybranACUStealthBonus')
         end
@@ -270,7 +270,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         -- remove cloak
         self:RemoveToggleCap('RULEUTC_CloakToggle')
         self:DisableUnitIntel('Enhancement', 'Cloak')
-        self.CloakEnh = nil
+        self.HasCloakEnh = nil
         if Buff.HasBuff(self, 'CybranACUCloakBonus') then
             Buff.RemoveBuff(self, 'CybranACUCloakBonus')
         end
@@ -530,7 +530,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     ---@param intel string
     OnIntelEnabled = function(self, intel)
         ACUUnit.OnIntelEnabled(self, intel)
-        if self.CloakEnh and self:IsIntelEnabled('Cloak') then
+        if self.HasCloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy
                 or 0)
             self:SetMaintenanceConsumptionActive()
@@ -538,7 +538,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 self.IntelEffectsBag = {}
                 self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-        elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
+        elseif self.HasStealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy
                 or 0)
             self:SetMaintenanceConsumptionActive()
@@ -557,9 +557,9 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             self.IntelEffectsBag = nil
         end
-        if self.CloakEnh and not self:IsIntelEnabled('Cloak') then
+        if self.HasCloakEnh and not self:IsIntelEnabled('Cloak') then
             self:SetMaintenanceConsumptionInactive()
-        elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
+        elseif self.HasStealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
         end
     end,
