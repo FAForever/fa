@@ -250,15 +250,6 @@ EnergyManagerBrainComponent = ClassSimple {
     ---@param self AIBrain
     ---@param triggerName string
     OnEnergyTrigger = function(self, triggerName)
-        LOG(('%d OnEnergyTrigger %s,\nE Ratio %f,\nE Stored: %f,\nE Storage Max: %f'):format(
-            GetGameTick()
-            , triggerName
-            , self:GetArmyStat('Economy_Ratio_Energy', -1).Value
-            , self:GetArmyStat('Economy_Stored_Energy', -1).Value
-            , self:GetArmyStat('Economy_MaxStorage_Energy', -1).Value
-            )
-        )
-
         if triggerName == "EnergyDepleted" or triggerName == "SwitchEnergyViableTrigger" then
             -- add trigger when we can recover units
             local energyStorageThreshold = 100000
