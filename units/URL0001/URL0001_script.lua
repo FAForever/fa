@@ -124,8 +124,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
 
-    --======================================================================================================
-    -- Enhancements
+    ---------------------------------------------------------------------------
+    --#region Enhancements
 
     ---@param self URL0001
     ---@param bp UnitBlueprintEnhancement
@@ -481,6 +481,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
         end
     end,
+
+    --#endregion
 
     -- Intel
     IntelEffects = {
