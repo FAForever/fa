@@ -27,7 +27,11 @@ local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0001 : ACUUnit
 ---@field LeftPod TConstructionPodUnit
+---@field HasLeftPod boolean
+---@field RebuildThread? thread # Rebuilds left pod
 ---@field RightPod TConstructionPodUnit
+---@field HasRightPod boolean
+---@field RebuildThread2? thread # Rebuilds right pod
 ---@field MissileHatchSlider moho.SlideManipulator
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
