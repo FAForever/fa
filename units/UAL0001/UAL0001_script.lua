@@ -74,8 +74,8 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
-        local bpEcon = self:GetBlueprint().Economy
         if not bp then return end
+        local bpEcon = self:GetBlueprint().Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
     end,
@@ -91,8 +91,8 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationAdvanced = function(self, bp)
-        local bpEcon = self:GetBlueprint().Economy
         if not bp then return end
+        local bpEcon = self:GetBlueprint().Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
     end,
