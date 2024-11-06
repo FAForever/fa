@@ -122,13 +122,13 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     -- Enhancements
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTeleporter = function(self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTeleporterRemove = function(self, bp)
         RemoveUnitEnhancement(self, 'Teleporter')
         RemoveUnitEnhancement(self, 'TeleporterRemove')
@@ -136,7 +136,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStealthGenerator = function(self, bp)
         self:AddToggleCap('RULEUTC_StealthToggle')
         self.StealthEnh = true
@@ -167,7 +167,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStealthGeneratorRemove = function(self, bp)
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
@@ -179,7 +179,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFAF_SelfRepairSystem = function(self, bp)
         if not Buffs['CybranACURegenerateBonus'] then
             BuffBlueprint {
@@ -206,7 +206,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFAF_SelfRepairSystemRemove = function(self, bp)
         -- remove prerequisites
         self:RemoveToggleCap('RULEUTC_StealthToggle')
@@ -224,7 +224,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCloakingGenerator = function(self, bp)
         if not bp then return end
         self:RemoveToggleCap('RULEUTC_StealthToggle')
@@ -253,7 +253,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCloakingGeneratorRemove = function(self, bp)
         -- remove prerequisites
         self:RemoveToggleCap('RULEUTC_CloakToggle')
@@ -277,7 +277,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         if not bp then return end
@@ -286,7 +286,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationRemove = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -294,7 +294,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineering = function(self, bp)
         self.BuildBotTotal = 3
         if not bp then return end
@@ -327,7 +327,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
         self.BuildBotTotal = 2
         local buildRate = self.Blueprint.Economy.BuildRate
@@ -341,7 +341,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3Engineering = function(self, bp)
         self.BuildBotTotal = 4
         if not bp then return end
@@ -374,7 +374,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3EngineeringRemove = function(self, bp)
         self.BuildBotTotal = 2
         local buildRate = self.Blueprint.Economy.BuildRate
@@ -387,7 +387,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCoolingUpgrade = function(self, bp)
         local wep = self:GetWeaponByLabel('RightRipper')
         wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
@@ -405,7 +405,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCoolingUpgradeRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightRipper')
         local wepBp = self.Blueprint.Weapon
@@ -428,19 +428,19 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementMicrowaveLaserGenerator = function(self, bp)
         self:SetWeaponEnabledByLabel('MLG', true)
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementMicrowaveLaserGeneratorRemove = function(self, bp)
         self:SetWeaponEnabledByLabel('MLG', false)
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementNaniteTorpedoTube = function(self, bp)
         self:SetWeaponEnabledByLabel('Torpedo', true)
         self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
@@ -451,7 +451,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 
     ---@param self URL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementNaniteTorpedoTubeRemove = function(self, bp)
         local bpIntel = self.Blueprint.Intel
         self:SetWeaponEnabledByLabel('Torpedo', false)
