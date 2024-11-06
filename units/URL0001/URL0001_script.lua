@@ -63,7 +63,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         ACUUnit.__init(self, 'RightRipper')
     end,
 
-    ---
     ---@param self URL0001
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
