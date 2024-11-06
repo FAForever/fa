@@ -698,7 +698,7 @@ UEL0001 = ClassUnit(ACUUnit) {
 
 
     ---@param self UEL0001
-    ---@param enh string
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
