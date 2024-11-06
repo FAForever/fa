@@ -209,7 +209,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param unitBeingBuilt Unit
+    ---@param unitBeingBuilt Unit | { BuildingCube : boolean }
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
