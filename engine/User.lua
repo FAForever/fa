@@ -1004,7 +1004,7 @@ end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
 --- Unlike other engine functions that return tables, this function returns the same table each time it is called.
----@return UIScenarioInfo
+---@return UISessionSenarioInfo
 function SessionGetScenarioInfo()
 end
 

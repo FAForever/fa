@@ -397,7 +397,7 @@ local function PostProcessUnit(unit)
         status.AllIntel = {}
         if intelBlueprint then
             for name, value in pairs(intelBlueprint) do
-    
+
                 -- may contain tables, such as `JamRadius`
                 if type(value) ~= 'table' then
                     if value == true or value > 0 then
@@ -555,7 +555,7 @@ local function PostProcessUnit(unit)
     -- Define a specific TransportSpeedReduction for all land and naval units.
     -- Experimentals have a TransportSpeedReduction of 1 due to transports gaining 1 speed and some survival maps loading experimentals into transports.
     -- Naval units also gain a TransportSpeedReduction of 1 to ensure mod compatibility.
-    if not unit.Physics.TransportSpeedReduction and not isStructure then    
+    if unit.Physics and not unit.Physics.TransportSpeedReduction and not isStructure then
         if isLand and isTech1 then
             unit.Physics.TransportSpeedReduction = 0.15
         elseif isLand and isTech2 then
