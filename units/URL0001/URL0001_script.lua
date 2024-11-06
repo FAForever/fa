@@ -29,7 +29,6 @@ local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 local CDFHeavyMicrowaveLaserGeneratorCom = CWeapons.CDFHeavyMicrowaveLaserGeneratorCom
 local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
-local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0001 : ACUUnit, CCommandUnit
 URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
@@ -578,3 +577,9 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
 }
 
 TypeClass = URL0001
+
+--#region backwards compatibility
+
+local Entity = import("/lua/sim/entity.lua").Entity
+
+--#endregion
