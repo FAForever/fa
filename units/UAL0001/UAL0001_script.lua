@@ -350,7 +350,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param enh AeonACUEnhancementBuffType
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
