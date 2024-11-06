@@ -83,7 +83,7 @@ XSL0001 = ClassUnit(ACUUnit) {
 
     ---@param self XSL0001
     ---@param bp Blueprint
-    ---@return table
+    ---@return Unit[]
     GetUnitsToBuff = function(self, bp)
         local unitCat = ParseEntityCategory(bp.UnitCategory or
             'BUILTBYTIER3FACTORY + BUILTBYQUANTUMGATE + NEEDMOBILEBUILD')
@@ -100,9 +100,11 @@ XSL0001 = ClassUnit(ACUUnit) {
         return units
     end,
 
-    RegenBuffThread = function(self, type)
-        local bp = self.Blueprint.Enhancements[type]
-        local buff = 'SeraphimACU' .. type
+    ---@param self XSL0001
+    ---@param regenAuraType Enhancement
+    RegenBuffThread = function(self, regenAuraType)
+        local bp = self.Blueprint.Enhancements[regenAuraType]
+        local buff = 'SeraphimACU' .. regenAuraType
 
         while not self.Dead do
             local units = self:GetUnitsToBuff(bp)
