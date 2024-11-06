@@ -72,7 +72,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     -- Enhancements
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
@@ -81,7 +81,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationRemove = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -89,7 +89,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationAdvanced = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         if not bp then return end
@@ -98,7 +98,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationAdvancedRemove = function(self, bp)
         local bpEcon = self:GetBlueprint().Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -106,7 +106,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement # This enhancement blueprint also includes the fields from `UnitBlueprintDefenseShield`
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -115,7 +115,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -123,14 +123,14 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement # This enhancement blueprint also includes the fields from `UnitBlueprintDefenseShield`
     ProcessEnhancementShieldHeavy = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:ForkThread(self.CreateHeavyShield, bp)
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldHeavyRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -138,19 +138,19 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTeleporter = function(self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementTeleporterRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Teleport')
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementChronoDampener = function(self, bp)
         self:SetWeaponEnabledByLabel('ChronoDampener', true)
         if not Buffs['AeonACUChronoDampener'] then
@@ -172,7 +172,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementChronoDampenerRemove = function(self, bp)
         if Buff.HasBuff(self, 'AeonACUChronoDampener') then
             Buff.RemoveBuff(self, 'AeonACUChronoDampener')
@@ -181,7 +181,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineering = function(self, bp)
         if not bp then return end
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
@@ -214,7 +214,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
         local bp = self:GetBlueprint().Economy.BuildRate
         if not bp then return end
@@ -226,7 +226,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3Engineering = function(self, bp)
         if not bp then return end
         local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
@@ -258,7 +258,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementT3EngineeringRemove = function(self, bp)
         local bp = self:GetBlueprint().Economy.BuildRate
         if not bp then return end
@@ -270,7 +270,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCrysalisBeam = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
@@ -283,7 +283,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCrysalisBeamRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
@@ -297,7 +297,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFAF_CrysalisBeamAdvanced = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
@@ -310,7 +310,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFAF_CrysalisBeamAdvancedRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
@@ -324,14 +324,14 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeatSink = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeatSinkRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
         local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
@@ -339,14 +339,14 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEnhancedSensors = function(self, bp)
         self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
         self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEnhancedSensorsRemove = function(self, bp)
         local bpIntel = self:GetBlueprint().Intel
         self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
@@ -372,7 +372,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UAL0001
-    ---@param bp Blueprint
+    ---@param bp UnitBlueprintEnhancement # This enhancement blueprint also includes the fields from `UnitBlueprintDefenseShield`
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
