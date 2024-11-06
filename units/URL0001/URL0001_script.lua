@@ -40,14 +40,18 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightRipper = ClassWeapon(CCannonMolecularWeapon) {},
         Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
+        ---@class MLG : CDFHeavyMicrowaveLaserGeneratorCom
         MLG = ClassWeapon(CDFHeavyMicrowaveLaserGeneratorCom) {
             DisabledFiringBones = { 'Turret_Muzzle_03' },
 
+            ---@param self MLG
+            ---@param transportstate boolean
             SetOnTransport = function(self, transportstate)
                 CDFHeavyMicrowaveLaserGeneratorCom.SetOnTransport(self, transportstate)
                 self.Trash:Add(ForkThread(self.OnTransportWatch, self))
             end,
 
+            ---@param self MLG
             OnTransportWatch = function(self)
                 while self:GetOnTransport() do
                     self:PlayFxBeamEnd()
