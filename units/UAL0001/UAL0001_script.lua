@@ -49,7 +49,7 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
         -- Set initial range of Chrono here so that max range can be displayed in the UI
-        local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+        local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
         local cd = self:GetWeaponByLabel('ChronoDampener')
         cd:ChangeMaxRadius(bpDisrupt)
         -- Restrict what enhancements will enable later
@@ -75,7 +75,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         if not bp then return end
-        local bpEcon = self:GetBlueprint().Economy
+        local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
     end,
@@ -83,7 +83,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationRemove = function(self, bp)
-        local bpEcon = self:GetBlueprint().Economy
+        local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
     end,
@@ -92,7 +92,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationAdvanced = function(self, bp)
         if not bp then return end
-        local bpEcon = self:GetBlueprint().Economy
+        local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
         self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
     end,
@@ -100,7 +100,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationAdvancedRemove = function(self, bp)
-        local bpEcon = self:GetBlueprint().Economy
+        local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
         self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
     end,
@@ -196,7 +196,7 @@ UAL0001 = ClassUnit(ACUUnit) {
                 Duration = -1,
                 Affects = {
                     BuildRate = {
-                        Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                         Mult = 1,
                     },
                     MaxHealth = {
@@ -238,7 +238,7 @@ UAL0001 = ClassUnit(ACUUnit) {
                 Duration = -1,
                 Affects = {
                     BuildRate = {
-                        Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                         Mult = 1,
                     },
                     MaxHealth = {
@@ -282,7 +282,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCrysalisBeamRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
-        local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+        local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
         wep:ChangeMaxRadius(bpDisrupt or 22)
         local oc = self:GetWeaponByLabel('OverCharge')
         oc:ChangeMaxRadius(bpDisrupt or 22)
@@ -309,7 +309,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFAF_CrysalisBeamAdvancedRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
-        local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+        local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
         wep:ChangeMaxRadius(bpDisrupt or 22)
         local oc = self:GetWeaponByLabel('OverCharge')
         oc:ChangeMaxRadius(bpDisrupt or 22)
@@ -330,7 +330,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementHeatSinkRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisruptor')
-        local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
+        local bpDisrupt = self.Blueprint.Weapon[1].RateOfFire
         wep:ChangeRateOfFire(bpDisrupt or 1)
     end,
 
@@ -344,7 +344,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEnhancedSensorsRemove = function(self, bp)
-        local bpIntel = self:GetBlueprint().Intel
+        local bpIntel = self.Blueprint.Intel
         self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
         self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
     end,
@@ -354,7 +354,7 @@ UAL0001 = ClassUnit(ACUUnit) {
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
 
         if not bp then return end
 
