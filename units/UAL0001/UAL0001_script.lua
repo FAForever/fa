@@ -68,8 +68,8 @@ UAL0001 = ClassUnit(ACUUnit) {
     end,
 
 
-    --================================================================================================================
-    -- Enhancements
+    ---------------------------------------------------------------------------
+    --#region Enhancements
 
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
@@ -375,6 +375,8 @@ UAL0001 = ClassUnit(ACUUnit) {
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
     end
+
+    --#endregion
 }
 
 TypeClass = UAL0001
