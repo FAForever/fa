@@ -237,6 +237,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
+                ---@type UEA0001
+                ---@diagnostic disable-next-line: assign-type-mismatch
                 local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
                 pod:SetCreator(self)
@@ -256,6 +258,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
+                ---@type UEA0001
+                ---@diagnostic disable-next-line: assign-type-mismatch
                 local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
                 pod:SetCreator(self)
@@ -326,6 +330,8 @@ UEL0001 = ClassUnit(ACUUnit) {
     ---@param bp Blueprint unused
     ProcessEnhancementLeftPod = function(self, bp)
         local location = self:GetPosition('AttachSpecial02')
+        ---@type UEA0001
+        ---@diagnostic disable-next-line: assign-type-mismatch
         local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
         pod:SetParent(self, 'LeftPod')
         pod:SetCreator(self)
@@ -355,6 +361,8 @@ UEL0001 = ClassUnit(ACUUnit) {
     ---@param bp Blueprint unused
     ProcessEnhancementRightPod = function(self, bp)
         local location = self:GetPosition('AttachSpecial01')
+        ---@type UEA0001
+        ---@diagnostic disable-next-line: assign-type-mismatch
         local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
         pod:SetParent(self, 'RightPod')
         pod:SetCreator(self)
