@@ -28,13 +28,18 @@ local Buff = import("/lua/sim/buff.lua")
 ---@class UEL0001 : ACUUnit
 ---@field LeftPod TConstructionPodUnit
 ---@field RightPod TConstructionPodUnit
+---@field MissileHatchSlider moho.SlideManipulator
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
         OverCharge = ClassWeapon(TDFOverchargeWeapon) {},
         AutoOverCharge = ClassWeapon(TDFOverchargeWeapon) {},
+        --- Special weapon with UEF ACU hatch animations when reloading
+        ---@class TacMissile : TIFCruiseMissileLauncher
+        ---@field unit UEL0001
         TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            ---@param self TacMissile
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -43,6 +48,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacMissile
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -55,6 +61,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacMissile
+            ---@param slider moho.SlideManipulator
             CloseHatchThread = function(self, slider)
                 -- wait for the launch effects to clear
                 WaitTicks(30)
@@ -68,7 +76,11 @@ UEL0001 = ClassUnit(ACUUnit) {
             end,
         },
 
+        --- Special weapon with UEF ACU hatch animations when reloading
+        ---@class TacNukeMissile : TIFCruiseMissileLauncher
+        ---@field unit UEL0001
         TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            ---@param self TacNukeMissile
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -77,6 +89,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacNukeMissile
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -89,6 +102,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacNukeMissile
+            ---@param slider moho.SlideManipulator
             CloseHatchThread = function(self, slider)
                 -- wait for the launch effects to clear
                 WaitTicks(30)
