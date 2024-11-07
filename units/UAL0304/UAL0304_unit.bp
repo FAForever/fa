@@ -148,7 +148,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Sonance Artillery",
             DoTPulses = 15,
-            DoTTime = 5,
+            DoTTime = 4.2,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",

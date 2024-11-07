@@ -20,9 +20,12 @@
 
 name: Deploy to FAF
 
+# Prevent simultaneous deployments across all deployment branches as
+# the server is unable to process multiple deployments at the same time.
+
 concurrency:
   cancel-in-progress: true
-  group: deploy/faf
+  group: deployment
 
 on:
   workflow_dispatch:
@@ -40,21 +43,43 @@ jobs:
       - name: Checkout FA repository
         uses: actions/checkout@v4
         with:
-            repository: FAForever/fa
-            ref: master
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          repository: FAForever/fa
+          ref: master
+
+      # Allows us to better understand the game version and the specific commit hash when we receive a log
+      - name: Update version references
+        run: |
+          COMMITHASH=$(git rev-parse HEAD)
+          sed -i "s/local Commit = 'unknown'/local Commit = \"${COMMITHASH}\"/" "lua/version.lua"
+          sed -i "s/local GameType = 'unknown'/local GameType = \"FAF\"/" "lua/version.lua"
+
+          # debugging
+          cat lua/version.lua
 
       # Disable debugging statements
-      - name: Update references
+      - name: Overwrite debug references
         run: |
-          sed -i 's/EnabledSpewing = true,/EnabledSpewing = false,/' "/lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledLogging = true,/EnabledLogging = false,/' "/lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledWarnings = true,/EnabledWarnings = false,/' "/lua/shared/components/DebugComponent.lua"
-          sed -i 's/EnabledDrawing = true,/EnabledDrawing = false,/' "/lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledSpewing = true,/EnabledSpewing = false,/" "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledLogging = true,/EnabledLogging = false,/" "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledWarnings = true,/EnabledWarnings = false,/" "lua/shared/components/DebugComponent.lua"
+          sed -i "s/EnabledDrawing = true,/EnabledDrawing = false,/" "lua/shared/components/DebugComponent.lua"
 
-      # Update the deploy/faf branch, we force push here because 
+          # debugging
+          cat lua/shared/components/DebugComponent.lua
+
+      # Create a commit with the changes of the workflow in it
+      - name: Create a commit
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git add .
+          git commit -m "Post-process deployment"
+
+      # Update the deploy/faf branch, we force push here because
       # we're not interested in fixing conflicts
       - name: Update deploy/faf
         run: |
           git push origin HEAD:deploy/faf --force
-
-

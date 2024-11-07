@@ -1,1 +1,0 @@
-- (#6329) Fix the selection box of the Uyanah (Seraphim T3 Lightning Tank) being unusually thin. Fix the lifebar and selection box of the Vulthoo (Seraphim T2 Gunship) not lining up with its model. The Vulthoo was made physically larger in a previous patch. 

@@ -1,15 +1,29 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+# Copyright (c) FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
 name: Documentation - Build and deploy
 
 on:
   push:
-    branches: ['develop']
-    paths: ['docs/**']
+    branches: ["develop", "deploy/fafdevelop", "deploy/fafbeta"]
+    paths: ["docs/**", "changelog/snippets/*.md"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,12 +36,25 @@ permissions:
 
 # Allow one concurrent deployment
 concurrency:
-  group: 'pages'
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
-  # Build job
+  changelog-develop:
+    name: Create changelog of FAF Develop
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafdevelop
+
+  changelog-beta:
+    name: Create changelog of FAF Beta
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafbeta
+
   build:
+    name: Build the documentation
+    needs: [changelog-develop, changelog-beta]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -35,28 +62,71 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs
+            .github/workflows/scripts/bash
+
+      # Set environment path for scripts so we can access it later
+      - name: Update environment path
+        run: |
+          echo "${{ github.workspace }}/.github/workflows/scripts/bash" >> $GITHUB_PATH
+
+      # Retrieve the generated changelogs
+      - name: Download artifact changelog of FAF Develop
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: docs/generated
+
+      - name: Download artifact changelog of FAF Beta
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: docs/generated
+
+      # Append the generated changelogs to the Jekyll-compatible templates
+      - name: Append the generated changelogs
+        run: |
+          cat generated/fafdevelop.md >> changelog/fafdevelop.md
+          cat generated/fafbeta.md >> changelog/fafbeta.md
+
+      # Update the posts directory contents
+      - name: Update changelog posts directory
+        shell: bash
+        run: |
+          changelog-links.sh _posts FAForever fa github.com
+
+      # Update the changelog directory contents
+      - name: Update changelog directory
+        shell: bash
+        run: |
+          changelog-links.sh changelog FAForever fa github.com
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
-          working-directory: '${{ github.workspace }}/docs'
+          ruby-version: "3.3"
+          bundler-cache: true
+          cache-version: 0
+          working-directory: "${{ github.workspace }}/docs"
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/_site/'
+          path: "docs/_site/"
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages

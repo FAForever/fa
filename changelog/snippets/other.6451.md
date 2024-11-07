@@ -1,0 +1,1 @@
+- (#6451) Annotate emitter blueprint parameters with extensive descriptions.

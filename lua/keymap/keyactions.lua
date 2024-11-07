@@ -1587,10 +1587,6 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true)',
         category = 'orders',
     },
-    ['Kill_All'] = {
-        action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true, true)',
-        category = 'orders',
-    },
     ['dock'] = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(true)',
         category = 'orders',

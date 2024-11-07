@@ -22,9 +22,20 @@
 
 ---@class DebugComponent
 DebugComponent = ClassSimple {
+
+    ---------------------------------------------------------------------------
+    --#region Workflow automation
+
+    -- The following fields are overwritten when a deployment happens. See also:
+    -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml
+    -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml
+    -- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml
+    
     EnabledSpewing = true,
     EnabledLogging = true,
     EnabledWarnings = true,
     EnabledErrors = true,
     EnabledDrawing = true,
+
+    --#endregion
 }

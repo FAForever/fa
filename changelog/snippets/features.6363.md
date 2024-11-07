@@ -1,2 +1,0 @@
-- (#6363) When an army is defeated, transfer all unbuilt units instead of only Experimentals and T3 Arty.
-  - When a unit fails to rebuild because its build site was blocked (for example a unit in factory), the mass invested is returned as a wreck.

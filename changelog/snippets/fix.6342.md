@@ -1,1 +1,0 @@
-- (#6342) Fix an error related to the blinking lights of structures
