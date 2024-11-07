@@ -293,6 +293,7 @@ end
 function Unit:GetUnitId()
 end
 
+--- Returns unit velocity in ogrids/tick
 ---@return number x
 ---@return number y
 ---@return number z
