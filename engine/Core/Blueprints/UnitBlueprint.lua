@@ -169,8 +169,6 @@
 ---@field BankFactor? number
 --- true if aircraft banks forward/back as well as sideways
 ---@field BankForward? boolean
---- distance from the target unit will start firing bombs
----@field BombDropThreshold? number
 --- distance to break off before turning around for another attack run
 ---@field BreakOffDistance? number
 --- if the air unit's new target is close-by, it will break off first to increase
