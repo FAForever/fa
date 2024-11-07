@@ -4,7 +4,7 @@
   3. Damage adjusted for more per-artillery variety in shots to kill T3 shields, while also evening out STK vs different faction T3 shields.
   4. Reload adjusted so that avg DPS vs T3 shields (this accounts for regen) per mass is equal to Aeon artillery.
   - Aeon Emissary: 
-    - Mass cost: 79000 -> 73200 (+7.9%)
+    - Mass cost: 73200 -> 79000 (+7.9%)
     - Energy cost: 1372500 -> 1481000 (+7.9%)
     - Build time: 120000 -> 129500 (+7.9%)
     - DPS with 4 T3 pgens: 1000
