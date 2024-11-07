@@ -181,8 +181,8 @@ UnitBlueprint{
     LifeBarSize = 2,
     Physics = {
         Elevation = 18,
-        FuelRechargeRate = 15,
-        FuelUseTime = 1000,
+        FuelRechargeRate = 0,
+        FuelUseTime = 0,
         GroundCollisionOffset = 2,
         MaxSpeed = 0.5,
         MotionType = "RULEUMT_Air",
