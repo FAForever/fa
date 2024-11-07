@@ -127,7 +127,7 @@ end
 
 ---Forces game to use AltFootprint for the unit
 ---@param state boolean
-function Unit:ForceAltFootPrint(state)
+function Unit:ForceAltFootprint(state)
 end
 
 --- Returns the unit's multiplier to a damage type
