@@ -94,10 +94,10 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
 ---@field DamageData WeaponDamageTable
----@field MyDepthCharge? DepthCharge    # If weapon blueprint has as (valid) `DepthCharge` field
----@field MyFlare? Flare            # If weapon blueprint has as (valid) `Flare` field
----@field MyUpperFlare? Flare       # If weapon blueprint has as (valid) `Flare` field that wants to be stacked
----@field MyLowerFlare? Flare       # If weapon blueprint has as (valid) `Flare` field that wants to be stacked
+---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
+---@field MyFlare? Flare            # If weapon blueprint has a (valid) `Flare` field
+---@field MyUpperFlare? Flare       # If weapon blueprint has a (valid) `Flare` field that wants to be stacked
+---@field MyLowerFlare? Flare       # If weapon blueprint has a (valid) `Flare` field that wants to be stacked
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
