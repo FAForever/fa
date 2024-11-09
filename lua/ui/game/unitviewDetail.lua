@@ -512,10 +512,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 local spaceWidth = control.Value[1]:GetStringAdvance(' ')
                 local str = LOC('<LOC uvd_ArmorType>')..LOC('<LOC at_'..armorType..'>')
                 local spaceCount = (195 - control.Value[1]:GetStringAdvance(str)) / spaceWidth
-                str = str..string.rep(' ', spaceCount)..LOC('<LOC uvd_DamageTaken>')
+                if armorType ~= "Normal" then
+                    str = str..string.rep(' ', spaceCount)..LOC('<LOC uvd_DamageTaken>')
+                end
                 table.insert(lines, str)
                 for _, armor in armorDefinition do
-                    if armor[1] == armorType then
+                    if armor[1] == armorType and armorType ~= "Normal" then
                         local row = 0
                         local armorDetails = ''
                         local elemCount = table.getsize(armor)
