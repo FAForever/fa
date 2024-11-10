@@ -18,8 +18,20 @@ local muzzleBones = { 'Turret_Barrel_F_B03', 'Turret_Barrel_E_B03', 'Turret_Barr
 URL0401 = ClassUnit(CLandUnit) {
 
     Weapons = {
+        ---@class URL0401_Gun01 : CIFArtilleryWeapon
+        ---@field losttarget boolean
+        ---@field initialaim boolean
+        ---@field PitchRotators moho.RotateManipulator[] # Pitch rotators for the fake turret barrels
+        ---@field currentbarrel number # Which barrel is currently aligned with the aim's yaw
+        ---@field Goal number # Yaw goal of fake barrels
+        ---@field restdirvector { x: number, y: number, z: number }
+        ---@field basediftorest number # "BaseDifToRest" angle in between Yaw aim bone and the resting fake barrel
+        ---@field pitchdif number # "PitchDif" angle in between fake barrel pitch and aim barrel pitch
+        ---@field rotatedbarrel true? # unused
+        ---@field Rotator moho.RotateManipulator # Yaw rotator for the `"Turret_Fake"` bone created every time the weapon fires after being packed
+        ---@field unit URL0401
         Gun01 = ClassWeapon(CIFArtilleryWeapon) {
-
+            ---@param self URL0401_Gun01
             OnCreate = function(self)
                 CIFArtilleryWeapon.OnCreate(self)
                 self.losttarget = false
@@ -29,11 +41,13 @@ URL0401 = ClassUnit(CLandUnit) {
                 self.currentbarrel = 1
             end,
 
+            ---@param self URL0401_Gun01
             OnLostTarget = function(self)
                 CIFArtilleryWeapon.OnLostTarget(self)
                 self.losttarget = true
             end,
 
+            ---@param self URL0401_Gun01
             PlayFxWeaponPackSequence = function(self)
                 if self.PitchRotators then
                     for k, v in barrelBones do
@@ -48,6 +62,7 @@ URL0401 = ClassUnit(CLandUnit) {
                 CIFArtilleryWeapon.PlayFxWeaponPackSequence(self)
             end,
 
+            ---@param self URL0401_Gun01
             LaunchEffects = function(self)
                 local FxLaunch = EffectTemplate.CArtilleryFlash02
                 for k, v in FxLaunch do
@@ -55,7 +70,11 @@ URL0401 = ClassUnit(CLandUnit) {
                 end
             end,
 
+            ---@param self URL0401_Gun01
+            ---@param muzzle Bone
             CreateProjectileAtMuzzle = function(self, muzzle)
+                -- set up the yaw and pitch rotators for the fake barrels since we just unpacked
+                -- Creates the animation where the barrels are at their lowest pitch and look spread out
                 if self.initialaim then
                     self.Rotator = CreateRotator(self.unit, 'Turret_Fake', 'y')
                     self.unit.Trash:Add(self.Rotator)
@@ -68,6 +87,7 @@ URL0401 = ClassUnit(CLandUnit) {
                         self.unit.Trash:Add(self.PitchRotators[k])
                     end
 
+                    -- fake barrel with the same yaw as the aim yaw
                     local barrel = self.currentbarrel
                     local basedirvector = {}
 
@@ -78,6 +98,7 @@ URL0401 = ClassUnit(CLandUnit) {
                     self.basediftorest = Util.GetAngleInBetween(self.restdirvector, basedirvector)
                 end
 
+                -- since we got a new target, adjust the pitch of the fake barrels to match the aim barrel
                 if self.losttarget or self.initialaim then
                     local dirvector = {}
                     dirvector.x, dirvector.y, dirvector.z = self.unit:GetBoneDirection('Turret_Aim_Barrel')
@@ -94,7 +115,7 @@ URL0401 = ClassUnit(CLandUnit) {
                     end
 
                     WaitFor(self.PitchRotators[1])
-
+                    -- Wait for aesthetics, to let the barrel rest at the final position a bit before firing
                     WaitTicks(3)
 
                     if self.losttarget then
@@ -119,6 +140,7 @@ URL0401 = ClassUnit(CLandUnit) {
                 self.Trash:Add(ForkThread(self.RotateBarrels, self))
             end,
 
+            ---@param self URL0401_Gun01
             RotateBarrels = function(self)
                 if not self.losttarget then
                     self.Rotator:SetSpeed(320)
