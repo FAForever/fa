@@ -23,6 +23,7 @@ local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
+local DebugUnitComponent = import("/lua/sim/units/components/DebugUnitComponent.lua").DebugUnitComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
 
@@ -112,7 +113,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields, DebugUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -145,7 +146,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -2141,7 +2142,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             if self:IsValidBone(v) then
                 self:ShowBone(v, children)
             else
-                WARN('*WARNING: TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self.UnitId), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
+                WARN('*TRYING TO SHOW BONE ', repr(v), ' ON UNIT ', repr(self.UnitId), ' BUT IT DOES NOT EXIST IN THE MODEL. PLEASE CHECK YOUR SCRIPT IN THE BUILD PROGRESS BONES.')
             end
         end
     end,
@@ -2243,31 +2244,30 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.Brain:OnUnitBeingBuiltProgress(self, builder, oldProg, newProg)
     end,
 
+    --- Set the unit's Yaw rotation and reset its roll/pitch
     ---@param self Unit
-    ---@param angle number
-    SetRotation = function(self, angle)
-        local qx, qy, qz, qw = Explosion.QuatFromRotation(angle, 0, 1, 0)
-        self:SetOrientation({qx, qy, qz, qw}, true)
+    ---@param degrees number
+    SetRotation = function(self, degrees)
+        self:SetOrientation(utilities.QuatFromRotation(degrees), true)
     end,
 
+    --- Rotate the unit on its Yaw axis
     ---@param self Unit
-    ---@param angle number
-    Rotate = function(self, angle)
-        local qx, qy, qz, qw = unpack(self:GetOrientation())
-        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        local current_yaw = math.floor(math.abs(a) * (180 / math.pi) + 0.5)
-
-        self:SetRotation(angle + current_yaw)
+    ---@param degrees number
+    Rotate = function(self, degrees)
+        self:SetOrientation(utilities.QuatFromRotation(degrees) * self:GetOrientation(), true)
     end,
 
+    --- Set the unit's Yaw rotation towards a point and reset its roll/pitch
     ---@param self Unit
-    ---@param tpos number
+    ---@param tpos Vector
     RotateTowards = function(self, tpos)
         local pos = self:GetPosition()
-        local rad = math.atan2(tpos[1] - pos[1], tpos[3] - pos[3])
-        self:SetRotation(rad * (180 / math.pi))
+        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
+    --- Set the unit's Yaw rotation towards the middle of the map (not playable area) and reset its roll/pitch
     ---@param self Unit
     RotateTowardsMid = function(self)
         local x, y = GetMapSize()
@@ -3095,11 +3095,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         if tempEnhanceBp.Prerequisite then
             if unitEnhancements[tempEnhanceBp.Slot] ~= tempEnhanceBp.Prerequisite then
-                WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper prerequisite. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] - Needed: ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] - Installed: ['..(tempEnhanceBp.Prerequisite or 'nil')..']')
+                WARN('*Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper prerequisite. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] - Needed: ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] - Installed: ['..(tempEnhanceBp.Prerequisite or 'nil')..']')
                 return false
             end
         elseif unitEnhancements[tempEnhanceBp.Slot] then
-            WARN('*WARNING: Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper slot available. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] has already ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] installed.')
+            WARN('*Ordered enhancement ['..(tempEnhanceBp.Name or 'nil')..'] does not have the proper slot available. Slot ['..(tempEnhanceBp.Slot or 'nil')..'] has already ['..(unitEnhancements[tempEnhanceBp.Slot] or 'nil')..'] installed.')
             return false
         end
 
@@ -3311,11 +3311,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Store latest layer for performance, preventing .Layer engine calls.
         self.Layer = new 
 
-        if old != 'None' then
-            self:DestroyMovementEffects()
-            self:CreateMovementEffects(self.MovementEffectsBag, nil)
-        end
-
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
@@ -3359,6 +3354,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.Footfalls = self:CreateFootFallManipulators(movementEffects[new].Footfall)
         end
         self:CreateLayerChangeEffects(new, old)
+        
+        -- re-create movement effects for units with different effects per layer
+        if old != 'None' then
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects(self.MovementEffectsBag, nil)
+        end
 
         -- Trigger the re-worded stuff that used to be inherited, no longer because of the engine bug above.
         if self.LayerChangeTrigger then
@@ -3633,7 +3634,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXImpact", impactType: ImpactType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXMotionChange", motionChange: MotionChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXLayerChange", layerChange: LayerChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
-    ---
+    --- Creates effects defined in `TerrainTypes.lua` based on the terrain that a movement is moving on.
     ---@param self Unit
     ---@param effectTypeGroups UnitBlueprintEffect[]
     ---@param fxBlockType LayerTerrainEffectType
@@ -3654,7 +3655,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         for _, typeGroup in effectTypeGroups do
             local bones = typeGroup.Bones
             if table.empty(bones) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
+                WARN('*No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
                 continue
             end
 
@@ -3706,28 +3707,31 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Creates camera shake effects and also movement effects for the terrain a unit is moving on.
     ---@param self Unit
     ---@param EffectsBag TrashBag
     ---@param TypeSuffix string
-    ---@param TerrainType string
-    ---@return boolean
+    ---@param TerrainType TerrainType?
+    ---@return boolean?
     CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
         local layer = self.Layer
         local bpTable = self.Blueprint.Display.MovementEffects
 
         if bpTable[layer] then
             bpTable = bpTable[layer]
-            local effectTypeGroups = bpTable.Effects
-
-            if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
-                if not self.Footfalls and bpTable.Footfall then
-                    WARN('*WARNING: No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects', layer, '.Effects table in unit blueprint. ')
-                end
-                return false
-            end
 
             if bpTable.CameraShake then
                 self.CamShakeT1 = self:ForkThread(self.MovementCameraShakeThread, bpTable.CameraShake)
+            end
+
+            local effectTypeGroups = bpTable.Effects
+
+            if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
+                -- warning isn't needed if this layer's table is used for Footfall or Contrails without terrain effects
+                if not bpTable.Footfall and not bpTable.Contrails then
+                    WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects.', layer, '.Effects table in unit blueprint.')
+                end
+                return false
             end
 
             self:CreateTerrainTypeEffects(effectTypeGroups, 'FXMovement', layer, TypeSuffix, EffectsBag, TerrainType)
@@ -3832,7 +3836,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     CreateBeamExhaust = function(self, bpTable, beamBP)
         local effectBones = bpTable.Bones
         if not effectBones or (effectBones and table.empty(effectBones)) then
-            WARN('*WARNING: No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
+            WARN('*No beam exhaust effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play beam exhaust effects. Add these to the Display.MovementEffects.BeamExhaust.Bones table in unit blueprint.')
             return false
         end
         for kb, vb in effectBones do
@@ -3851,7 +3855,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     CreateContrails = function(self, tableData)
         local effectBones = tableData.Bones
         if not effectBones or (effectBones and table.empty(effectBones)) then
-            WARN('*WARNING: No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
+            WARN('*No contrail effect bones defined for unit ', repr(self.UnitId), ', Effect Bones must be defined to play contrail effects. Add these to the Display.MovementEffects.Air.Contrail.Bones table in unit blueprint. ')
             return false
         end
         local ZOffset = tableData.ZOffset or 0.0
@@ -3882,7 +3886,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@return boolean
     CreateFootFallManipulators = function(self, footfall)
         if not footfall.Bones or (footfall.Bones and (table.empty(footfall.Bones))) then
-            WARN('*WARNING: No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
+            WARN('*No footfall bones defined for unit ', repr(self.UnitId), ', ', 'these must be defined to animation collision detector and foot plant controller')
             return false
         end
 
@@ -5440,12 +5444,12 @@ local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
----@class DummyUnit : moho.unit_methods
+---@class DummyUnit : moho.unit_methods, DebugUnitComponent
 ---@field EntityId EntityId
 ---@field Army Army
 ---@field Layer Layer
 ---@field Blueprint UnitBlueprint
-DummyUnit = ClassDummyUnit(moho.unit_methods) {
+DummyUnit = ClassDummyUnit(moho.unit_methods, DebugUnitComponent) {
 
     IsUnit = true,
 

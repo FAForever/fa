@@ -75,11 +75,13 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
 
     ---@param self AANDepthCharge01
     OnImpact = function(self, TargetType, TargetEntity)
+        self.HasImpacted = true
         local px, _, pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({ Owner = self })
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
         marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(self.Army, 5, 'WaterVision', true)
         ADepthChargeProjectileOnImpact(self, TargetType, TargetEntity)
     end,
 }

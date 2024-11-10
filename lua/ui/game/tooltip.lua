@@ -21,14 +21,14 @@ local mouseoverDisplay = false
 local createThread = false
 
 -- creates a tooltip box from ID table and with optional parameters
--- @param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
--- @param extended boolean indicates whether to just create tooltip header or also tooltip description
--- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
--- @param forced boolean determine if the tooltip should override hiding tooltips set in game options
--- @param padding number is optional space between tooltip description text and border of tooltip 
--- @param descFontSize number is optional font size for description text of tooltip 
--- @param textFontSize number is optional font size for header text of tooltip  
--- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+---@param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
+---@param extended? boolean indicates whether to just create tooltip header or also tooltip description
+---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param forced? boolean determine if the tooltip should override hiding tooltips set in game options
+---@param padding? number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize? number is optional font size for description text of tooltip 
+---@param textFontSize? number is optional font size for header text of tooltip  
+---@param position? string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
 function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padding, descFontSize, textFontSize, position)
 
     -- values used throughout the function
@@ -186,12 +186,12 @@ function CreateToolTip(parent, text)
 end
 
 -- creates a tooltip box with title text and/or description and with optional parameters
--- @param text string displayed in header of tooltip
--- @param desc string displayed in description of tooltip, this text is wrapped into multiple if longer than width
--- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
--- @param padding is optional space between tooltip description text and border of tooltip 
--- @param descFontSize number is optional font size for description text of tooltip 
--- @param textFontSize number is optional font size for header text of tooltip
+---@param text string displayed in header of tooltip
+---@param desc string displayed in description of tooltip, this text is wrapped into multiple if longer than width
+---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param padding? number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize? number is optional font size for description text of tooltip 
+---@param textFontSize? number is optional font size for header text of tooltip
 function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize, textFontSize)
     text = LOC(text)
     desc = LOC(desc)
@@ -363,12 +363,12 @@ end
 -- creates a tooltip box with specified title and description
 ---@param title string displayed in tooltip header
 ---@param description string displayed in tooltip body
----@param delay number is optional milliseconds used to delay tooltip popup
----@param width number is optional width of tooltip or it is auto calculated based on length of header/description
----@param padding number is optional space between tooltip description text and border of tooltip 
----@param descFontSize number is optional font size for description text of tooltip 
----@param textFontSize number is optional font size for header text of tooltip  
----@param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+---@param delay? number is optional milliseconds used to delay tooltip popup
+---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param padding? number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize? number is optional font size for description text of tooltip 
+---@param textFontSize? number is optional font size for header text of tooltip  
+---@param position? string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
 function AddControlTooltipManual(control, title, description, delay, width, padding, descFontSize, textFontSize, position)
 
     if not control.oldHandleEvent then

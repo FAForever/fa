@@ -11,6 +11,8 @@ local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
+local RotateVectorXYZByQuat =  import("/lua/utilities.lua").RotateVectorXYZByQuat
+
 -- upvalue scope for performance
 local unpack = unpack
 local Damage = Damage
@@ -24,10 +26,13 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local EntityCategoryContains = EntityCategoryContains
 
+local DebugProjectileComponent = import("/lua/sim/projectiles/components/DebugProjectileComponent.lua").DebugProjectileComponent
+
 local ProjectileMethods = moho.projectile_methods
 local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
 local ProjectileMethodsGetMaxZigZag = ProjectileMethods.GetMaxZigZag
 local ProjectileMethodsGetZigZagFrequency = ProjectileMethods.GetZigZagFrequency
+local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
 
 local EntityMethods = _G.moho.entity_methods
 local EntityGetBlueprint = EntityMethods.GetBlueprint
@@ -82,18 +87,18 @@ local OnImpactPreviousZ = 0
 
 local VectorCached = Vector(0, 0, 0)
 
----@class Projectile : moho.projectile_methods, InternalObject
+---@class Projectile : moho.projectile_methods, InternalObject, DebugProjectileComponent
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
----@field DamageData table
+---@field DamageData WeaponDamageTable
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
 ---@field OuterRing? NukeAOE
-Projectile = ClassProjectile(ProjectileMethods) {
+Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
@@ -180,25 +185,11 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local dx = sx * (Random() - 0.5) * fuzziness
             local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy / 2 + cy
             local dz = sz * (Random() - 0.5) * fuzziness + cz
-            local dw
 
-            -- Rotate a vector by a quaternion: q * v * conjugate(q)
-            -- Supreme Commander quaternions use y,z,x,w!
-            local ty, tz, tx, tw = unpack(EntityGetOrientation(target))
+            local orientation = EntityGetOrientation(target)
 
-            -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dw, dx, dy, dz = -tx * dx - tz * dy - ty * dz,
-                tw * dx + tz * dz - ty * dy,
-                tw * dy + ty * dx - tx * dz,
-                tw * dz + tx * dy - tz * dx
-
-            tx, tz, ty = -tx, -tz, -ty
-
-            -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dx, dy, dz = dw * tx + dx * tw + dy * ty - dz * tz,
-                dw * tz + dy * tw + dz * tx - dx * ty,
-                dw * ty + dz * tw + dx * tz - dy * tx
-
+            local dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
+            
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
             local px, _, pz = self:GetCurrentTargetPositionXYZ()
@@ -614,23 +605,18 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     --- Called by Lua to pass the damage data as a metatable
     ---@param self Projectile
-    ---@param data table
+    ---@param data WeaponDamageTable
     PassMetaDamage = function(self, data)
         self.DamageData = {}
         setmetatable(self.DamageData, data)
     end,
 
     --- Called by Lua to process the damage logic of a projectile
-    -- @param self The projectile itself
-    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
-    -- @param DamageData The damage data passed by the weapon
-    -- @param targetEntity The entity we hit, is nil if we hit terrain
-    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self Projectile
-    ---@param instigator Unit
-    ---@param DamageData table
-    ---@param targetEntity Unit | Prop | nil
-    ---@param cachedPosition Vector
+    ---@param instigator Unit # The launcher, and if it doesn't exist, the projectile itself
+    ---@param DamageData WeaponDamageTable # passed by the weapon
+    ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
+    ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
@@ -646,65 +632,62 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 local damageFriendly =  DamageData.DamageFriendly
                 local damageSelf = DamageData.DamageSelf or false
 
-                -- check for damage-over-time
-                local DoTTime = DamageData.DoTTime
-                if DoTTime <= 0 then
-                    -- no damage over time, do radius-based damage
+                -- do initial damage in a radius
+                DamageArea(
+                    instigator,
+                    cachedPosition,
+                    radius,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType,
+                    damageFriendly,
+                    damageSelf
+                )
+
+                local damageToShields = DamageData.DamageToShields
+                if damageToShields then
                     DamageArea(
                         instigator,
                         cachedPosition,
                         radius,
-                        damage,
-                        damageType,
+                        damageToShields,
+                        "FAF_AntiShield",
                         damageFriendly,
                         damageSelf
                     )
+                end
 
-                    local damageToShields = DamageData.DamageToShields
-                    if damageToShields then
-                        DamageArea(
+                -- check for and deal damage over time
+                local DoTTime = DamageData.DoTTime
+                if DoTTime > 0 then
+                    -- initial damage pulse was already dealt so subtract 1
+                    local DoTPulses = DamageData.DoTPulses - 1
+                    if DoTPulses >= 1 then
+                        ForkThread(
+                            AreaDoTThread,
                             instigator,
-                            cachedPosition,
+                            self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                            DoTPulses,
+                            (DoTTime / (DoTPulses)),
                             radius,
-                            damageToShields,
-                            "FAF_AntiShield",
-                            damageFriendly,
-                            damageSelf
-                        )
-                    end
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount
-                    if initialDmg > 0 then
-                        DamageArea(
-                            instigator,
-                            cachedPosition,
-                            radius,
-                            initialDmg,
+                            damage,
                             damageType,
-                            damageFriendly,
-                            damageSelf
+                            damageFriendly
                         )
                     end
-
-                    -- apply damage over time
-                    local DoTPulses = DamageData.DoTPulses or 1
-                    ForkThread(
-                        AreaDoTThread,
-                        instigator,
-                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                        DoTPulses,
-                        (DoTTime / (DoTPulses)),
-                        radius,
-                        damage,
-                        damageType,
-                        damageFriendly
-                    )
                 end
 
             -- damage a single entity
             elseif targetEntity then
                 local damageType = DamageData.DamageType
+
+                -- do initial damage
+                Damage(
+                    instigator,
+                    cachedPosition,
+                    targetEntity,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType
+                )
 
                 local damageToShields = DamageData.DamageToShields
                 if damageToShields then
@@ -717,43 +700,22 @@ Projectile = ClassProjectile(ProjectileMethods) {
                     )
                 end
 
-                -- check for damage-over-time
+                -- check for and apply damage over time
                 local DoTTime = DamageData.DoTTime
-                if DoTTime <= 0 then
-
-                    -- no damage over time, do single target damage
-                    Damage(
-                        instigator,
-                        cachedPosition,
-                        targetEntity,
-                        damage,
-                        damageType
-                    )
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        Damage(
+                if DoTTime > 0 then
+                    -- initial damage pulse was already dealt so subtract 1
+                    local DoTPulses = DamageData.DoTPulses - 1
+                    if DoTPulses >= 1 then
+                        ForkThread(
+                            UnitDoTThread,
                             instigator,
-                            cachedPosition,
                             targetEntity,
-                            initialDmg,
+                            DoTPulses,
+                            (DoTTime / (DoTPulses)),
+                            damage,
                             damageType
                         )
                     end
-
-                    -- apply damage over time
-                    local DoTPulses = DamageData.DoTPulses or 1
-                    ForkThread(
-                        UnitDoTThread,
-                        instigator,
-                        targetEntity,
-                        DoTPulses,
-                        (DoTTime / (DoTPulses)),
-                        damage,
-                        damageType,
-                        DamageData.DamageFriendly
-                    )
                 end
             end
         end
@@ -994,6 +956,28 @@ Projectile = ClassProjectile(ProjectileMethods) {
         return frequency
     end,
 
+    --- Set the vertical (gravitational) acceleration of the projectile. Default is -4.9, which is expected by the engine's weapon targeting and firing
+    ---@param acceleration number
+    SetBallisticAcceleration = function(self, acceleration)
+
+        -- Fix an engine bug where the values `1.#INF` or `-1.#IND` passed 
+        -- into this particular engine function can cause the simulation to freeze up.
+        --
+        -- Since `math.huge` does not exist (and does not cover the #IND case) I see
+        -- no other approach than this to try and 'fix' it.
+        --
+        -- Related sources:
+        -- - https://stackoverflow.com/questions/19107302/in-lua-what-is-inf-and-ind
+
+        -- guard to prevent invalid numbers (#IND) and infinite numbers (#INF) from reaching the engine function
+        local stringified = tostring(acceleration)
+        if stringified:find('#') then
+            error("Invalid acceleration value: " .. stringified)
+        end
+
+        return ProjectileMethodsSetBallisticAcceleration(self, acceleration)
+    end,
+
     ---------------------------------------------------------------------------
     --#region Deprecated functionality
 
@@ -1020,7 +1004,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     ---@deprecated
     ---@param self Projectile
-    ---@param DamageData table
+    ---@param DamageData WeaponDamageTable
     PassDamageData = function(self, DamageData)
         self.DamageData = {}
         self.DamageData.DamageRadius = DamageData.DamageRadius
@@ -1033,7 +1017,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
-        self.CollideFriendly = self.DamageData.CollideFriendly
+        self.CollideFriendly = DamageData.CollideFriendly
     end,
 
     ---root of all performance evil
