@@ -24,7 +24,9 @@ URL0401 = ClassUnit(CLandUnit) {
         ---@field PitchRotators moho.RotateManipulator[] # Pitch rotators for the fake turret barrels
         ---@field currentbarrel number # Which barrel is currently aligned with the aim's yaw
         ---@field Goal number # Yaw goal of fake barrels
-        ---@field restdirvector { x: number, y: number, z: number }
+        ---@field restdirvector Vector
+        ---@field dirvector Vector
+        ---@field basedirvector Vector
         ---@field basediftorest number # "BaseDifToRest" angle in between Yaw aim bone and the resting fake barrel
         ---@field pitchdif number # "PitchDif" angle in between fake barrel pitch and aim barrel pitch
         ---@field rotatedbarrel true? # unused
@@ -37,7 +39,9 @@ URL0401 = ClassUnit(CLandUnit) {
                 self.losttarget = false
                 self.initialaim = true
                 self.PitchRotators = {}
-                self.restdirvector = {}
+                self.restdirvector = Vector(0, 0, 0)
+                self.dirvector = Vector(0, 0, 0)
+                self.basedirvector = Vector(0, 0, 0)
                 self.currentbarrel = 1
             end,
 
@@ -89,21 +93,21 @@ URL0401 = ClassUnit(CLandUnit) {
 
                     -- fake barrel with the same yaw as the aim yaw
                     local barrel = self.currentbarrel
-                    local basedirvector = {}
+                    local basedirvector = self.basedirvector
 
                     self.Goal = 0
-                    self.restdirvector.x, self.restdirvector.y, self.restdirvector.z = self.unit:GetBoneDirection(barrelBones
+                    self.restdirvector[1], self.restdirvector[2], self.restdirvector[3] = self.unit:GetBoneDirection(barrelBones
                         [barrel])
-                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+                    basedirvector[1], basedirvector[2], basedirvector[3] = self.unit:GetBoneDirection('Turret_Aim')
                     self.basediftorest = Util.GetAngleInBetween(self.restdirvector, basedirvector)
                 end
 
                 -- since we got a new target, adjust the pitch of the fake barrels to match the aim barrel
                 if self.losttarget or self.initialaim then
-                    local dirvector = {}
-                    dirvector.x, dirvector.y, dirvector.z = self.unit:GetBoneDirection('Turret_Aim_Barrel')
-                    local basedirvector = {}
-                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+                    local dirvector = self.dirvector
+                    dirvector[1], dirvector[2], dirvector[3] = self.unit:GetBoneDirection('Turret_Aim_Barrel')
+                    local basedirvector = self.basedirvector
+                    basedirvector[1], basedirvector[2], basedirvector[3] = self.unit:GetBoneDirection('Turret_Aim')
 
                     local basediftoaim = Util.GetAngleInBetween(dirvector, basedirvector)
 
