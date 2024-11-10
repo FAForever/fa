@@ -286,6 +286,10 @@ end
 repr = inspect
 repru = inspect
 reprs = inspect
+
+---@param root any
+---@param options? DebugInspectOptions
+---@return string
 reprsl = function(root, options)
     local str = inspect(root, options)
     LOG(str)
