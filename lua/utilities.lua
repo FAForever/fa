@@ -405,7 +405,6 @@ end
 ---@param v1 Vector
 ---@param v2 Vector
 ---@return number
-
 function GetAngleInBetween(v1, v2)
     local x1, y1, z1 = v1.x, v1.y, v1.z
     local x2, y2, z2 = v2.x, v2.y, v2.z
