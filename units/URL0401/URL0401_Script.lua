@@ -29,7 +29,6 @@ URL0401 = ClassUnit(CLandUnit) {
         ---@field basedirvector Vector
         ---@field basediftorest number # "BaseDifToRest" angle in between Yaw aim bone and the resting fake barrel
         ---@field pitchdif number # "PitchDif" angle in between fake barrel pitch and aim barrel pitch
-        ---@field rotatedbarrel true? # unused
         ---@field Rotator moho.RotateManipulator # Yaw rotator for the `"Turret_Fake"` bone created every time the weapon fires after being packed
         ---@field unit URL0401
         Gun01 = ClassWeapon(CIFArtilleryWeapon) {
@@ -157,7 +156,6 @@ URL0401 = ClassUnit(CLandUnit) {
                     if self.currentbarrel > 6 then
                         self.currentbarrel = 1
                     end
-                    self.rotatedbarrel = true
                 end
             end,
         },
