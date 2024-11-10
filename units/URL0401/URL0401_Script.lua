@@ -131,15 +131,7 @@ URL0401 = ClassUnit(CLandUnit) {
                     end
                 end
 
-                local muzzleIdx = 0
-                for i = 1, self.unit:GetBoneCount() do
-                    if self.unit:GetBoneName(i) == 'Turret_Aim_Barrel_Muzzle' then
-                        muzzleIdx = i
-                        break
-                    end
-                end
-
-                CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
+                CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzle)
                 self.Trash:Add(ForkThread(self.LaunchEffects, self))
                 self.Trash:Add(ForkThread(self.RotateBarrels, self))
             end,
