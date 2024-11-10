@@ -74,6 +74,12 @@ URL0401 = ClassUnit(CLandUnit) {
                 end
             end,
 
+            --- Empty function because `CreateProjectileAtMuzzle` will wait when aiming the fake barrels, so the FX needs to be created in there for correct timing
+            ---@param self URL0401_Gun01
+            ---@param muzzle Bone
+            PlayFxMuzzleSequence = function(self, muzzle)
+            end,
+
             ---@param self URL0401_Gun01
             ---@param muzzle Bone
             CreateProjectileAtMuzzle = function(self, muzzle)
@@ -131,6 +137,7 @@ URL0401 = ClassUnit(CLandUnit) {
                     end
                 end
 
+                CIFArtilleryWeapon.PlayFxMuzzleSequence(self, muzzle)
                 CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzle)
                 self.Trash:Add(ForkThread(self.LaunchEffects, self))
                 self.Trash:Add(ForkThread(self.RotateBarrels, self))
