@@ -207,6 +207,13 @@ UnitBlueprint{
         BuildCostMass = 2250,
         BuildTime = 10000,
     },
+    AltFootprint = -- water only
+    {
+        SizeX = 2,
+        SizeZ = 8,
+        OccupancyCaps = 8,
+        MinWaterDepth = 1.5,
+    },
     Footprint = {
         SizeX = 2,
         SizeZ = 8,
@@ -413,7 +420,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
             DoTPulses = 5,
-            DoTTime = 0.5,
+            DoTTime = 0.4,
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 2,
             Label = "TorpedoL",
