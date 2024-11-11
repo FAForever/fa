@@ -394,6 +394,20 @@ Manager = {
         return true
     end,
 
+    ---@class EconStatsTriggerSpec
+    ---@field Name string
+    ---@field Parameters EconStatsTriggerParams
+
+    ---@class EconStatsTriggerParams
+    ---@field Brain AIBrain
+    ---@field ResourceType 'Mass' | 'Energy'
+    ---@field EconType 'TotalProduced' | 'TotalConsumed' | 'Income' | 'Output' | 'Stored' | 'Reclaimed' | 'Ratio' | 'MaxStorage' | 'PeakStorage' | 'Trend'
+    ---@field CompareType ComparatorString?
+    ---@field Number number # Value to compare against
+
+    ---@param self TriggerManager
+    ---@param spec EconStatsTriggerSpec
+    ---@return boolean
     EconStats = function(self, spec)
         local params = spec.Parameters
         if not params.ResourceType then

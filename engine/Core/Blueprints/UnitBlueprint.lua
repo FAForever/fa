@@ -1121,7 +1121,7 @@
 ---@field MaxGroundVariation number
 --- maximum speed for the unit
 ---@field MaxSpeed number
---- maximum speed for the unit in reverse
+--- maximum speed for the unit in reverse. Defaults to the same value as MaxSpeed
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
