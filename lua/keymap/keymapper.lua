@@ -215,7 +215,7 @@ function GetKeyActions()
     end
 
     for k,v in debugKeyActions do
-        if ret[k] and ret[k] != v.action then
+        if ret[k] and ret[k].action != v.action then
             WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
         end
 
