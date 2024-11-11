@@ -398,7 +398,7 @@ UnitBlueprint{
             TurretYawRange = 180,
             TurretYawSpeed = 125,
             Turreted = true,
-            WeaponCategory = "Indirect Fire",
+            WeaponCategory = "Direct Fire",
         },
         {
             Audio = {
