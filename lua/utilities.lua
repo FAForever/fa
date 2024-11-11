@@ -409,8 +409,6 @@ function GetAngleInBetween(v1, v2)
     local x1, y1, z1 = v1.x, v1.y, v1.z
     local x2, y2, z2 = v2.x, v2.y, v2.z
     -- arccos((v1 . v2) / (|v1| |v2|))
-    local z1Sq = z1 * z1
-    local z2Sq = z2 * z2
     local dot = x1 * x2 + y1 * y2 + z1 * z2
     local len2 = MathSqrt((x1 * x1 + y1 * y1 + z1Sq) * (x2 * x2 + y2 * y2 + z2Sq))
     return MathACos(dot / len2) * 180 / math.pi
