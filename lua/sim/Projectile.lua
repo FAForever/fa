@@ -328,6 +328,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if targetEntity.DisallowCollisions then
             return
         end
+        LOG('impacted', targetType, GetGameTick())
 
         -- localize information for performance
         local position = self:GetPosition()
