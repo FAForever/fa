@@ -433,6 +433,10 @@ GetAbilityDesc = {
     end
 }
 
+---@param bp UnitBlueprint
+---@param builder UserUnit
+---@param descID string
+---@param control Control
 function WrapAndPlaceText(bp, builder, descID, control)
     local lines = {}
     local blocks = {}
