@@ -169,4 +169,6 @@ properKeyNames = {
     ['OemClear'] = '<LOC properkeyname_0165>OemClear',
     ['Chevron'] = '<LOC properkeyname_0166>Chevron',
     ['Backtick'] = '<LOC properkeyname_0167>Backtick',
+    ['XButton1'] = '<LOC properkeyname_0168>XButton1',
+    ['XButton2'] = '<LOC properkeyname_0168>XButton1',
 }
