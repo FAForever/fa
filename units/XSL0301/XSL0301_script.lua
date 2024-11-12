@@ -38,10 +38,12 @@ XSL0301 = ClassUnit(CommandUnit) {
         },
     },
 
+    ---@param self XSL0301
     __init = function(self)
         CommandUnit.__init(self, 'LightChronatronCannon')
     end,
 
+    ---@param self XSL0301
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -51,39 +53,54 @@ XSL0301 = ClassUnit(CommandUnit) {
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
     end,
 
+    ---@param self XSL0301
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         CommandUnit.StartBeingBuiltEffects(self, builder, layer)
         self.Trash:Add(ForkThread(EffectUtil.CreateSeraphimBuildThread, self, builder, self.OnBeingBuiltEffectsBag, 2))
     end,
 
+    ---@param self XSL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones,
-            self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     -- =====================================================================================================================
     -- EMHANCEMENTS
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementTeleporter = function(self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementTeleporterRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Teleport')
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementMissile = function(self, bp)
         self:AddCommandCap('RULEUCC_Tactical')
         self:AddCommandCap('RULEUCC_SiloBuildTactical')
         self:SetWeaponEnabledByLabel('Missile', true)
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementMissileRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Tactical')
         self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
         self:SetWeaponEnabledByLabel('Missile', false)
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -91,18 +108,24 @@ XSL0301 = ClassUnit(CommandUnit) {
         self:CreateShield(bp)
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
         self:RemoveToggleCap('RULEUTC_ShieldToggle')
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementOvercharge = function(self, bp)
         self:AddCommandCap('RULEUCC_Overcharge')
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = false
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementOverchargeRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Overcharge')
         self:SetWeaponEnabledByLabel('OverCharge', false)
@@ -111,6 +134,8 @@ XSL0301 = ClassUnit(CommandUnit) {
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement 
     ProcessEnhancementEngineeringThroughput = function(self, bp)
         if not Buffs['SeraphimSCUBuildRate'] then
             BuffBlueprint {
@@ -130,12 +155,16 @@ XSL0301 = ClassUnit(CommandUnit) {
         Buff.ApplyBuff(self, 'SeraphimSCUBuildRate')
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEngineeringThroughputRemove = function(self, bp)
         if Buff.HasBuff(self, 'SeraphimSCUBuildRate') then
             Buff.RemoveBuff(self, 'SeraphimSCUBuildRate')
         end
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementDamageStabilization = function (self, bp)
         if not Buffs['SeraphimSCUDamageStabilization'] then
             BuffBlueprint {
@@ -162,12 +191,16 @@ XSL0301 = ClassUnit(CommandUnit) {
         Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementDamageStabilizationRemove = function (self, bp)
         if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
             Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
         end
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement 
     ProcessEnhancementEnhancedSensors = function(self, bp)
         self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
         self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
@@ -179,6 +212,8 @@ XSL0301 = ClassUnit(CommandUnit) {
         aoc:ChangeMaxRadius(35)
     end,
 
+    ---@param self XSL0301
+    ---@param bp UnitBlueprintEnhancement 
     ProcessEnhancementEnhancedSensorsRemove = function(self, bp)
         local bpIntel = self.Blueprint.Intel
         self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
@@ -191,6 +226,8 @@ XSL0301 = ClassUnit(CommandUnit) {
         aoc:ChangeMaxRadius(bp.NewMaxRadius or 25)
     end,
 
+    ---@param self XSL0301
+    --@param enh Blueprint
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
