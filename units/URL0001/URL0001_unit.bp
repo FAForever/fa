@@ -1030,7 +1030,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
             DoTPulses = 5,
-            DoTTime = 0.5,
+            DoTTime = 0.4,
             EffectiveRadius = 0,
             EnabledByEnhancement = "NaniteTorpedoTube",
             FireTargetLayerCapsTable = { Seabed = "Seabed|Sub|Water" },
