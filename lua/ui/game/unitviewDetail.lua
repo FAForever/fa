@@ -516,8 +516,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 local spaceWidth = control.Value[1]:GetStringAdvance(' ')
                 local str = LOC('<LOC uvd_ArmorType>')..LOC('<LOC at_'..armorType..'>')
                 local spaceCount = (195 - control.Value[1]:GetStringAdvance(str)) / spaceWidth
-                str = str..string.rep(' ', spaceCount)..LOC('<LOC uvd_DamageTaken>')
-                table.insert(lines, str)
+                local takesAdjustedDamage = false
                 for _, armor in armorDefinition do
                     if armor[1] == armorType then
                         local row = 0
@@ -525,6 +524,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         local elemCount = table.getsize(armor)
                         for i = 2, elemCount do
                             if string.find(armor[i], '1.0') > 0 then continue end
+                            takesAdjustedDamage = true
                             local armorName = armor[i]
                             armorName = string.sub(armorName, 1, string.find(armorName, ' ') - 1)
                             armorName = LOC('<LOC an_'..armorName..'>')..' - '..string.format('%0.1f', tonumber(armor[i]:sub(armorName:len() + 2, armor[i]:len())) * 100)
@@ -545,6 +545,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     end
                 end
                 table.insert(lines, '')
+
+                if takesAdjustedDamage then
+                    str = str..string.rep(' ', spaceCount)..LOC('<LOC uvd_DamageTaken>')
+                end
+                table.insert(lines, 1, str)
+
                 table.insert(blocks, {color = 'FF7FCFCF', lines = lines})
             end
             --Weapons
