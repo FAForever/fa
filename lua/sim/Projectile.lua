@@ -322,6 +322,12 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param targetType string
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
+        -- Since collision is checked before impacts are run, collision changes caused by impacts need to be checked by impacts
+        -- For example, a shield will first tell every projectile that it can collide with it, and then only afterwards will
+        -- HP be drained from the shield, and collisions turned off due to the shield being down. The same applies for units.
+        if targetEntity.DisallowCollisions then
+            return
+        end
 
         -- localize information for performance
         local position = self:GetPosition()
