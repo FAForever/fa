@@ -319,7 +319,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by the engine when the projectile impacts something
     ---@param self Projectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
         -- Since collision is checked before impacts are run, collision changes caused by impacts need to be checked by impacts
