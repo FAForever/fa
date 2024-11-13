@@ -91,7 +91,7 @@ jobs:
       - name: Download lua changelogs
         uses: actions/download-artifact@v4
         with:
-          name: changelog-fafdevelop
+          name: lua_changelog
           path: lua/ui/lobby/changelog/generated
 
       - name: Add the changelog as an artifact
