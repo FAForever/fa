@@ -31,8 +31,6 @@ on:
           - fafdevelop
           - fafbeta
 
-
-
 jobs:
   convert_changelog:
     name: Convert changelog

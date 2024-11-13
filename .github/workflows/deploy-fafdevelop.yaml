@@ -28,6 +28,7 @@ concurrency:
   group: deployment
 
 on:
+  push:
   workflow_dispatch:
   schedule:
     - cron: "0 21 * * 4"
@@ -35,9 +36,22 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
+
+  changelog:
+    name: Create changelog of FAF Develop
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafdevelop
+
+  changelog-lua:
+    name: Convert changelogs to Lua
+    uses: ./.github/workflows/docs-convert-changelog.yaml
+    with:
+      artifact: fafdevelop
+
   update:
     name: Update FAF Develop
-    needs: [test]
+    needs: [test, changelog]
     runs-on: ubuntu-latest
     steps:
       # https://github.com/actions/checkout/tree/v4/
@@ -68,18 +82,36 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      # Create a commit with the changes of the workflow in it
-      - name: Create a commit
+      - name: Clear dummy logs
         run: |
-          # Configure git
-          git config user.email "github@faforever.com"
-          git config user.name "FAForever Machine User"
+          rm -f lua/ui/lobby/changelog/generated/*
 
-          git add .
-          git commit -m "Post-process deployment"
+      # Retrieve the generated changelogs
+      - name: Download lua changelogs
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: lua/ui/lobby/changelog/generated
 
-      # Update the deploy/fafdevelop branch, we force push here because
-      # we're not interested in fixing conflicts
-      - name: Update deploy/fafdevelop
-        run: |
-          git push origin HEAD:deploy/fafdevelop --force
+      - name: Add the changelog as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lua
+          path: |
+            lua/ui/lobby
+
+      # # Create a commit with the changes of the workflow in it
+      # - name: Create a commit
+      #   run: |
+      #     # Configure git
+      #     git config user.email "github@faforever.com"
+      #     git config user.name "FAForever Machine User"
+
+      #     git add .
+      #     git commit -m "Post-process deployment"
+
+      # # Update the deploy/fafdevelop branch, we force push here because
+      # # we're not interested in fixing conflicts
+      # - name: Update deploy/fafdevelop
+      #   run: |
+      #     git push origin HEAD:deploy/fafdevelop --force
