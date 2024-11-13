@@ -2,6 +2,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local SelectionUtils = import("/lua/ui/game/selection.lua")
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 
 local lockZoomEnable = false
 function lockZoom()
@@ -661,4 +662,31 @@ SelectAllResourceConsumers = function(onscreen)
     end
 
     SelectUnits(units)
+end
+
+--- Select the commander with an option to zoom to. Will search for commanders in transports if none are found otherwise.
+---@param zoomTo boolean
+SelectCommander = function(zoomTo)
+    UISelectionByCategory("COMMAND", false, false, true, false)
+    local selectedUnits = GetSelectedUnits()
+    if not selectedUnits then
+        SetIgnoreSelection(true)
+        UISelectionByCategory("CANTRANSPORTCOMMANDER", false, false, false, false)
+        local transports = GetSelectedUnits()
+        SelectUnits(nil)
+        SetIgnoreSelection(false)
+        for _, transport in transports do
+            local attachedCommanders = EntityCategoryFilterDown(categories.COMMAND, GetAttachedUnitsList({transport}))
+            if attachedCommanders and table.getn(attachedCommanders) > 0 then
+                if zoomTo then
+                    UISelectAndZoomTo(transport, 0)
+                else
+                    SelectUnits({transport})
+                end
+                break
+            end
+        end
+    elseif zoomTo then
+        UIZoomTo(selectedUnits, 0)
+    end
 end
