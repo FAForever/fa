@@ -23,22 +23,7 @@ name: Convert Markdown changelog to Lua
 on:
   push:
   workflow_dispatch:
-    inputs:
-      reference:
-        required: true
-        type: choice
-        description: The reference (branch or tag) to use to compile the changelog snippets from
-        options:
-          - develop
-          - deploy/fafbeta
-          - deploy/fafdevelop
-
   workflow_call:
-    inputs:
-      reference:
-        required: true
-        type: string
-        description: The reference (branch or tag) to use to compile the changelog snippets from
 
 jobs:
   convert_changelog:
