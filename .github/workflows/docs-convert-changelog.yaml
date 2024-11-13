@@ -26,14 +26,22 @@ on:
   workflow_call:
 
 jobs:
+  changelog-develop:
+    name: Create changelog of FAF Develop
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafdevelop
+
+  changelog-beta:
+    name: Create changelog of FAF Beta
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: deploy/fafbeta
+
   convert_changelog:
     name: Convert changelog
     runs-on: ubuntu-latest
     steps:
-      - name: Install tooling
-        run: |
-          apt install bash git findutils
-
       - name: Set environment variable
         run: |
           echo "SCRIPTS=.github/workflows/scripts/python" >> $GITHUB_ENV
@@ -45,6 +53,19 @@ jobs:
             ${{ env.SCRIPTS }}
             changelog
             docs
+
+      # Retrieve the generated changelogs of FAF Develop and FAF Beta
+      - name: Download artifact changelog of FAF Develop
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: changelog
+
+      - name: Download artifact changelog of FAF Beta
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: changelog
 
       - name: Setup python
         uses: actions/setup-python@v5
