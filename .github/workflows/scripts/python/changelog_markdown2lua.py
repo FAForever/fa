@@ -25,6 +25,7 @@ HEADER = f"""{HEADER_SEPARATOR}
 {HEADER_SEPARATOR}
 """
 
+
 def get_parser():
     ap = ArgumentParser(description="Converts Markdown release files in a folder to Lua files.")
     ap.add_argument(
@@ -50,20 +51,37 @@ def convert_changelog(markdown: Path, lua: Path):
 
 
 def markdown2lua(version: str, content: str) -> str:
+    yaml_content, markdown_content = extract_yaml_front_matter(content)
     formatted_md = mdformat.text(
-        content,
+        markdown_content,
         options={
             "wrap": MAX_LINE_LENGTH,
         },
     )
 
     escaped_md = escape_special_symbols(formatted_md)
+    lua_description = ",\n".join(
+        LUA_DESC_LINE.format(line=line) for line in escaped_md.splitlines()
+    )
+
+    # YAML content is read and available here, but not added to the output yet.
+    # yaml_data = yaml.safe_load(yaml_content) if yaml_content else None
+
     return LUA_FILE.format(
         version=version,
-        description=",\n".join(
-            LUA_DESC_LINE.format(line=line) for line in escaped_md.splitlines()
-        ),
+        description=lua_description,
     )
+
+
+def extract_yaml_front_matter(content: str) -> (str, str):
+    """Extracts YAML front matter from markdown content."""
+    if content.startswith('---'):
+        end = content.find('---', 3)
+        if end != -1:
+            yaml_content = content[3:end].strip()
+            rest_of_content = content[end+3:].strip()
+            return yaml_content, rest_of_content
+    return '', content
 
 
 def escape_special_symbols(text: str) -> str:
