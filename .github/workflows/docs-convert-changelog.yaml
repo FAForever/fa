@@ -70,6 +70,12 @@ jobs:
           mkdir -p $out_dir
           python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
 
+      - name: Create changelog overview in Lua
+        run: |
+          out_dir=lua_changelog
+          mkdir -p $out_dir
+          python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
+
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
