@@ -26,17 +26,17 @@ on:
   workflow_call:
 
 jobs:
-  changelog-develop:
-    name: Create changelog of FAF Develop
-    uses: ./.github/workflows/docs-changelog.yaml
-    with:
-      reference: deploy/fafdevelop
+  # changelog-develop:
+  #   name: Create changelog of FAF Develop
+  #   uses: ./.github/workflows/docs-changelog.yaml
+  #   with:
+  #     reference: deploy/fafdevelop
 
-  changelog-beta:
-    name: Create changelog of FAF Beta
-    uses: ./.github/workflows/docs-changelog.yaml
-    with:
-      reference: deploy/fafbeta
+  # changelog-beta:
+  #   name: Create changelog of FAF Beta
+  #   uses: ./.github/workflows/docs-changelog.yaml
+  #   with:
+  #     reference: deploy/fafbeta
 
   convert_changelog:
     name: Convert changelog
@@ -54,19 +54,6 @@ jobs:
             changelog
             docs
 
-      # Retrieve the generated changelogs of FAF Develop and FAF Beta
-      - name: Download artifact changelog of FAF Develop
-        uses: actions/download-artifact@v4
-        with:
-          name: changelog-fafdevelop
-          path: changelog
-
-      - name: Download artifact changelog of FAF Beta
-        uses: actions/download-artifact@v4
-        with:
-          name: changelog-fafbeta
-          path: changelog
-
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -81,13 +68,7 @@ jobs:
         run: |
           out_dir=lua_changelog
           mkdir -p $out_dir
-          for file in changelog/*.md; do
-            out_file=$(basename ${file%.md}.lua)
-            python3 $SCRIPTS/changelog_markdown2lua.py "${file}" "${out_dir}/${out_file}"
-          done
-
-          ls
-          pwd
+          python3 $SCRIPTS/changelog_markdown2lua.py changelog "${out_dir}"
 
       # - name: Create an overview file
       #   run: |
