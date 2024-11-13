@@ -21,6 +21,7 @@
 name: Convert Markdown changelog to Lua
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       reference:
@@ -44,6 +45,10 @@ jobs:
     name: Convert changelog
     runs-on: ubuntu-latest
     steps:
+      - name: Install tooling
+        run: |
+          apt install bash git findutils
+
       - name: Set environment variable
         run: |
           echo "SCRIPTS=.github/workflows/scripts/python" >> $GITHUB_ENV
@@ -54,6 +59,7 @@ jobs:
           sparse-checkout: |
             ${{ env.SCRIPTS }}
             changelog
+            docs
 
       - name: Setup python
         uses: actions/setup-python@v5
@@ -68,11 +74,20 @@ jobs:
       - name: Convert changelog to Lua
         run: |
           out_dir=lua_changelog
-          mkdir $out_dir
+          mkdir -p $out_dir
           for file in changelog/*.md; do
             out_file=$(basename ${file%.md}.lua)
             python3 $SCRIPTS/changelog_markdown2lua.py "${file}" "${out_dir}/${out_file}"
           done
+
+          ls
+          pwd
+
+      # - name: Create an overview file
+      #   run: |
+      #     out_dir=lua_changelog
+      #     mkdir -p $out_dir
+      #     python3 $SCRIPTS/changelog_overview.py "changelog" "${out_dir}/overview.lua"
 
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
