@@ -105,7 +105,7 @@ def create_overview_file(input_dir: Path, output_file: Path):
         }
         overview_entries.append(entry)
 
-    overview_content = """
+    overview_content = HEADER.format(source='Overview Generation Script') + """
 ---@type UIChangelogOverview
 Overview = {
     Changelogs = {
