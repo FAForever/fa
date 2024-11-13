@@ -53,7 +53,7 @@ def create_overview_file(input_dir: Path, output_file: Path):
             'Version': version,
             'Name': name,
             'Date': date,
-            'URL': f"http://faforever.github.io/fa/{version}",
+            'URL': f"http://faforever.github.io/fa/changelog/{version}",
             'Path': f"/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
         }
         overview_entries.append(entry)
