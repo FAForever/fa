@@ -24,20 +24,16 @@ on:
   push:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      artifact:
+        type: choice
+        options:
+          - fafdevelop
+          - fafbeta
+
+
 
 jobs:
-  # changelog-develop:
-  #   name: Create changelog of FAF Develop
-  #   uses: ./.github/workflows/docs-changelog.yaml
-  #   with:
-  #     reference: deploy/fafdevelop
-
-  # changelog-beta:
-  #   name: Create changelog of FAF Beta
-  #   uses: ./.github/workflows/docs-changelog.yaml
-  #   with:
-  #     reference: deploy/fafbeta
-
   convert_changelog:
     name: Convert changelog
     runs-on: ubuntu-latest
@@ -53,6 +49,20 @@ jobs:
             ${{ env.SCRIPTS }}
             changelog
             docs
+
+      - name: Download develop artifact
+        if: inputs.artifact == 'fafdevelop'
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: docs/_posts
+
+      - name: Download balance artifact
+        if: inputs.artifact == 'fafbeta'
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: docs/_posts
 
       - name: Setup python
         uses: actions/setup-python@v5
