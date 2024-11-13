@@ -26,10 +26,8 @@ on:
   workflow_call:
     inputs:
       artifact:
-        type: choice
-        options:
-          - fafdevelop
-          - fafbeta
+        type: string  # fafdevelop or fafbeta
+        description: The reference (branch or tag) to use to compile the changelog snippets from
 
 jobs:
   convert_changelog:
