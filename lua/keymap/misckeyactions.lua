@@ -201,9 +201,9 @@ function ACUSelectCG()
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastACUSelectionTime
     if diffTime > 1.0 then
-        ConExecute('UI_SelectByCategory +nearest COMMAND')
+        SelectCommander(false)
     else
-        ConExecute('UI_SelectByCategory +nearest +goto COMMAND')
+        SelectCommander(true)
     end
 
     lastACUSelectionTime = curTime
