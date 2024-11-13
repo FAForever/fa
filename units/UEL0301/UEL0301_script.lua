@@ -352,6 +352,32 @@ UEL0301 = ClassUnit(CommandUnit) {
             WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
         end
     end,
+
+        ---@param self UEL0301
+    ---@param intel IntelType
+    OnIntelEnabled = function(self, intel)
+        CommandUnit.OnIntelEnabled(self, intel)
+        if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
+            if self.IntelEffects then
+                self.IntelEffectsBag = {}
+                self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+            end
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
+        end
+    end,
+
+    ---@param self UEL0301
+    ---@param intel IntelType
+    OnIntelDisabled = function(self, intel)
+        CommandUnit.OnIntelDisabled(self, intel)
+        if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then
+            self:SetMaintenanceConsumptionInactive()
+            if self.IntelEffectsBag then
+                EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
+            end
+        end
+    end,
 }
 
 TypeClass = UEL0301
