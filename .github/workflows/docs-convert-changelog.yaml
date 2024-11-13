@@ -26,7 +26,7 @@ on:
   workflow_call:
     inputs:
       artifact:
-        type: string  # fafdevelop or fafbeta
+        type: string # fafdevelop or fafbeta
         description: The reference (branch or tag) to use to compile the changelog snippets from
 
 jobs:
@@ -52,6 +52,7 @@ jobs:
         with:
           name: changelog-fafdevelop
           path: docs/_posts
+          merge-multiple: true
 
       - name: Download balance artifact
         if: inputs.artifact == 'fafbeta'
@@ -59,6 +60,7 @@ jobs:
         with:
           name: changelog-fafbeta
           path: docs/_posts
+          merge-multiple: true
 
       - name: Setup python
         uses: actions/setup-python@v5
