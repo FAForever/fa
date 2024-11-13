@@ -45,13 +45,14 @@ jobs:
 
   changelog-lua:
     name: Convert changelogs to Lua
+    needs: [changelog]
     uses: ./.github/workflows/docs-convert-changelog.yaml
     with:
       artifact: fafdevelop
 
   update:
     name: Update FAF Develop
-    needs: [test, changelog]
+    needs: [test, changelog-lua]
     runs-on: ubuntu-latest
     steps:
       # https://github.com/actions/checkout/tree/v4/
