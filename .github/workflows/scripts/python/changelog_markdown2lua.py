@@ -88,10 +88,46 @@ def escape_special_symbols(text: str) -> str:
     return text.replace("\\", "\\\\").replace('"', '\\"')
 
 
+def create_overview_file(input_dir: Path, output_file: Path):
+    overview_entries = []
+    for markdown_file in input_dir.glob("*.md"):
+        yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
+        yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
+
+        version = yaml_data.get('version', markdown_file.stem)
+        name = yaml_data.get('name', 'Unknown')
+
+        entry = {
+            'Version': version,
+            'Name': name,
+            'URL': f"http://faforever.github.io/fa/{version}",
+            'Path': f"/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
+        }
+        overview_entries.append(entry)
+
+    overview_content = """
+---@type UIChangelogOverview
+Overview = {
+    Changelogs = {
+"""
+    for entry in overview_entries:
+        overview_content += "        {\n"
+        overview_content += f"            Version = {entry['Version']},\n"
+        overview_content += f"            Name = \"{entry['Name']}\",\n"
+        overview_content += f"            URL = \"{entry['URL']}\",\n"
+        overview_content += f"            Path = \"{entry['Path']}\"\n"
+        overview_content += "        },\n"
+    overview_content += "    }\n}\n"
+
+    output_file.write_text(overview_content)
+
+
 def convert_changelog_folder(input_dir: Path, output_dir: Path):
     for markdown_file in input_dir.glob("*.md"):
         lua_file = output_dir / (markdown_file.stem + ".lua")
         convert_changelog(markdown_file, lua_file)
+    overview_file = output_dir / "overview.lua"
+    create_overview_file(input_dir, overview_file)
 
 
 if __name__ == "__main__":
