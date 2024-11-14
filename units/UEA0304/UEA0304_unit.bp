@@ -40,6 +40,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'UEA',        Cue = 'UEA0304_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 4000,
     BuildIconSortPriority = 40,
     Categories = {
         "AIR",
@@ -61,13 +62,10 @@ UnitBlueprint{
         "WEAKANTIAIR",
     },
     Defense = {
-        AirThreatLevel = 5.5,
+        AirThreatLevel = 5,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 4000,
         MaxHealth = 4000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 31,
     },
     Display = {
@@ -156,17 +154,12 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "air",
@@ -192,14 +185,6 @@ UnitBlueprint{
     LifeBarOffset = 0.75,
     LifeBarSize = 1.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 18,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,
@@ -281,7 +266,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.125,
+            RateOfFire = 10/80, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH4",
                 "TECH3 STRUCTURE",
@@ -333,7 +318,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.428,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -394,7 +379,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.428,
+            RateOfFire = 10/7, --10/integer interval in ticks
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -437,7 +422,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

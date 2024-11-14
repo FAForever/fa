@@ -334,7 +334,7 @@ end
 --- Creates a manipulator which rotates on a unit's bone
 ---@param object BoneObject
 ---@param bone Bone
----@param axis "x" | "y" | "z"
+---@param axis "x" | "y" | "z" | "-x" | "-y" | "-z"
 ---@param goal? unknown
 ---@param speed? number
 ---@param accel? number
@@ -444,7 +444,7 @@ end
 ---@see CreateUnitHPR() # heading-pitch-roll version
 ---@param blueprintId string
 ---@param army Army
----@param layer? number
+---@param layer Layer
 ---@param x number
 ---@param z number
 ---@param heading number
@@ -670,6 +670,7 @@ end
 function GetUnitBlueprintByName(bpName)
 end
 
+---@overload fun(x1: number, z1: number, x2: number, z2: number): Unit[] | nil
 --- retrieves all units in a rectangle
 ---@param rectangle Rectangle
 ---@return Unit[] | nil

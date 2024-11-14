@@ -1,31 +1,27 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 2000,
-        MaxHealth = 2000,
+        Health = 140,
+        MaxHealth = 140,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    AlbedoName = 'white_rough_plaster_albedo.dds',
-					NormalsName = 'white_rough_plaster_normalsts.dds',
-	  	    		ShaderName = 'VertexNormal',
-                    LODCutoff = 200,
-                    
+                    LODCutoff = 60,
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "white_rough_plaster_albedo.dds",
+                    NormalsName = "white_rough_plaster_normalsts.dds",
                 },
-				{
-
-                    AlbedoName = 'white_rough_plaster_albedo.dds',
-					NormalsName = 'white_rough_plaster_normalsts.dds',
-	  	    		ShaderName = 'VertexNormal',
-                    LODCutoff = 3000,
-                    
+                {
+                    LODCutoff = 240,
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "white_rough_plaster_albedo.dds",
+                    NormalsName = "white_rough_plaster_normalsts.dds",
                 },
             },
         },
@@ -36,15 +32,9 @@ PropBlueprint {
         ReclaimMassMax = 70,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Budda statue',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Budda statue" },
+    Physics = { BlockPath = true },
     SizeX = 1.5,
     SizeY = 2,
     SizeZ = 1,

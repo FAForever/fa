@@ -97,7 +97,8 @@ end
 Callbacks.SetStatByCallback = function(data, units)
     for stat, value in data do
         if not type(value) == 'boolean' then
-            WARN('SetStatByCallback: received non boolean value ' .. tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
+            WARN('SetStatByCallback: received non boolean value ' ..
+                tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
             continue
         end
         value = (value and 1) or 0 -- numerize our bool
@@ -716,9 +717,16 @@ end
 
 do
 
-    ---@param data table
+    local Width = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
+    local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
+
+    ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
+        do  -- feature: area commands
+            return
+        end
+
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
@@ -734,8 +742,69 @@ do
             return
         end
 
+        local ps = lastCommand.target:GetPosition()
+        local pe = data.Destination
+        local dx = pe[1] - ps[1]
+        local dz = pe[3] - ps[3]
+        local distance = math.sqrt(dx * dx + dz * dz)
+
+        -- limit the maximum distance
+        if distance > MaximumDistance then
+            pe[1] = (1 / distance) * MaximumDistance * dx + ps[1]
+            pe[3] = (1 / distance) * MaximumDistance * dz + ps[3]
+        end
+
+
+        -- radius = math.min(distance, maximumDistance)
+
+        -- local width = 5
+        -- local ox = nz
+        -- local oz = -nx
+
+        -- DrawCircle(ps, 1, 'ffffff')
+        -- DrawCircle(pe, 1, 'ffffff')
+        -- local ps1 = { ps[1] + width * ox, ps[2], ps[3] + width * oz }
+        -- local ps2 = { ps[1] - width * ox, ps[2], ps[3] - width * oz }
+
+        -- DrawCircle(ps1, 1, 'ffffff')
+        -- DrawCircle(ps2, 1, 'ffffff')
+
+        -- local pe1 = { pe[1] + width * ox, pe[2], pe[3] + width * oz }
+        -- local pe2 = { pe[1] - width * ox, pe[2], pe[3] - width * oz }
+
+        -- DrawCircle(pe1, 1, 'ffffff')
+        -- DrawCircle(pe2, 1, 'ffffff')
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimProps(selection, ps, pe, Width, true)
+        SPEW("Time taken for area reclaim order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start),
+            "miliseconds")
+    end
+
+    ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendAttackOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 10) or lastCommand.target then
+            return
+        end
+
         local target = lastCommand.target --[[@as Unit | Prop]]
-        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true)
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+        import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection,
+            { lastCommand.x, lastCommand.y, lastCommand.z }, data.Radius)
+        SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
     end
 
 end

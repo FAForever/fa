@@ -43,11 +43,13 @@ RadarUnit = ClassUnit(StructureUnit) {
     OnIntelDisabled = function(self, intel)
         StructureUnitOnIntelDisabled(self, intel)
         self:DestroyIdleEffects()
+        self:CreateBlinkingLights('Red')
     end,
 
     ---@param self RadarUnit
     OnIntelEnabled = function(self, intel)
         StructureUnitOnIntelEnabled(self, intel)
         self:CreateIdleEffects()
+        self:CreateBlinkingLights('Green')
     end,
 }

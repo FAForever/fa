@@ -7,6 +7,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UEL',        Cue = 'UEL0201_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Tank',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 300,
     BuildIconSortPriority = 40,
     Categories = {
         "BUILTBYTIER1FACTORY",
@@ -25,13 +26,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 300,
         MaxHealth = 300,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 2,
     },
     Display = {
@@ -92,16 +89,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "land",
@@ -113,15 +105,6 @@ UnitBlueprint{
     LifeBarSize = 0.65,
     Physics = {
         BackUpDistance = 6,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 3.4,
         MaxBrake = 3.4,
@@ -131,7 +114,6 @@ UnitBlueprint{
         MeshExtentsX = 0.65,
         MeshExtentsY = 0.35,
         MeshExtentsZ = 0.95,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
@@ -191,7 +173,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -222,12 +204,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

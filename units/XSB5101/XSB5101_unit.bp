@@ -6,6 +6,7 @@ UnitBlueprint{
         Killed         = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Structure',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 160,
     Categories = {
         "BENIGN",
@@ -26,15 +27,9 @@ UnitBlueprint{
         "WALL",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 0,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
-        ThreatLevel = 0,
     },
     Display = {
         AnimationDeath = {
@@ -75,22 +70,7 @@ UnitBlueprint{
         RebuildBonusIds = { "xsb5101" },
     },
     General = {
-        AlwaysAlignToTerrain = true,
         CapCost = 0.1,
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
         FactionName = "Seraphim",
         Icon = "land",
         SelectionPriority = 5,
@@ -101,14 +81,7 @@ UnitBlueprint{
     LifeBarOffset = 0.55,
     LifeBarSize = 0.8,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
+        AlwaysAlignToTerrain = true,
         DragCoefficient = 0.2,
         MaxGroundVariation = 50,
         MeshExtentsX = 1.5,
@@ -135,12 +108,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         UseCustomMesh = true,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

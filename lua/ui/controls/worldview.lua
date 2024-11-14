@@ -18,6 +18,7 @@ local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
 local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
+local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -31,58 +32,66 @@ local KeyCodeAlt = 18
 local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
-local weaponsCached = { }
+local unitsToWeaponsCached = { }
+
+---@class Renderable : Destroyable
+---@field OnRender fun(self:Renderable, worldView:WorldView)
 
 ---@class WorldViewDecalData
 ---@field texture string
 ---@field scale number
 
--- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
--- table from their blueprint. Otherwise returns null.
-
---- Returns all weapon blueprints that match the predicate of units with the `SHOWATTACKRETICLE` category set
+--- Returns all unique weapon blueprints that match the predicate, and are from units with the `SHOWATTACKRETICLE` category set
 ---@param predicate function<WeaponBlueprint>
----@return WeaponBlueprint[]
+---@return table<UnitId, WeaponBlueprint[] | false> unitsToWeapons
 local function GetSelectedWeaponsWithReticules(predicate)
     local selectedUnits = GetSelectedUnits()
 
     -- clear out the cache
-    local weapons = weaponsCached
-    for k, other in weapons do
-        weapons[k] = false
+    local unitsToWeapons = unitsToWeaponsCached
+    for k, other in unitsToWeapons do
+        unitsToWeapons[k] = false
     end
 
     -- find valid units
     if selectedUnits then
         for i, u in selectedUnits do
             local bp = u:GetBlueprint()
-            if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
-                for k, v in bp.Weapon do
-                    if predicate(v) then
-                        weapons[bp.BlueprintId] = v
-                        break
+            local bpId = bp.BlueprintId
+            if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not unitsToWeapons[bpId]) then
+                for _, wep in bp.Weapon do
+                    if predicate(wep) then
+                        if not unitsToWeapons[bpId] then
+                            unitsToWeapons[bpId] = { wep }
+                        else
+                            table.insert(unitsToWeapons[bpId], wep)
+                        end
                     end
                 end
             end
         end
     end
 
-    return weapons
+    return unitsToWeapons
 end
 
 --- A generic decal texture / size computation function that uses the damage or spread radius
 ---@param predicate function<WeaponBlueprint>
 ---@return WorldViewDecalData[]
 local function RadiusDecalFunction(predicate)
-    local weapons = GetSelectedWeaponsWithReticules(predicate)
+    local unitsToWeapons = GetSelectedWeaponsWithReticules(predicate)
 
     -- The maximum damage radius of a selected missile weapon.
     local maxRadius = 0
-    for _, w in weapons do
-        if w.FixedSpreadRadius and w.FixedSpreadRadius > maxRadius then
-            maxRadius = w.FixedSpreadRadius
-        elseif w.DamageRadius > maxRadius then
-            maxRadius = w.DamageRadius
+    for _, weapons in unitsToWeapons do
+        if weapons then
+            for _, w in weapons do
+                if w.FixedSpreadRadius and w.FixedSpreadRadius + w.DamageRadius > maxRadius then
+                    maxRadius = w.FixedSpreadRadius + w.DamageRadius
+                elseif w.DamageRadius > maxRadius then
+                    maxRadius = w.DamageRadius
+                end
+            end
         end
     end
 
@@ -101,7 +110,7 @@ end
 --- A decal texture / size computation function for `RULEUCC_Nuke`
 ---@return WorldViewDecalData[]
 local function NukeDecalFunc()
-    local weapons = GetSelectedWeaponsWithReticules(
+    local unitsToWeapons = GetSelectedWeaponsWithReticules(
         function(w)
             return w.NukeWeapon
         end
@@ -109,13 +118,17 @@ local function NukeDecalFunc()
 
     local inner = 0
     local outer = 0
-    for _, w in weapons do
-        if w.NukeOuterRingRadius > outer then
-            outer = w.NukeOuterRingRadius
-        end
+    for _, weapons in unitsToWeapons do
+        if weapons then
+            for _, w in weapons do
+                if w.NukeOuterRingRadius > outer then
+                    outer = w.NukeOuterRingRadius
+                end
 
-        if w.NukeInnerRingRadius > inner then
-            inner = w.NukeInnerRingRadius
+                if w.NukeInnerRingRadius > inner then
+                    inner = w.NukeInnerRingRadius
+                end
+            end
         end
     end
 
@@ -147,7 +160,8 @@ end
 local function AttackDecalFunc(mode)
     return RadiusDecalFunction(
         function(w)
-            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death" and w.WeaponCategory ~= "Anti Air"
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
+                and w.WeaponCategory ~= "Anti Air" and w.DamageType ~= 'Overcharge' and not w.EnabledByEnhancement
         end
 )
 end
@@ -211,6 +225,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
+---@field Renderables table<string, Renderable>
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
     PingThreads = {},
@@ -240,6 +255,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self.CursorOverride = false
 
         self.Trash = TrashBag()
+
+        self.Renderables = {}
+
     end,
 
     ---@param self WorldView
@@ -341,7 +359,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             order = self.CursorOverride
 
         -- special override
-        elseif holdAltToAttackMove == 'On' and IsKeyDown(KeyCodeAlt) and selection then
+        elseif holdAltToAttackMove == 'On' and IsKeyDown(KeyCodeAlt) and not IsKeyDown(KeyCodeCtrl) and selection then
             order = 'RULEUCC_AttackAlt'
 
         -- usual order structure
@@ -792,6 +810,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
+                CaptureReticle(self)
             end
         end
     end,
@@ -966,39 +985,44 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
+    ---@param self WorldView
+    ---@param ownerIndex integer
+    FlashScoreboardIcon = function(self, ownerIndex)
+        local scoreBoardControls = import("/lua/ui/game/score.lua").controls
+        if not scoreBoardControls.armyLines then
+            return
+        end
+        for _, line in scoreBoardControls.armyLines do
+            if line.armyID == ownerIndex then
+                ForkThread(self.FlashScoreboardIconThread, self, line.faction, 8, 0.4)
+                break
+            end
+        end
+    end,
+
+    ---@param self WorldView
+    ---@param toFlash Control
+    ---@param flashesRemaining integer
+    ---@param flashInterval number
+    FlashScoreboardIconThread = function(self, toFlash, flashesRemaining, flashInterval)
+        -- Flash the icon the appropriate number of times.
+        while flashesRemaining > 0 do
+            toFlash:Hide()
+            WaitSeconds(flashInterval)
+
+            toFlash:Show()
+            WaitSeconds(flashInterval)
+
+            flashesRemaining = flashesRemaining - 1
+        end
+    end,
+
+    ---@param self WorldView
+    ---@param pingData table
     DisplayPing = function(self, pingData)
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
-            -- Zero-based indices FTW...
-            local pingOwnerIndex = pingData.Owner + 1
-
-            -- The faction icon for the pingOwner.
-            local toFlash
-
-            -- Find the UI element we need to flash.
-            local scoreBoardControls = import("/lua/ui/game/score.lua").controls
-            for _, line in scoreBoardControls.armyLines or {} do
-                if line.armyID == pingOwnerIndex then
-                    toFlash = line.faction
-                    break
-                end
-            end
-
-            if toFlash then
-                local flashesRemaining = 8
-                local flashInterval = 0.4
-                ForkThread(function()
-                    -- Flash the icon the appropriate number of times.
-                    while flashesRemaining > 0 do
-                        toFlash:Hide()
-                        WaitSeconds(flashInterval)
-                        toFlash:Show()
-                        WaitSeconds(flashInterval)
-
-                        flashesRemaining = flashesRemaining - 1
-                    end
-                end)
-            end
+            self:FlashScoreboardIcon(pingData.Owner + 1) -- zero-based to one-based
         end
 
         if not self:IsHidden() and pingData.Location then
@@ -1359,7 +1383,53 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- called when strat icons are turned on/off
     end,
 
-    OnRenderWorld = function (self, delta)
-        -- called when custom world rendering is enabled
+    ---Add a shape to the draw table, pass an id with no data to remove it
+    ---@param self WorldView
+    ---@param id string -- id for tracking individual shapes
+    ---@param data? table -- data table for shape, pass nil to remove the given id
+    DrawShapeRegistry = function(self, id, data)
+        if data then
+            self:SetCustomRender(true)
+            self.DrawShapesTable[id] = data
+        else
+            self.DrawShapesTable[id] = nil
+        end
     end,
+
+    --#region Custom Rendering
+
+    --- Register a renderable to render each frame
+    ---@param self WorldView
+    ---@param renderable Renderable
+    ---@param id string
+    RegisterRenderable = function(self, renderable, id)
+        self.Trash:Add(renderable)
+        self.Renderables[id] = renderable
+
+        if not table.empty(self.Renderables) then
+            self:SetCustomRender(true)
+        end
+    end,
+
+    --- Unregister a renderable
+    ---@param self WorldView
+    ---@param id string
+    UnregisterRenderable = function(self, id)
+        self.Renderables[id] = nil
+
+        if table.empty(self.Renderables) then
+            self:SetCustomRender(false)
+        end
+    end,
+
+    --- Is called each frame to render shapes when custom rendering is enabled
+    ---@param self WorldView
+    ---@param delta number
+    OnRenderWorld = function (self, delta)
+        for id, renderable in self.Renderables do
+            renderable:OnRender(delta, delta)
+        end
+    end,
+
+    --#endregion
 }

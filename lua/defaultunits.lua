@@ -66,7 +66,6 @@ local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
 local MathAbs = math.abs
 
@@ -87,10 +86,5 @@ local RolloffPositionTable = { 0, 0, 0 }
 
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
-
--- compute once and store as upvalue for performance
-local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
 
 --#endregion

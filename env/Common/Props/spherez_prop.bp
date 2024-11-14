@@ -1,14 +1,16 @@
-PropBlueprint {
+PropBlueprint{
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 1000,
-                    MeshName = 'sphere_lod0.scm',
-                    ShaderName = 'TMeshZFill',
+                    LODCutoff = 210,
+                    ShaderName = "TMeshZFill",
+                    MeshName = "sphere_lod0.scm",
                 },
             },
             SortOrder = 999,
@@ -21,12 +23,8 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 0,
     },
-    Interface = {
-        HelpText = 'shield sphere',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "shield sphere" },
+    Physics = { BlockPath = false },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

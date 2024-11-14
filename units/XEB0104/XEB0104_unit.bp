@@ -14,6 +14,7 @@ UnitBlueprint{
         Open           = Sound { Bank = 'XEB',        Cue = 'XEB0104_Open',            LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Structure',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1000,
     BuildIconSortPriority = 200,
     Categories = {
         "BUILTBYTIER2COMMANDER",
@@ -37,14 +38,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 60,
         Health = 1000,
         MaxHealth = 1000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -53,6 +50,13 @@ UnitBlueprint{
         },
         AnimationOpen = "/units/XEB0104/XEB0104_aopen.sca",
         AnimationUpgrade = "/units/XEB0104/XEB0104_aupgrade.sca",
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
+        },
         IdleEffects = {
             Land = {
                 Effects = {
@@ -117,19 +121,8 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
             RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "land",
@@ -148,28 +141,16 @@ UnitBlueprint{
     LifeBarOffset = 0.35,
     LifeBarSize = 1.25,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
-        MaxSteerForce = 0,
         MeshExtentsX = 2,
         MeshExtentsY = 2.2,
         MeshExtentsZ = 2,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -0.5,
         SkirtOffsetZ = -0.5,
         SkirtSizeX = 2,
         SkirtSizeZ = 2,
-        TurnRate = 0,
     },
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.6,
@@ -185,12 +166,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

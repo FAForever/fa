@@ -7,6 +7,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XSL',            Cue = 'XSL0202_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Bot',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2500,
     BuildIconSortPriority = 20,
     Categories = {
         "BOT",
@@ -24,13 +25,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 2500,
         MaxHealth = 2500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 12,
     },
     Display = {
@@ -40,8 +37,6 @@ UnitBlueprint{
                 AnimationRateMax = 1.5,
                 AnimationRateMin = 0.5,
                 HitBox = {
-                    CollisionOffsetX = 0,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 1.0,
                     SizeX = 0.9,
                     SizeY = 0.7,
@@ -55,7 +50,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.5,
                 HitBox = {
                     CollisionOffsetX = 0.7,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 0.5,
                     SizeX = 1.1,
                     SizeY = 0.7,
@@ -69,7 +63,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.5,
                 HitBox = {
                     CollisionOffsetX = -0.2,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 0.7,
                     SizeX = 1.1,
                     SizeY = 0.7,
@@ -79,7 +72,7 @@ UnitBlueprint{
             },
         },
         AnimationWalk = "/units/xsl0202/xsl0202_Awalk.sca",
-        AnimationWalkRate = 1.5, 
+        AnimationWalkRate = 1.5,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -157,16 +150,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "land",
@@ -178,15 +166,6 @@ UnitBlueprint{
     LifeBarOffset = 0.2,
     LifeBarSize = 0.95,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 2.6,
         MaxBrake = 2.6,
@@ -196,11 +175,10 @@ UnitBlueprint{
         MeshExtentsX = 1,
         MeshExtentsY = 0.5,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         TurnRadius = 2,
-        TurnRate = 45,
+        TurnRate = 90,
     },
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
@@ -263,7 +241,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3.333,
+            RateOfFire = 10/3, --10/integer interval in ticks
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -296,12 +274,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

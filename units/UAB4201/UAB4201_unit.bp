@@ -7,6 +7,7 @@ UnitBlueprint{
         Open           = Sound { Bank = 'UAB',        Cue = 'UAB4201_Doors',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Gun',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 155,
     Categories = {
         "AEON",
@@ -28,13 +29,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "TMD",
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -83,20 +80,7 @@ UnitBlueprint{
         SizeZ = 1,
     },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = true,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_RetaliateToggle = true },
         ExcludeFromVeterancy = true,
         FactionName = "Aeon",
         Icon = "amph",
@@ -109,11 +93,7 @@ UnitBlueprint{
     LifeBarSize = 0.9,
     Physics = {
         BuildOnLayerCaps = {
-            LAYER_Air = false,
             LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
             LAYER_Water = true,
         },
         DragCoefficient = 0.2,
@@ -130,9 +110,9 @@ UnitBlueprint{
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.95,
     SelectionThickness = 0.45,
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.375,
     SizeX = 0.65,
-    SizeY = 0.75,
+    SizeY = 0.875,
     SizeZ = 1.25,
     StrategicIconName = "icon_structure2_antimissile",
     StrategicIconSortPriority = 200,
@@ -174,7 +154,7 @@ UnitBlueprint{
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",
@@ -197,7 +177,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

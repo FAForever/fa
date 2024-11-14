@@ -32,6 +32,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'UAA',        Cue = 'UAA0204_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 90,
     BuildIconSortPriority = 35,
     Categories = {
         "AEON",
@@ -50,13 +51,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Light",
-        EconomyThreatLevel = 6000,
+        EconomyThreatLevel = 80000,
         Health = 90,
         MaxHealth = 90,
-        RegenRate = 0,
-        SubThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_suicideweapon>Suicide Weapon" },
@@ -107,9 +105,9 @@ UnitBlueprint{
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
-        BuildTime = 2000,
+        BuildCostEnergy = 4600,
+        BuildCostMass = 230,
+        BuildTime = 1200,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -119,18 +117,9 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Dock = false,
-            RULEUCC_Guard = false,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "Aeon",
@@ -143,14 +132,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         AttackElevation = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 12,
         FuelRechargeRate = 0,
         FuelUseTime = 400,
@@ -189,7 +170,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Kamikaze",
             DoTPulses = 20,
-            DoTTime = 10,
+            DoTTime = 9.5,
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",
@@ -218,7 +199,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 10,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 10,
+            RateOfFire = 10/1, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
             TargetCheckInterval = 999999,

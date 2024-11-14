@@ -15,6 +15,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'XSL',            Cue = 'XSL0105_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 62.5,
     BuildIconSortPriority = 10,
     Categories = {
         "BUILTBYTIER1FACTORY",
@@ -38,14 +39,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 9,
         Health = 125,
         MaxHealth = 125,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -151,19 +148,15 @@ UnitBlueprint{
             YawBone = "Arm_Yaw",
         },
         CommandCaps = {
-            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = "Seraphim",
@@ -178,14 +171,6 @@ UnitBlueprint{
     Physics = {
         BackUpDistance = 8,
         BankingSlope = 0.5,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         Elevation = 0.5,
         MaxAcceleration = 3.8,
@@ -196,7 +181,6 @@ UnitBlueprint{
         MeshExtentsX = 0.65,
         MeshExtentsY = 0.75,
         MeshExtentsZ = 0.65,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
         RotateOnSpot = false,
@@ -224,7 +208,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

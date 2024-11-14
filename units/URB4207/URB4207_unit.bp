@@ -10,6 +10,7 @@ UnitBlueprint{
         ShieldOn       = Sound { Bank = 'URB',        Cue = 'URB4202_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Structure',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 165,
     Categories = {
         "CYBRAN",
@@ -28,13 +29,12 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 50,
+        EconomyThreatLevel = 11,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
         Shield = {
+            AbsorptionType = "StaticShield",
             ImpactEffects = "CybranShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01b_mesh",
             Mesh = "/effects/entities/CybranShield01/CybranShield01_mesh",
@@ -48,8 +48,6 @@ UnitBlueprint{
             ShieldSize = 40,
             ShieldVerticalOffset = -6,
         },
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_shielddome>Shield Dome" },
@@ -99,21 +97,7 @@ UnitBlueprint{
         SizeZ = 1,
     },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_Pause = true },
         FactionName = "Cybran",
         Icon = "land",
         OrderOverrides = {
@@ -133,14 +117,6 @@ UnitBlueprint{
     LifeBarOffset = 1.25,
     LifeBarSize = 3.5,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxGroundVariation = 1.1,
@@ -165,12 +141,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

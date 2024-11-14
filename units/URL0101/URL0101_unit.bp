@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'URL',        Cue = 'URL0101_Move_Stop',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 15,
     BuildIconSortPriority = 20,
     Categories = {
         "BOT",
@@ -28,14 +29,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 0,
         Health = 15,
         MaxHealth = 15,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0.1,
     },
     Display = {
         Abilities = {
@@ -90,18 +86,11 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
-            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "Cybran",
@@ -119,22 +108,12 @@ UnitBlueprint{
     LifeBarOffset = 0.2,
     LifeBarSize = 0.5,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 4.8,
         MaxBrake = 9.6,
         MaxSpeed = 4.8,
         MaxSpeedReverse = 4.8,
         MaxSteerForce = 10,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         TurnRadius = 0,
         TurnRate = 180,
@@ -161,13 +140,12 @@ UnitBlueprint{
                 Water = "Land|Water",
             },
             MaxRadius = 26,
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             ReTargetOnMiss = false,
             SlavedToBody = false,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
-            WeaponCategory = "Missile",
         },
     },
     Wreckage = {
@@ -176,12 +154,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

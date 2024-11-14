@@ -1,49 +1,35 @@
-PropBlueprint {
+PropBlueprint{
     Audio = {
-        BurnLoop = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        BurnStart = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Fire_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        TreeFall = Sound {
-            Bank = 'AmbientTest',
-            Cue = 'Gen_Tree_Crush',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        BurnLoop  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
+        BurnStart = Sound { Bank = 'AmbientTest', Cue = 'Gen_Fire_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        TreeFall  = Sound { Bank = 'AmbientTest', Cue = 'Gen_Tree_Crush', LodCutoff = 'UnitMove_LodCutoff' },
     },
-    Categories = {
-        'RECLAIMABLE',
-    },
+    Categories = { "RECLAIMABLE" },
     Defense = {
-        Health = 100,
-        MaxHealth = 100,
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'orange1oak1_albedo.dds',
-                    LODCutoff = 60,
-                    NormalsName = 'oak1_normalsTS.dds',
-                    ShaderName = 'UndulatingNormalMappedAlpha',
+                    LODCutoff = 40,
+                    ShaderName = "UndulatingNormalMappedAlpha",
+                    AlbedoName = "orange1oak1_albedo.dds",
+                    NormalsName = "oak1_normalsTS.dds",
                 },
                 {
-                    AlbedoName = 'orange1oak1_albedo.dds',
-                    LODCutoff = 300,
-                    NormalsName = 'oak1_normalsTS.dds',
-                    ShaderName = 'TMeshAlpha',
+                    LODCutoff = 150,
+                    ShaderName = "TMeshAlpha",
+                    AlbedoName = "orange1oak1_albedo.dds",
+                    NormalsName = "oak1_normalsTS.dds",
                 },
                 {
-                    AlbedoName = 'orange1oak1_albedo.dds',
-                    LODCutoff = 820,
-                    NormalsName = 'oak1_normalsTS.dds',
-                    ShaderName = 'TMeshAlpha',
+                    LODCutoff = 330,
+                    ShaderName = "TMeshAlpha",
+                    AlbedoName = "orange1oak1_albedo.dds",
+                    NormalsName = "oak1_normalsTS.dds",
                 },
             },
         },
@@ -54,14 +40,10 @@ PropBlueprint {
         ReclaimMassMax = 2.4,
         ReclaimTime = 15,
     },
-    Interface = {
-        HelpText = 'Large Tree - Decidous ',
-    },
-    Physics = {
-        BlockPath = false,
-    },
-    ScriptClass = 'Tree',
-    ScriptModule = '/lua/proptree.lua',
+    Interface = { HelpText = "Large Tree - Decidous " },
+    Physics = { BlockPath = false },
+    ScriptClass = "Tree",
+    ScriptModule = "/lua/proptree.lua",
     SizeX = 0.1,
     SizeY = 1,
     SizeZ = 0.1,

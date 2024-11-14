@@ -41,6 +41,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'XSA',            Cue = 'XSA0102_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Air',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 290,
     BuildIconSortPriority = 30,
     Categories = {
         "AIR",
@@ -59,14 +60,10 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 5.33,
+        AirThreatLevel = 5,
         ArmorType = "Light",
-        EconomyThreatLevel = 0,
         Health = 290,
         MaxHealth = 290,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_aa>Anti-Air" },
@@ -144,17 +141,12 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "air",
@@ -166,14 +158,6 @@ UnitBlueprint{
     LifeBarOffset = 0.7,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 14,
         FuelRechargeRate = 5,
         FuelUseTime = 300,
@@ -244,7 +228,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1,
+            RateOfFire = 10/10, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetCheckInterval = 0.3,
@@ -286,7 +270,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

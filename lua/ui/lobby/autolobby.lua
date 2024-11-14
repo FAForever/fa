@@ -92,8 +92,9 @@ local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
 
+    -- Game must have factions for players or else it won't start, so default to UEF.
+    result.Faction = 1
     local factionData = import("/lua/factions.lua")
-
     for index, tbl in factionData.Factions do
         if HasCommandLineArg("/" .. tbl.Key) then
             result.Faction = index
@@ -104,9 +105,9 @@ local function MakeLocalPlayerInfo(name)
     result.Team = tonumber(GetCommandLineArg("/team", 1)[1])
     result.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or false
 
-    result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
-    result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
-    result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1] or 500)
+    result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1] or 1500)
+    result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1] or 0)
     result.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
     result.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
     result.PL = math.floor(result.MEAN - 3 * result.DEV)
@@ -215,7 +216,13 @@ local function CheckForLaunch()
     for k,v in gameInfo.PlayerOptions do
         if v.Human and v.PL then
             allRatings[v.PlayerName] = v.PL
-            allDivisions[v.PlayerName]= v.DIV .. v.SUBDIV
+            if v.DIV ~= "unlisted" then
+                local divisiontext = v.DIV
+                if v.SUBDIV and v.SUBDIV ~="" then
+                    divisiontext = divisiontext .. ' ' .. v.SUBDIV
+                end
+                allDivisions[v.PlayerName]= divisiontext
+            end
             -- Initialize peer launch statuses
             peerLaunchStatuses[v.OwnerID] = false
         end
@@ -441,7 +448,7 @@ end
 
 -- join an already existing lobby
 function JoinGame(address, asObserver, playerName, uid)
-    LOG("Joingame (name=" .. playerName .. ", uid=" .. uid .. ", address=" .. address ..")")
+    LOG("Joingame (name=" .. tostring(playerName) .. ", uid=" .. tostring(uid) .. ", address=" .. tostring(address) ..")")
     CreateUI()
 
     -- TODO: I'm not sure if this argument is passed along when you are joining a lobby

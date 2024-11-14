@@ -19,6 +19,111 @@
 ---| 1 # Hold fire
 ---| 2 # Ground fire
 
+---@alias Keycode
+--- | 'BACK'
+--- | 'TAB'
+--- | 'RETURN'
+--- | 'ESCAPE'
+--- | 'SPACE'
+--- | 'DELETE'
+--- | 'START'
+--- | 'LBUTTON'
+--- | 'RBUTTON'
+--- | 'CANCEL'
+--- | 'MBUTTON'
+--- | 'CLEAR'
+--- | 'SHIFT'
+--- | 'ALT'
+--- | 'CONTROL'
+--- | 'MENU'
+--- | 'PAUSE'
+--- | 'CAPITAL'
+--- | 'PRIOR'
+--- | 'NEXT'
+--- | 'END'
+--- | 'HOME'
+--- | 'LEFT'
+--- | 'UP'
+--- | 'RIGHT'
+--- | 'DOWN'
+--- | 'SELECT'
+--- | 'PRINT'
+--- | 'EXECUTE'
+--- | 'SNAPSHOT'
+--- | 'INSERT'
+--- | 'HELP'
+--- | 'NUMPAD0'
+--- | 'NUMPAD1'
+--- | 'NUMPAD2'
+--- | 'NUMPAD3'
+--- | 'NUMPAD4'
+--- | 'NUMPAD5'
+--- | 'NUMPAD6'
+--- | 'NUMPAD7'
+--- | 'NUMPAD8'
+--- | 'NUMPAD9'
+--- | 'MULTIPLY'
+--- | 'ADD'
+--- | 'SEPARATOR'
+--- | 'SUBTRACT'
+--- | 'DECIMAL'
+--- | 'DIVIDE'
+--- | 'F1'
+--- | 'F2'
+--- | 'F3'
+--- | 'F4'
+--- | 'F5'
+--- | 'F6'
+--- | 'F7'
+--- | 'F8'
+--- | 'F9'
+--- | 'F10'
+--- | 'F11'
+--- | 'F12'
+--- | 'F13'
+--- | 'F14'
+--- | 'F15'
+--- | 'F16'
+--- | 'F17'
+--- | 'F18'
+--- | 'F19'
+--- | 'F20'
+--- | 'F21'
+--- | 'F22'
+--- | 'F23'
+--- | 'F24'
+--- | 'NUMLOCK'
+--- | 'SCROLL'
+--- | 'PAGEUP'
+--- | 'PAGEDOWN'
+--- | 'NUMPAD_SPACE'
+--- | 'NUMPAD_TAB'
+--- | 'NUMPAD_ENTER'
+--- | 'NUMPAD_F1'
+--- | 'NUMPAD_F2'
+--- | 'NUMPAD_F3'
+--- | 'NUMPAD_F4'
+--- | 'NUMPAD_HOME'
+--- | 'NUMPAD_LEFT'
+--- | 'NUMPAD_UP'
+--- | 'NUMPAD_RIGHT'
+--- | 'NUMPAD_DOWN'
+--- | 'NUMPAD_PRIOR'
+--- | 'NUMPAD_PAGEUP'
+--- | 'NUMPAD_NEXT'
+--- | 'NUMPAD_PAGEDOWN'
+--- | 'NUMPAD_END'
+--- | 'NUMPAD_BEGIN'
+--- | 'NUMPAD_INSERT'
+--- | 'NUMPAD_DELETE'
+--- | 'NUMPAD_EQUAL'
+--- | 'NUMPAD_MULTIPLY'
+--- | 'NUMPAD_ADD'
+--- | 'NUMPAD_SEPARATOR'
+--- | 'NUMPAD_SUBTRACT'
+--- | 'NUMPAD_DECIMAL'
+--- | 'NUMPAD_DIVIDE'
+
 --- No clue what this does
 ---@param entityId number
 ---@param onTime number
@@ -130,9 +235,11 @@ end
 function DecreaseBuildCountInQueue(queueIndex, count)
 end
 
----
----@param id unknown
-function DeleteCommand(id)
+---Deletes a command from the player command queue.
+---Each player has an array that holds all commands for all units, the commandID indexes to that array.
+---Note: this function doesn't receive any units as arguments--you will have to retrieve the commandId by UserUnit:GetCommandQueue()[commandIndex].ID
+---@param commandId number commandId, from UserUnit:GetCommandQueue()[commandIndex].ID
+function DeleteCommand(commandId)
 end
 
 ---
@@ -248,13 +355,13 @@ end
 function GetCamera(name)
 end
 
---- Gets the following arguments to a commandline option. For example, if `/arg -flag key:value drop`
---- was passed to the commandline, then `GetCommandLineArg("/arg", 2)` would return
---- `{"-flag", "key:value"}`
+--- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
+--- disregarding if they start with `/` like other commandline options.  
+--- Returns `false` if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
----@return string[]?
+---@return string[] | false
 function GetCommandLineArg(option, maxArgs)
 end
 
@@ -561,7 +668,7 @@ end
 
 --- For internal use by `CreateDiscoveryService()`
 ---@param serviceClass fa-class
----@return DiscoveryService
+---@return UILobbyDiscoveryService
 function InternalCreateDiscoveryService(serviceClass)
 end
 
@@ -599,15 +706,17 @@ end
 function InternalCreateItemList(itemList, parent)
 end
 
+---@alias UILobbyProtocols "UDP" | "TCP" | "None
+
 --- For internal use by `CreateLobbyComm()`
 ---@param lobbyComClass fa-class
----@param protocol string
+---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
----@param playerUID string
----@param natTraversalProvider userdata
----@return LobbyComm
+---@param playerUID? string
+---@param natTraversalProvider? userdata
+---@return UILobbyCommunication
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
@@ -802,7 +911,7 @@ end
 --- Make `dragger` the active dragger from a particular frame.
 --- You can pass `nil` to cancel the current dragger.
 ---@param originFrame Frame
----@param keycode string
+---@param keycode 'LBUTTON' | 'MBUTTON' | 'RBUTTON'
 ---@param dragger Dragger | nil
 function PostDragger(originFrame, keycode, dragger)
 end
@@ -895,7 +1004,7 @@ end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
 --- Unlike other engine functions that return tables, this function returns the same table each time it is called.
----@return UIScenarioInfo
+---@return UISessionSenarioInfo
 function SessionGetScenarioInfo()
 end
 
@@ -948,7 +1057,7 @@ end
 function SetActiveBuildTemplate(template)
 end
 
---- Set if anyone in the list is auto building
+--- Set if anyone in the list is auto building or auto assisting
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
@@ -1041,6 +1150,11 @@ end
 ---@param category string
 ---@param volume number 0.0 - 2.0
 function SetVolume(category, volume)
+end
+
+--- If set, inverts the middle mouse button
+---@param flag boolean
+function SetInvertMidMouseButton(flag)
 end
 
 --- Performs a callback with the given identifier from `callback.Func` in `/lua/simcallbacks.lua`.

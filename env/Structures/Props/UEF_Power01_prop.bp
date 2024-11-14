@@ -1,7 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -12,8 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
-                    ShaderName = 'TMeshNoNormals',
+                    LODCutoff = 240,
+                    ShaderName = "TMeshNoNormals",
                 },
             },
         },
@@ -24,15 +24,9 @@ PropBlueprint {
         ReclaimMassMax = 1,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'UEF Warehouse',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "UEF Warehouse" },
+    Physics = { BlockPath = true },
     SizeX = 1.5,
     SizeY = 1,
     SizeZ = 1.5,

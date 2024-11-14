@@ -74,7 +74,7 @@ IntelComponent = ClassSimple {
     end,
 
     ---@param self IntelComponent | Unit
-    ---@param disabler string
+    ---@param disabler string The reason the intel is disabled. If it's 'Energy', then free intel does not get disabled.
     ---@param intel? IntelType
     DisableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
@@ -84,67 +84,68 @@ IntelComponent = ClassSimple {
             -- prevent recharging from occuring
             self:OnIntelRechargeFailed()
 
-            -- disable all intel
+            -- upvalue for performance
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
-            local allIntelFromEnhancements = status.AllIntelFromEnhancements
+
+            -- disable all intel
             if not intel then
-                for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                        if not allIntelDisabledByEvent[i][disabler] then
-                            allIntelDisabledByEvent[i][disabler] = true
-                            self:DisableIntel(i)
-                            self:OnIntelDisabled(i)
-                        end
+                for intel, _ in allIntel do
+                    local allIntelDisablers = allIntelDisabledByEvent[intel]
+                    if not allIntelDisablers then
+                        allIntelDisabledByEvent[intel] = {}
                     end
-                end
-
-                if allIntelMaintenanceFree then
-                    for i, _ in allIntelMaintenanceFree do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                            if not allIntelDisabledByEvent[i][disabler] then
-                                allIntelDisabledByEvent[i][disabler] = true
-                                self:DisableIntel(i)
-                                self:OnIntelDisabled(i)
-                            end
-                        end
-                    end
-                end
-
-                -- disable one intel
-            elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
-                -- special case that requires additional book keeping
-                if disabler == 'Enhancement' then
-                    allIntelFromEnhancements[intel] = true
-                end
-
-                if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
-                    if not allIntelDisabledByEvent[intel][disabler] then
+                    if not allIntelDisablers[disabler] then
                         allIntelDisabledByEvent[intel][disabler] = true
                         self:DisableIntel(intel)
                         self:OnIntelDisabled(intel)
                     end
+                end
+
+                if disabler ~= 'Energy' and allIntelMaintenanceFree then
+                    for intel, _ in allIntelMaintenanceFree do
+                        local allIntelDisablers = allIntelDisabledByEvent[intel]
+                        if not allIntelDisablers then
+                            allIntelDisabledByEvent[intel] = {}
+                        end
+                        if not allIntelDisablers[disabler] then
+                            allIntelDisabledByEvent[intel][disabler] = true
+                            self:DisableIntel(intel)
+                            self:OnIntelDisabled(intel)
+                        end
+                    end
+                end
+
+            -- disable one intel
+            elseif allIntel[intel]
+                or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
+            then
+                local allIntelDisablers = allIntelDisabledByEvent[intel]
+                if not allIntelDisablers then
+                    allIntelDisabledByEvent[intel] = {}
+                end
+                if not allIntelDisablers[disabler] then
+                    allIntelDisabledByEvent[intel][disabler] = true
+                    self:DisableIntel(intel)
+                    self:OnIntelDisabled(intel)
                 end
             end
         end
     end,
 
     ---@param self IntelComponent | Unit
-    ---@param disabler string
+    ---@param disabler string The reason the intel is disabled. Intel will not enable if some other disabler is disabling it.
     ---@param intel? IntelType
     EnableUnitIntel = function(self, disabler, intel)
         local status = self.IntelStatus
         if status then
             -- LOG("EnableUnitIntel: " .. tostring(disabler) .. " for " .. tostring(intel))
 
+            -- upvalue for performance
             local allIntel = status.AllIntel
             local allIntelDisabledByEvent = status.AllIntelDisabledByEvent
             local allIntelMaintenanceFree = status.AllIntelMaintenanceFree
-            local allIntelFromEnhancements = status.AllIntelFromEnhancements
 
             -- special case when unit is finished building
             if disabler == 'NotInitialized' then
@@ -166,48 +167,39 @@ IntelComponent = ClassSimple {
                 return
             end
 
-            -- disable all intel
+            -- enable all intel
             if not intel then
-                for i, _ in allIntel do
-                    if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                        allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                        if allIntelDisabledByEvent[i][disabler] then
-                            allIntelDisabledByEvent[i][disabler] = nil
-                            if table.empty(allIntelDisabledByEvent[i]) then
-                                self:OnIntelRecharge(i)
-                            end
-                        end
-                    end
-                end
-
-                if allIntelFromEnhancements then
-                    for i, _ in allIntelFromEnhancements do
-                        if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[i]) then
-                            allIntelDisabledByEvent[i] = allIntelDisabledByEvent[i] or {}
-                            if allIntelDisabledByEvent[i][disabler] then
-                                allIntelDisabledByEvent[i][disabler] = nil
-                                if table.empty(allIntelDisabledByEvent[i]) then
-                                    self:OnIntelRecharge(i)
-                                end
-                            end
-                        end
-                    end
-                end
-
-                -- disable one intel
-            elseif allIntel[intel] or (allIntelFromEnhancements and allIntelFromEnhancements[intel]) then
-                -- special case that requires additional book keeping
-                if disabler == 'Enhancement' then
-                    allIntelFromEnhancements[intel] = true
-                end
-
-                if not (disabler == 'Energy' and allIntelMaintenanceFree and allIntelMaintenanceFree[intel]) then
-                    allIntelDisabledByEvent[intel] = allIntelDisabledByEvent[intel] or {}
-                    if allIntelDisabledByEvent[intel][disabler] then
-                        allIntelDisabledByEvent[intel][disabler] = nil
-                        if table.empty(allIntelDisabledByEvent[intel]) then
+                for intel, _ in allIntel do
+                    local allIntelDisablers = allIntelDisabledByEvent[intel]
+                    if allIntelDisablers[disabler] then
+                        allIntelDisablers[disabler] = nil
+                        if table.empty(allIntelDisablers) then
                             self:OnIntelRecharge(intel)
                         end
+                    end
+                end
+
+                if disabler ~= 'Energy' and allIntelMaintenanceFree then
+                    for intel, _ in allIntelMaintenanceFree do
+                        local allIntelDisablers = allIntelDisabledByEvent[intel]
+                        if allIntelDisablers[disabler] then
+                            allIntelDisablers[disabler] = nil
+                            if table.empty(allIntelDisablers) then
+                                self:OnIntelRecharge(intel)
+                            end
+                        end
+                    end
+                end
+
+            -- enable one intel
+            elseif allIntel[intel] 
+                or (disabler ~= 'Energy' and allIntelMaintenanceFree[intel])
+            then
+                local allIntelDisablers = allIntelDisabledByEvent[intel]
+                if allIntelDisablers[disabler] then
+                    allIntelDisablers[disabler] = nil
+                    if table.empty(allIntelDisablers) then
+                        self:OnIntelRecharge(intel)
                     end
                 end
             end
@@ -397,10 +389,10 @@ IntelComponent = ClassSimple {
 }
 
 local TechToDuration = {
-    TECH1 = 1,
-    TECH2 = 2,
-    TECH3 = 3,
-    EXPERIMENTAL = 6,
+    TECH1 = 1.0,
+    TECH2 = 1.0,
+    TECH3 = 1.0,
+    EXPERIMENTAL = 4,
 }
 
 local TechToLOD = {
@@ -596,7 +588,8 @@ local VeterancyRegenBuffs = {
 ---@field VetDamageTaken number
 ---@field VetInstigators table<EntityId, Unit>
 ---@field VetExperience? number
----@field VetLevel? number
+---@field VetLevel? number 
+---@field VetMassKillCredit? number -- bookkeeping number available to the player via stat
 VeterancyComponent = ClassSimple {
 
     ---@param self VeterancyComponent | Unit
@@ -610,10 +603,12 @@ VeterancyComponent = ClassSimple {
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
-            self:UpdateStat('VetLevel', 0)
             self:UpdateStat('VetExperience', 0)
+            self:UpdateStat('VetLevel', 0)
+            self:UpdateStat('VetMassKillCredit', 0)
             self.VetExperience = 0
             self.VetLevel = 0
+            self.VetMassKillCredit = 0
         end
     end,
 
@@ -624,12 +619,12 @@ VeterancyComponent = ClassSimple {
     ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())
-        self.VetDamageTaken = self.VetDamageTaken + amount
         if instigator and
             instigator.IsUnit and
             (not IsDestroyed(instigator)) and
             IsEnemy(self.Army, instigator.Army)
         then
+            self.VetDamageTaken = self.VetDamageTaken + amount
             local entityId = instigator.EntityId
             local vetInstigators = self.VetInstigators
             local vetDamage = self.VetDamage
@@ -664,6 +659,12 @@ VeterancyComponent = ClassSimple {
         if not blueprint.VetEnabled then
             return
         end
+
+        -- VetMassKillCredit is not otherwise used by the vet system, but
+        -- is available for players as a bookkeeping item for total mass
+        -- killed without the level gain limitations on VetExperience
+        self.VetMassKillCredit = self.VetMassKillCredit + experience
+        self:UpdateStat('VetMassKillCredit', self.VetMassKillCredit)
 
         local currExperience = self.VetExperience
         local currLevel = self.VetLevel

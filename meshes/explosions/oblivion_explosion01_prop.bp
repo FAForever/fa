@@ -1,14 +1,17 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = '/data/Env/Common/Props/marker01.dds',
-                    ShaderName = 'TMeshNoNormals',
+                    LODCutoff = 690,
+                    ShaderName = "TMeshNoNormals",
+                    AlbedoName = "/data/Env/Common/Props/marker01.dds",
                 },
             },
         },
@@ -19,12 +22,8 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'A marker for stuff dude',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Interface = { HelpText = "A marker for stuff dude" },
+    Physics = { BlockPath = true },
     SizeX = 14,
     SizeY = 2,
     SizeZ = 14,

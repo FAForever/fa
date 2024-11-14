@@ -104,26 +104,7 @@ function OnFirstUpdate()
     local playerArmy = armiesInfo.armiesTable[focusArmy]
     if avatars and avatars[1]:IsInCategory("COMMAND") then
         avatars[1]:SetCustomName(playerArmy.nickname)
-        PlaySound(Sound {
-            Bank = 'AmbientTest',
-            Cue = 'AMB_Planet_Rumble_zoom'
-        })
-        ForkThread(function()
-            WaitSeconds(1)
-
-            UIZoomTo(avatars, 1)
-            WaitSeconds(1.5)
-
-            local selected = false
-            repeat
-                WaitSeconds(0.1)
-
-                if not gameUIHidden then
-                    SelectUnits(avatars)
-                    selected = GetSelectedUnits()
-                end
-            until not table.empty(selected) or GameTick() > 50
-        end)
+        ForkThread(StartupSequence, avatars)
     end
 
     FlushEvents()
@@ -147,6 +128,28 @@ function OnFirstUpdate()
     UIUtil.UpdateCurrentSkin()
 end
 
+---@param avatars UserUnit[]
+function StartupSequence(avatars)
+    PlaySound(Sound {
+        Bank = "AmbientTest",
+        Cue = "AMB_Planet_Rumble_zoom"
+    })
+    WaitSeconds(1)
+
+    UIZoomTo(avatars, 1)
+    WaitSeconds(1.5)
+
+    local selected = false
+    repeat
+        WaitSeconds(0.1)
+
+        if not gameUIHidden then
+            SelectUnits(avatars)
+            selected = GetSelectedUnits()
+        end
+    until not table.empty(selected) or GameTick() > 50
+end
+
 function CreateUI(isReplay)
 
     -- overwrite some globals for performance / safety
@@ -157,6 +160,7 @@ function CreateUI(isReplay)
 
     -- start long-running threads
 
+    import("/lua/system/logger.lua")
     import("/lua/system/performance.lua")
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
@@ -195,17 +199,7 @@ function CreateUI(isReplay)
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
         Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
     then
-        ForkThread(function()
-            WaitSeconds(1.0)
-
-            if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-                ConExecute("cam_SetLOD WorldCamera 0.70")
-            end
-
-            if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                ConExecute("ren_ShadowSize 2048")
-            end
-        end)
+        ForkThread(ExperimentalGraphicsSettingsThread)
     end
 
     local focusArmy = GetFocusArmy()
@@ -350,6 +344,18 @@ function CreateUI(isReplay)
     import("/lua/keymap/hotkeylabels.lua").init()
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
+end
+
+function ExperimentalGraphicsSettingsThread()
+    WaitSeconds(1.0)
+
+    if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
+        ConExecute("cam_SetLOD WorldCamera 0.70")
+    end
+
+    if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
+        ConExecute("ren_ShadowSize 2048")
+    end
 end
 
 -- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
@@ -586,14 +592,14 @@ local cachedSelection = {
 --- Observable to allow mods to do something with a new selection
 ObserveSelection = import("/lua/shared/observable.lua").Create()
 
--- This function is called whenever the set of currently selected units changes
--- See /lua/unit.lua for more information on the lua unit object
--- @param oldSelection: What the selection was before
--- @param newSelection: What the selection is now
--- @param added: Which units were added to the old selection
--- @param removed: Which units where removed from the old selection
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
+
+---This function is called whenever the set of currently selected units changes
+---@param oldSelection UserUnit[] What the selection was before
+---@param newSelection UserUnit[] What the selection is now
+---@param added UserUnit[]        Which units were added to the old selection
+---@param removed UserUnit[]      Which units where removed from the old selection
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if ignoreSelection then
@@ -625,7 +631,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
         if changed then
             ForkThread(function()
-                SelectUnits(newSelection)
+                SelectUnits(newSelection) -- cannot fork cfunction directly
             end)
             return
         end
@@ -701,9 +707,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             local mode, data = unpack(CM.GetCommandMode())
 
             if mode then
-                ForkThread(function()
-                    CM.StartCommandMode(mode, data)
-                end)
+                ForkThread(CM.StartCommandMode, mode, data)
             end
         end
     end

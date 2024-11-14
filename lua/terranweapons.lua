@@ -8,11 +8,6 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import("/lua/sim/defaultweapons.lua")
-local CollisionBeams = import("/lua/defaultcollisionbeams.lua")
-
--- Weapon Files --
-
 TDFFragmentationGrenadeLauncherWeapon = import('/lua/sim/weapons/uef/TDFFragmentationGrenadeLauncherWeapon.lua').TDFFragmentationGrenadeLauncherWeapon
 TDFPlasmaCannonWeapon = import('/lua/sim/weapons/uef/TDFPlasmaCannonWeapon.lua').TDFPlasmaCannonWeapon
 TIFFragLauncherWeapon = import('/lua/sim/weapons/uef/TIFFragLauncherWeapon.lua').TIFFragLauncherWeapon
@@ -50,10 +45,15 @@ TAMPhalanxWeapon = import('/lua/sim/weapons/uef/TAMPhalanxWeapon.lua').TAMPhalan
 TOrbitalDeathLaserBeamWeapon = import('/lua/sim/weapons/uef/TOrbitalDeathLaserBeamWeapon.lua').TOrbitalDeathLaserBeamWeapon
 
 
--- Kept for Mod backwards compatibility
-local BareBonesWeapon = WeaponFile.BareBonesWeapon
+--#region kept for mod backwards compatibility
+local CollisionBeams = import("/lua/defaultcollisionbeams.lua")
 local GinsuCollisionBeam = CollisionBeams.GinsuCollisionBeam
-local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
-local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OrbitalDeathLaserCollisionBeam = CollisionBeams.OrbitalDeathLaserCollisionBeam
+
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local BareBonesWeapon = WeaponFile.BareBonesWeapon
+local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
+
 local EffectTemplate = import("/lua/effecttemplates.lua")
+--#endregion

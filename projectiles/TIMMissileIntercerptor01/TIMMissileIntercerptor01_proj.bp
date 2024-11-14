@@ -1,26 +1,22 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
+    Description = "UEF Anti Nuclear Missile",
     Audio = {
-        Impact = Sound {
-            Bank = 'Explosions',
-            Cue = 'Expl_Anti_Nuke',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact = Sound { Bank = 'Explosions', Cue = 'Expl_Anti_Nuke', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'NOSPLASHDAMAGE',
-        'ANTIMISSILE',
-        'TECH3',
-        'KILLAIRONCOLLISION'
+        "ANTIMISSILE",
+        "KILLAIRONCOLLISION",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TECH3",
+        "UEF",
     },
-    Description = 'UEF Anti Nuclear Missile',
     Display = {
         Mesh = {
             LODs = {
                 {
                     LODCutoff = 150,
-                    ShaderName = 'TMeshAlpha',
+                    ShaderName = "TMeshAlpha",
                 },
             },
         },
@@ -33,12 +29,10 @@ ProjectileBlueprint {
         BuildTime = 259200,
     },
     General = {
-        Category = 'Defense',
-        Faction = 'UEF',
+        Category = "Defense",
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 'UEF Anti Nuclear Missile',
-    },
+    Interface = { HelpText = "UEF Anti Nuclear Missile" },
     Physics = {
         Acceleration = 30,
         DestroyOnWater = false,
@@ -50,5 +44,5 @@ ProjectileBlueprint {
         UseGravity = false,
         VelocityAlign = true,
     },
-    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_strategic_antinuke.dds',
+    StrategicIconName = "/textures/ui/common/game/strategicicons/icon_strategic_antinuke.dds",
 }

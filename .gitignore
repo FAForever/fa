@@ -22,3 +22,6 @@ textures/ui/common/BUTTON/BACKUP/
 */dds/*
 .idea
 *.DS_Store
+act.exe
+*.venv
+lua_changelog

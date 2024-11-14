@@ -180,6 +180,25 @@ options = {
             },
 
             {
+                title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
+                key = 'invert_middle_mouse_button',
+                type = 'toggle',
+                default = 0,
+                update = function(control,value)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                set = function(key,value,startup)
+                    SetInvertMidMouseButton(value == 1)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0},
+                        {text = "<LOC _On>", key = 1},
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0158>Screen Edge Pans Main View",
                 key = 'screen_edge_pans_main_view',
                 type = 'toggle',
@@ -217,9 +236,9 @@ options = {
                     ConExecute("ui_KeyboardPanSpeed " .. tostring(value))
                 end,
                 custom = {
-                    min = 1,
-                    max = 200,
-                    inc = 0,
+                    min = 10,
+                    max = 400,
+                    inc = 10,
                 },
             },
             {
@@ -659,6 +678,32 @@ options = {
                     },
                 },
             },
+
+            -- {
+            --     title = '<LOC OPTIONS_0323>Area commands',
+            --     type = 'header',
+
+            --     -- these are expected everywhere
+            --     default = '',
+            --     key = '',
+            -- },
+
+            -- {
+            --     title = "<LOC area_commands_key>Key to trigger area commands",
+            --     key = 'area_commands_key',
+            --     type = 'toggle',
+            --     default = "no-key",
+            --     set = function(key, value, startup)
+            --         import("/lua/ui/game/hotkeys/area-reclaim-order.lua").SetDragKeyCode(value)
+            --     end,
+            --     custom = {
+            --         states = {
+            --             { text = "<LOC _Nokey>No key required", key = "no-key" },
+            --             { text = "<LOC _Alt>Alt", key = "ALT" },
+            --             { text = "<LOC _Control>Control", key = "CONTROL" },
+            --         },
+            --     },
+            -- },
 
             {
                 title = '<LOC OPTIONS_0322>Selection',

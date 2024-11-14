@@ -28,8 +28,12 @@
 ---| "TacticalMissile"
 ---| "TreeFire"
 ---| "TreeForce"
+---| "Disintegrate" # Used by tree props
+---| "Force"        # Used by tree props
+---| "Fire"         # Used by tree props
 ---| "WallOverspill"
 ---| "TransportDamage" # Skips visual effects in OnKilled
+---| "FAF_AntiShield" # Only deals damage to shields
 
 ---@alias ArmorType
 ---| "ASF"
@@ -109,6 +113,8 @@ armordefinition = {
 
         -- Armor Definition
         'Normal 1.0',
+        'Overcharge 0.25',
+        'Deathnuke 0.032',
         'TacticalMissile 0.55',
     },
 }

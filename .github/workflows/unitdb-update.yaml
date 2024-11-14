@@ -1,0 +1,41 @@
+# Copyright (c) 2024 Willem 'Jip' Wijnia
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: UnitDB - update unit information
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - deploy/faf
+
+jobs:
+  deploy:
+    name: Update the UnitDB
+    runs-on: ubuntu-latest
+    steps:
+        # All we need to do is send a request to the server to update the blueprint information. You can find the server code here:
+        # - https://github.com/FAForever/UnitDB/blob/master/www/update.php
+
+        # When using two or more query parameters the URL needs to be enclosed in double quotes, see also:
+        # - https://stackoverflow.com/questions/59749561/how-to-pass-several-parameters-through-curl-in-get-request
+      - name: Send request to server to update
+        run: |
+          curl -v -X GET "https://unitdb.faforever.com/update.php?token=${{secrets.UNITDB_UPGRADE_SECRET}}&version=deploy%2Ffaf"

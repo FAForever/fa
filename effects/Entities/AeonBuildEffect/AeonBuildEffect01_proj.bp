@@ -1,10 +1,10 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    ShaderName = 'AeonBuildPuddle',
                     LODCutoff = 350,
+                    ShaderName = "AeonBuildPuddle",
                 },
             },
         },

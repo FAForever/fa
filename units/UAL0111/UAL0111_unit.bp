@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ual0111_desc>Mobile Missile Launcher",
-    AI = { InitialAutoMode = true },
+    AI = {},
     Audio = {
         AmbientMove = Sound { Bank = 'UAL',        Cue = 'UAL0111_Move_Loop',   LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'UALDestroy', Cue = 'UAL_Destroy_Land',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -10,6 +10,7 @@ UnitBlueprint{
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
         Unpack      = Sound { Bank = 'UAL',        Cue = 'UAL0111_Open',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 750,
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
@@ -22,21 +23,18 @@ UnitBlueprint{
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
+        "SHOWATTACKRETICLE",
         "SILO",
         "SNIPEMODE",
-        "SHOWATTACKRETICLE",
         "TECH2",
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 11,
+        EconomyThreatLevel = 18,
         Health = 750,
         MaxHealth = 750,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 5,
+        SurfaceThreatLevel = 4,
     },
     Display = {
         Mesh = {
@@ -94,17 +92,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
-            RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "land",
@@ -116,15 +108,6 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BackUpDistance = 8,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 2.8,
         MaxBrake = 2.8,
@@ -134,7 +117,6 @@ UnitBlueprint{
         MeshExtentsX = 0.85,
         MeshExtentsY = 0.6,
         MeshExtentsZ = 1.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
@@ -205,7 +187,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.1,
+            RateOfFire = 10/100, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             TargetPriorities = {
@@ -235,12 +217,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

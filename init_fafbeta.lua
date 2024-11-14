@@ -196,6 +196,9 @@ allowedAssetsScd["loc_fr.scd"] = true
 allowedAssetsScd["loc_it.scd"] = true
 allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
+allowedAssetsScd["loc_cz.scd"] = true
+allowedAssetsScd["loc_cn.scd"] = true
+allowedAssetsScd["loc_pl.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
 allowedAssetsScd["editor.scd"] = false      -- Unused
@@ -638,3 +641,6 @@ MountDirectory(fa_path .. "/movies", '/movies')
 MountDirectory(fa_path .. "/sounds", '/sounds')
 MountDirectory(fa_path .. "/maps", '/maps')
 MountDirectory(fa_path .. "/fonts", '/fonts')
+
+-- Allows developers to embed code to debug a replay
+table.insert(path, 1, { dir = InitFileDir .. '\\..\\Debug', mountpoint = '/' })

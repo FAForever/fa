@@ -173,7 +173,7 @@ URS0201 = ClassUnit(CSeaUnit) {
         CSeaUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
             if self.Layer ~= 'Land' then
-                self:GetStat("h1_SetSalemAmph", 0)
+                self:ForceAltFootprint(true)
             else
                 self:SetScriptBit('RULEUTC_WeaponToggle', false)
             end
@@ -183,7 +183,7 @@ URS0201 = ClassUnit(CSeaUnit) {
     OnScriptBitClear = function(self, bit)
         CSeaUnit.OnScriptBitClear(self, bit)
         if bit == 1 then
-            self:GetStat("h1_SetSalemAmph", 1)
+            self:ForceAltFootprint(false)
         end
     end,
 }

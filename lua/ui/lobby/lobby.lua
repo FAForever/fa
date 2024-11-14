@@ -439,6 +439,9 @@ end
 
 --- Get a PlayerData object for the local player, configured using data from their profile.
 function GetLocalPlayerData()
+
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
     return PlayerData(
         {
             PlayerName = localPlayerName,
@@ -452,6 +455,11 @@ function GetLocalPlayerData()
             MEAN = argv.playerMean,
             DEV = argv.playerDeviation,
             Country = argv.PrefLanguage,
+
+            Version = version,
+            GameType = gametype,
+            Commit = commit,
+
         }
 )
 end
@@ -493,14 +501,7 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
     local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
 
-    -- if they're smaller than 1.0 then the AI doesn't get better; it gets worse!
-    if cheatBuildMultiplier < 0 then
-        cheatBuildMultiplier = 1 / cheatBuildMultiplier
-    end
-
-    if cheatResourceMultiplier < 0 then
-        cheatResourceMultiplier = 1 / cheatResourceMultiplier
-    end
+    
 
     -- compute the rating
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
@@ -3153,11 +3154,15 @@ function CreateUI(maxPlayers)
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
-    -- Version texts
-    local bool ShowPatch = false
-    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game version " .. version, 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
+
+    Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
+        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit:sub(1, 8)
+    ))
+
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
 
     -- Player Slots
@@ -4358,21 +4363,31 @@ function CreateUI(maxPlayers)
             local teams = {}
             local numTeams = 0
             for i, player in gameInfo.PlayerOptions:pairs() do
-                if not teams[player.Team] and player.Team != 1 then
-                    teams[player.Team] = 1
+                if not teams[player.Team] and player.Team ~= 1 then
+                    teams[player.Team] = true
                     numTeams = numTeams + 1
                 end
             end
-            -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
-            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+
+            -- adjust index by 1 because 0-based (ItemList rows) vs 1-based (Lua array) indexing
             local obsIndex = row + 1
-            if numTeams < 3 then
-                obsIndex = obsIndex - numTeams
+            local maxObsIndex = self:GetItemCount()
+
+            -- adjust index by the number of rows taken up by team ratings. 
+            ---@see refreshObserverList
+            if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+                if numTeams < 3 then
+                    obsIndex = obsIndex - numTeams
+                else
+                    -- 3+ teams has ratings at the end of the list, don't allow kicking when clicking those rating rows
+                    maxObsIndex = maxObsIndex - numTeams
+                end
             end
             
             -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
             -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
-            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
+            -- and that aren't the rows with team ratings when there are 3 or more teams
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID ~= localPlayerID and obsIndex <= maxObsIndex then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                         "<LOC lobui_0167>Kick Player", function()
                                             SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
@@ -5250,11 +5265,11 @@ local MessageHandlers = {
                     return false
                 end
 
-                if string.len(data.PlayerOptions.PlayerClan) > 3 then
+                -- note: there are strange clan names that use more than 1 byte per character
+                if string.len(data.PlayerOptions.PlayerClan) > 6 then
                     return false
                 end
             end
-
 
             if not data.PlayerOptions.OwnerID then
                 return false
@@ -5267,11 +5282,20 @@ local MessageHandlers = {
             if FindNameForID(data.SenderID) then
                 return false
             end
-            
+
+            -- check game version and reject if there is a missmatch
+            local hostVersion, hostGametype, hostCommit = import("/lua/version.lua").GetVersionData()
+            local playerVersion, playerGameType, playerCommit = tostring(data.PlayerOptions.Version), tostring(data.PlayerOptions.GameType), tostring(data.PlayerOptions.Commit)
+            if hostVersion ~= playerVersion or hostGametype ~= playerGameType or hostCommit ~= playerCommit then
+                local playerName = data.PlayerOptions.PlayerName
+                AddChatText(LOCF("<LOC lobui_666>Game version missmatch detected with %s. \r\n - host: %s (@%s)\r\n - %s: %s (@%s). \r\n\r\nTo prevent desyncs, %s is ejected automatically. It is possible that a new game version is released. If this keeps happening then it is better to rehost.", playerName, hostVersion, hostCommit:sub(1, 8), playerName, playerVersion, playerCommit:sub(1, 8), playerName))
+                return false
+            end
+
             return lobbyComm:IsHost()
         end,
         Reject = function(data)
-            lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
+            lobbyComm:EjectPeer(data.SenderID, "Game version missmatch or invalid player data.")
         end,
         Handle = function(data)
             -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty

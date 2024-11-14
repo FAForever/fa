@@ -8,7 +8,7 @@
 
 local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 
-local transferUnbuiltCategory = categories.EXPERIMENTAL + categories.TECH3 * categories.STRUCTURE * categories.ARTILLERY
+local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
 
@@ -66,7 +66,7 @@ end
 --- replaces the units with new ones)
 ---@param units Unit[]
 ---@param toArmy number
----@param captured boolean
+---@param captured boolean?
 ---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured)
     local toBrain = GetArmyBrain(toArmy)
@@ -371,14 +371,14 @@ function UpgradeTransferredKennels(kennels)
 end
 
 --- Takes the units and tries to rebuild them for each army (in order).
---- The transfer procedure is fairly expensive, so it is filtered to important units (EXPs and T3 arty).
 ---@param units Unit[]
 ---@param armies Army[]
 function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unbuiltUnits = {}
     local unbuiltUnitCount = 0
     for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
-        if unit:IsBeingBuilt() then
+        -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
+        if unit:IsBeingBuilt() and not unit.IsUpgrade then
             unbuiltUnitCount = unbuiltUnitCount + 1
             unbuiltUnits[unbuiltUnitCount] = unit
         end
@@ -569,12 +569,16 @@ end
 ---@param blockingEntities RevertibleCollisionShapeEntity[]
 function FinalizeRebuiltUnits(trackers, blockingEntities)
     for _, tracker in trackers do
-        if not tracker.Success and tracker.CanCreateWreck then -- create 50% wreck. Copied from Unit:CreateWreckageProp()
+        if not tracker.Success and tracker.CanCreateWreck then
             local bp = tracker.UnitBlueprint
             local pos = tracker.UnitPos
             local orientation = tracker.UnitOrientation
-            local mass = bp.Economy.BuildCostMass * 0.57 --0.57 to compensate some multipliers in CreateWreckage()
+            -- Refund exactly how much mass was put into the unit
+            local completionFactor = tracker.TargetBuildTime / bp.Economy.BuildTime
+            local mass = bp.Economy.BuildCostMass * completionFactor 
+            -- Don't refund energy because it would be counterintuitive for wreckage
             local energy = 0
+            -- global 2x time multiplier for unit wrecks, see `Unit:CreateWreckageProp`
             local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
             CreateWreckage(bp, pos, orientation, mass, energy, time)
         end
@@ -763,3 +767,28 @@ function OnAllianceResult(resultData)
 end
 
 import("/lua/simplayerquery.lua").AddResultListener("OfferAlliance", OnAllianceResult)
+
+local vectorCross = import('/lua/utilities.lua').Cross
+local upVector = Vector(0, 1, 0)
+
+--- Draw XYZ axes of an entity's bone for one tick
+---@param entity moho.entity_methods
+---@param bone Bone
+---@param length number? # length of axes, defaults to 0.2
+function DrawBone(entity, bone, length)
+    if not length then length = 0.2 end
+
+    local pos = entity:GetPosition(bone)
+    local dirX, dirY, dirZ = entity:GetBoneDirection(bone)
+
+    local forward = Vector(dirX, dirY, dirZ)
+    local left = vectorCross(upVector, forward)
+    local up = vectorCross(forward, left)
+
+    -- X axis
+    DrawLine(pos, pos + left * length, 'FF0000')
+    -- Y axis
+    DrawLine(pos, pos + up * length, '00ff00')
+    -- Z axis
+    DrawLine(pos, pos + forward * length, '0000ff')
+end

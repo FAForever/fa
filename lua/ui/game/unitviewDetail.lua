@@ -12,6 +12,8 @@ local armorDefinition = import("/lua/armordefinition.lua").armordefinition
 
 local controls = import("/lua/ui/controls.lua").Get()
 
+local MathFloor = math.floor
+
 View = controls.View or false
 MapView = controls.MapView or false
 ViewState = "full"
@@ -44,7 +46,7 @@ function GetTechLevelString(bp)
 end
 
 function FormatTime(seconds)
-    return string.format("%02d:%02d", math.floor(seconds / 60), math.mod(seconds, 60))
+    return string.format("%02d:%02d", MathFloor(seconds / 60), math.mod(seconds, 60))
 end
 
 function GetAbilityList(bp)
@@ -234,6 +236,14 @@ IsAbilityExist = {
     ability_omni = function(bp)
         return bp.Intel.OmniRadius > 0
     end,
+    ability_visionfield = function(bp)
+        return bp.Intel.MaxVisionRadius > 0
+    end,
+    ability_scry = function(bp)
+        return bp.Intel.RemoteViewingRadius > 0
+           and bp.Economy.InitialRemoteViewingEnergyDrain > 0
+           and bp.Economy.MaintenanceConsumptionPerSecondEnergy > 0
+    end,
     ability_flying = function(bp)
         return bp.Air.CanFly
     end,
@@ -332,6 +342,9 @@ IsAbilityExist = {
     end,
     ability_personal_teleporter = function(bp)
         return DecimalToBinary(bp.General.CommandCaps)[12] == 1 -- RULEUCC_Teleport
+    end,
+    ability_snipemode_prioritizes_acu = function(bp)
+        return bp.CategoriesHash.SNIPEMODE
     end
 }
 
@@ -344,6 +357,12 @@ GetAbilityDesc = {
     end,
     ability_omni = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.OmniRadius)
+    end,
+    ability_visionfield = function(bp)
+        return LOCF('<LOC uvd_VisionField>', bp.Intel.MaxVisionRadius)
+    end,
+    ability_scry = function(bp)
+        return LOCF('<LOC uvd_Scry>', bp.Intel.RemoteViewingRadius, bp.Economy.InitialRemoteViewingEnergyDrain, bp.Economy.MaintenanceConsumptionPerSecondEnergy)
     end,
     ability_flying = function(bp)
         return LOCF("<LOC uvd_0011>Speed: %0.1f, Turning: %0.1f", bp.Air.MaxAirspeed, bp.Air.TurnSpeed)
@@ -381,11 +400,13 @@ GetAbilityDesc = {
              ..LOCF('<LOC uvd_Blips>', bp.Intel.JammerBlips)
     end,
     ability_personalshield = function(bp)
-        return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
+        return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
+             ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
     end,
     ability_shielddome = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize/2)..', '
-             ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
+             ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
+             ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
     end,
     ability_stealthfield = function(bp)
         return LOCF('<LOC uvd_Radius>', bp.Intel.RadarStealthFieldRadius)
@@ -526,6 +547,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
             if not table.empty(bp.Weapon) then
                 local weapons = {upgrades = {normal = {}, death = {}},
                                     basic = {normal = {}, death = {}}}
+                local totalWeaponCount = 0
                 for _, weapon in bp.Weapon do
                     if not weapon.WeaponCategory then continue end
                     local dest = weapons.basic
@@ -542,11 +564,18 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     else
                         dest[weapon.DisplayName] = {info = weapon, count = 1}
                     end
+                    if not dest.death then
+                        totalWeaponCount = totalWeaponCount + 1
+                    end
                 end
                 for k, v in weapons do
                     if not table.empty(v.normal) or not table.empty(v.death) then
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {LOC('<LOC uvd_'..k..'>')..':'}})
                     end
+                    local totalDirectFireDPS = 0
+                    local totalIndirectFireDPS = 0
+                    local totalNavalDPS = 0
+                    local totalAADPS = 0
                     for name, weapon in v.normal do
                         local info = weapon.info
                         local weaponDetails1 = LOCStr(name)..' ('..LOCStr(info.WeaponCategory)..') '
@@ -562,10 +591,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             --DPS Calculations
                             local Damage = info.Damage
                             if info.DamageToShields then
-                                Damage = math.max(Damage, info.DamageToShields)
+                                Damage = Damage + info.DamageToShields
                             end
                             if info.BeamLifetime > 0 then
-                                Damage = Damage * (MATH_IRound(10 * info.BeamLifetime) + 1)
+                                Damage = Damage * (1 + MathFloor(MATH_IRound(info.BeamLifetime*10)/(MATH_IRound(info.BeamCollisionDelay*10)+1)))
                             else
                                 Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
                                 local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
@@ -632,10 +661,23 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 CycleTime = CycleTime + FiringCooldown
                             end
 
+                            local DPS = 0
                             if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' and info.WeaponCategory ~= 'Defense' then
                                 --Round DPS, or else it gets floored in string.format.
-                                local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
+                                DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
+                                -- Do not calulcate the DPS total if the unit only has one valid weapon.
+                                if totalWeaponCount > 1 then
+                                    if (info.WeaponCategory == 'Direct Fire' or info.WeaponCategory == 'Direct Fire Naval' or info.WeaponCategory == 'Direct Fire Experimental') and not info.IgnoreIfDisabled then
+                                        totalDirectFireDPS = totalDirectFireDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Indirect Fire' or info.WeaponCategory == 'Missile' or info.WeaponCategory == 'Artillery' or info.WeaponCategory == 'Bomb' then
+                                        totalIndirectFireDPS = totalIndirectFireDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Anti Navy' then
+                                        totalNavalDPS = totalNavalDPS + DPS * weapon.count
+                                    elseif info.WeaponCategory == 'Anti Air' then
+                                        totalAADPS = totalAADPS + DPS * weapon.count
+                                    end
+                                end
                             end
 
                             -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
@@ -659,7 +701,6 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                 Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
-
 
                         end
                         if weapon.count > 1 then
@@ -702,23 +743,53 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails = weaponDetails..' x'..weapon.count
                         end
                         table.insert(lines, weaponDetails)
+                        table.insert(blocks, {color = 'FFFF0000', lines = lines})
                     end
-                    if not table.empty(v.normal) or not table.empty(v.death) then
-                        table.insert(lines, '')
+                    
+                    -- Only display the totalDPS stats if they are greater than 0.
+                    -- Prevent the totalDPS stats from being displayed under the 'Upgrades' tab and avoid the doubling of empty lines.
+                    local upgradesAvailable = not table.empty(weapons.upgrades.normal) or not table.empty(weapons.upgrades.death)
+                    if k == 'basic' then
+                        if totalDirectFireDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0018>', totalDirectFireDPS)}})
+                        end
+                        if totalIndirectFireDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0019>', totalIndirectFireDPS)}})
+                        end
+                        if totalNavalDPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0020>', totalNavalDPS)}})
+                        end
+                        if totalAADPS > 0 then
+                            table.insert(blocks, {color = 'FFA600', lines = {LOCF('<LOC uvd_0021>', totalAADPS)}})
+                        end
+                        if not upgradesAvailable then
+                            table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
+                        end
                     end
-                    table.insert(blocks, {color = 'FFFF0000', lines = lines})
+                    -- Avoid the doubling of empty lines when the unit has upgrades.
+                    if upgradesAvailable then
+                        table.insert(blocks, {color = UIUtil.fontColor, lines = {''}}) -- Empty line
+                    end
                 end
             end
         end
         --Other parameters
         lines = {}
-        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %0.1f, Cap Cost: %0.1f",
+        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %.3g, Cap Cost: %.3g",
             bp.Intel.VisionRadius, bp.Intel.WaterVisionRadius, bp.Defense.RegenRate, bp.General.CapCost))
 
         if (bp.Physics.MotionType ~= 'RULEUMT_Air' and bp.Physics.MotionType ~= 'RULEUMT_None')
         or (bp.Physics.AltMotionType ~= 'RULEUMT_Air' and bp.Physics.AltMotionType ~= 'RULEUMT_None') then
-            table.insert(lines, LOCF("<LOC uvd_0012>Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d",
+            table.insert(lines, LOCF("<LOC uvd_0012>Speed: %.3g, Reverse: %.3g, Acceleration: %.3g, Turning: %d",
                 bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
+        end
+        
+        -- Display the TransportSpeedReduction stat in the UI.
+        -- Naval units and land experimentals also have this stat, but it since it is not relevant for non-modded games, we do not display it by default.
+        -- If a mod wants to display the TransportSpeedReduction stat for naval units or experimentals, this file can be hooked.
+        if bp.Physics.TransportSpeedReduction and not (bp.CategoriesHash.NAVAL or bp.CategoriesHash.EXPERIMENTAL) then
+            table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
+            bp.Physics.TransportSpeedReduction))
         end
 
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})

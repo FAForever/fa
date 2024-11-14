@@ -1175,25 +1175,28 @@ function OnRolloverHandler(button, state)
     end
 end
 
+---@param unit UserUnit
 function watchForQueueChange(unit)
     if watchingUnit == unit then
         return
     end
-
     updateQueue = false
     watchingUnit = unit
-    ForkThread(function()
-        local threadWatchingUnit = watchingUnit
-        while unit:GetCommandQueue()[1].type ~= 'Script' do
-            WaitSeconds(0.2)
-        end
+    ForkThread(QueueChangeWatchThread, unit)
+end
 
-        local selection = GetSelectedUnits() or {}
-        if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
-            SetSecondaryDisplay(lastDisplayType)
-        end
-        watchingUnit = nil
-    end)
+---@param unit UserUnit
+function QueueChangeWatchThread(unit)
+    local threadWatchingUnit = watchingUnit
+    while unit:GetCommandQueue()[1].type ~= 'Script' do
+        WaitSeconds(0.2)
+    end
+
+    local selection = GetSelectedUnits() or {}
+    if lastDisplayType and table.getn(selection) == 1 and threadWatchingUnit == watchingUnit and selection[1] == threadWatchingUnit then
+        SetSecondaryDisplay(lastDisplayType)
+    end
+    watchingUnit = nil
 end
 
 function checkBadClean(unit)
@@ -1892,7 +1895,7 @@ end
 
 function ToggleUnitPauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:ToggleCheck(false)
+        controls.extraBtn2:OnCheck(true)
     else
         SetPaused(sortedOptions.selection, true)
     end
@@ -1900,7 +1903,7 @@ end
 
 function ToggleUnitUnpauseAll()
     if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
-        controls.extraBtn2:OnCheck(true)
+        controls.extraBtn2:OnCheck(false)
     else
         SetPaused(sortedOptions.selection, false)
     end
@@ -2165,25 +2168,27 @@ function FormatData(unitData, type)
 
         import(UIUtil.GetLayoutFilename('construction')).OnTabChangeLayout(type)
     elseif type == 'templates' then
-        table.sort(unitData, function(a, b)
-            if a.key and not b.key then
-                return true
-            elseif b.key and not a.key then
-                return false
-            elseif a.key and b.key then
-                return a.key <= b.key
-            elseif a.name == b.name then
-                return false
-            else
-                if LOC(a.name) <= LOC(b.name) then
+        if unitData then
+            table.sort(unitData, function(a, b)
+                if a.key and not b.key then
                     return true
-                else
+                elseif b.key and not a.key then
                     return false
+                elseif a.key and b.key then
+                    return a.key <= b.key
+                elseif a.name == b.name then
+                    return false
+                else
+                    if LOC(a.name) <= LOC(b.name) then
+                        return true
+                    else
+                        return false
+                    end
                 end
+            end)
+            for _, v in unitData do
+                table.insert(retData, {type = 'templates', id = 'template', template = v})
             end
-        end)
-        for _, v in unitData do
-            table.insert(retData, {type = 'templates', id = 'template', template = v})
         end
         CreateExtraControls('templates')
         SetSecondaryDisplay('buildQueue')

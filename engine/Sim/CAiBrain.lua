@@ -138,7 +138,7 @@ end
 --- points in the template are used.
 ---
 ---@param type          string
----@param structureName filename # blueprint file
+---@param structureName FileName # blueprint file
 ---@param buildingTypes BuildingTemplate[]
 ---@param relative      boolean
 ---@param builder       Unit
@@ -202,7 +202,9 @@ end
 --- | 'Economy_Output_Energy' 
 --- | 'Economy_Stored_Energy' 
 --- | 'Economy_Reclaimed_Energy'
+--- | 'Economy_Ratio_Energy'
 --- | 'Economy_MaxStorage_Energy'
+--- | 'Economy_Trend_Energy'
 --- | 'Economy_PeakStorage_Energy'
 --- | 'Economy_TotalProduced_Mass'
 --- | 'Economy_TotalConsumed_Mass'
@@ -210,7 +212,9 @@ end
 --- | 'Economy_Output_Mass'
 --- | 'Economy_Stored_Mass'
 --- | 'Economy_Reclaimed_Mass'
+--- | 'Economy_Ratio_Mass'
 --- | 'Economy_MaxStorage_Mass'
+--- | 'Economy_Trend_Mass'
 --- | 'Economy_PeakStorage_Mass'
 
 --- Returns the statistic of the army, if it doesn't exist it creates it and returns the default value
@@ -258,7 +262,7 @@ function CAiBrain:GetBlueprintStat(statName, category)
 end
 
 --- Return this brain's current enemy.
--- @return Number, target's army number.
+---@return number -- target army's number
 function CAiBrain:GetCurrentEnemy()
 end
 
@@ -394,7 +398,7 @@ end
 ---@param position Vector
 ---@param radius number in game units
 ---@param restriction boolean
----@param threatType BrainThreatType
+---@param threatType? BrainThreatType
 ---@param armyIndex? number defaults to this brain's index
 ---@return number
 function CAiBrain:GetThreatAtPosition(position, radius, restriction, threatType, armyIndex)
@@ -484,23 +488,31 @@ function CAiBrain:PlatoonExists(platoon)
 end
 
 --- Remove an army stats trigger.
--- @param statName String, army's stat, example: "Economy_Ratio_Mass".
--- @param triggerName String, unique name of the trigger.
+---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage
+---@param triggerName string # unique name of the trigger.
 function CAiBrain:RemoveArmyStatsTrigger(statName, triggerName)
 end
 
 --- Sets army's stat to value.
--- @param statName String, army's stat, example: "Economy_Ratio_Mass".
--- @param value Number.
+---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage # army's stat, example: "Economy_Ratio_Mass".
+---@param value number
 function CAiBrain:SetArmyStat(statName, value)
 end
 
+---@alias ComparatorString
+---| "LessThan"
+---| "LessThanOrEqual"
+---| "GreaterThan"
+---| "GreaterThanOrEqual"
+---| "Equal"
+
 --- Creates a new stat trigger.
--- @param statName String, army's stat, example: "Economy_Ratio_Mass".
--- @param triggerName String, unique name of the trigger.
--- @param compareType String, available types: 'LessThan', 'LessThanOrEqual', 'GreaterThan', 'GreaterThanOrEqual', 'Equal'.
--- @param value Number.
-function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value)
+---@param statName AIBrainBlueprintStatUnits | AIBrainBlueprintStatEnemies | AIBrainBlueprintStatEconomy | AIBrainBlueprintStatDamage # army's stat
+---@param triggerName string # unique name of the trigger. See `RemoveArmyStatsTrigger` to remove occupied names.
+---@param compareType ComparatorString # available types: `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`, `Equal`
+---@param value number #
+---@param category EntityCategory? # 
+function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value, category)
 end
 
 --- Set the current enemy for this brain to attack.
@@ -518,7 +530,7 @@ function CAiBrain:SetGreaterOf(statname, val)
 end
 
 --- Set if the brain should share resources to the allies.
--- @param bool ture/false
+---@param bool boolean
 function CAiBrain:SetResourceSharing(bool)
 end
 

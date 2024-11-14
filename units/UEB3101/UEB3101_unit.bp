@@ -5,6 +5,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB3101_Activate',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Radar',     LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 10,
     BuildIconSortPriority = 10,
     Categories = {
         "BUILTBYTIER1ENGINEER",
@@ -28,13 +29,9 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 10,
         MaxHealth = 10,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -42,6 +39,13 @@ UnitBlueprint{
             "<LOC ability_upgradable>Upgradeable",
         },
         AnimationUpgrade = "/units/ueb3101/ueb3101_aupgrade.sca",
+        BlinkingLights = {
+            { BLBone = "Light", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0,     BLScale = 1 },
+        },
+        BlinkingLightsFx = {
+            Green = "/effects/emitters/light_green_03_emit.bp",
+            Red = "/effects/emitters/light_red_blinking_02_emit.bp",
+        },
         DamageEffects = {
             { Bone = 0,     OffsetX = 0,     OffsetY = 2,     OffsetZ = 0 },
         },
@@ -102,21 +106,7 @@ UnitBlueprint{
         SizeZ = 1,
     },
     General = {
-        CommandCaps = {
-            RULEUCC_Attack = false,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
-            RULEUCC_Guard = false,
-            RULEUCC_Move = false,
-            RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
-            RULEUCC_Pause = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
-            RULEUCC_Stop = false,
-            RULEUCC_Transport = false,
-        },
+        CommandCaps = { RULEUCC_Pause = true },
         FactionName = "UEF",
         Icon = "land",
         OrderOverrides = {
@@ -140,14 +130,6 @@ UnitBlueprint{
     LifeBarOffset = 0.4,
     LifeBarSize = 1,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MeshExtentsX = 1.1,
@@ -174,12 +156,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

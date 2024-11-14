@@ -16,6 +16,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'XSS',            Cue = 'XSS_Sub_Surface',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 6900,
     BuildIconSortPriority = 30,
     Categories = {
         "ANTINAVY",
@@ -45,7 +46,6 @@ UnitBlueprint{
         EconomyThreatLevel = 32,
         Health = 6900,
         MaxHealth = 6900,
-        RegenRate = 0,
         SubThreatLevel = 10,
         SurfaceThreatLevel = 16,
     },
@@ -130,18 +130,12 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Dive = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "sea",
@@ -158,15 +152,6 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         BackUpDistance = 5,
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = true,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         Elevation = -2,
@@ -178,7 +163,6 @@ UnitBlueprint{
         MeshExtentsX = 1.5,
         MeshExtentsY = 2,
         MeshExtentsZ = 6.25,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_SurfacingSub",
         TurnRadius = 15,
         TurnRate = 50,
@@ -239,7 +223,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
             TargetCheckInterval = 0.2,
@@ -304,7 +288,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
             TargetCheckInterval = 0.2,
@@ -365,7 +349,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 10/40, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "(STRUCTURE * DEFENSE - ANTIAIR)",
@@ -417,7 +401,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.3,
+            RateOfFire = 10/33, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

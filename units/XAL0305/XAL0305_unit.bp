@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XAL',        Cue = 'XAL0305_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Bot',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 15,
     Categories = {
         "AEON",
@@ -26,14 +27,11 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 41,
+        EconomyThreatLevel = 24,
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 10,
+        SurfaceThreatLevel = 12,
     },
     Display = {
         AnimationDeath = {
@@ -43,7 +41,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.75,
                 HitBox = {
                     CollisionOffsetX = -0.1,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = 0.5,
                     SizeX = 1.1,
                     SizeY = 0.4,
@@ -57,7 +54,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.75,
                 HitBox = {
                     CollisionOffsetX = 0.75,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.9,
                     SizeX = 1.3,
                     SizeY = 0.4,
@@ -71,7 +67,6 @@ UnitBlueprint{
                 AnimationRateMin = 0.75,
                 HitBox = {
                     CollisionOffsetX = -0.75,
-                    CollisionOffsetY = 0,
                     CollisionOffsetZ = -0.75,
                     SizeX = 1.25,
                     SizeY = 0.5,
@@ -129,16 +124,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "land",
@@ -149,15 +139,6 @@ UnitBlueprint{
     LifeBarOffset = 0.35,
     LifeBarSize = 1,
     Physics = {
-        BankingSlope = 0,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 2.4,
         MaxBrake = 2.4,
@@ -167,18 +148,15 @@ UnitBlueprint{
         MeshExtentsX = 1,
         MeshExtentsY = 1.25,
         MeshExtentsZ = 1,
-        MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
         StandUpright = true,
         TurnRadius = 5,
         TurnRate = 110,
     },
-    SelectionCenterOffsetX = 0,
     SelectionCenterOffsetZ = -0.1,
     SelectionSizeX = 0.65,
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.8,
-    CollisionOffsetY = 0,
     SizeX = 1.1,
     SizeY = 1.4,
     SizeZ = 0.9,
@@ -237,7 +215,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.15,
+            RateOfFire = 10/67, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "SNIPER",
@@ -277,12 +255,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

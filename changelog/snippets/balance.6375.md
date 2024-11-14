@@ -1,0 +1,1 @@
+- (#6375) Reduce blaze speed from 4.3 to 4.0 to make it easier to catch and reduce its powerful raiding capabilities.

@@ -11,9 +11,12 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
-local Factions = import('/lua/factions.lua').GetFactions(true)
 
-local CoroutineYield = coroutine.yield
+local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
+local FactoryManagerBrainComponent = import("/lua/aibrains/components/FactoryManagerBrainComponent.lua").FactoryManagerBrainComponent
+local JammerManagerBrainComponent = import("/lua/aibrains/components/JammerManagerBrainComponent.lua").JammerManagerBrainComponent
+local StatManagerBrainComponent = import("/lua/aibrains/components/StatManagerBrainComponent.lua").StatManagerBrainComponent
+local EnergyManagerBrainComponent = import("/lua/aibrains/components/EnergyManagerBrainComponent.lua").EnergyManagerBrainComponent
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -24,519 +27,23 @@ local CoroutineYield = coroutine.yield
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
+---@class ScoutLocation
+---@field Position Vector
+---@field TaggedBy Unit
+
 ---@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
----@alias HqTech "TECH2" | "TECH3"
----@alias HqLayer "AIR" | "LAND" | "NAVY"
----@alias HqFaction "UEF" | "AEON" | "CYBRAN" | "SERAPHIM" | "NOMADS"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"
 ---@alias ReconTypes 'Radar' | 'Sonar' | 'Omni' | 'LOSNow'
 ---@alias PlatoonType 'Air' | 'Land' | 'Sea'
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
----@class AIBrainHQComponent
----@field HQs table
-local AIBrainHQComponent = ClassSimple {
-
-    ---@param self AIBrainHQComponent | AIBrain
-    CreateBrainShared = function(self)
-        local layers = { "LAND", "AIR", "NAVAL" }
-        local techs = { "TECH2", "TECH3" }
-
-        self.HQs = {}
-        for _, facData in Factions do
-            local faction = facData.Category
-            self.HQs[faction] = {}
-            for _, layer in layers do
-                self.HQs[faction][layer] = {}
-                for _, tech in techs do
-                    self.HQs[faction][layer][tech] = 0
-                end
-            end
-        end
-
-        -- restrict all support factories by default
-        AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
-    end,
-
-    --- Adds a HQ so that the engi mod knows we have it
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
-    AddHQ = function(self, faction, layer, tech)
-        self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
-    end,
-
-    --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
-    RemoveHQ = function(self, faction, layer, tech)
-        self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
-    end,
-
-    --- Completely re evaluates the support factory restrictions of the engi mod
-    ---@param self AIBrain
-    ReEvaluateHQSupportFactoryRestrictions = function(self)
-        local layers = { "AIR", "LAND", "NAVAL" }
-        local factions = { "UEF", "AEON", "CYBRAN", "SERAPHIM" }
-
-        if categories.NOMADS then
-            table.insert(factions, 'NOMADS')
-        end
-
-        for _, faction in factions do
-            for _, layer in layers do
-                self:SetHQSupportFactoryRestrictions(faction, layer)
-            end
-        end
-    end,
-
-    --- Manages the support factory restrictions of the engi mod
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    SetHQSupportFactoryRestrictions = function(self, faction, layer)
-
-        -- localize for performance
-        local army = self:GetArmyIndex()
-
-        -- the pessimists we are, restrict everything!
-        AddBuildRestriction(army,
-            categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-        AddBuildRestriction(army,
-            categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
-
-        -- lift t2 / t3 support factory restrictions
-        if self.HQs[faction][layer]["TECH3"] > 0 then
-            RemoveBuildRestriction(army,
-                categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-            RemoveBuildRestriction(army,
-                categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
-        end
-
-        -- lift t2 support factory restrictions
-        if self.HQs[faction][layer]["TECH2"] > 0 then
-            RemoveBuildRestriction(army,
-                categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-        end
-    end,
-
-    --- Counts all HQs of specific faction, layer and tech for the engi mod.
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param layer HqLayer
-    ---@param tech HqTech
-    ---@return number
-    CountHQs = function(self, faction, layer, tech)
-        return self.HQs[faction][layer][tech]
-    end,
-
-    --- Counts all HQs of faction and tech, regardless of layer
-    ---@param self AIBrain
-    ---@param faction HqFaction
-    ---@param tech HqTech
-    ---@return number
-    CountHQsAllLayers = function(self, faction, tech)
-        local count = self.HQs[faction]["LAND"][tech]
-        count = count + self.HQs[faction]["AIR"][tech]
-        count = count + self.HQs[faction]["NAVAL"][tech]
-        return count
-    end,
-}
-
----@class AIBrainStatisticsComponent
----@field UnitStats table<UnitId, table<string, number>>
-local AIBrainStatisticsComponent = ClassSimple {
-
-    ---@param self AIBrainHQComponent | AIBrain
-    CreateBrainShared = function(self)
-        self.UnitStats = {}
-    end,
-
-    ---@param self AIBrain
-    ---@param unitId UnitId
-    ---@param statName string
-    ---@param value number
-    AddUnitStat = function(self, unitId, statName, value)
-        if self.UnitStats[unitId] == nil then
-            self.UnitStats[unitId] = {}
-        end
-
-        if self.UnitStats[unitId][statName] == nil then
-            self.UnitStats[unitId][statName] = value
-        else
-            self.UnitStats[unitId][statName] = self.UnitStats[unitId][statName] + value
-        end
-    end,
-
-    ---@param self AIBrain
-    ---@param unitId EntityId
-    ---@param statName string
-    ---@param value number
-    SetUnitStat = function(self, unitId, statName, value)
-        if self.UnitStats[unitId] == nil then
-            self.UnitStats[unitId] = {}
-        end
-
-        self.UnitStats[unitId][statName] = value
-    end,
-
-    ---@param self AIBrain
-    ---@param unitId EntityId
-    ---@param statName string
-    ---@return number
-    GetUnitStat = function(self, unitId, statName)
-        if self.UnitStats[unitId] == nil or self.UnitStats[unitId][statName] == nil then
-            return 0
-        end
-
-        return self.UnitStats[unitId][statName]
-    end,
-
-    ---@param self AIBrain
-    GetUnitStats = function(self)
-        return self.UnitStats
-    end,
-}
-
----@class AIBrainJammerComponent
----@field Jammers table<EntityId, Unit>
-local AIBrainJammerComponent = ClassSimple {
-
-    ---@param self AIBrainHQComponent | AIBrain
-    CreateBrainShared = function(self)
-        self.JammerResetTime = 15
-        self.Jammers = {}
-        setmetatable(self.Jammers, { __mode = 'v' })
-        ForkThread(self.JammingToggleThread, self)
-    end,
-
-    --- Adds a unit to a list of all units with jammers
-    ---@param self AIBrain
-    ---@param unit Unit Jammer unit
-    TrackJammer = function(self, unit)
-        self.Jammers[unit.EntityId] = unit
-    end,
-
-    --- Removes a unit to a list of all units with jammers
-    ---@param self AIBrain
-    ---@param unit Unit Jammer unit
-    UntrackJammer = function(self, unit)
-        self.Jammers[unit.EntityId] = nil
-    end,
-
-    --- Creates a thread that interates over all jammer units to reset them when vision is lost on them
-    ---@param self AIBrain
-    JammingToggleThread = function(self)
-        while true do
-            for i, jammer in self.Jammers do
-                if jammer.ResetJammer == 0 then
-                    self:ForkThread(self.JammingFollowUpThread, jammer)
-                    jammer.ResetJammer = -1
-                else
-                    if jammer.ResetJammer > 0 then
-                        jammer.ResetJammer = jammer.ResetJammer - 1
-                    end
-                end
-            end
-            WaitSeconds(1)
-        end
-    end,
-
-    --- Toggles a given unit's jammer
-    ---@param self AIBrain
-    ---@param unit Unit Jammer to be toggled
-    JammingFollowUpThread = function(self, unit)
-        unit:DisableUnitIntel('AutoToggle', 'Jammer')
-        WaitSeconds(1)
-        if not unit:BeenDestroyed() then
-            unit:EnableUnitIntel('AutoToggle', 'Jammer')
-            unit.ResetJammer = -1
-        end
-    end,
-
-    ---@param self AIBrain
-    ---@param blip Blip
-    ---@param reconType ReconTypes
-    ---@param val boolean
-    OnIntelChange = function(self, blip, reconType, val)
-        if reconType == 'LOSNow' or reconType == 'Omni' then
-            if not val then
-                local unit = blip:GetSource()
-                if unit.Blueprint.Intel.JammerBlips > 0 then
-                    unit.ResetJammer = self.JammerResetTime
-                end
-            end
-        end
-    end,
-}
-
----@class AIBrainEnergyComponent
----@field EnergyDepleted boolean
----@field EnergyDependingUnits table<EntityId, Unit>
----@field EnergyExcessConsumed number
----@field EnergyExcessRequired number
----@field EnergyExcessConverted number
----@field EnergyExcessUnitsEnabled table<EntityId, Unit>
----@field EnergyExcessUnitsDisabled table<EntityId, Unit>
-local AIBrainEnergyComponent = ClassSimple {
-    CreateBrainShared = function(self)
-        -- make sure there is always some storage
-        self:GiveStorage('Energy', 100)
-
-        -- make sure the army stats exist
-        self:SetArmyStat('Economy_Ratio_Mass', 1.0)
-        self:SetArmyStat('Economy_Ratio_Energy', 1.0)
-
-        -- add initial trigger and assume we're not depleted
-        self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
-        self.EnergyDepleted = false
-        self.EnergyDependingUnits = setmetatable({}, { __mode = 'v' })
-
-        --- Units that we toggle on / off depending on whether we have excess energy
-        self.EnergyExcessConsumed = 0
-        self.EnergyExcessRequired = 0
-        self.EnergyExcessConverted = 0
-        self.EnergyExcessUnitsEnabled = setmetatable({}, { __mode = 'v' })
-        self.EnergyExcessUnitsDisabled = setmetatable({}, { __mode = 'v' })
-    end,
-
-    --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
-    ---@param self AIBrain
-    ---@param entity Unit
-    AddEnergyDependingEntity = function(self, entity)
-        self.EnergyDependingUnits[entity.EntityId] = entity
-
-        -- guarantee callback when entity is depleted
-        if self.EnergyDepleted then
-            entity:OnEnergyDepleted()
-        end
-    end,
-
-    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts enabled
-    ---@param self AIBrain The brain itself
-    ---@param unit MassFabricationUnit The unit to keep track of
-    AddEnabledEnergyExcessUnit = function(self, unit)
-        self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
-        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
-
-        local ecobp = unit.Blueprint.Economy
-        self.EnergyExcessConsumed = self.EnergyExcessConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
-        self.EnergyExcessConverted = self.EnergyExcessConverted + ecobp.ProductionPerSecondMass
-    end,
-
-    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
-    ---@param self AIBrain
-    ---@param unit MassFabricationUnit The unit to keep track of
-    AddDisabledEnergyExcessUnit = function(self, unit)
-        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
-        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
-        self.EnergyExcessRequired = self.EnergyExcessRequired +
-            unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-    end,
-
-    --- Removes a unit that is enabled / disabled depending on how much energy storage we have
-    ---@param self AIBrain
-    ---@param unit MassFabricationUnit The unit to forget about
-    RemoveEnergyExcessUnit = function(self, unit)
-        local ecobp = unit.Blueprint.Economy
-        if self.EnergyExcessUnitsEnabled[unit.EntityId] then
-            self.EnergyExcessConsumed = self.EnergyExcessConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
-            self.EnergyExcessConverted = self.EnergyExcessConverted - ecobp.ProductionPerSecondMass
-            self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
-        elseif self.EnergyExcessUnitsDisabled[unit.EntityId] then
-            self.EnergyExcessRequired = self.EnergyExcessRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
-            self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
-        end
-    end,
-
-    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
-    ---@param self AIBrain
-    ToggleEnergyExcessUnitsThread = function(self)
-
-        -- allow for protected calls without closures
-        ---@param unitToProcess MassFabricationUnit
-        local function ProtectedOnExcessEnergy(unitToProcess)
-            unitToProcess:OnExcessEnergy()
-        end
-
-        ---@param unitToProcess MassFabricationUnit
-        local function ProtectedOnNoExcessEnergy(unitToProcess)
-            unitToProcess:OnNoExcessEnergy()
-        end
-
-        local fabricatorParameters = import("/lua/shared/fabricatorbehaviorparams.lua")
-        local disableRatio = fabricatorParameters.DisableRatio
-        local disableStorage = fabricatorParameters.DisableStorage
-
-        local enableRatio = fabricatorParameters.EnableRatio
-        local enableTrend = fabricatorParameters.EnableTrend
-        local enableStorage = fabricatorParameters.EnableStorage
-
-        -- localize scope for better performance
-        local pcall = pcall
-        local TableSize = table.getsize
-        local CoroutineYield = coroutine.yield
-
-        local ok, msg
-
-
-        -- Instead of creating a new sync table each tick, we'll reuse two tables as a double
-        -- buffer: one table represents the data from the current tick, the other the data last
-        -- synced. We only send the data when one field in the current tick differs from the last
-        -- data synced, and then swap the two tables when that happens.
-        local syncTable = {
-            on = 0,
-            off = 0,
-            totalEnergyConsumed = 0,
-            totalEnergyRequired = 0,
-            totalMassProduced = 0,
-        }
-        local lastSyncTable = {
-            on = 0,
-            off = 0,
-            totalEnergyConsumed = 0,
-            totalEnergyRequired = 0,
-            totalMassProduced = 0,
-        }
-
-        local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
-        local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
-
-        while true do
-
-            local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
-            local energyStored = self:GetEconomyStored('ENERGY')
-            local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
-
-            -- low on storage, start disabling them to fill our storages asap
-            if energyStoredRatio < disableRatio and energyStored < disableStorage then
-
-                -- while we have units to disable
-                for id, unit in EnergyExcessUnitsEnabled do
-                    if not unit:BeenDestroyed() then
-
-                        local ecobp = unit.Blueprint.Economy
-                        self.EnergyExcessConsumed = self.EnergyExcessConsumed -
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessRequired = self.EnergyExcessRequired +
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessConverted = self.EnergyExcessConverted - ecobp.ProductionPerSecondMass
-
-                        -- update internal state
-                        EnergyExcessUnitsDisabled[id] = unit
-                        EnergyExcessUnitsEnabled[id] = nil
-
-                        -- try to disable unit
-                        ok, msg = pcall(unit.OnNoExcessEnergy, unit)
-
-                        -- allow for debugging
-                        if not ok then
-                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
-                        end
-
-                        break
-                    end
-                end
-
-                -- high on storage and sufficient energy income, enable units
-            elseif (energyStoredRatio >= enableRatio and energyTrend > enableTrend) or energyStored > enableStorage then
-
-                -- while we have units to retrieve
-                for id, unit in EnergyExcessUnitsDisabled do
-                    if not unit:BeenDestroyed() then
-                        local ecobp = unit.Blueprint.Economy
-                        self.EnergyExcessConsumed = self.EnergyExcessConsumed +
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessRequired = self.EnergyExcessRequired -
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessConverted = self.EnergyExcessConverted + ecobp.ProductionPerSecondMass
-
-                        -- update internal state
-                        EnergyExcessUnitsDisabled[id] = nil
-                        EnergyExcessUnitsEnabled[id] = unit
-
-                        -- try to enable unit
-                        ok, msg = pcall(unit.OnExcessEnergy, unit)
-
-                        -- allow for debugging
-                        if not ok then
-                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
-                        end
-
-                        break
-                    end
-                end
-            end
-
-            if self.Army == GetFocusArmy() then
-                syncTable.on = TableSize(EnergyExcessUnitsEnabled)
-                syncTable.off = TableSize(EnergyExcessUnitsDisabled)
-                syncTable.totalEnergyConsumed = self.EnergyExcessConsumed
-                syncTable.totalEnergyRequired = self.EnergyExcessRequired
-                syncTable.totalMassProduced = self.EnergyExcessConverted
-                -- only send new data
-                if lastSyncTable.on ~= syncTable.on
-                    or lastSyncTable.off ~= syncTable.off
-                    or lastSyncTable.totalEnergyConsumed ~= syncTable.totalEnergyConsumed
-                    or lastSyncTable.totalEnergyRequired ~= syncTable.totalEnergyRequired
-                    or lastSyncTable.totalMassProduced ~= syncTable.totalMassProduced
-                then
-                    Sync.MassFabs = syncTable
-                    -- swap the data buffers
-                    syncTable, lastSyncTable = lastSyncTable, syncTable
-                end
-            end
-            CoroutineYield(1)
-        end
-    end,
-
-    OnStatsTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" then
-            self:OnEnergyTrigger(triggerName)
-        end
-    end,
-
-
-    ---@param self AIBrain
-    ---@param triggerName string
-    OnEnergyTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" then
-            -- add trigger when we can recover units
-            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
-            self.EnergyDepleted = true
-
-            -- recurse over the list of units and do callbacks accordingly
-            for id, entity in self.EnergyDependingUnits do
-                if not IsDestroyed(entity) then
-                    entity:OnEnergyDepleted()
-                end
-            end
-        else
-            -- add trigger when we're depleted
-            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
-            self.EnergyDepleted = false
-
-            -- recurse over the list of units and do callbacks accordingly
-            for id, entity in self.EnergyDependingUnits do
-                if not IsDestroyed(entity) then
-                    entity:OnEnergyViable()
-                end
-            end
-        end
-    end,
-
-}
-
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
+---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -547,8 +54,9 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
-AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
-    moho.aibrain_methods) {
+---@field CustomUnits { [string]: EntityId[] }
+AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
+    EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
     Status = 'InProgress',
 
@@ -606,10 +114,11 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
 
         self.PingCallbackList = {}
 
-        AIBrainEnergyComponent.CreateBrainShared(self)
-        AIBrainHQComponent.CreateBrainShared(self)
-        AIBrainStatisticsComponent.CreateBrainShared(self)
-        AIBrainJammerComponent.CreateBrainShared(self)
+        EnergyManagerBrainComponent.CreateBrainShared(self)
+        FactoryManagerBrainComponent.CreateBrainShared(self)
+        StatManagerBrainComponent.CreateBrainShared(self)
+        JammerManagerBrainComponent.CreateBrainShared(self)
+        StorageManagerBrainComponent.CreateBrainShared(self)
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist
@@ -720,7 +229,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             end
         end
 
-        AIBrainJammerComponent.OnIntelChange(self, blip, reconType, val)
+        JammerManagerBrainComponent.OnIntelChange(self, blip, reconType, val)
     end,
 
     -- System for playing VOs to the Player
@@ -734,22 +243,11 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     },
 
     ---@param self AIBrain
-    ---@param string string
+    ---@param key string
     ---@param sound SoundHandle
-    PlayVOSound = function(self, string, sound)
-        if not self.VOTable then
-            self.VOTable = {}
-        end
-
-        local VO = self.VOSounds[string]
-        if not VO then
-            WARN('PlayVOSound: ' .. string .. " not found")
-            return
-        end
-
-        if not self.VOTable[string] and VO['obs'] and GetFocusArmy() == -1 and self:GetArmyIndex() == 1 then
-            -- Don't stop sound IF not repeated AND sound is flagged as 'obs' AND i'm observer AND only from PlayerIndex = 1
-        elseif self.VOTable[string] or GetFocusArmy() ~= self:GetArmyIndex() then
+    PlayVOSound = function(self, key, sound)
+        if not self.VOSounds[key] then
+            WARN("PlayVOSound: " .. key .. " not found")
             return
         end
 
@@ -757,29 +255,51 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         if sound then
             cue, bank = GetCueBank(sound)
         else
-            cue, bank = VO['bank'], 'XGG'
+            -- note: what the VO sound table calls a "bank" is actually a "cue"
+            cue, bank = self.VOSounds[key]["bank"], "XGG"
         end
 
         if not (bank and cue) then
-            WARN('PlayVOSound: No valid bank/cue for ' .. string)
+            WARN("PlayVOSound: No valid bank/cue for " .. key)
             return
         end
 
-        self.VOTable[string] = true
-        import('/lua/SimSyncUtils.lua').SyncVoice({ Cue = cue, Bank = bank })
+        ForkThread(self.PlayVOSoundThread, self, key, {
+            Cue = cue,
+            Bank = bank,
+        })
+    end,
 
-        local timeout = VO['timeout']
-        ForkThread(function()
-            WaitSeconds(timeout)
-            self.VOTable[string] = nil
-        end)
+    ---@param self AIBrain
+    ---@param key string
+    ---@param data SoundBlueprint
+    PlayVOSoundThread = function(self, key, data)
+        if not self.VOTable then
+            self.VOTable = {}
+        end
+        if self.VOTable[key] then
+            return
+        end
+        local sound = self.VOSounds[key]
+        local focusArmy = GetFocusArmy()
+        local armyIndex = self:GetArmyIndex()
+        if focusArmy ~= armyIndex and not (focusArmy == -1 and armyIndex == 1 and sound.obs) then
+            return
+        end
+
+        self.VOTable[key] = true
+
+        import("/lua/SimSyncUtils.lua").SyncVoice(data)
+        WaitSeconds(sound.timeout)
+
+        self.VOTable[key] = nil
     end,
 
     --- Triggers based on an AiBrain
     ---@param self AIBrain
     ---@param triggerName string
     OnStatsTrigger = function(self, triggerName)
-        AIBrainEnergyComponent.OnStatsTrigger(self, triggerName)
+        EnergyManagerBrainComponent.OnStatsTrigger(self, triggerName)
 
         for k, v in self.TriggerList do
             if v.Name == triggerName then
@@ -975,10 +495,10 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
                             units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         end
                         if units and not table.empty(units) then
-                            local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+                            local givenUnits = TransferUnitsOwnership(units, brain.index)
 
                             -- only show message when we actually gift that player some units
-                            if givenUnitCount > 0 then
+                            if not table.empty(givenUnits) then
                                 Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
                             end
 
@@ -1288,10 +808,10 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
                 for _, brain in brains do
                     local units = self:GetListOfUnits(cat, false)
                     if units and units[1] then
-                        local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+                        local givenUnits = TransferUnitsOwnership(units, brain.index)
 
                         -- only show message when we actually gift that player some units
-                        if givenUnitCount > 0 then
+                        if not table.empty(givenUnits) then
                             Sync.ArmyTransfer = { {
                                 from = army,
                                 to = brain.index,
