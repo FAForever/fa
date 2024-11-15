@@ -23,7 +23,7 @@ UnitBlueprint{
         MaxAirspeed = 17,
         MinAirspeed = 15,
         PredictAheadForBombDrop = 3,
-        StartTurnDistance = 5,
+        StartTurnDistance = 2,
         TightTurnMultiplier = 0,
         TurnSpeed = 1.5,
         Winged = true,
