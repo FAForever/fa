@@ -136,6 +136,7 @@ local function ProcessWeapon(unit, weapon, projectile)
         weapon.AlwaysRecheckTarget = false
     end
 
+    -- Floor target check interval to ticks
     weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
 end
 
