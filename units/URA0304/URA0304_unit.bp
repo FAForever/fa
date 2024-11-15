@@ -222,7 +222,7 @@ UnitBlueprint{
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
-            BombDropThreshold = 3.5,
+            BombDropThreshold = 10,
             CollideFriendly = false,
             Damage = 2750,
             DamageFriendly = true,
