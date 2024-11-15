@@ -1,11 +1,10 @@
-
 local weaponTargetCheckUpperLimit = 6000
 
 ---@param unit UnitBlueprint
 ---@param weapon WeaponBlueprint
 ---@param projectile? ProjectileBlueprint
 local function ProcessWeapon(unit, weapon, projectile)
-    -- pre-compute flags   
+    -- pre-compute flags
     local isAir = false
     local isStructure = false
     local isBomber = false
@@ -81,7 +80,7 @@ local function ProcessWeapon(unit, weapon, projectile)
         end
     end
 
-    -- process target tracking radius 
+    -- process target tracking radius
 
     -- if it is set then we use that - allows us to make adjustments as we see fit
     if weapon.TrackingRadius == nil then
@@ -99,7 +98,7 @@ local function ProcessWeapon(unit, weapon, projectile)
         end
 
         -- add significant target checking radius for bombers
-        if isBomber then 
+        if isBomber then
             weapon.TrackingRadius = 1.25
         end
     end
@@ -112,8 +111,8 @@ local function ProcessWeapon(unit, weapon, projectile)
         -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another
         weapon.AlwaysRecheckTarget = false
 
-        -- allow 
-        if  weapon.RangeCategory == 'UWRC_DirectFire' or
+        -- allow
+        if weapon.RangeCategory == 'UWRC_DirectFire' or
             weapon.RangeCategory == "UWRC_IndirectFire" or
             weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then
             weapon.AlwaysRecheckTarget = true
