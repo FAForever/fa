@@ -317,7 +317,7 @@ local ChangelogDialog = ClassUI(Group) {
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
         for _, patch in pairs(ChangelogOverview.Overview.Changelogs) do
-            self.ContentPatchesList:AddItem(patch.Version .. " - " .. patch.Name)
+            self.ContentPatchesList:AddItem(patch.Name)
         end
     end,
 
