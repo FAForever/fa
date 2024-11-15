@@ -58,6 +58,9 @@ def create_overview_file(input_dir: Path, output_file: Path):
         }
         overview_entries.append(entry)
 
+    # Sort the entries by version in reverse order
+    overview_entries.sort(key=lambda entry: entry['Version'], reverse=True)
+
     overview_content = OVERVIEW_HEADER + """
 ---@type UIChangelogOverview
 Overview = {
