@@ -47,11 +47,13 @@ def create_overview_file(input_dir: Path, output_file: Path):
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
         yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
-        name = yaml_data.get('name', 'Unknown')
+        name = yaml_data.get('title', 'Unknown')
+        patch = yaml_data.get('patch', 'Unknown')
 
         entry = {
             'Version': version,
             'Name': name,
+            'Patch': patch,
             'Date': date,
             'URL': f"http://faforever.github.io/fa/changelog/{version}",
             'Path': f"/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
