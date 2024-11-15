@@ -299,7 +299,7 @@ local ChangelogDialog = ClassUI(Group) {
             end
 
             self.ContentPatchesList:SetSelection(index)
-            self.HeaderSubtitle:SetText(patch.Name)
+            self.HeaderSubtitle:SetText(patch.Name or "Unknown name")
             self.ContentNotesList:DeleteAllItems()
 
             local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
