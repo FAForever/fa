@@ -73,8 +73,7 @@ local ModuleTrash = TrashBag()
 ---@field HeaderSubtitle Text
 ---@field Footer Group
 ---@field FooterDebug Bitmap
----@field FooterGithubButton Button
----@field FooterPatchNotesButton Button
+---@field FooterOnlineButton Button
 ---@field FooterDiscordButton Button
 ---@field Content Group
 ---@field ContentDebug Bitmap
@@ -169,21 +168,12 @@ local ChangelogDialog = ClassUI(Group) {
         self.FooterDebug:SetSolidColor("ff00ff00")
         LayoutHelpers.FillParent(self.FooterDebug, self.Footer)
 
-        self.FooterGithubButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Github")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterGithubButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterGithubButton, self.Footer, 5)
-        self.FooterGithubButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
-        self.FooterGithubButton.OnClick = function()
+        self.FooterOnlineButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Online")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterOnlineButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterOnlineButton, self.Footer, 5)
+        self.FooterOnlineButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
+        self.FooterOnlineButton.OnClick = function()
             OpenURL('http://github.com/FAForever/fa/releases')
-        end
-
-        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Patchnotes")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
-        LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
-        self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
-        self.FooterPatchNotesButton:Disable()
-        self.FooterPatchNotesButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com')
         end
 
         self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report a bug")
@@ -280,22 +270,13 @@ local ChangelogDialog = ClassUI(Group) {
 
         if patch then
 
-            if patch.hasPrettyGithubRelease then
-                self.FooterGithubButton:Enable()
-                self.FooterGithubButton.OnClick = function()
-                    OpenURL(string.format('http://github.com/FAForever/fa/releases/tag/%d', patch.version))
+            if changelog.URL then
+                self.FooterOnlineButton:Enable()
+                self.FooterOnlineButton.OnClick = function()
+                    OpenURL(changelog.URL)
                 end
             else
-                self.FooterGithubButton:Disable()
-            end
-
-            if patch.hasPrettyPatchnotes then
-                self.FooterPatchNotesButton:Enable()
-                self.FooterPatchNotesButton.OnClick = function()
-                    OpenURL('http://patchnotes.faforever.com')
-                end
-            else
-                self.FooterPatchNotesButton:Disable()
+                self.FooterOnlineButton:Disable()
             end
 
             self.ContentPatchesList:SetSelection(index)
@@ -307,8 +288,7 @@ local ChangelogDialog = ClassUI(Group) {
                 self.ContentNotesList:AddItem(line)
             end
         else
-            self.FooterGithubButton:Disable()
-            self.FooterPatchNotesButton:Disable()
+            self.FooterOnlineButton:Disable()
         end
     end,
 
