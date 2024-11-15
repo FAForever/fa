@@ -75,11 +75,13 @@ def markdown2lua(version: str, content: str) -> str:
     )
 
     # YAML content is read and available here, but not added to the output yet.
-    # yaml_data = yaml.safe_load(yaml_content) if yaml_content else None
+    yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
     return LUA_FILE.format(
-        version=version,
-        description=lua_description,
+        Name = yaml_data.get('title', 'Unknown'),
+        Patch = yaml_data.get('patch', 'Unknown'),
+        Version=version,
+        Description=lua_description,
     )
 
 
