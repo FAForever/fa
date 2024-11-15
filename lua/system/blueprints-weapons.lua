@@ -138,7 +138,6 @@ local function ProcessWeapon(unit, weapon, projectile)
     end
 
     weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
-    weapon.TrackingRadius = 0.1 * math.floor(10 * weapon.TrackingRadius)
 end
 
 ---@param allBlueprints BlueprintsTable
