@@ -338,7 +338,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UEL0301
-    ---@param enh string
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
