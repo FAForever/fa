@@ -152,6 +152,7 @@ UnitBlueprint{
         MaxSpeed = 0.5,
         MotionType = "RULEUMT_Air",
     },
+    SelectionCenterOffsetY = 0.15,
     SelectionSizeX = 1.6,
     SelectionSizeZ = 3.25,
     SelectionThickness = 0.21,
