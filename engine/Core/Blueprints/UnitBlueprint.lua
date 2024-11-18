@@ -145,6 +145,7 @@
 ---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
+--- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
 ---@field NeedUnpack boolean
 --- this muliplier is applied when a staging platform is refueling an air unit
 ---@field RefuelingMultiplier number
@@ -1119,7 +1120,7 @@
 ---@field MaxGroundVariation number
 --- maximum speed for the unit
 ---@field MaxSpeed number
---- maximum speed for the unit in reverse
+--- maximum speed for the unit in reverse. Defaults to the same value as MaxSpeed
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
