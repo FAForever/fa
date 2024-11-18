@@ -1,4 +1,4 @@
-- (#5061, #6438, #6527, #6528) Add metamethods and utility functions for Vectors and Quaternions to simplify and clean up the code involving operations with them.
+- (#5061, #6438, #6527, #6525, #6528) Add metamethods and utility functions for Vectors and Quaternions to simplify and clean up the code involving operations with them.
   - This **removes** the file `/lua/shared/quaternions.lua`, which was added in #4768 (Mar 4, 2023), so mods that use that file will have to be updated.
   - The metamethods (defined globally in `/lua/system/utils.lua`) include:
     - Vector/Vector2 addition/subtraction/negation
