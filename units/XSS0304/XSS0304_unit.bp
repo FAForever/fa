@@ -387,8 +387,8 @@ UnitBlueprint{
             MaxRadius = 65,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
-            MuzzleVelocity = 100,
-            ProjectileId = "/projectiles/SAALosaareAutoCannon03/SAALosaareAutoCannon03_proj.bp",
+            MuzzleVelocity = 90,
+            ProjectileId = "/projectiles/SAALosaareAutoCannon01/SAALosaareAutoCannon01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
                 {

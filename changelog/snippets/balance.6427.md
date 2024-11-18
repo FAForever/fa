@@ -1,2 +1,2 @@
-- (#6427) Add strong tracking capabilities (like the Seraphim SAM) to the AA of the Cybran carrier, Seraphim carrier, and Seraphim T3 Submarine so that they do not miss their shots.
+- (#6427) Add strong tracking capabilities (like the Seraphim SAM) to the AA of the Cybran and Seraphim carriers so that they do not miss their shots.
     - Cybran carrier had an especially poor hit rate at the edge of its range since it had weak tracking but also could not lead its shots due to having tracking.
