@@ -59,8 +59,8 @@ UAL0301 = ClassUnit(CommandUnit) {
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
-    -- ============================================================================================================================================
-    -- ENHANCEMENTS
+    ---------------------------------------------------------------------------
+    --#region Enhancements
 
     ---@param self UAL0301
     ---@param bp UnitBlueprintEnhancement unused
@@ -228,6 +228,7 @@ UAL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    --#endregion
 }
 
 TypeClass = UAL0301
