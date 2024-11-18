@@ -26,8 +26,8 @@ local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
 ---@class URL0301 : CCommandUnit
----@field StealthEnh? boolean
----@field CloakEnh? boolean
+---@field HasStealthEnh? boolean
+---@field HasCloakEnh? boolean
 URL0301 = ClassUnit(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
@@ -86,8 +86,8 @@ URL0301 = ClassUnit(CCommandUnit) {
     ProcessEnhancementCloakingGenerator = function (self, bp)
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:AddToggleCap('RULEUTC_CloakToggle')
-        self.StealthEnh = false
-        self.CloakEnh = true
+        self.HasStealthEnh = false
+        self.HasCloakEnh = true
         self:EnableUnitIntel('Enhancement', 'Cloak')
         if not Buffs['CybranSCUCloakBonus'] then
             BuffBlueprint {
@@ -120,7 +120,7 @@ URL0301 = ClassUnit(CCommandUnit) {
 
         -- remove cloak
         self:DisableUnitIntel('Enhancement', 'Cloak')
-        self.CloakEnh = false
+        self.HasCloakEnh = false
         self:RemoveToggleCap('RULEUTC_CloakToggle')
         if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
             Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
@@ -135,7 +135,7 @@ URL0301 = ClassUnit(CCommandUnit) {
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             self.IntelEffectsBag = nil
         end
-        self.StealthEnh = true
+        self.HasStealthEnh = true
         self:EnableUnitIntel('Enhancement', 'RadarStealth')
         self:EnableUnitIntel('Enhancement', 'SonarStealth')
     end,
@@ -146,7 +146,7 @@ URL0301 = ClassUnit(CCommandUnit) {
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
-        self.StealthEnh = false
+        self.HasStealthEnh = false
     end,
 
     ---@param self URL0301
@@ -339,7 +339,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     ---@param intel IntelType
     OnIntelEnabled = function(self, intel)
         CCommandUnit.OnIntelEnabled(self, intel)
-        if self.CloakEnh and self:IsIntelEnabled('Cloak') then
+        if self.HasCloakEnh and self:IsIntelEnabled('Cloak') then
             self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy
                 or 0)
             self:SetMaintenanceConsumptionActive()
@@ -347,7 +347,7 @@ URL0301 = ClassUnit(CCommandUnit) {
                 self.IntelEffectsBag = {}
                 self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-        elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
+        elseif self.HasStealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy
                 or 0)
             self:SetMaintenanceConsumptionActive()
@@ -366,9 +366,9 @@ URL0301 = ClassUnit(CCommandUnit) {
             EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
             self.IntelEffectsBag = nil
         end
-        if self.CloakEnh and not self:IsIntelEnabled('Cloak') then
+        if self.HasCloakEnh and not self:IsIntelEnabled('Cloak') then
             self:SetMaintenanceConsumptionInactive()
-        elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
+        elseif self.HasStealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
         end
     end,
