@@ -334,7 +334,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     },
 
     ---@param self URL0301
-    ---@param intel string
+    ---@param intel IntelType
     OnIntelEnabled = function(self, intel)
         CCommandUnit.OnIntelEnabled(self, intel)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
@@ -357,7 +357,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param intel string
+    ---@param intel IntelType
     OnIntelDisabled = function(self, intel)
         CCommandUnit.OnIntelDisabled(self, intel)
         if self.IntelEffectsBag then
