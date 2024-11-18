@@ -64,7 +64,7 @@ UAL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UAL0301
     ---@param bp UnitBlueprintEnhancement unused
-    ProcessEnhancementTeleporter = function (self, bp)
+    ProcessEnhancementTeleporter = function(self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
 
