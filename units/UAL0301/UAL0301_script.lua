@@ -126,7 +126,7 @@ UAL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UAL0301
     ---@param bp UnitBlueprintEnhancement
-    ProcessEnhancementEngineeringFocusModule = function(self, bp)
+    ProcessEnhancementEngineeringFocusingModule = function(self, bp)
         if not Buffs['AeonSCUBuildRate'] then
             BuffBlueprint {
                 Name = 'AeonSCUBuildRate',
@@ -147,7 +147,7 @@ UAL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UAL0301
     ---@param bp UnitBlueprintEnhancement unused
-    ProcessEnhancementEngineeringFocusModuleRemove = function(self, bp)
+    ProcessEnhancementEngineeringFocusingModuleRemove = function(self, bp)
         if Buff.HasBuff(self, 'AeonSCUBuildRate') then
             Buff.RemoveBuff(self, 'AeonSCUBuildRate')
         end
