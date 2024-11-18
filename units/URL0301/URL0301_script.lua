@@ -80,7 +80,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     -- ENHANCEMENTS
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCloakingGenerator = function (self, bp)
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:AddToggleCap('RULEUTC_CloakToggle')
@@ -109,7 +109,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementCloakingGeneratorRemove = function (self, bp)
         -- remove prerequisites
         self:RemoveToggleCap('RULEUTC_StealthToggle')
@@ -126,7 +126,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStealthGenerator = function (self, bp)
         self:AddToggleCap('RULEUTC_StealthToggle')
         if self.IntelEffectsBag then
@@ -139,7 +139,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStealthGeneratorRemove = function (self, bp)
         self:RemoveToggleCap('RULEUTC_StealthToggle')
         self:DisableUnitIntel('Enhancement', 'RadarStealth')
@@ -148,21 +148,21 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementNaniteMissileSystem = function(self, bp)
         self:ShowBone('AA_Gun', true)
         self:SetWeaponEnabledByLabel('NMissile', true)
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementNaniteMissileSystemRemove = function(self, bp)
         self:HideBone('AA_Gun', true)
         self:SetWeaponEnabledByLabel('NMissile', false)
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementSelfRepairSystem = function(self, bp)
         local bpRegenRate = self.Blueprint.Enhancements.SelfRepairSystem.NewRegenRate or 0
         if not Buffs['CybranSCURegenerateBonus'] then
@@ -187,7 +187,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementSelfRepairSystemRemove = function(self, bp)
         if Buff.HasBuff(self, 'CybranSCURegenerateBonus') then
             Buff.RemoveBuff(self, 'CybranSCURegenerateBonus')
@@ -195,7 +195,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
@@ -203,7 +203,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocationRemove = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -211,7 +211,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementSwitchback = function(self, bp)
         self.BuildBotTotal = 4
         if not Buffs['CybranSCUBuildRate'] then
@@ -233,7 +233,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementSwitchbackRemove = function(self, bp)
         self.BuildBotTotal = 3
         if Buff.HasBuff(self, 'CybranSCUBuildRate') then
@@ -242,7 +242,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFocusConvertor = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisintegrator')
         wep:AddDamageMod(bp.NewDamageMod or 0)
@@ -250,7 +250,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementFocusConvertorRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisintegrator')
         wep:AddDamageMod(-self.Blueprint.Enhancements['FocusConvertor'].NewDamageMod)
@@ -258,14 +258,14 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEMPCharge = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisintegrator')
         wep:ReEnableBuff('STUN')
     end,
 
     ---@param self URL0301
-    ---@param bp UnitBlueprintEnhancements
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEMPChargeRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightDisintegrator')
         wep:DisableBuff('STUN')
