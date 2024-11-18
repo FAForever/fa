@@ -156,7 +156,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     FxDamage2 = {EffectTemplate.DamageFireSmoke01, EffectTemplate.DamageSparks01},
     FxDamage3 = {EffectTemplate.DamageFire01, EffectTemplate.DamageSparks01},
 
-    -- Disables all collisions. This will be true for all units being constructed as upgrades
+    -- Disables all collisions. This will be true for all units being constructed as upgrades and dead units
     DisallowCollisions = false,
 
     -- Destruction parameters
@@ -1574,7 +1574,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param firingWeapon Weapon The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
-        -- bail out immediately
+       -- dead unit or unit that is an upgrade
         if self.DisallowCollisions then
             return false
         end
@@ -1595,8 +1595,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
-
-       -- bail out immediately
+       -- dead unit or unit that is an upgrade
         if self.DisallowCollisions then
             return false
         end
