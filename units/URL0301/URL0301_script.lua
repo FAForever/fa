@@ -272,7 +272,7 @@ URL0301 = ClassUnit(CCommandUnit) {
     end,
 
     ---@param self URL0301
-    ---@param enh string
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         CCommandUnit.CreateEnhancement(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
