@@ -1474,6 +1474,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- this flag is used to skip the need of `IsDestroyed`
         self.Dead = true
 
+        -- don't allow projectiles/beams to collide since we are dead
+        self.DisallowCollisions = true
+
         local layer = self.Layer
         local bp = self.Blueprint
         local army = self.Army
@@ -1500,7 +1503,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local FractionThreshold = bp.General.FractionThreshold or 0.5
             if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
                 self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
-                self.DisallowCollisions = true
             end
 
             self:DoUnitCallbacks('OnKilled')
@@ -1942,8 +1944,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         if shallSink then
-            self.DisallowCollisions = true
-
             -- Bubbles and stuff coming off the sinking wreck.
             self:ForkThread(self.SinkDestructionEffects)
 
