@@ -20,7 +20,7 @@
 
 name: Deploy to FAF Beta Balance
 
-# Prevent simultaneous deployments across all deployment branches as 
+# Prevent simultaneous deployments across all deployment branches as
 # the server is unable to process multiple deployments at the same time.
 
 concurrency:
@@ -30,7 +30,7 @@ concurrency:
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 21 1 * *'
+    - cron: "0 21 1 * *"
 
 jobs:
   test:
@@ -44,8 +44,9 @@ jobs:
       - name: Checkout FA repository
         uses: actions/checkout@v4
         with:
-            repository: FAForever/fa
-            ref: develop
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          repository: FAForever/fa
+          ref: develop
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
@@ -58,7 +59,7 @@ jobs:
           cat lua/version.lua
 
       # Disable debugging statements
-      # 
+      #
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Overwrite debug references
         run: |
@@ -71,16 +72,14 @@ jobs:
       - name: Create a commit
         run: |
           # Configure git
-          git config user.email "administrator@faforever.com"
-          git config user.name "FAForever"
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
 
           git add .
           git commit -m "Post-process deployment"
 
-      # Update the deploy/fafbeta branch, we force push here because 
+      # Update the deploy/fafbeta branch, we force push here because
       # we're not interested in fixing conflicts
       - name: Update deploy/fafbeta
         run: |
           git push origin HEAD:deploy/fafbeta --force
-
-

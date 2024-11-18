@@ -1,0 +1,1 @@
+- (#6369) AI player teammates should now be able to complete campaign objectives such as the opening Supcom mission's objective to build 3 mexes.

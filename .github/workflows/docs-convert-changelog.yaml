@@ -1,0 +1,107 @@
+# Copyright (c) 2024 Daniel 'Zjonn' Dubiel
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Convert Markdown changelog to Lua
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: choice
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+        options:
+          - develop
+          - deploy/fafbeta
+          - deploy/fafdevelop
+
+  workflow_call:
+    inputs:
+      reference:
+        required: true
+        type: string
+        description: The reference (branch or tag) to use to compile the changelog snippets from
+
+jobs:
+  convert_changelog:
+    name: Convert changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variable
+        run: |
+          echo "SCRIPTS=.github/workflows/scripts/python" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ${{ env.SCRIPTS }}
+            changelog
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r $SCRIPTS/requirements.txt
+
+      - name: Convert changelog to Lua
+        run: |
+          out_dir=lua_changelog
+          mkdir $out_dir
+          for file in changelog/*.md; do
+            out_file=$(basename ${file%.md}.lua)
+            python3 $SCRIPTS/changelog_markdown2lua.py "${file}" "${out_dir}/${out_file}"
+          done
+
+      - name: Add the Lua changelog as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lua_changelog
+          path: |
+            lua_changelog
+
+  validate_lua_changelog:
+    name: Validate Lua changelog
+    runs-on: ubuntu-latest
+    container: faforever/lua:v5.0-1
+    needs: convert_changelog
+    steps:
+      - name: Install tooling
+        run: |
+          apk add bash git findutils
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tests/run-syntax-test.sh
+
+      - name: Download the Lua changelog artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lua_changelog
+
+      - name: Validate changelog files
+        run: |
+          ./tests/run-syntax-test.sh
