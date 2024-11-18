@@ -24,6 +24,7 @@ UnitBlueprint{
         "OVERLAYANTINAVY",
         "OVERLAYDEFENSE",
         "OVERLAYDIRECTFIRE",
+        "OVERLAYINDIRECTFIRE",
         "OVERLAYRADAR",
         "OVERLAYSONAR",
         "PRODUCTSC1",

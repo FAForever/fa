@@ -1,0 +1,39 @@
+name: General issue
+description: Create an issue for purposes not covered by the other templates
+labels: ["status: novel issue"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time in submitting an issue.
+
+        - This repository is maintained by volunteers, it may take a while for them to come back to you.
+        - Remember to include sufficient details and context.
+        - If you have multiple problems or suggestions, please submit them in separate issues.
+        - We accept pull requests. If you know how to fix it - go ahead!
+  - type: textarea
+    id: describe
+    attributes:
+      label: Describe the issue
+      description: A clear and concise description of what the issue is.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected Behavior
+      description: If applicable, a clear and concise description of what you expect to happen in various scenarios.
+    validations:
+      required: false
+  - type: textarea
+    id: images
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain the issue.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        _This issue will be read by people that are unable to look into your thoughts - this request is all they have to understand the situation. The more precise your request, the easier it becomes for us to help you._
