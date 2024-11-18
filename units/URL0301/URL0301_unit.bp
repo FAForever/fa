@@ -58,9 +58,9 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Normal",
         EconomyThreatLevel = 1208,
-        Health = 19000,
-        MaxHealth = 19000,
-        RegenRate = 25,
+        Health = 12500,
+        MaxHealth = 12500,
+        RegenRate = 21,
         SurfaceThreatLevel = 30,
     },
     Display = {
@@ -174,10 +174,10 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 26400,
-        BuildCostMass = 2000,
-        BuildRate = 56,
-        BuildTime = 14400,
+        BuildCostEnergy = 21450,
+        BuildCostMass = 1650,
+        BuildRate = 40,
+        BuildTime = 11500,
         BuildableCategory = { "BUILTBYTIER3ENGINEER CYBRAN" },
         MaintenanceConsumptionPerSecondEnergy = 0,
         MaxBuildDistance = 10,
@@ -607,7 +607,7 @@ UnitBlueprint{
                 },
             },
             CollideFriendly = false,
-            Damage = 300,
+            Damage = 100,
             DamageType = "Normal",
             DisplayName = "Disintegrator Pulse Laser",
             FireTargetLayerCapsTable = {
@@ -764,6 +764,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Land = true },
+        WreckageLayers = { Land = true, Seabed = true },
     },
 }
