@@ -66,6 +66,18 @@ function ToggleControl()
     end
 end
 
+---@class RecallSyncData
+---@field StartTime number # When the recall vote started sim-side in seconds
+---@field Open number # Duration of the recall vote in seconds
+---@field Blocks number? # number of voters. `nil` if the block count does not need to be updated, due to the edge case of a 2 player team where neither player has voted due to the vote requester's defeat
+---@field Yes number # number of Yes votes
+---@field No number # number of No votes
+---@field CanVote boolean # Whether or not the focused army has voted or is defeated
+---@field Cancel true?
+---@field CannotRequest CannotRecallReason
+---@field Close boolean # boolean is the recall result
+
+---@param data RecallSyncData
 function RequestHandler(data)
     if data.CannotRequest ~= nil then
         import("/lua/ui/game/diplomacy.lua").SetCannotRequestRecallReason(data.CannotRequest)
@@ -168,15 +180,15 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         local currentBlocks = votes.blocks
         if blocks ~= currentBlocks then
             votes.blocks = blocks
-            for i = currentBlocks, 1, -1 do
+            for i = (currentBlocks or 1), 1, -1 do
                 local block = votes[i]
                 if block then
                     block:Destroy()
                 end
                 votes[i] = nil
             end
-            if blocks > 2 then
-                local panelWidth = votes.Width()
+            if blocks then
+                local panelWidth = votes.Width() / LayoutHelpers.GetPixelScaleFactor() -- pre-unmultiply scale factor
                 local width = math.floor(panelWidth / blocks)
                 local offsetX = math.floor((panelWidth - blocks * width) * 0.5) - width
                 for i = 1, blocks do
@@ -200,6 +212,18 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             end
             -- manual dirtying of the lazyvar
             votes.Height[1] = nil
+        elseif currentBlocks then
+            local function SetTextures(vote, filename)
+                vote._left:SetTexture(UIUtil.UIFile(filename .. "_bmp_l.dds"))
+                vote._middle:SetTexture(UIUtil.UIFile(filename .. "_bmp_m.dds"))
+                vote._right:SetTexture(UIUtil.UIFile(filename .. "_bmp_r.dds"))
+            end
+
+            -- reset the status of existing blocks
+            for i = 1, currentBlocks do
+                votes[i].cast = nil
+                SetTextures(votes[i], "/game/recall-panel/recall-vote")
+            end
         end
     end,
 
@@ -306,6 +330,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
                 self.reviewResultsThread = nil
             end, self)
         end
+        self.label:SetText(LOC("<LOC diplomacy_0018>Ready for recall"))
     end,
 
     CancelVote = function(self)
@@ -323,7 +348,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         self.startTime:Set(-9999) -- make sure the OnFrame animation ends
         if self.reviewResultsThread then
             -- continue the OnSecond animation if it exists
-            coroutine.resume(self.reviewResultsThread)
+            ResumeThread(self.reviewResultsThread)
         else
             -- otherwise, create our own result reviewing handler
             self.reviewResultsThread = ForkThread(function(self)
@@ -342,12 +367,15 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
 
     AddVotes = function(self, yes, no)
         local votes = self.votes
-        if votes.blocks < 3 then return end
+        if not votes.blocks then return end
+
         local function SetTextures(vote, filename)
             vote._left:SetTexture(UIUtil.UIFile(filename .. "_bmp_l.dds"))
             vote._middle:SetTexture(UIUtil.UIFile(filename .. "_bmp_m.dds"))
             vote._right:SetTexture(UIUtil.UIFile(filename .. "_bmp_r.dds"))
         end
+
+        -- get where these new votes should be added on top of existing ones
         local index = 1
         for i = 1, votes.blocks do
             if not votes[i].cast then
@@ -355,6 +383,8 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
                 break
             end
         end
+
+        -- add the new votes
         if yes then
             for _ = 1, yes do
                 local vote = votes[index]
@@ -403,13 +433,21 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
         if time > 0 then
             local dur = self.duration
             time = GetGameTimeSeconds() - time
-            local nominalWidth = self.Width() - LayoutHelpers.ScaleNumber(16)
+            local pb = self.progressBar
+            local bg = self.progressBarBG
+            local nominalWidth = bg.Width() - LayoutHelpers.ScaleNumber(16)
             if time >= dur then
                 self.startTime:Set(-9999)
-                self.progressBar.Width:Set(0)
-                self.progressBar:Hide()
+                LayoutHelpers.AtHorizontalCenterIn(bg, pb)
+                pb.Width:Set(0)
+                pb:Hide()
             else
-                self.progressBar.Width:Set((1 - time / dur) * nominalWidth)
+                local wings = 0.5 * (1 - time / dur) * nominalWidth
+                -- it jitters less when you set both the left and the right instead of relying
+                -- on the layout centering with the width
+                local center = bg.Left() + 0.5 * bg.Width()
+                pb.Left:Set(math.floor(center - wings))
+                pb.Right:Set(math.ceil(center + wings))
             end
             notAnimating = false
         end
