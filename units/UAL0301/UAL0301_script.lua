@@ -75,7 +75,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -92,7 +92,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementShieldHeavy = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
@@ -109,7 +109,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement 
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
@@ -125,7 +125,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementEngineeringFocusModule = function(self, bp)
         if not Buffs['AeonSCUBuildRate'] then
             BuffBlueprint {
@@ -154,7 +154,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementSystemIntegrityCompensator = function(self, bp)
         if not Buffs['AeonSCURegenRate'] then
             BuffBlueprint {
@@ -195,7 +195,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStabilitySuppressant = function(self, bp)
         local wep = self:GetWeaponByLabel('RightReactonCannon')
         wep:AddDamageMod(bp.NewDamageMod or 0)
@@ -204,7 +204,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancement unused
+    ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementStabilitySuppressantRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightReactonCannon')
         wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
