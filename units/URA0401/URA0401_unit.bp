@@ -229,7 +229,8 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 190,
+            Damage = 150,
+            DamageRadius = 3,
             DamageType = "Normal",
             DisplayName = "Iridium Rocket Pack",
             FireTargetLayerCapsTable = {
@@ -293,7 +294,8 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 190,
+            Damage = 150,
+            DamageRadius = 3,
             DamageType = "Normal",
             DisplayName = "Iridium Rocket Pack",
             FireTargetLayerCapsTable = {
