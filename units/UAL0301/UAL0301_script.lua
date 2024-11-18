@@ -63,19 +63,19 @@ UAL0301 = ClassUnit(CommandUnit) {
     -- ENHANCEMENTS
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementTeleporter = function (self, bp)
         self:AddCommandCap('RULEUCC_Teleport')
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementTeleporterRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Teleport')
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShield = function(self, bp)
         self:AddToggleCap('RULEUTC_ShieldToggle')
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -84,7 +84,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -92,7 +92,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldHeavy = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)
@@ -101,7 +101,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementShieldHeavyRemove = function(self, bp)
         self:DestroyShield()
         self:SetMaintenanceConsumptionInactive()
@@ -109,7 +109,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements 
+    ---@param bp UnitBlueprintEnhancement 
     ProcessEnhancementResourceAllocation = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
@@ -117,7 +117,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementResourceAllocationRemove = function(self, bp)
         local bpEcon = self.Blueprint.Economy
         self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -125,7 +125,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementEngineeringFocusModule = function(self, bp)
         if not Buffs['AeonSCUBuildRate'] then
             BuffBlueprint {
@@ -146,7 +146,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementEngineeringFocusModuleRemove = function(self, bp)
         if Buff.HasBuff(self, 'AeonSCUBuildRate') then
             Buff.RemoveBuff(self, 'AeonSCUBuildRate')
@@ -154,7 +154,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementSystemIntegrityCompensator = function(self, bp)
         if not Buffs['AeonSCURegenRate'] then
             BuffBlueprint {
@@ -175,7 +175,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementSystemIntegrityCompensatorRemove = function(self, bp)
         if Buff.HasBuff(self, 'AeonSCURegenRate') then
             Buff.RemoveBuff(self, 'AeonSCURegenRate')
@@ -183,19 +183,19 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementSacrifice = function(self, bp)
         self:AddCommandCap('RULEUCC_Sacrifice')
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementSacrificeRemove = function(self, bp)
         self:RemoveCommandCap('RULEUCC_Sacrifice')
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementStabilitySuppressant = function(self, bp)
         local wep = self:GetWeaponByLabel('RightReactonCannon')
         wep:AddDamageMod(bp.NewDamageMod or 0)
@@ -204,7 +204,7 @@ UAL0301 = ClassUnit(CommandUnit) {
     end,
 
     ---@param self UAL0301
-    ---@param bp UnitBlueprintEnhancements unused
+    ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementStabilitySuppressantRemove = function(self, bp)
         local wep = self:GetWeaponByLabel('RightReactonCannon')
         wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
