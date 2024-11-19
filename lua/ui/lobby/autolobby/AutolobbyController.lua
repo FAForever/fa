@@ -859,7 +859,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
-        self.Trash:Add(ForkThread(self.CheckForRejoinThread, self))
+        -- self.Trash:Add(ForkThread(self.CheckForRejoinThread, self)) -- disabled, for now
 
         self:SendData(self.HostID, { Type = "AddPlayer", PlayerOptions = self:CreateLocalPlayer() })
     end,
