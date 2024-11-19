@@ -145,6 +145,7 @@
 ---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
+--- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
 ---@field NeedUnpack boolean
 --- this muliplier is applied when a staging platform is refueling an air unit
 ---@field RefuelingMultiplier number
