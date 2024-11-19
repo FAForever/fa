@@ -56,6 +56,8 @@ local AutolobbyMapPreview = ClassUI(Group) {
         self.WreckageIcon = UIUtil.CreateBitmap(self, "/scx_menu/lan-game-lobby/mappreview/wreckage.dds")
         self.SpawnIcons = {}
 
+        UIUtil.CreateDialogBrackets(self, 30, 24, 30, 24)
+
         self.IconTrash = TrashBag()
     end,
 
