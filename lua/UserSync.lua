@@ -229,6 +229,7 @@ function OnSync()
     end
 
     if Sync.NukeLaunchData then
+        LOG(repr(Sync.NukeLaunchData))
         import("/lua/ui/game/nukelaunchping.lua").DoNukePing(Sync.NukeLaunchData)
     end
 
