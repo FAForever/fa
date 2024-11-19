@@ -88,6 +88,8 @@ local AutolobbyInterface = Class(Group) {
 
         LayoutHelpers.ReusedLayoutFor(self.Preview)
             :AtCenterIn(self, -100, 0)
+            :Width(400)
+            :Height(400)
             :Hide()
             :End()
 
