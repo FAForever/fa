@@ -36,6 +36,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
     end,
 
     CreateVisibleEntity = function(self)
+        if not(self.GetFractionComplete) or self:GetFractionComplete() < 1 then return nil end
         AStructureUnit.CreateVisibleEntity(self)
 
         if self.RemoteViewingData.VisibleLocation and self.RemoteViewingData.DisableCounter == 0 and self.RemoteViewingData.IntelButton then
