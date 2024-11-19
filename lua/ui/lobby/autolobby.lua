@@ -90,10 +90,6 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
             "_scenario.lua")
         AutolobbyCommunicationsInstance:HostGame()
     end
-
-    -- -- start with a loading dialog
-    -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-    --     :CreateLoadingDialog()
 end
 
 local rejoinTest = false
@@ -116,26 +112,6 @@ function JoinGame(address, asObserver, playerName, uid)
         AutolobbyCommunicationsInstance.JoinParameters.DesiredPeerId = uid
         AutolobbyCommunicationsInstance:JoinGame(address, playerName, uid)
     end
-
-    if rejoinTest then
-        rejoinTest = false
-        ForkThread(
-            function()
-                local startSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or 1
-                if startSpot == 2 then
-                    WaitSeconds(3)
-                    LOG(" -- REJOIN TEST -- ")
-                    if AutolobbyCommunicationsInstance then
-                        AutolobbyCommunicationsInstance:DisconnectFromPeer("3")
-                    end
-                end
-            end
-        )
-    end
-
-    -- -- start with a loading dialog
-    -- import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
-    --     :CreateLoadingDialog()
 end
 
 --- Called by the engine.
