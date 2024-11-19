@@ -125,6 +125,11 @@ end
 function Unit:EnableManipulators(bone, Enable)
 end
 
+---Forces game to use AltFootprint for the unit
+---@param state boolean
+function Unit:ForceAltFootprint(state)
+end
+
 --- Returns the unit's multiplier to a damage type
 ---@param damageTypeName DamageType
 ---@return number
@@ -269,7 +274,6 @@ end
 ---@param statName string
 ---@param defaultVal? number
 ---@return number
--- Special case for the Salem: GetStat("h1_SetSalemAmph", 0 or 1) will Disable/Enable amphibious mode
 function Unit:GetStat(statName, defaultVal)
 end
 
