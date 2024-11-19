@@ -218,13 +218,13 @@ function CreateDecal(position, heading, textureName1, textureName2, type, sizeX,
 end
 
 --- Creates an economy event for the unit that consumes resources over given time.
---- The unit shows the orange build bar for this event.
 ---@param unit Unit
 ---@param totalEnergy number
 ---@param totalMass number
 ---@param timeInSeconds number
+---@param callback? fun(unit: Unit, economyEventProgress: number) # progress is (0,1]. Typically used with `Unit.SetWorkProgress` to show the orange build bar.
 ---@return EconomyEvent
-function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds)
+function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds, callback)
 end
 
 --- creates an emitter at an entity's bone, but does not attach the emitter to it
