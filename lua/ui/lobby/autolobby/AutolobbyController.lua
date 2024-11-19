@@ -473,7 +473,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
     ---@param self UIAutolobbyCommunications
     LaunchThread = function(self)
-        while not IsDestroyed(self) and false do
+        while not IsDestroyed(self) do
             if self:CanLaunch(self.LaunchStatutes) then
 
                 WaitSeconds(5.0)
