@@ -2154,14 +2154,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local bp = self.Blueprint.Audio
+        local bp = self.Blueprint.Audio.NuclearLaunchDetected
         if bp then
             for num, aiBrain in ArmyBrains do
-                local factionIndex = aiBrain:GetFactionIndex()
-
-                if bp['NuclearLaunchDetected'] then
-                    aiBrain:NuclearLaunchDetected(bp['NuclearLaunchDetected'])
-                end
+                aiBrain:NuclearLaunchDetected(bp)
             end
         end
     end,
