@@ -34,4 +34,4 @@
     - BuildTime: 14400 -> 11500
     - MassProduction: 3 -> 1
     - EnergyProduction: 300 -> 100
-    - GunDamage: 300 -> 100
+    - GunDamage: 400 -> 100
