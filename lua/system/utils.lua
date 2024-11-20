@@ -626,6 +626,9 @@ function StringJoin(items, delimiter)
 end
 
 --- "explode" a string into a series of tokens, using a separator character `sep`
+---@param str string
+---@param sep string
+---@return string[]
 function StringSplit(str, sep)
     local sep, fields = sep or ":", {}
     local pattern = string.format("([^%s]+)", sep)
