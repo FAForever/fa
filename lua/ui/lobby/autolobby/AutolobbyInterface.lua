@@ -134,8 +134,9 @@ local AutolobbyInterface = Class(Group) {
         self.State.PlayerOptions = playerOptions
 
         if pathToScenarioInfo and playerOptions then
-            self.Preview:Show()
-            self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
+            -- hide it for now until we have a better way to decipher its possible (negative) impact
+            -- self.Preview:Show()
+            -- self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
         end
     end,
 
