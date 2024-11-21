@@ -126,6 +126,20 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     end,
 
     ---@param self MobileUnit
+    ---@param built Unit
+    ---@param order string
+    ---@return boolean
+    OnStartBuild = function(self, built, order)
+        if IsAlly(self.Army, built.Army) then
+            return Unit.OnStartBuild(self, built, order)
+        else
+            self:OnFailedToBuild()
+            IssueToUnitClearCommands(self)
+            return false
+        end
+    end,
+
+    ---@param self MobileUnit
     ---@param new string
     ---@param old string
     OnLayerChange = function(self, new, old)

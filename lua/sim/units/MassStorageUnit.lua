@@ -21,6 +21,31 @@
 --**********************************************************************************
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
 
 ---@class MassStorageUnit : StructureUnit
-MassStorageUnit = ClassUnit(StructureUnit) {}
+MassStorageUnit = ClassUnit(StructureUnit) {
+
+    ---@param self MassStorageUnit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        StructureUnitOnStopBeingBuilt(self, builder, layer)
+
+        local brain = self.Brain
+        brain:RegisterUnitMassStorage(self)
+        self:OnMassStorageStateChange(brain.MassStorageState)
+    end,
+
+    ---@param self MassStorageUnit
+    ---@param state AIBrainMassStorageState
+    OnMassStorageStateChange = function(self, state)
+        if state == 'EconLowMassStore' then
+            self:CreateBlinkingLights('Red')
+        elseif state == 'EconMidMassStore' then
+            self:CreateBlinkingLights('Yellow')
+        elseif state == 'EconFullMassStore' then
+            self:CreateBlinkingLights('Green')
+        end
+    end,
+}

@@ -30,29 +30,30 @@ function EnableLoadBalance(enabled, unitThreshold)
     if enabled then
         ScenarioInfo.LoadBalance.UnitThreshold = unitThreshold or 50
     else
-        ForkThread(function()
-            --local timePerGroup = ScenarioInfo.DistributeTime/table.getn(ScenarioInfo.LoadBalance.SpawnGroups)
-
-            --Get time
-            local time = GetSystemTimeSecondsOnlyForProfileUse()
-
-            --Spawn bases
-            while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
-                local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
-                base:SpawnGroup(name, uncapturable, true)
-            end
-
-            --Spawn units
-            while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
-                local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups
-                    , 1))
-                CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
-            end
-
-            --Report time taken
-            LOG("Time to spawn: " .. (GetSystemTimeSecondsOnlyForProfileUse() - time))
-        end)
+        ForkThread(LoadBalanceThread)
     end
+end
+
+function LoadBalanceThread()
+    --local timePerGroup = ScenarioInfo.DistributeTime/table.getn(ScenarioInfo.LoadBalance.SpawnGroups)
+
+    --Get time
+    local time = GetSystemTimeSecondsOnlyForProfileUse()
+
+    --Spawn bases
+    while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
+        local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
+        base:SpawnGroup(name, uncapturable, true)
+    end
+
+    --Spawn units
+    while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
+        local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
+        CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
+    end
+
+    --Report time taken
+    LOG("Time to spawn: " .. (GetSystemTimeSecondsOnlyForProfileUse() - time))
 end
 
 ---@deprecated # use marker utilities instead
@@ -502,30 +503,12 @@ end
 ---@param unit Unit
 ---@param needToRotate number
 function CreateWreckage(unit, needToRotate)
-    prop = unit:CreateWreckageProp(0)
+    local prop = unit:CreateWreckageProp(0)
     if needToRotate then -- Some units like naval and air need to rotate for effect like after death in game
-        local roll = 0.5 + Random() - 2 * Random(0, 1) -- Random angle +-(0.5->1.5) radian
-        local pitch = 0.5 + Random() - 2 * Random(0, 1)
+        local roll = 0.5 + Random() - 2 * Random() -- Random angle +-(0.5->1.5) radian
+        local pitch = 0.5 + Random() - 2 * Random()
         local yaw = 0
-
-        local unitRotation = unit:GetOrientation()
-        local rotation = EulerToQuaternion(roll, pitch, yaw)
-        local newOrientation = {}
-        -- mmm I`m love quaternions... =3
-        newOrientation[1] = unitRotation[4] * rotation[1] + unitRotation[1] * rotation[4] +
-            unitRotation[2] * rotation[3
-            ] - unitRotation[3] * rotation[2]
-        newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] +
-            unitRotation[3] * rotation[1
-            ] - unitRotation[1] * rotation[3]
-        newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] +
-            unitRotation[1] * rotation[2
-            ] - unitRotation[2] * rotation[1]
-        newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] -
-            unitRotation[2] * rotation[2
-            ] - unitRotation[3] * rotation[3]
-
-        prop:SetOrientation(newOrientation, true)
+        prop:SetOrientation(EulerToQuaternion(roll, pitch, yaw) * unit:GetOrientation(), true)
     end
     unit:Destroy()
 end

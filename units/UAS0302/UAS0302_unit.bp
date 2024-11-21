@@ -19,6 +19,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UAS',        Cue = 'UAS0302_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Naval',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 48000,
     BuildIconSortPriority = 18,
     Categories = {
         "AEON",
@@ -44,8 +45,6 @@ UnitBlueprint{
         EconomyThreatLevel = 277,
         Health = 48000,
         MaxHealth = 48000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
         SurfaceThreatLevel = 23,
     },
     Display = {
@@ -120,17 +119,11 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "sea",
@@ -147,14 +140,6 @@ UnitBlueprint{
     LifeBarSize = 4,
     Physics = {
         BackUpDistance = 10,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = true,
-        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 3.7,
@@ -173,7 +158,6 @@ UnitBlueprint{
     SelectionSizeZ = 8.9,
     SelectionThickness = 0.2,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     SizeX = 3.3,
     SizeY = 2.8,
     SizeZ = 12.8,
@@ -228,7 +212,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.17,
+            RateOfFire = 10/59, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
@@ -292,7 +276,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.17,
+            RateOfFire = 10/59, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
@@ -356,7 +340,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.17,
+            RateOfFire = 10/59, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
@@ -414,7 +398,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.5,
+            RateOfFire = 10/20, --10/integer interval in ticks
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

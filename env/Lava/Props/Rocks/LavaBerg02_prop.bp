@@ -1,21 +1,21 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
-        'OBSTRUCTSBUILDING'
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 75.0,
+        MaxHealth = 75.0,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'LavaBerg02_albedo.dds',
-                    LODCutoff = 750,
-                    NormalsName = 'LavaBerg02_normalsTS.dds',
-                    ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 230,
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "LavaBerg02_albedo.dds",
+                    NormalsName = "LavaBerg02_normalsTS.dds",
                 },
             },
         },
@@ -26,9 +26,7 @@ PropBlueprint {
         ReclaimMassMax = 37.5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Medium Rock',
-    },
+    Interface = { HelpText = "Medium Rock" },
     SizeX = 1.5,
     SizeY = 0.25,
     SizeZ = 1.5,

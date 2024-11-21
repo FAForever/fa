@@ -1,8 +1,8 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "INDIRECTFIRE",
+        "PROJECTILE",
+        "UEF",
     },
     Display = {
         CameraFollowsProjectile = true,
@@ -10,7 +10,7 @@ ProjectileBlueprint {
             LODs = {
                 {
                     LODCutoff = 150,
-                    ShaderName = 'TMeshGlow',
+                    ShaderName = "TMeshGlow",
                 },
             },
         },
@@ -18,17 +18,15 @@ ProjectileBlueprint {
         UniformScale = 0.13,
     },
     General = {
-        Category = 'Artillery',
+        Category = "Artillery",
         EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'INDIRECTFIRE',
+            "UEF",
+            "PROJECTILE",
+            "INDIRECTFIRE",
         },
-        Faction = 'UEF',
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 20,

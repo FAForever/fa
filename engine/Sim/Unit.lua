@@ -52,6 +52,16 @@ local Unit = {}
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
 
+---@class UnitCommand
+---@field _c_object userdata
+---@field blueprintId? string -- For build commands
+---@field commandType integer -- Integer representation of CommandType, see UnitQueueDataToCommand for details
+---@field target? Prop|Unit|Entity -- For commands that target an entity
+---@field targetId? EntityId
+---@field x number -- X coordinate of command target
+---@field y number -- Y coordinate of command target
+---@field z number -- Z coordinate of command target
+
 --- Adds a command cap to the unit
 ---@param category moho.EntityCategory
 function Unit:AddBuildRestriction(category)
@@ -115,6 +125,11 @@ end
 function Unit:EnableManipulators(bone, Enable)
 end
 
+---Forces game to use AltFootprint for the unit
+---@param state boolean
+function Unit:ForceAltFootprint(state)
+end
+
 --- Returns the unit's multiplier to a damage type
 ---@param damageTypeName DamageType
 ---@return number
@@ -146,7 +161,7 @@ function Unit:GetCargo()
 end
 
 --- Returns table of commands queued up for this unit
----@return { }
+---@return UnitCommand[]
 function Unit:GetCommandQueue()
 end
 
@@ -259,7 +274,6 @@ end
 ---@param statName string
 ---@param defaultVal? number
 ---@return number
--- Special case for the Salem: GetStat("h1_SetSalemAmph", 0 or 1) will Disable/Enable amphibious mode
 function Unit:GetStat(statName, defaultVal)
 end
 
@@ -469,7 +483,7 @@ end
 function Unit:SetAccMult(accelMult)
 end
 
---- sets silo auto-build mode
+--- enable silo auto-build or unit auto-assist
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end
@@ -625,9 +639,18 @@ end
 function Unit:SetStat(name, value)
 end
 
---- Sets the icon underlay to set texture.
---- Used in campaign to highlight objective targets.
----@param icon string
+--- Sets the icon underlay to a given texture. 
+--- 
+--- The provided string is used as a lookup to find the relevant textures in `fa/textures/ui/common/game/strategicicons`. It ends up using:
+---
+--- - fa/textures/ui/common/game/strategicicons/x_over.dds
+--- - fa/textures/ui/common/game/strategicicons/x_rest.dds
+--- - fa/textures/ui/common/game/strategicicons/x_selected.dds
+--- - fa/textures/ui/common/game/strategicicons/x_selectedover.dds
+---
+--- Where `x` is the string provided.
+--- Often used in campaign to highlight objective targets.
+---@param icon 'icon_objective_primary' | 'icon_objective_secondary' | 'icon_objective_bonus' | string
 function Unit:SetStrategicUnderlay(icon)
 end
 

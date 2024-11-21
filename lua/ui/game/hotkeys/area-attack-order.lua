@@ -21,12 +21,12 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local GetTopmostWorldViewAt = import("/lua/ui/game/worldview.lua").GetTopmostWorldViewAt
+
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
-local MaximumWidth = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
-local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
 
 ---@type number
-local MinimumDistance = 4
+local MinimumRadius = 4
 
 ---@param value number
 SetMinimumDistance = function(value)
@@ -34,7 +34,7 @@ SetMinimumDistance = function(value)
         error('Expected a number, got ' .. type(value))
     end
 
-    MinimumDistance = value
+    MinimumRadius = value
 end
 
 ---@type Keycode
@@ -51,8 +51,8 @@ end
 
 ---@param origin Vector
 ---@param radius number
-local AreaReclaimOrderCallback = function(origin, radius)
-    if radius < MinimumDistance then
+local AreaAttackOrderCallback = function(origin, radius)
+    if radius < MinimumRadius then
         return
     end
 
@@ -61,16 +61,18 @@ end
 
 ---@param command UserCommand
 AreaAttackOrder = function(command)
+    
+    local mousePos = GetMouseScreenPos()
+    local worldView = GetTopmostWorldViewAt(mousePos[1], mousePos[2])
 
-    local worldView = import("/lua/ui/game/worldview.lua").viewLeft
-
-    RadialDragger(
+    local radialDragger = RadialDragger(
         worldView,
-        AreaReclaimOrderCallback,
+        AreaAttackOrderCallback,
         DragKeycode,
-        MinimumDistance,
-        MaximumWidth,
-        MaximumDistance
+        MinimumRadius
     )
+
+    radialDragger.RadiusCircle.Color = 'e52c2c'
+    radialDragger.RadiusCircle.Thickness = 0.03
 
 end

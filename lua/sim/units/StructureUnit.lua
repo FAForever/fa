@@ -11,13 +11,14 @@ local UnitStopBeingBuiltEffects = Unit.StopBeingBuiltEffects
 local UnitDoTakeDamage = Unit.DoTakeDamage
 local UnitCreateWreckage = Unit.CreateWreckage
 
+local BlinkingLightsUnitComponent = import("/lua/sim/units/components/BlinkingLightsUnitComponent.lua").BlinkingLightsUnitComponent
+
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
-local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
 local FactionToTarmacIndex = {
     UEF = 1,
@@ -32,7 +33,7 @@ local Rect = Rect
 local WaitTicks = WaitTicks
 local ForkThread = ForkThread
 local FlattenMapRect = FlattenMapRect
-local FlattenGradientMapRect = import('/lua/sim/terrainutils.lua').FlattenGradientMapRect
+local FlattenGradientMapRect = import("/lua/sim/terrainutils.lua").FlattenGradientMapRect
 local GetTerrainHeight = GetTerrainHeight
 local GetReclaimablesInRect = GetReclaimablesInRect
 local EntityCategoryContains = EntityCategoryContains
@@ -42,6 +43,11 @@ local MathClamp = math.clamp
 local MathMax = math.max
 local MathFloor = math.floor
 local MathCeil = math.ceil
+local MathSin = math.sin
+local MathCos = math.cos
+local DegToRad = math.pi/180
+local unpack = unpack
+local MathAtan2 = math.atan2
 
 local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
@@ -53,20 +59,22 @@ local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 ---@field OwnedByEntity EntityId
 
 -- compute once and store as upvalue for performance
+-- Enemy units that are searched for when rotating structures
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
+-- Structures that rotate towards the enemy: PD, AA, Torp launchers, Artillery, and TMD (except Volcano)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.ANTIAIR + categories.ANTINAVY + categories.ARTILLERY + (categories.ANTIMISSILE - categories.SILO - categories.uab4201))
+-- Structures that rotate in 90 degree steps: T2/T3/T4 Artillery
+local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
----@class StructureUnit : Unit
+---@class StructureUnit : Unit, BlinkingLightsUnitComponent
 ---@field AdjacentUnits? Unit[]
 ---@field TarmacBag StructureTarmacBag
 ---@field TerrainSlope table            # exists for backwards compatibility
----@field FxBlinkingLightsBag table     # exists for backwards compatibility
 ---@field DeathAnimManip moho.AnimationManipulator
 ---@field OnBeingBuiltEffectsBag TrashBag
 ---@field AdjacencyBeamsBag TrashBag
 ---@field BuildEffectsBag TrashBag
-StructureUnit = ClassUnit(Unit) {
+StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
     MinWeaponRequiresEnergy = 0,
@@ -81,8 +89,9 @@ StructureUnit = ClassUnit(Unit) {
     ---@param self StructureUnit
     OnCreate = function(self)
         UnitOnCreate(self)
+        BlinkingLightsUnitComponent.OnCreate(self)
+
         self:HideLandBones()
-        self.FxBlinkingLightsBag = { }
 
         -- default to ground fire mode for all structures
         self:SetFireState(2)
@@ -109,25 +118,27 @@ StructureUnit = ClassUnit(Unit) {
             and (layer == 'Land' or layer == 'Seabed')
         then
             -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+            local roll, pitch = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
                 blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
                 blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
             -- do not orientate structures that are on flat ground
-            if a1 != 0 or a2 != 0 then
-                -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
-                -- re-inverted again by multiplying it with the original orientation
-                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
-                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
-                local quat = quatOrient * quatSlope
-                self:SetOrientation(quat, true)
+            if roll ~= 0 or pitch ~= 0 then
+                -- "q′ = q2 * q1  in which q′ corresponds to the rotation q1 followed by the rotation q2" (wikipedia)
+                -- the unit's orientation comes first, and then is rotated by the terrain angle
+                self:SetOrientation(EulerToQuaternion(roll, pitch, 0) * self:GetOrientation(), true)
 
                 -- technically obsolete, but as this is part of an integration we don't want to break
                 -- the mod package that it originates from. Originates from the BrewLan mod suite
                 self.TerrainSlope = {}
             end
+        end
+
+        -- rotate weapon structures towards enemy
+        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
+            self:RotateTowardsEnemy()
         end
 
         -- create decal below structure
@@ -152,7 +163,7 @@ StructureUnit = ClassUnit(Unit) {
         end
     end,
 
-    --- Rotates the structure towards the enemy, primarily used for point defenses
+    --- Rotates the structure towards the enemy or map center
     ---@param self StructureUnit
     RotateTowardsEnemy = function(self)
 
@@ -169,50 +180,73 @@ StructureUnit = ClassUnit(Unit) {
             threat = -1,
         }
 
-        -- determine radius
-        local radius = 40
-        local weapons = self.Blueprint.Weapon
-        if weapons then
-            for k, weapon in weapons do
-                if weapon.MaxRadius and weapon.MaxRadius > radius then
-                    radius = 1.1 * weapon.MaxRadius
+        -- find targets in range unless a static arty
+        if not EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+            -- determine radius
+            local radius = 40
+            local weapons = self.Blueprint.Weapon
+            if weapons then
+                for k, weapon in weapons do
+                    if weapon.MaxRadius and 1.1 * weapon.MaxRadius > radius then
+                        radius = 1.1 * weapon.MaxRadius
+                    end
                 end
             end
-        end
 
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
-        local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
+            local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
+            local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
-        if units then
-            for _, u in units do
-                local blip = u:GetBlip(self.Army)
-                if blip then
+            if units then
+                for _, u in units do
+                    local blip = u:GetBlip(self.Army)
+                    if blip then
 
-                    -- check if we've got it on radar and whether it is identified by army in question
-                    local radar = blip:IsOnRadar(self.Army)
-                    local identified = blip:IsSeenEver(self.Army)
-                    if radar or identified then
-                        local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
-                        if threat >= target.threat then
-                            target.location = u:GetPosition()
-                            target.threat = threat
+                        -- check if we've got it on radar and whether it is identified by army in question
+                        local radar = blip:IsOnRadar(self.Army)
+                        local identified = blip:IsSeenEver(self.Army)
+                        if radar or identified then
+                            local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
+                            if threat >= target.threat then
+                                target.location = u:GetPosition()
+                                target.threat = threat
+                            end
                         end
                     end
                 end
             end
         end
 
-        -- get direction vector, atanify it for angle
-        local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
-        local degrees = rad * (180 / math.pi)
+        -- get direction vector, atanify it for angle, then subtract our existing heading if we were spawned in angled
+        local rad = MathAtan2(target.location[1] - pos[1], target.location[3] - pos[3]) - self:GetHeading()
 
-        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = MathFloor((degrees + 90) / 180) * 180
+        local stepSize
+        local bpFootprint = self.Blueprint.Footprint
+        if bpFootprint then
+            if bpFootprint.SizeX ~= bpFootprint.SizeZ then
+                -- Avoid rotating units with oblong footprints as the pathing and visuals won't match
+                stepSize = 180 * DegToRad
+            elseif EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+                stepSize = 90 * DegToRad
+            end
         end
 
-        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
-        rotator:SetPrecedence(1)
-        self.Trash:Add(rotator)
+        if stepSize then
+            rad = MathFloor((rad + 45 * DegToRad) / (90 * DegToRad)) * 90 * DegToRad
+        end
+
+        -- rotation quaternion {cos, 0, sin, 0}
+        local cos = MathCos(rad/2)
+        local sin = MathSin(rad/2)
+
+        -- quatRotate * quatOrient
+        local rhs1, rhs2, rhs3, rhs4 = unpack(self:GetOrientation())
+        rhs1, rhs2, rhs3, rhs4 = 
+            cos * rhs1 - sin * rhs3,
+            cos * rhs2 + sin * rhs4,
+            cos * rhs3 + sin * rhs1,
+            cos * rhs4 - sin * rhs2
+
+        self:SetOrientation({rhs1, rhs2, rhs3, rhs4}, true)
     end,
 
     ---@param self StructureUnit
@@ -220,11 +254,6 @@ StructureUnit = ClassUnit(Unit) {
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         UnitOnStartBeingBuilt(self, builder, layer)
-
-        -- rotate weaponry towards enemy
-        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
-            self:RotateTowardsEnemy()
-        end
 
         -- procedure to remove props that do not obstruct the building
         local blueprint = self.Blueprint
@@ -736,7 +765,7 @@ StructureUnit = ClassUnit(Unit) {
     ---------------------------------------------------------------------------
     --#region Adjacency feature
 
-    -- Called by the engine when a structure is finished building for each adjacent unit
+    -- Called by the engine when a structure in the same army is finished building for each adjacent unit
     ---@param self StructureUnit
     ---@param adjacentUnit StructureUnit
     ---@param triggerUnit StructureUnit
@@ -991,39 +1020,4 @@ StructureUnit = ClassUnit(Unit) {
             ChangeState(self, self.IdleState)
         end,
     },
-
-    ---------------------------------------------------------------------------
-    --#region Deprecated functionality
-
-    ---@deprecated
-    ---@param self StructureUnit
-    ChangeBlinkingLights = function(self)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    CreateBlinkingLights = function(self)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    OnMassStorageStateChange = function(self, state)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    OnEnergyStorageStateChange = function(self, state)
-    end,
-
-    ---@deprecated
-    ---@param self StructureUnit
-    DestroyBlinkingLights = function(self)
-        for _, v in self.FxBlinkingLightsBag do
-            v:Destroy()
-        end
-        self.FxBlinkingLightsBag = { }
-    end,
-
-    --#endregion
-
 }

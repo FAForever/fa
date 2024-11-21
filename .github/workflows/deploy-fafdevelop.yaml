@@ -1,0 +1,85 @@
+# Copyright (c) 2024 Willem 'Jip' Wijnia
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Deploy to FAF Develop
+
+# Prevent simultaneous deployments across all deployment branches as
+# the server is unable to process multiple deployments at the same time.
+
+concurrency:
+  cancel-in-progress: true
+  group: deployment
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 21 * * 4"
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+  update:
+    name: Update FAF Develop
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout/tree/v4/
+      - name: Checkout FA repository
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          repository: FAForever/fa
+          ref: develop
+
+      # Allows us to better understand the game version and the specific commit hash when we receive a log
+      - name: Update version references
+        run: |
+          COMMITHASH=$(git rev-parse HEAD)
+          sed -i "s/local Commit = 'unknown'/local Commit = \"${COMMITHASH}\"/" "lua/version.lua"
+          sed -i "s/local GameType = 'unknown'/local GameType = \"FAF Develop\"/" "lua/version.lua"
+
+          # debugging
+          cat lua/version.lua
+
+      # Disable debugging statements
+      #
+      # You can overwrite these adjustments by setting up a `Debug` folder
+      - name: Overwrite debug references
+        run: |
+          sed -i "s/EnabledDrawing = true,/EnabledDrawing = false,/" "lua/shared/components/DebugComponent.lua"
+
+          # debugging
+          cat lua/shared/components/DebugComponent.lua
+
+      # Create a commit with the changes of the workflow in it
+      - name: Create a commit
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git add .
+          git commit -m "Post-process deployment"
+
+      # Update the deploy/fafdevelop branch, we force push here because
+      # we're not interested in fixing conflicts
+      - name: Update deploy/fafdevelop
+        run: |
+          git push origin HEAD:deploy/fafdevelop --force

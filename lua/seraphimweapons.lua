@@ -5,6 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------------------------
 
+SAALightningWeapon = import("/lua/sim/weapons/seraphim/SAALightningWeapon.lua").SAALightningWeapon
 SANAnaitTorpedo = import('/lua/sim/weapons/seraphim/SANAnaitTorpedo.lua').SANAnaitTorpedo
 SDFExperimentalPhasonProj = import('/lua/sim/weapons/seraphim/SDFExperimentalPhasonProj.lua').SDFExperimentalPhasonProj
 SDFAireauWeapon = import('/lua/sim/weapons/seraphim/SDFAireauWeapon.lua').SDFAireauWeapon
@@ -52,18 +53,22 @@ SDFHeavyQuarnonCannon = import('/lua/sim/weapons/seraphim/SDFHeavyQuarnonCannon.
 SDFSniperShotNormalMode = import('/lua/sim/weapons/seraphim/SDFSniperShotNormalMode.lua').SDFSniperShotNormalMode
 SDFSniperShotSniperMode = import('/lua/sim/weapons/seraphim/SDFSniperShotSniperMode.lua').SDFSniperShotSniperMode
 SB0OhwalliExperimentalStrategicBombWeapon = import('/lua/sim/weapons/seraphim/SB0OhwalliExperimentalStrategicBombWeapon.lua').SB0OhwalliExperimentalStrategicBombWeapon
+SAALightningWeapon = import("/lua/sim/weapons/seraphim/SAALightningWeapon.lua").SAALightningWeapon
 
---- Kept Mod Support
+--#region kept for mod backwards compatibility
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
-local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
-local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
-local Explosion = import("/lua/defaultexplosions.lua")
-local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
-local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
-local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
-local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
-local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
+local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
+
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
+local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
+local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
+local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
+
+local Explosion = import("/lua/defaultexplosions.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
+--#endregion

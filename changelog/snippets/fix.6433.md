@@ -1,0 +1,1 @@
+- (#6433) Fix Aeon destroyer's depth charge's indirect fire range ring not appearing.

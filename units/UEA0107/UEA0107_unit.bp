@@ -21,7 +21,7 @@ UnitBlueprint{
         KTurn = 2,
         KTurnDamping = 2,
         LiftFactor = 8,
-        MaxAirspeed = 10,
+        MaxAirspeed = 10.75,
         StartTurnDistance = 10,
         TransportHoverHeight = 4,
     },
@@ -38,7 +38,7 @@ UnitBlueprint{
         UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
         Unload             = Sound { Bank = 'UEA',        Cue = 'UEA0107_Unit_Unload',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 500,
     BuildIconSortPriority = 50,
     Categories = {
         "AIR",
@@ -60,66 +60,11 @@ UnitBlueprint{
         ArmorType = "Light",
         Health = 500,
         MaxHealth = 500,
-        RegenRate = 0,
     },
     Display = {
         Abilities = { "<LOC ability_transport>Transport" },
         AnimationLand = "/units/UEA0107/UEA0107_atakeoff01.sca",
         ForcedBuildSpin = 90,
-        LayerChangeEffects = {
-            AirLand = {
-                Effects = {
-                    {
-                        Bones = {
-                            "Front_Right_Exhaust",
-                            "Front_Left_Exhaust",
-                            "Back_Right_Exhaust",
-                            "Back_Left_Exhaust",
-                        },
-                        Type = "Landing01",
-                    },
-                },
-            },
-            LandAir = {
-                Effects = {
-                    {
-                        Bones = {
-                            "Front_Right_Exhaust",
-                            "Front_Left_Exhaust",
-                            "Back_Right_Exhaust",
-                            "Back_Left_Exhaust",
-                        },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
-            AirWater = {
-                Effects = {
-                    {
-                        Bones = {
-                            "Front_Right_Engine",
-                            "Front_Left_Engine",
-                            "Back_Right_Engine",
-                            "Back_Left_Engine",
-                        },
-                        Type = "Landing01",
-                    },
-                },
-            },
-            WaterAir = {
-                Effects = {
-                    {
-                        Bones = {
-                            "Front_Right_Engine",
-                            "Front_Left_Engine",
-                            "Back_Right_Engine",
-                            "Back_Left_Engine",
-                        },
-                        Type = "TakeOff01",
-                    },
-                },
-            },
-        },
         IdleEffects = {
             Air = {
                 Effects = {
@@ -144,6 +89,60 @@ UnitBlueprint{
                             "Back_Left_Engine",
                         },
                         Type = "SeaIdleGunship01",
+                    },
+                },
+            },
+        },
+        LayerChangeEffects = {
+            AirLand = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Exhaust",
+                            "Front_Left_Exhaust",
+                            "Back_Right_Exhaust",
+                            "Back_Left_Exhaust",
+                        },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Engine",
+                            "Front_Left_Engine",
+                            "Back_Right_Engine",
+                            "Back_Left_Engine",
+                        },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            LandAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Exhaust",
+                            "Front_Left_Exhaust",
+                            "Back_Right_Exhaust",
+                            "Back_Left_Exhaust",
+                        },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Engine",
+                            "Front_Left_Engine",
+                            "Back_Right_Engine",
+                            "Back_Left_Engine",
+                        },
+                        Type = "TakeOff01",
                     },
                 },
             },
@@ -190,16 +189,10 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
-            RULEUCC_CallTransport = false,
-            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
-            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
         },
@@ -213,14 +206,6 @@ UnitBlueprint{
     LifeBarOffset = 1.65,
     LifeBarSize = 1.25,
     Physics = {
-        BuildOnLayerCaps = {
-            LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         Elevation = 8,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -230,6 +215,7 @@ UnitBlueprint{
         MeshExtentsZ = 5.25,
         MotionType = "RULEUMT_Air",
     },
+    SelectionCenterOffsetY = 0.15,
     SelectionSizeX = 0.8,
     SelectionSizeZ = 3,
     SelectionThickness = 0.22,
@@ -244,12 +230,11 @@ UnitBlueprint{
         Class1Capacity = 6,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsSmall = 6,
-        SlotsMedium = 2,
         SlotsLarge = 1,
+        SlotsMedium = 2,
+        SlotsSmall = 6,
         TransportClass = 10,
     },
-    UseOOBTestZoom = 200,
     Weapon = {
         {
             Damage = 0,
@@ -298,7 +283,6 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
-            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

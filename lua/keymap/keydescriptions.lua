@@ -312,8 +312,8 @@ keyDescriptions = {
     ['select_all_mex'] = '<LOC key_desc_0218>Select all mass extractors.',
     ['select_nearest_idle_lt_mex'] = '<LOC key_desc_0219>Select nearest onscreen lowest tech idle mass extractor.',
 
-    ['acu_select_cg'] = '<LOC key_desc_0220>Select ACU (control group)',
-    ['acu_append_cg'] = '<LOC key_desc_0221>Append ACU to selection (control group)',
+    ['acu_select_cg'] = '<LOC key_desc_0220>Select ACU (double tap to zoom)',
+    ['acu_append_cg'] = '<LOC key_desc_0221>Append ACU to selection (double tap to zoom)',
     ['select_nearest_idle_eng_not_acu'] = '<LOC key_desc_0222>Select nearest idle engineer (not ACU)',
     ['add_nearest_idle_engineers_seq'] = '<LOC key_desc_0223>Select/Add nearest idle engineers',
     ['cycle_idle_factories'] = '<LOC key_desc_0224>Cycle through idle factories',
@@ -538,8 +538,8 @@ keyDescriptions = {
     ['toggle_ai_nav_retreat_direction_from'] = 'NavUtils - Toggle to visualize output of RetreatDirectionFrom ',
     ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
 
-    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers',
-    ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers',
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
+    ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers by tech level and majority faction',
     ['abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['shift_abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['discharge_shields'] = '<LOC key_discharge_shields>Discharge shields',

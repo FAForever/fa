@@ -1228,7 +1228,16 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
     local isSkirmish = ScenarioInfo.type == 'skirmish'
 
     local tlx, tlz, brx, brz
-    if playableArea and isSkirmish then
+    if playableArea and isSkirmish and
+
+        -- check if the playable area is large enough. There are edge cases where maps temporarily decrease the playable 
+        -- area size. Since we can not re-generate the navigational mesh as AIs expect the structure to remain the 
+        -- same we just take the size of the map instead.
+
+        -- This for example applies to generated maps with the unexplored setting.
+        playableArea[3] - playableArea[1] > 32 and
+        playableArea[4] - playableArea[2] > 32
+    then
         tlx = playableArea[1]
         tlz = playableArea[2]
         brx = playableArea[3]
@@ -1520,7 +1529,7 @@ local function GenerateCullLabels()
                 node = stack[count]
                 count = count - 1
                 for k = 1, TableGetn(node) do
-                    local neighbor = node[k]
+                    local neighbor = NavLeaves[node[k]]
                     if neighbor.Label > 0 then
                         neighbor.Label = -1
                         count = count + 1

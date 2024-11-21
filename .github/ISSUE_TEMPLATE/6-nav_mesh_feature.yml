@@ -1,0 +1,79 @@
+name: Navigational mesh feature request
+description: To discuss the request of implementing queries for the navigational mesh.
+title: "[Nav Mesh]: "
+labels: ["status: novel issue, area: nav-mesh"]
+
+body:
+  # Intro
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time in making a Feature Request.
+
+        - This repository is maintained by volunteers, it may take a while for them to come back to you.
+        - Remember to include sufficient details and context.
+        - If you have multiple Idea's or suggestions, please submit them in separate issues.
+        - We accept pull requests. If you know how to fix it - go ahead!
+  # Describe
+  - type: textarea
+    id: describe
+    attributes:
+      label: Describe the Query
+      description: |
+        A clear and concise description of what the query is. This includes the parameters and the expected output. Make sure to include the types. As an example:
+
+        ```lua
+        ---@param layer String
+        ---@param origin Vector
+        ---@param destination Vector
+        ---@return boolean
+        function CanPathTo(layer, origin, destination)
+
+        end
+        ```
+    validations:
+      required: true
+  # Visualize
+  - type: textarea
+    id: visualise
+    attributes:
+      label: Visualize the Query
+      description: |
+        Screenshots with drawings on top of it to help solidify the expectation of the query. As an example:
+
+        ```lua
+        The idea is that you can generate a path that can help the AI to path from a specific vector. A simple comparison is finding a path from `a` to `b`, via `c`. To make it more visual:
+        ```
+
+        ![image](https://user-images.githubusercontent.com/15778155/196362165-d146d149-b2e5-424d-80c6-ef9e61f08b58.png)
+
+        Note that you can copy/paste images directly into Github. 
+
+        Not all requests are easy to draw up, therefore this section is optional.
+    validations:
+      required: false
+  # True / false positives
+  - type: textarea
+    id: positives
+    attributes:
+      label: True / false positives
+      description: |
+        Some queries can be ambiguous. One example is chokepoints. What is considered a choke point, and what is not? We need this data to help create the algorithm, while at the same time being able to confirm that it is well-balanced in making the decisions. This usually involves a lot of screenshots with positive output (it is a chokepoints) and negative output (it is not a choke point).
+
+        Note that you can copy/paste images directly into Github. 
+
+        Not all requests are easy to draw up, therefore this section is optional.
+    validations:
+      required: false
+  # Additional Content
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the query here.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        _This query request will be read by people that are unable to look into your thoughts - this issue is all they have to determine the viability of the query. The more precise your description, the easier it becomes for us to help you._

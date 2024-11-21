@@ -141,9 +141,11 @@
 ---@field GuardReturnRadius number
 --- guard range for the unit, automatically added if absent
 ---@field GuardScanRadius number
---- initial auto mode behaviour for the unit
+--- initial toggle of automatic behaviors (silo building and auto-assist)
+---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
+--- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
 ---@field NeedUnpack boolean
 --- this muliplier is applied when a staging platform is refueling an air unit
 ---@field RefuelingMultiplier number
@@ -444,6 +446,17 @@
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
 
+---@class UnitBlueprintBlinkingLightsData
+---@field BLBone Bone
+---@field BlOffsetX number      # defaults to 0
+---@field BLOffsetY number      # defaults to 0
+---@field BLOffsetZ number      # defaults to 0
+---@field BLScale number        # defaults to 1
+
+---@class UnitBlueprintBlinkingLightsFx
+---@field Green string          # Path to emitter, usually '/effects/emitters/light_green_03_emit.bp'
+---@field Red string            # Path to emitter, usually '/effects/emitters/light_red_03_emit.bp'
+---@field Yellow? string         # Path to emitter, usually '/effects/emitters/light_yellow_02_emit.bp'
 
 ---@class UnitBlueprintDisplay
 --- Used by the Aeon build animation for a custom mercury pool
@@ -493,6 +506,8 @@
 --- used by UEF and Cybran construction units to animate their hover transition
 ---@field AnimationWater? FileName
 ---@field AttackReticleSize? number unused
+---@field BlinkingLights UnitBlueprintBlinkingLightsData[]
+---@field BlinkingLightsFx UnitBlueprintBlinkingLightsFx
 --- the bone on factories where units are built
 ---@field BuildAttachBone? Bone
 --- used while cloaked
@@ -755,8 +770,9 @@
 ---@field TeleportMassMod? number
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
+---@see TeleportDelay For an additional flat delay that also delays teleport FX showing at the destination.
 ---@field TeleportTimeMod? number
---- Whether to use the new variable teleport cost calculation method, or revert to the old
+--- Whether to use the new distance-based teleport cost calculation method, or revert to the old unit cost based method.
 ---@field UseVariableTeleportCosts? boolean
 
 ---@class UnitBlueprintExternalFactory
@@ -912,6 +928,8 @@
 --- Regen Per Second. How much health the unit regenerates per second
 --- This is a multiplier of the base regen
 ---@field RegenPerSecond number
+--- Which unit categories are buffed by the aura
+---@field UnitCategory UnparsedCategory
 
 
 
@@ -947,7 +965,10 @@
 ---@field TarmacGlowDecal? any unused
 --- defines the tech level used for display purposes
 ---@field TechLevel UnitTechLevel
---- if present, makes the "teleport" ability show up in the unit view with the delay of this value. Defaults to 15 seconds.
+--- Extra time taken to teleport before other teleport time calculations. Defaults to 0 seconds.
+--- If `UseVariableTeleportCosts` is false, then this also delays teleport FX appearing at the destination.
+--- If `UseVariableTeleportCosts` is true, then destination FX appear after 0.4x the total teleport time.
+---@see TeleportTimeMod For an energy-scaling teleport time that does not delay teleport FX at the destination.
 ---@field TeleportDelay? number
 --- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
 ---@field TeleportFlatEnergyCost? number
@@ -987,7 +1008,6 @@
 ---@field AllIntel table<IntelType, boolean>
 ---@field AllIntelRecharging table<IntelType, boolean>
 ---@field AllIntelMaintenanceFree table<IntelType, boolean>
----@field AllIntelFromEnhancements table<IntelType, boolean>
 ---@field AllIntelDisabledByEvent table<IntelType, table<string, boolean>>
 
 ---@class UnitBlueprintIntel
@@ -1069,10 +1089,6 @@
 ---@field BuildRestriction UnitBuildRestriction
 --- acceleration to allow unit to catch up to the target when it starts to drift
 ---@field CatchUpAcc number
---- used by the Loyalist for its charge ability
----@field ChargeAccMult? number
---- used by the Loyalist for its charge ability
----@field ChargeSpeedMult? number
 --- unknown if significant in `Physics`
 ---@field CollisionOffsetX? number
 --- if a naval factory uses the special rolloff point computation
@@ -1106,12 +1122,15 @@
 ---@field MaxGroundVariation number
 --- maximum speed for the unit
 ---@field MaxSpeed number
---- maximum speed for the unit in reverse
+--- maximum speed for the unit in reverse. Defaults to the same value as MaxSpeed
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsX number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsY number
+--- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
 --- method of locomotion
@@ -1132,7 +1151,7 @@
 ---@field RotateBodyWhileMoving? boolean
 --- if this unit can try to rotate on the spot
 ---@field RotateOnSpot? boolean
---- threshold for rotate on spot to take effect when moving
+--- threshold speed in ogrids/s for rotate on spot to take effect. defaults to 0.5
 ---@field RotateOnSpotThreshold? number
 --- unknown behavior, used by Spiderbot and Megabot
 ---@field SinkLower? boolean
@@ -1152,9 +1171,10 @@
 ---@field SubSpeedMultiplier? number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
---- turn radius for the unit, in wolrd units
+--- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
+--- and if it results in a faster turn rate than `TurnRate`. Disabled at 0
 ---@field TurnRadius number
---- turn radius for the unit, in degrees per second
+--- turn rate for the unit, in degrees per second. Turning acts improperly when at 0
 ---@field TurnRate number
 --- when present, the speed multiplier is set to this number when entering the water layer
 ---@field WaterSpeedMultiplier? number

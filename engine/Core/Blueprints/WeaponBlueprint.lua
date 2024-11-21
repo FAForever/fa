@@ -39,6 +39,8 @@
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
 ---@field Audio WeaponBlueprintAudio
+--- How many times the engine calls OnFire for the weapon when attacking ground before moving on to the next ground attack order. Defaults to 3
+---@field AttackGroundTries? number
 --- if the unit has no issued commands and has a weapon that has `AutoInitiateAttackCommand` set,
 --- then if it finds a suitable target it will issue an attack command to go after the target
 ---@field AutoInitiateAttackCommand? boolean
@@ -51,7 +53,7 @@
 ---@field BeamLifetime number
 --- if the weapon will only fire when underwater
 ---@field BelowWaterFireOnly? boolean
---- threshold to release point before releasing ordnance
+--- Distance from bomb firing solution's position to the target's position within which the weapon will fire 
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
@@ -81,7 +83,7 @@
 ---@field DamageFriendly boolean
 --- blast radius
 ---@field DamageRadius number
---- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+--- how much additional damage is dealt to shields using the "FAF_AntiShield" damagetype
 ---@field DamageToShields? number
 --- the type of damage the unit will do
 ---@field DamageType DamageType
@@ -166,8 +168,8 @@
 --- registered properly by the engine and the unit will remain stuck on the first order, never firing again until the
 --- player clears the command queue and re-issues the order
 ---@field ManualFire? boolean
---- changes the weapon range from spherical to cylindrical, where the cylinder has a height of
---- this twice this value
+--- The maximum height difference upon which the weapon can fire at targets (cylindrical range).
+--- Defaults to nil, which gives infinite vertical range.
 ---@field MaxHeightDiff? number
 --- this weapon can only hold this many counted projectiles
 ---@field MaxProjectileStorage number
@@ -205,8 +207,8 @@
 --- if `NeedProp` is true then whenever the unit aquires a new target and is ready to attack it, it
 --- will first run the `OnGotTarget` script on the weapon
 ---@field NeedPrep? boolean
---- currently just sets `AlwaysRecheckTarget = false` so that bombers don't retarget halfway through
---- a bombing run
+--- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
+--- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
 --- if the unit is set as "busy" while the weapon charges
 ---@field NotExclusive? boolean
@@ -317,6 +319,8 @@
 ---@field TurretBoneDualMuzzle? Bone
 --- the second pitch bone for a turret, used for arms on bots as weapons
 ---@field TurretBoneDualPitch? Bone
+--- The second yaw bone for a turret, used for the torso of the Loyalist's secondary weapon that is on a turret connected to the torso.
+---@field TurretBoneDualYaw? Bone
 --- The bone used as the muzzle bone for turrets. This is used for aiming as where the projectile
 --- would come out
 ---@field TurretBoneMuzzle? Bone
@@ -340,6 +344,12 @@
 ---@field TurretYawRange number
 --- the speed at which the turret can turn in its yaw direction
 ---@field TurretYawSpeed number
+--- the center angle for determining secondary yaw, based off the rest pose of the model
+---@field TurretDualYaw number
+--- the angle +/- off the secondary yaw that is a valid angle to turn to
+---@field TurretDualYawRange number
+--- the speed at which the secondary turret can turn in its yaw direction
+---@field TurretDualYawSpeed number
 --- if this weapon uses the recent firing solution to create projectile instead of the
 --- aim bone transform
 ---@field UseFiringSolutionInsteadOfAimBone? boolean

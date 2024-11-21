@@ -1,10 +1,10 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 100,
     LODs = {
         {
-            ShaderName = 'NormalMappedAlphaNoShadow',
             LODCutoff = 400,
+            ShaderName = "NormalMappedAlphaNoShadow",
         },
     },
-    IconFadeInZoom = 100,
     UniformScale = 1.0,
 }

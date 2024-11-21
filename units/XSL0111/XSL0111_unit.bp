@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xsl0111_desc>Mobile Missile Launcher",
-    AI = { InitialAutoMode = true },
+    AI = {},
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0111_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Med', LodCutoff = 'UnitMove_LodCutoff' },
@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XSL',            Cue = 'XSL0111_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Tank', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 800,
     BuildIconSortPriority = 40,
     Categories = {
         "BUILTBYTIER2FACTORY",
@@ -26,14 +27,11 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = "Normal",
-        EconomyThreatLevel = 12,
+        EconomyThreatLevel = 19,
         Health = 800,
         MaxHealth = 800,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 6,
+        SurfaceThreatLevel = 5,
     },
     Display = {
         Mesh = {
@@ -91,17 +89,11 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
-            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
-            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
-            RULEUCC_Reclaim = false,
-            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
-            RULEUCC_SiloBuildTactical = false,
             RULEUCC_Stop = true,
-            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "land",
@@ -113,14 +105,6 @@ UnitBlueprint{
     LifeBarSize = 0.95,
     Physics = {
         BackUpDistance = 8,
-        BuildOnLayerCaps = {
-            LAYER_Air = false,
-            LAYER_Land = true,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
-        },
         DragCoefficient = 0.2,
         MaxAcceleration = 2.95,
         MaxBrake = 2.95,
@@ -200,7 +184,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 0.1666,
+            RateOfFire = 10/60, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = true,
             TargetPriorities = {
@@ -230,12 +214,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

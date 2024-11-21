@@ -1,7 +1,5 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
-    },
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -11,10 +9,10 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'sw_bush01_pink_albedo.dds',
-                    LODCutoff = 400,
-                    ShaderName = 'TMeshAlpha',
-					NormalsName = 'sw_bush01_normalsTS.dds',
+                    LODCutoff = 150,
+                    ShaderName = "TMeshAlpha",
+                    AlbedoName = "sw_bush01_pink_albedo.dds",
+                    NormalsName = "sw_bush01_normalsTS.dds",
                 },
             },
         },
@@ -25,9 +23,7 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Small Bush - Swamp',
-    },
+    Interface = { HelpText = "Small Bush - Swamp" },
     SizeX = 0.75,
     SizeY = 0.25,
     SizeZ = 0.5,

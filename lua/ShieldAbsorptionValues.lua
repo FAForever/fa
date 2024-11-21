@@ -22,12 +22,18 @@
 
 ---@alias AbsorptionType
 ---| "Default"
+---| "StaticShield"
 
 --- Defines what proportion of damage a shield of `AbsorptionType` absorbs from a specific `DamageType`
 --- Overrides the behavior of shields absorbing damage depending on their owner's armor type
 ---@type table<AbsorptionType, table<DamageType, number>>
 shieldAbsorptionValues = {
 	["Default"] = {
-		["Deathnuke"] = 1.0
+		["Deathnuke"] = 0.0,
+		["Overcharge"] = 1.0,
+	},
+	["StaticShield"] = { -- For mod support, auto-assigned if the owner has STRUCTURE category.
+		["Deathnuke"] = 1.0,
+		["Overcharge"] = 1.0,
 	},
 }

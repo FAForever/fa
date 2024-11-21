@@ -1,4 +1,3 @@
-
 # Annotating
 
 All future contributions should be properly annotated. With it [our Lua extension](https://github.com/FAForever/fa-lua-vscode-extension) is able to provide intellisense support for our game, mod and campaign developers. You can find all the supported annotations on the [official repository](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations). Note that the annotations supports markdown.
@@ -44,7 +43,7 @@ end
 --- | ------------------ | ----------- |
 --- | ReadyVariable      | `ScenarioInfo.VarTable[ReadyVariable]` Set when all units are on the transports
 --- | WaitVariable       | `ScenarioInfo.VarTable[WaitVariable]` Needs to be set before the transports can leave
---- | LandingList        | (REQUIRED or LandingChain)               
+--- | LandingList        | (REQUIRED or LandingChain)
 --- | LandingChain       | (REQUIRED or LandingList)
 --- | TransportReturn    | Location for transports to return to (they will attack with the land units if this isn't set)
 --- | TransportChain     | (REQUIRED or TransportRoute)

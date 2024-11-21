@@ -187,13 +187,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         proj:SetBallisticAcceleration(-self:CalculateBallisticAcceleration(proj))
     end,
 
+    --- Returns the positive downwards acceleration needed for a projectile to hit its target when travelling at the same speed as the unit launching it (for bombs)
     ---@param self DefaultProjectileWeapon
     ---@param projectile Projectile
     ---@return number
     CalculateBallisticAcceleration = function(self, projectile)
         local launcher = projectile:GetLauncher()
         if not launcher then -- fail-fast
-            return 4.75
+            return 4.9 -- Return the default gravity value if some calculations fail
         end
 
         local UnitGetVelocity = UnitGetVelocity
@@ -225,7 +226,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if self.Blueprint.MuzzleSalvoSize <= 1 then
                 -- do the calculation but skip any cache or salvo logic
                 if not targetPos then
-                    return 4.75
+                    return 4.9
                 end
                 if target and not target.IsProp then
                     targetVelX, _, targetVelZ = UnitGetVelocity(target)
@@ -233,7 +234,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
                 if distVel == 0 then
-                    return 4.75
+                    return 4.9
                 end
                 local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
                 do
@@ -243,14 +244,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
                 end
                 if distPos == 0 then
-                    return 4.75
+                    return 4.9
                 end
                 local time = distPos / distVel
                 projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
                 return 200 * projPosY / (time * time)
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
-                    lastAccel = 4.75,
+                    lastAccel = 4.9,
                     targetPos = targetPos,
                 }
                 if target then
@@ -283,19 +284,20 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local GetSurfaceHeight = GetSurfaceHeight
             local MathSqrt = math.sqrt
             local spread = self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
-            -- nominal acceleration is 4.75; however, bomb clusters adjust the time it takes to land
+            -- default gravitational acceleration is 4.9; however, bomb clusters adjust the time it takes to land
             -- so we convert the acceleration to time to add the spread and convert back:
             -- h = unitY - surfaceY         =>  h2 = 0.5 * (unitY - surfaceHeight(unitX, unitZ))
-            -- t = sqrt(2 h / a) + spread   =>  t = sqrt(4 / 4.75 * h2) + spread
+            -- t = sqrt(2 h / a) + spread   =>  t = sqrt(4 / 4.9 * h2) + spread
             -- a = 0.5 h / t^2              =>  a = h2 / t^2
             local halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX, projPosZ))
-            if halfHeight < 0.01 then return 4.75 end
-            local time = MathSqrt(0.842105263158 * halfHeight) + spread
+            if halfHeight < 0.01 then return 4.9 end
+            local time = MathSqrt(0.816326530612 * halfHeight) + spread
 
             -- now that we know roughly when we'll land, we can find a better guess for where
             -- we'll land, and thus guess the true falling height better as well
             halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX + time * projVelX, projPosX + time * projVelX))
-            time = MathSqrt(0.842105263158 * halfHeight) + spread
+            if halfHeight < 0.01 then return 4.9 end
+            time = MathSqrt(0.816326530612 * halfHeight) + spread
 
             local acc = halfHeight / (time * time)
             data.lastAccel = acc
@@ -306,8 +308,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
         local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
-            data.lastAccel = 4.75
-            return 4.75
+            data.lastAccel = 4.9
+            return 4.9
         end
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
@@ -324,8 +326,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local time = distPos / distVel
         local adjustedTime = time + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
         if adjustedTime == 0 then
-            data.lastAccel = 4.75
-            return 4.75
+            data.lastAccel = 4.9
+            return 4.9
         end
 
         -- If we have a target, targetPos may have updated now.
@@ -401,13 +403,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
                 self.EconDrain = CreateEconomyEvent(self.unit, nrgReq, 0, time)
                 self.FirstShot = true
-                self.unit:ForkThread(function()
-                    WaitFor(self.EconDrain)
-                    RemoveEconomyEvent(self.unit, self.EconDrain)
-                    self.EconDrain = nil
-                end)
+                ForkThread(self.EconomyDrainThread, self)
             end
         end
+    end,
+
+    ---@param self DefaultProjectileWeapon
+    EconomyDrainThread = function(self)
+        WaitFor(self.EconDrain)
+        RemoveEconomyEvent(self.unit, self.EconDrain)
+        self.EconDrain = nil
     end,
 
     -- Determine how much Energy is required to fire
@@ -880,7 +885,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
-            if not (IsDestroyed(unit) or IsDestroyed(self)) then
+            -- Bombers should not have their targets reset since they take a large path much longer than their reload time.
+            if not (IsDestroyed(unit) or IsDestroyed(self)) and not bp.NeedToComputeBombDrop then
                 if bp.TargetResetWhenReady then
 
                     -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
@@ -892,11 +898,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     self:ResetTarget()
                 else
 
-                    -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
-                    -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
+                    -- attempts to fix weapons being stuck on targets that are outside their current attack radius, but inside
+                    -- the tracking radius. This happens when the weapon acquires a target, but never actually fires and
                     -- therefore the thread of this state is not destroyed
 
-                    -- wait reload time + 2 seconds, then force the weapon to recheck its target
+                    -- wait reload time + 3 seconds, then force the weapon to recheck its target
                     WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
                     self:ResetTarget()
                 end
@@ -1106,8 +1112,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
-            local hasTarget = self:WeaponHasTarget()
-
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
                 self.CurrentRackSalvoNumber = 1
@@ -1115,7 +1119,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile or not hasTarget then
+                elseif countedProjectile then
                     if bp.WeaponUnpacks then
                         ChangeState(self, self.WeaponPackingState)
                     else
@@ -1124,7 +1128,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
                 end
-            elseif countedProjectile or not hasTarget then
+            elseif countedProjectile then
                 if bp.WeaponUnpacks then
                     ChangeState(self, self.WeaponPackingState)
                 else
@@ -1136,7 +1140,39 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            self.HaltFireOrdered = true
+            -- Override the default OnLostTarget but not inherited ones
+            -- the inherited ones are needed for beam weapons to stop firing: https://github.com/FAForever/fa/pull/4863
+            -- and for ythotha storm to not instantly stop firing: https://github.com/FAForever/fa/pull/5291
+            local baseOnLostTarget = self.__base.OnLostTarget
+            if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
+                baseOnLostTarget(self)
+            else
+                local unit = self.unit
+                if unit then
+                    unit:OnLostTarget(self)
+                end
+                Weapon.OnLostTarget(self)
+
+                -- Some weapons look too ridiculous shooting into the air, so stop them from firing
+                -- stopping firing will cause the last shot of AttackGroundTries to not fire
+                local bp = self.Blueprint
+                if bp.WeaponUnpacks then
+                    -- since we're stopping firing anyway, also prevent skipping the reload state here
+                    if bp.RackSalvoReloadTime > 0 then
+                        self.CurrentRackSalvoNumber = 1
+                        ChangeState(self, self.RackSalvoReloadState)
+                    else
+                        ChangeState(self, self.WeaponPackingState)
+                    end
+                elseif bp.MuzzleChargeDelay > 0.5 then
+                    if bp.RackSalvoReloadTime > 0 then
+                        self.CurrentRackSalvoNumber = 1
+                        ChangeState(self, self.RackSalvoReloadState)
+                    else
+                        ChangeState(self, self.IdleState)
+                    end
+                end
+            end
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
@@ -1164,9 +1200,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if notExclusive then
                 unit:SetBusy(false)
             end
-            self.ReloadEndTime = GetGameTick() + MATH_IRound(bp.RackSalvoReloadTime * 10)
+
             WaitSeconds(bp.RackSalvoReloadTime)
-            self.ReloadEndTime = nil
 
             self:WaitForAndDestroyManips()
 
@@ -1191,6 +1226,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
+            -- Override default OnLostTarget to prevent bypassing reload time by switching to idle state immediately
+            local unit = self.unit
+            if unit then
+                unit:OnLostTarget(self)
+            end
+
+            Weapon.OnLostTarget(self)
         end,
     },
 

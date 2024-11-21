@@ -22,14 +22,8 @@
 
 -- upvalue scope for performance
 local TableGetn = table.getn
-local TableSort = table.sort
-local TableSetn = table.setn
-local TableInsert = table.insert
-local TableRemove = table.remove
 
-local StringFormat = string.format
-
-local IssueReclaim = IssueReclaim
+local IssueAttack = IssueAttack
 
 local MathRound = math.round
 local MathSqrt = math.sqrt
@@ -51,9 +45,8 @@ end
 
 ---@param units Unit[]
 ---@param target Vector
----@param doPrint boolean           # if true, prints information about the order
----@param radius? number
-function AreaAttackOrder(units, target, doPrint, radius)
+---@param radius number
+function AreaAttackOrder(units, target, radius)
     local unitCount = TableGetn(units)
     if unitCount == 0 then
         return

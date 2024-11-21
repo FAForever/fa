@@ -34,10 +34,10 @@ float WaterElevation;
 float WaterElevationDeep;
 float WaterElevationAbyss;
 
-// masks of stratum layers 1 - 4
+// masks of stratum layers 0 - 3 (lower stratum has no mask)
 texture        UtilityTextureA;
 
-// masks of stratum layers 5 - 8
+// masks of stratum layers 4 - 7
 texture        UtilityTextureB;
 
 // red: wave normal strength
@@ -344,14 +344,34 @@ VS_OUT FixedFuncVS( VS_IN In )
     return Out;
 }
 
-bool IsExperimentalShader() {
+bool ShaderUsesTerrainInfoTexture() {
     // The tile value basically says how often the texture gets repeated on the map.
     // A value less than one doesn't make sense under normal conditions, so it is
     // relatively save to use it as our switch.
+    // We use the upper layer slot to store the terrain info texture, so we don't need
+    // the tile value for anything else.
 
-    // in order to trigger this you can set the albedo scale to be bigger than the map 
-    // size. Use the value 10000 to be safe for any map
+    // In order to trigger this you need to set the albedo scale to be bigger than the 
+    // map size in the editor. Use the value 10000 to be safe for any map
     return UpperAlbedoTile.x < 1.0;
+}
+
+bool ShaderUsesPbrRendering() {
+    // The tile value basically says how often the texture gets repeated on the map.
+    // A value less than one doesn't make sense under normal conditions, so it is
+    // relatively save to use it as our switch.
+    // We use the stratum 7 normal slot to store the roughness texture, so we don't need
+    // the tile value for anything else.
+
+    // In order to trigger this you need to set the normal scale to be bigger than the 
+    // map size in the editor. Use the value 10000 to be safe for any map
+    return Stratum7NormalTile.x < 1.0;
+}
+
+bool MapUsesAdvancedWater() {
+    // LightingMultiplier is one of the few variables that is driven by the map,
+    // but accessible by the mesh shader.
+    return LightingMultiplier > 2.1;
 }
 
 // sample a texture that is another buffer the same size as the one
@@ -388,53 +408,47 @@ float ComputeShadow( float4 vShadowCoord )
     return tex2D( ShadowSampler, vShadowCoord ).g;
 }
 
-// apply the water color
-float3 ApplyWaterColor(float terrainHeight, float depth, float3 inColor)
+float3 ApplyWaterColor(float3 viewDirection, float terrainHeight, float waterDepth, float3 color)
 {
-    if (depth > 0) {
+    if (waterDepth > 0) {
         // With this extra check we get rid of unwanted coloration on steep cliffs when zoomed in,
         // but we prevent that terrain tesselation swallows too much of the water when zoomed out
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
-        float4 wcolor = tex1D(WaterRampSampler, depth);
-        inColor = lerp(inColor.xyz, wcolor.xyz, wcolor.w * opacity);
-    }
-    return inColor;
-}
-
-float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, float waterDepth, float3 color)
-{
-    if (waterDepth > 0) {
-        float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
-        float3 up = float3(0,1,0);
-        // this is the length that the light travels underwater back to the camera
-        float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
-        // Light gets absorbed exponentially,
-        // to simplify, we assume that the light enters vertically into the water.
-        // We need to multiply by 2 to reach 98% absorption as the waterDepth can't go over 1.
-        float waterAbsorption = 1 - saturate(exp(-waterDepth * 2 * (1 + oneOverCosV)));
-        // darken the color first to simulate the light absorption on the way in and out
-        color *= 1 - waterAbsorption * opacity;
-        // lerp in the watercolor to simulate the scattered light from the dirty water
-        float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
-        color = lerp(color, waterColor.rgb, waterAbsorption * opacity);
+        if (MapUsesAdvancedWater()) {
+            float3 up = float3(0,1,0);
+            // this is the length that the light travels underwater back to the camera
+            float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
+            // Light gets absorbed exponentially,
+            // to simplify, we assume that the light enters vertically into the water.
+            // We need to multiply by 2 to reach 98% absorption as the waterDepth can't go over 1.
+            float waterAbsorption = 1 - saturate(exp(-waterDepth * 2 * (1 + oneOverCosV)));
+            // darken the color first to simulate the light absorption on the way in and out
+            color *= 1 - waterAbsorption * opacity;
+            // lerp in the watercolor to simulate the scattered light from the dirty water
+            float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
+            color = lerp(color, waterColor.rgb, waterAbsorption * opacity);
+        } else {
+            float4 waterColor = tex1D(WaterRampSampler, waterDepth);
+            color = lerp(color, waterColor.rgb, waterColor.a * opacity);
+        }
     }
     return color;
 }
 
 // calculate the lit pixels
-float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbedo, float specAmount, float waterDepth, float4 inShadow, uniform bool inShadows)
+float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo, float specAmount, float waterDepth, float4 shadowCoords, uniform bool inShadows)
 {
     float4 color = float4( 0, 0, 0, 0 );
 
-    float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
-    if (IsExperimentalShader()) {
-        float3 position = TerrainScale * inViewPosition;
-        float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w;
-        shadow = shadow * mapShadow;
+    float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow(shadowCoords) : 1;
+    if (ShaderUsesTerrainInfoTexture()) {
+        float3 position = TerrainScale * worldTerrain;
+        float terrainShadow = tex2D(UpperAlbedoSampler, position.xy).w;
+        shadow = shadow * terrainShadow;
     }
 
     // calculate some specular
-    float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
+    float3 viewDirection = normalize(worldTerrain.xzy-CameraPosition);
 
     float SunDotNormal = dot( SunDirection, inNormal);
     float3 R = SunDirection - 2.0f * SunDotNormal * inNormal;
@@ -444,11 +458,7 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     light = LightingMultiplier * light + ShadowFillColor * ( 1 - light );
     color.rgb = light * inAlbedo;
 
-    if (IsExperimentalShader()) {
-        color.rgb = ApplyWaterColorExponentially(-viewDirection, inViewPosition.z, waterDepth, color);
-    } else {
-        color.rgb = ApplyWaterColor(inViewPosition.z, waterDepth, color);
-    }
+    color.rgb = ApplyWaterColor(-viewDirection, worldTerrain.z, waterDepth, color);
 
     color.a = 0.01f + (specular*SpecularColor.w);
     return color;
@@ -494,14 +504,14 @@ float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughness, float waterDepth) {
+float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness, float waterDepth) {
     // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
+        float terrainShadow = tex2D(UpperAlbedoSampler, TerrainScale * inV.mTexWT).w; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-        shadow *= mapShadow;
+        shadow *= terrainShadow;
     }
 
     float facingSpecular = 0.04;
@@ -782,11 +792,11 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
     // sample all the textures we'll need
     float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale));
 
-    float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT  * TerrainScale * LowerNormalTile ) * 2 - 1);
-    float4 stratum0Normal = normalize(tex2D( Stratum0NormalSampler, inV.mTexWT  * TerrainScale * Stratum0NormalTile ) * 2 - 1);
-    float4 stratum1Normal = normalize(tex2D( Stratum1NormalSampler, inV.mTexWT  * TerrainScale * Stratum1NormalTile ) * 2 - 1);
-    float4 stratum2Normal = normalize(tex2D( Stratum2NormalSampler, inV.mTexWT  * TerrainScale * Stratum2NormalTile ) * 2 - 1);
-    float4 stratum3Normal = normalize(tex2D( Stratum3NormalSampler, inV.mTexWT  * TerrainScale * Stratum3NormalTile ) * 2 - 1);
+    float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT * TerrainScale * LowerNormalTile ) * 2 - 1);
+    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, inV.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
+    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, inV.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
+    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, inV.mTexWT * TerrainScale * Stratum2NormalTile) * 2 - 1);
+    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, inV.mTexWT * TerrainScale * Stratum3NormalTile) * 2 - 1);
 
     // blend all normals together
     float4 normal = lowerNormal;
@@ -839,7 +849,7 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    if (IsExperimentalShader()) {
+    if (ShaderUsesTerrainInfoTexture()) {
         float4 position = TerrainScale * inV.mTexWT;
         result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
     } else {
@@ -890,13 +900,13 @@ float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
 {
     // sample all the textures we'll need
-    float4 mask = saturate(tex2Dproj( UtilitySamplerA, inV.mTexWT  * TerrainScale)* 2 - 1 );
-    float4 upperAlbedo = tex2Dproj( UpperAlbedoSampler, inV.mTexWT  * TerrainScale* UpperAlbedoTile );
-    float4 lowerAlbedo = tex2Dproj( LowerAlbedoSampler, inV.mTexWT  * TerrainScale* LowerAlbedoTile );
-    float4 stratum0Albedo = tex2Dproj( Stratum0AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum0AlbedoTile );
-    float4 stratum1Albedo = tex2Dproj( Stratum1AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum1AlbedoTile );
-    float4 stratum2Albedo = tex2Dproj( Stratum2AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum2AlbedoTile );
-    float4 stratum3Albedo = tex2Dproj( Stratum3AlbedoSampler, inV.mTexWT  * TerrainScale* Stratum3AlbedoTile );
+    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale) * 2 - 1);
+    float4 upperAlbedo = tex2D( UpperAlbedoSampler, inV.mTexWT * TerrainScale * UpperAlbedoTile);
+    float4 lowerAlbedo = tex2D( LowerAlbedoSampler, inV.mTexWT * TerrainScale * LowerAlbedoTile);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, inV.mTexWT * TerrainScale * Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, inV.mTexWT * TerrainScale * Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, inV.mTexWT * TerrainScale * Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, inV.mTexWT * TerrainScale * Stratum3AlbedoTile);
 
     float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz*2-1;
 
@@ -909,7 +919,7 @@ float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
     albedo.xyz = lerp( albedo.xyz, upperAlbedo.xyz, upperAlbedo.w );
 
     // get the water depth
-    float waterDepth = tex2Dproj( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+    float waterDepth = tex2D( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
     // calculate the lit pixel
     float4 outColor = CalculateLighting( normal, inV.mTexWT.xyz, albedo.xyz, 1-albedo.w, waterDepth, inV.mShadow, inShadows);
@@ -921,19 +931,19 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
 {
     float4 position = TerrainScale*pixel.mTexWT;
 
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
+    float4 mask0 = saturate(tex2D(UtilitySamplerA,position)*2-1);
+    float4 mask1 = saturate(tex2D(UtilitySamplerB,position)*2-1);
 
-    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
-    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
-    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
-    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
-    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
-    float4 upperAlbedo = tex2Dproj(UpperAlbedoSampler,position*UpperAlbedoTile);
+    float4 lowerAlbedo = tex2D(LowerAlbedoSampler,position*LowerAlbedoTile);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
+    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
+    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
+    float4 upperAlbedo = tex2D(UpperAlbedoSampler,position*UpperAlbedoTile);
 
     float4 albedo = lowerAlbedo;
     albedo = lerp(albedo,stratum0Albedo,mask0.x);
@@ -958,8 +968,8 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     light = LightingMultiplier*light + ShadowFillColor*(1-light);
     albedo.rgb = light * ( albedo.rgb + specular.rgb );
 
-    float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
-    albedo.rgb = ApplyWaterColor(pixel.mTexWT.z, waterDepth, albedo.rgb);
+    float waterDepth = tex2D(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
+    albedo.rgb = ApplyWaterColor(-pixel.mViewDirection, pixel.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
@@ -1339,7 +1349,13 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
-    float3 color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    float3 color;
+    // We want the decals to behave consistently with the rest of the ground
+    if (ShaderUsesPbrRendering()) {
+        color = PBR(inV, decalAlbedo.rgb, normal, 0.9 * (1-decalSpec.r), waterDepth);
+    } else {
+        color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    }
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
@@ -2021,11 +2037,11 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
 
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
+    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
-    // SpecularColor.ba, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
+    // SpecularColor.ba, LowerNormalTile and Stratum7AlbedoTile are unused now
     // Candidates for configurable values are the rotation matrix values
 }
 
@@ -2075,17 +2091,17 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | L  | R             G               B              unused          | X               Y               Z               unused       |
+// | L  | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | S0 | R             G               B              unused          | X               Y               Z               unused       |
-// | S1 | R             G               B              unused          | X               Y               Z               unused       |
-// | S2 | R             G               B              unused          | X               Y               Z               unused       |
-// | S3 | R             G               B              unused          | X               Y               Z               unused       |
+// | S0 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S1 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S2 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S3 | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---            ---               ---             ---             ---             ---            ---
-// | S4 | R             G               B              unused          | X               Y               Z               unused       |
-// | S5 | R             G               B              unused          | X               Y               Z               unused       |
-// | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | R             G               B              unused          | X               Y               Z               unused       |
+// | S4 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S5 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S6 | R             G               B              specularity     | X               Y               Z               unused       |
+// | S7 | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        unused         shadow  | 
 
@@ -2169,14 +2185,14 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // x = normals-x
     // y = normals-z
-    // z = unused
+    // z = water depth
     // w = shadows
-    float4 utility = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float mapShadow = utility.w;
+    float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
+    float terrainShadow = terrainInfo.w;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
-        mapShadow = 1.0f;
+        terrainShadow = 1.0f;
     }
 
     // sample the albedo's
@@ -2203,7 +2219,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * mapShadow;
+    shadow = shadow * terrainShadow;
 
     // normalize the pre-computed normal
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
@@ -2222,13 +2238,13 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute water ramp intensity
     float waterDepth = tex2Dproj(UtilitySamplerC, coordinates).g;
-    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
 
 /* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
-   # textures and we use better water color calculations.        #
+   # textures.                                                   #
    # It is designed to be a drop-in replacement for TTerrainXP.  # */
 technique Terrain001 <
     string usage = "composite";
@@ -2395,14 +2411,14 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // x = normals-x
     // y = normals-z
-    // z = unused
+    // z = water depth
     // w = shadows
-    float4 utility01 = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float mapShadow = utility01.w;
+    float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
+    float terrainShadow = terrainInfo.w;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
-        mapShadow = 1.0f;
+        terrainShadow = 1.0f;
     }
 
     // x = specular
@@ -2437,7 +2453,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; 
-    shadow = shadow * mapShadow;
+    shadow = shadow * terrainShadow;
 
     // normalize the pre-computed normal
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
@@ -2456,7 +2472,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute water ramp intensity
     float waterDepth = tex2D(UtilitySamplerC, coordinates).g;
-    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
@@ -2615,8 +2631,8 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
 
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
+    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
 }
@@ -2707,6 +2723,9 @@ technique Terrain151 <
 float4 Terrain301NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
+    // 30° rotation
+    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
+    position.zw = mul(position.xy, rotationMatrix);
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
@@ -2717,21 +2736,21 @@ float4 Terrain301NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     }
 
     float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
-    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.zw * Stratum0AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, position.xy * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, position.zw * Stratum2AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, position.xy * Stratum3AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.zw * Stratum4AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.zw * Stratum6AlbedoTile.xy).rgb * 2 - 1);
 
-    float stratum0Height = sampleHeight(position.xy, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, float2(0.5, 0.0), true);
+    float stratum0Height = sampleHeight(position.zw, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position.xy, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, float2(0.0, 0.5), true);
-    float stratum2Height = sampleHeight(position.xy, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, float2(0.5, 0.5), true);
+    float stratum2Height = sampleHeight(position.zw, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, float2(0.5, 0.5), true);
     float stratum3Height = sampleHeight(position.xy, Stratum3AlbedoTile.xy, Stratum3NormalTile.xy, float2(0.0, 0.0), false);
-    float stratum4Height = sampleHeight(position.xy, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
+    float stratum4Height = sampleHeight(position.zw, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
-    float stratum6Height = sampleHeight(position.xy, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
+    float stratum6Height = sampleHeight(position.zw, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
     float3 normal = lowerNormal;
     normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x, SpecularColor.r);
@@ -2749,6 +2768,9 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     // height is now in the z coordinate
     float4 position = TerrainScale * inV.mTexWT;
+    // 30° rotation
+    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
+    position.zw = mul(position.xy, rotationMatrix);
 
     // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
@@ -2763,21 +2785,21 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
-    float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, position.xy, inV.nearScales.xx,     float2(0.5, 0.0), true);
+    float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, position.zw, inV.nearScales.xx,     float2(0.5, 0.0), true);
     float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position.xy, inV.nearScales.yy,     float2(0.0, 0.5), true);
-    float4 stratum2Albedo = sampleAlbedo(Stratum2AlbedoSampler, position.xy, inV.nearScales.zz,     float2(0.5, 0.5), true);
+    float4 stratum2Albedo = sampleAlbedo(Stratum2AlbedoSampler, position.zw, inV.nearScales.zz,     float2(0.5, 0.5), true);
     float4 stratum3Albedo = sampleAlbedo(Stratum3AlbedoSampler, position.xy, inV.nearScales.ww,     float2(0.0, 0.0), false);
-    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, position.xy, Stratum4AlbedoTile.xy, float2(0.5, 0.0), false);
+    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, position.zw, Stratum4AlbedoTile.xy, float2(0.5, 0.0), false);
     float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, Stratum5AlbedoTile.xy, float2(0.0, 0.5), false);
-    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, position.xy, Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, position.zw, Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
 
-    float stratum0Height = sampleHeight(position.xy, inV.nearScales.xx,     inV.farScales.xx,      float2(0.5, 0.0), true);
+    float stratum0Height = sampleHeight(position.zw, inV.nearScales.xx,     inV.farScales.xx,      float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position.xy, inV.nearScales.yy,     inV.farScales.yy,      float2(0.0, 0.5), true);
-    float stratum2Height = sampleHeight(position.xy, inV.nearScales.zz,     inV.farScales.zz,      float2(0.5, 0.5), true);
+    float stratum2Height = sampleHeight(position.zw, inV.nearScales.zz,     inV.farScales.zz,      float2(0.5, 0.5), true);
     float stratum3Height = sampleHeight(position.xy, inV.nearScales.ww,     inV.farScales.ww,      float2(0.0, 0.0), false);
-    float stratum4Height = sampleHeight(position.xy, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
+    float stratum4Height = sampleHeight(position.zw, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
-    float stratum6Height = sampleHeight(position.xy, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
+    float stratum6Height = sampleHeight(position.zw, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
     float4 albedo = lowerAlbedo;
     albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x, SpecularColor.r);
@@ -2794,8 +2816,8 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
     
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
+    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
 }

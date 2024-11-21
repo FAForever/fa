@@ -235,9 +235,11 @@ end
 function DecreaseBuildCountInQueue(queueIndex, count)
 end
 
----
----@param id unknown
-function DeleteCommand(id)
+---Deletes a command from the player command queue.
+---Each player has an array that holds all commands for all units, the commandID indexes to that array.
+---Note: this function doesn't receive any units as arguments--you will have to retrieve the commandId by UserUnit:GetCommandQueue()[commandIndex].ID
+---@param commandId number commandId, from UserUnit:GetCommandQueue()[commandIndex].ID
+function DeleteCommand(commandId)
 end
 
 ---
@@ -353,13 +355,13 @@ end
 function GetCamera(name)
 end
 
---- Gets the following arguments to a commandline option. For example, if `/arg -flag key:value drop`
---- was passed to the commandline, then `GetCommandLineArg("/arg", 2)` would return
---- `{"-flag", "key:value"}`
+--- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
+--- disregarding if they start with `/` like other commandline options.  
+--- Returns `false` if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
----@return string[]?
+---@return string[] | false
 function GetCommandLineArg(option, maxArgs)
 end
 
@@ -622,9 +624,9 @@ end
 function GpgNetActive()
 end
 
----@param cmd string
----@param ... any
-function GpgNetSend(cmd, ...)
+---@param command string
+---@param ... number | string
+function GpgNetSend(command, ...)
 end
 
 ---
@@ -666,7 +668,7 @@ end
 
 --- For internal use by `CreateDiscoveryService()`
 ---@param serviceClass fa-class
----@return DiscoveryService
+---@return UILobbyDiscoveryService
 function InternalCreateDiscoveryService(serviceClass)
 end
 
@@ -704,15 +706,18 @@ end
 function InternalCreateItemList(itemList, parent)
 end
 
+---@alias UILobbyProtocols "UDP" | "TCP" | "None
+
 --- For internal use by `CreateLobbyComm()`
----@param lobbyComClass fa-class
----@param protocol string
+---@generic T
+---@param lobbyComClass T
+---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
----@param playerUID string
----@param natTraversalProvider userdata
----@return LobbyComm
+---@param playerUID? string
+---@param natTraversalProvider? userdata
+---@return T
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
@@ -914,7 +919,7 @@ end
 
 --- Start a background load with the given map and mods.
 --- If `hipri` is true, this will interrupt any previous loads in progress.
----@param mapname string
+---@param mapname string        # path to the `scmap` file
 ---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)
@@ -1000,7 +1005,7 @@ end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
 --- Unlike other engine functions that return tables, this function returns the same table each time it is called.
----@return UIScenarioInfo
+---@return UISessionSenarioInfo
 function SessionGetScenarioInfo()
 end
 
@@ -1053,7 +1058,7 @@ end
 function SetActiveBuildTemplate(template)
 end
 
---- Set if anyone in the list is auto building
+--- Set if anyone in the list is auto building or auto assisting
 ---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
@@ -1146,6 +1151,11 @@ end
 ---@param category string
 ---@param volume number 0.0 - 2.0
 function SetVolume(category, volume)
+end
+
+--- If set, inverts the middle mouse button
+---@param flag boolean
+function SetInvertMidMouseButton(flag)
 end
 
 --- Performs a callback with the given identifier from `callback.Func` in `/lua/simcallbacks.lua`.

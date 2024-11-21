@@ -1,7 +1,5 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
-    },
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -11,9 +9,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 300,
-                    ShaderName = 'VertexNormal',
+                    LODCutoff = 210,
+                    ShaderName = "VertexNormal",
                 },
             },
         },
@@ -24,9 +21,7 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Rock',
-    },
+    Interface = { HelpText = "Rock" },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

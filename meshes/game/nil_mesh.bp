@@ -1,10 +1,10 @@
-MeshBlueprint {
+MeshBlueprint{
+    IconFadeInZoom = 100,
     LODs = {
         {
-            ShaderName = 'Unit',
             LODCutoff = 1,
+            ShaderName = "Unit",
         },
     },
-    IconFadeInZoom = 100,
     UniformScale = 0,
 }

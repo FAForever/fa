@@ -214,17 +214,23 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- attach us to the owner
         EntityAttachBoneTo(self, -1, spec.Owner, -1)
 
-        -- lookup as to whether we're static or a commander shield
+
+        -- lookup whether we're a static shield for absorbing deathnukes with modded shields that don't have the value set
+        local absorptionType = spec.AbsorptionType
+        -- lookup whether we're a static or a commander shield for overcharge's fixed damage
         local ownerBp = self.Owner.Blueprint
         local ownerCategories = ownerBp.CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
+            if not absorptionType then
+                absorptionType = "StaticShield"
+            end
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
         end
 
         -- lookup our damage absorption type's table
-        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[ownerBp.Defense.Shield.AbsorptionType or "Default"]
+        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[absorptionType or "Default"]
 
         -- use trashbag of the unit that owns us
         self.Trash = self.Owner.Trash
@@ -454,6 +460,9 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param type DamageType
     ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
+        if type == "TreeForce" or type == "TreeFire" then
+            return amount
+        end
         -- Allow decoupling the shield from the owner's armor multiplier
         local absorptionMulti = self.AbsorptionTypeDamageTypeToMulti[type] or self.Owner:GetArmorMult(type)
 
@@ -482,7 +491,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         amount = amount * (self.Owner:GetArmorMult(type))
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
         local finalVal = amount - EntityGetHealth(self)
-        if finalVal < 0 then
+        if finalVal < 0 or type == "FAF_AntiShield" then
             finalVal = 0
         end
         return finalVal
@@ -508,12 +517,17 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- damage correction for overcharge
 
+        -- If the absorption multiplier is less than 1, then the shield will get hit by two instances of area damage, the absorbed amount and the remainder.
+        -- This means that the following code then requires a multiplier to correct the total damage amount since both instances will be overriden.
+        -- For example with 0.25 absorption we would have a 0.25 damage and 0.75 damage instance hitting the shield. Both get set to 800 OC structure damage,
+        -- but then 0.25x armor is applied again (second OnGetDamageAbsorption call), reducing it to 2x200 damage, which requires a 2x multiplication to bring it to the expected 800.
+        -- Currently the absorption multiplier is 1, so we don't need a multiplier on the damage to balance it out.
+
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
-            if self.StaticShield then -- fixed damage for static shields
-                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
-                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
-            elseif self.CommandShield then --fixed damage for all ACU shields
+            if self.StaticShield then
+                amount = wep:GetBlueprint().Overcharge.structureDamage
+            elseif self.CommandShield then
                 amount = wep:GetBlueprint().Overcharge.commandDamage
             end
         end

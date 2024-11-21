@@ -1,1 +1,0 @@
-- (#6142) Fix Salvation being unable to fire at max range by reverting previous muzzle velocity changes.
