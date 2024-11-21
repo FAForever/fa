@@ -169,9 +169,15 @@ UnitBlueprint{
         Icon = "air",
         OrderOverrides = {
             RULEUCC_Transport = {
-                bitmapId = "deploy",
-                helpText = "deploy",
+                bitmapId = 'deploy',
+                helpText = 'auto_deploy',
+                behavior = 'AutoDeployBehavior',
+                initialStateFunc = 'AutoDeployInit',
+                statToggle = 'AutoDeploy',
             },
+        },
+        StatToggles = {
+            AutoDeploy = true,
         },
         ToggleCaps = { RULEUTC_ShieldToggle = true },
         UnitName = "<LOC uaa0310_name>CZAR",
