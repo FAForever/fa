@@ -1,0 +1,1 @@
+- (#6549) Fix CZAR's deploy button not being like that of other aircraft carriers where you can right click it to enable automatic deployment of built units.
