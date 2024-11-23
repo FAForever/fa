@@ -7,6 +7,7 @@
       - ShieldRechargeTime: 120 --> 100
       - ShieldRegenRate: 180 --> 240
     - Fizz Launcher 1
-      - FiringTolerance: 3 --> 20   - Fizz Launcher 2
+      - FiringTolerance: 3 --> 20
+    - Fizz Launcher 2
       - FiringTolerance: 1 --> 20
       - PrefersPrimaryWeaponTarget: true --> false
