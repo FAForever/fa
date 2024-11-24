@@ -928,6 +928,8 @@
 --- Regen Per Second. How much health the unit regenerates per second
 --- This is a multiplier of the base regen
 ---@field RegenPerSecond number
+--- Which unit categories are buffed by the aura
+---@field UnitCategory UnparsedCategory
 
 
 

@@ -545,6 +545,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed) then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
@@ -564,6 +565,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed) then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
