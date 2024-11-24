@@ -3729,8 +3729,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local effectTypeGroups = bpTable.Effects
 
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
-                -- warning isn't needed if this layer's table is used for Footfall or Contrails without terrain effects
-                if not bpTable.Footfall and not bpTable.Contrails then
+                -- warning isn't needed if this layer's table is used for Footfall or Contrails or Treads without terrain movement effects
+                if not bpTable.Footfall and not bpTable.Contrails and not bpTable.Treads then
                     WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects.', layer, '.Effects table in unit blueprint.')
                 end
                 return false
