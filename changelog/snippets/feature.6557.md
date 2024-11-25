@@ -1,0 +1,1 @@
+- (#6557) Siloes without engineering suites will not cancel missile construction when issued a hard-stop order (siloes will pause construction instead).
