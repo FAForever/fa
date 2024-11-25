@@ -298,14 +298,6 @@ local function MomentaryOrderBehavior(self, modifiers)
     self:SetCheck(false)
 end
 
-function Stop(units)
-    local units = units or GetSelectedUnits()
-
-    if units[1] then
-        IssueUnitCommand(units, 'Stop')
-    end
-end
-
 function ClearCommands(units)
     local cb = {Func = 'ClearCommands'}
 
@@ -324,6 +316,23 @@ function ClearCommands(units)
     end
 
     SimCallback(cb, true)
+end
+
+function Stop(units)
+    local units = units or GetSelectedUnits()
+    local silos = EntityCategoryFilterDown(categories.SILO, units)
+    if silos[1] then
+        ClearCommands(silos)
+        for _, silo in EntityCategoryFilterOut(categories.CONSTRUCTION, units) do
+            if not GetIsPausedOfUnit(silo) then
+                IssueUnitCommand(silo, 'Pause')
+            end
+        end
+    end
+    local units = EntityCategoryFilterOut(categories.SILO, units)
+    if units[1] then
+        IssueUnitCommand(units, 'Stop')
+    end
 end
 
 function SoftStop(units)
