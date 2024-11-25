@@ -319,7 +319,7 @@ function ClearCommands(units)
 end
 
 function Stop(units)
-    local units = units or GetSelectedUnits()
+    units = units or GetSelectedUnits()
     local silos = EntityCategoryFilterDown(categories.SILO, units)
     if silos[1] then
         ClearCommands(silos)
@@ -336,7 +336,7 @@ function Stop(units)
 end
 
 function SoftStop(units)
-    local units = units or GetSelectedUnits()
+    units = units or GetSelectedUnits()
     Construction.ResetOrderQueues(units)
     ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
     Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))
