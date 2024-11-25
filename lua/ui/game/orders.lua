@@ -327,7 +327,10 @@ function Stop(units)
         ClearCommands(silos)
         for _, silo in silos do
             if not GetIsPausedOfUnit(silo) then
-                IssueUnitCommand(silo, 'Pause')
+                local missileInfo = silo:GetMissileInfo()
+                if missileInfo.nukeSiloBuildCount > 0 or missileInfo.tacticalSiloBuildCount > 0 then
+                    IssueUnitCommand(silo, 'Pause')
+                end
             end
         end
     end
