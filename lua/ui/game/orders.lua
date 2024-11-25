@@ -318,18 +318,20 @@ function ClearCommands(units)
     SimCallback(cb, true)
 end
 
+-- This command (hard stop) will filter out non-construction silo units to avoid wasting partially completed missiles
+-- Those units will have their commands cleared, but will be paused instead of stopped
 function Stop(units)
     units = units or GetSelectedUnits()
-    local silos = EntityCategoryFilterDown(categories.SILO, units)
+    local silos = EntityCategoryFilterDown(categories.SILO - categories.CONSTRUCTION, units)
     if silos[1] then
         ClearCommands(silos)
-        for _, silo in EntityCategoryFilterOut(categories.CONSTRUCTION, units) do
+        for _, silo in silos do
             if not GetIsPausedOfUnit(silo) then
                 IssueUnitCommand(silo, 'Pause')
             end
         end
     end
-    local units = EntityCategoryFilterOut(categories.SILO, units)
+    units = EntityCategoryFilterOut(categories.SILO - categories.CONSTRUCTION, units)
     if units[1] then
         IssueUnitCommand(units, 'Stop')
     end
