@@ -380,7 +380,7 @@ function CreateTemplateFactory()
 end
 
 --- Creates a sim callback to set the priorities of the selected units
----@param prioritiesString string A string of categories
+---@param prioritiesString string | number A string of categories
 ---@param name string Name of the priority set, used when printing on screen
 ---@param exclusive boolean ??
 function SetWeaponPriorities(prioritiesString, name, exclusive)
