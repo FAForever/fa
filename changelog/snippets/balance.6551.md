@@ -7,7 +7,13 @@
       - ShieldRechargeTime: 120 --> 100
       - ShieldRegenRate: 180 --> 240
     - Fizz Launcher 1
-      - FiringTolerance: 3 --> 20
+      - Damage: 240 --> 140
+      - DPS: 960 --> 560
+      - FiringTolerance: 3 --> 10
+      - HeadingArcRange: 120 --> 90
     - Fizz Launcher 2
-      - FiringTolerance: 1 --> 20
+      - Damage: 240 --> 140
+      - DPS: 960 --> 560
+      - FiringTolerance: 1 --> 10
+      - HeadingArcRange: 120 --> 90
       - PrefersPrimaryWeaponTarget: true --> false
