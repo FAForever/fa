@@ -137,14 +137,14 @@
 --- Given the path to a scenario info file, returns a path with the `_scenario.lua` bit removed.
 ---@param pathToScenarioInfo any
 ---@return string
-local function GetPathToFolder(pathToScenarioInfo)
+local function GetPathToScenario(pathToScenarioInfo)
     return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua"))
 end
 
 --- Given the path to a scenario info file, returns the path to the folder it resides in.
 ---@param pathToScenarioInfo any
 ---@return string
-local function GetPathToScenario(pathToScenarioInfo)
+local function GetPathToFolder(pathToScenarioInfo)
     local splits = StringSplit(pathToScenarioInfo, "/")
     return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]))
 end
