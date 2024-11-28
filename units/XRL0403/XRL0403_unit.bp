@@ -58,6 +58,8 @@ UnitBlueprint{
         "SNIPER",
         "SONAR",
         "VISIBLETORECON",
+        "REPAIR",
+        "RECLAIM",
     },
     Defense = {
         AirThreatLevel = 3,
@@ -197,6 +199,9 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Reclaim = true,
+            RULEUCC_Repair = true,
+            RULEUCC_Pause = true,
         },
         FactionName = "Cybran",
         FractionThreshold = 0.99,
