@@ -77,7 +77,7 @@ UnitBlueprint{
             LAYER_Seabed = true,
         },
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
+        AlwaysAlignToTerrain = true,
         MotionType = "RULEUMT_None",
         SkirtSizeX = 1,
         SkirtSizeZ = 1,
