@@ -146,7 +146,8 @@ end
 ---@return string
 local function GetPathToFolder(pathToScenarioInfo)
     local splits = StringSplit(pathToScenarioInfo, "/")
-    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]))
+    -- Remove the length of the last token (filename), and the slash character before it.
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]) - 1)
 end
 
 --- Given the path to a scenario info file, returns the path to the scenario options file. The reference to this file is not stored in the _scenario.lua file.
