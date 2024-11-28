@@ -132,6 +132,8 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
+-- A scenario file path is typically like `/maps/scmp_001/scmp_001_scenario.lua`
+
 --- Given the path to a scenario info file, returns a path with the `_scenario.lua` bit removed.
 ---@param pathToScenarioInfo any
 ---@return string
