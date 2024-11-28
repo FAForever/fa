@@ -187,7 +187,7 @@ UnitBlueprint{
             "xrl0005",
             "drlk005",
         },
-        MaxBuildDistance = 1,
+        MaxBuildDistance = 7,
     },
     General = {
         CommandCaps = {
