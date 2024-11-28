@@ -262,14 +262,15 @@ function LoadScenario(pathToScenarioInfo)
     end
 
     -- optionally, add in the options
-    local ok, msg, scenarioOptions = pcall(LoadScenarioOptionsFile, GetPathToScenarioOptions(pathToScenarioInfo)) --[[@as UIScenarioOptionsFile | nil]]
-    if scenarioOptions then
+    local ok, scenarioOptions = pcall(LoadScenarioOptionsFile, GetPathToScenarioOptions(pathToScenarioInfo)) --[[@as UIScenarioOptionsFile | nil]]
+    if ok and scenarioOptions then
         scenarioInfo.options = scenarioOptions
     end
 
     -- optionally, add in briefing data flag
-    local ok, msg, scenarioStrings = pcall(LoadScenarioStringsFile, GetPathToScenarioStrings(pathToScenarioInfo)) --[[@as UIScenarioStringsFile | nil]]
-    if scenarioStrings then
+    local scenarioStrings
+    ok, scenarioStrings = pcall(LoadScenarioStringsFile, GetPathToScenarioStrings(pathToScenarioInfo)) --[[@as UIScenarioStringsFile | nil]]
+    if ok and scenarioStrings then
         if scenarioStrings.BriefingData then
             scenarioInfo.hasBriefing = true
         end
