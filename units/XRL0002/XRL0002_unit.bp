@@ -35,7 +35,6 @@ UnitBlueprint{
     },
     Display = {
         AnimationOpen = "/units/xrl0002/xrl0002_aopen.sca",
-        BuildAttachBone = "AttachPoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
