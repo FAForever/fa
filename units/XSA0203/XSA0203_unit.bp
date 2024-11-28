@@ -133,8 +133,8 @@ UnitBlueprint{
     LifeBarSize = 1,
     Physics = {
         Elevation = 10,
-        FuelRechargeRate = 5,
-        FuelUseTime = 400,
+        FuelRechargeRate = 10,
+        FuelUseTime = 600,
         GroundCollisionOffset = 1.6,
         MaxSpeed = 0.5,
         MeshExtentsX = 1.75,
@@ -290,7 +290,7 @@ UnitBlueprint{
             WeaponCategory = "Direct Fire",
         },
         {
-            Damage = 100,
+            Damage = 200,
             DamageFriendly = true,
             DamageRadius = 1,
             DamageType = "Normal",
