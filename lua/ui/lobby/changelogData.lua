@@ -1,8 +1,25 @@
 ---@type number
-last_version = 3813
+last_version = 3814
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3814,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3814 (29th of November, 2024)",
+            "",
+            "A log statement accessed an uninitialized variable, which causes matchmaker games to crash.",
+            "We fixed the log statement and matchmaker should now work again.",
+            "Special thanks to clyf and Nomander for being the emergency response team!",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
     {
         version = 3813,
         name = "Developers patch",
