@@ -1,1 +1,0 @@
-- (#6432) Fix units failing to transfer after defeat if the player that is being transferred to is defeated during the transfer process.

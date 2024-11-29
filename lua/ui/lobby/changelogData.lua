@@ -1,8 +1,29 @@
 ---@type number
-last_version = 3812
+last_version = 3813
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3813,
+        name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "The release was delayed by a week because we found a desync issue on the last minute. I want to thank everybody that contributed ",
+            "to the search and fixing of the issue. Pinpointing a desync is especially difficult but through the combined efforts of many people ",
+            "we managed to solve this exceptionally quickly. I am really glad to have such a good team!",
+            "The desync issue was on FAF Develop for a few weeks. If you want to contribute you can play on FAF Develop and/or FAF Beta Balance ",
+            "occasionally and report back to the game team. Whether all is good or you encountered issues - all data points are worth their effort.",
+            "",
+            "As mentioned before, the in-game will no longer include all the details of the changes. You can find the complete ",
+            "changelog on Github. You can use the button in the bottom-left corner of this dialog to immediately jump to ",
+            "details of the changes of the selected game version.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
     {
         version = 3812,
         name = "Hotfix",
