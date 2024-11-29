@@ -1,1 +1,0 @@
-- (#6418) Fix ACU explosions dealing too much damage to TMD structures.
