@@ -42,7 +42,7 @@ local AutolobbyCommunicationsInstance = false
 ---@param natTraversalProvider any
 ---@return UIAutolobbyCommunications
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+    LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID)
 
     -- create the interface, needs to be done before the lobby is
     local playerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 8
