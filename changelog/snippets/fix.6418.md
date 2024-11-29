@@ -1,1 +1,1 @@
-- (#6418) Fix ACU explosions being able to kill TMD structures.
+- (#6418) Fix ACU explosions dealing too much damage to TMD structures.
