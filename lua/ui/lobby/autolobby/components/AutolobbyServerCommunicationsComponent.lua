@@ -22,7 +22,7 @@
 
 -------------------------------------------------------------------------------
 --#region Game <-> Server communications
-
+-- 
 -- All the following logic is tightly coupled with functionality on either the
 -- lobby server, the ice adapter, the java server and/or the client. For more
 -- context you can search for the various keywords in the following repositories:
@@ -32,6 +32,36 @@
 --
 -- Specifically, the following file processes these messages on the server:
 -- - https://github.com/FAForever/server/blob/98271c421412467fa387f3a6530fe8d24e360fa4/server/gameconnection.py
+-- 
+-- ## How to test game communications
+-- 
+-- You can not test the game <-> server communications using the launch script to
+-- launch local instances of the game. This requires a bit of effort.
+-- 
+-- Prerequisites:
+-- - A Lua development environment
+-- - Two separate instances of the FAF client
+-- 
+-- Procedure:
+-- - Start the FAF client and then logout to view the login screen. 
+-- - Choose the test server. 
+-- - Navigate to the leaderboards. 
+-- - Navigate to the last page of the leaderboards. 
+-- - Both clients should pick a player with almost no games. 
+-- - Back in the FAF client login screen, click on 'login'.
+-- - - Sanity check: it should state somewhere on screen that you are logging into the test server.
+-- - Use the nickname of the player as login. Use `foo` as the password. Not all accounts that exist 
+-- in production also exist in the test server, so you'll have to try a few to find one that works.
+-- 
+-- Once logged in:
+-- - Via the hamburger menu (top left) go to Settings -> Forged Alliance Forever
+-- - Update the command line format to `"%s"  /init init_dev.lua`, it auto saves
+-- - Start searching
+-- 
+-- The procedure applies to both clients. By updating the command line format you override the 
+-- game files that the client is loading. Using this approach you can launch the game from
+-- any pull request. Just make sure that both clients use the same pull request and have gone
+-- through the same procedure.
 
 -- upvalue scope for performance
 local GpgNetSend = GpgNetSend
