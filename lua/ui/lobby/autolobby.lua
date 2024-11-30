@@ -42,6 +42,7 @@ local AutolobbyCommunicationsInstance = false
 ---@param natTraversalProvider any
 ---@return UIAutolobbyCommunications
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+    -- we intentionally do not log the 'natTraversalProvider' parameter as it can cause issues
     LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID)
 
     -- create the interface, needs to be done before the lobby is
