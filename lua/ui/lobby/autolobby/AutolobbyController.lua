@@ -746,7 +746,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:DebugSpew("LaunchGame")
         self:DebugSpew(reprs(gameConfig, { depth = 10 }))
 
-        self:SendGameStateToServer('Launching')
         return MohoLobbyMethods.LaunchGame(self, gameConfig)
     end,
 
@@ -820,7 +819,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- start prefetching the scenario
         self:Prefetch(self.GameOptions, self.GameMods)
 
-        self:SendGameStateToServer('Lobby')
         self:SendLaunchStatusToServer('Hosting')
 
         -- update UI for game options
@@ -854,8 +852,6 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.LocalPlayerName = newLocalName
         self.LocalPeerId = localPeerId
         self.HostID = hostPeerId
-
-        self:SendGameStateToServer('Lobby')
 
         -- occasionally send data over the network to create pings on screen
         self.Trash:Add(ForkThread(self.ShareLaunchStatusThread, self))
