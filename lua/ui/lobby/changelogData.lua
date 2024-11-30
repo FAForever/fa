@@ -1,8 +1,29 @@
 ---@type number
-last_version = 3814
+last_version = 3815
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3815,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3815 (29th of November, 2024)",
+            "",
+            "Fix the autolobby messing with the expected server state. We hope the autolobby functions as expected now.",
+            "",
+            "With thanks to Nomander for investigating the issue and deciphering a procedure to test the autolobby changes on ",
+            "the test server. Previously the changes were only tested locally by running multiple game instances on the same ",
+            "computer. When testing locally there is no server, and therefore we did not detect this issue sooner.",
+            "",
+            "Apologies for the inconveniences,",
+            "",
+            "With kind regards,",
+            "",
+            "Jip",
+        },
+    },
     {
         version = 3814,
         name = "Hotfix",
