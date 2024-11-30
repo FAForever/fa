@@ -64,8 +64,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     AutolobbyCommunicationsInstance.LobbyParameters.LocalPlayerPeerId = localPlayerUID
     AutolobbyCommunicationsInstance.LobbyParameters.NatTraversalProvider = natTraversalProvider
 
-    AutolobbyCommunicationsInstance:SendGameStateToServer('Idle')
-
     return AutolobbyCommunicationsInstance
 end
 
