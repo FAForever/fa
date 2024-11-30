@@ -51,7 +51,7 @@
 -- - Back in the FAF client login screen, click on 'login'.
 -- - - Sanity check: it should state somewhere on screen that you are logging into the test server.
 -- - Use the nickname of the player as login. Use `foo` as the password. Not all accounts that exist 
--- in production also exist in the test server, so you'll have to try a few to find one that works.
+-- in production also exist in the test server, so you may have to try a few to find one that works.
 -- 
 -- Once logged in:
 -- - Via the hamburger menu (top left) go to Settings -> Forged Alliance Forever
