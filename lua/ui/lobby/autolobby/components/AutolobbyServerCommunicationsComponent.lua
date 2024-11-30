@@ -55,7 +55,7 @@
 -- 
 -- Once logged in:
 -- - Via the hamburger menu (top left) go to Settings -> Forged Alliance Forever
--- - Update the command line format to `"%s"  /init init_dev.lua`, it auto saves
+-- - Update the command line format to `"%s"  /init init_local_development.lua`, it auto saves
 -- - Start searching
 -- 
 -- The procedure applies to both clients. By updating the command line format you override the 
