@@ -107,6 +107,11 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param value UILobbyState
     SendGameStateToServer = function(self, value)
+        -- any other value seriously messes with the lobby protocol on the server
+        if value ~= 'Launching' then
+            return
+        end
+
         GpgNetSend('GameState', value)
     end,
 
@@ -124,7 +129,7 @@ AutolobbyServerCommunicationsComponent = ClassSimple {
         GpgNetSend('EstablishedPeer', peerId)
     end,
 
-    --- Sends a message to the server that we disconnected from a peer. Note that a peer may be trying to rejoin. See also the launch status of the given peer. 
+    --- Sends a message to the server that we disconnected from a peer. Note that a peer may be trying to rejoin. See also the launch status of the given peer.
     ---@param self UIAutolobbyServerCommunicationsComponent | UIAutolobbyCommunications
     ---@param peerId UILobbyPeerId
     SendDisconnectedPeer = function(self, peerId)
