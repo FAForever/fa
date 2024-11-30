@@ -34,9 +34,9 @@ local Commit = 'unknown'    -- The use of `'` instead of `"` is **intentional**
 
 --#endregion
 
-local Version = "3814"
----@alias PATCH "3814"
----@alias VERSION "1.5.3814"
+local Version = "3815"
+---@alias PATCH "3815"
+---@alias VERSION "1.5.3815"
 ---@return PATCH    # Game release
 function GetVersion()
     LOG(string.format('Supreme Commander: Forged Alliance Lua version %s at %s (%s)', Version, GameType, Commit))
