@@ -294,6 +294,44 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         return 'Ready'
     end,
 
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, number>
+    CreateRatingsTable = function(self, playerOptions)
+        ---@type table<string, number>
+        local allRatings = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.Human and options.PL then
+                allRatings[options.PlayerName] = options.PL
+            end
+        end
+
+        return allRatings
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, string>
+    CreateDivisionsTable = function(self, playerOptions)
+        ---@type table<string, string>
+        local allDivisions = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.Human and options.PL then
+                if options.DIV ~= "unlisted" then
+                    local division = options.DIV
+                    if options.SUBDIV and options.SUBDIV ~="" then
+                        division = division .. ' ' .. options.SUBDIV
+                    end
+                    allDivisions[options.PlayerName]= division
+                end
+            end
+        end
+
+        return allDivisions
+    end,
+
     --- Verifies whether we can launch the game.
     ---@param self UIAutolobbyCommunications
     ---@param peerStatus UIAutolobbyStatus
@@ -488,6 +526,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
                     end
 
+                    -- tuck them into the game options. By all means a hack, but  
+                    -- this way they are available in both the sim and the UI
+                    self.GameOptions.Ratings = self:CreateRatingsTable(self.PlayerOptions)
+                    self.GameOptions.Divisions = self:CreateDivisionsTable(self.PlayerOptions)
+
                     -- create game configuration
                     local gameConfiguration = {
                         GameMods = self.GameMods,
@@ -496,7 +539,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         Observers = {},
                     }
 
-                    -- send it to all players and tell them to launch
+                    -- send it to all players and tell them to launch with the configuration
                     self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
                     self:LaunchGame(gameConfiguration)
                 end
