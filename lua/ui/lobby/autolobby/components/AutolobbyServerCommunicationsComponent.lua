@@ -35,7 +35,7 @@
 -- 
 -- ## How to test game communications
 -- 
--- You can not test the game <-> server communications using the launch script to
+-- You cannot test the game <-> server communications using the launch script to
 -- launch local instances of the game. This requires a bit of effort.
 -- 
 -- Prerequisites:
