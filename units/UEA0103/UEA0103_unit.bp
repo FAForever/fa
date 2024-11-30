@@ -41,6 +41,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'UEA',        Cue = 'UEA0103_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 215,
     BuildIconSortPriority = 40,
     Categories = {
         "AIR",
@@ -191,7 +192,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Napalm Carpet Bomb",
             DoTPulses = 10,
-            DoTTime = 4.2,
+            DoTTime = 3.6,
             FireTargetLayerCapsTable = {
                 Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",

@@ -832,10 +832,10 @@ AChronoDampener = {
 }
 
 AChronoDampenerLarge = {
-    EmtBpPath .. 'aeon_chrono_dampener_large_01_emit.bp',
-    EmtBpPath .. 'aeon_chrono_dampener_large_02_emit.bp',
-    EmtBpPath .. 'aeon_chrono_dampener_large_03_emit.bp',
-    EmtBpPath .. 'aeon_chrono_dampener_large_04_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_01_emit.bp', -- Body Glow
+    EmtBpPath .. 'aeon_chrono_dampener_large_02_emit.bp', -- Small dark ring
+    EmtBpPath .. 'aeon_chrono_dampener_large_03_emit.bp', -- Body Sparks
+    EmtBpPath .. 'aeon_chrono_dampener_large_04_emit.bp', -- Large bright ring
 }
 
 ACommanderOverchargeFlash01 = {
@@ -1456,7 +1456,7 @@ CArtilleryFlash01 = {
     EmtBpPath .. 'proton_artillery_muzzle_08_emit.bp',
 }
 CArtilleryFlash02 = {
-    EmtBpPath .. 'proton_artillery_muzzle_07_emit.bp',
+    EmtBpPath .. 'proton_artillery_muzzle_07_emit.bp', -- Large, faint rings of air expanding outwards
 }
 
 CArtilleryHit01 = DefaultHitExplosion01

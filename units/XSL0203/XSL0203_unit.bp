@@ -11,6 +11,7 @@ UnitBlueprint{
         TransitionWater    = Sound { Bank = 'UEL',            Cue = 'UEL0203_Into_Water',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Tank', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 675.0,
     BuildIconSortPriority = 30,
     Categories = {
         "BUILTBYTIER2FACTORY",
@@ -135,7 +136,7 @@ UnitBlueprint{
         Icon = "amph",
         UnitName = "<LOC xsl0203_name>Yenzyne",
     },
-    Intel = { VisionRadius = 20 },
+    Intel = { VisionRadius = 18 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,
     LifeBarSize = 0.75,

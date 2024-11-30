@@ -25,6 +25,7 @@ UnitBlueprint{
         StopMove              = Sound { Bank = 'XRL',         Cue = 'XRL0403_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'Interface',   Cue = 'Cybran_Select_Spider',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 110000,
     BuildBotTotal = 12,
     BuildIconSortPriority = 30,
     Categories = {
@@ -405,7 +406,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo Launcher",
             DoTPulses = 5,
-            DoTTime = 0.5,
+            DoTTime = 0.4,
             FireTargetLayerCapsTable = { Seabed = "Seabed|Sub|Water" },
             FiringTolerance = 2,
             Label = "Torpedo01",

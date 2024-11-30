@@ -7,6 +7,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'UAL',        Cue = 'UAL0304_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 900,
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
@@ -147,7 +148,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Sonance Artillery",
             DoTPulses = 15,
-            DoTTime = 5,
+            DoTTime = 4.2,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",

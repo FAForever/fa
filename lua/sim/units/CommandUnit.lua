@@ -8,6 +8,7 @@ local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLand
 ---@field UnitBeingBuilt? Unit
 ---@field UnitBuildOrder? string
 ---@field rightGunLabel string
+---@field BuildEffectBones? Bone[] -- cached table from blueprint
 CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
@@ -142,7 +143,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
     ---@param auto boolean
     SetAutoOvercharge = function(self, auto)
         local wep = self:GetWeaponByLabel('AutoOverCharge')
-        if wep.NeedsUpgrade then return end
+        -- non-OC SACU can get here if auto OC is ordered along with an OC capable ACU/SACU, so wep will be nil
+        if not wep or wep.NeedsUpgrade then return end
 
         wep:SetAutoOvercharge(auto)
         self:UpdateStat("AutoOC", auto and 1 or 0)

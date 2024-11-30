@@ -10,6 +10,7 @@ UnitBlueprint{
         StopMove    = Sound { Bank = 'XSL',            Cue = 'XSL0303_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Tank', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 4700,
     BuildIconSortPriority = 20,
     Categories = {
         "AMPHIBIOUS",
@@ -393,7 +394,7 @@ UnitBlueprint{
             TurretYawRange = 180,
             TurretYawSpeed = 125,
             Turreted = true,
-            WeaponCategory = "Indirect Fire",
+            WeaponCategory = "Direct Fire",
         },
         {
             Audio = {

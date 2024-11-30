@@ -764,10 +764,9 @@ end
 ---@param all_bps BlueprintsTable All the blueprints of the game.
 function PreModBlueprints(all_bps)
     for _, bp in all_bps.Unit do
-        ExtractCloakMeshBlueprint(bp)
-
         -- Units with no categories are skipped
         if bp.Categories then
+            ExtractCloakMeshBlueprint(bp)
 
             -- Construct hash-based categories
             bp.CategoriesHash = table.hash(bp.Categories)
@@ -785,15 +784,6 @@ function PreModBlueprints(all_bps)
                     bp.CategoriesHash[v] = true
                 end
                 bp.AddCategories = nil
-            end
-
-            -- Build range overlay
-            if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
-                if not bp.AI then bp.AI = {} end
-                bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-                if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
-                    bp.CategoriesHash.OVERLAYMISC = true
-                end
             end
 
             -- Add common category values for easier lookup

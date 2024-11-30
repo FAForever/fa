@@ -1,11 +1,15 @@
 PropBlueprint{
     Categories = { "RECLAIMABLE" },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 100,
+                    LODCutoff = 110,
                     ShaderName = "NormalMappedAlpha",
                     AlbedoName = "Clutter03_yellow_albedo.dds",
                     NormalsName = "Clutter03_normalsTS.dds",

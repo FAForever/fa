@@ -1,10 +1,17 @@
 UnitBlueprint{
     Description = "<LOC urb3102_desc>Sonar System",
+    AI = {
+        TargetBones = {
+            "Light07",
+            "URB3102",
+        },
+    },
     Audio = {
         Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Huge',    LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB3102_Activate',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Sonar', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 400,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER1ENGINEER",
@@ -115,10 +122,10 @@ UnitBlueprint{
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,
     SelectionThickness = 1,
-    CollisionOffsetY = -0.25,
-    SizeX = 0.5,
-    SizeY = 0.6,
-    SizeZ = 0.5,
+    CollisionOffsetY = -0.4,
+    SizeX = 0.6,
+    SizeY = 0.75,
+    SizeZ = 0.6,
     StrategicIconName = "icon_structure1_intel",
     StrategicIconSortPriority = 235,
     Wreckage = {

@@ -5,6 +5,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB2303_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Gun', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 3150,
     BuildIconSortPriority = 140,
     Categories = {
         "ARTILLERY",
@@ -139,8 +140,8 @@ UnitBlueprint{
             MinRadius = 50,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 26.13,
-            MuzzleVelocityReduceDistance = 120,
+            MuzzleVelocity = 27.8,
+            MuzzleVelocityReduceDistance = 115,
             ProjectileId = "/projectiles/CIFMolecularResonanceShell01/CIFMolecularResonanceShell01_proj.bp",
             ProjectilesPerOnFire = 1,
             RackBones = {

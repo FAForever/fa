@@ -45,7 +45,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'URA',        Cue = 'URA0401_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Air',      LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 75000,
     BuildIconSortPriority = 100,
     Categories = {
         "AIR",
@@ -229,7 +229,8 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 190,
+            Damage = 150,
+            DamageRadius = 3,
             DamageType = "Normal",
             DisplayName = "Iridium Rocket Pack",
             FireTargetLayerCapsTable = {
@@ -293,7 +294,8 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 190,
+            Damage = 150,
+            DamageRadius = 3,
             DamageType = "Normal",
             DisplayName = "Iridium Rocket Pack",
             FireTargetLayerCapsTable = {

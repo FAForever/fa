@@ -5,6 +5,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB2303_Activate', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Gun',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 2200,
     BuildIconSortPriority = 140,
     Categories = {
         "AEON",
@@ -131,7 +132,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Miasma Artillery",
             DoTPulses = 5,
-            DoTTime = 1,
+            DoTTime = 0.8,
             EnergyDrainPerSecond = 145,
             EnergyRequired = 1450,
             FireTargetLayerCapsTable = {
@@ -145,8 +146,8 @@ UnitBlueprint{
             MinRadius = 50,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 26.13,
-            MuzzleVelocityReduceDistance = 120,
+            MuzzleVelocity = 27.8,
+            MuzzleVelocityReduceDistance = 115,
             ProjectileId = "/projectiles/AIFMiasmaShell01/AIFMiasmaShell01_proj.bp",
             ProjectilesPerOnFire = 1,
             RackBones = {

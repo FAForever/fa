@@ -20,10 +20,6 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
--- replace with assembly implementations
-table.getsize = table.getsize2 or table.getsize
-table.empty = table.empty2 or table.empty
-
 -- load legacy builder systems
 doscript '/lua/system/GlobalPlatoonTemplate.lua'
 doscript '/lua/system/GlobalBuilderTemplate.lua'
@@ -334,9 +330,6 @@ function BeginSession()
 
     -- add on game over callbacks
     ForkThread(GameOverListenerThread)
-
-    -- log game time
-    ForkThread(GameTimeLogger)
 
     -- keep track of units off map
     OnStartOffMapPreventionThread()

@@ -17,6 +17,7 @@ end
 
 -- # Global (and shared) init
 doscript '/lua/globalInit.lua'
+doscript '/lua/ui/globals/GpgNetSend.lua'
 
 -- Do we have an custom language set inside user-options ?
 local selectedlanguage = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').selectedlanguage
@@ -113,7 +114,6 @@ if replayID then
     LOG("REPLAY ID: " .. replayID)
 end
 
-
 do
 
     -- Moderation functionality
@@ -150,8 +150,6 @@ do
     --- We delay the event to make sure we're not trying to send events when a player is trying to leave
     ---@param message string
     local SendModeratorEventThread = function(message)
-        WaitSeconds(2)
-
         local currentFocusArmy = GetFocusArmy()
 
         if not SessionIsGameOver() then
@@ -292,24 +290,6 @@ do
         end
 
         oldSimCallback(callback, addUnitSelection or false)
-    end
-
-    local oldGpgNetSend = GpgNetSend
-    _G.GpgNetSend = function(command, ...)
-
-        if SessionIsActive() and not SessionIsReplay() then
-            local stringifiedArgs = ""
-            for k = 1, table.getn(arg) do
-                stringifiedArgs = stringifiedArgs .. tostring(arg[k]) .. ","
-            end
-
-            -- try to inform moderators
-            ForkThread(SendModeratorEventThread,
-                string.format("GpgNetSend with command '%s' and data '%s'", tostring(command),
-                    stringifiedArgs))
-        end
-
-        oldGpgNetSend(command, unpack(arg))
     end
 end
 

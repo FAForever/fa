@@ -192,7 +192,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param plan? string
     SetAIPlan = function(self, plan)
-        if not plan or self[plan] then return end
+        if not (plan or self[plan]) then return end
         if self.AIThread then
             self.AIThread:Destroy()
         end

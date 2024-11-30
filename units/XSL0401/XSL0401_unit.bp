@@ -17,6 +17,7 @@ UnitBlueprint{
         StopMove              = Sound { Bank = 'XSL',            Cue = 'XSL0401_Move_Stop',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection           = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Bot',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 67000,
     BuildIconSortPriority = 30,
     Categories = {
         "AMPHIBIOUS",
@@ -194,6 +195,7 @@ UnitBlueprint{
         MaxAcceleration = 2.5,
         MaxBrake = 2.5,
         MaxSpeed = 2.5,
+        MaxSpeedReverse = 0,
         MaxSteerForce = 10,
         MeshExtentsX = 2.75,
         MeshExtentsY = 6.75,

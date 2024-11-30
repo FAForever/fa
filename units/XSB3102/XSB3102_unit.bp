@@ -6,6 +6,7 @@ UnitBlueprint{
         Killed         = Sound { Bank = 'XSL_Destroy',    Cue = 'XSB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Sonar',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500,
     BuildIconSortPriority = 190,
     Categories = {
         "BUILTBYTIER1ENGINEER",
@@ -123,10 +124,10 @@ UnitBlueprint{
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.66,
-    CollisionOffsetY = -0.25,
-    SizeX = 0.6,
-    SizeY = 0.8,
-    SizeZ = 0.6,
+    CollisionOffsetY = -0.4,
+    SizeX = 1.1,
+    SizeY = 1.2,
+    SizeZ = 0.9,
     StrategicIconName = "icon_structure1_intel",
     StrategicIconSortPriority = 235,
     Wreckage = {

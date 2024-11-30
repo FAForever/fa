@@ -12,6 +12,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB2205_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Gun', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 5800,
     BuildIconSortPriority = 130,
     Categories = {
         "ANTINAVY",
@@ -151,7 +152,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
             DoTPulses = 5,
-            DoTTime = 0.5,
+            DoTTime = 0.4,
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 60,
             Label = "Turret01",

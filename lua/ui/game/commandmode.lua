@@ -406,60 +406,73 @@ local function OnGuardUpgrade(guardees, unit)
     end
 end
 
+--- Thread to keep track of when to unpause, 
+--- logic is a bit convoluted but guarantees that we still have access to the user units as the game progresses
+---@param targetId EntityId
+local function UnpauseThread(targetId)
+    WaitTicks(10)
+    local target = GetUnitById(targetId)
+    while target do
+        local candidates = target.ThreadUnpauseCandidates
+        if (candidates and not table.empty(candidates)) then
+            for id, _ in candidates do
+                local engineer = GetUnitById(id)
+                -- check if it is idle instead of its guarded entity to allow queuing orders before the assist command
+                if engineer and not engineer:IsIdle() then
+                    -- ensure the target focus exists, since this thread may be targeted at something that is not building anything,
+                    -- but might start to build something after some network delay, which you won't want to unpause due to `nil == nil`
+                    local targetFocus = target:GetFocus()
+                    if targetFocus and targetFocus == engineer:GetFocus() then
+                        target.ThreadUnpauseCandidates = nil
+                        target.ThreadUnpause = nil
+                        SetPaused({ target }, false)
+                        return
+                    end
+                else
+                    -- engineer is idle, died, we switch armies, ...
+                    candidates[id] = nil
+                end
+            end
+        else
+            target.ThreadUnpauseCandidates = nil
+            target.ThreadUnpause = nil
+            return
+        end
+
+        WaitTicks(10)
+        target = GetUnitById(targetId)
+    end
+end
+
 ---@param guardees UserUnit[]
 ---@param target UserUnit
 local function OnGuardUnpause(guardees, target)
     local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_unpause
-    if prefs == 'On' or
-        (
-        prefs == 'ExtractorsAndRadars' and
-            EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
-    then
-
-        -- start a single thread to keep track of when to unpause, logic feels a bit convoluted
-        -- but that is purely to guarantee that we still have access to the user units as the
-        -- game progresses
-        if not target.ThreadUnpause then
-            local id = target:GetEntityId()
-            target.ThreadUnpause = ForkThread(
-                function()
-                    WaitSeconds(1.0)
-                    local target = GetUnitById(id)
-                    while target do
-                        local candidates = target.ThreadUnpauseCandidates
-                        if (candidates and not table.empty(candidates)) then
-                            for id, _ in candidates do
-                                local engineer = GetUnitById(id)
-                                if engineer and not engineer:IsIdle() then
-                                    local focus = engineer:GetFocus()
-                                    if focus == target:GetFocus() then
-                                        target.ThreadUnpauseCandidates = nil
-                                        target.ThreadUnpause = nil
-                                        SetPaused({ target }, false)
-                                        break
-                                    end
-                                    -- engineer is idle, died, we switch armies, ...
-                                else
-                                    candidates[id] = nil
-                                end
-                            end
-                        else
-                            target.ThreadUnpauseCandidates = nil
-                            target.ThreadUnpause = nil
-                            break
-                        end
-
-                        WaitSeconds(1.0)
-                        target = GetUnitById(id)
-                    end
-                end
+    local bp = __blueprints[target:GetUnitId()]
+    -- only create the unpause thread for units that have the ability to unpause
+    if  (
+            prefs == 'On' and 
+            (
+                EntityCategoryContains(categories.REPAIR + categories.FACTORY + categories.SILO, target)  -- REPAIR includes mantis and harbs, compared to ENGINEER category
+                or (bp.General.UpgradesTo and bp.General.UpgradesTo ~= '') -- upgradeables can also be assisted
             )
-        end
-
-        -- add these to keep track
+        )
+        or
+        (   
+            prefs == 'ExtractorsAndRadars'
+            and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target) 
+            and (bp.General.UpgradesTo and bp.General.UpgradesTo ~= '') -- use `and` to make sure the mex/radar is upgradeable
+        )
+    then
+        -- save the guardees' entity ids to keep track of in the unpause thread
         target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or {}
         for k, guardee in guardees do
             target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
+        end
+
+        -- start a single thread to keep track of when to unpause
+        if not target.ThreadUnpause then
+            target.ThreadUnpause = ForkThread(UnpauseThread, target:GetEntityId())
         end
     end
 end
@@ -547,10 +560,11 @@ end
 
 ---@param command UserCommand
 local function OnReclaimIssued(command)
-    -- Area reclaim dragger, command mode only
-    if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
-        import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
-    end
+    -- feature: area commands
+    -- -- Area reclaim dragger, command mode only
+    -- if command.Target.EntityId and modeData.name == "RULEUCC_Reclaim" then
+    --     import("/lua/ui/game/hotkeys/area-reclaim-order.lua").AreaReclaimOrder(command)
+    -- end
 end
 
 ---@param command UserCommand
@@ -564,6 +578,7 @@ end
 
 ---@param command UserCommand
 local function OnAttackIssued(command)
+    -- feature: area commands
     -- Area attack dragger, command mode only
     if command.Target.Type == 'Position' and modeData.name == "RULEUCC_Attack" then
         import("/lua/ui/game/hotkeys/area-attack-order.lua").AreaAttackOrder(command)
@@ -654,16 +669,27 @@ local OnCommandIssuedCallback = {
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 ---@param command UserCommand
 function OnCommandIssued(command)
+    -- not command.Clear = when we hold shift, to queue up multiple commands.
+    if not command.Clear then
+        -- signal for OnCommandModeBeat to end commandMode at the next beat
+        -- potentially removable? dont see the effect
+        issuedOneCommand = true
+    end
 
     -- If our callback returns true or we don't have a command type, we skip the rest of our logic
     if (OnCommandIssuedCallback[command.CommandType] and OnCommandIssuedCallback[command.CommandType](command))
     or command.CommandType == 'None' then
+        -- we do still need to end the commandmode for things like HotBuild.
+        if command.Clear then
+            -- but only when not using the cheat menu, which should stay open.
+            if modeData and not modeData.cheat or not modeData then
+                EndCommandMode(true)
+            end
+        end
         return
     end
-    -- is set when we hold shift, to queue up multiple commands. This is where the command mode stops
-    if not command.Clear then
-        issuedOneCommand = true
-    else
+    
+    if command.Clear then
         EndCommandMode(true)
         if command.CommandType ~= 'Stop'
         and TableGetN(command.Units) == 1

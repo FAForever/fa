@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'UAL',        Cue = 'UAL0205_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500.0,
     BuildIconSortPriority = 25,
     Categories = {
         "AEON",
@@ -136,7 +137,7 @@ UnitBlueprint{
         TurnFacingRate = 180,
         TurnRadius = 0,
         TurnRate = 120,
-        WaterSpeedMultiplier = 1.35,
+        WaterSpeedMultiplier = 1,
         WobbleFactor = 0,
         WobbleSpeed = 0,
     },

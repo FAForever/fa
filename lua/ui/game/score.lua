@@ -46,6 +46,7 @@ local created = false
 
 function updatePlayerName(line)
     local playerName = line.name:GetText()
+    local playerDivision = sessionInfo.Options.Divisions[playerName]
     local playerRating = sessionInfo.Options.Ratings[playerName] or 0
     local playerClan = sessionInfo.Options.ClanTags[playerName]
 
@@ -55,11 +56,21 @@ function updatePlayerName(line)
         playerClan = ""
     end
 
+    if playerDivision then
+        playerDivision = ' [' .. (playerDivision:gsub("^.", string.upper)) .. ']'
+    else
+        playerDivision = ""
+    end
+
     if playerRating then
         playerRating = ' [' .. math.floor(playerRating+0.5) .. ']'
     end
 
-    line.name:SetText(playerClan .. playerName .. playerRating)
+    if sessionInfo.Options.Divisions then
+        line.name:SetText(playerClan .. playerName .. playerDivision)
+    else
+        line.name:SetText(playerClan .. playerName .. playerRating)
+    end
 end
 
 function armyGroupHeight()
@@ -532,9 +543,13 @@ function SetupPlayerLines()
     end
 
     -- add replay ID
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
     mapData.MapDescription = LOC(description) ..
         "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(sessionInfo.map_version) ..
-        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
+        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId()) .. 
+        "\r\n" ..
+        "\r\n" .. "Game version: " .. version .. "\r\n" .. "Game type: " .. gametype .. "\r\n" .. "Commit: " .. commit:sub(1, 8)
 
     -- add ladder icon
     mapData.Ranked = sessionInfo.Options.Ranked or false

@@ -1,10 +1,17 @@
 UnitBlueprint{
     Description = "<LOC uab3102_desc>Sonar System",
+    AI = {
+        TargetBones = {
+            "Tower_02",
+            "UAB3102",
+        },
+    },
     Audio = {
         Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Land',  LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB3102_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Sonar', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 400,
     BuildIconSortPriority = 190,
     Categories = {
         "AEON",
@@ -120,9 +127,9 @@ UnitBlueprint{
     SelectionSizeX = 0.4,
     SelectionSizeZ = 0.4,
     SelectionThickness = 1,
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.4,
     SizeX = 0.6,
-    SizeY = 0.6,
+    SizeY = 0.8,
     SizeZ = 0.6,
     StrategicIconName = "icon_structure1_intel",
     StrategicIconSortPriority = 64,

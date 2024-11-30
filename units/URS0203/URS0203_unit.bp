@@ -1,6 +1,11 @@
 UnitBlueprint{
     Description = "<LOC urs0203_desc>Attack Submarine",
-    AI = { GuardReturnRadius = 40 },
+    AI = {
+        GuardReturnRadius = 40,
+        TargetBones = {
+            "URS0203",
+        },
+    },
     Audio = {
         AmbientMove    = Sound { Bank = 'URS',        Cue = 'URS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'URS',        Cue = 'URS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -13,6 +18,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'URS',        Cue = 'URS_Sub_Surface',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Sub',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 775,
     BuildIconSortPriority = 30,
     Categories = {
         "ANTINAVY",
@@ -192,9 +198,9 @@ UnitBlueprint{
     SelectionSizeX = 0.36,
     SelectionSizeZ = 1.45,
     SelectionThickness = 0.28,
-    CollisionOffsetY = -0.25,
+    CollisionOffsetY = -0.4,
     SizeX = 0.6,
-    SizeY = 0.6,
+    SizeY = 0.85,
     SizeZ = 2.3,
     StrategicIconName = "icon_sub1_antinavy",
     StrategicIconSortPriority = 165,
@@ -216,7 +222,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
             DoTPulses = 5,
-            DoTTime = 1,
+            DoTTime = 0.8,
             EffectiveRadius = 29,
             FireTargetLayerCapsTable = {
                 Sub = "Seabed|Sub|Water",

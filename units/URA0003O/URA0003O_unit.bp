@@ -22,6 +22,7 @@ UnitBlueprint{
         StartTurnDistance = 5,
         Winged = false,
     },
+    AverageDensity = 30,
     Categories = {
         "CONSTRUCTION",
         "DUMMYUNIT",

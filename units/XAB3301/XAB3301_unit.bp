@@ -13,6 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XAB',        Cue = 'XAB3301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Radar',          LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 250,
     BuildIconSortPriority = 200,
     Categories = {
         "ABILITYBUTTON",

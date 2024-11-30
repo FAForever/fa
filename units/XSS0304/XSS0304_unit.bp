@@ -1,6 +1,11 @@
 UnitBlueprint{
     Description = "<LOC xss0304_desc>Submarine Hunter",
-    AI = { GuardReturnRadius = 15 },
+    AI = {
+        GuardReturnRadius = 15,
+        TargetBones = {
+            "XSS0304",
+        },
+    },
     Audio = {
         AmbientMove    = Sound { Bank = 'XSS',            Cue = 'XSS0304_Move_Loop',   LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'XSS',            Cue = 'XSS0304_Move_Loop',   LodCutoff = 'UnitMove_LodCutoff' },
@@ -13,6 +18,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'XSS',            Cue = 'XSS_Sub_Surface',     LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Sub', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 4000,
     BuildIconSortPriority = 15,
     Categories = {
         "ANTIAIR",
@@ -387,7 +393,7 @@ UnitBlueprint{
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 90,
-            ProjectileId = "/projectiles/SAALosaareAutoCannon03/SAALosaareAutoCannon03_proj.bp",
+            ProjectileId = "/projectiles/SAALosaareAutoCannon01/SAALosaareAutoCannon01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
                 {
@@ -420,7 +426,7 @@ UnitBlueprint{
             TurretBonePitch = "Front_Turret_Barrel01",
             TurretBoneYaw = "Front_Turret",
             TurretDualManipulators = false,
-            TurretPitch = 0,
+            TurretPitch = 25,
             TurretPitchRange = 85,
             TurretPitchSpeed = 180,
             TurretYaw = 0,

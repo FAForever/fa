@@ -39,7 +39,7 @@ UnitBlueprint{
         UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
         Unload             = Sound { Bank = 'UEA',        Cue = 'UEA0104_Unit_Unload',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 1,
+    AverageDensity = 700,
     BuildIconSortPriority = 30,
     Categories = {
         "AIR",
@@ -209,6 +209,7 @@ UnitBlueprint{
         MeshExtentsZ = 3,
         MotionType = "RULEUMT_Air",
     },
+    SelectionCenterOffsetY = 0.15,
     SelectionSizeX = 0.6,
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.49,

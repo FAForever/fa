@@ -10,6 +10,7 @@ UnitBlueprint{
         EggSink        = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 10,
     BuildIconSortPriority = 25,
     Categories = {
         "CONSTRUCTION",

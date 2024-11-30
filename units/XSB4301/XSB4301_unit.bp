@@ -12,6 +12,7 @@ UnitBlueprint{
         ShieldOn       = Sound { Bank = 'XSB',            Cue = 'XSB4301_On_Off',             LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Structure',  LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 600,
     BuildIconSortPriority = 160,
     Categories = {
         "BUILTBYTIER3COMMANDER",
@@ -36,6 +37,7 @@ UnitBlueprint{
         Health = 600,
         MaxHealth = 600,
         Shield = {
+            AbsorptionType = "StaticShield",
             ImpactEffects = "SeraphimShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
             Mesh = "/effects/entities/SeraphimShield01/SeraphimShield01_mesh",

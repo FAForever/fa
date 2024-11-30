@@ -32,6 +32,7 @@ UnitBlueprint{
         Thruster           = Sound { Bank = 'UAA',        Cue = 'UAA0204_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 90,
     BuildIconSortPriority = 35,
     Categories = {
         "AEON",
@@ -104,9 +105,9 @@ UnitBlueprint{
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
-        BuildTime = 2000,
+        BuildCostEnergy = 4600,
+        BuildCostMass = 230,
+        BuildTime = 1200,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -169,7 +170,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Kamikaze",
             DoTPulses = 20,
-            DoTTime = 10,
+            DoTTime = 9.5,
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",

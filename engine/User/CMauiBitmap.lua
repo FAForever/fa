@@ -33,6 +33,11 @@ end
 function CMauiBitmap:SetForwardPattern()
 end
 
+---Sets color mask applied to bitmap during rendering (white images will get this color for example)
+---@param color Color
+function CMauiBitmap:SetColorMask(color)
+end
+
 ---
 ---@param frame number
 function CMauiBitmap:SetFrame(frame)
@@ -87,6 +92,12 @@ end
 ---
 ---@param doHit boolean
 function CMauiBitmap:UseAlphaHitTest(doHit)
+end
+
+--- Defines the color mask to be applied to bitmap during rendering (white images will get this color for example).
+--- Introduced by [binary patch #42](https://github.com/FAForever/FA-Binary-Patches/pull/42)
+---@param color string
+function CMauiBitmap:SetColorMask(color)
 end
 
 return CMauiBitmap

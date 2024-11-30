@@ -11,6 +11,7 @@ UnitBlueprint{
         TransitionWater    = Sound { Bank = 'UEL',        Cue = 'UEL0203_Into_Water',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Tank',       LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 900.0,
     BuildIconSortPriority = 25,
     Categories = {
         "BUILTBYTIER2FACTORY",

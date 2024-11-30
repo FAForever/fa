@@ -8,6 +8,7 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'XSL',            Cue = 'XSL0205_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Vehicle', LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 500.0,
     BuildIconSortPriority = 35,
     Categories = {
         "ANTIAIR",
@@ -167,7 +168,7 @@ UnitBlueprint{
         TurnFacingRate = 180,
         TurnRadius = 0,
         TurnRate = 120,
-        WaterSpeedMultiplier = 1.4,
+        WaterSpeedMultiplier = 1,
         WobbleFactor = 0,
         WobbleSpeed = 0,
     },

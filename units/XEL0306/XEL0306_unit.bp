@@ -10,6 +10,7 @@ UnitBlueprint{
         UISelection = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Vehicle',   LodCutoff = 'UnitMove_LodCutoff' },
         Unpack      = Sound { Bank = 'UEL',        Cue = 'UEL0111_Open',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 1700,
     BuildIconSortPriority = 30,
     Categories = {
         "BUILTBYTIER3FACTORY",
@@ -59,9 +60,9 @@ UnitBlueprint{
                         {
                             BoneName = "XEL0306",
                             TreadMarks = "tank_treads_albedo",
-                            TreadMarksInterval = 0.6,
+                            TreadMarksInterval = 0.4,
                             TreadMarksSizeX = 1.3,
-                            TreadMarksSizeZ = 1,
+                            TreadMarksSizeZ = 1.12,
                             TreadOffset = { 0, 0, 0 },
                         },
                     },

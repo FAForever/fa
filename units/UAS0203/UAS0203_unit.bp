@@ -1,6 +1,12 @@
 UnitBlueprint{
     Description = "<LOC uas0203_desc>Attack Submarine",
-    AI = { GuardReturnRadius = 40 },
+    AI = {
+        GuardReturnRadius = 40,
+        TargetBones = {
+            "UAS0203",
+            "upper_target",
+        },
+    },
     Audio = {
         AmbientMove    = Sound { Bank = 'UAS',        Cue = 'UAS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
         AmbientMoveSub = Sound { Bank = 'UAS',        Cue = 'UAS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -13,6 +19,7 @@ UnitBlueprint{
         SurfaceStart   = Sound { Bank = 'UAS',        Cue = 'UAS_Sub_Surface',    LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Sub',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 775,
     BuildIconSortPriority = 30,
     Categories = {
         "AEON",
@@ -198,11 +205,10 @@ UnitBlueprint{
     SelectionSizeZ = 1.5,
     SelectionThickness = 0.25,
     CollisionOffsetX = 0.05,
-    CollisionOffsetY = -0.25,
-    CollisionOffsetZ = -0.01,
+    CollisionOffsetY = -0.4,
     SizeX = 0.6,
-    SizeY = 0.5,
-    SizeZ = 1.85,
+    SizeY = 0.85,
+    SizeZ = 2.2,
     StrategicIconName = "icon_sub1_antinavy",
     StrategicIconSortPriority = 165,
     Veteran = {
