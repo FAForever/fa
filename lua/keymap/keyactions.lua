@@ -1960,16 +1960,20 @@ local keyActionsCinematics = {
         action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Append(true)',
         category = 'cinematics',
     },
-    ['cinematics_move_to_insert'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Insert(true)',
-        category = 'cinematics',
-    },
-    ['cinematics_move_to_overwrite'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Overwrite(true)',
-        category = 'cinematics',
-    },
     ['cinematics_move_to_remove'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Remove(true)',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RemoveLast(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_insert_at_index'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").InsertAfterIndex(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_overwrite_at_index'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").OverwriteAtIndex(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_remove_at_index'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RemoveAtIndex(true)',
         category = 'cinematics',
     },
 
@@ -2008,27 +2012,27 @@ local keyActionsCinematics = {
 
     -- Preference file interactions
     ['cinematics_move_to_store_01'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("01")',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("01", true)',
         category = 'cinematics',
     },
     ['cinematics_move_to_store_02'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("02")',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("02", true)',
         category = 'cinematics',
     },
     ['cinematics_move_to_store_03'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("03")',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("03", true)',
         category = 'cinematics',
     },
     ['cinematics_move_to_retrieve_01'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("01")',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("01", true)',
         category = 'cinematics',
     },
     ['cinematics_move_to_retrieve_02'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("02")',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("02", true)',
         category = 'cinematics',
     },
     ['cinematics_move_to_retrieve_03'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("03")',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("03", true)',
         category = 'cinematics',
     }
 }

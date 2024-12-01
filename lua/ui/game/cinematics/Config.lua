@@ -37,9 +37,10 @@ local function DefaultMoveToLayout()
 
         -- add, insert, overwrite and remove camera orientations
         ['A'] = keyActions.cinematics_move_to_add,
-        ['S'] = keyActions.cinematics_move_to_insert,
-        ['D'] = keyActions.cinematics_move_to_overwrite,
-        ['DELETE'] = keyActions.cinematics_move_to_remove,
+        ['S'] = keyActions.cinematics_move_to_insert_at_index,
+        ['D'] = keyActions.cinematics_move_to_overwrite_at_index,
+        ['BACKSPACE'] = keyActions.cinematics_move_to_remove,
+        ['DELETE'] = keyActions.cinematics_move_to_remove_at_index,
 
         -- animation
         ['Shift-Q'] = keyActions.cinematics_move_to_animate_forward,
@@ -71,4 +72,6 @@ function ApplyDefaultKeyLayout()
     -- apply the keys
     IN_ClearKeyMap()
     IN_AddKeyMapTable(combinedKeyMap)
+
+    print("Applied hotkeys for cinematics")
 end

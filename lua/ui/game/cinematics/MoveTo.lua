@@ -103,7 +103,7 @@ RetrieveFromDisk = function(key, doPrint)
     -- inform user
     if doPrint then
         print("MoveTo - Loaded sequence for MoveTo to key '" ..
-            stringifiedKey .. "' (" .. table.getn(Sequence) .. " steps)")
+            stringifiedKey .. "'  (" .. table.getn(Sequence) .. " steps)")
     end
 end
 
@@ -118,9 +118,9 @@ Append = function(doPrint)
     end
 end
 
---- Inserts a camera position at the specified index.
+--- Inserts a camera position at the specified index, pushing back the other camera positions.
 ---@param doPrint? boolean
-Insert = function(doPrint)
+InsertAfterIndex = function(doPrint)
     local sequenceCount = table.getn(Sequence)
     if sequenceCount == 0 then
         SequenceIndex = 1
@@ -129,16 +129,16 @@ Insert = function(doPrint)
     end
 
     local camera = GetCamera(DefaultCamera)
-    table.insert(camera, SequenceIndex + 1, camera:SaveSettings())
+    table.insert(Sequence, SequenceIndex, camera:SaveSettings())
 
     if doPrint then
-        print("MoveTo - Insert into sequence at index " .. SequenceIndex .. " (" .. sequenceCount .. " steps)")
+        print("MoveTo - Insert into sequence at index " .. SequenceIndex .. " (" .. (sequenceCount + 1) .. " steps)")
     end
 end
 
 --- Overwrites the camera position at the specified index.
 ---@param doPrint? boolean
-Overwrite = function(doPrint)
+OverwriteAtIndex = function(doPrint)
     local sequenceCount = table.getn(Sequence)
     if sequenceCount == 0 then
         SequenceIndex = 1
@@ -158,7 +158,8 @@ end
 
 --- Removes the current camera position.
 ---@param doPrint? boolean
-Remove = function(doPrint)
+---@return nil
+RemoveAtIndex = function(doPrint)
     local sequenceCount = table.getn(Sequence)
     if sequenceCount == 0 then
         print("No camera sequence defined")
@@ -168,7 +169,24 @@ Remove = function(doPrint)
     table.remove(Sequence, SequenceIndex)
 
     if doPrint then
-        print("MoveTo - Removed sequence " .. SequenceIndex .. " (" .. sequenceCount .. " steps)")
+        print("MoveTo - Removed at " .. SequenceIndex .. " (" .. (sequenceCount - 1).. " steps)")
+    end
+end
+
+--- Removes the last camera position.
+---@param doPrint doPrint? boolean
+---@return nil
+RemoveLast = function(doPrint)
+    local sequenceCount = table.getn(Sequence)
+    if sequenceCount == 0 then
+        print("No camera sequence defined")
+        return nil
+    end
+
+    table.remove(Sequence)
+
+    if doPrint then
+        print("MoveTo - Removed last (" .. (sequenceCount - 1) .. " steps)")
     end
 end
 
