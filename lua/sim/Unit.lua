@@ -156,7 +156,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     FxDamage2 = {EffectTemplate.DamageFireSmoke01, EffectTemplate.DamageSparks01},
     FxDamage3 = {EffectTemplate.DamageFire01, EffectTemplate.DamageSparks01},
 
-    -- Disables all collisions. This will be true for all units being constructed as upgrades
+    -- Disables all collisions. This will be true for all units being constructed as upgrades and dead units
     DisallowCollisions = false,
 
     -- Destruction parameters
@@ -1476,6 +1476,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- this flag is used to skip the need of `IsDestroyed`
         self.Dead = true
 
+        -- don't allow projectiles/beams to collide since we are dead
+        self.DisallowCollisions = true
+
         local layer = self.Layer
         local bp = self.Blueprint
         local army = self.Army
@@ -1502,7 +1505,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local FractionThreshold = bp.General.FractionThreshold or 0.5
             if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
                 self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
-                self.DisallowCollisions = true
             end
 
             self:DoUnitCallbacks('OnKilled')
@@ -1574,7 +1576,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param firingWeapon Weapon The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
-        -- bail out immediately
+       -- dead unit or unit that is an upgrade
         if self.DisallowCollisions then
             return false
         end
@@ -1595,8 +1597,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
-
-       -- bail out immediately
+       -- dead unit or unit that is an upgrade
         if self.DisallowCollisions then
             return false
         end
@@ -1944,8 +1945,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         if shallSink then
-            self.DisallowCollisions = true
-
             -- Bubbles and stuff coming off the sinking wreck.
             self:ForkThread(self.SinkDestructionEffects)
 
