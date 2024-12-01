@@ -1945,8 +1945,12 @@ local keyActionsMisc = {
 
 }
 
----@type table<string, UIKeyAction>
 local keyActionsCinematics = {
+    ['cinematics_bind_keys'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/config.lua").ApplyDefaultKeyLayout()',
+        category = 'cinematics',
+    },
+
     -- CRUD-like operations
     ['cinematics_move_to_clear'] = {
         action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Clear(true)',
