@@ -351,7 +351,7 @@ end
 
 ---
 ---@param name string
----@return Camera
+---@return UserCamera
 function GetCamera(name)
 end
 

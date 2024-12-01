@@ -60,7 +60,7 @@ function CUIWorldView:IsCartographic()
 end
 
 ---
----@param camera Camera
+---@param camera UserCamera
 function CUIWorldView:IsInputLocked(camera)
 end
 
@@ -70,7 +70,7 @@ function CUIWorldView:IsResourceRenderingEnabled()
 end
 
 ---
----@param camera Camera
+---@param camera UserCamera
 function CUIWorldView:LockInput(camera)
 end
 
@@ -96,7 +96,7 @@ function CUIWorldView:ShowConvertToPatrolCursor()
 end
 
 ---
----@param camera Camera
+---@param camera UserCamera
 function CUIWorldView:UnlockInput(camera)
 end
 

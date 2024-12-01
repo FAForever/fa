@@ -72,7 +72,7 @@ local function CheckConditions(CommandMode)
 end
 
 --- Defines the transparency curve
----@param camera Camera
+---@param camera UserCamera
 ---@param distance number
 ---@param terrainHeight number
 ---@param surfaceHeight number

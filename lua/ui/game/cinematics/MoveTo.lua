@@ -36,7 +36,7 @@ SequenceIndex = 1
 Sequence = {}
 
 --- Moves the given camera to the specified settings.
----@param camera Camera
+---@param camera UserCamera
 ---@param settings UserCameraSettings
 ---@param duration? number
 local MoveTo = function(camera, settings, duration)
@@ -171,7 +171,7 @@ end
 
 --- Immediately jump to the next position in the sequence.
 ---@param doPrint? boolean # defaults to false
----@return Camera?
+---@return UserCamera?
 JumpToNext = function(doPrint)
     doPrint = doPrint or false
 
@@ -197,7 +197,7 @@ end
 
 --- Immediately jump to the previous position in the sequence.
 ---@param doPrint? boolean
----@return Camera?
+---@return UserCamera?
 JumpToPrevious = function(doPrint)
     doPrint = doPrint or false
 
@@ -223,7 +223,7 @@ end
 
 --- Animate the camera to the next position.
 ---@see `ToPreviousState`
----@return Camera?   # Allows you to wait for the camera to finish
+---@return UserCamera?   # Allows you to wait for the camera to finish
 AnimateNext = function()
     local index = GetSequenceIndex()
     if not index then
@@ -242,7 +242,7 @@ end
 
 --- Move the camera to the previous position in the sequence.
 ---@see `ToNextState`
----@return Camera?   # Allows you to wait for the camera to finish
+---@return UserCamera?   # Allows you to wait for the camera to finish
 AnimatePrevious = function()
     local index = GetSequenceIndex()
     if not index then
@@ -260,14 +260,14 @@ AnimatePrevious = function()
 end
 
 --- Jump the camera to the next position and then proceed to animate to the position after that.
----@return Camera?   # Allows you to wait for the camera to finish
+---@return UserCamera?   # Allows you to wait for the camera to finish
 JumpAndAnimateNext = function()
     JumpToNext()
     return AnimateNext()
 end
 
 --- Jump the camera to the previous position and then proceed to animate to the position before that.
----@return Camera?   # Allows you to wait for the camera to finish
+---@return UserCamera?   # Allows you to wait for the camera to finish
 JumpAndAnimatePrevious = function()
     JumpToPrevious()
     return AnimatePrevious()

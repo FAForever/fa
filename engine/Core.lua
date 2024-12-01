@@ -45,7 +45,7 @@
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
 -- note that these object span both the sim and user states
----@alias GoalObject moho.manipulator_methods | EconomyEvent | Camera
+---@alias GoalObject moho.manipulator_methods | EconomyEvent | UserCamera
 
 ---@unknown
 function AITarget()
