@@ -132,11 +132,7 @@ Insert = function(doPrint)
     end
 
     local camera = GetCamera(DefaultCamera)
-    table.insert(camera, SequenceIndex, camera:SaveSettings())
-
-    local t = { 1, 2, 3 }
-    table.insert(t, 2, 4)
-    reprsl(t)
+    table.insert(camera, SequenceIndex + 1, camera:SaveSettings())
 
     if doPrint then
         print("MoveTo - Insert into sequence at index " .. SequenceIndex .. " (" .. sequenceCount .. " steps)")

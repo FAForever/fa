@@ -564,7 +564,7 @@ keyDescriptions = {
     -- CRUD-like operations
     ['cinematics_move_to_clear'] = '<LOC key_desc_cinematics_move_to_clear>MoveTo - Clear sequence',
     ['cinematics_move_to_add'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Append current camera position to the sequence',
-    ['cinematics_move_to_insert'] = '<LOC key_desc_cinematics_move_to_insert>MoveTo - Insert current camera position at the current index of the sequence',
+    ['cinematics_move_to_insert'] = '<LOC key_desc_cinematics_move_to_insert>MoveTo - Insert current camera position after the current index of the sequence',
     ['cinematics_move_to_overwrite'] = '<LOC key_desc_cinematics_move_to_overwrite>MoveTo - Overwrite with current camera position at the current index of the sequence',
     ['cinematics_move_to_remove'] = '<LOC key_desc_cinematics_move_to_remove>MoveTo - Remove camera position at the current index of the sequence',
 
