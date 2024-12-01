@@ -12,8 +12,12 @@ local CameraImpl = {}
 
 ---@alias UserCameraAccelerationModes 'Linear' | 'FastInSlowOut' | 'SlowInOut'
 
----
+--- Enables smooth transitions.
 function CameraImpl:EnableEaseInOut()
+end
+
+--- Disables smooth transitions.
+function CameraImpl:DisableEaseInOut()
 end
 
 --- Returns the focus point (on the terrain) of the center of the screen
