@@ -1946,6 +1946,58 @@ local keyActionsMisc = {
 }
 
 ---@type table<string, UIKeyAction>
+local keyActionsCinematics = {
+    ['cinematics_move_to_clear'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Clear()',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_add'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Add()',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_next'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimateNext()',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_prev'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimatePrevious()',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_next'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimateNext()',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_prev'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimatePrevious()',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_store_01'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("01")',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_store_02'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("02")',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_store_03'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("03")',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_retrieve_01'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("01")',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_retrieve_02'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("02")',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_retrieve_03'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("03")',
+        category = 'cinematics',
+    }
+}
+
+---@type table<string, UIKeyAction>
 keyActions = table.combine(
     keyActionsCamera,
     keyActionsSelection,
@@ -1962,5 +2014,6 @@ keyActions = table.combine(
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,
+    keyActionsCinematics,
     keyActionsMisc
 )

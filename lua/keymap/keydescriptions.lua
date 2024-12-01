@@ -560,4 +560,17 @@ keyDescriptions = {
 
     ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Normal)',
     ['select_torpedo_bombers'] = '<LOC key_desc_0408>Select all Bombers (Torpedo)',
+
+    ['cinematics_move_to_clear'] = '<LOC key_desc_cinematics_move_to_clear>MoveTo - Clear the MoveTo sequence',
+    ['cinematics_move_to_add'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Add current camera position to the MoveTo sequence',
+    ['cinematics_move_to_next'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Animate to next position in the MoveTo sequence',
+    ['cinematics_move_to_prev'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Animate to previous position in the MoveTo sequence',
+    ['cinematics_move_to_jump_next'] = '<LOC key_desc_cinematics_move_to_jump_next>MoveTo - Jump to next position and proceed to animate to the position after that',
+    ['cinematics_move_to_jump_prev'] = '<LOC key_desc_cinematics_move_to_jump_prev>MoveTo - Jump to previous position and proceed to animate to the position before that',
+    ['cinematics_move_to_store_01'] = '<LOC key_desc_cinematics_move_to_store_01>MoveTo - Save the 1st MoveTo sequence to the preference file',
+    ['cinematics_move_to_store_02'] = '<LOC key_desc_cinematics_move_to_store_02>MoveTo - Save the 2nd MoveTo sequence to the preference file',
+    ['cinematics_move_to_store_03'] = '<LOC key_desc_cinematics_move_to_store_03>MoveTo - Save the 3rd MoveTo sequence to the preference file',
+    ['cinematics_move_to_retrieve_01'] = '<LOC key_desc_cinematics_move_to_retrieve_01>MoveTo - Load the 1st MoveTo sequence from the preference file',
+    ['cinematics_move_to_retrieve_02'] = '<LOC key_desc_cinematics_move_to_retrieve_02>MoveTo - Load the 2nd MoveTo sequence from the preference file',
+    ['cinematics_move_to_retrieve_03'] = '<LOC key_desc_cinematics_move_to_retrieve_03>MoveTo - Load the 3rd MoveTo sequence from the preference file',
 }
