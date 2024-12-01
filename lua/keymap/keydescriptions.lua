@@ -561,12 +561,25 @@ keyDescriptions = {
     ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Normal)',
     ['select_torpedo_bombers'] = '<LOC key_desc_0408>Select all Bombers (Torpedo)',
 
-    ['cinematics_move_to_clear'] = '<LOC key_desc_cinematics_move_to_clear>MoveTo - Clear the MoveTo sequence',
-    ['cinematics_move_to_add'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Add current camera position to the MoveTo sequence',
-    ['cinematics_move_to_next'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Animate to next position in the MoveTo sequence',
-    ['cinematics_move_to_prev'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Animate to previous position in the MoveTo sequence',
-    ['cinematics_move_to_jump_next'] = '<LOC key_desc_cinematics_move_to_jump_next>MoveTo - Jump to next position and proceed to animate to the position after that',
-    ['cinematics_move_to_jump_prev'] = '<LOC key_desc_cinematics_move_to_jump_prev>MoveTo - Jump to previous position and proceed to animate to the position before that',
+    -- CRUD-like operations
+    ['cinematics_move_to_clear'] = '<LOC key_desc_cinematics_move_to_clear>MoveTo - Clear sequence',
+    ['cinematics_move_to_add'] = '<LOC key_desc_cinematics_move_to_add>MoveTo - Append current camera position to the sequence',
+    ['cinematics_move_to_insert'] = '<LOC key_desc_cinematics_move_to_insert>MoveTo - Insert current camera position at the current index of the sequence',
+    ['cinematics_move_to_overwrite'] = '<LOC key_desc_cinematics_move_to_overwrite>MoveTo - Overwrite with current camera position at the current index of the sequence',
+    ['cinematics_move_to_remove'] = '<LOC key_desc_cinematics_move_to_remove>MoveTo - Remove camera position at the current index of the sequence',
+
+    -- Navigation
+    ['cinematics_move_to_jump_current'] = '<LOC key_desc_cinematics_move_to_jump_current>MoveTo - Jump to the camera position at the current index of the sequence',
+    ['cinematics_move_to_jump_forward'] = '<LOC key_desc_cinematics_move_to_jump_forward>MoveTo - Jump to the next camera position in the sequence',
+    ['cinematics_move_to_jump_backward'] = '<LOC key_desc_cinematics_move_to_jump_backward>MoveTo - Jump to the previous camera position in the sequence',
+
+    -- Animation
+    ['cinematics_move_to_animate_forward'] = '<LOC key_desc_cinematics_move_to_animate_forward>MoveTo - Animate to the next camera position in the sequence',
+    ['cinematics_move_to_animate_backward'] = '<LOC key_desc_cinematics_move_to_animate_backward>MoveTo - Animate to the previous camera position in the sequence',
+    ['cinematics_move_to_jump_and_animate_forward'] = '<LOC key_desc_cinematics_move_to_jump_and_animate_forward>MoveTo - Jump to the next camera position, then animate to the one after',
+    ['cinematics_move_to_jump_and_animate_backward'] = '<LOC key_desc_cinematics_move_to_jump_and_animate_backward>MoveTo - Jump to the previous camera position, then animate to the one before',
+
+    -- Preference file interactions
     ['cinematics_move_to_store_01'] = '<LOC key_desc_cinematics_move_to_store_01>MoveTo - Save the 1st MoveTo sequence to the preference file',
     ['cinematics_move_to_store_02'] = '<LOC key_desc_cinematics_move_to_store_02>MoveTo - Save the 2nd MoveTo sequence to the preference file',
     ['cinematics_move_to_store_03'] = '<LOC key_desc_cinematics_move_to_store_03>MoveTo - Save the 3rd MoveTo sequence to the preference file',

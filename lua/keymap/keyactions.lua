@@ -1947,30 +1947,62 @@ local keyActionsMisc = {
 
 ---@type table<string, UIKeyAction>
 local keyActionsCinematics = {
+    -- CRUD-like operations
     ['cinematics_move_to_clear'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Clear()',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Clear(true)',
         category = 'cinematics',
     },
     ['cinematics_move_to_add'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Add()',
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Append(true)',
         category = 'cinematics',
     },
-    ['cinematics_move_to_next'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimateNext()',
+    ['cinematics_move_to_insert'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Insert(true)',
         category = 'cinematics',
     },
-    ['cinematics_move_to_prev'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimatePrevious()',
+    ['cinematics_move_to_overwrite'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Overwrite(true)',
         category = 'cinematics',
     },
-    ['cinematics_move_to_jump_next'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimateNext()',
+    ['cinematics_move_to_remove'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Remove(true)',
         category = 'cinematics',
     },
-    ['cinematics_move_to_jump_prev'] = {
-        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimatePrevious()',
+
+    -- Navigation
+    ['cinematics_move_to_jump_current'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpToCurrent(true)',
         category = 'cinematics',
     },
+    ['cinematics_move_to_jump_forward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpForward(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_backward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpBackward(true)',
+        category = 'cinematics',
+    },
+
+    -- Animation
+    ['cinematics_move_to_animate_forward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimateForward(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_animate_backward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimateBackwards(true)',
+        category = 'cinematics',
+    },
+
+    ['cinematics_move_to_jump_and_animate_forward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimateNext(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_and_animate_backward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimatePrevious(true)',
+        category = 'cinematics',
+    },
+
+    -- Preference file interactions
     ['cinematics_move_to_store_01'] = {
         action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("01")',
         category = 'cinematics',
