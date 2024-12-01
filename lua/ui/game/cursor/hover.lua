@@ -34,7 +34,7 @@ local function CheckConditions()
 end
 
 --- Defines the transparency curve
----@param camera Camera
+---@param camera UserCamera
 ---@param distance number
 ---@param unitPosition Vector
 ---@param mousePosition Vector

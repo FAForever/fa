@@ -1945,6 +1945,98 @@ local keyActionsMisc = {
 
 }
 
+local keyActionsCinematics = {
+    ['cinematics_bind_keys'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/config.lua").ApplyDefaultKeyLayout()',
+        category = 'cinematics',
+    },
+
+    -- CRUD-like operations
+    ['cinematics_move_to_clear'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Clear(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_add'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").Append(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_remove'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RemoveLast(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_insert_at_index'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").InsertAfterIndex(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_overwrite_at_index'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").OverwriteAtIndex(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_remove_at_index'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RemoveAtIndex(true)',
+        category = 'cinematics',
+    },
+
+    -- Navigation
+    ['cinematics_move_to_jump_current'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpToCurrent(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_forward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpForward(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_backward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpBackward(true)',
+        category = 'cinematics',
+    },
+
+    -- Animation
+    ['cinematics_move_to_animate_forward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimateForward(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_animate_backward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").AnimateBackwards(true)',
+        category = 'cinematics',
+    },
+
+    ['cinematics_move_to_jump_and_animate_forward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimateNext(true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_jump_and_animate_backward'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").JumpAndAnimatePrevious(true)',
+        category = 'cinematics',
+    },
+
+    -- Preference file interactions
+    ['cinematics_move_to_store_01'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("01", true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_store_02'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("02", true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_store_03'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").StoreToDisk("03", true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_retrieve_01'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("01", true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_retrieve_02'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("02", true)',
+        category = 'cinematics',
+    },
+    ['cinematics_move_to_retrieve_03'] = {
+        action = 'UI_Lua import("/lua/ui/game/cinematics/moveto.lua").RetrieveFromDisk("03", true)',
+        category = 'cinematics',
+    }
+}
+
 ---@type table<string, UIKeyAction>
 keyActions = table.combine(
     keyActionsCamera,
@@ -1962,5 +2054,6 @@ keyActions = table.combine(
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,
+    keyActionsCinematics,
     keyActionsMisc
 )
