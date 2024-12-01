@@ -26,9 +26,6 @@
 local PreferenceKey = "CinematicsMoveTo"
 local DefaultCamera = "WorldCamera"
 
----@type TrashBag
-local ModuleTrash = TrashBag()
-
 ---@type number
 SequenceIndex = 1
 
@@ -335,7 +332,7 @@ end
 
 --- Called by the module manager when this module becomes dirty.
 function __moduleinfo.OnDirty()
-    ModuleTrash:Destroy()
+    -- do nothing
 end
 
 --#endregion
