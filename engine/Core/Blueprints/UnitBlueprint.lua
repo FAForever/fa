@@ -235,6 +235,8 @@
 ---@field RandomMinChangeCombatStateTime? number
 --- distance from target at which to start turning to align with it
 ---@field StartTurnDistance number
+--- Length of time in seconds allowed for sustained turn before we re-try a different approach. Defaults to 10
+---@field SustainedTurnThreshold number
 --- additional turning multiplier ability during a tight turn maneuver
 ---@field TightTurnMultiplier? number
 --- how heigh the transport will stay when picking up and dropping off units
