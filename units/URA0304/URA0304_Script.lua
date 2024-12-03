@@ -20,17 +20,15 @@ URA0304 = ClassUnit(CAirUnit) {
 
             ---@param self Bomb
             CreateProjectileAtMuzzle = function(self, muzzle)
-                local ux,uy,uz = self.unit:GetVelocity()
-                local spd = math.sqrt(ux*ux+uy*uy+uz*uz) * 10 -- convert from ogrids/tick to ogrids/s
                 if self.LastDrop ~= 0 then
                     local dt = GetGameTick() - self.LastDrop
                     self.Drops = self.Drops + 1
                     self.SumDropInterval = self.SumDropInterval + dt
+                    local ux,uy,uz = self.unit:GetVelocity()
+                    local spd = math.sqrt(ux*ux+uy*uy+uz*uz) * 10 -- convert from ogrids/tick to ogrids/s
                         LOG(('Ticks between bomb drops %d (avg over %d: %.1f); Unit speed ogrids/s: %.1f'):format(
                         dt, self.Drops, self.SumDropInterval / self.Drops, spd
                     ))
-                else
-                    LOG(("Unit speed ogrids/s: %.1f"):format(spd))
                 end
                 self.LastDrop = GetGameTick()
                 CIFBombNeutronWeapon.CreateProjectileAtMuzzle(self, muzzle)
