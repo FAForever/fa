@@ -9,11 +9,13 @@ end
 
 ---
 ---@param textureName string
+---@return boolean
 function CUIMapPreview:SetTexture(textureName)
 end
 
 ---
 ---@param mapName string
+---@return boolean
 function CUIMapPreview:SetTextureFromMap(mapName)
 end
 

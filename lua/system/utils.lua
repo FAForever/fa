@@ -56,29 +56,39 @@ function safecall(msg, fn, ...)
     end
 end
 
---- table.empty(t) returns true iff t has no keys/values.
----@param t table
----@return boolean
-function table.empty(t)
-    if type(t) ~= 'table' then return true end
-    return next(t) == nil
-end
 
---- Returns actual size of a table, including string keys
----@param t table
----@return number
-function table.getsize(t)
-    if type(t) ~= 'table' then return 0 end
-    local size = 0
-    for k, v in t do
-        size = size + 1
+if not rawget(table, 'empty') then
+    -- This function should be defined in the engine for performance.
+    -- See also: 
+    -- - https://github.com/FAForever/FA-Binary-Patches/pull/98
+
+    --- table.empty(t) returns true iff t has no keys/values.
+    ---@param t table
+    ---@return boolean
+    function table.empty(t)
+        if type(t) ~= 'table' then return true end
+        return next(t) == nil
     end
-    return size
 end
 
--- replace with assembly implementations
-table.empty = table.empty2 or table.empty
-table.getsize = table.getsize2 or table.getsize
+if not rawget(table, 'getsize') then
+    -- This function should be defined in the engine for performance.
+    -- See also: 
+    -- - https://github.com/FAForever/FA-Binary-Patches/pull/98
+
+    --- Returns actual size of a table, including string keys
+    ---@param t table
+    ---@return number
+    function table.getsize(t)
+        if type(t) ~= 'table' then return 0 end
+        local size = 0
+        for k, v in t do
+            size = size + 1
+        end
+        return size
+    end
+
+end
 
 --- Returns a shallow copy of t
 ---@generic T
@@ -616,6 +626,9 @@ function StringJoin(items, delimiter)
 end
 
 --- "explode" a string into a series of tokens, using a separator character `sep`
+---@param str string
+---@param sep string
+---@return string[]
 function StringSplit(str, sep)
     local sep, fields = sep or ":", {}
     local pattern = string.format("([^%s]+)", sep)

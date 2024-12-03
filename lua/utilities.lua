@@ -391,7 +391,7 @@ end
 ---@param v2 Vector
 ---@return number
 function DotP(v1, v2)
-    return v1[1] * v2[1] + v1[2] * v[2] + v[3] * v[3]
+    return v1[1] * v2[1] + v1[2] * v2[2] + v1[3] * v2[3]
 end
 
 --- Returns the conjugate of a quaternion
@@ -406,12 +406,11 @@ end
 ---@param v2 Vector
 ---@return number
 function GetAngleInBetween(v1, v2)
-    local x1, y1, z2 = v1[1], v1[2], v1[3]
+    local x1, y1, z1 = v1[1], v1[2], v1[3]
     local x2, y2, z2 = v2[1], v2[2], v2[3]
     -- arccos((v1 . v2) / (|v1| |v2|))
-    local z2Sq = z2 * z2
-    local dot = x1*x2 + y1*y2 + z2Sq
-    local len2 = MathSqrt((x1*x1 + y1*y1 + z2Sq) * (x2*x2 + y2*y2 + z2Sq))
+    local dot = x1 * x2 + y1 * y2 + z1 * z2
+    local len2 = MathSqrt((x1 * x1 + y1 * y1 + z1 * z1) * (x2 * x2 + y2 * y2 + z2 * z2))
     return MathACos(dot / len2) * 180 / math.pi
 end
 
