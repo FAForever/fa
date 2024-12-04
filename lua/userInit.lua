@@ -17,6 +17,7 @@ end
 
 -- # Global (and shared) init
 doscript '/lua/globalInit.lua'
+doscript '/lua/ui/globals/GpgNetSend.lua'
 
 -- Do we have an custom language set inside user-options ?
 local selectedlanguage = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').selectedlanguage
@@ -289,24 +290,6 @@ do
         end
 
         oldSimCallback(callback, addUnitSelection or false)
-    end
-
-    local oldGpgNetSend = GpgNetSend
-    _G.GpgNetSend = function(command, ...)
-
-        if SessionIsActive() and not SessionIsReplay() then
-            local stringifiedArgs = ""
-            for k = 1, table.getn(arg) do
-                stringifiedArgs = stringifiedArgs .. tostring(arg[k]) .. ","
-            end
-
-            -- try to inform moderators
-            ForkThread(SendModeratorEventThread,
-                string.format("GpgNetSend with command '%s' and data '%s'", tostring(command),
-                    stringifiedArgs))
-        end
-
-        oldGpgNetSend(command, unpack(arg))
     end
 end
 

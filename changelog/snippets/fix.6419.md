@@ -1,1 +1,0 @@
-- (#6419) Fix engineer stations without a `GuardScanRadius` defaulting to 300 radius for their build range overlay. They now display their full build range in the radius for better compatibility with the reclaim tower mods, even though `GuardScanRadius` defaults to 25.

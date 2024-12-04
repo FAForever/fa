@@ -1,1 +1,0 @@
-- (#6467) Fix a crash during blueprint loading if a unit blueprint has an enhancements table but not an intel table.

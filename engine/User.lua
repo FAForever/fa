@@ -624,9 +624,9 @@ end
 function GpgNetActive()
 end
 
----@param cmd string
----@param ... any
-function GpgNetSend(cmd, ...)
+---@param command string
+---@param ... number | string
+function GpgNetSend(command, ...)
 end
 
 ---
@@ -709,14 +709,15 @@ end
 ---@alias UILobbyProtocols "UDP" | "TCP" | "None
 
 --- For internal use by `CreateLobbyComm()`
----@param lobbyComClass fa-class
+---@generic T
+---@param lobbyComClass T
 ---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
 ---@param playerUID? string
 ---@param natTraversalProvider? userdata
----@return UILobbyCommunication
+---@return T
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
@@ -918,7 +919,7 @@ end
 
 --- Start a background load with the given map and mods.
 --- If `hipri` is true, this will interrupt any previous loads in progress.
----@param mapname string
+---@param mapname string        # path to the `scmap` file
 ---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)

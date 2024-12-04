@@ -147,6 +147,7 @@
 ---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
+--- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
 ---@field NeedUnpack boolean
 --- this muliplier is applied when a staging platform is refueling an air unit
 ---@field RefuelingMultiplier number
@@ -929,6 +930,8 @@
 --- Regen Per Second. How much health the unit regenerates per second
 --- This is a multiplier of the base regen
 ---@field RegenPerSecond number
+--- Which unit categories are buffed by the aura
+---@field UnitCategory UnparsedCategory
 
 
 

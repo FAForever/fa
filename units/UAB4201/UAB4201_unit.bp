@@ -1,5 +1,11 @@
 UnitBlueprint{
     Description = "<LOC uab4201_desc>Tactical Missile Defense",
+    AI = {
+        TargetBones = {
+            "Door_Rt",
+            "UAB4201",
+        },
+    },
     Audio = {
         Close          = Sound { Bank = 'UAB',        Cue = 'UAB4201_Doors',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge', LodCutoff = 'UnitMove_LodCutoff' },
@@ -110,9 +116,9 @@ UnitBlueprint{
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.95,
     SelectionThickness = 0.45,
-    CollisionOffsetY = -0.375,
+    CollisionOffsetY = -0.4,
     SizeX = 0.65,
-    SizeY = 0.875,
+    SizeY = 0.9,
     SizeZ = 1.25,
     StrategicIconName = "icon_structure2_antimissile",
     StrategicIconSortPriority = 200,

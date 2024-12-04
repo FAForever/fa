@@ -161,7 +161,7 @@
 --- script: `Weapons = { FrontTurret01 = Class(TDFGaussCannonWeapon) {} }`
 --- If the Label does not match the weapon will not be workable. Defaults to `"Unlabelled"`.
 ---@field Label string
---- for tracking weapons, if the weapon should lead its target when aiming
+--- for weapons without a tracking projectile, if the weapon should lead its target when aiming
 ---@field LeadTarget? boolean
 --- if set, requires a player to directly issue an attack / launch order for the unit to fire. Is set for all SMLs and 
 --- stationary TMLs. Requires _some_ kind of delay between the firing (such as a charge delay) or queued orders are not 
@@ -353,7 +353,7 @@
 --- the speed at which the secondary turret can turn in its yaw direction
 ---@field TurretDualYawSpeed number
 --- if this weapon uses the recent firing solution to create projectile instead of the
---- aim bone transform
+--- aim bone transform when it fires.
 ---@field UseFiringSolutionInsteadOfAimBone? boolean
 --- the kind of weapon this is
 ---@field WeaponCategory WeaponCategory
