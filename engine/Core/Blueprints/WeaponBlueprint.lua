@@ -330,7 +330,7 @@
 ---@field TurretBoneYaw? Bone
 --- If two manipulators are needed for this weapon. Used for bots with arms.
 ---@field TurretDualManipulators? boolean
---- if this weapon has a turret
+--- if this weapon has a turret. Defaults to false
 ---@field Turreted boolean
 --- the center angle for determining pitch, based off the rest pose of the model
 ---@field TurretPitch number
