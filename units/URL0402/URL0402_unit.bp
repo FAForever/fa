@@ -310,8 +310,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/1, --10/integer interval in ticks
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 180,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
@@ -336,6 +334,23 @@ UnitBlueprint{
             WeaponCategory = "Direct Fire Experimental",
             WeaponRepackTimeout = 0,
             WeaponUnpacks = false,
+        },
+        {
+            -- Dummy weapon limiting the auto rotate behavior of the secondaries to outside a range
+            AboveWaterTargetsOnly = true,
+            FireTargetLayerCapsTable = {
+                Land = "Land|Water|Seabed",
+                Seabed = "Land|Water|Seabed",
+                Water = "Land|Water|Seabed",
+            },
+            TrackingRadius = 1,
+            TargetCheckInterval = 0.1,
+            RateOfFire = 0,
+            MaxRadius = 50,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 180,
+            TargetPriorities = { "ALLUNITS" },
+            TargetRestrictDisallow = "UNTARGETABLE",
         },
         {
             AboveWaterFireOnly = true,
