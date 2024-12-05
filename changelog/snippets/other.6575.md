@@ -1,0 +1,1 @@
+- (#6575) Add remaining annotations for the base weapon class file.
