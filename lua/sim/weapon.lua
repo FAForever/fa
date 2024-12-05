@@ -11,6 +11,7 @@
 local Entity = import("/lua/sim/entity.lua").Entity
 local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
 local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
+---@type false | EntityCategory[]
 local cachedPriorities = false
 local RecycledPriTable = {}
 
@@ -34,6 +35,7 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComp
 ---@field Buffs BlueprintBuff[]         # Active buffs for the weapon
 ---@field __index WeaponDamageTable
 
+---@return EntityCategory[]
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
@@ -564,7 +566,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param priorities number
+    ---@param priorities? EntityCategory[] | UnparsedCategory[] | false
     SetWeaponPriorities = function(self, priorities)
         if priorities then
             if type(priorities[1]) == 'string' then
