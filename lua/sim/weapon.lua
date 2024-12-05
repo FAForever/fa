@@ -79,6 +79,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field DamageRadiusMod number
 ---@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
 ---@field DisabledBuffs table
+---@field DisabledFiringBones Bone[] # Bones that `Unit.Animator` cannot move when this weapon has a target
 ---@field EnergyRequired? number
 ---@field EnergyDrainPerSecond? number
 ---@field Label string
@@ -376,7 +377,8 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     OnGotTarget = function(self)
-        local animator = self.unit.Animator
+        -- a few non-walker units may use `Animator` as well
+        local animator = self.unit--[[@as WalkingLandUnit]].Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, false)
@@ -386,7 +388,8 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     OnLostTarget = function(self)
-        local animator = self.unit.Animator
+        -- a few non-walker units may use `Animator` as well
+        local animator = self.unit--[[@as WalkingLandUnit]].Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, true)
