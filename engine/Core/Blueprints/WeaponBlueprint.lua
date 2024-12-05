@@ -220,7 +220,7 @@
 ---@field NukeInnerRingRadius? number
 --- How many damage ticks the inner damage ring of the nuke will be applied over to get from the
 --- epicenter to the inner ring radius. The ring will be broken up into this many disks.
----@field NukeInnerRingTicks? number
+---@field NukeInnerRingTicks? integer
 --- The total time in seconds it takes the inner damage ring to apply its damage from the epicenter
 --- of the nuke to its inner ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeInnerRingTotalTime? number
@@ -231,7 +231,7 @@
 ---@field NukeOuterRingRadius? number
 --- How many damage ticks the outer damage ring of the nuke will be applied over to get from the
 --- epicenter to the outer ring radius. The ring will be broken up into this many disks.
----@field NukeOuterRingTicks? number
+---@field NukeOuterRingTicks? integer
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
