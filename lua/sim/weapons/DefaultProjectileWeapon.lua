@@ -60,19 +60,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Make certain the weapon has essential aspects defined
         if not rackBones then
             local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoSize then
             local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoDelay then
             local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
