@@ -92,7 +92,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Army Army
 ---@field Trash TrashBag
 ---@field Launcher Unit
----@field OriginalTarget? Unit
+---@field OriginalTarget? Unit | Blip
 ---@field DamageData WeaponDamageTable
 ---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
 ---@field MyFlare? Flare            # If weapon blueprint has a (valid) `Flare` field
