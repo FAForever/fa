@@ -74,6 +74,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
 ---@field Army Army
+---@field AmbientSounds table<SoundBlueprint, Entity>
 ---@field Blueprint WeaponBlueprint
 ---@field Brain AIBrain
 ---@field CollideFriendly boolean
@@ -417,7 +418,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound SoundBlueprint | string # The string is the key for the audio in the weapon blueprint
     PlayWeaponSound = function(self, sound)
         local weaponSound = self.Blueprint.Audio[sound]
         if not weaponSound then return end
@@ -425,7 +426,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound SoundBlueprint | string # The string is the key for the audio in the weapon blueprint
     PlayWeaponAmbientSound = function(self, sound)
         local audio = self.Blueprint.Audio[sound]
         if not audio then return end
@@ -436,6 +437,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
         local ambientSound = ambientSounds[sound]
         if not ambientSound then
+            ---@type Entity
             ambientSound = Entity {}
             ambientSounds[sound] = ambientSound
             self.Trash:Add(ambientSound)
@@ -445,7 +447,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound SoundBlueprint | string # The string is the key for the audio in the weapon blueprint
     StopWeaponAmbientSound = function(self, sound)
         local ambientSounds = self.AmbientSounds
         if not ambientSounds then return end
