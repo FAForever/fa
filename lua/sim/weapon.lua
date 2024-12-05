@@ -176,6 +176,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
 
         local unit = self.unit
+        ---@diagnostic disable-next-line: param-type-mismatch
         if not (unit:ValidateBone(yawBone) and unit:ValidateBone(pitchBone) and unit:ValidateBone(muzzleBone)) then
             error('*ERROR: Bone aborting turret setup due to bone issues.', 2)
             return
