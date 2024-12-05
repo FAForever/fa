@@ -29,6 +29,8 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyServerCommunicationsComponent.lua")
     .AutolobbyServerCommunicationsComponent
 
+local AutolobbyArgumentsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyArguments.lua").AutolobbyArgumentsComponent
+
 local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
@@ -86,7 +88,7 @@ local AutolobbyEngineStrings = {
 ---@field DesiredPeerId UILobbyPeerId
 
 --- Responsible for the behavior of the automated lobby.
----@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent
+---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent, UIAutolobbyArgumentsComponent
 ---@field Trash TrashBag
 ---@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
@@ -100,7 +102,7 @@ local AutolobbyEngineStrings = {
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
-AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, DebugComponent) {
+AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, AutolobbyArgumentsComponent, DebugComponent) {
 
     ---@param self UIAutolobbyCommunications
     __init = function(self)
@@ -147,7 +149,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         -- retrieve team and start spot
-        info.Team = tonumber(GetCommandLineArg("/team", 1)[1])
+        info.Team = self:GetCommandLineArgumentNumber("/team", -1)
         info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or -1 -- TODO
 
         -- determine army color based on start location
@@ -321,10 +323,10 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             if options.Human and options.PL then
                 if options.DIV ~= "unlisted" then
                     local division = options.DIV
-                    if options.SUBDIV and options.SUBDIV ~="" then
+                    if options.SUBDIV and options.SUBDIV ~= "" then
                         division = division .. ' ' .. options.SUBDIV
                     end
-                    allDivisions[options.PlayerName]= division
+                    allDivisions[options.PlayerName] = division
                 end
             end
         end
@@ -526,7 +528,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
                     end
 
-                    -- tuck them into the game options. By all means a hack, but  
+                    -- tuck them into the game options. By all means a hack, but
                     -- this way they are available in both the sim and the UI
                     self.GameOptions.Ratings = self:CreateRatingsTable(self.PlayerOptions)
                     self.GameOptions.Divisions = self:CreateDivisionsTable(self.PlayerOptions)
