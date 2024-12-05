@@ -91,6 +91,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field unit Unit
 ---@field MaxRadius? number
 ---@field MinRadius? number
+---@field onTransport boolean # True if the parent unit has been loaded on to a transport unit.
 Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
