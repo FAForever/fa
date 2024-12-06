@@ -29,6 +29,8 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyServerCommunicationsComponent.lua")
     .AutolobbyServerCommunicationsComponent
 
+local AutolobbyArgumentsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyArguments.lua").AutolobbyArgumentsComponent
+
 local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
@@ -86,7 +88,7 @@ local AutolobbyEngineStrings = {
 ---@field DesiredPeerId UILobbyPeerId
 
 --- Responsible for the behavior of the automated lobby.
----@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent
+---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent, UIAutolobbyArgumentsComponent
 ---@field Trash TrashBag
 ---@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
@@ -100,7 +102,7 @@ local AutolobbyEngineStrings = {
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
-AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, DebugComponent) {
+AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, AutolobbyArgumentsComponent, DebugComponent) {
 
     ---@param self UIAutolobbyCommunications
     __init = function(self)
@@ -108,7 +110,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         self.LocalPeerId = "-2"
         self.LocalPlayerName = "Charlie"
-        self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
+        self.PlayerCount = self:GetCommandLineArgumentNumber("/players", 2)
         self.HostID = "-2"
 
         self.GameMods = {}
@@ -147,19 +149,19 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         -- retrieve team and start spot
-        info.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-        info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or -1 -- TODO
+        info.Team = self:GetCommandLineArgumentNumber("/team", -1)
+        info.StartSpot = self:GetCommandLineArgumentNumber("/startspot", -1)
 
         -- determine army color based on start location
         info.PlayerColor = GameColors.MapToWarmCold(info.StartSpot)
         info.ArmyColor = GameColors.MapToWarmCold(info.StartSpot)
 
         -- retrieve rating
-        info.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or 500
-        info.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or 1500
-        info.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or 0
-        info.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
-        info.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
+        info.DEV = self:GetCommandLineArgumentNumber("/deviation", 500)
+        info.MEAN = self:GetCommandLineArgumentNumber("/mean", 1500)
+        info.NG = self:GetCommandLineArgumentNumber("/numgames", 0)
+        info.DIV = self:GetCommandLineArgumentString("/division", "")
+        info.SUBDIV = self:GetCommandLineArgumentString("/subdivision", "")
         info.PL = math.floor(info.MEAN - 3 * info.DEV)
 
         return info
@@ -193,7 +195,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         }
 
         -- process game options from the command line
-        for name, value in Utils.GetCommandLineArgTable("/gameoptions") do
+        for name, value in self:GetCommandLineArgumentArray("/gameoptions") do
             if name and value then
                 options[name] = value
             else
@@ -292,6 +294,44 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         return 'Ready'
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, number>
+    CreateRatingsTable = function(self, playerOptions)
+        ---@type table<string, number>
+        local allRatings = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.Human and options.PL then
+                allRatings[options.PlayerName] = options.PL
+            end
+        end
+
+        return allRatings
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, string>
+    CreateDivisionsTable = function(self, playerOptions)
+        ---@type table<string, string>
+        local allDivisions = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.Human and options.PL then
+                if options.DIV ~= "unlisted" then
+                    local division = options.DIV
+                    if options.SUBDIV and options.SUBDIV ~= "" then
+                        division = division .. ' ' .. options.SUBDIV
+                    end
+                    allDivisions[options.PlayerName] = division
+                end
+            end
+        end
+
+        return allDivisions
     end,
 
     --- Verifies whether we can launch the game.
@@ -488,6 +528,11 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
                     end
 
+                    -- tuck them into the game options. By all means a hack, but
+                    -- this way they are available in both the sim and the UI
+                    self.GameOptions.Ratings = self:CreateRatingsTable(self.PlayerOptions)
+                    self.GameOptions.Divisions = self:CreateDivisionsTable(self.PlayerOptions)
+
                     -- create game configuration
                     local gameConfiguration = {
                         GameMods = self.GameMods,
@@ -496,7 +541,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         Observers = {},
                     }
 
-                    -- send it to all players and tell them to launch
+                    -- send it to all players and tell them to launch with the configuration
                     self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
                     self:LaunchGame(gameConfiguration)
                 end
