@@ -110,7 +110,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         self.LocalPeerId = "-2"
         self.LocalPlayerName = "Charlie"
-        self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
+        self.PlayerCount = self:GetCommandLineArgumentNumber("/players", 2)
         self.HostID = "-2"
 
         self.GameMods = {}
@@ -150,18 +150,18 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         -- retrieve team and start spot
         info.Team = self:GetCommandLineArgumentNumber("/team", -1)
-        info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or -1 -- TODO
+        info.StartSpot = self:GetCommandLineArgumentNumber("/startspot", -1)
 
         -- determine army color based on start location
         info.PlayerColor = GameColors.MapToWarmCold(info.StartSpot)
         info.ArmyColor = GameColors.MapToWarmCold(info.StartSpot)
 
         -- retrieve rating
-        info.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or 500
-        info.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or 1500
-        info.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or 0
-        info.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
-        info.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
+        info.DEV = self:GetCommandLineArgumentNumber("/deviation", 500)
+        info.MEAN = self:GetCommandLineArgumentNumber("/mean", 1500)
+        info.NG = self:GetCommandLineArgumentNumber("/numgames", 0)
+        info.DIV = self:GetCommandLineArgumentString("/division", "")
+        info.SUBDIV = self:GetCommandLineArgumentString("/subdivision", "")
         info.PL = math.floor(info.MEAN - 3 * info.DEV)
 
         return info
@@ -195,7 +195,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         }
 
         -- process game options from the command line
-        for name, value in Utils.GetCommandLineArgTable("/gameoptions") do
+        for name, value in self:GetCommandLineArgumentArray("/gameoptions") do
             if name and value then
                 options[name] = value
             else
