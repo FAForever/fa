@@ -1,4 +1,0 @@
-- (#6465) Improve the visual representation of multiple projectiles by increasing their `StrategicIconSize`.
-  - Usha-Ah: Seraphim T3 Sniper Bot: Increase the `StrategicIconSize` of its secondary firing mode's projectile from `1` to `4`. 
-  - Othuum: T3 Siege Tank and Yenzyne: T2 Hover Tank: Increase the `StrategicIconSize` of their Thau Cannon's projectile from `1` to `2`.
-  - Percival: T3 Armored Assault Bot: Increase the `StrategicIconSize` of its cannon's projectile from `2` to `3`. 
