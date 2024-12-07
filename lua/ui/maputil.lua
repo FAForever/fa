@@ -132,19 +132,22 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
+-- A scenario file path is typically like `/maps/scmp_001/scmp_001_scenario.lua`
+
 --- Given the path to a scenario info file, returns a path with the `_scenario.lua` bit removed.
 ---@param pathToScenarioInfo any
 ---@return string
-local function GetPathToFolder(pathToScenarioInfo)
+local function GetPathToScenario(pathToScenarioInfo)
     return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua"))
 end
 
 --- Given the path to a scenario info file, returns the path to the folder it resides in.
 ---@param pathToScenarioInfo any
 ---@return string
-local function GetPathToScenario(pathToScenarioInfo)
+local function GetPathToFolder(pathToScenarioInfo)
     local splits = StringSplit(pathToScenarioInfo, "/")
-    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]))
+    -- Remove the length of the last token (filename), and the slash character before it.
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]) - 1)
 end
 
 --- Given the path to a scenario info file, returns the path to the scenario options file. The reference to this file is not stored in the _scenario.lua file.
@@ -260,14 +263,15 @@ function LoadScenario(pathToScenarioInfo)
     end
 
     -- optionally, add in the options
-    local ok, msg, scenarioOptions = pcall(LoadScenarioOptionsFile, GetPathToScenarioOptions(pathToScenarioInfo)) --[[@as UIScenarioOptionsFile | nil]]
-    if scenarioOptions then
+    local ok, scenarioOptions = pcall(LoadScenarioOptionsFile, GetPathToScenarioOptions(pathToScenarioInfo)) --[[@as UIScenarioOptionsFile | nil]]
+    if ok and scenarioOptions then
         scenarioInfo.options = scenarioOptions
     end
 
     -- optionally, add in briefing data flag
-    local ok, msg, scenarioStrings = pcall(LoadScenarioStringsFile, GetPathToScenarioStrings(pathToScenarioInfo)) --[[@as UIScenarioStringsFile | nil]]
-    if scenarioStrings then
+    local scenarioStrings
+    ok, scenarioStrings = pcall(LoadScenarioStringsFile, GetPathToScenarioStrings(pathToScenarioInfo)) --[[@as UIScenarioStringsFile | nil]]
+    if ok and scenarioStrings then
         if scenarioStrings.BriefingData then
             scenarioInfo.hasBriefing = true
         end

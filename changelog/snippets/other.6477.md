@@ -1,1 +1,0 @@
-- (#6477) Add the function `DrawBone(entity, bone, length)` to `SimUtils.lua`.

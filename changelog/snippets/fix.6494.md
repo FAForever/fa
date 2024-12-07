@@ -1,1 +1,0 @@
-- (#6494) Fix a crash when the `EnableDiskWatch` command line argument is enabled.

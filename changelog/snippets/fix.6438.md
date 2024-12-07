@@ -1,1 +1,0 @@
-- (#6438) Fix `TerrainUtils.GetTerrainSlopeAngles` returning roll on the -Z axis instead of the +Z axis. Previously, this required the roll to be negated when used to orient objects such as units with the terrain. Now roll no longer needs to be negated.
