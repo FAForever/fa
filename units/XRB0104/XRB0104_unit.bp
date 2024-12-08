@@ -28,6 +28,7 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CAPTURE",
+        "CONSTRUCTION",
         "CQUEMOV",
         "CYBRAN",
         "DRAGBUILD",

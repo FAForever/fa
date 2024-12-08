@@ -17,6 +17,7 @@ UnitBlueprint{
     AverageDensity = 2500,
     BuildIconSortPriority = 200,
     Categories = {
+        "CONSTRUCTION",
         "DRAGBUILD",
         "ENGINEERSTATION",
         "OVERLAYMISC",

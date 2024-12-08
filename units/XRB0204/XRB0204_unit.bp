@@ -24,6 +24,7 @@ UnitBlueprint{
     BuildIconSortPriority = 200,
     Categories = {
         "CAPTURE",
+        "CONSTRUCTION",
         "CQUEMOV",
         "CYBRAN",
         "DRAGBUILD",

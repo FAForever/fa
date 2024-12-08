@@ -41,6 +41,7 @@ UnitBlueprint{
         "BUBBLESHIELDSPILLOVERCHECK",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
         "CQUEMOV",
         "DRAGBUILD",
         "EXPERIMENTAL",

@@ -21,6 +21,7 @@ UnitBlueprint{
         "BUILTBYTIER2ENGINEER",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
         "CQUEMOV",
         "DRAGBUILD",
         "ENGINEERSTATION",
