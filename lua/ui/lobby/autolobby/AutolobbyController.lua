@@ -64,6 +64,7 @@ local AutolobbyEngineStrings = {
 ---@field DIV string    # Related to rating/divisions
 ---@field SUBDIV string # Related to rating/divisions
 ---@field PL number     # Related to rating/divisions
+---@field PlayerClan string
 
 ---@alias UIAutolobbyConnections boolean[][]
 ---@alias UIAutolobbyStatus UIPeerLaunchStatus[]
@@ -163,6 +164,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         info.DIV = self:GetCommandLineArgumentString("/division", "")
         info.SUBDIV = self:GetCommandLineArgumentString("/subdivision", "")
         info.PL = math.floor(info.MEAN - 3 * info.DEV)
+        info.PlayerClan = self:GetCommandLineArgumentString("/clan", "")
 
         return info
     end,
@@ -332,6 +334,21 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         return allDivisions
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, string>
+    CreateClanTagsTable = function(self, playerOptions)
+        local allClanTags = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.PlayerClan then
+                allClanTags[options.PlayerName] = options.PlayerClan
+            end
+        end
+
+        return allClanTags
     end,
 
     --- Verifies whether we can launch the game.
@@ -532,6 +549,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                     -- this way they are available in both the sim and the UI
                     self.GameOptions.Ratings = self:CreateRatingsTable(self.PlayerOptions)
                     self.GameOptions.Divisions = self:CreateDivisionsTable(self.PlayerOptions)
+                    self.GameOptions.ClanTags = self:CreateClanTagsTable(self.PlayerOptions)
 
                     -- create game configuration
                     local gameConfiguration = {
