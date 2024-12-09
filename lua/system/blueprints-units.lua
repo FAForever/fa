@@ -395,17 +395,19 @@ local function PostProcessUnit(unit)
 
         -- usual case: find all remaining intel
         status.AllIntel = {}
-        for name, value in pairs(intelBlueprint) do
+        if intelBlueprint then
+            for name, value in pairs(intelBlueprint) do
 
-            -- may contain tables, such as `JamRadius`
-            if type(value) ~= 'table' then
-                if value == true or value > 0 then
-                    local intel = BlueprintNameToIntel[name]
-                    if intel and not activeIntel[intel] then
-                        if allIntelIsFree then
-                            status.AllIntelMaintenanceFree[intel] = true
-                        else
-                            status.AllIntel[intel] = true
+                -- may contain tables, such as `JamRadius`
+                if type(value) ~= 'table' then
+                    if value == true or value > 0 then
+                        local intel = BlueprintNameToIntel[name]
+                        if intel and not activeIntel[intel] then
+                            if allIntelIsFree then
+                                status.AllIntelMaintenanceFree[intel] = true
+                            else
+                                status.AllIntel[intel] = true
+                            end
                         end
                     end
                 end
@@ -505,6 +507,10 @@ local function PostProcessUnit(unit)
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
         local factor = array[1].Damage
 
+        if not unit.Categories then
+            unit.Categories = {}
+        end
+
         for category, damage in pairs(damagePerRangeCategory) do
             if damage > 0 then
                 local cat = "OVERLAY" .. category
@@ -549,7 +555,7 @@ local function PostProcessUnit(unit)
     -- Define a specific TransportSpeedReduction for all land and naval units.
     -- Experimentals have a TransportSpeedReduction of 1 due to transports gaining 1 speed and some survival maps loading experimentals into transports.
     -- Naval units also gain a TransportSpeedReduction of 1 to ensure mod compatibility.
-    if not unit.Physics.TransportSpeedReduction and not isStructure then    
+    if unit.Physics and not unit.Physics.TransportSpeedReduction and not isStructure then
         if isLand and isTech1 then
             unit.Physics.TransportSpeedReduction = 0.15
         elseif isLand and isTech2 then

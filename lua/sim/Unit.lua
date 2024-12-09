@@ -545,6 +545,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed) then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
@@ -564,6 +565,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        ---@diagnostic disable-next-line: param-type-mismatch
         if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) and IsProp(self.EntityBeingReclaimed) then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
@@ -2154,14 +2156,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local bp = self.Blueprint.Audio
+        local bp = self.Blueprint.Audio.NuclearLaunchDetected
         if bp then
             for num, aiBrain in ArmyBrains do
-                local factionIndex = aiBrain:GetFactionIndex()
-
-                if bp['NuclearLaunchDetected'] then
-                    aiBrain:NuclearLaunchDetected(bp['NuclearLaunchDetected'])
-                end
+                aiBrain:NuclearLaunchDetected(bp)
             end
         end
     end,
@@ -2244,31 +2242,30 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.Brain:OnUnitBeingBuiltProgress(self, builder, oldProg, newProg)
     end,
 
+    --- Set the unit's Yaw rotation and reset its roll/pitch
     ---@param self Unit
-    ---@param angle number
-    SetRotation = function(self, angle)
-        local qx, qy, qz, qw = Explosion.QuatFromRotation(angle, 0, 1, 0)
-        self:SetOrientation({qx, qy, qz, qw}, true)
+    ---@param degrees number
+    SetRotation = function(self, degrees)
+        self:SetOrientation(utilities.QuatFromRotation(degrees), true)
     end,
 
+    --- Rotate the unit on its Yaw axis
     ---@param self Unit
-    ---@param angle number
-    Rotate = function(self, angle)
-        local qx, qy, qz, qw = unpack(self:GetOrientation())
-        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        local current_yaw = math.floor(math.abs(a) * (180 / math.pi) + 0.5)
-
-        self:SetRotation(angle + current_yaw)
+    ---@param degrees number
+    Rotate = function(self, degrees)
+        self:SetOrientation(utilities.QuatFromRotation(degrees) * self:GetOrientation(), true)
     end,
 
+    --- Set the unit's Yaw rotation towards a point and reset its roll/pitch
     ---@param self Unit
-    ---@param tpos number
+    ---@param tpos Vector
     RotateTowards = function(self, tpos)
         local pos = self:GetPosition()
-        local rad = math.atan2(tpos[1] - pos[1], tpos[3] - pos[3])
-        self:SetRotation(rad * (180 / math.pi))
+        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
+    --- Set the unit's Yaw rotation towards the middle of the map (not playable area) and reset its roll/pitch
     ---@param self Unit
     RotateTowardsMid = function(self)
         local x, y = GetMapSize()
@@ -3635,7 +3632,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXImpact", impactType: ImpactType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXMotionChange", motionChange: MotionChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
     ---@overload fun(self: Unit, effectTypeGroups: UnitBlueprintEffect[], fxBlockType: "FXLayerChange", layerChange: LayerChangeType, suffix?: string, bag?: TrashBag, terrainType?: TerrainType)
-    ---
+    --- Creates effects defined in `TerrainTypes.lua` based on the terrain that a movement is moving on.
     ---@param self Unit
     ---@param effectTypeGroups UnitBlueprintEffect[]
     ---@param fxBlockType LayerTerrainEffectType
@@ -3708,11 +3705,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Creates camera shake effects and also movement effects for the terrain a unit is moving on.
     ---@param self Unit
     ---@param EffectsBag TrashBag
     ---@param TypeSuffix string
-    ---@param TerrainType string
-    ---@return boolean
+    ---@param TerrainType TerrainType?
+    ---@return boolean?
     CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
         local layer = self.Layer
         local bpTable = self.Blueprint.Display.MovementEffects
@@ -3727,8 +3725,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local effectTypeGroups = bpTable.Effects
 
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
-                -- warning isn't needed if this layer's table is used for Footfall without terrain effects
-                if not bpTable.Footfall then
+                -- warning isn't needed if this layer's table is used for Footfall or Contrails or Treads without terrain movement effects
+                if not bpTable.Footfall and not bpTable.Contrails and not bpTable.Treads then
                     WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects.', layer, '.Effects table in unit blueprint.')
                 end
                 return false

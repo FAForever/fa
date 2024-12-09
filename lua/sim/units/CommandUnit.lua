@@ -8,6 +8,7 @@ local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLand
 ---@field UnitBeingBuilt? Unit
 ---@field UnitBuildOrder? string
 ---@field rightGunLabel string
+---@field BuildEffectBones? Bone[] -- cached table from blueprint
 CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 

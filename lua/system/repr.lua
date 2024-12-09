@@ -260,7 +260,7 @@ end
 local function inspect(root, options)
     options = options or {}
 
-    local depth = options.depth or 1
+    local depth = options.depth or 3
     local newline = options.newline or '\n'
     local indent = options.indent or '  '
     local meta = options.meta or false
@@ -286,6 +286,10 @@ end
 repr = inspect
 repru = inspect
 reprs = inspect
+
+---@param root any
+---@param options? DebugInspectOptions
+---@return string
 reprsl = function(root, options)
     local str = inspect(root, options)
     LOG(str)

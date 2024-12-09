@@ -20,7 +20,7 @@ local function SelfDestructThread(unit)
 end
 
 --- Toggles the destruction of the units
----@param data { owner: number, noDelay: boolean, allUnits: boolean }
+---@param data { owner: number, noDelay: boolean }
 ---@param units Unit[]
 function ToggleSelfDestruct(data, units)
 
@@ -31,11 +31,6 @@ function ToggleSelfDestruct(data, units)
 
     -- do not allow observers to use this
     if data.owner ~= -1 and OkayToMessWithArmy(data.owner) then
-
-        -- if we want to destroy all units
-        if data.allUnits then
-            units = GetArmyBrain(data.owner):GetListOfUnits(categories.ALLUNITS, false, false)
-        end
 
         -- just take them all out
         if data.noDelay then
