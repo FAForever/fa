@@ -36,6 +36,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
     end,
 
     CreateVisibleEntity = function(self)
+        if not(self.GetFractionComplete) or self:GetFractionComplete() < 1 then return nil end
         AStructureUnit.CreateVisibleEntity(self)
 
         if self.RemoteViewingData.VisibleLocation and self.RemoteViewingData.DisableCounter == 0 and self.RemoteViewingData.IntelButton then
@@ -47,11 +48,12 @@ XAB3301 = ClassUnit( AStructureUnit ) {
             end
 
             if not self.ScryEnabled then
-                self.ScryEnabled = true 
-                
-                self.Animator:SetRate(1)
-                self.RotatorBot:SetTargetSpeed(12)
-                self.RotatorTop:SetTargetSpeed(-8)
+                self.ScryEnabled = true
+                if self.Animator.SetRate then self.Animator:SetRate(1) end
+                if self.RotatorBot.SetTargetSpeed then
+                    self.RotatorBot:SetTargetSpeed(12)
+                    self.RotatorTop:SetTargetSpeed(-8)
+                end
 
                 for k, v in AQuantumGateAmbient do
                     self.TrashAmbientEffects:Add(CreateAttachedEmitter(self, 'spin02', self.Army, v):ScaleEmitter(0.6))
