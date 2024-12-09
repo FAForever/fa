@@ -1,1 +1,0 @@
-- (#6446) Fix the "assist to upgrade" and "assist to unpause" game options conflicting and causing upgrading units to unpause during lag spikes.

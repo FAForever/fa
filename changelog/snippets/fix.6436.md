@@ -1,1 +1,0 @@
-- (#6436, #6480, #6552) Prevent the logging of an unecessary warning when certain units make landfall.

@@ -1,1 +1,0 @@
-- (#6456) Fix engineers not rotating towards the optimal rolloff point in factories with "build finished" animations such as the UEF and Cybran air factories.

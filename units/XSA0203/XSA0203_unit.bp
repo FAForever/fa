@@ -105,7 +105,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 10000,
         BuildCostMass = 500,
-        BuildTime = 3300,
+        BuildTime = 2700,
     },
     Footprint = {
         MaxSlope = 0.25,
