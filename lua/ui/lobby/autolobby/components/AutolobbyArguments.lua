@@ -81,8 +81,8 @@ AutolobbyArgumentsComponent = ClassSimple {
 
         -- try to get the first argument
         local arguments = GetCommandLineArg(option, 1)
-        if arguments and (not option[ arg[1] ]) then
-            return arg[1]
+        if arguments and (not option[ arguments[1] ]) then
+            return arguments[1]
         end
 
         return default
@@ -100,12 +100,12 @@ AutolobbyArgumentsComponent = ClassSimple {
 
         -- try to get the first argument and parse it as a number
         local arguments = GetCommandLineArg(option, 1)
-        if arguments and (not option[ arg[1] ]) then
-            local parsed = tonumber(arg[1])
+        if arguments and (not option[ arguments[1] ]) then
+            local parsed = tonumber(arguments[1])
             if parsed then
                 return parsed
             else
-                self:DebugWarn("Failed to parse as a number: ", arg[1], " for key ", option)
+                self:DebugWarn("Failed to parse as a number: ", arguments[1], " for key ", option)
                 return default
             end
         end
