@@ -11,7 +11,7 @@ gamePatches = {
             description = {
                 "# Game version 3816 (10th of December, 2024)",
                 "",
-                "This hotfix primarily fixes the bug that divisions were not displayed in matchmaker games.",
+                "This hotfix primarily fixes the bug that ratings and divisions were not displayed in matchmaker games.",
                 "",
                 "With kind regards,",
                 "",
