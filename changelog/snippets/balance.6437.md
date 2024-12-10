@@ -1,0 +1,2 @@
+- (#6437) Automatically rotate Cybran Carrier and Othuum towards their targets when idle or attacking so that all their weapons can fire.
+    - Units rotate in place while aiming, so formations do not get disrupted.
