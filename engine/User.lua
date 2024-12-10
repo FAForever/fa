@@ -355,13 +355,13 @@ end
 function GetCamera(name)
 end
 
---- Gets the following arguments to a commandline option. For example, if `/arg -flag key:value drop`
---- was passed to the commandline, then `GetCommandLineArg("/arg", 2)` would return
---- `{"-flag", "key:value"}`
+--- Gets the "arguments" (tokens split by spaces) that follow a commandline option,
+--- disregarding if they start with `/` like other commandline options.  
+--- Returns `false` if there are not `maxArgs` tokens after the `option`.
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
----@return string[]?
+---@return string[] | false
 function GetCommandLineArg(option, maxArgs)
 end
 
@@ -624,9 +624,9 @@ end
 function GpgNetActive()
 end
 
----@param cmd string
----@param ... any
-function GpgNetSend(cmd, ...)
+---@param command string
+---@param ... number | string
+function GpgNetSend(command, ...)
 end
 
 ---
@@ -709,14 +709,15 @@ end
 ---@alias UILobbyProtocols "UDP" | "TCP" | "None
 
 --- For internal use by `CreateLobbyComm()`
----@param lobbyComClass fa-class
+---@generic T
+---@param lobbyComClass T
 ---@param protocol UILobbyProtocols
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
 ---@param playerUID? string
 ---@param natTraversalProvider? userdata
----@return UILobbyCommunication
+---@return T
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
@@ -918,7 +919,7 @@ end
 
 --- Start a background load with the given map and mods.
 --- If `hipri` is true, this will interrupt any previous loads in progress.
----@param mapname string
+---@param mapname string        # path to the `scmap` file
 ---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)
@@ -1004,7 +1005,7 @@ end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
 --- Unlike other engine functions that return tables, this function returns the same table each time it is called.
----@return UIScenarioInfo
+---@return UISessionSenarioInfo
 function SessionGetScenarioInfo()
 end
 

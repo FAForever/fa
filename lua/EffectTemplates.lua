@@ -1456,7 +1456,7 @@ CArtilleryFlash01 = {
     EmtBpPath .. 'proton_artillery_muzzle_08_emit.bp',
 }
 CArtilleryFlash02 = {
-    EmtBpPath .. 'proton_artillery_muzzle_07_emit.bp',
+    EmtBpPath .. 'proton_artillery_muzzle_07_emit.bp', -- Large, faint rings of air expanding outwards
 }
 
 CArtilleryHit01 = DefaultHitExplosion01

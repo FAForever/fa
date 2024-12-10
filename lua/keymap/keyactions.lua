@@ -223,11 +223,11 @@ local keyActionsSelectionQuickSelect = {
         category = 'selection',
     },
     ['goto_commander'] = {
-        action = 'UI_SelectByCategory +nearest +goto COMMAND',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectCommander(true)',
         category = 'selection',
     },
     ['select_commander'] = {
-        action = 'UI_SelectByCategory +nearest COMMAND',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectCommander(false)',
         category = 'selection',
     },
     ['select_all'] = {
@@ -1585,10 +1585,6 @@ local keyActionsOrders = {
     },
     ['Kill_Selected_Units'] = {
         action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true)',
-        category = 'orders',
-    },
-    ['Kill_All'] = {
-        action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true, true)',
         category = 'orders',
     },
     ['dock'] = {
