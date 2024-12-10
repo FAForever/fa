@@ -4329,7 +4329,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     ---@param buffTable BlueprintBuff[]
-    ---@param PosEntity Vector
+    ---@param PosEntity? Vector
     AddBuff = function(self, buffTable, PosEntity)
         local bt = buffTable.BuffType
         if not bt then
