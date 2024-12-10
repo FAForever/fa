@@ -1,0 +1,3 @@
+- (#6563) Combine Ahwassa's final 3 damage instances into 1 damage instance.
+  - Greatly improves the effectiveness of stacked low HP shields, such as the UEF and Aeon mobile shields.
+  - Fixes Ahwassa not overkilling units as much as it should, and leaving more reclaim because of that.
