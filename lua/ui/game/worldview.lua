@@ -47,7 +47,7 @@ local function CreatePositionMarker(army, worldView)
     marker.frame.Depth:Set(marker:Depth() - 1)
 
     marker.name = UIUtil.CreateText(marker, data.name, 12, UIUtil.bodyFont)
-	marker.name:DisableHitTest()
+    marker.name:DisableHitTest()
     marker.name:SetColor('white')
 
     if Factions[data.faction] then
@@ -78,7 +78,8 @@ local function CreatePositionMarker(army, worldView)
     -- That often happens even if the cursor is nowhere near the marker, so it's unusable. This way isn't pretty, but at least it works correctly.
     local oldWVHandleEvent = worldView.HandleEvent
     worldView.HandleEvent = function(self, event)
-        if marker and event.Type == 'ButtonPress' and not event.Modifiers.Middle and marker.frame:HitTest(event.MouseX, event.MouseY) then
+        if marker and event.Type == 'ButtonPress' and not event.Modifiers.Middle and
+            marker.frame:HitTest(event.MouseX, event.MouseY) then
             if positionMarkers[marker.army].views == 1 then
                 positionMarkers[marker.army] = nil
             end
@@ -92,9 +93,12 @@ local function CreatePositionMarker(army, worldView)
     marker.OnFrame = function(self, delta)
         if not worldView:IsHidden() then
             local pos = worldView:Project(self.pos)
-            LayoutHelpers.AtLeftTopIn(self, worldView, (pos.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (pos.y - self.Height() / 2) / LayoutHelpers.GetPixelScaleFactor())
+            LayoutHelpers.AtLeftTopIn(self, worldView, (pos.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(),
+                (pos.y - self.Height() / 2) / LayoutHelpers.GetPixelScaleFactor())
 
-            if (self:Left() < worldView:Left() or self:Top() < worldView:Top() or self:Right() > worldView:Right() or self:Bottom() > worldView:Bottom()) then
+            if (
+                self:Left() < worldView:Left() or self:Top() < worldView:Top() or self:Right() > worldView:Right() or
+                    self:Bottom() > worldView:Bottom()) then
                 if not self:IsHidden() then
                     self:Hide()
                 end
@@ -120,7 +124,8 @@ function MarkStartPositions(startPositions)
             local faction = armyData.faction + 1
             local color = armyData.color
 
-            positionMarkers[armyId] = {army = armyId, pos = pos, name = name, faction = faction, color = color, views = 0}
+            positionMarkers[armyId] = { army = armyId, pos = pos, name = name, faction = faction, color = color,
+                views = 0 }
 
             for viewName, view in MapControls do
                 if viewName ~= 'MiniMap' then
@@ -132,6 +137,16 @@ function MarkStartPositions(startPositions)
 end
 
 function CreateMainWorldView(parent, mapGroup, mapGroupRight)
+    -- feature: preserve the world camera when changing views
+    ---@type UserCamera
+    local worldCamera = GetCamera('WorldCamera')
+
+    ---@type UserCameraSettings | nil
+    local worldCameraSettings = nil
+    if worldCamera then
+        worldCameraSettings = worldCamera:SaveSettings()
+    end
+
     if viewLeft then
         viewLeft:Destroy()
         viewLeft = false
@@ -176,6 +191,15 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         view:DisableHitTest()
         LayoutHelpers.FillParent(view, viewLeft)
     end
+
+    -- feature: preserve the world camera when changing views
+    if worldCameraSettings then
+        local newWorldCamera = GetCamera('WorldCamera')
+        if newWorldCamera then
+            newWorldCamera:RestoreSettings(worldCameraSettings)
+        end
+    end
+
     import("/lua/ui/game/multifunction.lua").RefreshMapDialog()
 end
 
@@ -200,11 +224,13 @@ function Expand()
 
         viewLeft.Top:Set(gameViewTemp.Top)
         viewLeft.Left:Set(gameViewTemp.Left)
-        viewLeft.Right:Set(function() return (gameViewTemp.Left() - 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
+        viewLeft.Right:Set(function() return (gameViewTemp.Left() - 2) +
+            ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
         viewLeft.Bottom:Set(gameViewTemp.Bottom)
 
         viewRight.Top:Set(gameViewTemp.Top)
-        viewRight.Left:Set(function() return (gameViewTemp.Left() + 2) + ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
+        viewRight.Left:Set(function() return (gameViewTemp.Left() + 2) +
+            ((gameViewTemp.Right() - gameViewTemp.Left()) / 2) end)
         viewRight.Right:Set(gameViewTemp.Right)
         viewRight.Bottom:Set(gameViewTemp.Bottom)
     else
