@@ -1,0 +1,1 @@
+- (#6569) Fix the matchmaker lobby not passing ratings, divisions and clan tags to the session
