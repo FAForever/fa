@@ -1,8 +1,23 @@
 ---@type number
-last_version = 3815
+last_version = 3816
 
 ---@type PatchNotes[]
 gamePatches = {
+        {
+            version = 3816,
+            name = "Hotfix",
+            hasPrettyGithubRelease = true,
+            hasPrettyPatchnotes = false,
+            description = {
+                "# Game version 3816 (10th of December, 2024)",
+                "",
+                "This hotfix primarily fixes the bug that divisions were not displayed in matchmaker games.",
+                "",
+                "With kind regards,",
+                "",
+                "BlackYps",
+            },
+        },
     {
         version = 3815,
         name = "Hotfix",
