@@ -9,11 +9,9 @@
 -----------------------------------------------------------------
 
 ---@alias AeonACUEnhancementBuffType
----| "DamageStabilization"
 ---| "ACUBUILDRATE"
 
 ---@alias AeonACUEnhancementBuffName          # BuffType
----| "AeonACUChronoDampener"                  # DamageStabilization
 ---| "AeonACUT2BuildRate"                     # ACUBUILDRATE
 ---| "AeonACUT3BuildRate"                     # ACUBUILDRATE
 
@@ -153,30 +151,11 @@ UAL0001 = ClassUnit(ACUUnit) {
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementChronoDampener = function(self, bp)
         self:SetWeaponEnabledByLabel('ChronoDampener', true)
-        if not Buffs['AeonACUChronoDampener'] then
-            BuffBlueprint {
-                Name = 'AeonACUChronoDampener',
-                DisplayName = 'AeonACUChronoDampener',
-                BuffType = 'DamageStabilization',
-                Stacks = 'REPLACE',
-                Duration = -1,
-                Affects = {
-                    MaxHealth = {
-                        Add = bp.NewHealth,
-                        Mult = 1.0,
-                    },
-                },
-            }
-        end
-        Buff.ApplyBuff(self, 'AeonACUChronoDampener')
     end,
 
     ---@param self UAL0001
     ---@param bp UnitBlueprintEnhancement
     ProcessEnhancementChronoDampenerRemove = function(self, bp)
-        if Buff.HasBuff(self, 'AeonACUChronoDampener') then
-            Buff.RemoveBuff(self, 'AeonACUChronoDampener')
-        end
         self:SetWeaponEnabledByLabel('ChronoDampener', false)
     end,
 
