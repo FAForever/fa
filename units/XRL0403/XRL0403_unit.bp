@@ -58,6 +58,8 @@ UnitBlueprint{
         "SNIPER",
         "SONAR",
         "VISIBLETORECON",
+        "REPAIR",
+        "RECLAIM",
     },
     Defense = {
         AirThreatLevel = 3,
@@ -187,7 +189,7 @@ UnitBlueprint{
             "xrl0005",
             "drlk005",
         },
-        MaxBuildDistance = 1,
+        MaxBuildDistance = 7,
     },
     General = {
         CommandCaps = {
@@ -197,6 +199,9 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Reclaim = true,
+            RULEUCC_Repair = true,
+            RULEUCC_Pause = true,
         },
         FactionName = "Cybran",
         FractionThreshold = 0.99,
