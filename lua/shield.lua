@@ -464,7 +464,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param instigator Unit
     ---@param amount number
     ---@param type DamageType
-    ---@return number? damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
+    ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
         if type == "TreeForce" or type == "TreeFire" then
             return amount
@@ -582,28 +582,25 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
-            if absorbed then
-                EntityAdjustHealth(self, instigator, -absorbed)
+            EntityAdjustHealth(self, instigator, -absorbed)
 
-                -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
-                if tick > owner.tickIssuedShieldRepair then
-                    owner.tickIssuedShieldRepair = tick
-                    local guards = UnitGetGuards(owner)
-                    if not TableEmpty(guards) then
-                        -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
-                        for i, guard in guards do
-                            if TableGetn(guard:GetCommandQueue()) >= 2 then
-                                guards[i] = nil
-                            end
+            -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
+            if tick > owner.tickIssuedShieldRepair then
+                owner.tickIssuedShieldRepair = tick
+                local guards = UnitGetGuards(owner)
+                if not TableEmpty(guards) then
+                    -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
+                    for i, guard in guards do
+                        if TableGetn(guard:GetCommandQueue()) >= 2 then
+                            guards[i] = nil
                         end
-
-                        -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
-                        IssueClearCommands(guards)
-                        IssueRepair(guards, owner)
-                        IssueGuard(guards, owner)
                     end
-                end
 
+                    -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
+                    IssueClearCommands(guards)
+                    IssueRepair(guards, owner)
+                    IssueGuard(guards, owner)
+                end
             end
 
             -- check to spawn impact effect
