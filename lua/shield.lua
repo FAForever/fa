@@ -42,6 +42,8 @@ local MathSqrt = math.sqrt
 local MathMin = math.min
 
 local TableAssimilate = table.assimilate
+local TableGetn = table.getn
+local TableEmpty = table.empty
 
 -- cache globals
 local Warp = Warp
@@ -59,6 +61,9 @@ local ArmyGetHandicap = ArmyGetHandicap
 local CoroutineYield = coroutine.yield
 local CreateEmitterAtBone = CreateEmitterAtBone
 local _c_CreateShield = _c_CreateShield
+local IssueClearCommands = IssueClearCommands
+local IssueRepair = IssueRepair
+local IssueGuard = IssueGuard
 
 -- cache cfunctions
 local EntityGetHealth = _G.moho.entity_methods.GetHealth
@@ -87,6 +92,7 @@ local EntitySetParentOffset = _G.moho.entity_methods.SetParentOffset
 local UnitSetScriptBit = _G.moho.unit_methods.SetScriptBit
 local UnitIsUnitState = _G.moho.unit_methods.IsUnitState
 local UnitRevertCollisionShape = _G.moho.unit_methods.RevertCollisionShape
+local UnitGetGuards = _G.moho.unit_methods.GetGuards
 
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
@@ -582,21 +588,22 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
                 if tick > owner.tickIssuedShieldRepair then
                     owner.tickIssuedShieldRepair = tick
-                    local guards = owner:GetGuards()
-                    if not table.empty(guards) then
-                        for k, guard in guards do
-                            -- do not clear queues for units order to do something after assisting the shield
-                            if table.getn(guard:GetCommandQueue()) == 1 then
-                                IssueToUnitClearCommands(guard)
-                            else
-                                guards[k] = nil
+                    local guards = UnitGetGuards(owner)
+                    if not TableEmpty(guards) then
+                        -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
+                        for i, guard in guards do
+                            if TableGetn(guard:GetCommandQueue()) >= 2 then
+                                guards[i] = nil
                             end
                         end
+
+                        -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
+                        IssueClearCommands(guards)
                         IssueRepair(guards, owner)
-                        -- Queue a guard order so that units start guarding again after the repair is done
                         IssueGuard(guards, owner)
                     end
                 end
+
             end
 
             -- check to spawn impact effect
