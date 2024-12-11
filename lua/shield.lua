@@ -93,6 +93,7 @@ local UnitSetScriptBit = _G.moho.unit_methods.SetScriptBit
 local UnitIsUnitState = _G.moho.unit_methods.IsUnitState
 local UnitRevertCollisionShape = _G.moho.unit_methods.RevertCollisionShape
 local UnitGetGuards = _G.moho.unit_methods.GetGuards
+local UnitGetCommandQueue = _G.moho.unit_methods.GetCommandQueue
 
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
@@ -591,7 +592,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 if not TableEmpty(guards) then
                     -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
                     for i, guard in guards do
-                        if TableGetn(guard:GetCommandQueue()) >= 2 then
+                        if TableGetn(UnitGetCommandQueue(guard)) >= 2 then
                             guards[i] = nil
                         end
                     end
