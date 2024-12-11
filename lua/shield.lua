@@ -509,6 +509,12 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self:ApplyDamage(instigator, amount, vector, damageType, true)
     end,
 
+    ---@param self Shield
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param dmgType DamageType
+    ---@param doOverspill boolean
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
 
         -- cache information used throughout the function
