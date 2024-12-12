@@ -1,0 +1,1 @@
+- (#6583) Fix personal shields reflecting above the water surface.
