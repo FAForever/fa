@@ -979,7 +979,7 @@
 --- table of toggle capabilities available for this unit
 ---@field ToggleCaps table<ToggleCap, boolean>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
----@field StatToggles table<string, table>
+---@field StatToggles? table<string, true>
 --- name of the unit
 ---@field UnitName UnlocalizedString
 ---@field UnitWeight number unused
