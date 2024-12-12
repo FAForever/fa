@@ -56,13 +56,33 @@ local AutolobbyEngineStrings = {
     ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
+-- associated textures are in `/textures/divisions/<division> <subdivision>.png` 
+-- Make note of the space, which isn't there for "grandmaster" and "unlisted" divisions
+
+---@alias Division
+---| "bronze"
+---| "silver"
+---| "gold"
+---| "diamond"
+---| "master"
+---| "grandmaster"
+---| "unlisted"
+
+---@alias Subdivision
+---| "I"
+---| "II"
+---| "III"
+---| "IV"
+---| "V"
+---| "" # when Division is grandmaster or unlisted
+
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
 ---@field StartSpot number
 ---@field DEV number    # Related to rating/divisions
 ---@field MEAN number   # Related to rating/divisions
 ---@field NG number     # Related to rating/divisions
----@field DIV string    # Related to rating/divisions
----@field SUBDIV string # Related to rating/divisions
+---@field DIV Division    # Related to rating/divisions
+---@field SUBDIV Subdivision # Related to rating/divisions
 ---@field PL number     # Related to rating/divisions
 ---@field PlayerClan string
 
