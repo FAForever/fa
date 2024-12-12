@@ -215,7 +215,7 @@ local orderToCursorCallback = {
     RULEUCC_RetaliateToggle = nil,
 }
 
----@class WorldView : moho.UIWorldView, Control
+---@class WorldView : moho.UIWorldView, Control, InternalObject
 ---@field Cursor table
 ---@field CursorTrash TrashBag
 ---@field CursorLastEvent any
