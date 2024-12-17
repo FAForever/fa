@@ -126,6 +126,9 @@ local issuedOneCommand = false
 local startBehaviors = {}
 local endBehaviors = {}
 
+-- allocate the table once for performance
+local commandModeTable = {commandMode, modeData}
+
 --- Callback triggers when command mode starts
 ---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
 ---@param identifier? string
@@ -172,6 +175,8 @@ function StartCommandMode(newCommandMode, data)
     -- update our local state
     commandMode = newCommandMode
     modeData = data
+    commandModeTable[1] = commandMode
+    commandModeTable[2] = modeData
 
     -- do start behaviors
     for i, v in startBehaviors do
@@ -210,6 +215,8 @@ function EndCommandMode(isCancel)
     -- update our local state
     commandMode = false
     modeData = false
+    commandModeTable[1] = commandMode
+    commandModeTable[2] = modeData
     issuedOneCommand = false
 end
 
@@ -223,6 +230,8 @@ function CacheAndClearCommandMode()
     CacheCommandMode()
     commandMode = false
     modeData = false
+    commandModeTable[1] = commandMode
+    commandModeTable[2] = modeData
 end
 
 --- Restores the cached command mode
@@ -236,14 +245,9 @@ function RestoreCommandMode(ignorePreviousCommands)
     end
 end
 
--- allocate the table once for performance
-local commandModeTable = {}
-
---- Retrieves the current command mode information.
+--- Retrieves the commandModeTable. You typically only need to call this once, after which the table reference can be stored as a local.
 ---@return { [1]: CommandModeDataOrder, [2]: CommandModeData }
 function GetCommandMode()
-    commandModeTable[1] = commandMode
-    commandModeTable[2] = modeData
     return commandModeTable
 end
 
