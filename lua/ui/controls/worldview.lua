@@ -32,6 +32,8 @@ local KeyCodeAlt = 18
 local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
+local commandModeTable = CommandMode.GetCommandMode()
+
 local unitsToWeaponsCached = { }
 
 ---@class Renderable : Destroyable
@@ -346,7 +348,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     OnUpdateCursor = function(self)
         -- gather all information
         local selection = GetSelectedUnits()
-        local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
+        local command_mode, command_data = unpack(commandModeTable)     -- is set when we issue orders manually, try to build something, etc
         local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc and not in command mode
         local holdAltToAttackMove = Prefs.GetFieldFromCurrentProfile('options').alt_to_force_attack_move
 
@@ -553,8 +555,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
         -- otherwise we only show it if we're in command mode
         else
-            local commandData = CommandMode.GetCommandMode()
-            local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Attack'
+            local viaCommandMode = commandModeTable[1] and commandModeTable[1] == 'order' and commandModeTable[2].name == 'RULEUCC_Attack'
             if viaCommandMode then
                 local commandModeChange = (viaCommandMode != self.ViaCommandModeOld)
                 self:OnCursorDecals(identifier, enabled or commandModeChange, changed or commandModeChange, AttackDecalFunc)
@@ -632,7 +633,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-                CommandMode.GetCommandMode()[2].reticle = TeleportReticle(self)
+                commandModeTable[2].reticle = TeleportReticle(self)
             end
         end
     end,
@@ -702,8 +703,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     OnCursorReclaim = function(self, identifier, enabled, changed)
 
         -- allows us to make easier distinctions for the status quo, note that this becomes invalid once we change
-        local commandData = CommandMode.GetCommandMode()
-        local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Reclaim'
+        local viaCommandMode = commandModeTable[1] and commandModeTable[1] == 'order' and commandModeTable[2].name == 'RULEUCC_Reclaim'
         local viaRightMouseButton = self:GetRightMouseButtonOrder() == 'RULEUCC_Reclaim' -- always returns nil when in command mode
         local canIssueReclaimOrders = self:CanIssueReclaimOrders()
 
