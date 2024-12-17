@@ -377,9 +377,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             -- 3. then whatever is below the mouse
             elseif orderViaMouse and orderViaMouse != 'RULEUCC_Move' then
                 order = orderViaMouse
-            -- 4. then if we hold alt, we'll show the attack cursor
-            elseif IsKeyDown(KeyCodeAlt) and selection then
-                order = 'RULEUCC_Attack'
             end
         end
 
