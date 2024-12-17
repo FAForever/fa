@@ -1,0 +1,1 @@
+(#6585) Minor streamlining to GetCommandModeCalls in controls/worldview.lua, and allow alt attack move pref to work properly.
