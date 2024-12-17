@@ -1,8 +1,82 @@
 ---@type number
-last_version = 3812
+last_version = 3816
 
 ---@type PatchNotes[]
 gamePatches = {
+        {
+            version = 3816,
+            name = "Hotfix",
+            hasPrettyGithubRelease = true,
+            hasPrettyPatchnotes = false,
+            description = {
+                "# Game version 3816 (10th of December, 2024)",
+                "",
+                "This hotfix primarily fixes the bug that ratings and divisions were not displayed in matchmaker games.",
+                "",
+                "With kind regards,",
+                "",
+                "BlackYps",
+            },
+        },
+    {
+        version = 3815,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3815 (29th of November, 2024)",
+            "",
+            "Fix the autolobby messing with the expected server state. We hope the autolobby functions as expected now.",
+            "",
+            "With thanks to Nomander for investigating the issue and deciphering a procedure to test the autolobby changes on ",
+            "the test server. Previously the changes were only tested locally by running multiple game instances on the same ",
+            "computer. When testing locally there is no server, and therefore we did not detect this issue sooner.",
+            "",
+            "Apologies for the inconveniences,",
+            "",
+            "With kind regards,",
+            "",
+            "Jip",
+        },
+    },
+    {
+        version = 3814,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3814 (29th of November, 2024)",
+            "",
+            "A log statement accessed an uninitialized variable, which causes matchmaker games to crash.",
+            "We fixed the log statement and matchmaker should now work again.",
+            "Special thanks to clyf and Nomander for being the emergency response team!",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
+    {
+        version = 3813,
+        name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "The release was delayed by a week because we found a desync issue on the last minute. I want to thank everybody that contributed ",
+            "to the search and fixing of the issue. Pinpointing a desync is especially difficult but through the combined efforts of many people ",
+            "we managed to solve this exceptionally quickly. I am really glad to have such a good team!",
+            "The desync issue was on FAF Develop for a few weeks. If you want to contribute you can play on FAF Develop and/or FAF Beta Balance ",
+            "occasionally and report back to the game team. Whether all is good or you encountered issues - all data points are worth their effort.",
+            "",
+            "As mentioned before, the in-game will no longer include all the details of the changes. You can find the complete ",
+            "changelog on Github. You can use the button in the bottom-left corner of this dialog to immediately jump to ",
+            "details of the changes of the selected game version.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
     {
         version = 3812,
         name = "Hotfix",
