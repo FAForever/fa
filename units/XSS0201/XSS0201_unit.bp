@@ -164,6 +164,7 @@ UnitBlueprint{
         MeshExtentsY = 2,
         MeshExtentsZ = 6.25,
         MotionType = "RULEUMT_SurfacingSub",
+        SubSpeedMultiplier = 0.9,
         TurnRadius = 15,
         TurnRate = 50,
     },
