@@ -896,7 +896,10 @@ local function RetaliateInitFunction(control, unitList)
 end
 
 function CycleRetaliateStateUp()
-    orderCheckboxMap["RULEUCC_RetaliateToggle"]:CycleFireStateUp()
+    local retaliateCheckbox = orderCheckboxMap["RULEUCC_RetaliateToggle"]
+    if retaliateCheckbox then
+        retaliateCheckbox:CycleFireStateUp()
+    end
 end
 
 local function pauseFunc()
