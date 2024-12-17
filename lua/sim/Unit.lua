@@ -146,6 +146,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
+---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
@@ -2156,14 +2157,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local bp = self.Blueprint.Audio
+        local bp = self.Blueprint.Audio.NuclearLaunchDetected
         if bp then
             for num, aiBrain in ArmyBrains do
-                local factionIndex = aiBrain:GetFactionIndex()
-
-                if bp['NuclearLaunchDetected'] then
-                    aiBrain:NuclearLaunchDetected(bp['NuclearLaunchDetected'])
-                end
+                aiBrain:NuclearLaunchDetected(bp)
             end
         end
     end,
@@ -3729,8 +3726,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local effectTypeGroups = bpTable.Effects
 
             if not effectTypeGroups or (effectTypeGroups and (table.empty(effectTypeGroups))) then
-                -- warning isn't needed if this layer's table is used for Footfall or Contrails without terrain effects
-                if not bpTable.Footfall and not bpTable.Contrails then
+                -- warning isn't needed if this layer's table is used for Footfall or Contrails or Treads without terrain movement effects
+                if not bpTable.Footfall and not bpTable.Contrails and not bpTable.Treads then
                     WARN('*No movement effect groups defined for unit ', repr(self.UnitId), ', Effect groups with bone lists must be defined to play movement effects. Add these to the Display.MovementEffects.', layer, '.Effects table in unit blueprint.')
                 end
                 return false

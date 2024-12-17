@@ -1,5 +1,0 @@
-- (#6536) Fix the tracking radius for unit weapons being floored to the nearest tenth, which made units not track targets that are near the outside of their range.
-  - Mobile unit weapons: 1.0x of weapon range -> 1.05x
-  - Anti-air weapons: 1.10x -> 1.15x
-  - Bomber weapons: 1.2x -> 1.25x
-  - Structure weapons: 1x -> 1x
