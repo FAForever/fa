@@ -295,7 +295,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         --  'Shield'
 
         if impactType == 'Unit' or impactType == 'UnitAir' or impactType == 'UnitUnderwater' then
-            if not self:GetLauncher() then
+            if not self.Launcher then
                 return
             end
 
@@ -316,7 +316,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         end
 
         -- Do Damage
-        self:DoDamage(self:GetLauncher(), damageData, targetEntity)
+        self:DoDamage(self.Launcher, damageData, targetEntity)
 
         local ImpactEffects = {}
         local ImpactEffectScale = 1

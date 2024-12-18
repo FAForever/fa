@@ -145,7 +145,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         self.Blueprint = blueprint
         self.Trash = trash
         self.Army = EntityGetArmy(self) --[[@as number]]
-        self.Launcher = self:GetLauncher() --[[@as Unit]]
+        self.Launcher = self.Launcher --[[@as Unit]]
 
         -- set some health, if we have some
         local maxHealth = blueprint.Defense.MaxHealth
@@ -760,7 +760,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             for k, v in data.Buffs do
                 if v.Add.OnImpact == true then
                     if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
-                        target = self:GetLauncher()
+                        target = self.Launcher
                     end
                     -- Check for target validity
                     if target and IsUnit(target) then
