@@ -32,7 +32,7 @@ Prop = Class(moho.prop_methods) {
         -- caching
         self.Trash = TrashBag()
         self.EntityId = self:GetEntityId()
-        self.Blueprint = self:GetBlueprint()
+        self.Blueprint = self.Blueprint
         self.CachePosition = self:GetPosition()
 
         -- set reclaim values

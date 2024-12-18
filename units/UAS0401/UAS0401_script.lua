@@ -212,7 +212,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
-        local watchBone = self:GetBlueprint().WatchBone or 0
+        local watchBone = self.Blueprint.WatchBone or 0
 
         self:ForkThread(function()
             local pos = self:GetPosition()

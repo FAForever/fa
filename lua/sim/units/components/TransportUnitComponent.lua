@@ -90,7 +90,7 @@ BaseTransport = ClassSimple {
         -- We need to determine how to handle the cargo
         -- Units in internal storage are just killed/destroyed, and relevant numbers tallied up
         -- Units in external storage have anims, effects, etc. and OnImpact is called for them
-        if damageType == "TransportDamage" or self:GetBlueprint().Transport.StorageSlots ~= 0 then
+        if damageType == "TransportDamage" or self.Blueprint.Transport.StorageSlots ~= 0 then
             cargoDamageType = "TransportDamage" -- This damage type makes sure we skip death effects for internal cargo
             cacheCargo = false
         else

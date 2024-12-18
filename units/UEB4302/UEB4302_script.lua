@@ -18,7 +18,7 @@ UEB4302 = ClassUnit(TStructureUnit) {
         AntiNuke = ClassWeapon(TAMInterceptorWeapon) {
             IdleState = State(TAMInterceptorWeapon.IdleState) {
                 OnGotTarget = function(self)
-                    local bp = self:GetBlueprint()
+                    local bp = self.Blueprint
                     --only say we've fired if the parent fire conditions are met
                     if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                         if (bp.CountedProjectile == false) or self:CanFire() then

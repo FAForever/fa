@@ -44,7 +44,7 @@ CConstructionTemplate = ClassSimple {
     ---@param self CConstructionTemplate
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or
+        self.BuildBotTotal = self.Blueprint.BuildBotTotal or
             math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
     end,
 

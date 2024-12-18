@@ -39,12 +39,12 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
 
     KillingState = State {
         LifeThread = function(self)
-            WaitSeconds(self:GetBlueprint().Lifetime)
+            WaitSeconds(self.Blueprint.Lifetime)
             ChangeState(self, self.DeathState)
         end,
 
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             local aiBrain = self:GetAIBrain()
 
             -- Queue up random moves
@@ -92,7 +92,7 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
         end,
 
         ComputeWaitTime = function(self)
-            local timeLeft = self:GetBlueprint().Lifetime - self.timeAlive
+            local timeLeft = self.Blueprint.Lifetime - self.timeAlive
 
             local maxWait = 75
             if timeLeft < 7.5 and timeLeft > 2.5 then
