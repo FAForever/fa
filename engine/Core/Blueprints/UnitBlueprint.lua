@@ -1163,7 +1163,7 @@
 ---@field RotateOnSpot? boolean
 --- threshold speed in ogrids/s for rotate on spot to take effect. defaults to 0.5
 ---@field RotateOnSpotThreshold? number
---- unknown behavior, used by Spiderbot and Megabot
+--- Allows the unit to sink a bit into the ground so that its legs can touch the ground on uneven terrain.
 ---@field SinkLower? boolean
 --- used by the sinker projectile script as the acceleration to reach the bottom of the seabed
 ---@field SinkSpeed? number
