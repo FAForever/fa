@@ -59,7 +59,7 @@
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
---- used by the Lobo script to pass the lifetime of the vision marker created upon landing
+--- used by UEL0103 (Lobo) script to pass the lifetime of the vision marker created upon landing
 ---@field CameraLifetime? number
 --- time to maintain the camera shake
 ---@field CameraShakeDuration? number
@@ -67,7 +67,7 @@
 ---@field CameraShakeMax? number
 --- minimum size of the camera shake
 ---@field CameraShakeMin? number
---- used by the Lobo script to pass the radius of the vision marker created upon landing
+--- used by UEL0103 (Lobo) script to pass the radius of the vision marker created upon landing
 ---@field CameraVisionRadius? number
 --- how far from the unit should the camera shake
 ---@field CameraShakeRadius number
@@ -195,7 +195,7 @@
 --- Speed at which the projectile comes out of the muzzle. This speed is used in the ballistics
 --- calculations. If you weapon doesn't fire at its max radius, this may be too low.
 ---@field MuzzleChargeStart? number
---- used by the Galactic Colossus
+--- Determines which bone units are tractored to. Used by `ADFTractorClaw` (UAL0401 Galactic Colossus's tractor beam)
 ---@field MuzzleSpecial? number
 --- the exit velocity of the projectile once created at the muzzle of the barrel 
 ---@field MuzzleVelocity number
@@ -281,7 +281,7 @@
 ---@field ReTargetOnMiss? boolean
 --- if `true`, will set the orange work progress bar to display the reload progress of this weapon
 ---@field RenderFireClock? boolean
---- used by the Othuy ("lighting storm") to define the time to re-aquire a new target before going
+--- used by the XSL0402 (Othuy "lighting storm") to define the time to re-aquire a new target before going
 --- through the next lighting strike process
 ---@field RequireTime? number
 --- the number of projectiles in the firing salvo
