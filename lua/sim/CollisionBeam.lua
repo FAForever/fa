@@ -50,7 +50,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         self.LastTerrainType = nil
         self.BeamEffectsBag = {}
         self.TerrainEffectsBag = {}
-        self.Army = self:GetArmy()
+        self.Army = self.Army
         self.Trash = TrashBag()
     end,
 

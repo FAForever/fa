@@ -203,7 +203,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
-        self.Sync.army = self:GetArmy()
+        self.Sync.army = self.Army
         setmetatable(self.Sync, SyncMeta)
 
         self.Trash = self.Trash or TrashBag()
@@ -253,7 +253,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- cache engine calls
         self.EntityId = self:GetEntityId()
-        self.Army = self:GetArmy()
+        self.Army = self.Army
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
 

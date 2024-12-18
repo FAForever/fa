@@ -896,13 +896,13 @@ local function ShowRaisedPlatforms(self)
                 pos[3] + plats[((i - 1) * 12) + (b * 3) - 1]
             ), true)
         end
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][2], -2, self:GetArmy(),
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][2], -2, self.Army,
             '/effects/emitters/build_beam_01_emit.bp'))
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][3], -2, self:GetArmy(),
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][3], -2, self.Army,
             '/effects/emitters/build_beam_01_emit.bp'))
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][2], -2, self:GetArmy(),
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][2], -2, self.Army,
             '/effects/emitters/build_beam_01_emit.bp'))
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][3], -2, self:GetArmy(),
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][3], -2, self.Army,
             '/effects/emitters/build_beam_01_emit.bp'))
     end
 end

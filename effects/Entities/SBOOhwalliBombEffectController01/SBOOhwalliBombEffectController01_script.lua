@@ -98,10 +98,10 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 		WaitTicks(26)
 
         -- Create a light for this thing's flash.
-        CreateLightParticle(self, -1, self:GetArmy(), 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
+        CreateLightParticle(self, -1, self.Army, 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
 
         -- Create our decals
-        CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self:GetArmy())
+        CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self.Army)
 
 		-- Create explosion effects
         for k, v in EffectTemplate.SOhwalliDetonate01 do

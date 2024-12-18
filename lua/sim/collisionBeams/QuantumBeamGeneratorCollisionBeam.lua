@@ -41,7 +41,7 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self QuantumBeamGeneratorCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 3.5 + (Random() * 3.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)

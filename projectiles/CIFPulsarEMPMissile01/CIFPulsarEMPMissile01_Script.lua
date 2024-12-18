@@ -8,7 +8,7 @@ CDFRocketIridium03 = Class(CIridiumRocketProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         CIridiumRocketProjectile.OnImpact(self, targetType, targetEntity)
-        local army = self:GetArmy()
+        local army = self.Army
         CreateLightParticle( self, -1, army, 2, 1, 'glow_03', 'ramp_red_06' )
         CreateLightParticle( self, -1, army, 1, 3, 'glow_03', 'ramp_antimatter_02' )
     end,
