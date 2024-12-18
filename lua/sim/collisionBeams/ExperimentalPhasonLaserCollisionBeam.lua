@@ -41,7 +41,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 4.0 + (Random() * 1.0) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -71,11 +71,11 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     CreateBeamEffects = function(self)
         SCCollisionBeam.CreateBeamEffects(self)
         for k, v in EffectTemplate.SExperimentalPhasonLaserBeam do
-			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), v)
+			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self.Army, v)
 			table.insert(self.BeamEffectsBag, fxBeam)
 			self.Trash:Add(fxBeam)
         end
-        -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
+        -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self.Army, '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
     end,
 }
 

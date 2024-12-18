@@ -35,7 +35,7 @@ LightningSmallSurfaceCollisionBeam = Class(LightningSmallCollisionBeam) {
 
     ---@param self LightningSmallSurfaceCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.1 + (Random() * 1.1) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)

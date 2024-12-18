@@ -47,7 +47,7 @@ SCUDeath01 = Class(NullShell) {
 
     ---@param self SCUDeath01
     EffectThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local position = self:GetPosition()
         if position[2] + 2 > GetSurfaceHeight(position[1], position[3]) then
             self:ForkThread(self.CreateOuterRingWaveSmokeRing)

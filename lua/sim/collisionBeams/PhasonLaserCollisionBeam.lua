@@ -39,7 +39,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self PhasonLaserCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)

@@ -12,7 +12,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
-        self.guardDummy = CreateUnitHPR('ZXA0003', self:GetArmy(), 0,0,0,0,0,0)
+        self.guardDummy = CreateUnitHPR('ZXA0003', self.Army, 0,0,0,0,0,0)
         self.guardDummy:AttachTo(self, -1)
         self.Trash:Add(self.guardDummy)
     end,
