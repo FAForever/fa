@@ -246,7 +246,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     OnCreate = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
@@ -5461,7 +5461,7 @@ DummyUnit = ClassDummyUnit(moho.unit_methods, DebugUnitComponent) {
         self.Layer = UnitGetCurrentLayer(self)
 
         -- cache often accessed values into inner table
-        self.Blueprint = self:GetBlueprint()
+        self.Blueprint = self.Blueprint
     end,
 
     --- Typically called by functions

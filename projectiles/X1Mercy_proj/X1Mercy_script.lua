@@ -43,7 +43,7 @@ X1Mercy = Class(AMiasmaProjectile) {
 
         --WARN(tostring(TargetType) .. " - " .. tostring(TargetEntity))
         --Sounds for all other impacts, ie: Impact<TargetTypeName>
-        local bp = self:GetBlueprint().Audio
+        local bp = self.Blueprint.Audio
         local snd = bp['Impact'.. TargetType]
         if snd then
             self:PlaySound(snd)

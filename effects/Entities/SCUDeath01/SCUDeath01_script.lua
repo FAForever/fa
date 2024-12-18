@@ -14,7 +14,7 @@ SCUDeath01 = Class(NullShell) {
     ---@param self SCUDeath01
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self.Blueprint
 
         -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then

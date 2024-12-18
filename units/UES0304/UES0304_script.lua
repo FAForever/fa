@@ -18,7 +18,7 @@ UES0304 = ClassUnit(TSubUnit) {
         CruiseMissiles = ClassWeapon(TIFCruiseMissileLauncherSub) {
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
-                self.Rotator = CreateRotator(self.unit, self:GetBlueprint().RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
+                self.Rotator = CreateRotator(self.unit, self.Blueprint.RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
                 TIFCruiseMissileLauncherSub.PlayFxMuzzleChargeSequence(self, muzzle)
             end,
 
@@ -40,7 +40,7 @@ UES0304 = ClassUnit(TSubUnit) {
 
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
-                self.Rotator = CreateRotator(self.unit, self:GetBlueprint().RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
+                self.Rotator = CreateRotator(self.unit, self.Blueprint.RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
                 TIFCruiseMissileLauncherSub.PlayFxMuzzleChargeSequence(self, muzzle)
             end,
 

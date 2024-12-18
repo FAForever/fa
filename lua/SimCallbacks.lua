@@ -881,7 +881,7 @@ local function SetWorldCameraToUnitIconAngle(location, zoom)
 end
 
 local function ShowRaisedPlatforms(self)
-    local plats = self:GetBlueprint().Physics.RaisedPlatforms
+    local plats = self.Blueprint.Physics.RaisedPlatforms
     if not plats then return end
     local pos = self:GetPosition()
     local entities = {}

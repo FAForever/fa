@@ -49,7 +49,7 @@ UEB1104 = ClassUnit(TMassFabricationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = self.Blueprint
 
             -- Play the "activate" sound
             if myBlueprint.Audio.Activate then

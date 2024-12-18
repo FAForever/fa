@@ -167,7 +167,7 @@ SemiBallisticComponent = ClassSimple {
     ---@return number
     AverageVerticalVelocityThroughTurn = function(self, targetAngle, currentAngle)
         local averageVerticalVelocity = 1/(targetAngle-currentAngle) * (MathCos(currentAngle) - MathCos(targetAngle))
-        averageVerticalVelocity = averageVerticalVelocity * self:GetBlueprint().Physics.MaxSpeed
+        averageVerticalVelocity = averageVerticalVelocity * self.Blueprint.Physics.MaxSpeed
         return averageVerticalVelocity
     end,
 

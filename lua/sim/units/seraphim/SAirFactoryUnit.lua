@@ -53,7 +53,7 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         self:SetBlockCommandQueue(true)
         if unitBeingBuilt and not unitBeingBuilt.Dead and EntityCategoryContains(categories.AIR, unitBeingBuilt) then
             unitBeingBuilt:DetachFrom(true)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:DetachAll(bp.Display.BuildAttachBone or 0)
         end
 

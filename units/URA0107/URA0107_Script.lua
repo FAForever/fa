@@ -32,7 +32,7 @@ URA0107 = ClassUnit(AirTransport) {
         AirTransport.OnStopBeingBuilt(self,builder,layer)
         self.AnimManip = CreateAnimator(self)
         self.Trash:Add(self.AnimManip)
-        self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
+        self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTakeOff, false):SetRate(1)
     end,
 
     ---@param self URA0107
@@ -44,12 +44,12 @@ URA0107 = ClassUnit(AirTransport) {
         if ((new == 'Top' or new == 'Up') and old == 'Down') then
             self.AnimManip:SetRate(-1)
         elseif (new == 'Down') then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand, false):SetRate(1.5)
+            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationLand, false):SetRate(1.5)
 -- NOTE: We need to add funtionality to fit this guy on the platform
 --         elseif (new == 'Bottom') then
---             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true):SetRate(1)
+--             self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationIdle, true):SetRate(1)
         elseif (new == 'Up') then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
+            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTakeOff, false):SetRate(1)
         end
     end,
 

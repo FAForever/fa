@@ -321,7 +321,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 
         if (old == 'Stopped') then
-            local bpDisplay = self:GetBlueprint().Display
+            local bpDisplay = self.Blueprint.Display
             if bpDisplay.AnimationWalk and self.Animator then
                 self.Animator:SetDirectionalAnim(true)
                 self.Animator:SetRate(bpDisplay.AnimationWalkRate)

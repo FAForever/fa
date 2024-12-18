@@ -56,7 +56,7 @@ URS0201 = ClassUnit(CSeaUnit) {
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        local bp = self.Blueprint or self:GetBlueprint()
+        local bp = self.Blueprint or self.Blueprint
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
             self:SetSpeedMult(bp.Physics.LandSpeedMultiplier or 1)

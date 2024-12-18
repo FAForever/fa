@@ -12,7 +12,7 @@ local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
     OnImpact = function(self, TargetType, TargetEntity)
-        local bp = self:GetBlueprint().Audio
+        local bp = self.Blueprint.Audio
         local snd = bp['Impact' .. TargetType]
         if snd then
             self:PlaySound(snd)

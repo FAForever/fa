@@ -80,7 +80,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         self.PrepareToBuildManipulator = CreateAnimator(self)
-        self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
+        self.PrepareToBuildManipulator:PlayAnim(self.Blueprint.Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}
         self.AttachmentSliderManip = CreateSlider(self, self.BuildAttachBone)
         ChangeState(self, self.IdleState)
