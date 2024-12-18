@@ -25,7 +25,7 @@ local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
-local podBpEco = __blueprints['uea0001'].Economy
+local podBpEco = __blueprints['uea0001']--[[@as UnitBlueprint]].Economy
 
 ---@class UEL0001 : ACUUnit
 ---@field LeftPod TConstructionPodUnit
