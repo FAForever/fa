@@ -31,8 +31,6 @@
 ---@field AimsStraightOnDisable boolean
 --- always recheck for better target regardless of whether you already have one or not
 ---@field AlwaysRecheckTarget boolean
---- used by the Omen's script
----@field AnimationOpen? FileName
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
 --- if an anti-artillery shield will block this projectile
