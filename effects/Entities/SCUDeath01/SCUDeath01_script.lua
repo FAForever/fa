@@ -29,7 +29,7 @@ SCUDeath01 = Class(NullShell) {
     ---@param damageData table
     PassDamageData = function(self, damageData)
         NullShell.PassMetaDamage(self, damageData)
-        local instigator = self:GetLauncher()
+        local instigator = self.Launcher
         if instigator == nil then
             instigator = self
         end
