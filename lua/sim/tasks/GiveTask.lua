@@ -49,20 +49,20 @@ GiveTask = Class(ScriptTask) {
             end
 
             if units[1] then
-                GiveUnitsToPlayer({To=to}, units)
+                GiveUnitsToPlayer({ To = to }, units)
                 local data = {
-                    Type='alert',
-                    Location=units[1]:GetPosition(),
-                    Lifetime=10,
-                    Owner=self.Army,
-                    To=to,
-                    Ring='/game/marker/ring_yellow02-blur.dds',
-                    Sound='UEF_Select_Radar',
-                    Mesh='alert_marker',
-                    ArrowColor='yellow',
+                    Type = 'alert',
+                    Location = units[1]:GetPosition(),
+                    Lifetime = 10,
+                    Owner = self.Army,
+                    To = to,
+                    Ring = '/game/marker/ring_yellow02-blur.dds',
+                    Sound = 'UEF_Select_Radar',
+                    Mesh = 'alert_marker',
+                    ArrowColor = 'yellow',
                 }
                 SpawnPing(data)
-           end
+            end
         end
 
         transferList[self.Army] = {}

@@ -34,8 +34,8 @@ TASKSTATUS = {
     -- Task is done with its execution for this tick, but should be called back
     -- on the next tick.
     Wait = 1,
-    
-    -- Returning a number greater than TASKSTATUS_Wait incdicates an additional
+
+    -- Returning a number greater than TASKSTATUS_Wait indicates an additional
     -- number of ticks to wait. For example:
     --    return TASKSTATUS_Wait + 3
     -- This indicates a wait of 4 ticks.
@@ -53,16 +53,16 @@ TASKSTATUS = {
 
 AIRESULT = {
     -- Command in progress; result has not been set yet
-    Unknown=0,
+    Unknown = 0,
 
     -- Successfully carried out the order.
-    Success=1,
+    Success = 1,
 
     -- Failed to carry out the order.
-    Fail=2,
+    Fail = 2,
 
     -- The order made no sense for this type of unit, and was ignored.
-    Ignored=3,
+    Ignored = 3,
 }
 
 ---@alias ScriptTaskAIResult
@@ -82,7 +82,7 @@ ScriptTask = Class(moho.ScriptTask_Methods) {
         self.CommandData = commandData
     end,
 
-    -- Called by the engine every tick. Function must return a value in TaskStatus
+    --- Called by the engine in an interval. Function must return a value in TaskStatus
     ---@param self ScriptTask
     ---@return ScriptTaskStatus
     TaskTick = function(self)
