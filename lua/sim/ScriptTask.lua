@@ -41,6 +41,16 @@ TASKSTATUS = {
     -- This indicates a wait of 4 ticks.
 }
 
+---@alias ScriptTaskStatus
+---| -1 # Done
+---| -2 # Suspend: some external event will reactivate the task
+---| -3 # Abort: kill all tasks on this thread
+---| -4 # Delay ticking until all other tasks have ticked
+---| 0 # Repeat execution immediately
+---| 1 # Wait until next tick to repeat. Numbers greater than 1 indicates additional number of ticks to wait.
+---| integer
+
+
 AIRESULT = {
     -- Command in progress; result has not been set yet
     Unknown=0,
@@ -55,19 +65,26 @@ AIRESULT = {
     Ignored=3,
 }
 
+---@alias ScriptTaskAIResult
+---| 0 # Unknown: Command in progress; result has not been set yet
+---| 1 # Success: Successfully carried out the order.
+---| 2 # Fail: Failed to carry out the order.
+---| 3 # Ignored: The order made no sense for this type of unit, and was ignored.
+
 ---@class ScriptTask : moho.ScriptTask_Methods
+---@field CommandData { TaskName: string } | table
 ScriptTask = Class(moho.ScriptTask_Methods) {
 
-    -- Called immediately when task is created
+    --- Called immediately when task is created
     ---@param self ScriptTask
-    ---@param commandData any
-    OnCreate = function(self,commandData)
+    ---@param commandData { TaskName: string } | table # LuaParams table from the user side
+    OnCreate = function(self, commandData)
         self.CommandData = commandData
     end,
 
     -- Called by the engine every tick. Function must return a value in TaskStatus
     ---@param self ScriptTask
-    ---@return integer
+    ---@return ScriptTaskStatus
     TaskTick = function(self)
         LOG('tick')
         self:SetAIResult(AIRESULT.Fail)

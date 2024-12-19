@@ -7,11 +7,13 @@ local ScriptTask = import("/lua/sim/scripttask.lua").ScriptTask
 local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
----@class AttackMove : ScriptTask
+---@class AttackMoveTask : ScriptTask
+---@field CommandData { TaskName: "AttackMove" }
 AttackMove = Class(ScriptTask) {
 
-    ---@param self AttackMove
-    ---@return integer
+    -- Called by the engine every tick. Function must return a value in TaskStatus
+    ---@param self AttackMoveTask
+    ---@return ScriptTaskStatus
     TaskTick = function(self)
         self:SetAIResult(AIRESULT.Success)
         return TASKSTATUS.Done

@@ -8,10 +8,12 @@ local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
 ---@class EnhanceTask : ScriptTask
+---@field CommandData { TaskName: "EnhanceTask", Enhancement: Enhancement }
+---@field Success? boolean # Whether or not the upgrade finished building
 EnhanceTask = Class(ScriptTask) {
 
     ---@param self EnhanceTask
-    ---@param commandData any
+    ---@param commandData { TaskName: "EnhanceTask", Enhancement: Enhancement } # LuaParams table from the user side
     OnCreate = function(self,commandData)
         ScriptTask.OnCreate(self,commandData)
         self:GetUnit():SetWorkProgress(0.0)
@@ -35,6 +37,9 @@ EnhanceTask = Class(ScriptTask) {
     end,
 
     Stopping = State {
+        -- Called by the engine every tick. Function must return a value in TaskStatus
+        ---@param self EnhanceTask
+        ---@return ScriptTaskStatus
         TaskTick = function(self)
             local unit = self:GetUnit()
 
@@ -56,6 +61,9 @@ EnhanceTask = Class(ScriptTask) {
     },
 
     Enhancing = State {
+        -- Called by the engine every tick. Function must return a value in TaskStatus
+        ---@param self EnhanceTask
+        ---@return ScriptTaskStatus
         TaskTick = function(self)
             local unit = self:GetUnit()
             local current = unit.WorkProgress

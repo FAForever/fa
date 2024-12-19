@@ -3,12 +3,17 @@ local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local GiveUnitsToPlayer = import("/lua/simutils.lua").GiveUnitsToPlayer
 local SpawnPing = import("/lua/simping.lua").SpawnPing
 
-local transferList =  {}
+local transferList = {}
+
 ---@class GiveTask : ScriptTask
+---@field CommandData { TaskName: "GiveTask", To: Army }
+---@field Army Army
+---@field first boolean
 GiveTask = Class(ScriptTask) {
 
+    --- Called immediately when task is created
     ---@param self GiveTask
-    ---@param commandData any
+    ---@param commandData { TaskName: "GiveTask", To: Army } # LuaParams table from the user side
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
 
@@ -25,8 +30,9 @@ GiveTask = Class(ScriptTask) {
         self.first = true
     end,
 
+    -- Called by the engine every tick. Function must return a value in TaskStatus
     ---@param self GiveTask
-    ---@return integer
+    ---@return ScriptTaskStatus
     TaskTick = function(self)
         if self.first then
             -- Wait a tick to let all GiveTask commands execute
