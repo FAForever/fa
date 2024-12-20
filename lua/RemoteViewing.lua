@@ -40,10 +40,10 @@ function RemoteViewing(SuperClass)
         ---@param self RemoteViewingUnit
         ---@param builder Unit
         ---@param layer Layer
-        OnStopBeingBuilt = function(self,builder,layer)
+        OnStopBeingBuilt = function(self, builder, layer)
             self.Sync.Abilities = self:GetBlueprint().Abilities
             self:SetMaintenanceConsumptionInactive()
-            SuperClass.OnStopBeingBuilt(self,builder,layer)
+            SuperClass.OnStopBeingBuilt(self, builder, layer)
         end,
 
         ---@param self RemoteViewingUnit
@@ -94,7 +94,7 @@ function RemoteViewing(SuperClass)
                 self:ForkThread(self.TargetLocationThread)
             end
         end,
-        
+
         ---@param self RemoteViewingUnit
         CreateVisibleEntity = function(self)
             -- Only give a visible area if we have a location and intel button enabled
@@ -124,7 +124,7 @@ function RemoteViewing(SuperClass)
                 else
                     -- Move and reactivate old visible area
                     if not self.RemoteViewingData.Satellite:BeenDestroyed() then
-                        Warp( self.RemoteViewingData.Satellite, self.RemoteViewingData.VisibleLocation )
+                        Warp(self.RemoteViewingData.Satellite, self.RemoteViewingData.VisibleLocation)
                         self.RemoteViewingData.Satellite:EnableIntel('Omni')
                         self.RemoteViewingData.Satellite:EnableIntel('Radar')
                         self.RemoteViewingData.Satellite:EnableIntel('Vision')

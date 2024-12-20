@@ -25,23 +25,23 @@ local CM = import("/lua/ui/game/commandmode.lua")
 ---@return { TaskName: string, UserValidated: boolean, Location: Vector, AuthorizedUnits: UserUnit[] } result
 function VerifyScriptCommand(data)
     local mode = CM.GetCommandMode()
-   
+
     local result = {
         TaskName = mode[2].TaskName,
         UserValidated = false,
         Location = data.Target.Position
     }
-    
+
     if mode[1] != "order" then
         WARN('VerifyScriptCommand() called when command mode is not "order"')
         return result
     end
-    
+
     if mode[2].name != "RULEUCC_Script" then
         WARN('VerifyScriptCommand() called when command name is not "Script"')
         return result
     end
-    
+
     --LOG('verify script: ',mode[2].UserVerifyScript)
     if mode[2].UserVerifyScript then
         import(mode[2].UserVerifyScript).VerifyScriptCommand(data,result)
@@ -49,6 +49,6 @@ function VerifyScriptCommand(data)
         result.AuthorizedUnits = data.Units
         result.UserValidated = true
     end
-    
+
     return result
 end

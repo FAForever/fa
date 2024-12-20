@@ -15,15 +15,15 @@ local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbie
 -- Setup as RemoteViewing child of AStructureUnit
 local RemoteViewing = import("/lua/remoteviewing.lua").RemoteViewing
 ---@diagnostic disable-next-line: cast-local-type
-AStructureUnit = RemoteViewing( AStructureUnit )
+AStructureUnit = RemoteViewing(AStructureUnit)
 
 ---@class XAB3301: AStructureUnit, RemoteViewingUnit
 ---@field Animator moho.AnimationManipulator
 ---@field RotatorBot moho.RotateManipulator
 ---@field RotatorTop moho.RotateManipulator
 ---@field TrashAmbientEffects TrashBag
-XAB3301 = ClassUnit( AStructureUnit ) {
 ---@field ScryEnabled boolean
+XAB3301 = ClassUnit(AStructureUnit) {
     ---@param self XAB3301
     ---@param builder Unit
     ---@param layer Layer
@@ -51,15 +51,15 @@ XAB3301 = ClassUnit( AStructureUnit ) {
 
         if self.RemoteViewingData.VisibleLocation and self.RemoteViewingData.DisableCounter == 0 and self.RemoteViewingData.IntelButton then
 
-            if self.ScryEnabled then 
+            if self.ScryEnabled then
                 CreateLightParticle(self, "spin02", self.Army, 1, 20, 'glow_02', 'ramp_blue_16')
-            else 
+            else
                 CreateLightParticle(self, "spin02", self.Army, 10, 20, 'glow_02', 'ramp_blue_22')
             end
 
             if not self.ScryEnabled then
-                self.ScryEnabled = true 
-                
+                self.ScryEnabled = true
+
                 self.Animator:SetRate(1)
                 self.RotatorBot:SetTargetSpeed(12)
                 self.RotatorTop:SetTargetSpeed(-8)
@@ -81,7 +81,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
         self.RotatorTop:SetTargetSpeed(-4)
 
         self.TrashAmbientEffects:Destroy()
-        self.ScryEnabled = false 
+        self.ScryEnabled = false
     end,
 }
 

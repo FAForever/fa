@@ -15,8 +15,8 @@ TargetLocation = Class(ScriptTask) {
     --- Called immediately when task is created
     ---@param self TargetLocationTask
     ---@param commandData { TaskName: "TargetLocation", UserValidated: boolean, Location: Vector }
-    OnCreate = function(self,commandData)
-        ScriptTask.OnCreate(self,commandData)
+    OnCreate = function(self, commandData)
+        ScriptTask.OnCreate(self, commandData)
         local unit = self:GetUnit():OnTargetLocation(commandData.Location)
     end,
 
