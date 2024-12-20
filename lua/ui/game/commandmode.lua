@@ -96,7 +96,7 @@ local MathAtan = math.atan
 
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
----@field altCursor string          # Allows for an alternative cursor
+---@field altCursor? string          # Allows for an alternative cursor
 
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
