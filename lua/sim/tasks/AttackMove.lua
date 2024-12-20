@@ -3,6 +3,7 @@
 --*
 --* Dummy task for the Attack Move button
 --*****************************************************************************
+
 local ScriptTask = import("/lua/sim/scripttask.lua").ScriptTask
 local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT

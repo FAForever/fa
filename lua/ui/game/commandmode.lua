@@ -6,6 +6,7 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+
 local commandMeshResources = import("/lua/ui/game/commandmeshes.lua").commandMeshResources
 local Prefs = import("/lua/user/prefs.lua")
 
