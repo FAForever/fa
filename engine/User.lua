@@ -602,10 +602,37 @@ end
 function GetUnitCommandDataOfUnit(unit)
 end
 
---- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
---- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams`.
----@param rule CommandCap
----@return string
+--- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.  
+--- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams` or `UserUnitCommand`.
+--[[```
+             RULEUCC_Move = Move
+             RULEUCC_Stop = Stop
+           RULEUCC_Attack = Attack
+            RULEUCC_Guard = Guard
+           RULEUCC_Patrol = Patrol
+  RULEUCC_RetaliateToggle = None
+           RULEUCC_Repair = Repair
+          RULEUCC_Capture = Capture
+        RULEUCC_Transport = TransportUnloadUnits
+    RULEUCC_CallTransport = TransportLoadUnits
+             RULEUCC_Nuke = Nuke
+         RULEUCC_Tactical = Tactical
+         RULEUCC_Teleport = Teleport
+            RULEUCC_Ferry = Ferry
+RULEUCC_SiloBuildTactical = BuildSiloTactical
+    RULEUCC_SiloBuildNuke = BuildSiloNuke
+        RULEUCC_Sacrifice = Sacrifice
+            RULEUCC_Pause = Pause
+       RULEUCC_Overcharge = OverCharge
+             RULEUCC_Dive = Dive
+          RULEUCC_Reclaim = Reclaim
+    RULEUCC_SpecialAction = SpecialAction
+             RULEUCC_Dock = None
+           RULEUCC_Script = None
+          RULEUCC_Invalid = None
+```]]
+---@param rule EngineCommandCap
+---@return string | "None"
 function GetUnitCommandFromCommandCap(rule)
 end
 
