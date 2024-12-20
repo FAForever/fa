@@ -322,6 +322,9 @@ UnitBlueprint{
         },
         {
             AlwaysRecheckTarget = false,
+            Audio = {
+                Fire = Sound { Bank = 'XSS_Weapon', Cue = 'XSS0304_Ajellu_Torpedo', LodCutoff = 'Weapon_LodCutoff' },
+            },
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
             Damage = 2,
