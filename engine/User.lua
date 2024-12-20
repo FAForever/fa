@@ -837,11 +837,11 @@ end
 function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
----
----@param command any
----@param string any?
+--- Issue a command to the current selection. 
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear boolean?
-function IssueCommand(command, string, clear)
+function IssueCommand(command, luaParams, clear)
 end
 
 ---
@@ -849,12 +849,12 @@ end
 function IssueDockCommand(clear)
 end
 
----
+--- Issue a command to the given units.
 ---@param unitList UserUnit[]
----@param command string
----@param string? string
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear? boolean
-function IssueUnitCommand(unitList, command, string, clear)
+function IssueUnitCommand(unitList, command, luaParams, clear)
 end
 
 --- Given a MS Windows char code, returns the Maui char code
