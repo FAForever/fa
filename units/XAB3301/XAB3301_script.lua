@@ -7,16 +7,26 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 
 local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbient
 
 -- Setup as RemoteViewing child of AStructureUnit
 local RemoteViewing = import("/lua/remoteviewing.lua").RemoteViewing
+---@diagnostic disable-next-line: cast-local-type
 AStructureUnit = RemoteViewing( AStructureUnit )
 
+---@class XAB3301: AStructureUnit, RemoteViewingUnit
+---@field Animator moho.AnimationManipulator
+---@field RotatorBot moho.RotateManipulator
+---@field RotatorTop moho.RotateManipulator
+---@field TrashAmbientEffects TrashBag
 XAB3301 = ClassUnit( AStructureUnit ) {
-
+---@field ScryEnabled boolean
+    ---@param self XAB3301
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -35,6 +45,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
         self.TrashAmbientEffects = TrashBag()
     end,
 
+    ---@param self XAB3301
     CreateVisibleEntity = function(self)
         AStructureUnit.CreateVisibleEntity(self)
 
@@ -61,6 +72,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
 
     end,
 
+    ---@param self XAB3301
     DisableVisibleEntity = function(self)
         AStructureUnit.DisableVisibleEntity(self)
 

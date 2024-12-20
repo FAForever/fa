@@ -18,6 +18,11 @@ local CM = import("/lua/ui/game/commandmode.lua")
 --    bool UserValidated - Whether or not this request has been validated
 --    table AuthorizedUnits - List of units to issue the command to
 -- }
+
+--- Called by the engine whenever a `RULEUCC_Script` order is issued with a target through command mode.
+--- The return value overwrites the lua params table passed to the ScriptTask script sim-side.
+---@param data UserCommand
+---@return { TaskName: string, UserValidated: boolean, Location: Vector, AuthorizedUnits: UserUnit[] } result
 function VerifyScriptCommand(data)
     local mode = CM.GetCommandMode()
    

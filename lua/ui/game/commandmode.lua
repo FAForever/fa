@@ -107,7 +107,10 @@ local MathAtan = math.atan
 
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
 
----@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
+---@class CommandModeDataOrderScript : CommandModeDataOrder
+---@field TaskName string
+
+---@alias CommandModeData CommandModeDataOrder | CommandModeDataOrderScript | CommandModeDataBuild | CommandModeDataBuildAnchored | false
 
 ---@type CommandMode
 local cachedCommandMode = false

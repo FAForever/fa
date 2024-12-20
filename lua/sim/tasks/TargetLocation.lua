@@ -7,25 +7,29 @@ local ScriptTask = import("/lua/sim/scripttask.lua").ScriptTask
 local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
----@class TargetLocation : ScriptTask
+---@class TargetLocationTask : ScriptTask
+---@field CommandData { TaskName: "TargetLocation", UserValidated: boolean, Location: Vector }
+---@field GetUnit fun(self: TargetLocationTask): RemoteViewingUnit
 TargetLocation = Class(ScriptTask) {
 
-    ---@param self TargetLocation
-    ---@param commandData table
+    --- Called immediately when task is created
+    ---@param self TargetLocationTask
+    ---@param commandData { TaskName: "TargetLocation", UserValidated: boolean, Location: Vector }
     OnCreate = function(self,commandData)
         ScriptTask.OnCreate(self,commandData)
         local unit = self:GetUnit():OnTargetLocation(commandData.Location)
     end,
 
-    ---@param self TargetLocation
-    ---@return number
+    -- Called by the engine every tick. Function must return a value in TaskStatus
+    ---@param self TargetLocationTask
+    ---@return ScriptTaskStatus
     TaskTick = function(self)
         self:SetAIResult(AIRESULT.Success)
         return TASKSTATUS.Done
     end,
 
-    ---@param self TargetLocation
-    ---@return boolean
+    ---@param self TargetLocationTask
+    ---@return true
     IsInRange = function(self)
         return true
     end,
