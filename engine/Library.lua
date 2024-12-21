@@ -73,6 +73,7 @@ end
 function debug.allocatedsize(obj)
 end
 
+--- Returns a cached table of all table allocations tracked between calls of `debug.trackallocations(true)` and `debug.trackallocations(false)`.
 ---@return table<any, string>
 function debug.allocinfo()
 end

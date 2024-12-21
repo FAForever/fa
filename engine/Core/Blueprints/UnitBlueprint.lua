@@ -36,6 +36,9 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
+--- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
+--- The `OrderInfo.behavior` is overwritten in `orders.lua`.
+---@field Abilities table<string, OrderInfo>
 --- the number of build bots a Cybran builder has
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons

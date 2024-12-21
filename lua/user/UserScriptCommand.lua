@@ -4,6 +4,7 @@
 --*
 --* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+
 local CM = import("/lua/ui/game/commandmode.lua")
 
 -- The user wants to issue an ability order in the current command mode. This
@@ -18,25 +19,30 @@ local CM = import("/lua/ui/game/commandmode.lua")
 --    bool UserValidated - Whether or not this request has been validated
 --    table AuthorizedUnits - List of units to issue the command to
 -- }
+
+--- Called by the engine whenever a `RULEUCC_Script` order is issued with a target through command mode.
+--- The return value overwrites the lua params table passed to the ScriptTask script sim-side, except for the field `AuthorizedUnits`, which is interpreted by the engine instead of being passed.
+---@param data UserCommand
+---@return { TaskName: string, UserValidated: boolean, Location: Vector, AuthorizedUnits: UserUnit[] } result
 function VerifyScriptCommand(data)
     local mode = CM.GetCommandMode()
-   
+
     local result = {
         TaskName = mode[2].TaskName,
         UserValidated = false,
         Location = data.Target.Position
     }
-    
+
     if mode[1] != "order" then
         WARN('VerifyScriptCommand() called when command mode is not "order"')
         return result
     end
-    
+
     if mode[2].name != "RULEUCC_Script" then
         WARN('VerifyScriptCommand() called when command name is not "Script"')
         return result
     end
-    
+
     --LOG('verify script: ',mode[2].UserVerifyScript)
     if mode[2].UserVerifyScript then
         import(mode[2].UserVerifyScript).VerifyScriptCommand(data,result)
@@ -44,6 +50,6 @@ function VerifyScriptCommand(data)
         result.AuthorizedUnits = data.Units
         result.UserValidated = true
     end
-    
+
     return result
 end
