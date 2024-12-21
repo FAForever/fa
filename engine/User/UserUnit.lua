@@ -27,7 +27,7 @@ local UserUnit = {}
 ---| "UNITCOMMAND_Teleport"
 ---| "UNITCOMMAND_Ferry"
 ---| "UNITCOMMAND_AssistMove"
----| "UNITCOMMAND_DetachFromTransport"
+---| "UNITCOMMAND_DetachFromTransport" # Does nothing?
 ---| "UNITCOMMAND_TransportUnloadSpecificUnits"
 ---| "UNITCOMMAND_TransportUnloadUnits"
 ---| "UNITCOMMAND_TransportReverseLoadUnits"

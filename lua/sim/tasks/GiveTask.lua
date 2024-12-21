@@ -6,14 +6,14 @@ local SpawnPing = import("/lua/simping.lua").SpawnPing
 local transferList = {}
 
 ---@class GiveTask : ScriptTask
----@field CommandData { TaskName: "GiveTask", To: Army }
+---@field CommandData { TaskName: "GiveTask", To: Army } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
 ---@field Army Army
 ---@field first boolean
 GiveTask = Class(ScriptTask) {
 
     --- Called immediately when task is created
     ---@param self GiveTask
-    ---@param commandData { TaskName: "GiveTask", To: Army } # LuaParams table from the user side
+    ---@param commandData { TaskName: "GiveTask", To: Army } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
 

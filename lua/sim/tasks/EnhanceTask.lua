@@ -9,12 +9,12 @@ local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local AIRESULT = import("/lua/sim/scripttask.lua").AIRESULT
 
 ---@class EnhanceTask : ScriptTask
----@field CommandData { TaskName: "EnhanceTask", Enhancement: Enhancement }
+---@field CommandData { TaskName: "EnhanceTask", Enhancement: Enhancement } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
 ---@field Success? boolean # Whether or not the upgrade finished building
 EnhanceTask = Class(ScriptTask) {
 
     ---@param self EnhanceTask
-    ---@param commandData { TaskName: "EnhanceTask", Enhancement: Enhancement } # LuaParams table from the user side
+    ---@param commandData { TaskName: "EnhanceTask", Enhancement: Enhancement } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
         self:GetUnit():SetWorkProgress(0.0)

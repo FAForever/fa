@@ -21,7 +21,7 @@ local CM = import("/lua/ui/game/commandmode.lua")
 -- }
 
 --- Called by the engine whenever a `RULEUCC_Script` order is issued with a target through command mode.
---- The return value overwrites the lua params table passed to the ScriptTask script sim-side.
+--- The return value overwrites the lua params table passed to the ScriptTask script sim-side, except for the field `AuthorizedUnits`, which is interpreted by the engine instead of being passed.
 ---@param data UserCommand
 ---@return { TaskName: string, UserValidated: boolean, Location: Vector, AuthorizedUnits: UserUnit[] } result
 function VerifyScriptCommand(data)
