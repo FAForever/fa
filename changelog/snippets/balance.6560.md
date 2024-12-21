@@ -1,4 +1,4 @@
-- (#6560) Adjust several minor stats to better align the Vulthoo with its role as a 'Tech 2.5 unit'. Additionally, fix a bug that prevented it from hitting units directly beneath it.
+- (#6560, #6595) Adjust several minor stats to better align the Vulthoo with its role as a 'Tech 2.5 unit'. Additionally, fix a bug that prevented it from hitting units directly beneath it.
 
   - Vulthoo: T2 Gunship (XSA0203):
     - Physics
