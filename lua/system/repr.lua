@@ -182,12 +182,7 @@ function Inspector:getId(v)
     if not id then
         local tv = type(v)
         id = (ids[tv] or 0) + 1
-        ids[tv] = id
-        if tv == "function" then
-            local info = debug.getinfo(v, "S")
-            id = fmt("%s %s(%d)", id, DiskToLocal(string.sub(info.source, 2)), info.linedefined)
-        end
-        ids[v] = id
+        ids[v], ids[tv] = id, id
     end
     return tostring(id)
 end
@@ -228,11 +223,7 @@ function Inspector:putValue(v)
                         puts(buf, "]")
                     end
                     puts(buf, ' = ')
-                    if k == "__index" and tostring(t[k]) == tostring(t) then
-                        puts(buf, string.format("{...} -- %s (%g bytes)", tostring(t), debug.allocatedsize(t)))
-                    else
-                        self:putValue(t[k])
-                    end
+                    self:putValue(t[k])
                 end
             end
 
@@ -258,7 +249,7 @@ function Inspector:putValue(v)
         end
 
     else
-        puts(buf, fmt('<%s %s>', tv, self:getId(v)))
+        puts(buf, fmt('<%s %d>', tv, self:getId(v)))
     end
 end
 
