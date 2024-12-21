@@ -22,6 +22,67 @@
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
+---@type UnitState[]
+local possibleUnitStates = {
+    "Immobile",
+    "Moving",
+    "Attacking",
+    "Guarding",
+    "Building",
+    "Upgrading",
+    "WaitingForTransport",
+    "TransportLoading",
+    "TransportUnloading",
+    "MovingDown",
+    "MovingUp",
+    "Patrolling",
+    "Busy",
+    "Attached",
+    "BeingReclaimed",
+    "Repairing",
+    "Diving",
+    "Surfacing",
+    "Teleporting",
+    "Ferrying",
+    "WaitForFerry",
+    "AssistMoving",
+    "PathFinding",
+    "ProblemGettingToGoal",
+    "NeedToTerminateTask",
+    "Capturing",
+    "BeingCaptured",
+    "Reclaiming",
+    "AssistingCommander",
+    "Refueling",
+    "GuardBusy",
+    "ForceSpeedThrough",
+    "UnSelectable",
+    "DoNotTarget",
+    "LandingOnPlatform",
+    "CannotFindPlaceToLand",
+    "BeingUpgraded",
+    "Enhancing",
+    "BeingBuilt",
+    "NoReclaim",
+    "NoCost",
+    "BlockCommandQueue",
+    "MakingAttackRun",
+    "HoldingPattern",
+    "SiloBuildingAmmo",
+}
+
+---@param unit Unit
+---@return UnitState[] currentStates # Can be empty
+local function GetStatesOfUnit(unit)
+    local currentStates = {}
+    for _, possibleState in possibleUnitStates do
+        if unit:IsUnitState(possibleState) then
+            table.insert(currentStates, possibleState)
+        end
+    end
+    return currentStates
+end
+
 ---@class DebugUnitComponent : DebugComponent
 DebugUnitComponent = Class(DebugComponent) {
 
@@ -117,5 +178,33 @@ DebugUnitComponent = Class(DebugComponent) {
 
         local blueprint = self.Blueprint
         DrawCircle(self:GetPosition(), math.max(blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ), color)
+    end,
+
+    ---@param self DebugUnitComponent | Unit
+    DebugPrintCurrentStates = function(self)
+        self:DebugLog(string.format("States at tick %d: %s", GetGameTick(), table.concat(GetStatesOfUnit(self), ', ')))
+    end,
+
+    ---@param self DebugUnitComponent | Unit
+    DebugToggleTrackingStateChanges = function(self)
+        if not self.StateChangeTracker then
+            self.StateChangeTracker = self.Trash:Add(ForkThread(function()
+                local oldStatesHashed = {}
+                while true do
+                    local newStates = GetStatesOfUnit(self)
+                    local newStatesHashed = table.hash(GetStatesOfUnit(self))
+                    for _, state in possibleUnitStates do
+                        if newStatesHashed[state] ~= oldStatesHashed[state] then
+                            self:DebugLog(string.format("New states at tick %d: %s", GetGameTick(), table.concat(newStates, ', ')))
+                        end
+                    end
+                    oldStatesHashed = newStatesHashed
+                    WaitTicks(1)
+                end
+            end))
+        else
+            KillThread(self.StateChangeTracker)
+            self.StateChangeTracker = nil
+        end
     end,
 }
