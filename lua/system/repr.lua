@@ -228,7 +228,11 @@ function Inspector:putValue(v)
                         puts(buf, "]")
                     end
                     puts(buf, ' = ')
-                    self:putValue(t[k])
+                    if k == "__index" and tostring(t[k]) == tostring(t) then
+                        puts(buf, string.format("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debug.allocatedsize(t)))
+                    else
+                        self:putValue(t[k])
+                    end
                 end
             end
 
