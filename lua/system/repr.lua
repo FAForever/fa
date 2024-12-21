@@ -29,7 +29,7 @@
 ---@field buf table
 ---@field depth integer
 ---@field level integer
----@field ids table<any, integer>
+---@field ids table<type, integer> | table<any, integer|string>
 ---@field newline string
 ---@field meta boolean
 ---@field indent string
@@ -182,7 +182,12 @@ function Inspector:getId(v)
     if not id then
         local tv = type(v)
         id = (ids[tv] or 0) + 1
-        ids[v], ids[tv] = id, id
+        ids[tv] = id
+        if tv == "function" then
+            local info = debug.getinfo(v, "S")
+            id = fmt("%s %s(%d)", id, DiskToLocal(string.sub(info.source, 2)), info.linedefined)
+        end
+        ids[v] = id
     end
     return tostring(id)
 end
@@ -249,7 +254,7 @@ function Inspector:putValue(v)
         end
 
     else
-        puts(buf, fmt('<%s %d>', tv, self:getId(v)))
+        puts(buf, fmt('<%s %s>', tv, self:getId(v)))
     end
 end
 
