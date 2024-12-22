@@ -47,14 +47,18 @@ local tostring = tostring
 local rep = string.rep
 local flr = math.floor
 local match = string.match
+local substr = string.sub
 local gsub = string.gsub
 local fmt = string.format
 local _rawget = rawget
 local type = type
 local getmetatable = getmetatable
+local debugGetInfo = debug.getinfo
 
 local TableSort = table.sort
 local TableEmpty = table.empty
+
+local DiskToLocal = DiskToLocal
 
 ---@param t table
 ---@return function
@@ -187,8 +191,8 @@ function Inspector:getId(v)
         id = (ids[tv] or 0) + 1
         ids[tv] = id
         if tv == "function" then
-            local info = debug.getinfo(v, "S")
-            id = fmt("%s %s(%d)", id, DiskToLocal(string.sub(info.source, 2)--[[@as FileName]]), info.linedefined)
+            local info = debugGetInfo(v, "S")
+            id = fmt("%s %s(%d)", id, DiskToLocal(substr(info.source, 2)--[[@as FileName]]), info.linedefined)
         end
         ids[v] = id
     end
