@@ -311,11 +311,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, string.format("{...} -- %s (%g bytes)", fafTableToString(t), debug.allocatedsize(t)))
+            puts(buf, fmt("{...} -- %s (%g bytes)", fafTableToString(t), debug.allocatedsize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, string.format("{ -- %s (%d bytes)", fafTableToString(t), debug.allocatedsize(t)))
+            puts(buf, fmt("{ -- %s (%d bytes)", fafTableToString(t), debug.allocatedsize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
@@ -335,7 +335,7 @@ function Inspector:putValue(v)
                     end
                     puts(buf, ' = ')
                     if k == "__index" and tostring(t[k]) == tostring(t) then
-                        puts(buf, string.format("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debug.allocatedsize(t)))
+                        puts(buf, fmt("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debug.allocatedsize(t)))
                     else
                         self:putValue(t[k])
                     end
