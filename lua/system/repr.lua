@@ -51,6 +51,7 @@ local gsub = string.gsub
 local fmt = string.format
 local _rawget = rawget
 local type = type
+local getmetatable = getmetatable
 
 local TableSort = table.sort
 
@@ -193,6 +194,110 @@ function Inspector:getId(v)
     return tostring(id)
 end
 
+local VectorMeta = getmetatable(Vector2(0, 0))
+local LazyVarMeta = import('/lua/lazyvar.lua').LazyVarMetaTable
+
+-- Converts the `__name` field added to engine classes in `classes.lua` to a friendlier name
+local CClassNameToString = {
+    -- moho classes that share the same name across user and sim
+
+    CPrefetchSet = "CPrefetchSet",
+    EntityCategory = "Entity Category",
+    -- sound_methods = "Sound", -- In moho but has no fields, including `__name`
+
+    --Sim moho classes
+
+    aibrain_methods = "AIBrain",
+    aipersonality_methods = "AIPersonality",
+    platoon_methods = "Platoon",
+
+    ScriptTask_Methods = "Script Task",
+
+    IEffect = "IEffect",
+    CDecalHandle = "Decal",
+
+    entity_methods = "Entity",
+
+    unit_methods = "Unit",
+    navigator_methods = "Navigator",
+    blip_methods = "Blip",
+    shield_methods = "Shield",
+    weapon_methods = "Weapon",
+    projectile_methods = "Projectile",
+    CollisionBeamEntity = "Collision Beam",
+    -- EconomyEvent = "EconomyEvent", -- In moho but has no fields, including `__name`
+
+    prop_methods = "Prop",
+    MotorFallDown = "MotorFallDown",
+
+    manipulator_methods = "Manipulator",
+    AimManipulator = "AimManipulator",
+    RotateManipulator = "RotateManipulator",
+    StorageManipulator = "StorageManipulator",
+    CollisionManipulator = "CollisionManipulator",
+    SlaveManipulator = "SlaveManipulator",
+    ThrustManipulator = "ThrustManipulator",
+    BoneEntityManipulator = "BoneEntityManipulator",
+    SlideManipulator = "SlideManipulator",
+    BuilderArmManipulator = "BuilderArmManipulator",
+    AnimationManipulator = "AnimationManipulator",
+    FootPlantManipulator = "FootPlantManipulator",
+
+    CDamage = "CDamage",
+    CAiAttackerImpl_methods = "CAiAttackerImpl",
+
+    --User moho classes
+
+    cursor_methods = "Cursor",
+
+    control_methods = "Control",
+    scrollbar_methods = "Scrollbar",
+    bitmap_methods = "Bitmap",
+    dragger_methods = "Dragger",
+    item_list_methods = "ItemList",
+    movie_methods = "Movie",
+    border_methods = "Border",
+    text_methods = "Text",
+    edit_methods = "Edit",
+    group_methods = "Group",
+    frame_methods = "Frame",
+
+    lobby_methods = "Lobby Communications",
+    discovery_service_methods = "Discovery Service",
+    ui_map_preview_methods = "Map Preview",
+    WldUIProvider_methods = "WldUIProvider",
+
+    UIWorldView = "WorldView",
+    userDecal_methods = "UserDecal",
+    world_mesh_methods = "WorldMesh",
+
+    mesh_methods = "mesh_methods",
+    histogram_methods = "Histogram",
+    PathDebugger_methods = "PathDebugger",
+
+    -- Shared class implemented in Lua
+    Trashbag = "Trashbag",
+}
+
+---@param v table | fa-class | fa-class-state
+local function fafTableToString(v)
+    local mt = getmetatable(v)
+    if _rawget(v, "__State") then
+        return fmt("%s (State %s)", tostring(v), tostring(v.__StateIdentifier))
+    elseif mt == VectorMeta then
+        return fmt("%s (%s)", tostring(v), "Vector")
+    elseif mt == LazyVarMeta then
+        return fmt("%s (%s)", tostring(v), "LazyVar")
+    else
+        local friendlyName = CClassNameToString[mt.__name]
+        if friendlyName then
+            return fmt("%s (%s)", tostring(v), friendlyName)
+        else
+            return tostring(v)
+        end
+    end
+end
+
 ---@param v any
 function Inspector:putValue(v)
     local buf = self.buf
@@ -206,11 +311,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, string.format("{...} -- %s (%g bytes)", tostring(t), debug.allocatedsize(t)))
+            puts(buf, string.format("{...} -- %s (%g bytes)", fafTableToString(t), debug.allocatedsize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, string.format("{ -- %s (%d bytes)", tostring(t), debug.allocatedsize(t)))
+            puts(buf, string.format("{ -- %s (%d bytes)", fafTableToString(t), debug.allocatedsize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
