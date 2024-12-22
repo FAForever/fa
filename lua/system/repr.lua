@@ -54,6 +54,7 @@ local type = type
 local getmetatable = getmetatable
 
 local TableSort = table.sort
+local TableEmpty = table.empty
 
 ---@param t table
 ---@return function
@@ -344,7 +345,7 @@ function Inspector:putValue(v)
 
             local mt = getmetatable(t)
             if self.meta then
-                if type(mt) == 'table' and not table.empty(mt) then
+                if type(mt) == 'table' and not TableEmpty(mt) then
                     if seqLen + keysLen > 0 then puts(buf, ',') end
                     tabify(self)
                     puts(buf, '<metatable> = ')
@@ -354,7 +355,7 @@ function Inspector:putValue(v)
 
             self.level = self.level - 1
 
-            if keysLen > 0 or (self.meta and type(mt) == 'table' and not table.empty(mt)) then
+            if keysLen > 0 or (self.meta and type(mt) == 'table' and not TableEmpty(mt)) then
                 tabify(self)
             elseif seqLen > 0 then
                 puts(buf, ' ')
