@@ -101,6 +101,7 @@ local luaKeywords = {
 ---@return boolean
 local function isIdentifier(str)
     return type(str) == "string" and
+---@diagnostic disable-next-line: undefined-field
         not not str:match("^[_%a][_%a%d]*$") and
         not luaKeywords[str]
 end
@@ -185,7 +186,7 @@ function Inspector:getId(v)
         ids[tv] = id
         if tv == "function" then
             local info = debug.getinfo(v, "S")
-            id = fmt("%s %s(%d)", id, DiskToLocal(string.sub(info.source, 2)), info.linedefined)
+            id = fmt("%s %s(%d)", id, DiskToLocal(string.sub(info.source, 2)--[[@as FileName]]), info.linedefined)
         end
         ids[v] = id
     end
