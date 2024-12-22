@@ -343,9 +343,14 @@ function Inspector:putValue(v)
                 end
             end
 
-            local mt = getmetatable(t)
-            local checkMetaTable = self.meta and type(mt) == 'table' and not TableEmpty(mt)
-            if checkMetaTable then
+            local mt
+            local checkMeta
+            if self.meta then
+                mt = getmetatable(t)
+                checkMeta = type(mt) == 'table' and not TableEmpty(mt)
+            end
+
+            if checkMeta then
                 if seqLen + keysLen > 0 then puts(buf, ',') end
                 tabify(self)
                 puts(buf, '<metatable> = ')
@@ -354,7 +359,7 @@ function Inspector:putValue(v)
 
             self.level = self.level - 1
 
-            if keysLen > 0 or checkMetaTable then
+            if keysLen > 0 or checkMeta then
                 tabify(self)
             elseif seqLen > 0 then
                 puts(buf, ' ')
