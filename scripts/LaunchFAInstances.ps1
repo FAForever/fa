@@ -25,7 +25,7 @@ if (Test-Path $debuggerExecutable) {
 }
 
 # Command-line arguments common for all instances
-$baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /gameoptions CheatsEnabled:true GameSpeed:adjustable '
+$baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /gameoptions CheatsEnabled:true GameSpeed:adjustable DisconnectShareCommanders:Permanent DisconnectShare:SameAsShare'
 
 # Game-specific settings
 $hostProtocol = "udp"
