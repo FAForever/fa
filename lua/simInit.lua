@@ -103,7 +103,8 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
-    ---@type AIBrain[]
+
+    ---@type table<Army, AIBrain>
     ArmyBrains = {}
 
 

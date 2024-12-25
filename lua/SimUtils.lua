@@ -651,13 +651,13 @@ function UpdateUnitCap(deadArmy)
         return
     end
     local aliveCount = 0
+    ---@type table<number, AIBrain>
     local alive = {}
     local caps = {}
 
     for index, brain in ArmyBrains do
         if (mode == 'all' or (mode == 'allies' and IsAlly(deadArmy, index))) and not ArmyIsCivilian(index) then
             if not brain:IsDefeated() then
-                brain.index = index
                 aliveCount = aliveCount + 1
                 alive[aliveCount] = brain
                 local cap = GetArmyUnitCap(index)
@@ -669,7 +669,7 @@ function UpdateUnitCap(deadArmy)
     if aliveCount > 0 then
         local capChng = GetArmyUnitCap(deadArmy) / aliveCount
         for i, brain in alive do
-            SetArmyUnitCap(brain.index, caps[i] + capChng)
+            SetArmyUnitCap(brain.Army, caps[i] + capChng)
         end
     end
 end
@@ -687,7 +687,7 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
         if transferUnfinishedUnits then
             local indexes = {}
             for _, brain in brains do
-                table.insert(indexes, brain.index)
+                table.insert(indexes, brain.Army)
             end
             units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
             TransferUnfinishedUnitsAfterDeath(units, indexes)
@@ -702,15 +702,15 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
                 units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
             end
             if units and not table.empty(units) then
-                local newUnits = TransferUnitsOwnership(units, brain.index, false, true)
+                local newUnits = TransferUnitsOwnership(units, brain.Army, false, true)
 
                 -- we might not transfer any newUnits
                 if not table.empty(newUnits) then
                     table.destructiveCat(totalNewUnits, newUnits)
 
                     Sync.ArmyTransfer = { {
-                        from = self.index, 
-                        to = brain.index, 
+                        from = self.Army, 
+                        to = brain.Army, 
                         reason = reason or "FullShare" 
                     } }
                 end
@@ -731,8 +731,6 @@ function GetAllegianceCategories(armyIndex)
     local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
 
     for index, brain in ArmyBrains do
-        brain.index = index
-
         if not brain:IsDefeated() and armyIndex ~= index then
             if ArmyIsCivilian(index) then
                 table.insert(BrainCategories.Civilians, brain)

@@ -57,6 +57,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 
 ---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
 ---@field AI boolean
+---@field Army Army             # self:GetArmyIndex()
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
 ---@field Status BrainState
@@ -447,7 +448,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         -- OnDefeat runs after AbandonedByPlayer, so we need to prevent killing the army twice
         if self.Status == 'Defeat' then
             return
-        end 
+        end
         self.Status = 'Defeat'
 
         local selfIndex = self:GetArmyIndex()
