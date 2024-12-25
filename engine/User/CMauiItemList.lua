@@ -82,7 +82,9 @@ end
 ---@param background Color
 ---@param selectedForeground Color
 ---@param selectedBackground Color
-function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground)
+---@param mouseoverForeground Color
+---@param mouseoverBackground Color
+function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground, mouseoverForeground, mouseoverBackground)
 end
 
 --- Sets the font to use in this ItemList control
