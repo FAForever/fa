@@ -757,16 +757,20 @@ end
 function TransferUnitsToHighestBrain(self, brains, transferUnfinishedUnits, categoriesToTransfer, reason)
     if not table.empty(brains) then
         local ratings = ScenarioInfo.Options.Ratings
+        ---@type table<AIBrain, number>
+        local brainRatings = {}
         for _, brain in brains do
-            if ratings[brain.Nickname] then
-                brain.rating = ratings[brain.Nickname]
+            -- AI can have a rating set in the lobby
+            if brain.BrainType == "Human" and ratings[brain.Nickname] then
+                brainRatings[brain] = ratings[brain.Nickname]
             else
                 -- if there is no rating, create a fake negative rating based on score
-                brain.rating = -1 / CalculateBrainScore(brain)
+                -- leave -1000 rating for negative rated players
+                brainRatings[brain] = -1000 - 1 / CalculateBrainScore(brain)
             end
         end
         -- sort brains by rating
-        table.sort(brains, function(a, b) return a.rating > b.rating end)
+        table.sort(brains, function(a, b) return brainRatings[a] > brainRatings[b] end)
         return TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesToTransfer, reason)
     end
 end
