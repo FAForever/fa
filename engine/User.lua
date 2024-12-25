@@ -131,9 +131,8 @@
 --- - `CTRL-SHIFT-ALT-ESCAPE`
 ---@alias Hotkey string
 
-
---- No clue what this does
----@param entityId number
+--- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
+---@param entityId EntityId
 ---@param onTime number
 ---@param offTime number
 ---@param totalTime number
