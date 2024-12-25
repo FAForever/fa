@@ -484,7 +484,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
             local shareOption = ScenarioInfo.Options.DisconnectShare
             local shareAcuOption = ScenarioInfo.Options.DisconnectShareCommanders
             local victoryOption = ScenarioInfo.Options.Victory
-            
+
             if shareOption == 'SameAsShare' then
                 shareOption = ScenarioInfo.Options.Share
             end
@@ -540,7 +540,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                     ForkThread(KillArmyOnACUDeath, self, shareOption)
                 end
             else
-                WARN('Invalid disconnection ACU share condition was used for this game. Defaulting to exploding ACU.')
+                WARN('Invalid disconnection ACU share condition was used for this game: `' .. (shareAcuOption or 'nil') .. '` Defaulting to exploding ACU.')
                 ForkThread(KillArmy, self, shareOption)
             end
 
