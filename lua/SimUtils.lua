@@ -902,7 +902,7 @@ function KillArmy(self, shareOption)
         elseif shareOption == 'TransferToKiller' then
             TransferUnitsToKiller(self)
         elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, BrainCategories.Enemies, true, "Defectors")
+            TransferUnitsToHighestBrain(self, BrainCategories.Enemies, true, nil, "Defectors")
         else -- Something went wrong in settings. Act like share until death to avoid abuse
             WARN('Invalid share condition was used for this game: `' .. (shareOption or 'nil') .. '` Defaulting to killing all units')
             KillSharedUnits(selfIndex)
