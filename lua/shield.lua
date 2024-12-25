@@ -42,8 +42,6 @@ local MathSqrt = math.sqrt
 local MathMin = math.min
 
 local TableAssimilate = table.assimilate
-local TableGetn = table.getn
-local TableEmpty = table.empty
 
 -- cache globals
 local Warp = Warp
@@ -61,9 +59,6 @@ local ArmyGetHandicap = ArmyGetHandicap
 local CoroutineYield = coroutine.yield
 local CreateEmitterAtBone = CreateEmitterAtBone
 local _c_CreateShield = _c_CreateShield
-local IssueClearCommands = IssueClearCommands
-local IssueRepair = IssueRepair
-local IssueGuard = IssueGuard
 
 -- cache cfunctions
 local EntityGetHealth = _G.moho.entity_methods.GetHealth
@@ -92,8 +87,6 @@ local EntitySetParentOffset = _G.moho.entity_methods.SetParentOffset
 local UnitSetScriptBit = _G.moho.unit_methods.SetScriptBit
 local UnitIsUnitState = _G.moho.unit_methods.IsUnitState
 local UnitRevertCollisionShape = _G.moho.unit_methods.RevertCollisionShape
-local UnitGetGuards = _G.moho.unit_methods.GetGuards
-local UnitGetCommandQueue = _G.moho.unit_methods.GetCommandQueue
 
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
@@ -363,7 +356,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
     -- @param self A shield that we're computing the overlapping shields for
-    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
+    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cash
     GetOverlappingShields = function(self, tick)
 
         -- allow the game tick to be send to us, saves cycles
@@ -516,12 +509,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self:ApplyDamage(instigator, amount, vector, damageType, true)
     end,
 
-    ---@param self Shield
-    ---@param instigator Unit
-    ---@param amount number
-    ---@param vector Vector
-    ---@param dmgType DamageType
-    ---@param doOverspill boolean
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
 
         -- cache information used throughout the function
@@ -578,31 +565,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- do damage logic for shield
 
-        local owner = self.Owner
-        if owner ~= instigator then
+        if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
             EntityAdjustHealth(self, instigator, -absorbed)
-
-            -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
-            if tick > owner.tickIssuedShieldRepair then
-                owner.tickIssuedShieldRepair = tick
-                local guards = UnitGetGuards(owner)
-                if not TableEmpty(guards) then
-                    -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
-                    for i, guard in guards do
-                        if TableGetn(UnitGetCommandQueue(guard)) >= 2 then
-                            guards[i] = nil
-                        end
-                    end
-
-                    -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
-                    IssueClearCommands(guards)
-                    IssueRepair(guards, owner)
-                    IssueGuard(guards, owner)
-                end
-            end
 
             -- check to spawn impact effect
             local r = Random(1, self.Size)
@@ -717,8 +684,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
-    ---@param self Shield The shield we're checking the collision for
-    ---@param other Projectile The projectile we're checking the collision with
+    -- @param self The shield we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         -- special logic when it is a projectile to simulate air crashes

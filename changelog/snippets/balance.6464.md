@@ -1,1 +1,0 @@
-- (#6464) Make engineers assisting a shield start repairing the shield in 0.1 seconds instead of 0.7 to 1.1 seconds.
