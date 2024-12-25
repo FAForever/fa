@@ -32,9 +32,11 @@ $hostProtocol = "udp"
 $hostPlayerName = "HostPlayer_1"
 $gameName = "MyGame"
 
-# Array of factions to choose from
+# Array of player data to choose from
 $factions = @("UEF", "Seraphim", "Cybran", "Aeon")
 $clans = @("Yps", "Nom", "Cly", "Mad", "Gol", "Kur", "Row", "Jip", "Bal", "She")
+$divisions = @("bronze", "silver", "gold", "diamond", "master", "grandmaster", "unlisted")
+$subdivisions = @("I", "II", "III", "IV", "V")
 
 # Get the screen resolution (for placing and resizing the windows)
 Add-Type -AssemblyName System.Windows.Forms
@@ -84,6 +86,15 @@ function Get-TeamArgument {
     return "/team $((($instanceNumber % $teams) + 1 + 1))"
 }
 
+function Get-DivisionArgText {
+    $division = $($divisions | Get-Random)
+    $argText = "/division $division"
+    if ($division -ne "unlisted" -and $division -ne "grandmaster") {
+        $argText += " /subdivision $($subdivisions | Get-Random)"
+    }
+    return $argText
+}
+
 # Prepare arguments and launch instances
 if ($players -eq 1) {
     $logFile = "dev.log"
@@ -92,7 +103,9 @@ if ($players -eq 1) {
     $hostLogFile = "host_dev_1.log"
     $hostFaction = $factions | Get-Random
     $hostTeamArgument = Get-TeamArgument -instanceNumber 0
-    $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /players $players /$hostFaction $hostTeamArgument $baseArguments /division HostDivision /subdivision 1 /clan $($clans | Get-Random)"
+
+    $divisionArgText = Get-DivisionArgText
+    $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /players $players /$hostFaction $hostTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
 
     # Launch host game instance
     Launch-GameInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments $hostArguments
@@ -108,7 +121,8 @@ if ($players -eq 1) {
         $clientPlayerName = "ClientPlayer_$($i + 1)"
         $clientFaction = $factions | Get-Random
         $clientTeamArgument = Get-TeamArgument -instanceNumber $i
-        $clientArguments = "/log $clientLogFile /joingame $hostProtocol localhost:$port $clientPlayerName /startspot $($i + 1) /players $players /$clientFaction $clientTeamArgument $baseArguments /division Diamond /subdivision $($i + 1) /clan $($clans | Get-Random)"
+        $divisionArgText = Get-DivisionArgText
+        $clientArguments = "/log $clientLogFile /joingame $hostProtocol localhost:$port $clientPlayerName /startspot $($i + 1) /players $players /$clientFaction $clientTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
         
         Launch-GameInstance -instanceNumber ($i + 1) -xPos $xPos -yPos $yPos -arguments $clientArguments
     }
