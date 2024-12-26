@@ -12,19 +12,39 @@ local Group = import("/lua/maui/group.lua").Group
 local GameCommon = import("/lua/ui/game/gamecommon.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
+---@type WorldView | false
 view = false
 
+--- Shows the logo in the secondary adapter.
+---@return nil
 function ShowLogoInHead1()
-    if GetNumRootFrames() < 2 then return end
+
+    ---------------------------------------------------------------------------
+    -- defensive programming
+
+    -- don't do anything if there's only one root frame
+    if GetNumRootFrames() < 2 then
+        return
+    end
 
     local rootFrame = GetFrame(1)
     local bg = Bitmap(rootFrame, UIUtil.UIFile('/marketing/splash.dds'))
     LayoutHelpers.FillParentPreserveAspectRatio(bg, rootFrame)
 end
 
+--- Creates a world view on the secondary adapter. The worldview is registered and available in the world view manager.
+---
+--- This function is referenced directly by the engine.
+---@return nil
 function CreateSecondView()
-    if GetNumRootFrames() < 2 then return end
-    
+    ---------------------------------------------------------------------------
+    -- defensive programming
+
+    -- don't do anything if there's only one root frame
+    if GetNumRootFrames() < 2 then
+        return
+    end
+
     ClearFrame(1)
     secondHeadGroup = Group(GetFrame(1), "secondHeadGroup")
     LayoutHelpers.FillParent(secondHeadGroup, GetFrame(1))

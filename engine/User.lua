@@ -386,9 +386,17 @@ end
 function GetFireState(units)
 end
 
---- Returns the root UI frame for a given head
+--- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter. 
+---
+--- In the game options you can add a second adapter under the 'Video' tab.
+--- 
+--- See also `GetNumRootFrames()` to determine the number of root frames. 
+--- 
+--- See also the following modules that manage these frames:
+--- - Primary adapter: lua\ui\game\worldview.lua
+--- - Secondary adapter: lua\ui\game\multihead.lua
 ---@param head number
----@return Frame
+---@return Frame | nil
 function GetFrame(head)
 end
 
@@ -473,7 +481,14 @@ end
 function GetMovieVolume()
 end
 
---- Returns the current number of root frames (typically one per head)
+--- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments.
+--- 
+--- In the game options you can add a second adapter under the 'Video' tab.
+---
+--- See also `GetFrame(0)` and `GetFrame(1)` to retrieve the root frame for a given adapter. 
+--- See also the following modules that manage these frames:
+--- - Primary adapter: lua\ui\game\worldview.lua
+--- - Secondary adapter: lua\ui\game\multihead.lua
 ---@return number
 function GetNumRootFrames()
 end
