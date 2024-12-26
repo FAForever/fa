@@ -485,7 +485,7 @@ end
 --- 
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
---- See also `GetFrame(0)` and `GetFrame(1)` to retrieve the root frame for a given adapter. 
+--- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter. 
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
 --- - Secondary adapter: lua\ui\game\multihead.lua
