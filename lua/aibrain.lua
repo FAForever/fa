@@ -18,8 +18,7 @@ local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
 local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
-local RecallOnArmyDefeat = import("/lua/sim/Recall.lua")
-local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+local RecallOnArmyDefeat = import("/lua/sim/Recall.lua").OnArmyDefeat
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 
 local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
@@ -1262,3 +1261,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --#endregion
     -------------------------------------------------------------------------------
 }
+
+---#region backwards compatibility
+
+local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+
+--#endregion
