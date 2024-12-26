@@ -481,7 +481,7 @@ end
 function GetMovieVolume()
 end
 
---- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments.
+--- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments. The game supports up to two root frames.
 --- 
 --- In the game options you can add a second adapter under the 'Video' tab.
 ---
