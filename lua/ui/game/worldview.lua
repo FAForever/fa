@@ -321,7 +321,7 @@ function UnlockInput()
     end
 end
 
---- This function is called by the engine so it can not be removed (its logic could be changed though)
+--- This function is called by the engine so it cannot be removed (its logic could be changed though)
 ---@return boolean
 function IsInputLocked()
     return (viewLeft and viewLeft:IsInputLocked()) or (viewRight and viewRight:IsInputLocked()) or false
