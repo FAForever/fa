@@ -50,7 +50,7 @@ end
 --- This function is referenced directly by the engine.
 ---@return nil
 function CreateSecondView()
-    
+
     ---------------------------------------------------------------------------
     -- defensive programming
 
@@ -67,7 +67,6 @@ function CreateSecondView()
     view:Register('CameraHead2', nil, '<LOC map_view_0003>Secondary View', 3)
     view:SetRenderPass(UIUtil.UIRP_UnderWorld | UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
     LayoutHelpers.FillParent(view, secondHeadGroup)
-
 end
 
 -- backwards compatibility for mods
