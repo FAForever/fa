@@ -283,8 +283,12 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         -- disable all weapons, enable with a delay
         for k = 1, unit.WeaponCount do
             local weapon = unit:GetWeapon(k)
-            weapon:SetEnabled(false)
-            weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
+            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
+            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
+            if not enablingEnhancement or (activeEnhancements and activeEnhancements[enablingEnhancement]) then
+                weapon:SetEnabled(false)
+                weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
+            end
         end
     end
 
