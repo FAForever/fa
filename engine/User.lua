@@ -395,7 +395,7 @@ end
 --- See also the following modules that manage these frames:
 --- - Primary adapter: lua\ui\game\worldview.lua
 --- - Secondary adapter: lua\ui\game\multihead.lua
----@param head number
+---@param head 0 | 1
 ---@return Frame | nil
 function GetFrame(head)
 end
