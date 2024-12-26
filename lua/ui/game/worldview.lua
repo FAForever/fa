@@ -153,7 +153,7 @@ end
 --- Creates the world view on the primary monitor.
 ---@param parent Control
 ---@param mapGroup Control
----@param mapGroupRight Control | nil   # if provided, creates a split view with a separate world view in both map groups
+---@param mapGroupRight? Control # if provided, creates a split view with a separate world view in both map groups
 function CreateMainWorldView(parent, mapGroup, mapGroupRight)
     -- feature: preserve the world camera when changing views
     ---@type UserCamera
