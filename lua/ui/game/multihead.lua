@@ -20,6 +20,11 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+--- This module is responsible for creating the secondary worldview.
+---
+--- This module is tightly coupled with the following module(s):
+--- - lua/ui/game/worldview.lua
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group

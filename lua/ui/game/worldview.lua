@@ -6,6 +6,11 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+--- This module is responsible for creating the primary worldview(s) and managing all worldviews in general.
+---
+--- This module is tightly coupled with the following module(s):
+--- - lua/ui/game/multihead.lua
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
