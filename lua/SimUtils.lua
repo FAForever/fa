@@ -935,12 +935,12 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
     -- Share units including ACUs and walls and keep track of ACUs
     local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectShareTemporary")
-    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
+    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits or {})
 
     -- non-assassination games could have an army abandon without having any commanders
     if not table.empty(sharedCommanders) then
         -- create a countdown to show when the ACU recalls (similar to the one used for timed self-destruct)
-        for _, com in sharedCommanders do
+        for i, com in sharedCommanders do
             -- don't recall shared ACUs
             if com.RecallingAfterDefeat then
                 sharedCommanders[i] = nil
@@ -994,7 +994,7 @@ function KillArmyOnACUDeath(self, shareOption)
     -- Share units including ACUs and walls and keep track of ACUs
     local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectSharePermanent")
-    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
+    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits or {})
 
     if not table.empty(sharedCommanders) then
         local shareTick = GetGameTick()
@@ -1013,7 +1013,7 @@ function KillArmyOnACUDeath(self, shareOption)
 
         -- if all the commanders die early, assume disconnect abuse and apply standard share condition. Only makes sense in Assassination.
         local scenarioOptions = ScenarioInfo.Options
-        if not oneComAlive and shareTime + CommanderSafeTime <= GetGameTick() and scenarioOptions.Victory == "demoralization" then
+        if not oneComAlive and shareTick + CommanderSafeTime <= GetGameTick() and scenarioOptions.Victory == "demoralization" then
             KillArmy(self, scenarioOptions.Share)
             return
         end
