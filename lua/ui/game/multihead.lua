@@ -52,7 +52,6 @@ end
 --- Creates a world view on the secondary adapter. The worldview is registered and available in the world view manager.
 ---
 --- This function is referenced directly by the engine.
----@return nil
 function CreateSecondView()
 
     ---------------------------------------------------------------------------
