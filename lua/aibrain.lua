@@ -496,8 +496,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
                 local commanders = self:GetListOfUnits(categories.COMMAND, false)
                 if shareAcuOption == 'Recall' then
+                    local gameTick = GetGameTick()
                     for _, com in commanders do
-                        if com.LastTickDamaged + CommanderSafeTime <= GetGameTick() then
+                        if com.LastTickDamaged + CommanderSafeTime <= gameTick then
                             table.insert(safeCommanders, com)
                         else
                             -- explode unsafe ACUs because KillArmy might not
