@@ -102,7 +102,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     OnCreate = function(self)
         -- Store blueprint for improved access pattern, see benchmark on blueprints
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Blueprint = bp
 
         -- Legacy information stored for backwards compatibility

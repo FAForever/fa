@@ -35,7 +35,7 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
         -- prevent the unit from being reclaimed
         self:SetReclaimable(false)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
@@ -51,7 +51,7 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
         self:ForkThread(function()
             self.OpenAnimManip = CreateAnimator(self)
             self.Trash:Add(self.OpenAnimManip)
-            self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+            self.OpenAnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0.1)
             self:PlaySound(bp.Audio['EggOpen'])
 
             WaitFor(self.OpenAnimManip)

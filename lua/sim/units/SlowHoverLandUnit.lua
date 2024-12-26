@@ -38,7 +38,7 @@ SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
 
-        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self.Blueprint).Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
         else

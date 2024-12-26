@@ -19,7 +19,7 @@ UAS0302 = ClassUnit(ASeaUnit) {
     OnCreate = function(self)
         ASeaUnit.OnCreate(self)
         for i = 1, 3 do
-            self.Trash:Add(CreateAnimator(self):PlayAnim(self:GetBlueprint().Weapon[i].AnimationOpen))
+            self.Trash:Add(CreateAnimator(self):PlayAnim(self.Blueprint.Weapon[i].AnimationOpen))
         end
     end,
 }

@@ -34,7 +34,7 @@ SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
 
         -- the layer change is called before `OnCreate` is when a unit is created, hence the field `self.Blueprint` may not exist
 
-        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self.Blueprint).Physics.WaterSpeedMultiplier
         if new == 'Seabed' then
             self:SetSpeedMult(mult)
         else
