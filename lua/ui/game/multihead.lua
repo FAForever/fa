@@ -34,7 +34,6 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 view = false
 
 --- Shows the logo in the secondary adapter.
----@return nil
 function ShowLogoInHead1()
 
     ---------------------------------------------------------------------------
