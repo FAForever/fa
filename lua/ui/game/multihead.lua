@@ -50,6 +50,7 @@ end
 --- This function is referenced directly by the engine.
 ---@return nil
 function CreateSecondView()
+    
     ---------------------------------------------------------------------------
     -- defensive programming
 
