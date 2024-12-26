@@ -11,7 +11,7 @@ local SCivilianStructureUnit = import("/lua/seraphimunits.lua").SCivilianStructu
 XSC1901 = ClassUnit(SCivilianStructureUnit) {
 	OnCreate = function(self)
 		SCivilianStructureUnit.OnCreate(self)
-		local army = self:GetArmy()
+		local army = self.Army
 		--------------CreateAttachedEmitter(self,'XSC1901',army, '/effects/emitters/seraphim_rift_arch_base_01_emit.bp'):OffsetEmitter(0.00, 0.00, 0.00)
         CreateAttachedEmitter(self,'XSC1901',army, '/effects/emitters/seraphim_rift_arch_base_01_emit.bp')	-- glow
         CreateAttachedEmitter(self,'XSC1901',army, '/effects/emitters/seraphim_rift_arch_base_02_emit.bp')	-- plasma pillar

@@ -1379,7 +1379,7 @@ CzarShield = ClassShield(PersonalShield) {
 
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
-        local army = self:GetArmy()
+        local army = self.Army
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity(self.ImpactEntitySpecs)
         local pos = self:GetPosition()

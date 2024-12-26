@@ -50,7 +50,7 @@ Flare = Class(Entity) {
     ---@param self Flare
     ---@param spec FlareSpec
     OnCreate = function(self, spec)
-        self.Army = self:GetArmy()
+        self.Army = self.Army
         self.Owner = spec.Owner
         self.Radius = spec.Radius or 5
         self.OffsetMult = spec.OffsetMult or 0
@@ -133,7 +133,7 @@ DepthCharge = Class(Entity) {
     ---@param self DepthCharge
     ---@param spec DepthChargeSpec
     OnCreate = function(self, spec)
-        self.Army = self:GetArmy()
+        self.Army = self.Army
         self.Owner = spec.Owner
         self.Radius = spec.Radius
         self.ProjectilesToDeflect = spec.ProjectilesToDeflect or 3
@@ -172,7 +172,7 @@ MissileRedirect = Class(Entity) {
     ---@param self MissileRedirect
     ---@param spec MissileRedirectSpec
     OnCreate = function(self, spec)
-        self.Army = self:GetArmy()
+        self.Army = self.Army
         self.Owner = spec.Owner
         self.Radius = spec.Radius
         self.RedirectRateOfFire = spec.RedirectRateOfFire or 1

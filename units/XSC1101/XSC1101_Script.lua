@@ -34,7 +34,7 @@ UAC1101 = ClassUnit(ACivilianStructureUnit) {
 
     OnCreate = function(self)
 		ACivilianStructureUnit.OnCreate(self)
-		local army = self:GetArmy()
+		local army = self.Army
 		for k, v in self.BoneSetE01 do
 			AttachBeamEntityToEntity(self, self.BoneB01, self, v, army, self.FxBeamAmbient ) 
 		end
