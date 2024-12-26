@@ -187,7 +187,7 @@ end
 
 --- Create a border around the `parent` with the `filter-ping-list-panel` files
 ---@param parent Control
----@return Bitmap[] border # 8 Bitmap objects: top left, top middle, top right, middle left, middle right, bottom left, bottom middle, bottom right
+---@return { tl: Bitmap, tm: Bitmap, tr: Bitmap, ml: Bitmap, mr: Bitmap, bl: Bitmap, bm: Bitmap, br: Bitmap } border
 function CreateBorder(parent)
     -- t, m, b = top, middle, bottm
     -- l, m, r = left, middle, right
@@ -209,5 +209,5 @@ function CreateBorder(parent)
     Layouter(bm):CenteredBelow(parent):FillHorizontally(parent):End()
     Layouter(br):BottomRightOf(parent):End()
 
-    return { tl, tm, tr, ml, mr, bl, bm, br }
+    return { ["tl"] = tl, ["tm"] = tm, ["tr"] = tr, ["ml"] = ml, ["mr"] = mr, ["bl"] = bl, ["bm"] = bm, ["br"] = br }
 end
