@@ -1,6 +1,6 @@
 ---@meta
 
----@class Camera
+---@class UserCamera
 local CameraImpl = {}
 
 
@@ -12,8 +12,12 @@ local CameraImpl = {}
 
 ---@alias UserCameraAccelerationModes 'Linear' | 'FastInSlowOut' | 'SlowInOut'
 
----
+--- Enables smooth transitions.
 function CameraImpl:EnableEaseInOut()
+end
+
+--- Disables smooth transitions.
+function CameraImpl:DisableEaseInOut()
 end
 
 --- Returns the focus point (on the terrain) of the center of the screen
@@ -109,9 +113,9 @@ function CameraImpl:SetZoom(zoom, seconds)
 end
 
 --- Snaps the camera to the given position, orientation and zoom
----@param position any
----@param orientationHPR any
----@param zoom any
+---@param position Vector
+---@param orientationHPR Vector
+---@param zoom number
 function CameraImpl:SnapTo(position, orientationHPR, zoom)
 end
 
