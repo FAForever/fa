@@ -43,21 +43,21 @@ local Inspector_mt = { __index = Inspector }
 ---@field meta? boolean
 
 -- upvalue scope for performance
-local MathFloor = math.floor
-local StringRep = string.rep
-local StringMatch = string.match
-local StringSub = string.sub
-local StringGsub = string.gsub
-local StringFormat = string.format
-local DebugGetInfo = debug.getinfo
 local DebugAllocatedSize = debug.allocatedsize
-local TableSort = table.sort
+local DebugGetInfo = debug.getinfo
+local MathFloor = math.floor
+local StringFormat = string.format
+local StringGsub = string.gsub
+local StringMatch = string.match
+local StringRep = string.rep
+local StringSub = string.sub
 local TableEmpty = table.empty
+local TableSort = table.sort
 
-local tostring = tostring
-local rawget = rawget
-local type = type
 local getmetatable = getmetatable
+local rawget = rawget
+local tostring = tostring
+local type = type
 
 local DiskToLocal = DiskToLocal
 
