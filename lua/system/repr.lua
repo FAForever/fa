@@ -285,7 +285,7 @@ local CClassNameToString = {
 }
 
 ---@param v table | fa-class | fa-class-state
-local function fafTableToString(v)
+local function objectToString(v)
     local mt = getmetatable(v)
     if _rawget(v, "__State") then
         return fmt("%s (State %s)", tostring(v), tostring(v.__StateIdentifier))
@@ -316,11 +316,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, fmt("{...} -- %s (%g bytes)", fafTableToString(t), debug.allocatedsize(t)))
+            puts(buf, fmt("{...} -- %s (%g bytes)", objectToString(t), debug.allocatedsize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, fmt("{ -- %s (%d bytes)", fafTableToString(t), debug.allocatedsize(t)))
+            puts(buf, fmt("{ -- %s (%d bytes)", objectToString(t), debug.allocatedsize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
