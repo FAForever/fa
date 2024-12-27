@@ -1,4 +1,4 @@
-- (#6560, #6595) Adjust several minor stats to better align the Vulthoo with its role as a 'Tech 2.5 unit'. Additionally, fix a bug that prevented it from hitting units directly beneath it.
+- (#6560) Adjust several minor stats to better align the Vulthoo with its role as a 'Tech 2.5 unit'.
 
   - Vulthoo: T2 Gunship (XSA0203):
     - Physics
@@ -6,6 +6,3 @@
       - FuelUseTime: 400 --> 600 (800 for Tech 3 Gunships)
     - Air Crash
       - Damage: 100 --> 200 (300 for Tech 3 Gunships)
-    - Heavy Phasic Autogun (x2)
-      - TurretPitch: -20 --> -40
-      - TurretPitchRange: 60 --> 90
