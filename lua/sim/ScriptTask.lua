@@ -78,7 +78,7 @@ ScriptTask = Class(moho.ScriptTask_Methods) {
         self.CommandData = commandData
     end,
 
-    --- Called by the engine in an interval. Function must return a value in TaskStatus
+    --- Called by the engine at an interval determined by the returned TaskStatus value
     ---@param self ScriptTask
     ---@return ScriptTaskStatus
     TaskTick = function(self)

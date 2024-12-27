@@ -21,7 +21,7 @@ TargetLocation = Class(ScriptTask) {
         local unit = self:GetUnit():OnTargetLocation(commandData.Location)
     end,
 
-    -- Called by the engine every tick. Function must return a value in TaskStatus
+    --- Called by the engine at an interval determined by the returned TaskStatus value
     ---@param self TargetLocationTask
     ---@return ScriptTaskStatus
     TaskTick = function(self)

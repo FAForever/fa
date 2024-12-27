@@ -38,7 +38,7 @@ EnhanceTask = Class(ScriptTask) {
     end,
 
     Stopping = State {
-        -- Called by the engine every tick. Function must return a value in TaskStatus
+        --- Called by the engine at an interval determined by the returned TaskStatus value
         ---@param self EnhanceTask
         ---@return ScriptTaskStatus
         TaskTick = function(self)
@@ -62,7 +62,7 @@ EnhanceTask = Class(ScriptTask) {
     },
 
     Enhancing = State {
-        -- Called by the engine every tick. Function must return a value in TaskStatus
+        --- Called by the engine at an interval determined by the returned TaskStatus value
         ---@param self EnhanceTask
         ---@return ScriptTaskStatus
         TaskTick = function(self)

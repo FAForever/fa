@@ -30,7 +30,7 @@ GiveTask = Class(ScriptTask) {
         self.first = true
     end,
 
-    -- Called by the engine every tick. Function must return a value in TaskStatus
+    --- Called by the engine at an interval determined by the returned TaskStatus value
     ---@param self GiveTask
     ---@return ScriptTaskStatus
     TaskTick = function(self)
