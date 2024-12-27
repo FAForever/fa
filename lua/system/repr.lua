@@ -53,8 +53,8 @@ local tostring = tostring
 local rawget = rawget
 local type = type
 local getmetatable = getmetatable
-local debugGetInfo = debug.getinfo
-local debugAllocatedSize = debug.allocatedsize
+local DebugGetInfo = debug.getinfo
+local DebugAllocatedSize = debug.allocatedsize
 
 local TableSort = table.sort
 local TableEmpty = table.empty
@@ -192,7 +192,7 @@ function Inspector:getId(v)
         id = (ids[tv] or 0) + 1
         ids[tv] = id
         if tv == "function" then
-            local info = debugGetInfo(v, "S")
+            local info = DebugGetInfo(v, "S")
             id = StringFormat("%s %s(%d)", id, DiskToLocal(StringSub(info.source, 2)--[[@as FileName]]), info.linedefined)
         end
         ids[v] = id
@@ -317,11 +317,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, StringFormat("{...} -- %s (%g bytes)", objectToString(t), debugAllocatedSize(t)))
+            puts(buf, StringFormat("{...} -- %s (%g bytes)", objectToString(t), DebugAllocatedSize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, StringFormat("{ -- %s (%d bytes)", objectToString(t), debugAllocatedSize(t)))
+            puts(buf, StringFormat("{ -- %s (%d bytes)", objectToString(t), DebugAllocatedSize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
@@ -341,7 +341,7 @@ function Inspector:putValue(v)
                     end
                     puts(buf, ' = ')
                     if k == "__index" and tostring(t[k]) == tostring(t) then
-                        puts(buf, StringFormat("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debugAllocatedSize(t)))
+                        puts(buf, StringFormat("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), DebugAllocatedSize(t)))
                     else
                         self:putValue(t[k])
                     end
