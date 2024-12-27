@@ -38,6 +38,7 @@ local TableEmpty = table.empty
 local TableSort = table.sort
 
 local getmetatable = getmetatable
+local next = next
 local rawget = rawget
 local tostring = tostring
 local type = type
