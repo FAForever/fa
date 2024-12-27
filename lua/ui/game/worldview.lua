@@ -47,7 +47,7 @@ local function CreatePositionMarker(army, worldView)
     marker.frame.Depth:Set(marker:Depth() - 1)
 
     marker.name = UIUtil.CreateText(marker, data.name, 12, UIUtil.bodyFont)
-	marker.name:DisableHitTest()
+    marker.name:DisableHitTest()
     marker.name:SetColor('white')
 
     if Factions[data.faction] then
@@ -120,7 +120,7 @@ function MarkStartPositions(startPositions)
             local faction = armyData.faction + 1
             local color = armyData.color
 
-            positionMarkers[armyId] = {army = armyId, pos = pos, name = name, faction = faction, color = color, views = 0}
+            positionMarkers[armyId] = { army = armyId, pos = pos, name = name, faction = faction, color = color, views = 0 }
 
             for viewName, view in MapControls do
                 if viewName ~= 'MiniMap' then
@@ -132,6 +132,16 @@ function MarkStartPositions(startPositions)
 end
 
 function CreateMainWorldView(parent, mapGroup, mapGroupRight)
+    -- feature: preserve the world camera when changing views
+    ---@type UserCamera
+    local worldCamera = GetCamera('WorldCamera')
+
+    ---@type UserCameraSettings | nil
+    local worldCameraSettings = nil
+    if worldCamera then
+        worldCameraSettings = worldCamera:SaveSettings()
+    end
+
     if viewLeft then
         viewLeft:Destroy()
         viewLeft = false
@@ -176,6 +186,15 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         view:DisableHitTest()
         LayoutHelpers.FillParent(view, viewLeft)
     end
+
+    -- feature: preserve the world camera when changing views
+    if worldCameraSettings then
+        local newWorldCamera = GetCamera('WorldCamera')
+        if newWorldCamera then
+            newWorldCamera:RestoreSettings(worldCameraSettings)
+        end
+    end
+
     import("/lua/ui/game/multifunction.lua").RefreshMapDialog()
 end
 
