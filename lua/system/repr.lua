@@ -25,23 +25,6 @@
 -- SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --******************************************************************************************************
 
----@class DebugInspector
----@field buf table
----@field depth integer
----@field level integer
----@field ids table<type, integer> | table<any, integer|string>
----@field newline string
----@field meta boolean
----@field indent string
-local Inspector = {}
-local Inspector_mt = { __index = Inspector }
-
----@class DebugInspectOptions
----@field depth? number
----@field newline? string
----@field indent? string
----@field meta? boolean
-
 -- upvalue scope for performance
 local DebugAllocatedSize = debug.allocatedsize
 local DebugGetInfo = debug.getinfo
@@ -60,6 +43,23 @@ local tostring = tostring
 local type = type
 
 local DiskToLocal = DiskToLocal
+
+---@class DebugInspector
+---@field buf table
+---@field depth integer
+---@field level integer
+---@field ids table<type, integer> | table<any, integer|string>
+---@field newline string
+---@field meta boolean
+---@field indent string
+local Inspector = {}
+local Inspector_mt = { __index = Inspector }
+
+---@class DebugInspectOptions
+---@field depth? number
+---@field newline? string
+---@field indent? string
+---@field meta? boolean
 
 ---@param t table
 ---@return function
