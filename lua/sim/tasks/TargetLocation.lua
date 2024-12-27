@@ -18,7 +18,7 @@ TargetLocation = Class(ScriptTask) {
     ---@param commandData { TaskName: "TargetLocation", UserValidated: boolean, Location: Vector } # LuaParams table from `UserScriptCommand`. This table is shared by all units ordered the task from one command.
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
-        local unit = self:GetUnit():OnTargetLocation(commandData.Location)
+        self:GetUnit():OnTargetLocation(commandData.Location)
     end,
 
     --- Called by the engine at an interval determined by the returned TaskStatus value
