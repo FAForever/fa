@@ -54,6 +54,7 @@ local rawget = rawget
 local type = type
 local getmetatable = getmetatable
 local debugGetInfo = debug.getinfo
+local debugAllocatedSize = debug.allocatedsize
 
 local TableSort = table.sort
 local TableEmpty = table.empty
@@ -316,11 +317,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, StringFormat("{...} -- %s (%g bytes)", objectToString(t), debug.allocatedsize(t)))
+            puts(buf, StringFormat("{...} -- %s (%g bytes)", objectToString(t), debugAllocatedSize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, StringFormat("{ -- %s (%d bytes)", objectToString(t), debug.allocatedsize(t)))
+            puts(buf, StringFormat("{ -- %s (%d bytes)", objectToString(t), debugAllocatedSize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
@@ -340,7 +341,7 @@ function Inspector:putValue(v)
                     end
                     puts(buf, ' = ')
                     if k == "__index" and tostring(t[k]) == tostring(t) then
-                        puts(buf, StringFormat("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debug.allocatedsize(t)))
+                        puts(buf, StringFormat("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debugAllocatedSize(t)))
                     else
                         self:putValue(t[k])
                     end
