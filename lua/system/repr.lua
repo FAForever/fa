@@ -49,15 +49,15 @@ local StringMatch = string.match
 local StringSub = string.sub
 local StringGsub = string.gsub
 local StringFormat = string.format
+local DebugGetInfo = debug.getinfo
+local DebugAllocatedSize = debug.allocatedsize
+local TableSort = table.sort
+local TableEmpty = table.empty
+
 local tostring = tostring
 local rawget = rawget
 local type = type
 local getmetatable = getmetatable
-local DebugGetInfo = debug.getinfo
-local DebugAllocatedSize = debug.allocatedsize
-
-local TableSort = table.sort
-local TableEmpty = table.empty
 
 local DiskToLocal = DiskToLocal
 
