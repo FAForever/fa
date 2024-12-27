@@ -43,14 +43,14 @@ local Inspector_mt = { __index = Inspector }
 ---@field meta? boolean
 
 -- upvalue scope for performance
+local MathFloor = math.floor
+local StringRep = string.rep
+local StringMatch = string.match
+local StringSub = string.sub
+local StringGsub = string.gsub
+local StringFormat = string.format
 local tostring = tostring
-local rep = string.rep
-local flr = math.floor
-local match = string.match
-local substr = string.sub
-local gsub = string.gsub
-local fmt = string.format
-local _rawget = rawget
+local rawget = rawget
 local type = type
 local getmetatable = getmetatable
 local debugGetInfo = debug.getinfo
@@ -71,10 +71,10 @@ end
 ---@param str string
 ---@return string
 local function smartQuote(str)
-    if match(str, '"') and not match(str, "'") then
+    if StringMatch(str, '"') and not StringMatch(str, "'") then
         return "'" .. str .. "'"
     end
-    return '"' .. gsub(str, '"', '\\"') .. '"'
+    return '"' .. StringGsub(str, '"', '\\"') .. '"'
 end
 
 ---@type table<string, boolean>
@@ -117,7 +117,7 @@ end
 ---@return boolean
 local function isSequenceKey(k, sequenceLength)
     return type(k) == "number" and
-        flr(k) == k and
+        MathFloor(k) == k and
         1 <= (k) and
         k <= sequenceLength
 end
@@ -153,7 +153,7 @@ end
 local function getKeys(t)
 
     local seqLen = 1
-    while _rawget(t, seqLen) ~= nil do
+    while rawget(t, seqLen) ~= nil do
         seqLen = seqLen + 1
     end
     seqLen = seqLen - 1
@@ -178,7 +178,7 @@ end
 
 ---@param inspector DebugInspector
 local function tabify(inspector)
-    puts(inspector.buf, inspector.newline .. rep(inspector.indent, inspector.level))
+    puts(inspector.buf, inspector.newline .. StringRep(inspector.indent, inspector.level))
 end
 
 ---@param v any
@@ -192,7 +192,7 @@ function Inspector:getId(v)
         ids[tv] = id
         if tv == "function" then
             local info = debugGetInfo(v, "S")
-            id = fmt("%s %s(%d)", id, DiskToLocal(substr(info.source, 2)--[[@as FileName]]), info.linedefined)
+            id = StringFormat("%s %s(%d)", id, DiskToLocal(StringSub(info.source, 2)--[[@as FileName]]), info.linedefined)
         end
         ids[v] = id
     end
@@ -287,16 +287,16 @@ local CClassNameToString = {
 ---@param v table | fa-class | fa-class-state
 local function objectToString(v)
     local mt = getmetatable(v)
-    if _rawget(v, "__State") then
-        return fmt("%s (State %s)", tostring(v), tostring(v.__StateIdentifier))
+    if rawget(v, "__State") then
+        return StringFormat("%s (State %s)", tostring(v), tostring(v.__StateIdentifier))
     elseif mt == VectorMeta then
-        return fmt("%s (%s)", tostring(v), "Vector")
+        return StringFormat("%s (%s)", tostring(v), "Vector")
     elseif mt == LazyVarMeta then
-        return fmt("%s (%s)", tostring(v), "LazyVar")
+        return StringFormat("%s (%s)", tostring(v), "LazyVar")
     else
         local friendlyName = CClassNameToString[mt.__name]
         if friendlyName then
-            return fmt("%s (%s)", tostring(v), friendlyName)
+            return StringFormat("%s (%s)", tostring(v), friendlyName)
         else
             return tostring(v)
         end
@@ -316,11 +316,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, fmt("{...} -- %s (%g bytes)", objectToString(t), debug.allocatedsize(t)))
+            puts(buf, StringFormat("{...} -- %s (%g bytes)", objectToString(t), debug.allocatedsize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, fmt("{ -- %s (%d bytes)", objectToString(t), debug.allocatedsize(t)))
+            puts(buf, StringFormat("{ -- %s (%d bytes)", objectToString(t), debug.allocatedsize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
@@ -340,7 +340,7 @@ function Inspector:putValue(v)
                     end
                     puts(buf, ' = ')
                     if k == "__index" and tostring(t[k]) == tostring(t) then
-                        puts(buf, fmt("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debug.allocatedsize(t)))
+                        puts(buf, StringFormat("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), debug.allocatedsize(t)))
                     else
                         self:putValue(t[k])
                     end
@@ -373,7 +373,7 @@ function Inspector:putValue(v)
         end
 
     else
-        puts(buf, fmt('<%s %s>', tv, self:getId(v)))
+        puts(buf, StringFormat('<%s %s>', tv, self:getId(v)))
     end
 end
 
