@@ -191,7 +191,7 @@ UnitBlueprint{
                 Water = "Land|Water|Seabed",
             },
             FiringRandomnessWhileMoving = 0.3,
-            FiringTolerance = 2,
+            FiringTolerance = 0,
             Label = "MainGun",
             MaxRadius = 65,
             MuzzleChargeDelay = 1,

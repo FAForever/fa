@@ -136,7 +136,7 @@ XSL0305 = ClassUnit(SLandUnit) {
         weapon.FxMuzzleFlash = self.Weapons[label].FxMuzzleFlash
         weapon.damageTableCache = false
         weapon:ChangeProjectileBlueprint(bp.ProjectileId)
-        weapon:ChangeFiringTolerance(bp.FiringTolerance)
+        weapon:ChangeFiringTolerance(bp.FiringTolerance) -- kept for backwards compatibility
         weapon:ChangeMaxRadius(bp.MaxRadius)
         weapon:ChangeRateOfFire(bp.RateOfFire)
         weapon:SetTurretYawSpeed(bp.TurretYawSpeed)
