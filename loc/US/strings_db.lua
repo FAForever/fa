@@ -1595,7 +1595,7 @@ Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's bu
 Unit_Description_0111="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
 Unit_Description_0112="Doubles the main cannon's rate of fire, and increases its range and that of Overcharge. Increases the range of the Microwave Laser if present.\n\n+100% Main cannon rate of fire\n+8 Main cannon range\n+8 Microwave Laser range"
 Unit_Description_0113="Enhances the ACU with a Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
-Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 250\nNanite Torpedo range = 60\n+34 Sonar Radius"
+Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 225\nNanite Torpedo range = 60\n+34 Sonar Radius"
 Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
 
 -- CYBRAN -- Support Commander Units/Upgrades
