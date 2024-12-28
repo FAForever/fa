@@ -139,9 +139,9 @@ PlatoonFormManager = Class(BuilderManager) {
                 WARN('*Platoon Form: Could not find template named: ' .. builder:GetPlatoonTemplate())
                 return
             end
-            local formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
+            local formIt = poolPlatoon:CanFormPlatoon(template, 1, self.Location, radius)
             if formIt and builder:GetBuilderStatus() then
-                local hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
+                local hndl = poolPlatoon:FormPlatoon(template, 1, self.Location, radius)
 
                 --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager Forming - ',repr(builder.BuilderName),': Location = ',self.LocationType)
                 --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager - Platoon Size = ', table.getn(hndl:GetPlatoonUnits()))
