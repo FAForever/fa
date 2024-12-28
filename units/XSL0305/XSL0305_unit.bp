@@ -289,7 +289,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 2000,
+            Damage = 1570,
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = "Normal",
@@ -324,7 +324,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/152, --10/integer interval in ticks
+            RateOfFire = 10/119, --10/integer interval in ticks
             RenderFireClock = true,
             SlavedToBody = false,
             TargetPriorities = {
