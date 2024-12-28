@@ -195,23 +195,17 @@ UnitBlueprint{
     },
     Weapon = {
         {
+            -- Dummy weapon to control attack move stopping distance
             AboveWaterTargetsOnly = true,
-            Damage = 0,
-            DamageFriendly = false,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
             Label = "DummyWeapon",
             MaxRadius = 55,
-            RackBones = {
-                {
-                    MuzzleBones = { "Muzzle" },
-                    RackBone = "Barrel",
-                },
-            },
-            RateOfFire = 10/20, --10/integer interval in ticks
-            SlavedToBody = false,
+            RateOfFire = 0, --10/integer interval in ticks
+            TrackingRadius = 1.0,
+            TargetCheckInterval = 2.0,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
         },
