@@ -2,6 +2,7 @@ UnitBlueprint{
     Description = "<LOC xsl0305_desc>Sniper Bot",
     AI = {
         TargetBones = { "Barrel" },
+        GuardScanRadius = 77,
     },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0305_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
