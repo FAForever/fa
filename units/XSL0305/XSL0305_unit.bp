@@ -195,6 +195,7 @@ UnitBlueprint{
     },
     Weapon = {
         {
+            AboveWaterTargetsOnly = true,
             Damage = 0,
             DamageFriendly = false,
             FireTargetLayerCapsTable = {
