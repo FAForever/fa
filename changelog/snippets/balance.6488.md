@@ -1,0 +1,37 @@
+- (#6488) Support Commander Base Stats
+
+  - Aeon
+    - Health: 15000 -> 11500
+    - RegenRate: 17 -> 14
+    - EnergyCost: 27100 -> 21450
+    - MassCost: 1950 -> 1650
+    - BuildRate: 56 -> 40
+    - BuildTime: 14400 -> 11500
+    - GunDamage: 300 -> 100
+    - GunRange: 30 -> 25
+  - UEF
+    - Health: 16000 -> 13000
+    - RegenRate: 20 -> 16
+    - EnergyCost: 25200 -> 21450
+    - MassCost: 2100 -> 1650
+    - BuildRate: 56 -> 40
+    - BuildTime: 14400 -> 11500
+    - GunDamage: 300 -> 100
+  - Cybran
+    - Health: 19000 -> 12500
+    - RegenRate: 25 -> 21
+    - EnergyCost: 26400 -> 21450
+    - MassCost: 2000 -> 1650
+    - BuildRate: 56 -> 40
+    - BuildTime: 14400 -> 11500
+    - GunDamage: 300 -> 100
+  - Seraphim
+    - Health: 15000 -> 11500
+    - RegenRate: 17 -> 14
+    - EnergyCost: 27100 -> 21450
+    - MassCost: 1950 -> 1650
+    - BuildRate: 56 -> 40
+    - BuildTime: 14400 -> 11500
+    - MassProduction: 3 -> 1
+    - EnergyProduction: 300 -> 100
+    - GunDamage: 400 -> 100
