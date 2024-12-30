@@ -56,7 +56,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UEL0301
     ---@param unitBeingBuilt Unit
-    ---@param order string unused
+    ---@param order string Unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -172,7 +172,6 @@ UEL0301 = ClassUnit(CommandUnit) {
         CommandUnit.OnTransportDetach(self, bone, attachee)
         attachee:SetDoNotTarget(false)
     end,
-
 
     -- ============================================================================================================================================================
     -- ENHANCEMENTS
@@ -357,7 +356,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param intel IntelType
     OnIntelEnabled = function(self, intel)
         CommandUnit.OnIntelEnabled(self, intel)
-        if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
+        if self.EnhancementUpgrades.SensorRangeEnhancer and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
                 self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
@@ -371,7 +370,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param intel IntelType
     OnIntelDisabled = function(self, intel)
         CommandUnit.OnIntelDisabled(self, intel)
-        if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then
+        if self.EnhancementUpgrades.SensorRangeEnhancer and not self:IsIntelEnabled('Jammer') then
             self:SetMaintenanceConsumptionInactive()
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
