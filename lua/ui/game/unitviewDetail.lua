@@ -139,7 +139,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
         if string.find(bpID, '_') then
             bpID = string.sub(bpID, 1, string.find(bpID, "_[^_]*$")-1)
         end
-        WrapAndPlaceText(nil, nil, bpID.."-"..iconID, View.Description)
+        WrapAndPlaceText(bp, userUnit, bpID.."-"..iconID, View.Description)
     end
 
     local showShield = false
@@ -442,11 +442,26 @@ function WrapAndPlaceText(bp, builder, descID, control)
     local blocks = {}
     --Unit description
     local text = LOC(UnitDescriptions[descID])
+
+    local function VAR(field)
+        local preReq = bp.Prerequisite
+        if not bp[field] then
+            WARN('VAR fail; field: ' .. field)
+            table.print(bp)
+            return '<VAR ' .. field .. '>'
+        elseif builder.Enhancements.preReq then
+            return tostring(bp[field] - (builder.Enhancements.preReq[field] or 0))
+        else
+            return tostring(bp[field])
+        end
+    end
+
     if text and text ~='' then
+        text = (string.gsub(text, '<VAR (%w+)>', VAR))
         table.insert(blocks, {color = UIUtil.fontColor,
             lines = WrapText(text, control.Value[1].Width(), function(text)
                 return control.Value[1]:GetStringAdvance(text)
-            end)})
+            end)}) 
         table.insert(blocks, {color = UIUtil.bodyColor, lines = {''}})
     end
 
@@ -456,7 +471,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
             table.insert(lines, '    '..LOC(bp.Enhancements[v].Name))
         end
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})
-    elseif bp then
+    elseif bp and not bp.Slot then
         --Get not autodetected abilities
         if bp.Display.Abilities then
             for _, id in bp.Display.Abilities do
