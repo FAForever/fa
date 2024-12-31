@@ -103,7 +103,8 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
-    ---@type AIBrain[]
+
+    ---@type table<Army, AIBrain>
     ArmyBrains = {}
 
 
@@ -307,7 +308,7 @@ function BeginSession()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
 
     import("/lua/sim/score.lua").init()
-    import("/lua/sim/recall.lua").init()
+    import("/lua/sim/Recall.lua").init()
 
     -- other logic at the start of the game --
 

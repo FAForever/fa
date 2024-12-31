@@ -34,6 +34,9 @@
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
+---@type table<Army, AIBrain>
+ArmyBrains = {}
+
 --- restricts the army from building the unit category
 ---@param army Army
 ---@param category EntityCategory
@@ -84,13 +87,14 @@ end
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
--- engine patched to allow commanders to be able to be shared
-
---- changes the army of a unit, returning the new unit and destroying the old one
+--- Changes the army of a unit, returning the new unit and destroying the old one
+--- Modified by an engine patch to allow commanders to be given.
+--- `COMMAND` units are filtered out in SimHooks.lua for legacy compatibility.
 ---@param unit Unit
 ---@param army Army
----@return Unit
-function ChangeUnitArmy(unit, army)
+---@param allowCommanders? boolean
+---@return Unit|nil
+function ChangeUnitArmy(unit, army, allowCommanders)
 end
 
 --- returns true if cheats are enabled and logs the cheat attempt no matter what
