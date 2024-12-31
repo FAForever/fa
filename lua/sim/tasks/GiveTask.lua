@@ -3,12 +3,17 @@ local TASKSTATUS = import("/lua/sim/scripttask.lua").TASKSTATUS
 local GiveUnitsToPlayer = import("/lua/simutils.lua").GiveUnitsToPlayer
 local SpawnPing = import("/lua/simping.lua").SpawnPing
 
-local transferList =  {}
+local transferList = {}
+
 ---@class GiveTask : ScriptTask
+---@field CommandData { TaskName: "GiveTask", To: Army } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
+---@field Army Army
+---@field first boolean
 GiveTask = Class(ScriptTask) {
 
+    --- Called immediately when task is created
     ---@param self GiveTask
-    ---@param commandData any
+    ---@param commandData { TaskName: "GiveTask", To: Army } # LuaParams table from the user side. This table is shared by all units ordered the task from one command.
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
 
@@ -25,8 +30,9 @@ GiveTask = Class(ScriptTask) {
         self.first = true
     end,
 
+    --- Called by the engine at an interval determined by the returned TaskStatus value
     ---@param self GiveTask
-    ---@return integer
+    ---@return ScriptTaskStatus
     TaskTick = function(self)
         if self.first then
             -- Wait a tick to let all GiveTask commands execute
@@ -43,20 +49,20 @@ GiveTask = Class(ScriptTask) {
             end
 
             if units[1] then
-                GiveUnitsToPlayer({To=to}, units)
+                GiveUnitsToPlayer({ To = to }, units)
                 local data = {
-                    Type='alert',
-                    Location=units[1]:GetPosition(),
-                    Lifetime=10,
-                    Owner=self.Army,
-                    To=to,
-                    Ring='/game/marker/ring_yellow02-blur.dds',
-                    Sound='UEF_Select_Radar',
-                    Mesh='alert_marker',
-                    ArrowColor='yellow',
+                    Type = 'alert',
+                    Location = units[1]:GetPosition(),
+                    Lifetime = 10,
+                    Owner = self.Army,
+                    To = to,
+                    Ring = '/game/marker/ring_yellow02-blur.dds',
+                    Sound = 'UEF_Select_Radar',
+                    Mesh = 'alert_marker',
+                    ArrowColor = 'yellow',
                 }
                 SpawnPing(data)
-           end
+            end
         end
 
         transferList[self.Army] = {}

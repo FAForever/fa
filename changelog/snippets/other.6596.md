@@ -1,0 +1,1 @@
+- (#6596) Annotate files related to scripted tasks like the Scry ability of the Eye of Rhianne or unit Enhancements.

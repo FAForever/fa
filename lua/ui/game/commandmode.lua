@@ -6,6 +6,7 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+
 local commandMeshResources = import("/lua/ui/game/commandmeshes.lua").commandMeshResources
 local Prefs = import("/lua/user/prefs.lua")
 
@@ -96,7 +97,7 @@ local MathAtan = math.atan
 
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
----@field altCursor string          # Allows for an alternative cursor
+---@field altCursor? string          # Allows for an alternative cursor
 
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
@@ -107,7 +108,10 @@ local MathAtan = math.atan
 
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
 
----@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
+---@class CommandModeDataOrderScript : CommandModeDataOrder
+---@field TaskName string
+
+---@alias CommandModeData CommandModeDataOrder | CommandModeDataOrderScript | CommandModeDataBuild | CommandModeDataBuildAnchored | false
 
 ---@type CommandMode
 local cachedCommandMode = false

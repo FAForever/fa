@@ -602,10 +602,37 @@ end
 function GetUnitCommandDataOfUnit(unit)
 end
 
---- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
---- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams`.
----@param rule CommandCap
----@return string
+--- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.  
+--- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams` or `UserUnitCommand`.
+--[[```
+             RULEUCC_Move = Move
+             RULEUCC_Stop = Stop
+           RULEUCC_Attack = Attack
+            RULEUCC_Guard = Guard
+           RULEUCC_Patrol = Patrol
+  RULEUCC_RetaliateToggle = None
+           RULEUCC_Repair = Repair
+          RULEUCC_Capture = Capture
+        RULEUCC_Transport = TransportUnloadUnits
+    RULEUCC_CallTransport = TransportLoadUnits
+             RULEUCC_Nuke = Nuke
+         RULEUCC_Tactical = Tactical
+         RULEUCC_Teleport = Teleport
+            RULEUCC_Ferry = Ferry
+RULEUCC_SiloBuildTactical = BuildSiloTactical
+    RULEUCC_SiloBuildNuke = BuildSiloNuke
+        RULEUCC_Sacrifice = Sacrifice
+            RULEUCC_Pause = Pause
+       RULEUCC_Overcharge = OverCharge
+             RULEUCC_Dive = Dive
+          RULEUCC_Reclaim = Reclaim
+    RULEUCC_SpecialAction = SpecialAction
+             RULEUCC_Dock = None
+           RULEUCC_Script = None
+          RULEUCC_Invalid = None
+```]]
+---@param rule EngineCommandCap
+---@return string | "None"
 function GetUnitCommandFromCommandCap(rule)
 end
 
@@ -810,11 +837,11 @@ end
 function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
----
----@param command any
----@param string any?
+--- Issue a command to the current selection. 
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear boolean?
-function IssueCommand(command, string, clear)
+function IssueCommand(command, luaParams, clear)
 end
 
 ---
@@ -822,12 +849,12 @@ end
 function IssueDockCommand(clear)
 end
 
----
+--- Issue a command to the given units.
 ---@param unitList UserUnit[]
----@param command string
----@param string? string
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear? boolean
-function IssueUnitCommand(unitList, command, string, clear)
+function IssueUnitCommand(unitList, command, luaParams, clear)
 end
 
 --- Given a MS Windows char code, returns the Maui char code
