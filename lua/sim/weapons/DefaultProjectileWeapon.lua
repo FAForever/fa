@@ -202,9 +202,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
-        local projVelX, _, projVelZ = UnitGetVelocity(launcher)
+        local projVelX, projVelY, projVelZ = UnitGetVelocity(launcher)
 
-        local targetPos
+        -- The projectile will have velocity in the horizontal plane equal to the unit's 3 dimensional speed
+        -- Multiply the XZ components by the ratio of the XYZ to XZ speeds to get the correct XZ components
+        local projVelXZSquareSum = projVelX * projVelX + projVelZ * projVelZ
+        local multiplier = math.sqrt((projVelXZSquareSum + projVelY * projVelY) / (projVelXZSquareSum))
+        projVelX = projVelX * multiplier
+        projVelZ = projVelZ * multiplier
+
+        local targetPos, _
         local targetVelX, targetVelZ = 0, 0
 
         local data = self.CurrentSalvoData
