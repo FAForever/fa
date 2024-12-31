@@ -216,6 +216,11 @@ local orderToCursorCallback = {
 }
 
 ---@class WorldView : moho.UIWorldView, Control
+---@field _cameraName string        # Name of the camera this world view is attached to.
+---@field _disableMarkers boolean   # If true then markers won't show.
+---@field _displayName string       # Used in the interface
+---@field _order number             # Appears unused
+---@field _registered boolean       # Flag that indicates if this world view is registered with the world view manager.
 ---@field Cursor table
 ---@field CursorTrash TrashBag
 ---@field CursorLastEvent any
