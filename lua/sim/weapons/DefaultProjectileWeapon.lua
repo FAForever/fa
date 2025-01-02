@@ -752,6 +752,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 self:PlayFxRackSalvoReloadSequence()
                 self.CurrentRackSalvoNumber = 1
             end
+            -- unpacking, manual fire, salvo-reloading weapons can get stuck unpacked here because
+            -- the engine doesn't clear orders for manually fired weapons after the order is finished
+            if bp.ManualFire and self.WeaponPackState == 'Unpacked' then
+                -- Let the weapon call `OnFire` the next tick if it has targets before state change interrupts it
+                WaitTicks(3)
+                ChangeState(self, self.WeaponPackingState)
+            end
         end,
 
         ---@param self DefaultProjectileWeapon
