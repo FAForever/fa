@@ -532,14 +532,11 @@ end
 ---@param trackers RebuildTracker[]
 ---@param army Army
 function TryRebuildUnits(trackers, army)
-    LOG(repr(trackers, {depth = 2}), army, debug.traceback())
     local rebuilders = {}
     for k, tracker in trackers do
         if tracker.Success then
-            LOG('skipping rebuilder', k)
             continue
         end
-        LOG('creating rebuilder', k)
         -- create invisible drone which belongs to allied army. BuildRange = 10000
         local rebuilder = CreateUnitHPR('ZXA0001', army, 5, 20, 5, 0, 0, 0)
         rebuilder.TargetBuildTime = tracker.TargetBuildTime
@@ -547,8 +544,6 @@ function TryRebuildUnits(trackers, army)
 
         IssueBuildMobile({ rebuilder }, tracker.UnitPos, tracker.UnitBlueprintID, {})
     end
-
-    LOG('supposedly Created rebuilders')
 
     WaitTicks(3) -- wait some ticks (3 is minimum), IssueBuildMobile() is not instant
 
@@ -558,11 +553,7 @@ function TryRebuildUnits(trackers, army)
         rebuilder:SetConsumptionPerSecondEnergy(0)
     end
 
-    LOG('supposedly rebuilding')
-
     WaitTicks(1)
-
-    LOG('supposedly rebuilt')
 
     for k, rebuilder in rebuilders do
         local tracker = trackers[k]
@@ -571,11 +562,7 @@ function TryRebuildUnits(trackers, army)
         if newUnit and math.abs(progressDif) < 0.001 then
             newUnit:SetHealth(newUnit, tracker.UnitHealth)
             tracker.Success = true
-            LOG('succeeded tracker', k)
-        else
-            LOG('failed tracker', k, 'newUnit', newUnit, 'progressDiff', math.abs(progressDif))
         end
-        LOG('rebuilder destroyed', k)
         rebuilder:Destroy()
     end
 end
