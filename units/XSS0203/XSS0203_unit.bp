@@ -283,7 +283,7 @@ UnitBlueprint{
                 Sub = "Water",
                 Water = "Water",
             },
-            FiringTolerance = 0,
+            FiringTolerance = 180,
             Label = "AntiTorpedo",
             LeadTarget = false,
             MaxRadius = 32,

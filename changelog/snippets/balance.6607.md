@@ -2,11 +2,13 @@
 
   - **Aeon T3 Sonar Platform (UAS0305):**
     - Quasar Anti Torpedo
-      - MinRadius: 0 --> 5 
+      - FiringTolerance: 2 --> 180
+      - MinRadius: 0 --> 5
       - `UseFiringSolutionInsteadOfAimBone`: `false` --> `true`
 
   - **Sou-istle: T1 Attack Submarine (XSS0203):**
     - Ajellu Anti-Torpedo Defense
+      - FiringTolerance: 0 --> 180
       - MinRadius: 0 --> 5
       - `UseFiringSolutionInsteadOfAimBone`: `false` --> `true`
       - Audio queue added
