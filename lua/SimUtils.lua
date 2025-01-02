@@ -510,7 +510,7 @@ end
 function TryRebuildUnits(trackers, army)
     LOG(repr(trackers, {depth = 2}), army, debug.traceback())
     local rebuilders = {}
-    for k, tracker in ipairs(trackers) do
+    for k, tracker in trackers do
         if tracker.Success then
             LOG('skipping rebuilder', k)
             continue
@@ -540,7 +540,7 @@ function TryRebuildUnits(trackers, army)
 
     LOG('supposedly rebuilt')
 
-    for k, rebuilder in ipairs(rebuilders) do
+    for k, rebuilder in rebuilders do
         local tracker = trackers[k]
         local newUnit = rebuilder:GetFocusUnit()
         local progressDif = rebuilder:GetWorkProgress() - tracker.UnitProgress
