@@ -48,7 +48,7 @@ AutolobbyArgumentsComponent = ClassSimple {
         ["/mean"] = true,
 
         -- related to divisions
-        ["division"] = true,
+        ["/division"] = true,
         ["/subdivision"] = true,
 
         -- related to game settings
