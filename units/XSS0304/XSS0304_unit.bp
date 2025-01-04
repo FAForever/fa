@@ -220,7 +220,7 @@ UnitBlueprint{
                 Sub = "Seabed|Sub|Water",
                 Water = "Seabed|Sub|Water",
             },
-            FiringTolerance = 2000,
+            FiringTolerance = 180,
             Label = "TorpedoFront",
             MaxRadius = 60,
             MuzzleSalvoDelay = 1.1,
