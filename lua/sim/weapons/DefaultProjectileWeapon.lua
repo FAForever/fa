@@ -1306,13 +1306,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
+            local bp = self.Blueprint
+
+            WaitSeconds(bp.WeaponRepackTimeout)
 
             if not IsDestroyed(unit) then
                 unit:SetBusy(true)
             end
-
-            local bp = self.Blueprint
-            WaitSeconds(bp.WeaponRepackTimeout)
 
             self:AimManipulatorSetEnabled(false)
             self:PlayFxWeaponPackSequence()
