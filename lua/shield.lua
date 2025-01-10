@@ -465,7 +465,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param instigator Unit
     ---@param amount number
     ---@param type DamageType
-    ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
+    ---@return number? damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
         if type == "TreeForce" or type == "TreeFire" then
             return amount
@@ -583,7 +583,28 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
-            EntityAdjustHealth(self, instigator, -absorbed)
+            if absorbed then
+                EntityAdjustHealth(self, instigator, -absorbed)
+
+                -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
+                if tick > owner.tickIssuedShieldRepair then
+                    owner.tickIssuedShieldRepair = tick
+                    local guards = owner:GetGuards()
+                    if not table.empty(guards) then
+                        for k, guard in guards do
+                            -- do not clear queues for units order to do something after assisting the shield
+                            if table.getn(guard:GetCommandQueue()) == 1 then
+                                IssueToUnitClearCommands(guard)
+                            else
+                                guards[k] = nil
+                            end
+                        end
+                        IssueRepair(guards, owner)
+                        -- Queue a guard order so that units start guarding again after the repair is done
+                        IssueGuard(guards, owner)
+                    end
+                end
+            end
 
             -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
             if tick > owner.tickIssuedShieldRepair then
