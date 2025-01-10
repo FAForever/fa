@@ -27,17 +27,29 @@ UAB4201 = ClassUnit(AStructureUnit) {
             ---@param self UAB4201_AntiMissile
             OnCreate = function(self)
                 AAMWillOWisp.OnCreate(self)
-                self.RotatorManipulator = TrashBagAdd(self.Trash, CreateRotator(self.unit, 'Dome', 'z', 0, 40, nil, nil))
+                -- Speed is set to do a rotation in 1 tick
+                self.RotatorManipulator = TrashBagAdd(self.Trash, CreateRotator(self.unit, 'Dome', 'z', 0, 225, nil, nil))
             end,
 
-            --- Rotate the dome 45 degrees when the volcano fires.
+            --- Rotate the dome when the volcano unpacks
             ---@param self UAB4201_AntiMissile
             PlayFxWeaponUnpackSequence = function(self)
                 local rotations = self.RotatorManipulatorCounter
-                self.RotatorManipulator:SetGoal(45 * rotations)
-                self.RotatorManipulatorCounter = rotations < 8 and rotations + 1 or 0
+                self.RotatorManipulator:SetGoal(22.5 * rotations)
+                self.RotatorManipulatorCounter = rotations + 1
+
                 AAMWillOWisp.PlayFxWeaponUnpackSequence(self)
             end,
+
+            --- Rotate the dome when the volcano packs. Ends on a 45 degree turn so that the mesh doesn't self-intersect.
+            ---@param self UAB4201_AntiMissile
+            PlayFxWeaponPackSequence = function(self)
+                local rotations = self.RotatorManipulatorCounter
+                self.RotatorManipulator:SetGoal(22.5 * rotations)
+                self.RotatorManipulatorCounter = rotations < 16 and rotations + 1 or 1
+
+                AAMWillOWisp.PlayFxWeaponPackSequence(self)
+            end
         },
     },
 }
