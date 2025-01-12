@@ -73,7 +73,7 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
 
         local trash = self.Trash
         for k = 1, 3 do
-            flareSpecs.Radius = 8 + k * 5
+            flareSpecs.Radius = 2 + k * 7
             trash:Add(Flare(flareSpecs))
         end
     end,
