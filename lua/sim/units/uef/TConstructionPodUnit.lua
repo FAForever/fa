@@ -3,9 +3,10 @@ local oldGetGuards = TConstructionUnit.GetGuards
 
 ---@class TConstructionPodUnit : TConstructionUnit
 ---@field Pod string
----@field Parent Unit
+---@field Parent? UEL0301 | UEL0001 # Only these two units set the parent properly
 ---@field guardCache table
 ---@field guardDummy Unit
+---@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
 
@@ -56,7 +57,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     end,
 
     ---@param self TConstructionPodUnit
-    ---@param parent Unit
+    ---@param parent UEL0301 | UEL0001 # Only these two implement the function `NotifyOfPodDeath`
     ---@param podName string
     SetParent = function(self, parent, podName)
         self.Parent = parent
