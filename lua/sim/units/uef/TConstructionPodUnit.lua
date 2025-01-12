@@ -188,8 +188,11 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        self.Parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
-        self.Parent = nil
+        local parent = self.Parent
+        if parent then
+            parent:NotifyOfPodDeath(self.Pod, self.rebuildDrone)
+            self.Parent = nil
+        end
         TConstructionUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
