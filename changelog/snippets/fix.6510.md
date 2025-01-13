@@ -1,0 +1,1 @@
+- (#6510) Fix a warning not being given when user key actions were overwritten by default actions.
