@@ -6,21 +6,21 @@
 
   - <details><summary>Add LOC entries for the following 13 options:</summary>
 
-        ```
-        <LOC spawn_filter_count>Count
-        <LOC spawn_filter_veterancy>Veterancy
-        <LOC spawn_filter_rotation>Rotation
-        <LOC spawn_filter_count>Count
-        <LOC spawn_filter_rotation>Rotation
-        <LOC spawn_filter_scatter>Scatter
-        <LOC spawn_filter_preset>Filter Preset
-        <LOC spawn_filter_save>Save
-        <LOC spawn_filter_save_tip>Save current filter as preset
-        <LOC spawn_filter_delete>Delete
-        <LOC spawn_filter_delete_tip>Delete current filter preset
-        <LOC spawn_filter_clear>Clear All
-        <LOC spawn_filter_clear_tip>Clear all filters
-        ```
+      ```
+      <LOC spawn_filter_count>Count
+      <LOC spawn_filter_veterancy>Veterancy
+      <LOC spawn_filter_rotation>Rotation
+      <LOC spawn_filter_count>Count
+      <LOC spawn_filter_rotation>Rotation
+      <LOC spawn_filter_scatter>Scatter
+      <LOC spawn_filter_preset>Filter Preset
+      <LOC spawn_filter_save>Save
+      <LOC spawn_filter_save_tip>Save current filter as preset
+      <LOC spawn_filter_delete>Delete
+      <LOC spawn_filter_delete_tip>Delete current filter preset
+      <LOC spawn_filter_clear>Clear All
+      <LOC spawn_filter_clear_tip>Clear all filters
+      ```
 
     </details>
 
