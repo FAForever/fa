@@ -2437,7 +2437,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, coordinates * Stratum4AlbedoTile.xx);
     float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, coordinates * Stratum5AlbedoTile.xx);
     float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, coordinates * Stratum6AlbedoTile.xx);
-    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, coordinates);
+    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, coordinates * Stratum7AlbedoTile.xx);
 
     // blend the albedo
     float4 albedo = lowerAlbedo;
@@ -2448,7 +2448,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo, stratum4Albedo, mask1.x);
     albedo = lerp(albedo, stratum5Albedo, mask1.y);
 
-    // blend map-wide albedo
+    // blend macrotexture
     albedo = lerp(albedo, stratum7Albedo, stratum7Albedo.w);
 
     // compute the shadows, combining the baked and dynamic shadows
@@ -2624,8 +2624,8 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo,stratum4Albedo,mask1.x);
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
-    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
-    albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
+    float4 macrotexture = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
+    albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
@@ -2809,8 +2809,8 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
-    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
-    albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
+    float4 macrotexture = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
+    albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
