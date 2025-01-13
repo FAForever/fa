@@ -198,6 +198,11 @@ Helpful hotkeys and resource you can use in game
 - <kbd>~</kbd> to Open the Console
 - In the Console run `ren_ShowNetworkStats` for the sim rate / package drops, on the top right
 - In the Console run `ShowStats` for engine stats, on the left
+- Use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> to copy selected units to the clipboard, so that you can spawn them again ("paste" them) with <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd>.
+  - In general, <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd> runs Lua UI code from your clipboard.
+- In the Console run `SimLua` with Lua code to test Sim code, and `UI_Lua` to test UI code.
+- The Sim-side global function `SelectUnit()` gives the sim-side of the currently selected unit; useful for testing scripts or logging information.
+- In the Console run `ui_SelectAnything` to be able to select enemy units; useful for copying test scenarios or debugging selected units.
 
 ## Frequently asked Questions (FAQ)
 
