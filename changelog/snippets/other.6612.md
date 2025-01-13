@@ -1,56 +1,60 @@
-(#6612) Add missing translation entries and Tweak existing strings.
+- (#6612) Add missing localization entries and update Traditional Chinese translations.
 
-**lua/ui/dialogs/createunit.lua**
+  [Unit creation dialog](/lua/ui/dialogs/createunit.lua):
 
-Fix syntex error for Toggle Economy tooltip in spawn filter.
+  - Fix typo in the Economy filter tooltip's LOC tag.
 
-`<LOC spawn_filter_build_eco>_tipToggle Economy units`=>`<LOC spawn_filter_build_eco_tip>Toggle Economy units`
+  - <details><summary>Add LOC entries for the following 13 options:</summary>
 
-Add LOC entries for following options:
+        ```
+        <LOC spawn_filter_count>Count
+        <LOC spawn_filter_veterancy>Veterancy
+        <LOC spawn_filter_rotation>Rotation
+        <LOC spawn_filter_count>Count
+        <LOC spawn_filter_rotation>Rotation
+        <LOC spawn_filter_scatter>Scatter
+        <LOC spawn_filter_preset>Filter Preset
+        <LOC spawn_filter_save>Save
+        <LOC spawn_filter_save_tip>Save current filter as preset
+        <LOC spawn_filter_delete>Delete
+        <LOC spawn_filter_delete_tip>Delete current filter preset
+        <LOC spawn_filter_clear>Clear All
+        <LOC spawn_filter_clear_tip>Clear all filters
+        ```
 
-```
-<LOC spawn_filter_count>Count
-<LOC spawn_filter_veterancy>Veterancy
-<LOC spawn_filter_rotation>Rotation
-<LOC spawn_filter_count>Count
-<LOC spawn_filter_rotation>Rotation
-<LOC spawn_filter_scatter>Scatter
-<LOC spawn_filter_preset>Filter Preset
-<LOC spawn_filter_save>Save
-<LOC spawn_filter_save_tip>Save current filter as preset
-<LOC spawn_filter_delete>Delete
-<LOC spawn_filter_delete_tip>Delete current filter preset
-<LOC spawn_filter_clear>Clear All
-<LOC spawn_filter_clear_tip>Clear all filters
-```
+    </details>
 
-**lua/ui/lobby/changelog.lua**
+  [Lobby changelog](/lua/ui/lobby/changelog.lua):
 
-Add LOC entries for following options:
+  - <details><summary>Add LOC entries for the following 3 options:</summary>
 
-```
-<LOC uilobby_0004>Github
-<LOC uilobby_0005>Patchnotes
-<LOC uilobby_0006>Report a bug
-```
+    ```
+    <LOC uilobby_0004>Github
+    <LOC uilobby_0005>Patchnotes
+    <LOC uilobby_0006>Report a bug
+    ```
 
-**lua/ui/lobby/lobby.lua**
+    </details>
 
-Add LOC entries for following options:
+  [Lobby](/lua/ui/lobby/lobby.lua):
 
-`<LOC lobui_0447>Snowflakes count`
+  - Add LOC entries for the following option:
 
-**lua/ui/lobby/lobbyOptions.lua**
+    `<LOC lobui_0447>Snowflakes count`
 
-Add LOC entries for following options:
+  [Lobby Options](/lua/ui/lobby/lobbyOptions.lua):
 
-```
-<LOC lobui_0808>Disconnection delay
-<LOC lobui_0809>Sets the disconnect delay when a player has trouble connecting.
-<LOC lobui_0810>Tournament
-<LOC lobui_0811>The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.
-<LOC lobui_0812>Quick
-<LOC lobui_0813>The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.
-<LOC lobui_0814>Regular
-<LOC lobui_0815>The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.
-```
+  - <details><summary>Add LOC entries for the following 8 options:</summary>
+
+    ```
+    <LOC lobui_0808>Disconnection delay
+    <LOC lobui_0809>Sets the disconnect delay when a player has trouble connecting.
+    <LOC lobui_0810>Tournament
+    <LOC lobui_0811>The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.
+    <LOC lobui_0812>Quick
+    <LOC lobui_0813>The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.
+    <LOC lobui_0814>Regular
+    <LOC lobui_0815>The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.
+    ```
+
+    </details>
