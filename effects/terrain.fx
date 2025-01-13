@@ -2330,7 +2330,7 @@ technique Terrain052 <
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | albedo.r      albedo.g        albedo.b       transparency    | specular        unused          unused          unused       |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | specular.r      specular.g      specular.b      specular sharpness  |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        unused         shadow  | 
 
@@ -2396,7 +2396,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     // x = stratum layer 4
     // y = stratum layer 5
     // z = stratum layer 6
-    // w = ??
+    // w = unused
     float4 mask1 = tex2D(UtilitySamplerB, coordinates);
 
     if (halfRange) {
@@ -2406,7 +2406,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // x = normals-x
     // y = normals-z
-    // z = water depth
+    // z = unused
     // w = shadows
     float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
     float terrainShadow = terrainInfo.w;
@@ -2416,14 +2416,13 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         terrainShadow = 1.0f;
     }
 
-    // x = specular
-    // y = unused
-    // z = unused
-    // w = unused
-    float4 utility03 = tex2D(Stratum7NormalSampler, coordinates.xy);
-    float mapSpecular = utility03.r;
+    // x = specular red
+    // y = specular green
+    // z = specular blue
+    // w = specular sharpness
+    float4 mapSpecular = tex2D(Stratum7NormalSampler, coordinates.xy);
 
-    // sample the albedo's
+    // sample the albedos
     float4 lowerAlbedo =    tex2D(LowerAlbedoSampler,    coordinates * LowerAlbedoTile.xx);
     float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, coordinates * Stratum0AlbedoTile.xx);
     float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, coordinates * Stratum1AlbedoTile.xx);
@@ -2455,7 +2454,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     // compute specular
     float3 r = reflect(normalize(inV.mViewDirection), normal);
-    float3 specular = pow(saturate(dot(r, SunDirection)), 20) * mapSpecular * stratum7Albedo.w * shadow * SunColor;
+    float3 specular = pow(saturate(dot(r, SunDirection)), 80 * mapSpecular.a * SpecularColor.r) * mapSpecular.rgb * shadow * SunColor;
 
     // compute lighting
     float dotSunNormal = max(0, dot(SunDirection, normal));
