@@ -72,7 +72,7 @@ AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
 
         -- Have a minimum height so that shields don't get hit by diverted projectiles
         -- Also launch a bit above the projectile's height to catch it better as the flare falls down
-        local dy = MathMax(targetY - posY + targetVY * arriveTime + 9, 17)
+        local dy = MathMax(targetY - posY + 9, 17)
 
         local vy0 = dy / arriveTime * 2
         ProjectileSetVelocity(proj, 0, vy0, 0)
