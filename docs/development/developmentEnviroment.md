@@ -203,6 +203,7 @@ Helpful hotkeys and resource you can use in game
 - In the Console run `SimLua` with Lua code to test Sim code, and `UI_Lua` to test UI code.
 - The Sim-side global function `SelectUnit()` gives the sim-side of the currently selected unit; useful for testing scripts or logging information.
 - In the Console run `ui_SelectAnything` to be able to select enemy units; useful for copying test scenarios or debugging selected units.
+- In the Console run `ui_DebugAltClick` to be able to quickly switch armies by <kbd>Alt</kbd> + left-clicking a unit in the army you want to switch to.
 
 ## Frequently asked Questions (FAQ)
 
