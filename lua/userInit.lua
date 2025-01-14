@@ -396,6 +396,16 @@ do
         UnitsCache[1] = unit
         IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
     end
+
+    --- Issue a command to a given unit
+    ---@param unit UserUnit
+    ---@param command UserUnitCommand # Will crash the game if not a valid command.
+    ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
+    ---@param clear? boolean
+    _G.IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
+        UnitsCache[1] = unit
+        IssueUnitCommand(UnitsCache, command, luaParams, clear)
+    end
 end
 
 do

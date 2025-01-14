@@ -837,6 +837,14 @@ end
 function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
+--- Issue a command to a given unit
+---@param unit UserUnit
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
+---@param clear? boolean
+IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
+end
+
 --- Issue a command to the current selection. 
 ---@param command UserUnitCommand # Will crash the game if not a valid command.
 ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
