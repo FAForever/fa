@@ -289,7 +289,11 @@ local function DockOrderBehavior(self, modifiers)
     end
 
     if modifiers.Right then
-        import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged()
+        if modifiers.Ctrl then
+            import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.75)
+        else
+            import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.50)
+        end
     end
 
     self:SetCheck(false)

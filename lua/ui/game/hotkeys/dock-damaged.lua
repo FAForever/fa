@@ -20,27 +20,29 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local gameMain = import("/lua/ui/game/gamemain.lua")
-local commandMode = import("/lua/ui/game/commandmode.lua")
+local TableInsert = table.insert
+local TableGetn = table.getn
 
 --- Docks the air units that are considered to be too damaged for air engagements.
----@param ratio? number # number between 0.0 and 1.0, defaults to 0.25. All units with a health ratio lower is considered to be damaged
+---@param ratio? number # number between 0.0 and 1.0, defaults to 0.5. All units with a health ratio lower is considered to be damaged
 function DockDamaged(ratio)
-    -- default to 25%
-    ratio = ratio or 0.25
+    ratio = ratio or 0.5
+
+    local gameMain = import("/lua/ui/game/gamemain.lua")
+    local commandMode = import("/lua/ui/game/commandmode.lua")
 
     local damaged = {}
     local remaining = {}
 
     local selection = GetSelectedUnits()
-    for k = 1, table.getn(selection) do
+    for k = 1, TableGetn(selection) do
         local unit = selection[k]
         local health = unit:GetHealth()
         local maxHealth = unit:GetMaxHealth()
         if health / maxHealth < ratio then
-            table.insert(damaged, unit)
+            TableInsert(damaged, unit)
         else
-            table.insert(remaining, unit)
+            TableInsert(remaining, unit)
         end
     end
 
@@ -55,4 +57,7 @@ function DockDamaged(ratio)
     -- prevents losing command mode
     gameMain.SetIgnoreSelection(false)
     commandMode.RestoreCommandMode(true)
+
+    -- inform user
+    print(string.format("Docking %i units", TableGetn(damaged)))
 end
