@@ -39,7 +39,12 @@ function DockDamaged(ratio)
         local unit = selection[k]
         local health = unit:GetHealth()
         local maxHealth = unit:GetMaxHealth()
-        if health / maxHealth < ratio then
+
+        local isAirUnit = EntityCategoryContains(categories.AIR, unit)
+        local canUseAirStaging = not EntityCategoryContains(categories.CANNOTUSEAIRSTAGING, unit)
+        local isDamagedSufficiently = health / maxHealth < ratio
+
+        if isAirUnit and canUseAirStaging and isDamagedSufficiently then
             TableInsert(damaged, unit)
         else
             TableInsert(remaining, unit)
