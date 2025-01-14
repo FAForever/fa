@@ -2080,7 +2080,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 // Append a "B" to the name, if the shader uses Biplanar mapping.
 
 // ----------------------------------------------------------------------------
-//#region TerrainXP+, Terrain000 and Terrain050
+//#region TTerrainXPExt, Terrain000 and Terrain050
 
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
@@ -2103,7 +2103,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 // are designed as a drop-in replacement that solely introduce the map-wide
 // normals and map-wide shadows.
 
-// TTerrainXP+ keeps the different interpretation of mask ranges between
+// TTerrainXPExt keeps the different interpretation of mask ranges between
 // albedo and normal textures, so it is a direct drop-in replacement.
 // Terrain000 enables the full mask range for both textures.
 // Terrain050 only uses half the mask range. We choose to provide this option
@@ -2239,7 +2239,7 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 /* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
    # textures.                                                   #
    # It is designed to be a drop-in replacement for TTerrainXP.  # */
-technique TTerrainXP+ <
+technique TTerrainXPExt <
     string usage = "composite";
     string normals = "TTerrainNormalsXP";
 >
