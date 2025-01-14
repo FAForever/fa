@@ -280,11 +280,18 @@ end
 
 -- Used by orders that happen immediately and don't change the command mode (ie the stop button)
 local function DockOrderBehavior(self, modifiers)
-    if modifiers.Shift then
-        IssueDockCommand(false)
-    else
-        IssueDockCommand(true)
+    if modifiers.Left then
+        if modifiers.Shift then
+            IssueDockCommand(false)
+        else
+            IssueDockCommand(true)
+        end
     end
+
+    if modifiers.Right then
+        import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged()
+    end
+
     self:SetCheck(false)
 end
 
