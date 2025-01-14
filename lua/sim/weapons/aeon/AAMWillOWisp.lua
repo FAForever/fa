@@ -68,7 +68,7 @@ AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
         local posX, posY, posZ = EntityGetPositionXYZ(self.unit, muzzle)
 
         -- Make the distance a bit shorter to allow the flare hitbox to catch the projectile and to launch faster to catch projectiles on the edge of the range
-        local arriveTime = (GetDistanceBetweenTwoPoints2(targetX, targetZ, posX, posZ) - 10) / (MathSqrt(targetVX * targetVX + targetVZ * targetVZ) * 10)
+        local arriveTime = MathMax(GetDistanceBetweenTwoPoints2(targetX, targetZ, posX, posZ) - 10, 10) / (MathSqrt(targetVX * targetVX + targetVZ * targetVZ) * 10)
 
         -- Have a minimum height so that shields don't get hit by diverted projectiles
         -- Also launch a bit above the projectile's height to catch it better as the flare falls down
