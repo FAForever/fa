@@ -60,25 +60,27 @@ AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultCreateProjectileAtMuzzle(self, muzzle)
 
-        -- Assume we only target and fire at projectiles
-        local target = WeaponGetCurrentTarget(self) --[[@as Projectile]]
-        local targetX, targetY, targetZ = EntityGetPositionXYZ(target)
-        local targetVX, targetVY, targetVZ = ProjectileGetVelocity(target)
+        -- Assume we only target and fire at projectiles. The projectile may destroy itself right as we fire though if it hit something.
+        local target = WeaponGetCurrentTarget(self) --[[@as Projectile?]]
+        if target then
+            local targetX, targetY, targetZ = EntityGetPositionXYZ(target)
+            local targetVX, targetVY, targetVZ = ProjectileGetVelocity(target)
 
-        local posX, posY, posZ = EntityGetPositionXYZ(self.unit, muzzle)
+            local posX, posY, posZ = EntityGetPositionXYZ(self.unit, muzzle)
 
-        -- Make the distance a bit shorter to allow the flare hitbox to catch the projectile and to launch faster to catch projectiles on the edge of the range
-        local arriveTime = MathMax(GetDistanceBetweenTwoPoints2(targetX, targetZ, posX, posZ) - 10, 10) / (MathSqrt(targetVX * targetVX + targetVZ * targetVZ) * 10)
+            -- Make the distance a bit shorter to allow the flare hitbox to catch the projectile and to launch faster to catch projectiles on the edge of the range
+            local arriveTime = MathMax(GetDistanceBetweenTwoPoints2(targetX, targetZ, posX, posZ) - 10, 10) / (MathSqrt(targetVX * targetVX + targetVZ * targetVZ) * 10)
 
-        -- Have a minimum height so that shields don't get hit by diverted projectiles
-        -- Also launch a bit above the projectile's height to catch it better as the flare falls down
-        local dy = MathMax(targetY - posY + 9, 17)
+            -- Have a minimum height so that shields don't get hit by diverted projectiles
+            -- Also launch a bit above the projectile's height to catch it better as the flare falls down
+            local dy = MathMax(targetY - posY + 9, 17)
 
-        local vy0 = dy / arriveTime * 2
-        ProjectileSetVelocity(proj, 0, vy0, 0)
-        ProjectileSetBallisticAcceleration(proj, -vy0 / arriveTime)
-        -- Can't wait in here or else it interrupts the firing cycle
-        ForkThread(floatProjectile, proj, arriveTime)
+            local vy0 = dy / arriveTime * 2
+            ProjectileSetVelocity(proj, 0, vy0, 0)
+            ProjectileSetBallisticAcceleration(proj, -vy0 / arriveTime)
+            -- Can't wait in here or else it interrupts the firing cycle
+            ForkThread(floatProjectile, proj, arriveTime)
+        end
 
         return proj
     end,
