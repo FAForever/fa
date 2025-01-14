@@ -35,14 +35,17 @@ local MathSqrt = math.sqrt
 local MathMax = math.max
 local ForkThread = ForkThread
 local WaitSeconds = WaitSeconds
+local IsDestroyed = IsDestroyed
 
 --- Makes the flare fall at a natural speed at the top of its trajectory so that it can catch the missile better
 ---@param proj Projectile
 ---@param t number
 local function floatProjectile(proj, t)
     WaitSeconds(t)
-    ProjectileSetVelocity(proj, 0, 0, 0)
-    ProjectileSetBallisticAcceleration(proj, -4.9)
+    if not IsDestroyed(proj) then
+        ProjectileSetVelocity(proj, 0, 0, 0)
+        ProjectileSetBallisticAcceleration(proj, -4.9)
+    end
 end
 
 --- Aeon anti-projectile weapon that launches flares to a bit above the target projectile's height.
