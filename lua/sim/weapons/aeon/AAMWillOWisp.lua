@@ -21,20 +21,31 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local DefaultCreateProjectileAtMuzzle = DefaultProjectileWeapon.CreateProjectileAtMuzzle
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local EntityMethods = moho.entity_methods
-local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
-local EntityGetBoneDirection = EntityMethods.GetBoneDirection
 local GetDistanceBetweenTwoPoints2 = import('/lua/utilities.lua').GetDistanceBetweenTwoPoints2
 
+local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
+local ProjectileGetVelocity = moho.projectile_methods.GetVelocity
+local ProjectileSetVelocity = moho.projectile_methods.SetVelocity
+local ProjectileSetBallisticAcceleration = moho.projectile_methods.SetBallisticAcceleration
+local WeaponGetCurrentTarget = moho.weapon_methods.GetCurrentTarget
+
+local MathSqrt = math.sqrt
+local MathMax = math.max
+local ForkThread = ForkThread
+local WaitSeconds = WaitSeconds
+
+--- Makes the flare fall at a natural speed at the top of its trajectory so that it can catch the missile better
 ---@param proj Projectile
 ---@param t number
 local function floatProjectile(proj, t)
     WaitSeconds(t)
-    proj:SetVelocity(0, 0, 0)
-    proj:SetBallisticAcceleration(-4.9)
+    ProjectileSetVelocity(proj, 0, 0, 0)
+    ProjectileSetBallisticAcceleration(proj, -4.9)
 end
 
+--- Aeon anti-projectile weapon that launches flares to a bit above the target projectile's height.
 ---@class AAMWillOWisp : DefaultProjectileWeapon
 AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AAntiMissileFlareFlash,
@@ -44,26 +55,27 @@ AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
-        local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
+        local proj = DefaultCreateProjectileAtMuzzle(self, muzzle)
 
-        local target = self:GetCurrentTarget()
-        if target then
-            local targetX, targetY, targetZ = EntityGetPositionXYZ(target)
-            local targetDX, targetDY, targetDZ = target:GetVelocity()
+        -- Assume we only target and fire at projectiles
+        local target = WeaponGetCurrentTarget(self) --[[@as Projectile]]
+        local targetX, targetY, targetZ = EntityGetPositionXYZ(target)
+        local targetVX, targetVY, targetVZ = ProjectileGetVelocity(target)
 
-            local unit = self.unit
-            local posX, posY, posZ = EntityGetPositionXYZ(unit, muzzle)
-            
-            local arriveTime = (GetDistanceBetweenTwoPoints2(targetX, targetZ, posX, posZ) - 10) / (math.sqrt(targetDX * targetDX + targetDZ * targetDZ) * 10)
+        local posX, posY, posZ = EntityGetPositionXYZ(self.unit, muzzle)
 
-            local dy = math.max(targetY - posY + targetDY * arriveTime + 9, 17)
+        -- Make the distance a bit shorter to allow the flare hitbox to catch the projectile and to launch faster to catch projectiles on the edge of the range
+        local arriveTime = (GetDistanceBetweenTwoPoints2(targetX, targetZ, posX, posZ) - 10) / (MathSqrt(targetVX * targetVX + targetVZ * targetVZ) * 10)
 
-            local vy0 = dy / arriveTime * 2
-            local g = -vy0 / arriveTime
-            proj:SetVelocity(0, vy0, 0)
-            proj:SetBallisticAcceleration(g)
-            ForkThread(floatProjectile, proj, arriveTime)
-        end
+        -- Have a minimum height so that shields don't get hit by diverted projectiles
+        -- Also launch a bit above the projectile's height to catch it better as the flare falls down
+        local dy = MathMax(targetY - posY + targetVY * arriveTime + 9, 17)
+
+        local vy0 = dy / arriveTime * 2
+        ProjectileSetVelocity(proj, 0, vy0, 0)
+        ProjectileSetBallisticAcceleration(proj, -vy0 / arriveTime)
+        -- Can't wait in here or else it interrupts the firing cycle
+        ForkThread(floatProjectile, proj, arriveTime)
 
         return proj
     end,
