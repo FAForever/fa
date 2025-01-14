@@ -387,7 +387,7 @@ do
         commandMode.RestoreCommandMode(true)
     end
 
-    ---@param unit UserUnit[]
+    ---@param unit UserUnit
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
     ---@param count number
