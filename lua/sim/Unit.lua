@@ -1608,7 +1608,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- if we're allied, check if we allow allied collisions
         if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
-            return firingWeapon.Blueprint.CollideFriendly
+            return firingWeapon.CollideFriendly
         end
 
         return true
