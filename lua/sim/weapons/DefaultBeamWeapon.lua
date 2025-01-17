@@ -5,6 +5,8 @@ local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 ---@field DisableBeamThreadInstance? thread
 ---@field Beams { Beam: CollisionBeam, Muzzle: string, Destroyables: table}[]
 ---@field BeamStarted boolean
+---@field HoldFireThread? thread # deprecated
+---@field ContBeamOn? boolean
 DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
@@ -114,6 +116,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
         -- continious beams
         if bp.BeamLifetime == 0 then
+            ---@diagnostic disable-next-line: deprecated
             self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)
         end
 

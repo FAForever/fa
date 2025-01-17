@@ -251,6 +251,10 @@ end
 function KillThread(thread)
 end
 
+---@class thread
+local thread = {}
+thread.Destroy = KillThread -- Set in /lua/system/config.lua
+
 --- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
 --- This means that it returns the closest integer and tie-breaks towards even numbers
 --- (since a bias towards even numbers is less detrimental than an upward bias).
