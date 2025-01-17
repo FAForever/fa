@@ -245,6 +245,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     -- Weapon States Section
 
     IdleState = State(DefaultProjectileWeapon.IdleState) {
+        ---@param self DefaultBeamWeapon
         Main = function(self)
             DefaultProjectileWeapon.IdleState.Main(self)
             self:PlayFxBeamEnd()
@@ -253,6 +254,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     },
 
     WeaponPackingState = State(DefaultProjectileWeapon.WeaponPackingState) {
+        ---@param self DefaultBeamWeapon
         Main = function(self)
             local bp = self.Blueprint
             if bp.BeamLifetime > 0 then
@@ -271,6 +273,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     end,
 
     RackSalvoFireReadyState = State(DefaultProjectileWeapon.RackSalvoFireReadyState) {
+        ---@param self DefaultBeamWeapon
         Main = function(self)
             if not self:EconomySupportsBeam() then
                 self:PlayFxBeamEnd()
