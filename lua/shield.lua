@@ -755,9 +755,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
+        local selfArmy = self.Army
+        local otherArmy = firingWeapon.Army
         -- if we're allied, check if we allow that type of collision
-        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
-            return firingWeapon.Blueprint.CollideFriendly
+        if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
+            return firingWeapon.CollideFriendly and self.Owner ~= firingWeapon.unit
         end
 
         return true
