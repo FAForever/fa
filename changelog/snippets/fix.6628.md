@@ -1,0 +1,1 @@
+- (#6628) Fix beams and projectiles not colliding with ally units/shields as expected when `CollideFriendly` is set to `true` in the weapon blueprint.
