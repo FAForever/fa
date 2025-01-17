@@ -109,12 +109,12 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- enable the beam
         beam:Enable()
 
-        -- non-continious beams that just end
+        -- non-continuous beams that just end
         if bp.BeamLifetime > 0 then
             self:ForkThread(self.BeamLifetimeThread, beam, bp.BeamLifetime or 1)
         end
 
-        -- continious beams
+        -- continuous beams
         if bp.BeamLifetime == 0 then
             ---@diagnostic disable-next-line: deprecated
             self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)
