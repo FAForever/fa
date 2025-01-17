@@ -356,17 +356,20 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     --- Creates a new `WeaponDamageTable` in `self.DamageTable` using the weapon blueprint
     ---@param self CollisionBeam
     SetDamageTable = function(self)
-        local weaponBlueprint = self.Weapon:GetBlueprint()
-        self.DamageTable = {}
-        self.DamageTable.DamageRadius = weaponBlueprint.DamageRadius
-        self.DamageTable.DamageAmount = weaponBlueprint.Damage
-        self.DamageTable.DamageType = weaponBlueprint.DamageType
-        self.DamageTable.DamageFriendly = weaponBlueprint.DamageFriendly
-        self.DamageTable.CollideFriendly = weaponBlueprint.CollideFriendly
-        self.DamageTable.DoTTime = weaponBlueprint.DoTTime
-        self.DamageTable.DoTPulses = weaponBlueprint.DoTPulses
-        self.DamageTable.Buffs = weaponBlueprint.Buffs
-        self.CollideFriendly = weaponBlueprint.CollideFriendly
+        local bp = self.Weapon:GetBlueprint()
+        local collideFriendly = bp.CollideFriendly
+        self.DamageTable = {
+            DamageRadius = bp.DamageRadius,
+            DamageAmount = bp.Damage,
+            DamageType = bp.DamageType,
+            DamageFriendly = bp.DamageFriendly,
+            CollideFriendly = collideFriendly,
+            DoTTime = bp.DoTTime,
+            DoTPulses = bp.DoTPulses,
+            Buffs = bp.Buffs,
+        }
+        -- Cache the table access for collision checks later
+        self.CollideFriendly = collideFriendly
     end,
 
     -- When this beam impacts with the target, do any buffs that have been passed to it.
