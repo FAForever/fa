@@ -94,6 +94,7 @@ local VectorCached = Vector(0, 0, 0)
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
 ---@field DamageData WeaponDamageTable
+---@field CollideFriendly boolean # Cached from DamageData
 ---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
 ---@field MyFlare? Flare            # If weapon blueprint has a (valid) `Flare` field
 ---@field MyUpperFlare? Flare       # If weapon blueprint has a (valid) `Flare` field that wants to be stacked
@@ -612,6 +613,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param data WeaponDamageTable
     PassMetaDamage = function(self, data)
         self.DamageData = {}
+        self.CollideFriendly = data.CollideFriendly
         setmetatable(self.DamageData, data)
     end,
 
