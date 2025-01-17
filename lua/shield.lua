@@ -1326,18 +1326,7 @@ AntiArtilleryShield = ClassShield(Shield) {
     ---@param self AntiArtilleryShield # The shield we're checking the collision for
     ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        local bp = firingWeapon:GetBlueprint()
-        if bp.CollideFriendly == false then
-            if self.Army == firingWeapon.unit.Army then
-                return false
-            end
-        end
-
-        if bp.ArtilleryShieldBlocks then
-            return true
-        end
-
-        return false
+        return firingWeapon.Blueprint.ArtilleryShieldBlocks and Shield.OnCollisionCheckWeapon(self, firingWeapon)
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
@@ -1345,19 +1334,7 @@ AntiArtilleryShield = ClassShield(Shield) {
     ---@param self AntiArtilleryShield # The shield we're checking the collision for
     ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-        if other.Army == -1 then
-            return false
-        end
-
-        if other:GetBlueprint().Physics.CollideFriendlyShield and other.DamageData.ArtilleryShieldBlocks then
-            return true
-        end
-
-        if other.DamageData.ArtilleryShieldBlocks and IsEnemy(self.Army, other.Army) then
-            return true
-        end
-
-        return false
+        return other.DamageData.ArtilleryShieldBlocks and Shield.OnCollisionCheck(self, other)
     end,
 }
 
