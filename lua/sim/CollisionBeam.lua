@@ -282,7 +282,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     --- Called by the engine while the beam is active every `CollisionCheckInterval + 1` ticks 
-    --- or when `SetBeamFx(beamEmitter, checkCollision)` is called with `CheckCollision = true`.
+    --- or when `SetBeamFx(beamEmitter, checkCollision)` is called with `checkCollision = true`.
     --- Expect Impacts with non-physical things like 'Air' (hitting nothing) and 'Underwater' (hitting nothing underwater).
     ---@param self CollisionBeam
     ---@param impactType ImpactType
