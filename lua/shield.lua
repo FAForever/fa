@@ -362,8 +362,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
-    -- @param self A shield that we're computing the overlapping shields for
-    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
+    ---@param self Shield # A shield that we're computing the overlapping shields for
+    ---@param tick number # Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
     GetOverlappingShields = function(self, tick)
 
         -- allow the game tick to be send to us, saves cycles
@@ -717,8 +717,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
-    ---@param self Shield The shield we're checking the collision for
-    ---@param other Projectile The projectile we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         -- special logic when it is a projectile to simulate air crashes
@@ -758,8 +758,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a collision beam to check if the collision is valid
-    -- @param self The shield we're checking the collision for
-    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
         -- if we're allied, check if we allow that type of collision
@@ -1327,6 +1327,9 @@ AntiArtilleryShield = ClassShield(Shield) {
         self.ShieldType = 'AntiArtillery'
     end,
 
+    --- Called when a shield collides with a collision beam to check if the collision is valid
+    ---@param self AntiArtilleryShield # The shield we're checking the collision for
+    ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local bp = firingWeapon:GetBlueprint()
         if bp.CollideFriendly == false then
@@ -1342,7 +1345,10 @@ AntiArtilleryShield = ClassShield(Shield) {
         return false
     end,
 
-    -- Return true to process this collision, false to ignore it.
+    --- Called when a shield collides with a projectile to check if the collision is valid
+    --- Return true to process this collision, false to ignore it.
+    ---@param self AntiArtilleryShield # The shield we're checking the collision for
+    ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
         if other.Army == -1 then
             return false
