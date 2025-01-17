@@ -733,28 +733,21 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             end
         end
 
-        -- special behavior for projectiles that always collide with
-        -- shields, like the seraphim storm when the Ythotha dies
-        if other.CollideFriendlyShield then
-            return true
-        end
-
-        if -- our projectiles do not collide with our shields
-        self.Army == other.Army
-            -- neutral projectiles do not collide with any shields
-            or other.Army == -1
-        then
-            return false
-        end
-
         -- special behavior for projectiles that represent strategic missiles
         local otherHashedCats = other.Blueprint.CategoriesHash
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end
 
-        -- otherwise, only collide if we're hostile to the other army
-        return IsEnemy(self.Army, other.Army)
+        local selfArmy = self.Army
+        local otherArmy = other.Army
+        -- if we're allied, check if we allow allied collisions
+        if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
+            -- do not collide with our own unit's projectiles
+            return other.CollideFriendly and self.Owner ~= other.Launcher
+        end
+
+        return true
     end,
 
     --- Called when a shield collides with a collision beam to check if the collision is valid
