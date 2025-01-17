@@ -107,7 +107,7 @@ UnitBlueprint{
                 Fire = Sound { Bank = 'UELWeapon', Cue = 'UEB2101_Cannon_Sgl', LodCutoff = 'Weapon_LodCutoff' },
             },
             BallisticArc = "RULEUBA_LowArc",
-            CollideFriendly = true,
+            CollideFriendly = false,
             Damage = 50,
             DamageType = "Normal",
             DisplayName = "Light Plasma Cannon",

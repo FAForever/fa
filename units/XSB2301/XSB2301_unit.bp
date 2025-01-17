@@ -139,7 +139,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_LowArc",
             BeamCollisionDelay = 0,
             BeamLifetime = 1,
-            CollideFriendly = true,
+            CollideFriendly = false,
             Damage = 55,
             DamageRadius = 0,
             DamageType = "Normal",
