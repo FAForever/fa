@@ -76,6 +76,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field Brain AIBrain
 ---@field CollideFriendly boolean
 ---@field DamageMod number
+---@field DamageModifiers number[] # Set of damage multipliers used by collision beams for the weapon
 ---@field DamageRadiusMod number
 ---@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
 ---@field DisabledBuffs table
