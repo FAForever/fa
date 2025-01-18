@@ -54,6 +54,15 @@
 
     </details>
 
+  - <details><summary>Fix invalid LOC entries for the following 2 options:</summary>
+    
+    '''
+    <LOC strat_icon_scale_150>150% (may cause distortions)
+    <LOC strat_icon_scale_200>200%
+    '''
+    
+    </details>
+
   - <details><summary>Add LOC entries for the following 4 options:</summary>
 
     ```
