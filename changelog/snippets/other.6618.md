@@ -48,6 +48,7 @@
     <LOC selectionsets0002>Double tap control group decay (in ms)
     <LOC ASSIST_TO_UPGRADE_MASS>Assist to upgrade mass extractors
     <LOC ASSIST_TO_UPGRADE_RADAR>Assist to upgrade radars
+    <LOC structure_ringing_artillery_title>Assist to cap tech 2 artillery with power
     <LOC structure_ringing_heavy_artillery_title>Assist to cap end game artillery with power
     ```
 
