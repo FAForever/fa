@@ -1005,8 +1005,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 1.0 },
-                        { text = "<LOC strat_icon_scale-150>150% (may cause distortions)", key = 1.5 },
-                        { text = "<LOC strat_icon_scale-200>200%", key = 2.0 },
+                        { text = "<LOC strat_icon_scale_150>150% (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale_200>200%", key = 2.0 },
                     },
                 },
             },
