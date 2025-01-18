@@ -64,3 +64,22 @@
     ```
 
     </details>
+
+    [Mod Manager](/lua/ui/lobby/ModsManager.lua):
+
+  - <details><summary>Add LOC entries for the following 10 options:</summary>
+
+    ```
+    <LOC uiunitmanager_29>Status
+    <LOC uiunitmanager_30>sorts mods by activation status
+    <LOC uiunitmanager_31>Type
+    <LOC uiunitmanager_32>sorts mods by type and name
+    <LOC uiunitmanager_33>Name
+    <LOC uiunitmanager_34>sorts mods by name') },
+    <LOC uiunitmanager_35>Author
+    <LOC uiunitmanager_36>sorts mods by author and name
+    <LOC uiunitmanager_37>Version
+    <LOC uiunitmanager_38>sorts mods by version and name
+    ```
+
+    </details>
