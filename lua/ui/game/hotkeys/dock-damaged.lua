@@ -64,5 +64,5 @@ function DockDamaged(ratio)
     commandMode.RestoreCommandMode(true)
 
     -- inform user
-    print(string.format("Docking %i units", TableGetn(damaged)))
+    print(string.format("Docking %d units", TableGetn(damaged)))
 end
