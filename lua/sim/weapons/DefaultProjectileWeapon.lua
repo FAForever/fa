@@ -29,6 +29,7 @@ local MathClamp = math.clamp
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 ---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
+---@field EconDrain? moho.EconomyEvent
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
