@@ -65,7 +65,7 @@
 
     </details>
 
-    [Mod Manager](/lua/ui/lobby/ModsManager.lua):
+  [Mod Manager](/lua/ui/lobby/ModsManager.lua):
 
   - <details><summary>Add LOC entries for the following 10 options:</summary>
 
