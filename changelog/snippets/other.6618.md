@@ -14,7 +14,7 @@
       <LOC spawn_debug_006>Spawn structure tarmacs
       <LOC spawn_debug_007>Spawn mesh entites instead of units
       <LOC spawn_debug_008>Clear spawned entity meshes
-      <LOC spawn_debug_009>Position camera for build icon on spawn"
+      <LOC spawn_debug_009>Position camera for build icon on spawn
       <LOC spawn_debug_010>Ignore terrain blocking (disables preview)
       <LOC spawn_debug_011>Show raised platforms
       <LOC spawn_debug_012>Unit spawn filter settings:
