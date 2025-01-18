@@ -260,6 +260,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         local explosionBones = {}
         local explosionBoneCount = table.getn(self.ExplosionBones)
 
+        -- Since this is a thread, it is delayed by 1 tick so the instigator may be destroyed
         if not IsDestroyed(instigator) then
             -- if there is an instigator, favor exploding bits that are near the instigator
             local ix, iy, iz = instigator:GetPositionXYZ()
