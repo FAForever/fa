@@ -51,6 +51,7 @@ function DockDamaged(ratio)
         end
     end
 
+    -- Since `IssueUnitCommand` does not work with docking orders, use the selection-only `IssueDockCommand` function
     -- prevents losing command mode
     commandMode.CacheAndClearCommandMode()
     gameMain.SetIgnoreSelection(true)
