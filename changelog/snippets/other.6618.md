@@ -51,7 +51,7 @@
     <LOC structure_ringing_heavy_artillery_title>Assist to cap end game artillery with power
     ```
 
-    <details>
+    </details>
 
   - <details><summary>Add LOC entries for the following 4 options:</summary>
 
