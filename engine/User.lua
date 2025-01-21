@@ -124,6 +124,13 @@
 --- | 'NUMPAD_DECIMAL'
 --- | 'NUMPAD_DIVIDE'
 
+--- Represents a hotkey combination. The format is: [keycode]-[keycode]-[keycode]-[keycode]-(...)
+--- A list of examples:
+--- - `1`
+--- - `CTRL-Q`
+--- - `CTRL-SHIFT-ALT-ESCAPE`
+---@alias Hotkey string
+
 --- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
 ---@param entityId EntityId
 ---@param onTime number
@@ -351,7 +358,7 @@ end
 
 ---
 ---@param name string
----@return Camera
+---@return UserCamera
 function GetCamera(name)
 end
 
@@ -661,8 +668,8 @@ end
 function HasCommandLineArg(option)
 end
 
---- Add a set of key mappings
----@param keyMapTable table<string, string>
+--- Add a set of key mappings. Does not overwrite existing hotkeys.
+---@param keyMapTable table<Hotkey, string>
 function IN_AddKeyMapTable(keyMapTable)
 end
 

@@ -7,6 +7,7 @@ keyCategories = {
     ['selectionControlGroups'] = "<LOC keymap_selection_control_group>Selection - Control groups",
     ['selectionSubgroups'] = "<LOC keymap_selection_fragments>Selection - Subgroups",
     ['camera'] = "<LOC keymap_category_0025>Camera",
+    ['cinematics'] = "<LOC keymap_category_cinematics>Cinematics",
     ['orders'] = "<LOC keymap_category_0036>Orders",
     ['ordersAdvanced'] = "<LOC keymap_orders_queue_based>Orders - Advanced",
     ['ordersQueueBased'] = "<LOC keymap_orders_queue_based>Orders - Queue manipulation",
@@ -42,6 +43,7 @@ keyCategoryOrder = {
     'user',
     'mods',
     'debug',
+    'cinematics',
     'ai',
     'none'
 }
