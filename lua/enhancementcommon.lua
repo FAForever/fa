@@ -57,7 +57,7 @@ function GetRestricted()
 end
 
 ---@param entityID EntityId
----@return EnhancementSyncData
+---@return EnhancementSyncData?
 function GetEnhancements(entityID)
     return enhancementTable[tostring(entityID)]
 end
