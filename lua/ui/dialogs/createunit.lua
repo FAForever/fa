@@ -835,7 +835,7 @@ function CreateDialog()
     }
     dialog = import('/lua/maui/window.lua').Window(
         GetFrame(0), --Parent
-        'Debug Spawn and Army Focus', --title
+        "<LOC spawn_filter_title>Debug Spawn and Army Focus", --title
         nil, -- icon --[==["/textures/ui/common/lobby/uef_ico.dds"]==]
         nil, -- pin button
         true, -- config button
