@@ -99,7 +99,7 @@ EnergyManagerBrainComponent = ClassSimple {
         end
     end,
 
-    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
+    --- A continuous thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
     ---@param self AIBrain
     ToggleEnergyExcessUnitsThread = function(self)
 

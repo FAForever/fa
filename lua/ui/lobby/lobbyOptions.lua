@@ -374,24 +374,24 @@ globalOpts = {
     },
     {
         default = 3,
-        label = "Disconnection delay",
-        help = "Sets the disconnect delay when a player has trouble connecting.",
+        label = "<LOC lobui_0808>Disconnection delay",
+        help = "<LOC lobui_0809>Sets the disconnect delay when a player has trouble connecting.",
         key = 'DisconnectionDelay02',
         mponly = true,
         values = {
             {
-                text = "Tournament",
-                help = "The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.",
+                text = "<LOC lobui_0810>Tournament",
+                help = "<LOC lobui_0811>The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.",
                 key = '10',
             },
             {
-                text = "Quick",
-                help = "The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.",
+                text = "<LOC lobui_0812>Quick",
+                help = "<LOC lobui_0813>The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.",
                 key = '30',
             },
             {
-                text = "Regular",
-                help = "The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.",
+                text = "<LOC lobui_0814>Regular",
+                help = "<LOC lobui_0815>The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.",
                 key = '90',
             },
         },
