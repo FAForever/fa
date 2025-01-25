@@ -35,10 +35,6 @@ view = false
 
 --- Shows the logo in the secondary adapter.
 function ShowLogoInHead1()
-
-    ---------------------------------------------------------------------------
-    -- defensive programming
-
     -- don't do anything if there's only one root frame
     if GetNumRootFrames() < 2 then
         return
@@ -53,10 +49,6 @@ end
 ---
 --- This function is referenced directly by the engine.
 function CreateSecondView()
-
-    ---------------------------------------------------------------------------
-    -- defensive programming
-
     -- don't do anything if there's only one root frame
     if GetNumRootFrames() < 2 then
         return
