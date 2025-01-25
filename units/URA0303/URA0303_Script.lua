@@ -19,8 +19,12 @@ URA0303 = ClassUnit(CAirUnit) {
         Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
         Missiles2 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
+
+    ---@param self URA0303
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        CAirUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionInactive()
         -- Don't turn off stealth for AI so that it uses it by default
         if self.Brain.BrainType == 'Human' then
@@ -30,7 +34,6 @@ URA0303 = ClassUnit(CAirUnit) {
         end
         self:RequestRefreshUI()
     end,
-    
 }
 
 TypeClass = URA0303

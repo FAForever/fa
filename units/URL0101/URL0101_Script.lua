@@ -7,6 +7,10 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 
 ---@class URL0101 : CWalkingLandUnit
 URL0101 = ClassUnit(CWalkingLandUnit) {
+
+    ---@param self URL0101
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
 

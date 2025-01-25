@@ -16,11 +16,14 @@ URA0304 = ClassUnit(CAirUnit) {
         AAGun1 = ClassWeapon(CAAAutocannon) {},
         AAGun2 = ClassWeapon(CAAAutocannon) {},
     },
-    ContrailBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},
-    ExhaustBones = {'Left_Exhaust','Center_Exhaust','Right_Exhaust'},
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
+    ContrailBones = { 'Left_Exhaust', 'Center_Exhaust', 'Right_Exhaust' },
+    ExhaustBones = { 'Left_Exhaust', 'Center_Exhaust', 'Right_Exhaust' },
+
+    ---@param self URA0304
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        CAirUnit.OnStopBeingBuilt(self, builder, layer)
         -- Don't turn off stealth for AI so that it uses it by default
         if self.Brain.BrainType == 'Human' then
             self:SetScriptBit('RULEUTC_StealthToggle', true)
@@ -28,13 +31,19 @@ URA0304 = ClassUnit(CAirUnit) {
             self:SetMaintenanceConsumptionActive()
         end
     end,
-    
+
+    ---@param self URA0304
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
+        if instigator and instigator.Army == self.Army and instigator.Blueprint.CategoriesHash["STRATEGICBOMBER"] then
             return
         end
-        
+
         CAirUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
 }
+
 TypeClass = URA0304
