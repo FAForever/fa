@@ -71,7 +71,7 @@
 
   [Unit Description](lua/ui/game/unitviewDetail.lua):
 
-  - <details><summary>Add a gsub function to replace "-" with space:</summary>
+  - <details><summary>Add a gsub function to replace "-" with "_":</summary>
 
       `id = id:gsub('%-', '_')`
 
