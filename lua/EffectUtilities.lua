@@ -336,7 +336,7 @@ local UnitBuildEffects = {
 --- Creates the Cybran factor build effects
 ---@param builder Unit
 ---@param unitBeingBuilt Unit
----@param buildBones Bone[]
+---@param buildBones BuildBones
 ---@param buildEffectsBag TrashBag
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, buildBones, buildEffectsBag)
     CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, buildEffectsBag, false)
