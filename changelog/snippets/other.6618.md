@@ -77,7 +77,7 @@
 
     </details>
 
-    - <details><summary>Add LOC entries for the following 2 options:</summary>
+  - <details><summary>Add LOC entries for the following 2 options:</summary>
 
       ```
       <LOC uvd_cost>Charge Cost: -%d E (-%d E/s)
