@@ -1,1 +1,0 @@
-- (#6577) Annotate `AddBlinkyBox`. This UI-side global engine function makes a unit's selection box blink for some time.

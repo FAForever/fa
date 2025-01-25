@@ -1595,14 +1595,14 @@ Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's bu
 Unit_Description_0111="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
 Unit_Description_0112="Doubles the main cannon's rate of fire, and increases its range and that of Overcharge. Increases the range of the Microwave Laser if present.\n\n+100% Main cannon rate of fire\n+8 Main cannon range\n+8 Microwave Laser range"
 Unit_Description_0113="Enhances the ACU with a Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
-Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 250\nNanite Torpedo range = 60\n+34 Sonar Radius"
+Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 225\nNanite Torpedo range = 60\n+34 Sonar Radius"
 Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
 Unit_Description_0116="Personal Cloaking further hiding the SACU from optical sensors and massively boosting HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+15000 Health"
 Unit_Description_0117="Grants the main cannon EMP capability, utterly disabling enemy units.\n\n+3 Main cannon EMP Radius - Stun Duration = 3 seconds (T3) 0.3 seconds (SACU)"
-Unit_Description_0118="Increases main cannon damage and range.\n\n+200 Main cannon damage\n+15 Main cannon range"
+Unit_Description_0118="Increases main cannon damage and range.\n\n+200 Main cannon damage\n+10 Main cannon range"
 Unit_Description_0119="Adds an anti-air SAM weapon system.\n\nNanite Missile System - DPS: 360, Range: 60"
 Unit_Description_0120="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0121="Massively increases SACU build speed.\n\n+42 Buildpower"
