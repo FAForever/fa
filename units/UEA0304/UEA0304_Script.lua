@@ -19,8 +19,13 @@ UEA0304 = ClassUnit(TAirUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
-        --Turns Jamming off when unit is built
-        self:SetScriptBit('RULEUTC_JammingToggle', true)
+        -- Don't turn off jamming for AI so that it uses it by default
+        if self.Brain.BrainType == 'Human' then
+            self:SetScriptBit('RULEUTC_JammingToggle', true)
+        else
+            self:SetMaintenanceConsumptionActive()
+        end
+        
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
