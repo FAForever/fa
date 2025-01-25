@@ -66,13 +66,6 @@ DRA0202 = ClassUnit(CAirUnit) {
         },
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
-        self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
-        self:RequestRefreshUI()
-    end,
-
     RotateWings = function(self, target)
         local trash = self.Trash
 
