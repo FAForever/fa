@@ -1,0 +1,37 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'rock_03_albedo.dds',
+					NormalsName = 'waste_rock_08_normalsTS.dds',
+                    LODCutoff = 100,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 3,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Tiny Rock',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 0.25,
+    SizeY = 0.25,
+    SizeZ = 0.25,
+}
