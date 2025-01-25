@@ -2264,8 +2264,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param tpos Vector
     RotateTowards = function(self, tpos)
-        local pos = self:GetPosition()
-        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        local pX, _, pZ = self:GetPositionXYZ()
+        local dx, dz = tpos[1] - pX, tpos[3] - pZ
         self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
