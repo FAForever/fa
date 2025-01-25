@@ -27,7 +27,7 @@ view = false
 
 --- Primary view, and if in split screen this is the left view. The left view is always visible. 
 --- 
---- Most features that rely on a worldview only work for the left worldview. One example is the reclaim overlay.
+--- Most features are tightly coupled with the left worldview. This is an implementation detail, usually for performance reasons. One example is the reclaim overlay.
 ---@type WorldView | false
 viewLeft = false
 
