@@ -6368,7 +6368,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog()
-    CreateInputDialog(GUI, "Game Rules",
+    CreateInputDialog(GUI, "<LOC lobui_0464>Game Rules",
         function(self, text)
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
