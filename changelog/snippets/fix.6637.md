@@ -1,0 +1,1 @@
+- (#6637) Improve merge blueprint compatibility with removal of enhancements.
