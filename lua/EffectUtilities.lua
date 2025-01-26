@@ -48,6 +48,49 @@ local IEffectSetEmitterCurveParam = moho.IEffect.SetEmitterCurveParam
 local IEffectSetEmitterParam = moho.IEffect.SetEmitterParam
 local TrashBagAdd = TrashBag.Add
 
+--#region Optimized functions
+
+local EffectUtilitiesOpti = import("/lua/effectutilitiesopti.lua")
+local EffectUtilitiesUEF = import("/lua/effectutilitiesuef.lua")
+local EffectUtilitiesGeneric = import("/lua/effectutilitiesgeneric.lua")
+local EffectUtilitiesAeon = import("/lua/effectutilitiesaeon.lua")
+
+CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
+CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
+SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
+
+CreateAeonBuildBaseThread = EffectUtilitiesAeon.CreateAeonBuildBaseThread
+CreateAeonConstructionUnitBuildingEffects = EffectUtilitiesAeon.CreateAeonConstructionUnitBuildingEffects
+CreateAeonCommanderBuildingEffects = EffectUtilitiesAeon.CreateAeonCommanderBuildingEffects
+CreateAeonFactoryBuildingEffects = EffectUtilitiesAeon.CreateAeonFactoryBuildingEffects
+CreateAeonColossusBuildingEffects = EffectUtilitiesAeon.CreateAeonColossusBuildingEffects
+CreateAeonCZARBuildingEffects = EffectUtilitiesAeon.CreateAeonCZARBuildingEffects
+CreateAeonTempestBuildingEffects = EffectUtilitiesAeon.CreateAeonTempestBuildingEffects
+CreateAeonParagonBuildingEffects = EffectUtilitiesAeon.CreateAeonParagonBuildingEffects
+
+CreateEffectsOpti = EffectUtilitiesGeneric.CreateEffectsOpti
+CreateEffectsInTrashbag = EffectUtilitiesGeneric.CreateEffectsInTrashbag
+CreateEffectsWithOffsetOpti = EffectUtilitiesGeneric.CreateEffectsWithOffsetOpti
+CreateEffectsWithOffsetInTrashbag = EffectUtilitiesGeneric.CreateEffectsWithOffsetInTrashbag
+CreateEffectsWithRandomOffsetOpti = EffectUtilitiesGeneric.CreateEffectsWithRandomOffsetOpti
+CreateEffectsWithRandomOffsetInTrashbag = EffectUtilitiesGeneric.CreateEffectsWithRandomOffsetInTrashbag
+CreateBoneEffectsOpti = EffectUtilitiesGeneric.CreateBoneEffectsOpti
+CreateBoneEffectsInTrashbag = EffectUtilitiesGeneric.CreateBoneEffectsInTrashbag
+CreateBoneEffectsOffsetOpti = EffectUtilitiesGeneric.CreateBoneEffectsOffsetOpti
+CreateBoneEffectsOffsetInTrashbag = EffectUtilitiesGeneric.CreateBoneEffectsOffsetInTrashbag
+CreateRandomEffectsOpti = EffectUtilitiesGeneric.CreateRandomEffectsOpti
+CreateRandomEffectsInTrashbag = EffectUtilitiesGeneric.CreateRandomEffectsInTrashbag
+PlayReclaimEffects = EffectUtilitiesGeneric.PlayReclaimEffects
+PlayReclaimEndEffects = EffectUtilitiesGeneric.PlayReclaimEndEffects
+ApplyWindDirection = EffectUtilitiesGeneric.ApplyWindDirection
+
+CreateDefaultBuildBeams = EffectUtilitiesUEF.CreateDefaultBuildBeams
+CreateUEFBuildSliceBeams = EffectUtilitiesUEF.CreateUEFBuildSliceBeams
+CreateUEFUnitBeingBuiltEffects = EffectUtilitiesUEF.CreateUEFUnitBeingBuiltEffects
+CreateUEFCommanderBuildSliceBeams = EffectUtilitiesUEF.CreateUEFCommanderBuildSliceBeams
+CreateBuildCubeThread = EffectUtilitiesUEF.CreateBuildCubeThread
+--#endregion
+
 -- local DeprecatedWarnings = { }
 
 ---@alias AdjacencyBeam {Unit: Unit, Trash: TrashBag}
@@ -1477,45 +1520,3 @@ function DestroyRemainingTeleportChargingEffects(unit, effectsBag)
         unit.TeleportCybranSphere:Destroy()
     end
 end
-
---- Optimized functions --
-
-local EffectUtilitiesOpti = import("/lua/effectutilitiesopti.lua")
-local EffectUtilitiesUEF = import("/lua/effectutilitiesuef.lua")
-local EffectUtilitiesGeneric = import("/lua/effectutilitiesgeneric.lua")
-local EffectUtilitiesAeon = import("/lua/effectutilitiesaeon.lua")
-
-CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
-CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
-SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
-
-CreateAeonBuildBaseThread = EffectUtilitiesAeon.CreateAeonBuildBaseThread
-CreateAeonConstructionUnitBuildingEffects = EffectUtilitiesAeon.CreateAeonConstructionUnitBuildingEffects
-CreateAeonCommanderBuildingEffects = EffectUtilitiesAeon.CreateAeonCommanderBuildingEffects
-CreateAeonFactoryBuildingEffects = EffectUtilitiesAeon.CreateAeonFactoryBuildingEffects
-CreateAeonColossusBuildingEffects = EffectUtilitiesAeon.CreateAeonColossusBuildingEffects
-CreateAeonCZARBuildingEffects = EffectUtilitiesAeon.CreateAeonCZARBuildingEffects
-CreateAeonTempestBuildingEffects = EffectUtilitiesAeon.CreateAeonTempestBuildingEffects
-CreateAeonParagonBuildingEffects = EffectUtilitiesAeon.CreateAeonParagonBuildingEffects
-
-CreateEffectsOpti = EffectUtilitiesGeneric.CreateEffectsOpti
-CreateEffectsInTrashbag = EffectUtilitiesGeneric.CreateEffectsInTrashbag
-CreateEffectsWithOffsetOpti = EffectUtilitiesGeneric.CreateEffectsWithOffsetOpti
-CreateEffectsWithOffsetInTrashbag = EffectUtilitiesGeneric.CreateEffectsWithOffsetInTrashbag
-CreateEffectsWithRandomOffsetOpti = EffectUtilitiesGeneric.CreateEffectsWithRandomOffsetOpti
-CreateEffectsWithRandomOffsetInTrashbag = EffectUtilitiesGeneric.CreateEffectsWithRandomOffsetInTrashbag
-CreateBoneEffectsOpti = EffectUtilitiesGeneric.CreateBoneEffectsOpti
-CreateBoneEffectsInTrashbag = EffectUtilitiesGeneric.CreateBoneEffectsInTrashbag
-CreateBoneEffectsOffsetOpti = EffectUtilitiesGeneric.CreateBoneEffectsOffsetOpti
-CreateBoneEffectsOffsetInTrashbag = EffectUtilitiesGeneric.CreateBoneEffectsOffsetInTrashbag
-CreateRandomEffectsOpti = EffectUtilitiesGeneric.CreateRandomEffectsOpti
-CreateRandomEffectsInTrashbag = EffectUtilitiesGeneric.CreateRandomEffectsInTrashbag
-PlayReclaimEffects = EffectUtilitiesGeneric.PlayReclaimEffects
-PlayReclaimEndEffects = EffectUtilitiesGeneric.PlayReclaimEndEffects
-ApplyWindDirection = EffectUtilitiesGeneric.ApplyWindDirection
-
-CreateDefaultBuildBeams = EffectUtilitiesUEF.CreateDefaultBuildBeams
-CreateUEFBuildSliceBeams = EffectUtilitiesUEF.CreateUEFBuildSliceBeams
-CreateUEFUnitBeingBuiltEffects = EffectUtilitiesUEF.CreateUEFUnitBeingBuiltEffects
-CreateUEFCommanderBuildSliceBeams = EffectUtilitiesUEF.CreateUEFCommanderBuildSliceBeams
-CreateBuildCubeThread = EffectUtilitiesUEF.CreateBuildCubeThread
