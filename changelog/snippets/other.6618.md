@@ -116,6 +116,9 @@
 
   [Lobby](/lua/ui/lobby/lobby.lua):
 
-  - Add LOC entriy for the following option:
+  - Add LOC entriy for the following 2 options:
 
-    `<LOC _Briefing>Briefing`
+    ```
+    <LOC _Briefing>Briefing
+    <LOC lobui_0464>Game Rules
+    ```
