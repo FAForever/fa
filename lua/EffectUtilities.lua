@@ -382,7 +382,7 @@ local UnitBuildEffects = {
 ---@param buildBones BuildBones
 ---@param buildEffectsBag TrashBag
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, buildBones, buildEffectsBag)
-    CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, buildEffectsBag, false)
+    TrashBagAdd(buildEffectsBag, ForkThread(CreateCybranBuildBeamsOpti, builder, nil, unitBeingBuilt, buildEffectsBag, false))
 
     local builderArmy = builder.Army
     for _, bone in buildBones.BuildEffectBones do
