@@ -14,6 +14,8 @@ TeamVoteCooldown = 1 * 60 * 10
 --- ticks that the recall vote is open (30 seconds)
 VoteTime = 30 * 10
 
+---@param acceptanceVotes number
+---@param totalVotes number
 function RecallRequestAccepted(acceptanceVotes, totalVotes)
     if totalVotes <= 3 then
         return acceptanceVotes >= totalVotes

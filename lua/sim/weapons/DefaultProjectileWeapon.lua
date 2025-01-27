@@ -29,6 +29,7 @@ local MathClamp = math.clamp
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 ---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
+---@field EconDrain? moho.EconomyEvent
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -1058,18 +1059,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
+                            -- Play the "Strategic launch detected" VO to all armies
                             unit:NukeCreatedAtUnit()
                             unit:RemoveNukeSiloAmmo(1)
+
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = {
-                                army = self.Army - 1,
-                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and
-                                    self:GetCurrentTargetPos() or nil
-                            }
-                            if not Sync.NukeLaunchData then
-                                Sync.NukeLaunchData = {}
+                            -- Enemies receive the notification without location data to avoid cheats, while still being notified visually instead of only by audio
+
+                            local isObsOrAlly = GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())
+
+                            -- the global VO plays only when the audio exists, so notify enemies if it exists
+                            if isObsOrAlly or unit.Blueprint.Audio.NuclearLaunchDetected ~= nil then
+                                local launchData = {
+                                    army = self.Army - 1,
+                                    location = isObsOrAlly and self:GetCurrentTargetPos() or nil
+                                }
+                                if not Sync.NukeLaunchData then
+                                    Sync.NukeLaunchData = {}
+                                end
+                                table.insert(Sync.NukeLaunchData, launchData)
                             end
-                            table.insert(Sync.NukeLaunchData, launchData)
                         else
                             unit:RemoveTacticalSiloAmmo(1)
                         end

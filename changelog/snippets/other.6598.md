@@ -1,0 +1,1 @@
+- (#6598) Add documentation for the recently added `TransportSpeedReduction` unit blueprint value.

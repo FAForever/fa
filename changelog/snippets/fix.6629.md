@@ -1,0 +1,1 @@
+- (#6629) Fix a rare error that would cause the Fatboy to not finish dying.

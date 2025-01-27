@@ -1,0 +1,57 @@
+ProjectileBlueprint{
+    Audio = {
+        Impact        = Sound { Bank = 'Impacts', Cue = 'CYB_Expl_Med_Impact',        LodCutoff = 'Weapon_LodCutoff' },
+        ImpactTerrain = Sound { Bank = 'Impacts', Cue = 'Impact_Land_Gen_CYBRAN',     LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
+    },
+    Categories = {
+        "INDIRECTFIRE",
+        "MISSILE",
+        "PROJECTILE",
+    },
+    Defense = {
+        Health = 1,
+        MaxHealth = 1,
+    },
+    Display = {
+        ImpactEffects = {
+            Scale = 1,
+            Type = "Medium03",
+        },
+        Mesh = {
+            LODs = {
+                {
+                    LODCutoff = 150,
+                    ShaderName = "TMeshAlpha",
+                    AlbedoName = "/units/SRL0310/SRL0310_albedo.dds",
+                    NormalsName = "/units/SRL0310/SRL0310_normalsts.dds",
+                    SpecularName = "/units/SRL0310/SRL0310_specteam.dds",
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.03,
+    },
+    General = {
+        Category = "Missile",
+        EntityCategory = {
+            "PROJECTILE",
+            "INDIRECTFIRE",
+            "MISSILE",
+        },
+        Faction = "Cybran",
+        Weapon = "Pulsar EMP Missile",
+    },
+    Interface = { HelpText = "Pulsar EMP Missile" },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 21,
+        LeadTarget = true,
+        MaxSpeed = 21,
+        MaxZigZag = 5,
+        TrackTarget = false,
+        TurnRate = 20,
+        VelocityAlign = true,
+        ZigZagFrequency = 0.2,
+    },
+}

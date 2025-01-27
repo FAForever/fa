@@ -6,15 +6,60 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+--- A basic area defined in the scenario.
+---@class UIScenarioArea
+---@field [1] number    # x0
+---@field [2] number    # z0
+---@field [3] number    # x1
+---@field [4] number    # z1
+---@field type 'RECTANGLE'
+
+--- A marker defined in the scenario.
+---@class UIScenarioMarker
+---@field color string
+---@field type string
+---@field prop BlueprintId  # path to blueprint
+---@field orientation Vector
+---@field position Vector
+
+--- A chain of markers defined in the scenario.
+---@class UIScenarioChain
+---@field Markers string[]  # key of marker in the master chain
+
+--- An army defined in the scenario.
+---@class UIScenarioArmy
+---@field personality string
+---@field plans string
+---@field color number
+---@field faction number
+---@field Economy { mass: number, energy: number }
+---@field Alliances table
+---@field PlatoonBuilders { Builders: table }
+
+--- Scenario entities of a map that defines all areas, (resource) markers, marker chains and armies as defined in the average _save file.
+---@class UIScenarioSaveFile
+---@field Props table       # Unknown
+---@field Areas table<string, { rectangle: UIScenarioArea }>
+---@field MasterChain { _MASTERCHAIN_ : table<string, UIScenarioMarker> }
+---@field Chains table<string, UIScenarioChain>
+---@field Orders table      # Unknown
+---@field Platoons table    # Unknown
+---@field Armies table<string, UIScenarioArmy>
+
+--- Scenario options of a map, as defined in the average _options.lua file.
+---@class UIScenarioOptionsFile
+---@field options ScenarioOption[]
+
 ---@class UIScenarioConfiguration
 ---@field teams {name: string, armies: string[]}
 ---@field customprops table<string, string>
 
----@class UIScenarioInfo
+--- The scenario information as defined in the average _scenario file.
+---@class UIScenarioInfoFile
 ---@field AdaptiveMap boolean
 ---@field description string
 ---@field map string
----@field map_version number
+---@field map_version? number
 ---@field name string
 ---@field norushradius number
 ---@field norushoffsetX_ARMY_1? number
@@ -49,19 +94,36 @@
 ---@field norushoffsetY_ARMY_15? number
 ---@field norushoffsetX_ARMY_16? number
 ---@field norushoffsetY_ARMY_16? number
----@field preview string
----@field save string
----@field script string
+---@field preview? FileName
+---@field save FileName
+---@field script FileName
 ---@field size {[1]: number, [2]: number}
+---@field reclaim? {[1]: number, [2]: number } # mass/energy
 ---@field starts boolean
----@field type string
+---@field type 'skirmish' | 'campaign_coop'
 ---@field Configurations table<string, UIScenarioConfiguration>
----@field file string
----@field Outdated boolean
---- Additional map options supplied by the map `options.lua` file, if it exists.
---- These are the lobby option-factory type of options, not the actual `<key, value>` pairs
---- that the lobby ends up defining.
----@field options? ScenarioOption[]
+
+---@class UIScenarioBriefingData
+---@field text table
+---@field movies string[]
+---@field voice table
+---@field bgsound table
+---@field style string
+
+--- The scenario strings as defined in the average _strings file.
+---@class UIScenarioStringsFile: table
+---@field BriefingData? UIScenarioBriefingData
+---@field OPERATION_NAME? string
+---@field OPERATION_DESCRIPTION? string
+
+--- The full scenario information with additional fields
+---@class UILobbyScenarioInfo: UIScenarioInfoFile
+---@field file FileName             # reference to the _scenario.lua file
+---@field options ScenarioOption[]  # options from optional _options.lua file
+---@field hasBriefing boolean       # flag whether the _strings.lua file has briefing data in it
+
+--- The scenario information with additional fields, as defined once in a session
+---@class UISessionSenarioInfo : UIScenarioInfoFile
 --- These are the actual `<key, value>` pairs that the lobby defines, not the option-factory type
 --- objects the lobby uses
 ---@field Options? GameOptions
@@ -70,69 +132,166 @@
 ---@field PlayableAreaHeight number Syncs when the playable area changes
 ---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
+-- A scenario file path is typically like `/maps/scmp_001/scmp_001_scenario.lua`
 
-local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
-local Utils = import("/lua/system/utils.lua")
+--- Given the path to a scenario info file, returns a path with the `_scenario.lua` bit removed.
+---@param pathToScenarioInfo any
+---@return string
+local function GetPathToScenario(pathToScenarioInfo)
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len("scenario.lua"))
+end
 
--- load a scenario based on a scenario file name
----@param scenName string
----@return UIScenarioInfo
-function LoadScenario(scenName)
-    -- TODO - expose FILE_IsAbsolute and if it's not, add the path and the _scenario.lua
+--- Given the path to a scenario info file, returns the path to the folder it resides in.
+---@param pathToScenarioInfo any
+---@return string
+local function GetPathToFolder(pathToScenarioInfo)
+    local splits = StringSplit(pathToScenarioInfo, "/")
+    -- Remove the length of the last token (filename), and the slash character before it.
+    return string.sub(pathToScenarioInfo, 1, string.len(pathToScenarioInfo) - string.len(splits[table.getn(splits)]) - 1)
+end
 
-    if not DiskGetFileInfo(scenName) then
+--- Given the path to a scenario info file, returns the path to the scenario options file. The reference to this file is not stored in the _scenario.lua file.
+---@param pathToScenarioInfo FileName
+---@return FileName
+function GetPathToScenarioOptions(pathToScenarioInfo)
+    return GetPathToScenario(pathToScenarioInfo) .. "options.lua" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario strings file.  The reference to this file is not stored in the _scenario.lua file.
+---@param pathToScenarioInfo FileName
+---@return FileName
+function GetPathToScenarioStrings(pathToScenarioInfo)
+    return GetPathToScenario(pathToScenarioInfo) .. "strings.lua" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario water mask. The water mask can help players understand where water is.
+---@param pathToScenarioInfo string
+---@return FileName
+function GetPathToWaterMask(pathToScenarioInfo)
+    return GetPathToFolder(pathToScenarioInfo) .. "/lobby/preview-water.dds" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario cliff mask. The cliffs mask can help players understand where units can go.
+---@param pathToScenarioInfo string
+---@return FileName
+function GetPathToCliffMask(pathToScenarioInfo)
+    return GetPathToFolder(pathToScenarioInfo) .. "/lobby/preview-cliffs.dds" --[[@as FileName]]
+end
+
+--- Given the path to a scenario info file, returns the path to the scenario buildable mask. The buildable mask can help players understand where they have large, buildable areas.
+---@param pathToScenarioInfo string
+---@return FileName
+function GetPathToBuildableMask(pathToScenarioInfo)
+    return GetPathToFolder(pathToScenarioInfo) .. "/lobby/preview-buildable.dds" --[[@as FileName]]
+end
+
+--- Loads in the scenario save. This function is expensive and should be used sparingly.
+---@param pathToScenarioSave FileName
+---@return UIScenarioSaveFile | nil
+function LoadScenarioSaveFile(pathToScenarioSave)
+    if not DiskGetFileInfo(pathToScenarioSave) then
         return nil
     end
 
-    local env = {}
-    doscript('/lua/dataInit.lua', env)
-    doscript(scenName, env)
+    local data = {}
+    doscript('/lua/dataInit.lua', data)
+    doscript(pathToScenarioSave, data)
 
-    if not env.ScenarioInfo then
+    return data.Scenario
+end
+
+--- Loads in the scenario options.
+---@param pathToScenarioOptions FileName
+---@return UIScenarioOptionsFile | nil
+function LoadScenarioOptionsFile(pathToScenarioOptions)
+    if not DiskGetFileInfo(pathToScenarioOptions) then
         return nil
     end
+
+    local data = {}
+    doscript('/lua/dataInit.lua', data)
+    doscript(pathToScenarioOptions, data)
+
+    return data.options
+end
+
+--- Loads in the scenario strings.
+---@param pathToScenarioStrings FileName
+---@return UIScenarioStringsFile | nil
+function LoadScenarioStringsFile(pathToScenarioStrings)
+    if not DiskGetFileInfo(pathToScenarioStrings) then
+        return nil
+    end
+
+    local data = {}
+    doscript('/lua/dataInit.lua', data)
+    doscript(pathToScenarioStrings, data)
+
+    return data
+end
+
+--- Loads in the scenario information.
+---@param pathToScenarioInfo FileName
+---@return UIScenarioInfoFile | nil
+function LoadScenarioInfoFile(pathToScenarioInfo)
+    if not DiskGetFileInfo(pathToScenarioInfo) then
+        return nil
+    end
+
+    local data = {}
+    doscript('/lua/dataInit.lua', data)
+    doscript(pathToScenarioInfo, data)
 
     -- Backward compatibility
-    if env.version == 1 then
-        local temp = env
-        env = {
+    if data.version == 1 then
+        local temp = data
+        data = {
             ScenarioInfo = temp,
         }
     end
 
-    local optionsFileName = string.sub(scenName, 1, string.len(scenName) - string.len("scenario.lua")) .. "options.lua"
-    if DiskGetFileInfo(optionsFileName) then
-        local optionsEnv = {}
-        doscript(optionsFileName, optionsEnv)
-        if optionsEnv.options ~= nil then
-            env.ScenarioInfo.options = optionsEnv.options
-        end
-    end
-
-    -- Check if the map has mission briefing data
-    local stringsFileName = string.sub(scenName, 1, string.len(scenName) - string.len("scenario.lua")) .. "strings.lua"
-    if DiskGetFileInfo(stringsFileName) then
-        local stringsEnv = {}
-        doscript(stringsFileName, stringsEnv)
-        if stringsEnv.BriefingData ~= nil then
-            env.ScenarioInfo.hasBriefing = true
-        end
-    end
-
-    -- Is this map flagged out of date? *CACKLES INSANELY*
-    local pathBits = Utils.StringSplit(scenName, '/')
-    env.ScenarioInfo.Outdated = OutdatedMaps[pathBits[2]]
-
-    env.ScenarioInfo.file = scenName -- stuff the file name in so we have that
-    return env.ScenarioInfo
+    return data.ScenarioInfo
 end
 
--- the default scenario enumerator sort method
+--- Loads in the entire scenario including the save and optional files such as _options.lua and _strings.lua.
+---@param pathToScenarioInfo FileName
+---@return UILobbyScenarioInfo?
+function LoadScenario(pathToScenarioInfo)
+    local scenarioInfo = LoadScenarioInfoFile(pathToScenarioInfo)
+    if not scenarioInfo then
+        return nil
+    end
+
+    -- optionally, add in the options
+    local ok, scenarioOptions = pcall(LoadScenarioOptionsFile, GetPathToScenarioOptions(pathToScenarioInfo)) --[[@as UIScenarioOptionsFile | nil]]
+    if ok and scenarioOptions then
+        scenarioInfo.options = scenarioOptions
+    end
+
+    -- optionally, add in briefing data flag
+    local scenarioStrings
+    ok, scenarioStrings = pcall(LoadScenarioStringsFile, GetPathToScenarioStrings(pathToScenarioInfo)) --[[@as UIScenarioStringsFile | nil]]
+    if ok and scenarioStrings then
+        if scenarioStrings.BriefingData then
+            scenarioInfo.hasBriefing = true
+        end
+    end
+
+    scenarioInfo.file = pathToScenarioInfo
+    return scenarioInfo --[[@as UILobbyScenarioInfo]]
+end
+
+--- the default scenario enumerator sort method
+---@param compa string
+---@param compb string
+---@return boolean
 local function DefaultScenarioSorter(compa, compb)
     return string.upper(compa) < string.upper(compb)
 end
 
--- given a scenario, determines if it can be played in skirmish mode
+--- given a scenario, determines if it can be played in skirmish mode
+---@param scenario UIScenarioInfoFile
+---@return boolean
 function IsScenarioPlayable(scenario)
     if not scenario.Configurations.standard.teams[1].armies then
         return false
@@ -141,12 +300,15 @@ function IsScenarioPlayable(scenario)
     return true
 end
 
--- EnumerateScenarios returns an array of scenario names
---  nameFilter can be passed in to narrow the enumaration, for example
---      EnumerateScenarios("SCMP*") will find all maps that start with SCMP
---      if nameFilter is nil, all maps will be returned
---  sortFunc is a function which, given two scenario names, will return true for the file name to come first
---      if no sortFunc is defined the default sorter will be used
+--- EnumerateScenarios returns an array of scenario names
+---  nameFilter can be passed in to narrow the enumaration, for example
+---      EnumerateScenarios("SCMP*") will find all maps that start with SCMP
+---      if nameFilter is nil, all maps will be returned
+---  sortFunc is a function which, given two scenario names, will return true for the file name to come first
+---      if no sortFunc is defined the default sorter will be used
+---@param nameFilter? string            # defaults to '*'
+---@param sortFunc? fun(a, b): boolean  # defaults to alphabetical on name of map
+---@return table
 function EnumerateSkirmishScenarios(nameFilter, sortFunc)
     nameFilter = nameFilter or '*'
     sortFunc = sortFunc or DefaultScenarioSorter
@@ -172,6 +334,8 @@ end
 -- given a scenario table, loads the save file and puts all the start positions in a table
 -- I've made this function so it works with the old data format and the new
 -- Returning an empty table means scenario data was ill formed
+---@param scenario UIScenarioInfoFile
+---@return Vector2[]
 function GetStartPositions(scenario)
     local saveData = {}
     doscript('/lua/dataInit.lua', saveData)
@@ -229,7 +393,9 @@ function GetStartPositions(scenario)
     return armyPositions
 end
 
--- enumerates and returns to key name for all the armies for this map
+-- Retrieves all of the playable armies for a scenario
+---@param scenario UIScenarioInfoFile
+---@return string[] | nil
 function GetArmies(scenario)
     local retArmies = nil
 
@@ -249,11 +415,14 @@ function GetArmies(scenario)
 
     return retArmies
 end
+
+---@param scenario UIScenarioInfoFile
+---@return string[]
 function GetExtraArmies(scenario)
     if scenario.Configurations.standard and scenario.Configurations.standard.teams then
         local teams = scenario.Configurations.standard.teams
         if teams.ExtraArmies then
-            local armies = STR_GetTokens(teams.ExtraArmies,' ')
+            local armies = STR_GetTokens(teams.ExtraArmies, ' ')
             return armies
         end
     end
@@ -261,6 +430,8 @@ end
 
 --- Validate options provided by the scenario file.
 -- This function prints warnings about any defects and attempts to correct them with sane defaults.
+---@param scenarioOptions ScenarioOption[]
+---@return boolean
 function ValidateScenarioOptions(scenarioOptions)
     -- Most maps just don't have any options.
     if not scenarioOptions then
@@ -276,8 +447,8 @@ function ValidateScenarioOptions(scenarioOptions)
             table.print(optData)
             passed = false
         elseif type(optData.default) ~= "number" or
-                optData.default <= 0 or
-                optData.default > table.getn(optData.values) then
+            optData.default <= 0 or
+            optData.default > table.getn(optData.values) then
             WARN("Invalid default option value " .. tostring(optData.default))
             WARN("Remember: option defaults are 1-based indices into the `values' table, not values themselves")
             WARN("Offending option table:")
@@ -306,6 +477,8 @@ end
 --
 -- @param scenario Scenario info
 -- @return true if the map has Land Path nodes, false otherwise.
+---@param scenario UIScenarioInfoFile
+---@return boolean
 function CheckMapHasMarkers(scenario)
     if not DiskGetFileInfo(scenario.save) then
         return false
@@ -316,19 +489,90 @@ function CheckMapHasMarkers(scenario)
 
 
     local markers = saveData and
-                    saveData.Scenario and
-                    saveData.Scenario.MasterChain and
-                    saveData.Scenario.MasterChain['_MASTERCHAIN_'] and
-                    saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers or false
+        saveData.Scenario and
+        saveData.Scenario.MasterChain and
+        saveData.Scenario.MasterChain['_MASTERCHAIN_'] and
+        saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers or false
 
     if not markers then
-       WARN('Map '.. scenario.name..' has no markers') return false
+        WARN('Map ' .. scenario.name .. ' has no markers')
+        return false
     else
-       for marker, data in markers do
-          if data.adjacentTo and string.find(data.adjacentTo, ' ') then
-             return true
-          end
-       end
+        for marker, data in markers do
+            if data.adjacentTo and string.find(data.adjacentTo, ' ') then
+                return true
+            end
+        end
     end
     return false
 end
+
+-------------------------------------------------------------------------------
+--#region Efficient utility functions
+
+--- Retrieves all of the playable armies for a scenario. Does not allocate new memory.
+---@param scenarioInfo UIScenarioInfoFile
+---@return string[]?     # If defined, looks like: { 'ARMY_01', 'ARMY_02', ... }. Returns nil when the scenario is malformed.
+function GetArmiesFromScenario(scenarioInfo)
+
+    -- Usually the configuration looks like the following:
+    -- Configurations = {
+    --     ['standard'] = {
+    --         teams = {
+    --             { name = 'FFA', armies = { 'ARMY_1', 'ARMY_2', 'ARMY_3', 'ARMY_4', } },
+    --         },
+    --         customprops = {
+    --         },
+    --     },
+    -- }
+    --
+    -- It is clearly an unfinished design. There's not much we can do about that. We first check
+    -- if it looks like that and we just return that accordingly.
+
+    if scenarioInfo.Configurations.standard and scenarioInfo.Configurations.standard.teams then
+        for _, teamConfig in scenarioInfo.Configurations.standard.teams do
+            if teamConfig.name and (teamConfig.name == 'FFA') then
+                return teamConfig.armies
+            end
+        end
+    end
+
+    -- Scenario format is malformed, not much we can do about this.
+
+    return nil
+end
+
+--- Retrieves all the starting positions for a scenario. Allocates and returns new tables on each call.
+---@param scenarioInfo UIScenarioInfoFile
+---@param scenarioSave UIScenarioSaveFile
+---@return Vector2[]?
+function GetStartPositionsFromScenario(scenarioInfo, scenarioSave)
+    local armies = GetArmiesFromScenario(scenarioInfo)
+    if not armies then
+        return nil
+    end
+
+    local markers = scenarioSave.MasterChain._MASTERCHAIN_.Markers
+    if not markers then
+        return nil
+    end
+
+    local output = {}
+    for _, army in armies do
+        local marker = markers[army]
+        if marker then
+            table.insert(output, { marker.position[1], marker.position[3] })
+        else
+            table.insert(output, { 0, 0 })
+
+            WARN(
+                "MapUtil - no initial position marker for army", army, "found in",
+                scenarioInfo.name, "version", tostring(scenarioInfo.map_version)
+            )
+        end
+    end
+
+    return output
+end
+
+--#endregion

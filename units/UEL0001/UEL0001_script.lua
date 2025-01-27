@@ -27,14 +27,23 @@ local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0001 : ACUUnit
 ---@field LeftPod TConstructionPodUnit
+---@field HasLeftPod boolean
+---@field RebuildThread? thread # Rebuilds left pod
 ---@field RightPod TConstructionPodUnit
+---@field HasRightPod boolean
+---@field RebuildThread2? thread # Rebuilds right pod
+---@field MissileHatchSlider moho.SlideManipulator
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
         DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
         OverCharge = ClassWeapon(TDFOverchargeWeapon) {},
         AutoOverCharge = ClassWeapon(TDFOverchargeWeapon) {},
+        --- Special weapon with UEF ACU hatch animations when reloading
+        ---@class TacMissile : TIFCruiseMissileLauncher
+        ---@field unit UEL0001
         TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            ---@param self TacMissile
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -43,6 +52,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacMissile
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -55,6 +65,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacMissile
+            ---@param slider moho.SlideManipulator
             CloseHatchThread = function(self, slider)
                 -- wait for the launch effects to clear
                 WaitTicks(30)
@@ -68,7 +80,11 @@ UEL0001 = ClassUnit(ACUUnit) {
             end,
         },
 
+        --- Special weapon with UEF ACU hatch animations when reloading
+        ---@class TacNukeMissile : TIFCruiseMissileLauncher
+        ---@field unit UEL0001
         TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            ---@param self TacNukeMissile
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -77,6 +93,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacNukeMissile
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 local hatch = self.unit.MissileHatchSlider
@@ -89,6 +106,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end,
 
+            ---@param self TacNukeMissile
+            ---@param slider moho.SlideManipulator
             CloseHatchThread = function(self, slider)
                 -- wait for the launch effects to clear
                 WaitTicks(30)
@@ -194,7 +213,7 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 
     ---@param self UEL0001
-    ---@param unitBeingBuilt Unit
+    ---@param unitBeingBuilt Unit | { BuildingCube : boolean }
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
@@ -222,6 +241,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
+                ---@type UEA0001
+                ---@diagnostic disable-next-line: assign-type-mismatch
                 local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
                 pod:SetCreator(self)
@@ -241,6 +262,8 @@ UEL0001 = ClassUnit(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
+                ---@type UEA0001
+                ---@diagnostic disable-next-line: assign-type-mismatch
                 local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
                 pod:SetCreator(self)
@@ -302,239 +325,396 @@ UEL0001 = ClassUnit(ACUUnit) {
         attachee:SetDoNotTarget(false)
     end,
 
+    ---------------------------------------------------------------------------
+    --#region Enhancements
+
+    -- Drone Upgrades
+
     ---@param self UEL0001
-    ---@param enh string
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementLeftPod = function(self, bp)
+        local location = self:GetPosition('AttachSpecial02')
+        ---@type UEA0001
+        ---@diagnostic disable-next-line: assign-type-mismatch
+        local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
+        pod:SetParent(self, 'LeftPod')
+        pod:SetCreator(self)
+        self.Trash:Add(pod)
+        self.HasLeftPod = true
+        self.LeftPod = pod
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementLeftPodRemove = function(self, bp)
+        if self.HasLeftPod == true then
+            self.HasLeftPod = false
+            if self.LeftPod and not self.LeftPod.Dead then
+                self.LeftPod:Kill()
+                self.LeftPod = nil
+            end
+            if self.RebuildingPod ~= nil then
+                RemoveEconomyEvent(self, self.RebuildingPod)
+                self.RebuildingPod = nil
+            end
+        end
+        KillThread(self.RebuildThread)
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementRightPod = function(self, bp)
+        local location = self:GetPosition('AttachSpecial01')
+        ---@type UEA0001
+        ---@diagnostic disable-next-line: assign-type-mismatch
+        local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
+        pod:SetParent(self, 'RightPod')
+        pod:SetCreator(self)
+        self.Trash:Add(pod)
+        self.HasRightPod = true
+        self.RightPod = pod
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementRightPodRemove = function(self, bp)
+        if self.HasLeftPod == true then
+            self.HasLeftPod = false
+            if self.LeftPod and not self.LeftPod.Dead then
+                self.LeftPod:Kill()
+                self.LeftPod = nil
+            end
+            if self.RebuildingPod ~= nil then
+                RemoveEconomyEvent(self, self.RebuildingPod)
+                self.RebuildingPod = nil
+            end
+        end
+        if self.HasRightPod == true then
+            self.HasRightPod = false
+            if self.RightPod and not self.RightPod.Dead then
+                self.RightPod:Kill()
+                self.RightPod = nil
+            end
+            if self.RebuildingPod2 ~= nil then
+                RemoveEconomyEvent(self, self.RebuildingPod2)
+                self.RebuildingPod2 = nil
+            end
+        end
+        KillThread(self.RebuildThread)
+        KillThread(self.RebuildThread2)
+    end,
+
+    -- Teleport Upgrade
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementTeleporter = function(self, bp)
+        self:AddCommandCap('RULEUCC_Teleport')
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementTeleporterRemove = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Teleport')
+    end,
+
+    -- Personal Shield
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementShield = function(self, bp)
+        self:AddToggleCap('RULEUTC_ShieldToggle')
+        self:CreateShield(bp)
+        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+        self:SetMaintenanceConsumptionActive()
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementShieldRemove = function(self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        RemoveUnitEnhancement(self, 'ShieldRemove')
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
+    -- Bubble Shield
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementShieldGeneratorField = function(self, bp)
+        self:AddToggleCap('RULEUTC_ShieldToggle')
+        self:DestroyShield()
+        self:ForkThread(
+            function()
+                WaitTicks(1)
+                self:CreateShield(bp)
+                self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+                self:SetMaintenanceConsumptionActive()
+            end
+        )
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementShieldGeneratorFieldRemove = function(self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
+    -- T2 Engineering Suite
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementAdvancedEngineering = function(self, bp)
+        local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
+        self:RemoveBuildRestriction(cat)
+        if not Buffs['UEFACUT2BuildRate'] then
+            BuffBlueprint {
+                Name = 'UEFACUT2BuildRate',
+                DisplayName = 'UEFACUT2BuildRate',
+                BuffType = 'ACUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Mult = 1,
+                    },
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
+
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementAdvancedEngineeringRemove = function(self, bp)
+        local bp = self.Blueprint.Economy.BuildRate
+        if not bp then return end
+        self:RestoreBuildRestrictions()
+        self:AddBuildRestriction(categories.UEF *
+            (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        self:AddBuildRestriction(categories.UEF *
+            (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
+            Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
+        end
+    end,
+
+    -- T3 Engineering Suite
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementT3Engineering = function(self, bp)
+        local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
+        self:RemoveBuildRestriction(cat)
+        if not Buffs['UEFACUT3BuildRate'] then
+            BuffBlueprint {
+                Name = 'UEFACUT3BuildRate',
+                DisplayName = 'UEFCUT3BuildRate',
+                BuffType = 'ACUBUILDRATE',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    BuildRate = {
+                        Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                        Mult = 1,
+                    },
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
+
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementT3EngineeringRemove = function(self, bp)
+        local bp = self.Blueprint.Economy.BuildRate
+        if not bp then return end
+        self:RestoreBuildRestrictions()
+        if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
+            Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
+        end
+        self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+    end,
+
+    -- Nano Repair System
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementDamageStabilization = function(self, bp)
+        if not Buffs['UEFACUDamageStabilization'] then
+            BuffBlueprint {
+                Name = 'UEFACUDamageStabilization',
+                DisplayName = 'UEFACUDamageStabilization',
+                BuffType = 'DamageStabilization',
+                Stacks = 'REPLACE',
+                Duration = -1,
+                Affects = {
+                    MaxHealth = {
+                        Add = bp.NewHealth,
+                        Mult = 1.0,
+                    },
+                    Regen = {
+                        Add = bp.NewRegenRate,
+                        Mult = 1.0,
+                    },
+                },
+            }
+        end
+        Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
+
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementDamageStabilizationRemove = function(self, bp)
+        if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
+            Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
+        end
+    end,
+
+    -- Gun Upgrade
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementHeavyAntiMatterCannon = function(self, bp)
+        local wep = self:GetWeaponByLabel('RightZephyr')
+        wep:AddDamageMod(bp.ZephyrDamageMod)
+        wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementHeavyAntiMatterCannonRemove = function(self, bp)
+        local bp = self.Blueprint.Enhancements['HeavyAntiMatterCannon']
+        if not bp then return end
+        local wep = self:GetWeaponByLabel('RightZephyr')
+        wep:AddDamageMod(-bp.ZephyrDamageMod)
+        local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
+        wep:ChangeMaxRadius(bpDisrupt or 22)
+        local oc = self:GetWeaponByLabel('OverCharge')
+        oc:ChangeMaxRadius(bpDisrupt or 22)
+        local aoc = self:GetWeaponByLabel('AutoOverCharge')
+        aoc:ChangeMaxRadius(bpDisrupt or 22)
+    end,
+
+    -- RAS
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementResourceAllocation = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        if not bp then return end
+        self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+        self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementResourceAllocationRemove = function(self, bp)
+        local bpEcon = self.Blueprint.Economy
+        self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
+        self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+    end,
+
+    -- Tactical Missile Launcher
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementTacticalMissile = function(self, bp)
+        self:AddCommandCap('RULEUCC_Tactical')
+        self:AddCommandCap('RULEUCC_SiloBuildTactical')
+        self:SetWeaponEnabledByLabel('TacMissile', true)
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementTacticalMissileRemove = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Tactical')
+        self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+        self:SetWeaponEnabledByLabel('TacMissile', false)
+        local amt = self:GetTacticalSiloAmmoCount()
+        self:RemoveTacticalSiloAmmo(amt or 0)
+        self:StopSiloBuild()
+    end,
+
+    -- Billy Nuke
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementTacticalNukeMissile = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Tactical')
+        self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+        self:AddCommandCap('RULEUCC_Nuke')
+        self:AddCommandCap('RULEUCC_SiloBuildNuke')
+        self:SetWeaponEnabledByLabel('TacMissile', false)
+        self:SetWeaponEnabledByLabel('TacNukeMissile', true)
+        local amt = self:GetTacticalSiloAmmoCount()
+        self:RemoveTacticalSiloAmmo(amt or 0)
+        self:StopSiloBuild()
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementTacticalNukeMissileRemove = function(self, bp)
+        self:RemoveCommandCap('RULEUCC_Nuke')
+        self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
+        self:RemoveCommandCap('RULEUCC_Tactical')
+        self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+        self:SetWeaponEnabledByLabel('TacMissile', false)
+        self:SetWeaponEnabledByLabel('TacNukeMissile', false)
+        local amt = self:GetTacticalSiloAmmoCount()
+        self:RemoveTacticalSiloAmmo(amt or 0)
+        local amt = self:GetNukeSiloAmmoCount()
+        self:RemoveNukeSiloAmmo(amt or 0)
+        self:StopSiloBuild()
+    end,
+
+
+    ---@param self UEL0001
+    ---@param enh Enhancement
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
-        if enh == 'LeftPod' then
-            local location = self:GetPosition('AttachSpecial02')
-            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'LeftPod')
-            pod:SetCreator(self)
-            self.Trash:Add(pod)
-            self.HasLeftPod = true
-            self.LeftPod = pod
-        elseif enh == 'RightPod' then
-            local location = self:GetPosition('AttachSpecial01')
-            local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
-            pod:SetParent(self, 'RightPod')
-            pod:SetCreator(self)
-            self.Trash:Add(pod)
-            self.HasRightPod = true
-            self.RightPod = pod
-        elseif enh == 'LeftPodRemove' or enh == 'RightPodRemove' then
-            if self.HasLeftPod == true then
-                self.HasLeftPod = false
-                if self.LeftPod and not self.LeftPod.Dead then
-                    self.LeftPod:Kill()
-                    self.LeftPod = nil
-                end
-                if self.RebuildingPod ~= nil then
-                    RemoveEconomyEvent(self, self.RebuildingPod)
-                    self.RebuildingPod = nil
-                end
-            end
-            if self.HasRightPod == true then
-                self.HasRightPod = false
-                if self.RightPod and not self.RightPod.Dead then
-                    self.RightPod:Kill()
-                    self.RightPod = nil
-                end
-                if self.RebuildingPod2 ~= nil then
-                    RemoveEconomyEvent(self, self.RebuildingPod2)
-                    self.RebuildingPod2 = nil
-                end
-            end
-            KillThread(self.RebuildThread)
-            KillThread(self.RebuildThread2)
-        elseif enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
-        elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
-        elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:CreateShield(bp)
-            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-            self:SetMaintenanceConsumptionActive()
-        elseif enh == 'ShieldRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            RemoveUnitEnhancement(self, 'ShieldRemove')
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh == 'ShieldGeneratorField' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:DestroyShield()
-            self:ForkThread(
-                function()
-                    WaitTicks(1)
-                    self:CreateShield(bp)
-                    self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-                    self:SetMaintenanceConsumptionActive()
-                end
-            )
-        elseif enh == 'ShieldGeneratorFieldRemove' then
-            self:DestroyShield()
-            self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh == 'AdvancedEngineering' then
-            local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
-            self:RemoveBuildRestriction(cat)
-            if not Buffs['UEFACUT2BuildRate'] then
-                BuffBlueprint {
-                    Name = 'UEFACUT2BuildRate',
-                    DisplayName = 'UEFACUT2BuildRate',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
-                            Mult = 1,
-                        },
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
-        elseif enh == 'AdvancedEngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
-            self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.UEF *
-                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            self:AddBuildRestriction(categories.UEF *
-                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
-                Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
-            end
-        elseif enh == 'T3Engineering' then
-            local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
-            self:RemoveBuildRestriction(cat)
-            if not Buffs['UEFACUT3BuildRate'] then
-                BuffBlueprint {
-                    Name = 'UEFACUT3BuildRate',
-                    DisplayName = 'UEFCUT3BuildRate',
-                    BuffType = 'ACUBUILDRATE',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        BuildRate = {
-                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
-                            Mult = 1,
-                        },
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
-        elseif enh == 'T3EngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
-            self:RestoreBuildRestrictions()
-            if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
-                Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
-            end
-            self:AddBuildRestriction(categories.UEF *
-                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        elseif enh == 'DamageStabilization' then
-            if not Buffs['UEFACUDamageStabilization'] then
-                BuffBlueprint {
-                    Name = 'UEFACUDamageStabilization',
-                    DisplayName = 'UEFACUDamageStabilization',
-                    BuffType = 'DamageStabilization',
-                    Stacks = 'REPLACE',
-                    Duration = -1,
-                    Affects = {
-                        MaxHealth = {
-                            Add = bp.NewHealth,
-                            Mult = 1.0,
-                        },
-                        Regen = {
-                            Add = bp.NewRegenRate,
-                            Mult = 1.0,
-                        },
-                    },
-                }
-            end
-            Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
-        elseif enh == 'DamageStabilizationRemove' then
-            if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
-                Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
-            end
-        elseif enh == 'HeavyAntiMatterCannon' then
-            local wep = self:GetWeaponByLabel('RightZephyr')
-            wep:AddDamageMod(bp.ZephyrDamageMod)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
-        elseif enh == 'HeavyAntiMatterCannonRemove' then
-            local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
-            if not bp then return end
-            local wep = self:GetWeaponByLabel('RightZephyr')
-            wep:AddDamageMod(-bp.ZephyrDamageMod)
-            local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
-            wep:ChangeMaxRadius(bpDisrupt or 22)
-            local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bpDisrupt or 22)
-            local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bpDisrupt or 22)
-        elseif enh == 'ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
-            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
-            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
-        elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh == 'TacticalMissile' then
-            self:AddCommandCap('RULEUCC_Tactical')
-            self:AddCommandCap('RULEUCC_SiloBuildTactical')
-            self:SetWeaponEnabledByLabel('TacMissile', true)
-        elseif enh == 'TacticalNukeMissile' then
-            self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
-            self:AddCommandCap('RULEUCC_Nuke')
-            self:AddCommandCap('RULEUCC_SiloBuildNuke')
-            self:SetWeaponEnabledByLabel('TacMissile', false)
-            self:SetWeaponEnabledByLabel('TacNukeMissile', true)
-            local amt = self:GetTacticalSiloAmmoCount()
-            self:RemoveTacticalSiloAmmo(amt or 0)
-            self:StopSiloBuild()
-        elseif enh == 'TacticalMissileRemove' or enh == 'TacticalNukeMissileRemove' then
-            self:RemoveCommandCap('RULEUCC_Nuke')
-            self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
-            self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
-            self:SetWeaponEnabledByLabel('TacMissile', false)
-            self:SetWeaponEnabledByLabel('TacNukeMissile', false)
-            local amt = self:GetTacticalSiloAmmoCount()
-            self:RemoveTacticalSiloAmmo(amt or 0)
-            local amt = self:GetNukeSiloAmmoCount()
-            self:RemoveNukeSiloAmmo(amt or 0)
-            self:StopSiloBuild()
+
+        local ref = 'ProcessEnhancement' .. enh
+        local handler = self[ref]
+        if handler then
+            handler(self, bp)
+        else
+            WARN("Missing enhancement: ", enh, " for unit: ", self:GetUnitId(), " note that the function name should be called: ", ref)
         end
     end,
+
+    --#endregion
 }
 
 TypeClass = UEL0001

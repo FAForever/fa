@@ -18,22 +18,39 @@ local muzzleBones = { 'Turret_Barrel_F_B03', 'Turret_Barrel_E_B03', 'Turret_Barr
 URL0401 = ClassUnit(CLandUnit) {
 
     Weapons = {
+        ---@class URL0401_Gun01 : CIFArtilleryWeapon
+        ---@field losttarget boolean
+        ---@field initialaim boolean
+        ---@field PitchRotators moho.RotateManipulator[] # Pitch rotators for the fake turret barrels
+        ---@field currentbarrel number # Which barrel is currently aligned with the aim's yaw
+        ---@field Goal number # Yaw goal of fake barrels
+        ---@field restdirvector Vector
+        ---@field dirvector Vector
+        ---@field basedirvector Vector
+        ---@field basediftorest number # "BaseDifToRest" angle in between Yaw aim bone and the resting fake barrel
+        ---@field pitchdif number # "PitchDif" angle in between fake barrel pitch and aim barrel pitch
+        ---@field Rotator moho.RotateManipulator # Yaw rotator for the `"Turret_Fake"` bone created every time the weapon fires after being packed
+        ---@field unit URL0401
         Gun01 = ClassWeapon(CIFArtilleryWeapon) {
-
+            ---@param self URL0401_Gun01
             OnCreate = function(self)
                 CIFArtilleryWeapon.OnCreate(self)
                 self.losttarget = false
                 self.initialaim = true
                 self.PitchRotators = {}
-                self.restdirvector = {}
+                self.restdirvector = Vector(0, 0, 0)
+                self.dirvector = Vector(0, 0, 0)
+                self.basedirvector = Vector(0, 0, 0)
                 self.currentbarrel = 1
             end,
 
+            ---@param self URL0401_Gun01
             OnLostTarget = function(self)
                 CIFArtilleryWeapon.OnLostTarget(self)
                 self.losttarget = true
             end,
 
+            ---@param self URL0401_Gun01
             PlayFxWeaponPackSequence = function(self)
                 if self.PitchRotators then
                     for k, v in barrelBones do
@@ -48,6 +65,7 @@ URL0401 = ClassUnit(CLandUnit) {
                 CIFArtilleryWeapon.PlayFxWeaponPackSequence(self)
             end,
 
+            ---@param self URL0401_Gun01
             LaunchEffects = function(self)
                 local FxLaunch = EffectTemplate.CArtilleryFlash02
                 for k, v in FxLaunch do
@@ -55,7 +73,17 @@ URL0401 = ClassUnit(CLandUnit) {
                 end
             end,
 
+            --- Empty function because `CreateProjectileAtMuzzle` will wait when aiming the fake barrels, so the FX needs to be created in there for correct timing
+            ---@param self URL0401_Gun01
+            ---@param muzzle Bone
+            PlayFxMuzzleSequence = function(self, muzzle)
+            end,
+
+            ---@param self URL0401_Gun01
+            ---@param muzzle Bone
             CreateProjectileAtMuzzle = function(self, muzzle)
+                -- set up the yaw and pitch rotators for the fake barrels since we just unpacked
+                -- Creates the animation where the barrels are at their lowest pitch and look spread out
                 if self.initialaim then
                     self.Rotator = CreateRotator(self.unit, 'Turret_Fake', 'y')
                     self.unit.Trash:Add(self.Rotator)
@@ -68,21 +96,23 @@ URL0401 = ClassUnit(CLandUnit) {
                         self.unit.Trash:Add(self.PitchRotators[k])
                     end
 
+                    -- fake barrel with the same yaw as the aim yaw
                     local barrel = self.currentbarrel
-                    local basedirvector = {}
+                    local basedirvector = self.basedirvector
 
                     self.Goal = 0
-                    self.restdirvector.x, self.restdirvector.y, self.restdirvector.z = self.unit:GetBoneDirection(barrelBones
+                    self.restdirvector[1], self.restdirvector[2], self.restdirvector[3] = self.unit:GetBoneDirection(barrelBones
                         [barrel])
-                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+                    basedirvector[1], basedirvector[2], basedirvector[3] = self.unit:GetBoneDirection('Turret_Aim')
                     self.basediftorest = Util.GetAngleInBetween(self.restdirvector, basedirvector)
                 end
 
+                -- since we got a new target, adjust the pitch of the fake barrels to match the aim barrel
                 if self.losttarget or self.initialaim then
-                    local dirvector = {}
-                    dirvector.x, dirvector.y, dirvector.z = self.unit:GetBoneDirection('Turret_Aim_Barrel')
-                    local basedirvector = {}
-                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+                    local dirvector = self.dirvector
+                    dirvector[1], dirvector[2], dirvector[3] = self.unit:GetBoneDirection('Turret_Aim_Barrel')
+                    local basedirvector = self.basedirvector
+                    basedirvector[1], basedirvector[2], basedirvector[3] = self.unit:GetBoneDirection('Turret_Aim')
 
                     local basediftoaim = Util.GetAngleInBetween(dirvector, basedirvector)
 
@@ -94,7 +124,7 @@ URL0401 = ClassUnit(CLandUnit) {
                     end
 
                     WaitFor(self.PitchRotators[1])
-
+                    -- Wait for aesthetics, to let the barrel rest at the final position a bit before firing
                     WaitTicks(3)
 
                     if self.losttarget then
@@ -106,19 +136,13 @@ URL0401 = ClassUnit(CLandUnit) {
                     end
                 end
 
-                local muzzleIdx = 0
-                for i = 1, self.unit:GetBoneCount() do
-                    if self.unit:GetBoneName(i) == 'Turret_Aim_Barrel_Muzzle' then
-                        muzzleIdx = i
-                        break
-                    end
-                end
-
-                CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
+                CIFArtilleryWeapon.PlayFxMuzzleSequence(self, muzzle)
+                CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzle)
                 self.Trash:Add(ForkThread(self.LaunchEffects, self))
                 self.Trash:Add(ForkThread(self.RotateBarrels, self))
             end,
 
+            ---@param self URL0401_Gun01
             RotateBarrels = function(self)
                 if not self.losttarget then
                     self.Rotator:SetSpeed(320)
@@ -132,7 +156,6 @@ URL0401 = ClassUnit(CLandUnit) {
                     if self.currentbarrel > 6 then
                         self.currentbarrel = 1
                     end
-                    self.rotatedbarrel = true
                 end
             end,
         },

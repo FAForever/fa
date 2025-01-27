@@ -63,18 +63,46 @@ function StartFrontEndUI()
     end
 end
 
-
---Used by command line to host a game
-function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTraversalProvider)
-    LOG("Command line hostlobby")
-    local lobby = import("/lua/ui/lobby/lobby.lua")
+--- Hosts a multiplayer LAN lobby.
+--- Called by the engine with the command line argument `/hostgame <protocol> <port> <playerName> <gameName> <mapFile>`
+--- Add the argument `/players <number>` to use the auto lobby. `/<factionName>` to choose a faction.
+---@param protocol UILobbyProtocols
+---@param port number
+---@param playerName string
+---@param gameName string
+---@param mapFile FileName
+---@param natTraversalProvider userdata?
+function StartHostLobbyUI(protocol, port, playerName, gameName, mapFile, natTraversalProvider)
+    LOG("Hosting lobby from the command line")
+    local lobby
+    -- auto lobby only works with 2+ players
+    local autoStart = GetCommandLineArg("/players", 1)[1] >= 2
+    if autoStart then   
+        lobby = import("/lua/ui/lobby/autolobby.lua")
+    else
+        lobby = import("/lua/ui/lobby/lobby.lua")
+    end
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
-    lobby.HostGame(gameName, mapName, false)
+    lobby.HostGame(gameName, mapFile, false)
 end
 
---Used by command line to join a game
+--- Joins a multiplayer lobby.
+--- Called by the engine with the command line argument `/joingame <protocol> <address> <playerName>`
+--- Add the argument `/players <number>` to use the auto lobby. `/<factionName>` to choose a faction.
+---@param protocol UILobbyProtocols
+---@param address string
+---@param playerName string
+---@param natTraversalProvider userdata?
 function StartJoinLobbyUI(protocol, address, playerName, natTraversalProvider)
-    local lobby = import("/lua/ui/lobby/lobby.lua")
+    LOG("Joining lobby from the command line") -- can also be from lobby.lua ReturnToMenu(true), but that never gets called
+    local lobby
+    -- auto lobby only works with 2+ players
+    local autoStart = GetCommandLineArg("/players", 1)[1] >= 2
+    if autoStart then
+        lobby = import("/lua/ui/lobby/autolobby.lua")
+    else
+        lobby = import("/lua/ui/lobby/lobby.lua")
+    end
     local port = 0
     lobby.CreateLobby(protocol, port, playerName, nil, natTraversalProvider, GetFrame(0), StartFrontEndUI)
     lobby.JoinGame(address, false)

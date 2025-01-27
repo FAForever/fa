@@ -46,8 +46,7 @@
 ---@field AutoInitiateAttackCommand? boolean
 --- Ballistic arcs that should be used on the projectile
 ---@field BallisticArc? WeaponBallisticArc
---- every `X/10+1` game ticks, this beam will collide and do damage - using `0` will cause beams to
---- damage every tick. Beams also always collide an extra time on the first tick.
+--- Interval in seconds between beam collision checks (which take 1 tick) - using `0` will cause beams to damage every tick
 ---@field BeamCollisionDelay number
 --- the amount of time the beam exists
 ---@field BeamLifetime number
@@ -161,7 +160,7 @@
 --- script: `Weapons = { FrontTurret01 = Class(TDFGaussCannonWeapon) {} }`
 --- If the Label does not match the weapon will not be workable. Defaults to `"Unlabelled"`.
 ---@field Label string
---- for tracking weapons, if the weapon should lead its target when aiming
+--- for weapons without a tracking projectile, if the weapon should lead its target when aiming
 ---@field LeadTarget? boolean
 --- if set, requires a player to directly issue an attack / launch order for the unit to fire. Is set for all SMLs and 
 --- stationary TMLs. Requires _some_ kind of delay between the firing (such as a charge delay) or queued orders are not 
@@ -319,6 +318,8 @@
 ---@field TurretBoneDualMuzzle? Bone
 --- the second pitch bone for a turret, used for arms on bots as weapons
 ---@field TurretBoneDualPitch? Bone
+--- The second yaw bone for a turret, used for the torso of the Loyalist's secondary weapon that is on a turret connected to the torso.
+---@field TurretBoneDualYaw? Bone
 --- The bone used as the muzzle bone for turrets. This is used for aiming as where the projectile
 --- would come out
 ---@field TurretBoneMuzzle? Bone
@@ -342,8 +343,14 @@
 ---@field TurretYawRange number
 --- the speed at which the turret can turn in its yaw direction
 ---@field TurretYawSpeed number
+--- the center angle for determining secondary yaw, based off the rest pose of the model
+---@field TurretDualYaw number
+--- the angle +/- off the secondary yaw that is a valid angle to turn to
+---@field TurretDualYawRange number
+--- the speed at which the secondary turret can turn in its yaw direction
+---@field TurretDualYawSpeed number
 --- if this weapon uses the recent firing solution to create projectile instead of the
---- aim bone transform
+--- aim bone transform when it fires.
 ---@field UseFiringSolutionInsteadOfAimBone? boolean
 --- the kind of weapon this is
 ---@field WeaponCategory WeaponCategory

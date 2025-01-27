@@ -16,6 +16,24 @@ local RecycledPriTable = {}
 
 local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComponent.lua").DebugWeaponComponent
 
+--- Table of damage information passed from the weapon to the projectile
+--- Can be assigned as a meta table to the projectile's damage table to reduce memory usage for unchanged values
+---@class WeaponDamageTable
+---@field DamageToShields number        # weaponBlueprint.DamageToShields 
+---@field InitialDamageAmount number    # weaponBlueprint.InitialDamage or 0
+---@field DamageRadius number           # weaponBlueprint.DamageRadius + Weapon.DamageRadiusMod
+---@field DamageAmount number           # weaponBlueprint.Damage + Weapon.DamageMod
+---@field DamageType DamageType         # weaponBlueprint.DamageType
+---@field DamageFriendly boolean        # weaponBlueprint.DamageFriendly or true
+---@field CollideFriendly boolean       # weaponBlueprint.CollideFriendly or false
+---@field DoTTime number                # weaponBlueprint.DoTTime
+---@field DoTPulses number              # weaponBlueprint.DoTPulses
+---@field MetaImpactAmount any          # weaponBlueprint.MetaImpactAmount
+---@field MetaImpactRadius any          # weaponBlueprint.MetaImpactRadius
+---@field ArtilleryShieldBlocks boolean # weaponBlueprint.ArtilleryShieldBlocks
+---@field Buffs BlueprintBuff[]         # Active buffs for the weapon
+---@field __index WeaponDamageTable
+
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
@@ -58,7 +76,9 @@ local WeaponMethods = moho.weapon_methods
 ---@field Brain AIBrain
 ---@field CollideFriendly boolean
 ---@field DamageMod number
+---@field DamageModifiers number[] # Set of damage multipliers used by collision beams for the weapon
 ---@field DamageRadiusMod number
+---@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
 ---@field DisabledBuffs table
 ---@field EnergyRequired? number
 ---@field EnergyDrainPerSecond? number
@@ -137,7 +157,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         local pitchBone = bp.TurretBonePitch
         local muzzleBone = bp.TurretBoneMuzzle
         local precedence = bp.AimControlPrecedence or 10
-        local pitchBone2, muzzleBone2
+        local pitchBone2, muzzleBone2, yawBone2
 
         local boneDualPitch = bp.TurretBoneDualPitch
         if boneDualPitch and boneDualPitch ~= '' then
@@ -147,6 +167,11 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         if boneDualMuzzle and boneDualMuzzle ~= '' then
             muzzleBone2 = boneDualMuzzle
         end
+        local boneDualYaw = bp.TurretBoneDualYaw
+        if boneDualYaw and boneDualYaw ~= '' then
+            yawBone2 = boneDualYaw
+        end
+
         local unit = self.unit
         if not (unit:ValidateBone(yawBone) and unit:ValidateBone(pitchBone) and unit:ValidateBone(muzzleBone)) then
             error('*ERROR: Bone aborting turret setup due to bone issues.', 2)
@@ -156,10 +181,15 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 error('*ERROR: Bone aborting turret setup due to pitch/muzzle bone2 issues.', 2)
                 return
             end
+        elseif yawBone2 then
+            if not unit:ValidateBone(yawBone2) then
+                error('*ERROR: Bone aborting turret setup due to yaw bone2 issues.', 2)
+                return
+            end
         end
-        local aimControl, aimRight, aimLeft
+        local aimControl, aimRight, aimLeft, aimYaw2
         if yawBone and pitchBone and muzzleBone then
-            local trashManipulators = self.Trash
+            local selfTrash = self.Trash
             if bp.TurretDualManipulators then
                 aimControl = CreateAimController(self, 'Torso', yawBone)
                 aimRight = CreateAimController(self, 'Right', pitchBone, pitchBone, muzzleBone)
@@ -173,15 +203,15 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                     aimControl:SetResetPoseTime(9999999)
                 end
                 self:SetFireControl('Right')
-                trashManipulators:Add(aimControl)
-                trashManipulators:Add(aimRight)
-                trashManipulators:Add(aimLeft)
+                selfTrash:Add(aimControl)
+                selfTrash:Add(aimRight)
+                selfTrash:Add(aimLeft)
             else
                 aimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, unit) then
                     aimControl:SetResetPoseTime(9999999)
                 end
-                trashManipulators:Add(aimControl)
+                selfTrash:Add(aimControl)
                 aimControl:SetPrecedence(precedence)
                 if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for _, v in bp.RackBones do
@@ -189,10 +219,19 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                         if rackBone ~= pitchBone then
                             local slaver = CreateSlaver(unit, rackBone, pitchBone)
                             slaver:SetPrecedence(precedence - 1)
-                            trashManipulators:Add(slaver)
+                            selfTrash:Add(slaver)
                         end
                     end
                 end
+            end
+
+            if yawBone2 then
+                aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2, yawBone2)
+                aimYaw2:SetPrecedence(precedence-1)
+                if EntityCategoryContains(categories.STRUCTURE, unit) then
+                    aimYaw2:SetResetPoseTime(9999999)
+                end
+                selfTrash:Add(aimYaw2)
             end
         else
             error('*ERROR: Trying to setup a turreted weapon but there are yaw bones, pitch bones or muzzle bones missing from the blueprint.', 2)
@@ -231,6 +270,18 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 turretyawmax = turretyawmax / 12
                 aimRight:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
                 aimLeft:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+            end
+            
+            if aimYaw2 then
+                local turretYawMin2 = turretyawmin
+                local turretYawMax2 = turretyawmax
+                if bp.TurretDualYaw and bp.TurretDualYawRange then
+                    turretYawMin2 = bp.TurretDualYaw - bp.TurretDualYawRange
+                    turretYawMax2 = bp.TurretDualYaw + bp.TurretDualYawRange
+                end
+
+                local turretYawSpeed2 = bp.TurretDualYawSpeed or turretyawspeed
+                aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, turretpitchmin, turretpitchmax, turretpitchspeed)
             end
         else
             local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: '.. unit.UnitId
@@ -410,8 +461,9 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self.Blueprint
+        ---@type WeaponDamageTable
         local damageTable = {}
-        
+
         damageTable.DamageToShields = weaponBlueprint.DamageToShields
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
@@ -445,12 +497,12 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     damageTableCache = false,
     ---@param self Weapon
-    ---@return table | boolean
+    ---@return WeaponDamageTable
     GetDamageTable = function(self)
         if not self.damageTableCache then
             self.damageTableCache = self:GetDamageTableInternal()
         end
-        return self.damageTableCache
+        return self.damageTableCache --[[@as WeaponDamageTable]]
     end,
 
     ---@param self Weapon

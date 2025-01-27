@@ -36,6 +36,9 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
+--- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
+--- The `OrderInfo.behavior` is overwritten in `orders.lua`.
+---@field Abilities table<string, OrderInfo>
 --- the number of build bots a Cybran builder has
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons
@@ -145,6 +148,7 @@
 ---@see SetAutoMode
 ---@field InitialAutoMode boolean
 --- unit should unpack before firing weapon
+--- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
 ---@field NeedUnpack boolean
 --- this muliplier is applied when a staging platform is refueling an air unit
 ---@field RefuelingMultiplier number
@@ -929,6 +933,8 @@
 --- Regen Per Second. How much health the unit regenerates per second
 --- This is a multiplier of the base regen
 ---@field RegenPerSecond number
+--- Which unit categories are buffed by the aura
+---@field UnitCategory UnparsedCategory
 
 
 
@@ -1121,7 +1127,7 @@
 ---@field MaxGroundVariation number
 --- maximum speed for the unit
 ---@field MaxSpeed number
---- maximum speed for the unit in reverse
+--- maximum speed for the unit in reverse. Defaults to the same value as MaxSpeed
 ---@field MaxSpeedReverse number
 --- maximum steer force magnitude that can be applied to acceleration
 ---@field MaxSteerForce number
@@ -1168,6 +1174,9 @@
 ---@field StandUpright boolean
 --- used by XSB3202 when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
+--- How much this unit slows down transports it is loaded in.  
+--- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).
+---@field TransportSpeedReduction number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
