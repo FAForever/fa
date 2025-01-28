@@ -1393,7 +1393,7 @@ function CreateDialog()
 
     local mouseover = false
     local function SetUnitImage(bitmap, id, smol)
-        local icon = __blueprints[id].Source and (__blueprints[id].Source):gsub('/units/.*', '')..'/textures/ui/common/icons/units/'..id..'_icon.dds'
+        local icon = UIUtil.UIFile('/textures/ui/common/icons/units/' .. id .. '_icon.dds', true)
         local lods = __blueprints[id].Display.Mesh.LODs
         local albedo = lods[smol and lods and table.getn(lods) or 1].AlbedoName
 
