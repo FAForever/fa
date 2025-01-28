@@ -19,6 +19,9 @@
 ---@field StartSpot number
 ---@field Team number
 ---@field AILobbyProperties? AILobbyProperties
+---@field Version VERSION       # Related to game version
+---@field GameType string       # Related to game version
+---@field Commit string         # Related to game version
 
 
 local WatchedValueTable = import("/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua").WatchedValueTable
