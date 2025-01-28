@@ -641,6 +641,9 @@ function HandleUnitWithBuildPresets(bps, all_bps)
 
     for _, bp in bps do
         for name, preset in bp.EnhancementPresets do
+            -- allow removing presets using merge bp
+            if not preset then continue end
+
             -- start with clean copy of the original unit BP
             tempBp = table.deepcopy(bp)
 
