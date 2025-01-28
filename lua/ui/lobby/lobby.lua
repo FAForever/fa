@@ -451,6 +451,9 @@ end
 
 --- Get a PlayerData object for the local player, configured using data from their profile.
 function GetLocalPlayerData()
+
+	local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
     return PlayerData(
         {
             PlayerName = localPlayerName,
@@ -466,6 +469,11 @@ function GetLocalPlayerData()
             Country = argv.PrefLanguage,
 			Avatar = argv.Urlava,
 			TooltipAvatar = argv.Tlpava,
+			
+			
+			Version = version,
+            GameType = gametype,
+            Commit = commit,
         }
 )
 end
@@ -3108,10 +3116,14 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     -- Version texts
-    local bool ShowPatch = false
-    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game version " .. version, 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
+	
+	Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
+        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit:sub(1, 8)
+    ))
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
 
     -- Player Slots
@@ -5180,16 +5192,62 @@ local MessageHandlers = {
     },
 
     AddPlayer = {
-        -- Accept = AmHost,
+        
+        ---@class LobbyAddPlayerData
+        ---@field PlayerOptions PlayerData
+        ---@field SenderId number
+        ---@field SenderName string
+        ---@field Type string
+        ---@param data LobbyAddPlayerData
         Accept = function(data)
-            -- return data.PlayerOptions.OwnerID and data.PlayerOptions.OwnerID == data.SenderID and lobbyComm:IsHost()
-            return data.PlayerOptions.OwnerID and
-                data.PlayerOptions.OwnerID == data.SenderID and
-                not FindNameForID(data.SenderID) and
-                lobbyComm:IsHost()
-        end,
+            if type(data.PlayerOptions.MEAN) != 'number' then
+                return false
+            end
+            if type (data.PlayerOptions.NG) != 'number' then
+                return false
+            end
+            if type(data.PlayerOptions.Faction) != 'number' then
+                return false
+            end
+            if type(data.PlayerOptions.PlayerName) != 'string' then
+                return false
+            end
+            local charactersInPlayerName = string.len(data.PlayerOptions.PlayerName)
+            if charactersInPlayerName < 3 or charactersInPlayerName > 32 then
+                return false
+            end
+            if data.PlayerOptions.PlayerClan then
+                if type(data.PlayerOptions.PlayerClan) != 'string' then
+                    return false
+                end
+                if string.len(data.PlayerOptions.PlayerClan) > 6 then
+                    return false
+                end
+            end
+            if not data.PlayerOptions.OwnerID then
+                return false
+            end
+            if not (data.PlayerOptions.OwnerID == data.SenderID) then
+                return false
+            end
+            if FindNameForID(data.SenderID) then
+                return false
+            end
+            
+			local hostVersion, hostGametype, hostCommit = import("/lua/version.lua").GetVersionData()
+            local playerVersion, playerGameType, playerCommit = tostring(data.PlayerOptions.Version), tostring(data.PlayerOptions.GameType), tostring(data.PlayerOptions.Commit)
+            if hostVersion ~= playerVersion or hostGametype ~= playerGameType or hostCommit ~= playerCommit then
+                local playerName = data.PlayerOptions.PlayerName
+                AddChatText(LOCF("<LOC lobui_666>Game version missmatch detected with %s. \r\n - host: %s (@%s)\r\n - %s: %s (@%s). \r\n\r\nTo prevent desyncs, %s is ejected automatically. It is possible that a new game version is released. If this keeps happening then it is better to rehost.", playerName, hostVersion, hostCommit:sub(1, 8), playerName, playerVersion, playerCommit:sub(1, 8), playerName))
+                return false
+            end
+			
+			
+            return lobbyComm:IsHost()
+		end,
+		
         Reject = function(data)
-            lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
+            lobbyComm:EjectPeer(data.SenderID, "Game version missmatch or invalid player data.")
         end,
         Handle = function(data)
             -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
