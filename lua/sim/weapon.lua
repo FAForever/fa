@@ -491,7 +491,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
         -- Add buff
         damageTable.Buffs = {}
-        if weaponBlueprint.Buffs ~= nil then
+        if weaponBlueprint.Buffs then
             for k, v in weaponBlueprint.Buffs do
                 if not self.DisabledBuffs[v.BuffType] then
                     damageTable.Buffs[k] = v

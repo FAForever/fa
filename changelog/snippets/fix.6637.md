@@ -1,1 +1,1 @@
-- (#6637) Improve merge blueprint compatibility with removal of enhancements.
+- (#6637) Improve merge blueprint compatibility with removal of enhancements, enhancement presets, and weapon Buffs.
