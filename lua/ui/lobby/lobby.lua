@@ -3297,13 +3297,22 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Актуальный баланс")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, {text=LOC("Актуальный баланс GAF"), body=LOC("Кликни что-бы узнать про величайший баланс")})
+    LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, 630)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -640)
+	LayoutHelpers.SetWidth(GUI.patchnotesButton, 300)
+    LayoutHelpers.SetHeight(GUI.patchnotesButton, 45)
+    GUI.patchnotesButton.OnClick = function(self, event)
+        Changelog.Changelog(GUI)
+    end
     -- Patchnotes Button
-    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Patchnotes")
-    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'Lobby_patchnotes')
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Discord GAF")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, {text=LOC("Discord GAF"), body=LOC("Официальный дискорд GAPForever")})
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
-        Changelog.Changelog(GUI)
+        OpenURL('http://discord.com/invite/3wvXGZHHFp')
     end
 
     -- Create mission briefing button
