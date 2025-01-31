@@ -637,16 +637,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 local damageSelf = DamageData.DamageSelf or false
 
                 -- do initial damage in a radius
-                DamageArea(
-                    instigator,
-                    cachedPosition,
-                    radius,
-                    damage + (DamageData.InitialDamageAmount or 0),
-                    damageType,
-                    damageFriendly,
-                    damageSelf
-                )
-
+                -- anti-shield damage first so that the remaining damage can overkill under the shield
                 local damageToShields = DamageData.DamageToShields
                 if damageToShields then
                     DamageArea(
@@ -659,6 +650,16 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                         damageSelf
                     )
                 end
+
+                DamageArea(
+                    instigator,
+                    cachedPosition,
+                    radius,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType,
+                    damageFriendly,
+                    damageSelf
+                )
 
                 -- check for and deal damage over time
                 local DoTTime = DamageData.DoTTime
@@ -685,14 +686,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 local damageType = DamageData.DamageType
 
                 -- do initial damage
-                Damage(
-                    instigator,
-                    cachedPosition,
-                    targetEntity,
-                    damage + (DamageData.InitialDamageAmount or 0),
-                    damageType
-                )
-
+                -- anti-shield damage first so remainder can overkill under the shield
                 local damageToShields = DamageData.DamageToShields
                 if damageToShields then
                     Damage(
@@ -703,6 +697,14 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                         "FAF_AntiShield"
                     )
                 end
+
+                Damage(
+                    instigator,
+                    cachedPosition,
+                    targetEntity,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType
+                )
 
                 -- check for and apply damage over time
                 local DoTTime = DamageData.DoTTime

@@ -1,2 +1,0 @@
-- (#6485) The new, better way of calculating the water absorption is now available for all terrain shaders. The only requirement is that the light multiplier is set to more than 2.1. Decals now use PBR light calculations if the terrain shader uses it, making them more consistent with the ground they are on.
-- 

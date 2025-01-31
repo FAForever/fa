@@ -928,6 +928,8 @@
 --- Regen Per Second. How much health the unit regenerates per second
 --- This is a multiplier of the base regen
 ---@field RegenPerSecond number
+--- Which unit categories are buffed by the aura
+---@field UnitCategory UnparsedCategory
 
 
 
@@ -1167,6 +1169,9 @@
 ---@field StandUpright boolean
 --- used by XSB3202 when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
+--- How much this unit slows down transports it is loaded in.  
+--- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).
+---@field TransportSpeedReduction number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
