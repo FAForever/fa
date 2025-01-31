@@ -1152,8 +1152,8 @@ local function CacheUnit(bp)
 
     -- Extract and cache enhancements so they can be restricted individually
     for name, enh in bp.Enhancements or {} do
-        -- Skip slots or 'removable' enhancements
-        if name ~= 'Slots' and not string.find(name, 'Remove') then
+        -- Skip slots, 'Remove' enhancements, and enhancements removed by merging `false`
+        if enh and name ~= 'Slots' and not string.find(name, 'Remove') then
             -- Some enhancements are shared between factions, e.g. Teleporter
             -- and other enhancements have different stats and icons
             -- depending on faction or whether they are for ACU or SCU
