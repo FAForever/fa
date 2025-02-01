@@ -89,7 +89,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 25500,
         BuildCostMass = 2550,
-        BuildRate = 120,
+        BuildRate = 135,
         BuildTime = 4100,
         BuildableCategory = { "BUILTBYQUANTUMGATE UEF" },
         RebuildBonusIds = { "ueb0304" },
