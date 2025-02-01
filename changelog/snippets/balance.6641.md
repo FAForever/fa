@@ -15,3 +15,8 @@
 
       A key point of this health reduction is that Percivals now take 5 shots to kill a brick, instead of 6 shots with the 6th shot overkilling by 1200 out of 1450 damage, so Percivals are now much stronger against Bricks in a plain fight without supporting DPS. Even though the plain matchup is no longer close, Bricks can still win against Percivals by dodging shots.
       <br> The health reduction also very slightly helps Harbingers and Othuums kill Bricks they get in range of.
+    
+    - Turn rate: 68.75 -> 75
+
+      With the 1 range reduction, Bricks would need a slightly faster reaction time when used against ACUs. This turn rate buff counteracts that, as Bricks got a range buff to deal with ACUs in the first place.
+      <br> It also slightly improves the Brick's micro potential against Percivals and its ability to choose fights, which is fair enough considering that the HP and DPS reductions do add up.
