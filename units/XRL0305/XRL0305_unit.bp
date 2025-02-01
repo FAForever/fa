@@ -135,7 +135,7 @@ UnitBlueprint{
         MotionType = "RULEUMT_Amphibious",
         RotateOnSpot = false,
         StandUpright = true,
-        TurnRadius = 2,
+        TurnRadius = 0,
         TurnRate = 75,
     },
     SelectionSizeX = 0.9,
