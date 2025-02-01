@@ -136,7 +136,7 @@ UnitBlueprint{
         RotateOnSpot = false,
         StandUpright = true,
         TurnRadius = 2,
-        TurnRate = 65,
+        TurnRate = 75,
     },
     SelectionSizeX = 0.9,
     SelectionSizeZ = 0.9,
