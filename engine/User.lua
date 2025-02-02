@@ -124,8 +124,8 @@
 --- | 'NUMPAD_DECIMAL'
 --- | 'NUMPAD_DIVIDE'
 
---- No clue what this does
----@param entityId number
+--- Repeatedly the selection box of the unit to the hovered-over state to create a blinking effect
+---@param entityId EntityId
 ---@param onTime number
 ---@param offTime number
 ---@param totalTime number
@@ -386,9 +386,17 @@ end
 function GetFireState(units)
 end
 
---- Returns the root UI frame for a given head
----@param head number
----@return Frame
+--- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter. 
+---
+--- In the game options you can add a second adapter under the 'Video' tab.
+--- 
+--- See also `GetNumRootFrames()` to determine the number of root frames. 
+--- 
+--- See also the following modules that manage these frames:
+--- - Primary adapter: lua\ui\game\worldview.lua
+--- - Secondary adapter: lua\ui\game\multihead.lua
+---@param head 0 | 1
+---@return Frame | nil
 function GetFrame(head)
 end
 
@@ -473,7 +481,14 @@ end
 function GetMovieVolume()
 end
 
---- Returns the current number of root frames (typically one per head)
+--- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments. The game supports up to two root frames.
+--- 
+--- In the game options you can add a second adapter under the 'Video' tab.
+---
+--- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter. 
+--- See also the following modules that manage these frames:
+--- - Primary adapter: lua\ui\game\worldview.lua
+--- - Secondary adapter: lua\ui\game\multihead.lua
 ---@return number
 function GetNumRootFrames()
 end
@@ -587,7 +602,7 @@ function GetUIControlsAlpha()
 end
 
 --- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
----@param unitSet any
+---@param unitSet UserUnit[]
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
 ---@return EntityCategory buildableCategories
@@ -595,17 +610,44 @@ function GetUnitCommandData(unitSet)
 end
 
 --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
----@param unit any
+---@param unit UserUnit
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandDataOfUnit(unit)
 end
 
---- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
---- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams`.
----@param rule CommandCap
----@return string
+--- Given a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command or "None" otherwise.  
+--- See `/lua/ui/game/commandgraphparams.lua#CommandGraphParams` or `UserUnitCommand`.
+--[[```
+             RULEUCC_Move = Move
+             RULEUCC_Stop = Stop
+           RULEUCC_Attack = Attack
+            RULEUCC_Guard = Guard
+           RULEUCC_Patrol = Patrol
+  RULEUCC_RetaliateToggle = None
+           RULEUCC_Repair = Repair
+          RULEUCC_Capture = Capture
+        RULEUCC_Transport = TransportUnloadUnits
+    RULEUCC_CallTransport = TransportLoadUnits
+             RULEUCC_Nuke = Nuke
+         RULEUCC_Tactical = Tactical
+         RULEUCC_Teleport = Teleport
+            RULEUCC_Ferry = Ferry
+RULEUCC_SiloBuildTactical = BuildSiloTactical
+    RULEUCC_SiloBuildNuke = BuildSiloNuke
+        RULEUCC_Sacrifice = Sacrifice
+            RULEUCC_Pause = Pause
+       RULEUCC_Overcharge = OverCharge
+             RULEUCC_Dive = Dive
+          RULEUCC_Reclaim = Reclaim
+    RULEUCC_SpecialAction = SpecialAction
+             RULEUCC_Dock = None
+           RULEUCC_Script = None
+          RULEUCC_Invalid = None
+```]]
+---@param rule EngineCommandCap
+---@return string | "None"
 function GetUnitCommandFromCommandCap(rule)
 end
 
@@ -648,8 +690,8 @@ end
 function IN_RemoveKeyMapTable(keyMapTable)
 end
 
----
----@param queueIndex any
+--- Increase the count at a given location of the current build queue
+---@param queueIndex number
 ---@param count number
 function IncreaseBuildCountInQueue(queueIndex, count)
 end
@@ -810,11 +852,19 @@ end
 function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
----
----@param command any
----@param string any?
+--- Issue a command to a given unit
+---@param unit UserUnit
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
+---@param clear? boolean
+IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
+end
+
+--- Issue a command to the current selection. 
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear boolean?
-function IssueCommand(command, string, clear)
+function IssueCommand(command, luaParams, clear)
 end
 
 ---
@@ -822,12 +872,12 @@ end
 function IssueDockCommand(clear)
 end
 
----
+--- Issue a command to the given units.
 ---@param unitList UserUnit[]
----@param command string
----@param string? string
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
 ---@param clear? boolean
-function IssueUnitCommand(unitList, command, string, clear)
+function IssueUnitCommand(unitList, command, luaParams, clear)
 end
 
 --- Given a MS Windows char code, returns the Maui char code

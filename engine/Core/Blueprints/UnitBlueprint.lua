@@ -36,6 +36,9 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
+--- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
+--- The `OrderInfo.behavior` is overwritten in `orders.lua`.
+---@field Abilities table<string, OrderInfo>
 --- the number of build bots a Cybran builder has
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons
@@ -127,7 +130,9 @@
 
 
 ---@class UnitBlueprintAI
---- under what angle the unit attacks its target after getting an attack order
+--- At what angle (to either side) the unit attacks its target after getting an attack order. 
+--- If one of the unit's weapons has a target and has `SlavedToBody = true`, it will rotate when idle and attacking.
+--- Overrides Weapon `SlavedToBody` and `SlavedToBodyArcRange` behavior.
 ---@field AttackAngle number
 --- automatically surface to attack ground targets
 ---@field AutoSurfaceToAttack boolean
@@ -1167,8 +1172,11 @@
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
 ---@field StandUpright boolean
---- used by XSB3202 when the vertical layer changes from top to sub
+--- used by XSB3202 (T2 sonar) and XSS0201 (Destroyer) when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
+--- How much this unit slows down transports it is loaded in.  
+--- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).
+---@field TransportSpeedReduction number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,

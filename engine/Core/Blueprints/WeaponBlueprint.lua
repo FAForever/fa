@@ -46,8 +46,7 @@
 ---@field AutoInitiateAttackCommand? boolean
 --- Ballistic arcs that should be used on the projectile
 ---@field BallisticArc? WeaponBallisticArc
---- every `X/10+1` game ticks, this beam will collide and do damage - using `0` will cause beams to
---- damage every tick
+--- Interval in seconds between beam collision checks (which take 1 tick) - using `0` will cause beams to damage every tick
 ---@field BeamCollisionDelay number
 --- the amount of time the beam exists
 ---@field BeamLifetime number
@@ -142,10 +141,10 @@
 ---@field Flare WeaponBlueprintFlare
 --- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
---- controls what the weapon is allowed to target in reference to the heading of the unit
+--- controls what the weapon is allowed to target in reference to the heading of the unit. Defaults to 0
 ---@field HeadingArcCenter number
 --- controls what the weapon is allowed to target in reference to the arc center,
---- this is degrees on either side
+--- this is degrees on either side. Defaults to 180
 ---@field HeadingArcRange number
 --- does not consider the weapon when attacking targets if it is disabled
 ---@field IgnoreIfDisabled? boolean
@@ -287,10 +286,12 @@
 --- if the weapon goes directly from its `IdleState` to its `RackSalvoFiringState` without
 --- going through its `RackSalvoFireReadyState` first
 ---@field SkipReadyState? boolean
---- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
+--- If the weapon causes the unit to rotate towards the weapon's target when the target is outside of `SlavedToBodyArcRange`.
+--- With multiple slaved weapons, the first slaved weapon in the blueprint that currently has a target is used for turning.
+--- If `UnitBlueprintAI.AttackAngle` is true, then this causes the unit to rotate when attacking while idle.
 ---@field SlavedToBody? boolean
---- Range of arc in both directions to be considered "slaved" to a target. With multiple weapons, 
---- the first weapon in the blueprint that currently has a target is used for turning.
+--- Degrees to either side of the unit's heading outside of which the weapon will rotate the unit towards the target.
+--- Defaults to 1. Behavior gets overriden by `UnitBlueprintAI.AttackAngle`.
 ---@field SlavedToBodyArcRange? number
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean

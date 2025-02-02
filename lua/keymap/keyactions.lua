@@ -1464,7 +1464,7 @@ local keyActionsOrders = {
         category = 'orders',
     },
     ['shift_stop'] = {
-        action = 'IssueCommand Stop',
+        action = 'UI_Lua import("/lua/ui/game/orders.lua").Stop()',
         category = 'orders',
     },
     ['shift_dive'] = {

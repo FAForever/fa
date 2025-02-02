@@ -146,6 +146,10 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ReclaimTimeMultiplier? number
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
+---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
+---@field Sync { id: string, army: Army } # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
+---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
+---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
@@ -2260,8 +2264,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param tpos Vector
     RotateTowards = function(self, tpos)
-        local pos = self:GetPosition()
-        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        local pX, _, pZ = self:GetPositionXYZ()
+        local dx, dz = tpos[1] - pX, tpos[3] - pZ
         self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
@@ -3203,7 +3207,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end;
 
     ---@param self Unit
-    ---@param enh string
+    ---@param enh Enhancement
     ---@return boolean
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
@@ -3239,7 +3243,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param enhancement string
+    ---@param enhancement Enhancement
     CreateEnhancementEffects = function(self, enhancement)
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
@@ -3275,7 +3279,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param enh string
+    ---@param enh Enhancement
     ---@return boolean
     HasEnhancement = function(self, enh)
         local unitEnh = SimUnitEnhancements[self.EntityId]
@@ -4329,8 +4333,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     ---@param buffTable BlueprintBuff[]
-    ---@param PosEntity? Vector
-    AddBuff = function(self, buffTable, PosEntity)
+    ---@param stunOrigin? Vector # Defaults to position of `self`
+    AddBuff = function(self, buffTable, stunOrigin)
         local bt = buffTable.BuffType
         if not bt then
             error('*ERROR: Tried to add a unit buff in unit.lua but got no buff table.  Wierd.', 1)
@@ -4347,7 +4351,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local targets
             if buffTable.Radius and buffTable.Radius > 0 then
                 -- If the radius is bigger than 0 then we will use the unit as the center of the stun blast
-                targets = utilities.GetTrueEnemyUnitsInSphere(self, PosEntity or self:GetPosition(), buffTable.Radius, category)
+                targets = utilities.GetTrueEnemyUnitsInSphere(self, stunOrigin or self:GetPosition(), buffTable.Radius, category)
             else
                 -- The buff will be applied to the unit only
                 if EntityCategoryContains(category, self) then
