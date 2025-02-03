@@ -362,8 +362,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
-    -- @param self A shield that we're computing the overlapping shields for
-    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
+    ---@param self Shield # A shield that we're computing the overlapping shields for
+    ---@param tick number # Optional parameter, represents the game tick. Used to determine if we need to refresh the cache
     GetOverlappingShields = function(self, tick)
 
         -- allow the game tick to be send to us, saves cycles
@@ -717,8 +717,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     --- Called when a shield collides with a projectile to check if the collision is valid
-    ---@param self Shield The shield we're checking the collision for
-    ---@param other Projectile The projectile we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         -- special logic when it is a projectile to simulate air crashes
@@ -733,38 +733,33 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             end
         end
 
-        -- special behavior for projectiles that always collide with
-        -- shields, like the seraphim storm when the Ythotha dies
-        if other.CollideFriendlyShield then
-            return true
-        end
-
-        if -- our projectiles do not collide with our shields
-        self.Army == other.Army
-            -- neutral projectiles do not collide with any shields
-            or other.Army == -1
-        then
-            return false
-        end
-
         -- special behavior for projectiles that represent strategic missiles
         local otherHashedCats = other.Blueprint.CategoriesHash
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end
 
-        -- otherwise, only collide if we're hostile to the other army
-        return IsEnemy(self.Army, other.Army)
+        local selfArmy = self.Army
+        local otherArmy = other.Army
+        -- if we're allied, check if we allow allied collisions
+        if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
+            -- do not collide with our own unit's projectiles
+            return other.CollideFriendly and self.Owner ~= other.Launcher
+        end
+
+        return true
     end,
 
     --- Called when a shield collides with a collision beam to check if the collision is valid
-    -- @param self The shield we're checking the collision for
-    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    ---@param self Shield # The shield we're checking the collision for
+    ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
+        local selfArmy = self.Army
+        local otherArmy = firingWeapon.Army
         -- if we're allied, check if we allow that type of collision
-        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
-            return firingWeapon.Blueprint.CollideFriendly
+        if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
+            return firingWeapon.CollideFriendly and self.Owner ~= firingWeapon.unit
         end
 
         return true
@@ -1327,36 +1322,19 @@ AntiArtilleryShield = ClassShield(Shield) {
         self.ShieldType = 'AntiArtillery'
     end,
 
+    --- Called when a shield collides with a collision beam to check if the collision is valid
+    ---@param self AntiArtilleryShield # The shield we're checking the collision for
+    ---@param firingWeapon Weapon # The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        local bp = firingWeapon:GetBlueprint()
-        if bp.CollideFriendly == false then
-            if self.Army == firingWeapon.unit.Army then
-                return false
-            end
-        end
-
-        if bp.ArtilleryShieldBlocks then
-            return true
-        end
-
-        return false
+        return firingWeapon.Blueprint.ArtilleryShieldBlocks and Shield.OnCollisionCheckWeapon(self, firingWeapon)
     end,
 
-    -- Return true to process this collision, false to ignore it.
+    --- Called when a shield collides with a projectile to check if the collision is valid
+    --- Return true to process this collision, false to ignore it.
+    ---@param self AntiArtilleryShield # The shield we're checking the collision for
+    ---@param other Projectile # The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-        if other.Army == -1 then
-            return false
-        end
-
-        if other:GetBlueprint().Physics.CollideFriendlyShield and other.DamageData.ArtilleryShieldBlocks then
-            return true
-        end
-
-        if other.DamageData.ArtilleryShieldBlocks and IsEnemy(self.Army, other.Army) then
-            return true
-        end
-
-        return false
+        return other.DamageData.ArtilleryShieldBlocks and Shield.OnCollisionCheck(self, other)
     end,
 }
 

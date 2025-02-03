@@ -50,6 +50,8 @@
 ---@field CollideSurface boolean
 --- whether to check the projectile for collisions against other entities
 ---@field CollideEntity boolean
+--- Deprecated, no longer implemented.
+---@field CollideFriendlyShield boolean
 --- if this projectile should turn to track its target
 ---@field TrackTarget boolean
 --- if this projectile should track as if it was an attack-ground attack
