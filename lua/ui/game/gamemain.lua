@@ -783,7 +783,7 @@ function OnUserPause(pause)
             else
                 SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
                     to = 'all',
-                    text = 'Unpaused the game',
+                    text = 'Resumed the game',
                     Chat = true,
                 })
             end
