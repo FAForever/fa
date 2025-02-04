@@ -280,13 +280,105 @@ UnitBlueprint{
         },
     },
     Enhancements = {
+
+        -- Left upgrade slot
+        EngineeringThroughput = {
+            BuildCostEnergy = 47400,
+            BuildCostMass = 450,
+            BuildTime = 4200,
+            Icon = "efm",
+            Name = "<LOC enhancements_0143>Rapid Fabricator",
+            NewBuildRate = 58,
+            Slot = "LCH",
+            UpgradeEffectBones = {
+                "Left_Arm_Muzzle",
+                "Left_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        EngineeringThroughputRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "efm",
+            Name = "<LOC enhancements_0144>Remove Rapid Fabricator",
+            Prerequisite = "EngineeringThroughput",
+            RemoveEnhancements = {
+                "EngineeringThroughput",
+                "EngineeringThroughputRemove",
+            },
+            Slot = "LCH",
+        },
+        -- TODO: Add Gun Option for removed Base Damage
+
+
+        -- Right upgrade slot
+        Overcharge = {
+            BuildCostEnergy = 283500,
+            BuildCostMass = 4500,
+            BuildTime = 12600,
+            Icon = "oc",
+            Name = "<LOC enhancements_0139>Overcharge",
+            Slot = "RCH",
+            UpgradeEffectBones = {
+                "Right_Arm_Muzzle",
+                "Right_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        OverchargeRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = "oc",
+            Name = "<LOC enhancements_0140>Remove Overcharge",
+            Prerequisite = "Overcharge",
+            RemoveEnhancements = {
+                "Overcharge",
+                "OverchargeRemove",
+            },
+            Slot = "RCH",
+        },
+        Teleporter = {
+            BuildCostEnergy = 1500000,
+            BuildCostMass = 15000,
+            BuildTime = 21000,
+            Icon = "pqt",
+            MaintenanceConsumptionPerSecondEnergy = 10000,
+            Name = "<LOC enhancements_0035>Personal Teleporter",
+            ShowBones = { "Back_Upgrade" },
+            Slot = "RCH",
+            UpgradeEffectBones = {
+                "Right_Arm_Muzzle",
+                "Right_Arm_Barrel",
+            },
+            UpgradeUnitAmbientBones = { "Torso" },
+        },
+        TeleporterRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            HideBones = { "Back_Upgrade" },
+            Icon = "pqt",
+            Name = "<LOC enhancements_0036>Remove Personal Teleporter",
+            Prerequisite = "Teleporter",
+            RemoveEnhancements = {
+                "Teleporter",
+                "TeleporterRemove",
+            },
+            Slot = "RCH",
+        },
+        -- TODO: Add RAS
+
+
+        -- Back upgrade slot
         DamageStabilization = {
             BuildCostEnergy = 74300,
             BuildCostMass = 2300,
             BuildTime = 5900,
             Icon = "dss",
             Name = "<LOC enhancements_0131>Nano-Repair System",
-            NewHealth = 14000,
+            NewHealth = 18000,
             NewRegenRate = 250,
             ShowBones = { "Back_Upgrade" },
             Slot = "LCH",
@@ -307,33 +399,6 @@ UnitBlueprint{
             RemoveEnhancements = {
                 "DamageStabilization",
                 "DamageStabilizationRemove",
-            },
-            Slot = "LCH",
-        },
-        EngineeringThroughput = {
-            BuildCostEnergy = 47400,
-            BuildCostMass = 450,
-            BuildTime = 4200,
-            Icon = "efm",
-            Name = "<LOC enhancements_0143>Rapid Fabricator",
-            NewBuildRate = 98,
-            Slot = "LCH",
-            UpgradeEffectBones = {
-                "Left_Arm_Muzzle",
-                "Left_Arm_Barrel",
-            },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        EngineeringThroughputRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "efm",
-            Name = "<LOC enhancements_0144>Remove Rapid Fabricator",
-            Prerequisite = "EngineeringThroughput",
-            RemoveEnhancements = {
-                "EngineeringThroughput",
-                "EngineeringThroughputRemove",
             },
             Slot = "LCH",
         },
@@ -390,67 +455,9 @@ UnitBlueprint{
             },
             Slot = "Back",
         },
-        Overcharge = {
-            BuildCostEnergy = 283500,
-            BuildCostMass = 4500,
-            BuildTime = 12600,
-            Icon = "oc",
-            Name = "<LOC enhancements_0139>Overcharge",
-            Slot = "RCH",
-            UpgradeEffectBones = {
-                "Right_Arm_Muzzle",
-                "Right_Arm_Barrel",
-            },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        OverchargeRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            Icon = "oc",
-            Name = "<LOC enhancements_0140>Remove Overcharge",
-            Prerequisite = "Overcharge",
-            RemoveEnhancements = {
-                "Overcharge",
-                "OverchargeRemove",
-            },
-            Slot = "RCH",
-        },
-        Shield = {
-            BuildCostEnergy = 107500,
-            BuildCostMass = 1050,
-            BuildTime = 6720,
-            Icon = "sp",
-            ImpactEffects = "SeraphimShieldHit01",
-            MaintenanceConsumptionPerSecondEnergy = 300,
-            Name = "<LOC enhancements_0028>Personal Shield Generator",
-            OwnerShieldMesh = "/units/xsl0301/xsl0301_personalshield_mesh",
-            PersonalShield = true,
-            RegenAssistMult = 10,
-            ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 20000,
-            ShieldRechargeTime = 160,
-            ShieldRegenRate = 22,
-            ShieldRegenStartTime = 1,
-            ShowBones = { "Back_Upgrade" },
-            Slot = "Back",
-            UpgradeEffectBones = { "Back_Upgrade" },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        ShieldRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "Back_Upgrade" },
-            Icon = "sp",
-            Name = "<LOC enhancements_0147>Remove Personal Shield Generator",
-            Prerequisite = "Shield",
-            RemoveEnhancements = {
-                "Shield",
-                "ShieldRemove",
-            },
-            Slot = "Back",
-        },
+        -- TODO: Add Regen Field
+
+        -- Slots
         Slots = {
             Back = {
                 name = "<LOC _Back>",
@@ -468,35 +475,7 @@ UnitBlueprint{
                 y = 50,
             },
         },
-        Teleporter = {
-            BuildCostEnergy = 1500000,
-            BuildCostMass = 15000,
-            BuildTime = 21000,
-            Icon = "pqt",
-            MaintenanceConsumptionPerSecondEnergy = 10000,
-            Name = "<LOC enhancements_0035>Personal Teleporter",
-            ShowBones = { "Back_Upgrade" },
-            Slot = "RCH",
-            UpgradeEffectBones = {
-                "Right_Arm_Muzzle",
-                "Right_Arm_Barrel",
-            },
-            UpgradeUnitAmbientBones = { "Torso" },
-        },
-        TeleporterRemove = {
-            BuildCostEnergy = 1,
-            BuildCostMass = 1,
-            BuildTime = 0.1,
-            HideBones = { "Back_Upgrade" },
-            Icon = "pqt",
-            Name = "<LOC enhancements_0036>Remove Personal Teleporter",
-            Prerequisite = "Teleporter",
-            RemoveEnhancements = {
-                "Teleporter",
-                "TeleporterRemove",
-            },
-            Slot = "RCH",
-        },
+
     },
     General = {
         BuildBones = {
