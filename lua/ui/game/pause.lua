@@ -94,18 +94,19 @@ _G.SessionResume = function()
     end
 
     -- we waited long enough, we're good
-    if GetSystemTimeSeconds() - OnPauseTimestamp > PauseThreshold then
+    local timeDifference = GetSystemTimeSeconds() - OnPauseTimestamp
+    if timeDifference > PauseThreshold then
         LOG("Threshold is met to resume")
         oldSessionResume()
         return 'Accepted'
+    else
+        -- inform other clients
+        SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+            to = 'all',
+            text = string.format('Wants to resume the game but has to wait %d seconds', PauseThreshold - timeDifference),
+            Chat = true,
+        })
+
+        return 'Declined'
     end
-
-    -- inform other clients
-    SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
-        to = 'all',
-        text = 'Wants to continue the game',
-        Chat = true,
-    })
-
-    return 'Declined'
 end
