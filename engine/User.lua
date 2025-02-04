@@ -386,9 +386,17 @@ end
 function GetFireState(units)
 end
 
---- Returns the root UI frame for a given head
----@param head number
----@return Frame
+--- Returns the root UI frame for a given adapter. You can use `GetFrame(0)` to retrieve the primary adapter. And you can use `GetFrame(1)` to retrieve the secondary adapter. 
+---
+--- In the game options you can add a second adapter under the 'Video' tab.
+--- 
+--- See also `GetNumRootFrames()` to determine the number of root frames. 
+--- 
+--- See also the following modules that manage these frames:
+--- - Primary adapter: lua\ui\game\worldview.lua
+--- - Secondary adapter: lua\ui\game\multihead.lua
+---@param head 0 | 1
+---@return Frame | nil
 function GetFrame(head)
 end
 
@@ -473,7 +481,14 @@ end
 function GetMovieVolume()
 end
 
---- Returns the current number of root frames (typically one per head)
+--- Returns the current number of root frames. There is usually only one root frame for each adapter (monitor). This is often referred to as a 'head' in other comments. The game supports up to two root frames.
+--- 
+--- In the game options you can add a second adapter under the 'Video' tab.
+---
+--- See also `GetFrame(0)` to retrieve the root frame of the primary adapter and `GetFrame(1)` to retrieve the root frame of the secondary adapter. 
+--- See also the following modules that manage these frames:
+--- - Primary adapter: lua\ui\game\worldview.lua
+--- - Secondary adapter: lua\ui\game\multihead.lua
 ---@return number
 function GetNumRootFrames()
 end
@@ -587,7 +602,7 @@ function GetUIControlsAlpha()
 end
 
 --- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
----@param unitSet any
+---@param unitSet UserUnit[]
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
 ---@return EntityCategory buildableCategories
@@ -595,7 +610,7 @@ function GetUnitCommandData(unitSet)
 end
 
 --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
----@param unit any
+---@param unit UserUnit
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
 ---@return EntityCategory buildableCategories
@@ -675,8 +690,8 @@ end
 function IN_RemoveKeyMapTable(keyMapTable)
 end
 
----
----@param queueIndex any
+--- Increase the count at a given location of the current build queue
+---@param queueIndex number
 ---@param count number
 function IncreaseBuildCountInQueue(queueIndex, count)
 end
@@ -835,6 +850,14 @@ end
 ---@param count number
 ---@param clear boolean? defaults to false
 function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
+end
+
+--- Issue a command to a given unit
+---@param unit UserUnit
+---@param command UserUnitCommand # Will crash the game if not a valid command.
+---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
+---@param clear? boolean
+IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
 end
 
 --- Issue a command to the current selection. 

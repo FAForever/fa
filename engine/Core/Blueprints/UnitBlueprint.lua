@@ -130,7 +130,9 @@
 
 
 ---@class UnitBlueprintAI
---- under what angle the unit attacks its target after getting an attack order
+--- At what angle (to either side) the unit attacks its target after getting an attack order. 
+--- If one of the unit's weapons has a target and has `SlavedToBody = true`, it will rotate when idle and attacking.
+--- Overrides Weapon `SlavedToBody` and `SlavedToBodyArcRange` behavior.
 ---@field AttackAngle number
 --- automatically surface to attack ground targets
 ---@field AutoSurfaceToAttack boolean
@@ -1170,7 +1172,7 @@
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
 ---@field StandUpright boolean
---- used by XSB3202 when the vertical layer changes from top to sub
+--- used by XSB3202 (T2 sonar) and XSS0201 (Destroyer) when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
 --- How much this unit slows down transports it is loaded in.  
 --- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).

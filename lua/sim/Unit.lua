@@ -2264,8 +2264,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param tpos Vector
     RotateTowards = function(self, tpos)
-        local pos = self:GetPosition()
-        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        local pX, _, pZ = self:GetPositionXYZ()
+        local dx, dz = tpos[1] - pX, tpos[3] - pZ
         self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
@@ -3207,7 +3207,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end;
 
     ---@param self Unit
-    ---@param enh string
+    ---@param enh Enhancement
     ---@return boolean
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
@@ -3243,7 +3243,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param enhancement string
+    ---@param enhancement Enhancement
     CreateEnhancementEffects = function(self, enhancement)
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
@@ -3279,7 +3279,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param enh string
+    ---@param enh Enhancement
     ---@return boolean
     HasEnhancement = function(self, enh)
         local unitEnh = SimUnitEnhancements[self.EntityId]
@@ -4020,7 +4020,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         if self:IsValidBone(bone) then
             return true
         end
-        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.', 2)
+        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. (self.UnitId or self:GetUnitId()) .. ' and it does not exist in the model.', 2)
 
         return false
     end,

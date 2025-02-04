@@ -141,10 +141,10 @@
 ---@field Flare WeaponBlueprintFlare
 --- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
---- controls what the weapon is allowed to target in reference to the heading of the unit
+--- controls what the weapon is allowed to target in reference to the heading of the unit. Defaults to 0
 ---@field HeadingArcCenter number
 --- controls what the weapon is allowed to target in reference to the arc center,
---- this is degrees on either side
+--- this is degrees on either side. Defaults to 180
 ---@field HeadingArcRange number
 --- does not consider the weapon when attacking targets if it is disabled
 ---@field IgnoreIfDisabled? boolean
@@ -219,7 +219,7 @@
 ---@field NukeInnerRingRadius? number
 --- How many damage ticks the inner damage ring of the nuke will be applied over to get from the
 --- epicenter to the inner ring radius. The ring will be broken up into this many disks.
----@field NukeInnerRingTicks? number
+---@field NukeInnerRingTicks? integer
 --- The total time in seconds it takes the inner damage ring to apply its damage from the epicenter
 --- of the nuke to its inner ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeInnerRingTotalTime? number
@@ -230,7 +230,7 @@
 ---@field NukeOuterRingRadius? number
 --- How many damage ticks the outer damage ring of the nuke will be applied over to get from the
 --- epicenter to the outer ring radius. The ring will be broken up into this many disks.
----@field NukeOuterRingTicks? number
+---@field NukeOuterRingTicks? integer
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
@@ -286,10 +286,12 @@
 --- if the weapon goes directly from its `IdleState` to its `RackSalvoFiringState` without
 --- going through its `RackSalvoFireReadyState` first
 ---@field SkipReadyState? boolean
---- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
+--- If the weapon causes the unit to rotate towards the weapon's target when the target is outside of `SlavedToBodyArcRange`.
+--- With multiple slaved weapons, the first slaved weapon in the blueprint that currently has a target is used for turning.
+--- If `UnitBlueprintAI.AttackAngle` is true, then this causes the unit to rotate when attacking while idle.
 ---@field SlavedToBody? boolean
---- Range of arc in both directions to be considered "slaved" to a target. With multiple weapons, 
---- the first weapon in the blueprint that currently has a target is used for turning.
+--- Degrees to either side of the unit's heading outside of which the weapon will rotate the unit towards the target.
+--- Defaults to 1. Behavior gets overriden by `UnitBlueprintAI.AttackAngle`.
 ---@field SlavedToBodyArcRange? number
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean
@@ -329,7 +331,7 @@
 ---@field TurretBoneYaw? Bone
 --- If two manipulators are needed for this weapon. Used for bots with arms.
 ---@field TurretDualManipulators? boolean
---- if this weapon has a turret
+--- if this weapon has a turret. Defaults to false
 ---@field Turreted boolean
 --- the center angle for determining pitch, based off the rest pose of the model
 ---@field TurretPitch number
