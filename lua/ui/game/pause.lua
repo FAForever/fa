@@ -35,7 +35,7 @@ local function FindLocalClient()
     local allClients = GetSessionClients()
     for k = 1, table.getn(allClients) do
         local client = allClients[k]
-        if client["local"] then
+        if client.local then
             return k, client
         end
     end
