@@ -4988,21 +4988,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@return UnitCommand[]
     GetCommandQueue = function(self)
-        local queue = cUnit.GetCommandQueue(self)
-        if queue then
-            for k, order in queue do
-                if order.targetId then
-                    local target = GetEntityById(order.targetId)
-                    if target and IsEntity(target) then
-                        order.target = target
-                        -- take position of the entity, used to sort the units
-                        order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
+        local ok, msg = pcall(cUnit.GetCommandQueue, self)
+        if not ok then
+            WARN('unit getcqueue errored:', self.UnitId, self.EntityId, 'dead, destroyed:', self.Dead, IsDestroyed(self))
+            WARN(msg)
+        else
+            local queue = cUnit.GetCommandQueue(self)
+            if queue then
+                for k, order in queue do
+                    if order.targetId then
+                        local target = GetEntityById(order.targetId)
+                        if target and IsEntity(target) then
+                            order.target = target
+                            -- take position of the entity, used to sort the units
+                            order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
+                        end
                     end
                 end
             end
-        end
 
-        return queue
+            return queue
+        end
     end,
 
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
