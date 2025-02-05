@@ -27,7 +27,7 @@ local OnPauseClientIndex = -1
 local OnPauseTimestamp = 0
 
 ---@type number
-local PauseThreshold = 10
+local PauseThreshold = 10 -- seconds
 
 ---@return integer  # The index of the client, like the parameter `pausedBy` of OnPause
 ---@return Client?  # The data of the client
