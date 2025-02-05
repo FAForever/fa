@@ -43,7 +43,7 @@ local function FindLocalClient()
     return -1, nil
 end
 
---- Called by the engine when the simulation pauses for all clients.
+--- Called from `gamemain.lua` when the simulation pauses for all clients.
 ---@param pausedBy integer  # The index of the client in the clients list (that you get via `GetSessionClients`)
 ---@param timeoutsRemaining number
 function OnPause(pausedBy, timeoutsRemaining)
