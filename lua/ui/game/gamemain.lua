@@ -749,7 +749,7 @@ function SendResumedBy(sender)
     if not ResumedBy then ResumedBy = sender end
 end
 
---- Called by the engine when the simulation
+--- Called by the engine when the simulation is resumed
 function OnResume()
     import("/lua/ui/game/pause.lua").OnResume()
 
