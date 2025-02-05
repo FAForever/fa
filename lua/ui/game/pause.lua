@@ -93,7 +93,7 @@ _G.SessionResume = function()
         return 'Accepted'
     end
 
-    -- we waited long enough, we're good
+    -- unpause if we have waited longer than the unpause threshold
     local timeDifference = GetSystemTimeSeconds() - OnPauseTimestamp
     if timeDifference > PauseThreshold then
         LOG("Threshold is met to resume")
