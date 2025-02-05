@@ -1,0 +1,1 @@
+- (#6645) Fix an error when using distribute orders on a unit that dies shortly after.
