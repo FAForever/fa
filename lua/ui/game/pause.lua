@@ -77,7 +77,7 @@ local oldSessionResume = _G.SessionResume
 _G.SessionResume = function()
     LOG("SessionResume")
 
-    -- scenario's that are all good
+    -- no unpause restrictions in replays or singleplayer
     if SessionIsReplay() or
         not SessionIsMultiplayer()
     then
