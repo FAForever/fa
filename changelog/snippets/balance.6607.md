@@ -17,3 +17,7 @@
     - Ajellu Anti-Torpedo Defense (x2)
       - MinRadius: 0 --> 10
       - Audio queue added
+
+  - **Barracuda (XRS0204) and Megalith (XRL0403)**
+    - Anti-Torpedo Flare
+      - MinRadius: 0 --> 5
