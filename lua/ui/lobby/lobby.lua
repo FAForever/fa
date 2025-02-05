@@ -5674,7 +5674,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif MessageHandlers[data.Type].Reject then
             MessageHandlers[data.Type].Reject(data)
         else
-            WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
+            WARN("Rejected message of type " .. tostring(data.Type) .. " from " .. tostring(FindNameForID(data.SenderID)))
         end
     end
 
