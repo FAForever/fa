@@ -581,7 +581,7 @@ function DeselectSelens(selection)
     return otherUnits, true
 end
 
---- A cache used with ObserveSelection to prevent continious table allocations
+--- A cache used with ObserveSelection to prevent continuous table allocations
 local cachedSelection = {
     oldSelection = { },
     newSelection = { },

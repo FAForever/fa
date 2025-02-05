@@ -802,7 +802,7 @@ function PlayVoiceOver(voSound)
 end
 
 --- Sets enhancement restrictions from the names of the enhancements you do not want the player to build
----@param enhancements string[]
+---@param enhancements Enhancement[]
 function RestrictEnhancements(enhancements)
     local restrict = {}
     for _, enh in enhancements do

@@ -74,7 +74,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         return
     end
     local categoriesENGINEERSTATION = categories.ENGINEERSTATION
-    local shareUpgrades = ScenarioInfo.Options.Share == 'FullShare'
+    local shareUpgrades = ScenarioInfo.Options.Share ~= 'ShareUntilDeath'
 
     -- do not gift insignificant units
     units = EntityCategoryFilterDown(transferUnitsCategory, units)
