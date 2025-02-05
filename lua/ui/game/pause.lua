@@ -85,7 +85,7 @@ _G.SessionResume = function()
         return 'Accepted'
     end
 
-    -- local client initiated the pause, we're all good
+    -- no unpause restriction if our local client initiated the pause
     local localClientIndex, clientData = FindLocalClient()
     if OnPauseClientIndex == localClientIndex then
         LOG("Same client unpauses")
