@@ -741,7 +741,7 @@ end
 -- Called after the Sim has confirmed that the game has resumed.
 local ResumedBy = nil
 
---- Transmitted via a Chat command by another user to inform Lua who send the resume command. 
+--- Transmitted via a Chat command by another user to inform Lua who sent the resume command. 
 ---@param sender string # The name of the player that resumed the game. 
 function SendResumedBy(sender)
     import("/lua/ui/game/pause.lua").SendResumedBy(sender)
