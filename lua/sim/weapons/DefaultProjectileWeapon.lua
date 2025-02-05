@@ -13,6 +13,7 @@ local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
+local MathSqrt = math.sqrt
 
 ---@class WeaponSalvoData
 ---@field target? Unit | Prop   if absent, will use `targetPos` instead
@@ -61,19 +62,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Make certain the weapon has essential aspects defined
         if not rackBones then
             local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoSize then
             local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoDelay then
             local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
@@ -203,9 +204,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
-        local projVelX, _, projVelZ = UnitGetVelocity(launcher)
+        local projVelX, projVelY, projVelZ = UnitGetVelocity(launcher)
 
-        local targetPos
+        -- The projectile will have velocity in the horizontal plane equal to the unit's 3 dimensional speed
+        -- Multiply the XZ components by the ratio of the XYZ to XZ speeds to get the correct XZ components
+        local projVelXZSquareSum = projVelX * projVelX + projVelZ * projVelZ
+        local multiplier = MathSqrt((projVelXZSquareSum + projVelY * projVelY) / (projVelXZSquareSum))
+        projVelX = projVelX * multiplier
+        projVelZ = projVelZ * multiplier
+
+        local targetPos, _
         local targetVelX, targetVelZ = 0, 0
 
         local data = self.CurrentSalvoData
@@ -283,7 +291,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         if not targetPos then
             -- put the bomb cluster in free-fall
             local GetSurfaceHeight = GetSurfaceHeight
-            local MathSqrt = math.sqrt
             local spread = self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
             -- default gravitational acceleration is 4.9; however, bomb clusters adjust the time it takes to land
             -- so we convert the acceleration to time to add the spread and convert back:
