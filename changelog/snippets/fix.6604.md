@@ -1,0 +1,1 @@
+- (#6604) Fix SACUs with gun range upgrades not stopping at max range when on an attack move order due to insufficient `GuardScanRadius`.
