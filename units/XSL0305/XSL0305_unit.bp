@@ -168,7 +168,7 @@ UnitBlueprint{
         MeshExtentsY = 1.25,
         MeshExtentsZ = 1,
         MotionType = "RULEUMT_Land",
-        SniperModeSpeedMultiplier = 1.8/2.3,
+        SniperModeSpeedMultiplier = 2.0/2.3,
         StandUpright = true,
         TurnRadius = 5,
         TurnRate = 90,
