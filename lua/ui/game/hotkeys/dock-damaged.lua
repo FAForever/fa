@@ -34,7 +34,6 @@ function DockDamaged(ratio, clear)
     local commandMode = import("/lua/ui/game/commandmode.lua")
 
     local damaged = {}
-    local remaining = {}
 
     local selection = GetSelectedUnits()
     for k = 1, TableGetn(selection) do
@@ -48,8 +47,6 @@ function DockDamaged(ratio, clear)
 
         if isAirUnit and canUseAirStaging and isDamagedSufficiently then
             TableInsert(damaged, unit)
-        else
-            TableInsert(remaining, unit)
         end
     end
 
@@ -60,7 +57,7 @@ function DockDamaged(ratio, clear)
 
     SelectUnits(damaged)
     IssueDockCommand(clear)
-    SelectUnits(remaining)
+    SelectUnits(selection)
 
     -- prevents losing command mode
     gameMain.SetIgnoreSelection(false)
