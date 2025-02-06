@@ -70,5 +70,7 @@ function DockDamaged(ratio, clear)
 
         -- inform user
         print(string.format("Docking %d units <%d%% HP", damagedCount, ratio * 100))
+    else
+        print(string.format("No units <%d%% HP to dock", ratio * 100))
     end
 end
