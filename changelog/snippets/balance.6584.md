@@ -12,5 +12,4 @@
       - RateOfFire: 10/45 --> 10/50
       - DPS: 338 --> 300
       - MuzzleSalvoDelay: 1.0 --> 1.1
-      - Range: 65 --> 60
       - FiringTolerance: 2000 --> 180
