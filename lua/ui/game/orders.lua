@@ -278,7 +278,9 @@ local function AttackOrderBehavior(self, modifiers)
     end
 end
 
--- Used by orders that happen immediately and don't change the command mode (ie the stop button)
+--- Dock all units on left click, dock only damaged units on right click
+---@param self Checkbox
+---@param modifiers EventModifiers
 local function DockOrderBehavior(self, modifiers)
     if modifiers.Left then
         if modifiers.Shift then
