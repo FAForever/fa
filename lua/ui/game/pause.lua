@@ -75,8 +75,6 @@ end
 local oldSessionResume = _G.SessionResume
 ---@return 'Accepted' | 'Declined'
 _G.SessionResume = function()
-    LOG("SessionResume")
-
     -- no unpause restrictions in replays or singleplayer
     if SessionIsReplay() or
         not SessionIsMultiplayer()
@@ -88,7 +86,6 @@ _G.SessionResume = function()
     -- no unpause restriction if our local client initiated the pause
     local localClientIndex, clientData = FindLocalClient()
     if OnPauseClientIndex == localClientIndex then
-        LOG("Same client unpauses")
         oldSessionResume()
         return 'Accepted'
     end
@@ -96,7 +93,6 @@ _G.SessionResume = function()
     -- unpause if we have waited longer than the unpause threshold
     local timeDifference = GetSystemTimeSeconds() - OnPauseTimestamp
     if timeDifference > PauseThreshold then
-        LOG("Threshold is met to resume")
         oldSessionResume()
         return 'Accepted'
     else
