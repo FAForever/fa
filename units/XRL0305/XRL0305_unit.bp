@@ -30,8 +30,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 7250,
-        MaxHealth = 7250,
+        Health = 7500,
+        MaxHealth = 7500,
         SubThreatLevel = 4,
         SurfaceThreatLevel = 31,
     },
@@ -167,7 +167,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 120,
+            Damage = 118,
             DamageType = "Normal",
             DisplayName = "Heavy Disintegrator Pulse Laser",
             FireTargetLayerCapsTable = {
