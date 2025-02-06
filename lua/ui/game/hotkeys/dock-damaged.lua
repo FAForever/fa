@@ -20,9 +20,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local TableInsert = table.insert
-local TableGetn = table.getn
-
 --- Docks the air units that are considered to be too damaged for air engagements.
 ---@param ratio? number # number between 0.0 and 1.0, defaults to 0.9. All units with a health ratio lower are considered to be damaged
 ---@param clear? boolean # Defaults to false
@@ -33,42 +30,45 @@ function DockDamaged(ratio, clear)
     local gameMain = import("/lua/ui/game/gamemain.lua")
     local commandMode = import("/lua/ui/game/commandmode.lua")
 
-    local damaged = {}
-
     local selection = GetSelectedUnits()
-    for k = 1, TableGetn(selection) do
-        local unit = selection[k]
+    local dockableUnits = EntityCategoryFilterDown(categories.AIR - categories.CANNOTUSEAIRSTAGING, selection)
+    local damaged = {}
+    local damagedCount = 0
+
+    for _, unit in dockableUnits do
         local health = unit:GetHealth()
         local maxHealth = unit:GetMaxHealth()
 
-        local isAirUnit = EntityCategoryContains(categories.AIR, unit)
-        local canUseAirStaging = not EntityCategoryContains(categories.CANNOTUSEAIRSTAGING, unit)
         local isDamagedSufficiently = health / maxHealth < ratio
+        LOG(unit:GetBlueprint().BlueprintId)
 
-        if isAirUnit and canUseAirStaging and isDamagedSufficiently then
-            TableInsert(damaged, unit)
+        if isDamagedSufficiently then
+            damagedCount = damagedCount + 1
+            damaged[damagedCount] = unit
         end
     end
 
-    -- Since `IssueUnitCommand` does not work with docking orders, use the selection-only `IssueDockCommand` function
-    -- prevents losing command mode
-    if not clear then
-        commandMode.CacheAndClearCommandMode()
+    if damagedCount > 0 then
+        -- Since `IssueUnitCommand` does not work with docking orders, use the selection-only `IssueDockCommand` function
+        -- prevents losing command mode
+        if not clear then
+            commandMode.CacheAndClearCommandMode()
+        end
+        gameMain.SetIgnoreSelection(true)
+
+        SelectUnits(damaged)
+        IssueDockCommand(clear)
+        SelectUnits(selection)
+
+        -- prevents losing command mode
+        gameMain.SetIgnoreSelection(false)
+        if not clear then
+            commandMode.RestoreCommandMode(true)
+        else
+            commandMode.EndCommandMode(true)
+        end
+
+        -- inform user
+        print(string.format("Docking %d units", damagedCount))
     end
-    gameMain.SetIgnoreSelection(true)
-
-    SelectUnits(damaged)
-    IssueDockCommand(clear)
-    SelectUnits(selection)
-
-    -- prevents losing command mode
-    gameMain.SetIgnoreSelection(false)
-    if not clear then
-        commandMode.RestoreCommandMode(true)
-    else
-        commandMode.EndCommandMode(true)
-    end
-
-    -- inform user
-    print(string.format("Docking %d units", TableGetn(damaged)))
 end
