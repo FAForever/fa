@@ -52,7 +52,9 @@ function DockDamaged(ratio, clear)
 
     -- Since `IssueUnitCommand` does not work with docking orders, use the selection-only `IssueDockCommand` function
     -- prevents losing command mode
-    commandMode.CacheAndClearCommandMode()
+    if not clear then
+        commandMode.CacheAndClearCommandMode()
+    end
     gameMain.SetIgnoreSelection(true)
 
     SelectUnits(damaged)
@@ -61,7 +63,11 @@ function DockDamaged(ratio, clear)
 
     -- prevents losing command mode
     gameMain.SetIgnoreSelection(false)
-    commandMode.RestoreCommandMode(true)
+    if not clear then
+        commandMode.RestoreCommandMode(true)
+    else
+        commandMode.EndCommandMode(true)
+    end
 
     -- inform user
     print(string.format("Docking %d units", TableGetn(damaged)))
