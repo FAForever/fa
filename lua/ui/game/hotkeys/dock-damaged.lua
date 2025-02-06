@@ -24,9 +24,9 @@ local TableInsert = table.insert
 local TableGetn = table.getn
 
 --- Docks the air units that are considered to be too damaged for air engagements.
----@param ratio? number # number between 0.0 and 1.0, defaults to 0.5. All units with a health ratio lower is considered to be damaged
+---@param ratio? number # number between 0.0 and 1.0, defaults to 0.9. All units with a health ratio lower are considered to be damaged
 function DockDamaged(ratio)
-    ratio = ratio or 0.5
+    ratio = ratio or 0.9
 
     local gameMain = import("/lua/ui/game/gamemain.lua")
     local commandMode = import("/lua/ui/game/commandmode.lua")

@@ -1592,7 +1592,7 @@ local keyActionsOrders = {
         category = 'orders',
     },
     ['dock_damaged'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged()',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9)',
         category = 'orders',
     },
     ['shift_dock'] = {
@@ -1600,7 +1600,7 @@ local keyActionsOrders = {
         category = 'orders',
     },
     ['shift_dock_damaged'] = {
-        action = 'UI_Lua import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged()',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9)',
         category = 'orders',
     },
 }
