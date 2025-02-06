@@ -26,9 +26,26 @@ local Construction = import("/lua/ui/game/construction.lua")
 
 controls = import("/lua/ui/controls.lua").Get()
 
+---@class OrderButton : Checkbox, MauiCheckbox
+---@field _order string
+---@field _data table
+---@field _curHelpText string
+---@field _toggleMode integer
+---@field _toggleState number|boolean
+---@field mixedModeIcon Bitmap
+---@field toggleModeIcon Bitmap
+---@field autoModeIcon Bitmap
+---@field _script string
+---@field _cursor string
+---@field _unit UserUnit
+---@field _pod UserUnit[]
+---@field buttonText Text
+---@field _OnFirestateSelection function
+---@field _toggleIcon Bitmap
+
 -- Positioning controls, don't belong to file
 local layoutVar = false
-local glowThread = false
+local glowThread = nil
 
 -- These variables control the number of slots available for orders
 -- Though they are fixed, the code is written so they could easily be made soft
@@ -40,6 +57,7 @@ local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
 local lastOCTime = {}
 
+---@param parent Control
 local function CreateOrderGlow(parent)
     controls.orderGlow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
     LayoutHelpers.AtCenterIn(controls.orderGlow, parent)
@@ -73,6 +91,7 @@ function setOrderKeys(orderKeys_)
     orderKeys = orderKeys_
 end
 
+---@param parent Control
 local function CreateAutoBuildEffect(parent)
     local glow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
     LayoutHelpers.AtCenterIn(glow, parent)
@@ -100,6 +119,8 @@ local function CreateAutoBuildEffect(parent)
     return glow
 end
 
+---@param parent Control
+---@param ID string
 function CreateMouseoverDisplay(parent, ID)
     if controls.mouseoverDisplay then
         controls.mouseoverDisplay:Destroy()
@@ -126,12 +147,13 @@ local function CreateOrderButtonGrid()
 end
 
 -- Local logic data
-local orderCheckboxMap = false
+local orderCheckboxMap = {}
 ---@type UserUnit[]
 local currentSelection = nil
 
 -- Helper function to create order bitmaps
 -- Note, your bitmaps must be in /game/orders/ and have the standard button naming convention
+---@param bitmapId string
 local function GetOrderBitmapNames(bitmapId)
     if bitmapId == nil then
         LOG("Error - nil bitmap passed to GetOrderBitmapNames")
@@ -150,6 +172,8 @@ end
 
 -- Used by most orders, which start and stop a command mode, so they toggle on when pressed
 -- and toggle off when done
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function StandardOrderBehavior(self, modifiers)
     -- If we're checked, end the current command mode, otherwise start it
     if self:IsChecked() then
@@ -161,6 +185,9 @@ end
 
 --TODO: set up these functions so they are abstracted for all orders, so you can check them for anything like OC, diving, production, whatever.
 --returns 0 for no units found, 1 for only snipes on, 2 for only snipes off, 3 for mixed.
+---@param unitList UserUnit[]
+---@param variable string
+---@param value string
 local function IsToggleMode(unitList, variable, value)
 
     local toggleStateTrue
@@ -196,6 +223,8 @@ OrderTogglesTable.Attack.ToggleFromBoth = OrderTogglesTable.Attack.ToggleFromOff
 
 -- toggle mode: 1 - true; 2 - false; 3 - both; 0 - error
 -- call the functions from the OrderTogglesTable
+---@param control OrderButton
+---@param ordertype string
 local function ToggleOrder(control, ordertype)
     if control._toggleMode == 1 then
         OrderTogglesTable[ordertype].ToggleFromOn()
@@ -210,6 +239,7 @@ local function ToggleOrder(control, ordertype)
 end
 
 -- toggle mode: 1 - true; 2 - false; 3 - both; 0 - error
+---@param control OrderButton
 local function UpdateToggleIcon(control)
     if control._toggleMode == 1 then
         control.toggleModeIcon:SetAlpha(1)
@@ -231,6 +261,8 @@ end
 --Weapon priority switching
 --------------------------------
 
+---@param control OrderButton
+---@param unitList UserUnit[]
 local function AttackOrderInit(control, unitList)
     if not unitList[1] then
         return true
@@ -269,6 +301,8 @@ end
 
 -- Allow the right button on the attack order to change target priorities, while the left button stays as before.
 -- would be cool to implement overloading like this onto other orders too for epic things.
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function AttackOrderBehavior(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
@@ -279,6 +313,8 @@ local function AttackOrderBehavior(self, modifiers)
 end
 
 -- Used by orders that happen immediately and don't change the command mode (ie the stop button)
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function DockOrderBehavior(self, modifiers)
     if modifiers.Shift then
         IssueDockCommand(false)
@@ -293,11 +329,14 @@ function Dock(clear)
 end
 
 -- Used by orders that happen immediately and don't change the command mode (ie the stop button)
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
 end
 
+---@param units? UserUnit[]
 function ClearCommands(units)
     local cb = {Func = 'ClearCommands'}
 
@@ -320,6 +359,7 @@ end
 
 -- This command (hard stop) will filter out non-construction silo units to avoid wasting partially completed missiles
 -- Those units will have their commands cleared, but will be paused instead of stopped
+---@param units? UserUnit[]
 function Stop(units)
     units = units or GetSelectedUnits()
     local silos = EntityCategoryFilterDown(categories.SILO - categories.CONSTRUCTION, units)
@@ -340,6 +380,7 @@ function Stop(units)
     end
 end
 
+---@param units? UserUnit[]
 function SoftStop(units)
     units = units or GetSelectedUnits()
     Construction.ResetOrderQueues(units)
@@ -347,6 +388,7 @@ function SoftStop(units)
     Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))
 end
 
+---@param modifiers EventModifiers
 function StopOrderBehavior(self, modifiers)
     local userKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
     if userKeyMap['S'] == 'soft_stop' and not modifiers.Shift then
@@ -357,6 +399,7 @@ function StopOrderBehavior(self, modifiers)
 end
 
 -- Used by things that build weapons, etc
+---@param modifiers EventModifiers
 local function BuildOrderBehavior(self, modifiers)
     if modifiers.Left then
         IssueCommand(GetUnitCommandFromCommandCap(self._order))
@@ -388,6 +431,8 @@ local function BuildInitFunction(control, unitList)
 end
 
 -- Used by subs that can dive/surface
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function DiveOrderBehavior(self, modifiers)
     if modifiers.Left then
         local unitList = GetSelectedUnits()
@@ -445,6 +490,8 @@ local function DiveOrderBehavior(self, modifiers)
     end
 end
 
+---@param control OrderButton
+---@param unitList UserUnit[]
 local function DiveInitFunction(control, unitList)
     if not control.autoModeIcon then
         control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_bmp.dds'))
@@ -501,11 +548,15 @@ end
 
 -- Pause button specific behvior
 -- TODO pause button will be moved to construction manager
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function PauseOrderBehavior(self, modifiers)
-    Checkbox.OnClick(self)
+    Checkbox.OnClick(self, modifiers)
     SetPaused(currentSelection, self:IsChecked())
 end
 
+---@param control OrderButton
+---@param unitList UserUnit[]
 local function PauseInitFunction(control, unitList)
     control:SetCheck(GetIsPaused(unitList))
 end
@@ -516,6 +567,7 @@ function TogglePauseState()
 end
 
 -- Some toggleable abilities need reverse semantics.
+---@param scriptBit integer
 local function CheckReverseSemantics(scriptBit)
     if scriptBit == 0 then -- shields
         return true
@@ -524,6 +576,8 @@ local function CheckReverseSemantics(scriptBit)
     return false
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function AttackMoveBehavior(self, modifiers)
     if self:IsChecked() then
         CommandMode.EndCommandMode(true)
@@ -538,6 +592,8 @@ local function AttackMoveBehavior(self, modifiers)
     end
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function AbilityButtonBehavior(self, modifiers)
     if self:IsChecked() then
         CommandMode.EndCommandMode(true)
@@ -553,6 +609,9 @@ local function AbilityButtonBehavior(self, modifiers)
 end
 
 -- Generic script button specific behvior
+---@param self OrderButton
+---@param modifiers EventModifiers
+---@param subState boolean
 local function ScriptButtonOrderBehavior(self, modifiers, subState)
     local state
     if subState ~= nil then
@@ -578,10 +637,14 @@ local function ScriptButtonOrderBehavior(self, modifiers, subState)
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
     if subState == nil then
-        Checkbox.OnClick(self)
+        Checkbox.OnClick(self, modifiers)
     end
 end
 
+-- Generic script button specific behvior
+---@param control OrderButton
+---@param unitList UserUnit[]
+---@param subCheck boolean
 local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -608,6 +671,9 @@ local function ScriptButtonInitFunction(control, unitList, subCheck)
     end
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
+---@param subState boolean
 local function StatToggleOrderBehavior(self, modifiers, subState)
     local state
     if subState ~= nil then
@@ -633,12 +699,15 @@ local function StatToggleOrderBehavior(self, modifiers, subState)
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
     if subState == nil then
-        Checkbox.OnClick(self)
+        Checkbox.OnClick(self, modifiers)
     else
         return (mixed and true) or (not state)
     end
 end
 
+---@param control OrderButton
+---@param unitList UserUnit[]
+---@param subCheck boolean
 local function StatToggleInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
@@ -665,6 +734,8 @@ local function StatToggleInitFunction(control, unitList, subCheck)
     end
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function DroneBehavior(self, modifiers)
     if modifiers.Left then
         SelectUnits(self._unit)
@@ -689,6 +760,8 @@ local function DroneBehavior(self, modifiers)
     end
 end
 
+---@param self OrderButton
+---@param selection UserUnit[]
 local function DroneInit(self, selection)
 
     local mixed = false
@@ -728,6 +801,7 @@ local retaliateStateInfo = {
     [2] = {bitmap = 'stand-ground',    helpText = "mode_hold_ground", id = 'HoldGround'},
 }
 
+---@param parent Bitmap
 local function CreateBorder(parent)
     local border = {}
 
@@ -771,6 +845,7 @@ local function CreateBorder(parent)
     return border
 end
 
+---@param parent OrderButton
 local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
@@ -783,7 +858,7 @@ local function CreateFirestatePopup(parent, selected)
         btn.index = index
         btn.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
-                CreateMouseoverDisplay(control, control.info.helpText, 1)
+                CreateMouseoverDisplay(control, control.info.helpText)
             elseif event.Type == 'MouseExit' then
                 if controls.mouseoverDisplay then
                     controls.mouseoverDisplay:Destroy()
@@ -825,15 +900,20 @@ local function CreateFirestatePopup(parent, selected)
     return bg
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function RetaliateOrderBehavior(self, modifiers)
     if not self._OnFirestateSelection then
-        self._OnFirestateSelection = function(self, newState, id)
-            self._toggleState = newState
+        ---@param button OrderButton
+        ---@param newState integer|boolean
+        ---@param id FireState
+        self._OnFirestateSelection = function(button, newState, id)
+            button._toggleState = newState
             SetFireState(currentSelection, id)
-            self:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[newState].bitmap))
-            self._curHelpText = retaliateStateInfo[newState].helpText
-            self._popup:Destroy()
-            self._popup = nil
+            button:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[newState].bitmap))
+            button._curHelpText = retaliateStateInfo[newState].helpText
+            button._popup:Destroy()
+            button._popup = nil
         end
     end
     if self._popup then
@@ -857,10 +937,12 @@ local function RetaliateOrderBehavior(self, modifiers)
     end
 end
 
+---@param control OrderButton
+---@param unitList UserUnit[]
 local function RetaliateInitFunction(control, unitList)
     control._toggleState = GetFireState(unitList)
     if not retaliateStateInfo[control._toggleState] then
-        LOG("Error: orders.lua - invalid toggle state: ", tostring(self._toggleState))
+        LOG("Error: orders.lua - invalid toggle state: ", tostring(control._toggleState))
     end
     control:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[control._toggleState].bitmap))
     control._curHelpText = retaliateStateInfo[control._toggleState].helpText
@@ -907,6 +989,7 @@ local function disPauseFunc()
     Construction.DisablePauseToggle()
 end
 
+---@param button OrderButton
 local function NukeBtnText(button)
     if not currentSelection[1] or currentSelection[1].Dead then return '' end
     if table.getsize(currentSelection) > 1 then
@@ -923,6 +1006,7 @@ local function NukeBtnText(button)
     end
 end
 
+---@param button OrderButton
 local function TacticalBtnText(button)
     if not currentSelection[1] or currentSelection[1].Dead then return '' end
     if table.getsize(currentSelection) > 1 then
@@ -939,6 +1023,7 @@ local function TacticalBtnText(button)
     end
 end
 
+---@param bp UnitBlueprint
 function FindOCWeapon(bp)
     for index, weapon in bp.Weapon do
         if weapon.OverChargeWeapon then
@@ -948,11 +1033,14 @@ function FindOCWeapon(bp)
 
     return
 end
+
 ---@param units UserUnit[]
 local function IsAutoOCMode(units)
     return units[1]:GetStat("AutoOC",0).Value == 1
 end
 
+---@param control OrderButton
+---@param unitList UserUnit[]
 local function OverchargeInit(control, unitList)
     if not control.autoModeIcon then
         control.autoModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/autocast_green.dds'))
@@ -994,6 +1082,8 @@ local function OverchargeInit(control, unitList)
     end
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 function OverchargeBehavior(self, modifiers)
     if modifiers.Left then
         EnterOverchargeMode()
@@ -1029,6 +1119,8 @@ function EnterOverchargeMode()
     end
 end
 
+---@param self OrderButton
+---@param deltaTime number
 local function OverchargeFrame(self, deltaTime)
     local unit = currentSelection[1]
     if not unit or unit.Dead then return end
@@ -1060,6 +1152,8 @@ local function OverchargeFrame(self, deltaTime)
     end
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 AutoDeployBehavior = function(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
@@ -1073,6 +1167,8 @@ AutoDeployBehavior = function(self, modifiers)
     end
 end
 
+---@param self OrderButton
+---@param selection UserUnit[]
 AutoDeployInit = function(self, selection)
     self._order = 'RULEUCC_Transport'
     self._toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
@@ -1084,6 +1180,8 @@ AutoDeployInit = function(self, selection)
     end
 end
 
+---@param self OrderButton
+---@param modifiers EventModifiers
 local function TransportOrderBehavior(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
@@ -1203,6 +1301,9 @@ Since this is a table, if you need any more information, for instance, the comma
 you can add it to the table and it will be ignored, so you're safe to put whatever info you need in to it. When the
 OnClick callback is called, self._data will contain this info.
 --]]
+---@param orderInfo table
+---@param slot integer
+---@param batchMode boolean
 local function AddOrder(orderInfo, slot, batchMode)
     batchMode = batchMode or false
 
@@ -1280,7 +1381,7 @@ local function AddOrder(orderInfo, slot, batchMode)
     -- Set up tooltips
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, self._curHelpText, 1)
+            CreateMouseoverDisplay(self, self._curHelpText)
 
             if not self:IsDisabled() then
                 if controls.orderGlow then
@@ -1319,6 +1420,8 @@ local function AddOrder(orderInfo, slot, batchMode)
 end
 
 -- Creates the buttons for the common orders, and then disables them if they aren't in the order set
+---@param availableOrders table
+---@param init? boolean
 local function CreateCommonOrders(availableOrders, init)
     for key in commonOrders do
         local orderInfo = standardOrdersTable[key]
@@ -1363,6 +1466,9 @@ local function CreateCommonOrders(availableOrders, init)
     end
 end
 
+---@param standardOrdersTable table
+---@param availableOrders table
+---@param units UserUnit[]
 function AddAbilityButtons(standardOrdersTable, availableOrders, units)
     -- Look for units in the selection that have special ability buttons
     -- If any are found, add the ability information to the standard order table
@@ -1383,6 +1489,9 @@ function AddAbilityButtons(standardOrdersTable, availableOrders, units)
 end
 
 -- Creates the buttons for the alt orders, placing them as possible
+---@param availableOrders table
+---@param availableToggles table
+---@param units UserUnit[]
 local function CreateAltOrders(availableOrders, availableToggles, units)
     -- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
     -- to determine where they go by using preferred slots
@@ -1579,6 +1688,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 end
 
+---@param standardOrdersTable table
+---@param newSelection UserUnit[]
 function ApplyOverrides(standardOrdersTable, newSelection)
     -- Look in blueprints for any icon or tooltip overrides
     -- Note that if multiple overrides are found for the same order, then the default is used
@@ -1646,6 +1757,9 @@ function ApplyOverrides(standardOrdersTable, newSelection)
 end
 
 -- Called by gamemain when new orders are available,
+---@param availableOrders table
+---@param availableToggles table
+---@param newSelection UserUnit[]
 function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     -- Save new selection
     currentSelection = newSelection
@@ -1719,6 +1833,7 @@ function CreateControls()
     end
 end
 
+---@param layout any
 function SetLayout(layout)
     layoutVar = layout
 
@@ -1729,13 +1844,18 @@ function SetLayout(layout)
     end
 
     CreateControls()
-    import(UIUtil.GetLayoutFilename('orders')).SetLayout()
+    local fileName = UIUtil.GetLayoutFilename('orders')
+    if fileName then
+        import(fileName).SetLayout()
+    end
 
     -- Created greyed out orders on setup
     CreateCommonOrders({}, true)
 end
 
 -- Called from gamemain to create control
+---@param parent Control
+---@param mfd Control
 function SetupOrdersControl(parent, mfd)
     controls.controlClusterGroup = parent
     controls.mfdControl = mfd
