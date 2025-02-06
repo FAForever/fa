@@ -27,7 +27,7 @@ local OnPauseClientIndex = -1
 local OnPauseTimestamp = 0
 
 ---@type number
-local PauseThreshold = 10 -- seconds
+local ResumeThreshold = 10 -- seconds
 
 ---@return integer  # The index of the client, like the parameter `pausedBy` of OnPause
 ---@return Client?  # The data of the client
@@ -92,14 +92,14 @@ _G.SessionResume = function()
 
     -- unpause if we have waited longer than the unpause threshold
     local timeDifference = GetSystemTimeSeconds() - OnPauseTimestamp
-    if timeDifference > PauseThreshold then
+    if timeDifference > ResumeThreshold then
         oldSessionResume()
         return 'Accepted'
     else
         -- inform other clients
         SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
             to = 'all',
-            text = string.format('Wants to resume the game but has to wait %d seconds', PauseThreshold - timeDifference),
+            text = string.format('Wants to resume the game but has to wait %d seconds', ResumeThreshold - timeDifference),
             Chat = true,
         })
 
