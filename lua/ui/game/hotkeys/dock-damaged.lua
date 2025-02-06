@@ -40,7 +40,6 @@ function DockDamaged(ratio, clear)
         local maxHealth = unit:GetMaxHealth()
 
         local isDamagedSufficiently = health / maxHealth < ratio
-        LOG(unit:GetBlueprint().BlueprintId)
 
         if isDamagedSufficiently then
             damagedCount = damagedCount + 1
