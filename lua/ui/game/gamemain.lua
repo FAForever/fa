@@ -747,9 +747,12 @@ function OnQueueChanged(newQueue)
     end
 end
 
--- Called after the Sim has confirmed the game is indeed paused. This will happen
--- on everyone's machine in a network game.
+--- Called by the engine after the sim confirmed that the game is indeed paused. This is run on all instances that are connected to the lobby.
+---@param pausedBy integer   # The index of the client in the clients list (that you get via `GetSessionClients`)
+---@param timeoutsRemaining number
 function OnPause(pausedBy, timeoutsRemaining)
+    import("/lua/ui/game/pause.lua").OnPause(pausedBy, timeoutsRemaining)
+
     PauseSound("World",true)
     PauseSound("Music",true)
     PauseVoice("VO",true)
@@ -759,11 +762,17 @@ end
 
 -- Called after the Sim has confirmed that the game has resumed.
 local ResumedBy = nil
+
+--- Transmitted via a Chat command by another user to inform Lua who sent the resume command. 
+---@param sender string # The name of the player that resumed the game. 
 function SendResumedBy(sender)
     if not ResumedBy then ResumedBy = sender end
 end
 
+--- Called by the engine when the simulation is resumed
 function OnResume()
+    import("/lua/ui/game/pause.lua").OnResume()
+
     PauseSound("World",false)
     PauseSound("Music",false)
     PauseVoice("VO",false)
@@ -775,6 +784,8 @@ end
 -- Called immediately when the user hits the pause button on the machine
 -- that initiated the pause and other network players won't call this function
 function OnUserPause(pause)
+    import("/lua/ui/game/pause.lua").OnUserPause(pause)
+
     local Tabs = import("/lua/ui/game/tabs.lua")
     local focus = GetArmiesTable().focusArmy
     if Tabs.CanUserPause() then
@@ -792,7 +803,7 @@ function OnUserPause(pause)
             else
                 SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
                     to = 'all',
-                    text = 'Unpaused the game',
+                    text = 'Resumed the game',
                     Chat = true,
                 })
             end
