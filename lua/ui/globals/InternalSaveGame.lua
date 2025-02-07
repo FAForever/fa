@@ -29,11 +29,15 @@ do
 
     --- Hook to fix a buffer overflow security issue in the engine
     ---@param filename string
-    _G.InternalSaveGame = function(filename)
+    _G.InternalSaveGame = function(filename, friendlyFilename, onCompletionCallback)
         if DebugAllocatedSize(filename) > 50 then
             filename = filename:sub(0, 50)
         end
 
-        return oldInternalSaveGame(filename)
+        if DebugAllocatedSize(friendlyFilename) > 50 then
+            friendlyFilename = friendlyFilename:sub(0, 50)
+        end
+
+        return oldInternalSaveGame(filename, friendlyFilename, onCompletionCallback)
     end
 end
