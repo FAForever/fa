@@ -75,24 +75,16 @@ end
 local oldSessionResume = _G.SessionResume
 ---@return 'Accepted' | 'Declined'
 _G.SessionResume = function()
-    -- no unpause restrictions in replays or singleplayer
-    if SessionIsReplay() or
-        not SessionIsMultiplayer()
-    then
-        oldSessionResume()
-        return 'Accepted'
-    end
-
-    -- no unpause restriction if our local client initiated the pause
     local localClientIndex, clientData = FindLocalClient()
-    if OnPauseClientIndex == localClientIndex then
-        oldSessionResume()
-        return 'Accepted'
-    end
-
-    -- unpause if we have waited longer than the unpause threshold
     local timeDifference = GetSystemTimeSeconds() - OnPauseTimestamp
-    if timeDifference > ResumeThreshold then
+
+    -- conditions that allow an immediate resume of the session
+    if SessionIsReplay() or
+        not SessionIsMultiplayer() or
+        OnPauseClientIndex == localClientIndex or -- feature: the person who initiated the pause can resume at any time
+        timeDifference > ResumeThreshold -- feature: any person can resume after the pause lasted past the threshold
+    then
+        SessionSendChatMessage({ SendResumedBy = true })
         oldSessionResume()
         return 'Accepted'
     else

@@ -516,7 +516,6 @@ function CommonLogic()
                 else
                     local status = SessionResume()
                     if status == 'Accepted' then
-                        SessionSendChatMessage({SendResumedBy=true})
                         self:SetGlowState(checked)
                     else
                         -- reset the check since the resume was declined

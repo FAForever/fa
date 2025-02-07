@@ -1096,10 +1096,11 @@ end
 --- Resume the world simulation
 function SessionResume()
 end
- 
----
----@param client? number | number[] client or clients
----@param message table | number | string
+
+--- Sends a message to one, more or all other connected clients. This message is sent separately from the simulation. But it is sent in order.
+---@overload fun(message: table | number | string)
+---@param client? number | number[]         # client or clients
+---@param message table | number | string   # 
 function SessionSendChatMessage(client, message)
 end
 
