@@ -159,7 +159,7 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         DragCoefficient = 0.2,
-        MaxAcceleration = 2.4,
+        MaxAcceleration = 2.3,
         MaxBrake = 2.3,
         MaxSpeed = 2.3,
         MaxSpeedReverse = 0,
