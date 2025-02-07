@@ -1062,8 +1062,6 @@ end
 ---@param sender string     # username
 ---@param data table        
 function ReceiveChat(sender, data)
-    LOG("ReceiveChat", sender)
-    reprsl(data)
     if data.Identifier then
 
         -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
