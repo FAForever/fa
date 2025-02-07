@@ -31,11 +31,11 @@ do
     ---@param filename string
     _G.InternalSaveGame = function(filename, friendlyFilename, onCompletionCallback)
         if DebugAllocatedSize(filename) > 50 then
-            filename = filename:sub(0, 50)
+            filename = filename:sub(1, 50)
         end
 
         if DebugAllocatedSize(friendlyFilename) > 50 then
-            friendlyFilename = friendlyFilename:sub(0, 50)
+            friendlyFilename = friendlyFilename:sub(1, 50)
         end
 
         return oldInternalSaveGame(filename, friendlyFilename, onCompletionCallback)
