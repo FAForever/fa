@@ -16,6 +16,6 @@
 
     - Sniper mode speed: 1.65 -> 2.0
 
-    The speed was uninentionally reduced from 1.8 to 1.65 due to the last speed nerf, which was excessive (an ACU is 1.7 speed for comparison). Since the sniper mode is a bit underused, the unintentional reduction is reverted and the speed is further buffed to 2.0 speed.
+      The speed was uninentionally reduced from 1.8 to 1.65 due to the last speed nerf, which was excessive (an ACU is 1.7 speed for comparison). Since the sniper mode is a bit underused, the unintentional reduction is reverted and the speed is further buffed to 2.0 speed.
 
     There may be further changes to sniper mode next patch to make it more viable.
