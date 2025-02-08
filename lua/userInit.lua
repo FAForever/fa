@@ -18,6 +18,7 @@ end
 -- # Global (and shared) init
 doscript '/lua/globalInit.lua'
 doscript '/lua/ui/globals/GpgNetSend.lua'
+doscript '/lua/ui/globals/InternalSaveGame.lua'
 
 -- Do we have an custom language set inside user-options ?
 local selectedlanguage = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').selectedlanguage
