@@ -6,6 +6,7 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+
 local commandMeshResources = import("/lua/ui/game/commandmeshes.lua").commandMeshResources
 local Prefs = import("/lua/user/prefs.lua")
 
@@ -96,7 +97,7 @@ local MathAtan = math.atan
 
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
----@field altCursor string          # Allows for an alternative cursor
+---@field altCursor? string          # Allows for an alternative cursor
 
 ---@class CommandModeDataOrder : CommandModeDataBase
 ---@field name CommandCap
@@ -107,7 +108,10 @@ local MathAtan = math.atan
 
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
 
----@alias CommandModeData CommandModeDataOrder | CommandModeDataBuild | CommandModeDataBuildAnchored | false
+---@class CommandModeDataOrderScript : CommandModeDataOrder
+---@field TaskName string
+
+---@alias CommandModeData CommandModeDataOrder | CommandModeDataOrderScript | CommandModeDataBuild | CommandModeDataBuildAnchored | false
 
 ---@type CommandMode
 local cachedCommandMode = false
@@ -406,60 +410,73 @@ local function OnGuardUpgrade(guardees, unit)
     end
 end
 
+--- Thread to keep track of when to unpause, 
+--- logic is a bit convoluted but guarantees that we still have access to the user units as the game progresses
+---@param targetId EntityId
+local function UnpauseThread(targetId)
+    WaitTicks(10)
+    local target = GetUnitById(targetId)
+    while target do
+        local candidates = target.ThreadUnpauseCandidates
+        if (candidates and not table.empty(candidates)) then
+            for id, _ in candidates do
+                local engineer = GetUnitById(id)
+                -- check if it is idle instead of its guarded entity to allow queuing orders before the assist command
+                if engineer and not engineer:IsIdle() then
+                    -- ensure the target focus exists, since this thread may be targeted at something that is not building anything,
+                    -- but might start to build something after some network delay, which you won't want to unpause due to `nil == nil`
+                    local targetFocus = target:GetFocus()
+                    if targetFocus and targetFocus == engineer:GetFocus() then
+                        target.ThreadUnpauseCandidates = nil
+                        target.ThreadUnpause = nil
+                        SetPaused({ target }, false)
+                        return
+                    end
+                else
+                    -- engineer is idle, died, we switch armies, ...
+                    candidates[id] = nil
+                end
+            end
+        else
+            target.ThreadUnpauseCandidates = nil
+            target.ThreadUnpause = nil
+            return
+        end
+
+        WaitTicks(10)
+        target = GetUnitById(targetId)
+    end
+end
+
 ---@param guardees UserUnit[]
 ---@param target UserUnit
 local function OnGuardUnpause(guardees, target)
     local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_unpause
-    if prefs == 'On' or
-        (
-        prefs == 'ExtractorsAndRadars' and
-            EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target))
-    then
-
-        -- start a single thread to keep track of when to unpause, logic feels a bit convoluted
-        -- but that is purely to guarantee that we still have access to the user units as the
-        -- game progresses
-        if not target.ThreadUnpause then
-            local id = target:GetEntityId()
-            target.ThreadUnpause = ForkThread(
-                function()
-                    WaitSeconds(1.0)
-                    local target = GetUnitById(id)
-                    while target do
-                        local candidates = target.ThreadUnpauseCandidates
-                        if (candidates and not table.empty(candidates)) then
-                            for id, _ in candidates do
-                                local engineer = GetUnitById(id)
-                                if engineer and not engineer:IsIdle() then
-                                    local focus = engineer:GetFocus()
-                                    if focus == target:GetFocus() then
-                                        target.ThreadUnpauseCandidates = nil
-                                        target.ThreadUnpause = nil
-                                        SetPaused({ target }, false)
-                                        break
-                                    end
-                                    -- engineer is idle, died, we switch armies, ...
-                                else
-                                    candidates[id] = nil
-                                end
-                            end
-                        else
-                            target.ThreadUnpauseCandidates = nil
-                            target.ThreadUnpause = nil
-                            break
-                        end
-
-                        WaitSeconds(1.0)
-                        target = GetUnitById(id)
-                    end
-                end
+    local bp = __blueprints[target:GetUnitId()]
+    -- only create the unpause thread for units that have the ability to unpause
+    if  (
+            prefs == 'On' and 
+            (
+                EntityCategoryContains(categories.REPAIR + categories.FACTORY + categories.SILO, target)  -- REPAIR includes mantis and harbs, compared to ENGINEER category
+                or (bp.General.UpgradesTo and bp.General.UpgradesTo ~= '') -- upgradeables can also be assisted
             )
-        end
-
-        -- add these to keep track
+        )
+        or
+        (   
+            prefs == 'ExtractorsAndRadars'
+            and EntityCategoryContains((categories.MASSEXTRACTION + categories.RADAR) * categories.STRUCTURE, target) 
+            and (bp.General.UpgradesTo and bp.General.UpgradesTo ~= '') -- use `and` to make sure the mex/radar is upgradeable
+        )
+    then
+        -- save the guardees' entity ids to keep track of in the unpause thread
         target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or {}
         for k, guardee in guardees do
             target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
+        end
+
+        -- start a single thread to keep track of when to unpause
+        if not target.ThreadUnpause then
+            target.ThreadUnpause = ForkThread(UnpauseThread, target:GetEntityId())
         end
     end
 end

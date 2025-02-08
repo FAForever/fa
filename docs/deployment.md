@@ -21,19 +21,22 @@ The deployment procedure can be a lengthy process because it involves various st
 
 ### Deployment of engine patches
 
-The deployment of engine patches to the release branch is a manual process. This is intentional as users will automatically download the executable upon launching the game. 
+The deployment of engine patches to the release branch is a manual process. This is intentional from a security perspective - it provides a second pair of eyes from a server administrator who is usually not directly related to the game team. 
 
 - (1) Make sure that any open changes that you want to include are merged to the `master` branch of the [Binary patches](https://github.com/FAForever/FA-Binary-Patches) repository.
 - (2) Update the executable of the `FAF Develop` and `FAF Beta Balance` game types using the [Upload workflow](https://github.com/FAForever/FA-Binary-Patches/actions).
-- (3) Ask a server administrator to prepare the executable to be updated upon the next game release.
-- (4) ???
 
-You can continue the deployment steps but you can not finalize it until the server administrator got back to you that it is set. This may take an arbitrary amount of time so make sure this is done well in advance. 
+The workflow requires an approval of another maintainer. Once approved, wait for the workflow to finish.
 
-### Changelog for a deployment
+- (3) Verify the executable on the `FAF Develop` game type.
+- (4) Ask a server administrator to prepare the executable to be updated upon the next game release. This practically involves a copy operation where the server administrator verifies the executable of FAF Develop and copies it to a different location.
 
-- (0) Checkout on the `develop` branch and pull in the latest version. Make sure that there are no other open changes.
-- (1) Create a new branch that originates from `develop`. We'll refer to this branch as the `changelog branch`.
+You can continue the deployment steps, but you can not finalize it until the server administrator got back to you that it is set. This may take an arbitrary amount of time so make sure this is done well in advance.
+
+### Deployment of Lua
+
+- (0) Checkout on the [develop](https://github.com/FAForever/fa/tree/develop) branch and pull in the latest version. Make sure that there are no other open changes.
+- (1) Create a new branch that originates from [develop](https://github.com/FAForever/fa/tree/develop). We'll refer to this branch as the `changelog branch`.
 - (2) Generate the changelog using the [Changelog generation workflow](https://github.com/FAForever/fa/actions/workflows/docs-changelog.yaml).
 - (3) Once the workflow is completed, navigate to the summary section and download the artifact that is created by the workflow.
 - (4) Save the generated changelog to a new file in the format `yyyy-mm-dd-game-version.md` in `docs/_posts`. As an example for a file name: `2024-08-03-3811.md`.
@@ -48,31 +51,32 @@ permalink: changelog/3811
 ---
 ```
 
-- - (5.1) Add an introduction at the top of the changelog.
-- - (5.2) Add the contributors at the bottom.
+- - (5.2) Add an introduction at the top of the changelog.
+- - (5.3) Add the contributors at the bottom.
 
-- (6) Stage, commit and push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull requests points to `develop`. 
+- (6) Stage, commit and push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull request points to [develop](https://github.com/FAForever/fa/tree/develop).
 - (7) Delete the current snippets and stage, commit and push the changes to GitHub.
+- (8) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/develop/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/develop/lua/version.lua) and stage, commit and push the changes to GitHub.
 
-You can re-use the same branch and pull request in the next phase of the deployment.
+At this point you need to wait until the `changelog branch` is merged.
 
-### Deployment of Lua
+- (9) Push everything that you want to release from [develop](https://github.com/FAForever/fa/tree/develop) to the [master](https://github.com/FAForever/fa/tree/master) branch.
 
-The following (manual) steps are relevant to create a valid deployment to the FAF game type.
+### Deployment - final steps
 
-- (0) Checkout on the `changelog branch` branch created in the previous step and pull in the latest version.
-- (1) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/develop/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/develop/lua/version.lua).
-- (3) Push everything that you want to release to the [master](https://github.com/FAForever/fa/tree/master) branch.
-- (4) Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
-- (5) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [master](https://github.com/FAForever/fa/tree/master) branch.
+- (1) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [master](https://github.com/FAForever/fa/tree/master) branch.
+- - (1.1) Set the tag with the game version. 
+- - (1.2) Match the format of the title with that of previous releases.
+- - (1.3) Copy and paste the changelog into the description. Make sure to remove the title as a release has its own title.
+- - (1.4) Create the release.
+- (2) Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
 
-### Release on GitHub
+The workflow requires an approval of another maintainer. Once approved, wait for the workflow to finish.
 
-Once `deploy/faf` is updated it is important to create a [release](https://github.com/FAForever/fa/releases/new) on GitHub
+- (3) Use the [Update SpookyDB](https://github.com/FAForever/fa/actions/workflows/spookydb-update.yaml) workflow to update [SpookyDB](https://github.com/FAForever/spooky-db)
+- (4) Use the [Update UnitDB](https://github.com/FAForever/fa/actions/workflows/unitdb-update.yaml) workflow to update [UnitDB](https://github.com/FAForever/UnitDB)
 
-
-
-The last step allows us to systematically post process what we deploy. You can learn more about this by inspecting the workflow file.
+Once all this is run you can review the status of the deployment by the server in the [production environment](https://github.com/FAForever/fa/deployments/production). Once that returns green the deployment succeeded and you can inform the community of the deployment. Congratulations!
 
 ## Automated deployments
 

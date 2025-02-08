@@ -17,6 +17,7 @@ end
 
 -- # Global (and shared) init
 doscript '/lua/globalInit.lua'
+doscript '/lua/ui/globals/GpgNetSend.lua'
 
 -- Do we have an custom language set inside user-options ?
 local selectedlanguage = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').selectedlanguage
@@ -290,24 +291,6 @@ do
 
         oldSimCallback(callback, addUnitSelection or false)
     end
-
-    local oldGpgNetSend = GpgNetSend
-    _G.GpgNetSend = function(command, ...)
-
-        if SessionIsActive() and not SessionIsReplay() then
-            local stringifiedArgs = ""
-            for k = 1, table.getn(arg) do
-                stringifiedArgs = stringifiedArgs .. tostring(arg[k]) .. ","
-            end
-
-            -- try to inform moderators
-            ForkThread(SendModeratorEventThread,
-                string.format("GpgNetSend with command '%s' and data '%s'", tostring(command),
-                    stringifiedArgs))
-        end
-
-        oldGpgNetSend(command, unpack(arg))
-    end
 end
 
 do
@@ -404,7 +387,7 @@ do
         commandMode.RestoreCommandMode(true)
     end
 
-    ---@param unit UserUnit[]
+    ---@param unit UserUnit
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
     ---@param count number
@@ -412,6 +395,16 @@ do
     _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
         UnitsCache[1] = unit
         IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
+    end
+
+    --- Issue a command to a given unit
+    ---@param unit UserUnit
+    ---@param command UserUnitCommand # Will crash the game if not a valid command.
+    ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
+    ---@param clear? boolean
+    _G.IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
+        UnitsCache[1] = unit
+        IssueUnitCommand(UnitsCache, command, luaParams, clear)
     end
 end
 

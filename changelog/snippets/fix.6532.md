@@ -1,0 +1,1 @@
+- (#6532) Fix excess projectiles impacting entities that die in the same tick. For example, 6 tactical missiles impacting a shield at the same time, despite only 3 being needed to bring down the shield.

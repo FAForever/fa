@@ -171,12 +171,11 @@ end
 function Entity:GetBoneCount()
 end
 
---- Returns separate three numbers representing the roll, pitch, yaw of the bone
----@see EulerToQuaternion(roll, pitch, yaw) if you need a quaternion instead
+--- Returns three separate numbers representing the X, Y, Z direction vector of the bone
 ---@param bone Bone
----@return number roll
----@return number pitch
----@return number yaw
+---@return number x
+---@return number y
+---@return number z
 function Entity:GetBoneDirection(bone)
 end
 

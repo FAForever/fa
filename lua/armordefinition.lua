@@ -20,7 +20,6 @@
 ---| "FireBeetleExplosion"
 ---| "Normal"
 ---| "Nuke"
----| "OtheTacticalBomb"
 ---| "Overcharge"
 ---| "Reclaimed"
 ---| "Spell"
@@ -105,7 +104,6 @@ armordefinition = {
         -- Armor Definition
         'Normal 1.0',
         'CzarBeam 0.25',
-        'OtheTacticalBomb 0.1',
     },
     {
         -- Armor Type name
@@ -113,6 +111,8 @@ armordefinition = {
 
         -- Armor Definition
         'Normal 1.0',
+        'Overcharge 0.25',
+        'Deathnuke 0.032',
         'TacticalMissile 0.55',
     },
 }

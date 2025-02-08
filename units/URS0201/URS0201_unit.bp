@@ -133,39 +133,37 @@ UnitBlueprint{
         },
         MovementEffects = {
             Land = {
-                Effects = {
-                    Footfall = {
-                        Bones = {
-                            {
-                                FootBone = "Exhaust_Leg_L01",
-                                Scale = 0.58,
-                                Type = "FootFall01",
-                            },
-                            {
-                                FootBone = "Exhaust_Leg_L02",
-                                Scale = 0.58,
-                                Type = "FootFall01",
-                            },
-                            {
-                                FootBone = "Exhaust_Leg_L03",
-                                Scale = 0.58,
-                                Type = "FootFall01",
-                            },
-                            {
-                                FootBone = "Exhaust_Leg_R01",
-                                Scale = 0.58,
-                                Type = "FootFall01",
-                            },
-                            {
-                                FootBone = "Exhaust_Leg_R02",
-                                Scale = 0.58,
-                                Type = "FootFall01",
-                            },
-                            {
-                                FootBone = "Exhaust_Leg_R03",
-                                Scale = 0.58,
-                                Type = "FootFall01",
-                            },
+                Footfall = {
+                    Bones = {
+                        {
+                            FootBone = "Exhaust_Leg_L01",
+                            Scale = 0.58,
+                            Type = "FootFall01",
+                        },
+                        {
+                            FootBone = "Exhaust_Leg_L02",
+                            Scale = 0.58,
+                            Type = "FootFall01",
+                        },
+                        {
+                            FootBone = "Exhaust_Leg_L03",
+                            Scale = 0.58,
+                            Type = "FootFall01",
+                        },
+                        {
+                            FootBone = "Exhaust_Leg_R01",
+                            Scale = 0.58,
+                            Type = "FootFall01",
+                        },
+                        {
+                            FootBone = "Exhaust_Leg_R02",
+                            Scale = 0.58,
+                            Type = "FootFall01",
+                        },
+                        {
+                            FootBone = "Exhaust_Leg_R03",
+                            Scale = 0.58,
+                            Type = "FootFall01",
                         },
                     },
                 },
@@ -208,6 +206,13 @@ UnitBlueprint{
         BuildCostEnergy = 15000,
         BuildCostMass = 2250,
         BuildTime = 10000,
+    },
+    AltFootprint = -- water only
+    {
+        SizeX = 2,
+        SizeZ = 8,
+        OccupancyCaps = 8,
+        MinWaterDepth = 1.5,
     },
     Footprint = {
         SizeX = 2,
@@ -262,9 +267,9 @@ UnitBlueprint{
     SelectionSizeX = 0.65,
     SelectionSizeZ = 3,
     SelectionThickness = 0.22,
-    CollisionOffsetY = -0.29,
+    CollisionOffsetY = -0.4,
     SizeX = 1.5,
-    SizeY = 1.3,
+    SizeY = 1.4,
     SizeZ = 5.4,
     StrategicIconName = "icon_ship2_antinavy",
     StrategicIconSortPriority = 155,
@@ -415,7 +420,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
             DoTPulses = 5,
-            DoTTime = 0.5,
+            DoTTime = 0.4,
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 2,
             Label = "TorpedoL",
