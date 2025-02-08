@@ -24,18 +24,18 @@
 
 do
     local DebugAllocatedSize = debug.allocatedsize
-
     local oldInternalSaveGame = _G.InternalSaveGame
 
     --- Hook to fix a buffer overflow security issue in the engine
     ---@param filename string
     _G.InternalSaveGame = function(filename, friendlyFilename, onCompletionCallback)
-        if DebugAllocatedSize(filename) > 50 then
-            filename = filename:sub(1, 50)
+        local characterLimit = 100
+        if DebugAllocatedSize(filename) > characterLimit then
+            filename = filename:sub(1, characterLimit)
         end
 
-        if DebugAllocatedSize(friendlyFilename) > 50 then
-            friendlyFilename = friendlyFilename:sub(1, 50)
+        if DebugAllocatedSize(friendlyFilename) > characterLimit then
+            friendlyFilename = friendlyFilename:sub(1, characterLimit)
         end
 
         return oldInternalSaveGame(filename, friendlyFilename, onCompletionCallback)
