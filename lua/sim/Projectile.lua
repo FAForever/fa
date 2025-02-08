@@ -89,10 +89,10 @@ local VectorCached = Vector(0, 0, 0)
 
 ---@class Projectile : moho.projectile_methods, InternalObject, DebugProjectileComponent
 ---@field Blueprint ProjectileBlueprint
----@field Army number
+---@field Army Army
 ---@field Trash TrashBag
 ---@field Launcher Unit
----@field OriginalTarget? Unit
+---@field OriginalTarget? Unit | Blip
 ---@field DamageData WeaponDamageTable
 ---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
 ---@field MyFlare? Flare            # If weapon blueprint has a (valid) `Flare` field
@@ -323,9 +323,15 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by the engine when the projectile impacts something
     ---@param self Projectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
+        -- Since collision is checked before impacts are run, collision changes caused by impacts need to be checked by impacts
+        -- For example, a shield will first tell every projectile that it can collide with it, and then only afterwards will
+        -- HP be drained from the shield, and collisions turned off due to the shield being down. The same applies for units.
+        if targetEntity.DisallowCollisions then
+            return
+        end
 
         -- localize information for performance
         local position = self:GetPosition()

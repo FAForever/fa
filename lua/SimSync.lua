@@ -1,7 +1,9 @@
 ---@declare-global
+
 -- The global sync table is copied to the user layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
-
+---@class SyncTable: table
+---@field EnhanceRestrict table<Enhancement, true>
 Sync = { }
 
 local SyncDefaults = {
@@ -19,6 +21,10 @@ end
 -- focus army we can resync the data.
 UnitData = {}
 
+---@alias EnhancementSyncData table<EnhancementSlot, Enhancement>
+---@alias EnhancementSyncTable table<EntityId, EnhancementSyncData>
+
+---@type EnhancementSyncTable
 SimUnitEnhancements = {}
 
 function ResetSyncTable()
@@ -39,6 +45,9 @@ function ResetSyncTable()
     end
 end
 
+---@param unit Unit
+---@param enhancement Enhancement
+---@param slot EnhancementSlot
 function AddUnitEnhancement(unit, enhancement, slot)
     if not slot then return end
     local id = unit.EntityId
@@ -47,6 +56,8 @@ function AddUnitEnhancement(unit, enhancement, slot)
     SyncUnitEnhancements()
 end
 
+---@param unit Unit
+---@param enhancement Enhancement
 function RemoveUnitEnhancement(unit, enhancement)
     if not unit or unit.Dead then return end
     local id = unit.EntityId
@@ -68,6 +79,7 @@ function RemoveUnitEnhancement(unit, enhancement)
     SyncUnitEnhancements()
 end
 
+---@param unit Unit
 function RemoveAllUnitEnhancements(unit)
     local id = unit.EntityId
     if not SimUnitEnhancements[id] then return end
@@ -75,6 +87,7 @@ function RemoveAllUnitEnhancements(unit)
     SyncUnitEnhancements()
 end
 
+--- Syncs enhancements of units allied to us (or all units if we're observer)
 function SyncUnitEnhancements()
     import("/lua/enhancementcommon.lua").SetEnhancementTable(SimUnitEnhancements)
     local sync = {}

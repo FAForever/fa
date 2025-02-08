@@ -1,0 +1,1 @@
+- (#6617) Fix an error when silos are given a hard-stop order, causing them to not pause missile construction.

@@ -1,0 +1,1 @@
+- (#6636) Fix an error that occurs when a Cybran air factory dies while building something.

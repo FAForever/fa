@@ -7,6 +7,7 @@
 --====================================================================================
 -- Disable the LuaPlus bit where you can add attributes to nil, booleans, numbers, and strings.
 --------------------------------------------------------------------------------------
+
 local function metacleanup(obj)
     local name = type(obj)
     local mmt = {
@@ -28,6 +29,7 @@ metacleanup('')
 --====================================================================================
 -- Set up a metatable for coroutines (a.k.a. threads)
 --------------------------------------------------------------------------------------
+
 local thread_mt = {Destroy = KillThread}
 thread_mt.__index = thread_mt
 function thread_mt.__newindex(_, _, _)
@@ -40,6 +42,7 @@ setmetatable(getmetatable(coroutine.create(function()end)), thread_mt)
 -- Replace math.random with our custom random.  On the sim side, this is
 -- a rng with consistent state across all clients.
 --------------------------------------------------------------------------------------
+
 if Random then
     math.random = Random
 end
@@ -49,6 +52,7 @@ end
 -- Give globals an __index() with an error function. This causes an error message
 -- when a nonexistent global is accessed, instead of just quietly returning nil.
 --------------------------------------------------------------------------------------
+
 local globalsmeta = {
     __index = function(_, key)
         error("access to nonexistent global variable " .. repr(key), 2)
