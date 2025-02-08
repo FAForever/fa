@@ -2097,7 +2097,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 // | S6 | R             G               B              specularity     | X               Y               Z               unused       |
 // | S7 | R             G               B              specularity     | X               Y               Z               unused       |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        unused         shadow  | 
+// | U  | normal.x      normal.z        waterDepth     shadow          | 
 
 // These shaders are similar to the usual TTerrainXP shader. They
 // are designed as a drop-in replacement that solely introduce the map-wide
@@ -2182,6 +2182,7 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     // w = shadows
     float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
     float terrainShadow = terrainInfo.w;
+    float waterDepth = terrainInfo.b;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
@@ -2221,17 +2222,13 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float3 r = reflect(normalize(inV.mViewDirection), normal);
     float3 specular = pow(saturate(dot(r, SunDirection)),80) * albedo.aaa * SpecularColor.a * SpecularColor.rgb;
 
-    // compute lighting
-    float dotSunNormal = max(0, dot(SunDirection, normal));
+    float dotSunNormal = dot(SunDirection, normal);
 
-    // combine everything
     float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
-    // compute water ramp intensity
-    float waterDepth = tex2Dproj(UtilitySamplerC, coordinates).g;
-    albedo.rgb = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColor(-inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
