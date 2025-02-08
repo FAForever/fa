@@ -1,32 +1,21 @@
-- (#6606) Buff the power of sniper bots as they have become too expensive and micro-intensive to use compared to saving for a T4 to counter Bricks and Percivals. In general the buffs focus on ranged effectiveness while keeping the same high cost and low speed.
+- (#6606) Buff the power of sniper bots as they have become too expensive and micro-intensive to use compared to saving for a T4 to counter Bricks and Percivals. The changes improve the leniency for their micro and improve their firing accuracy.
+
+  - Aeon and Seraphim snipers (XAL0305 & XSL0305):
+
+    - Speed: 2.2 (Seraphim) / 2.4 (Aeon) -> 2.3 (Seraphim) / 2.5 (Aeon)
+
+    - Firing Tolerance: 2 (Aeon) / 3 (Seraphim) / 0.5 (Seraphim sniper mode) -> 0 (all)
+
+      This fixes them consistently missing shots while turning/retargeting.
+
+    - Firing Randomness while moving: 0.4 (Seraphim) / 0.3 (Aeon) / 0.2 (Seraphim sniper mode) -> 0.18 / 0.1 / 0.05
+
+      The firing randomness is reduced so that snipers can reliably hit T3 units at max range, since the random chance to miss was annoying and snipers no longer need such a downside due to their cost changes.
 
   - Seraphim Sniper (XSL0305):
 
-    - Sniper mode speed: 1.65 -> 1.8
+    - Sniper mode speed: 1.65 -> 2.0
 
-      Since the sniper mode speed is coded as a multiplier, it was unintentionally nerfed by the recent speed changes from 1.8 to 1.65. 1.65 is slower than ACU (1.7), so it was clearly excessive, and made sniper mode even more difficult to use against fast mainline units.
+    The speed was uninentionally reduced from 1.8 to 1.65 due to the last speed nerf, which was excessive (an ACU is 1.7 speed for comparison). Since the sniper mode is a bit underused, the unintentional reduction is reverted and the speed is further buffed to 2.0 speed.
 
-    The Seraphim sniper gets a mini rework to make it more favorable to use the sniper mode regularly, instead of reserving it for alpha-striking experimentals and ACUs:
-
-    - Normal mode and sniper mode DPS swapped: 153/132 -> 132/152 respectively
-
-    - Sniper mode damage reduced, reload sped up: 2000 dmg/15.2s (132 DPS) -> 1570 dmg/10.3s (152 DPS)
-    
-      This reduces for how long the sniper slows down after firing and makes it overkill Harbingers and Othuums much less (30%/28% overkill -> 2%/0%).
-
-    - Turret Yaw speed: 90 -> 70 (normal mode) / 50 (sniper mode)
-
-      This is due to a bug fix. It further emphasizes a steady, long range sniping style for Seraphim in contrast to Aeon's quick turning and more mobile firing.
-
-  - Aeon and Seraphim snipers (XAL0305 & XSL0305):
-    - Firing Tolerance: 2 (Aeon)/3 (Seraphim)/0.5 (Seraphim sniper mode) -> 0 (all)
-
-      This fixes them consistently missing on the first shot after turning/retargeting, especially for the Seraphim sniper which now has lower yaw speed than turn speed.
-      
-    - Range: Seraphim: 55/65 -> 60/70; Aeon: 60 -> 65
-
-      This partially reverts the range nerf from the most recent changes to snipers. The cost changes solved most of the issues, while the range nerf introduced too much of a micro requirement and gave too little range to deal damage to enemy units before they catch up. The range is only partially reverted so that Seraphim sniper mode does not outrange Ravagers (70 range).
-
-    - Seraphim sniper speed in normal mode swapped with Aeon sniper: Aeon: 2.4 -> 2.2; Seraphim: 2.2 -> 2.4
-  
-      This creates a more interesting interaction between Aeon and Seraphim snipers as they swap who outranges or outspeeds who, instead of Aeon always outspeeding Seraphim. Aeon has the very fast Absolver to counter Seraphim's alpha strike capability as well.
+    There may be further changes to sniper mode next patch to make it more viable.
