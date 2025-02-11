@@ -450,7 +450,9 @@ function ExtractMeshBlueprint(bp)
             local meshbp = disp.Mesh
             meshbp.Source = meshbp.Source or bp.Source
             meshbp.BlueprintId = disp.MeshBlueprint
-            -- roates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
+            -- Robert Oates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
+            -- The above comment likely refers to PrefetchUtilities.lua `CreatePrefetchSetFromBlueprints`
+            -- The Mesh table is also needed for dynamic LOD of structure tarmacs and build effects in lua
             -- disp.Mesh = nil
             MeshBlueprint(meshbp)
         end
