@@ -48,20 +48,21 @@
 --   default to its old value, not to 0 or its normal default.
 --
 
+---@type BlueprintsTable
+local original_blueprints
+---@type ModInfo
+local current_mod
+
+-- upvalue for performance
 local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
 local getinfo = debug.getinfo
+local pcall = pcall
+local doscript = doscript
+local DiskFindFiles = DiskFindFiles
+
 local here = getinfo(1).source
-
----@type BlueprintsTable
-local original_blueprints
-local current_mod
-
--- upvalue for performance
-pcall = pcall
-doscript = doscript
-DiskFindFiles = DiskFindFiles
 
 doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
