@@ -317,6 +317,9 @@ end
 -- table.keys(t) -- returns keys in increasing order (low performance with large tables)
 -- table.keys(t, function(a, b) return a > b end) -- returns keys in decreasing order (low performance with large tables)
 -- table.keys(t, false) -- returns keys without comparing/sorting (better performance with large tables)
+---@param t table
+---@param comp? fun(a, b): boolean | false
+---@return table
 function table.keys(t, comp)
     local r = {}
     if not t then return r end -- prevents looping over nil table
@@ -352,7 +355,8 @@ end
 ---   for k,v in sortedpairs(t) do
 ---       print(k,v)
 ---   end
---- @param comp is an optional comparison function, defaulting to less-than.
+---@param t table
+---@param comp? fun(a, b): boolean # optional comparison function, defaulting to less-than.
 function sortedpairs(t, comp)
     local keys = table.keys(t, comp)
     local i=1
