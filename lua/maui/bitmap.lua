@@ -29,6 +29,7 @@
 
 local Control = import("/lua/maui/control.lua").Control
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class BitmapTexture
 ---@field _texture LazyVar<FileName>
@@ -48,9 +49,8 @@ Bitmap = ClassUI(moho.bitmap_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
-        self._filename = {_texture = LazyVar.Create(), _border = 1}
-        self._color = LazyVar.Create()
+        self._filename = {_texture = LazyVarCreate(), _border = 1}
+        self._color = LazyVarCreate()
         self._color.OnDirty = function(var)
             self:InternalSetSolidColor(self._color())
         end

@@ -41,7 +41,7 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
             -- critical units found, make sure they all exist properly
             local oneCriticalUnitAlive = false
             for _, unit in criticalUnits do
-                if (not IsDestroyed(unit)) and (unit:GetFractionComplete() == 1) then
+                if (not IsDestroyed(unit)) and (unit:GetFractionComplete() == 1) and not unit.RecallingAfterDefeat then
                     oneCriticalUnitAlive = true
                     break
                 end
