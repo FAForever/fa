@@ -1434,7 +1434,7 @@ Unit_Description_0008="Doubles the main cannon's damage, and increases its range
 Unit_Description_0009="Tactical Cruise Missiles replaced by much more expensive, powerful Tactical Nuclear Missiles."
 Unit_Description_0010="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside it. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield Regen Rate = 60 HP/s\nShield Recharge Time = 45 seconds"
-Unit_Description_0467_faf="Enhances the protective shield around the ACU. Requires Energy to run.\n\nShield Regen Rate = 80 HP/s\nShield Recharge Time = 120 seconds"
+Unit_Description_0467_faf="Enhances the protective shield around the ACU. Requires Energy to run.\n\nShield Regen Rate = 80 HP/s\nShield Recharge Time = 120 seconds\n+2 Shield dome size"
 Unit_Description_0012="Increases ACU's resource generation to 15 mass per second and 2520 energy per second."
 Unit_Description_0013="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 140 seconds"
 Unit_Description_0014="Creates an Engineering Drone which act as a flying T1 Engineer. Assists the ACU by default, but can be given its own orders.\n\n+5 Buildpower Drone"
