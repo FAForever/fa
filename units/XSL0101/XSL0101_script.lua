@@ -3,6 +3,7 @@
 -- Summary  :  Seraphim Land Scout Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 ---@alias SelenBuffType "SELENCLOAKBONUS"
 ---@alias SelenBuffName "SelenCloakVisionDebuff"
 

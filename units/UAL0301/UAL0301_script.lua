@@ -4,6 +4,7 @@
 -- Summary  :  Aeon Sub Commander Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 ---@alias AeonSCUEnhancementBuffType
 ---| "SCUBUILDRATE"
 ---| "SCUREGENRATE"
