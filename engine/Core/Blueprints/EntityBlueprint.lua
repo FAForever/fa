@@ -5,6 +5,8 @@
 ---@field AltFootprint? FootprintBlueprint
 --- unit average density in tons / m^3 (default is 0.49). Affects the behavior of units when they bump into each other. Units with more weight push units with less weight.
 ---@field AverageDensity? number
+--- Used by engine behavior to find the correct blueprint. Should not be assigned to existing ordinals in lua code.
+---@field BlueprintOrdinal? number
 --- list of category names that this entity belongs to
 ---@field Categories CategoryName[]
 --- hash of category names that this entity belongs to
