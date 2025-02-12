@@ -138,6 +138,11 @@ local function ProcessWeapon(unit, weapon, projectile)
 
     -- Floor target check interval to ticks
     weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
+
+    -- Game will constantly give warnings without any info when a weapon has 0 radius, so give some info in case it happens
+    if weapon.MaxRadius == 0 then
+        WARN(string.format('%s has 0 max radius for weapon %s', unit.BlueprintId, weapon.BlueprintId))
+    end
 end
 
 ---@param allBlueprints BlueprintsTable
