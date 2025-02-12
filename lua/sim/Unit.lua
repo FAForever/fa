@@ -150,6 +150,9 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Sync { id: string, army: Army } # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
 ---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
 ---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
+---@field Weapons table<string, Weapon> # string is weapon Label
+---@field WeaponInstances Weapon[]
+---@field WeaponCount number
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
