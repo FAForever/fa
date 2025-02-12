@@ -1182,7 +1182,7 @@
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,
---- and if it results in a faster turn rate than `TurnRate`. Disabled at 0
+--- and if it results in a faster turn rate than `TurnRate`. Disabled at 0. Turnrate = 180 deg / (pi*radius/speed)
 ---@field TurnRadius number
 --- turn rate for the unit, in degrees per second. Turning acts improperly when at 0
 ---@field TurnRate number
