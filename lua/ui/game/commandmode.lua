@@ -183,7 +183,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
+---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
     if ignoreSelection then
         return
