@@ -105,7 +105,12 @@ local MathAtan = math.atan
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
 
+--- Like 'build' mode but can only place structures within `MaxBuildDistance` of all selected units.
+--- Shows the distance as a range ring which jitters while the unit moves due to not using interpolated position.
+--- This distance does not represent the actual maximum build range (which adds builder footprint and target skirt).
+--- Not recommended for use.
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
+---@field name string # blueprint id of the unit being built
 
 ---@class CommandModeDataOrderScript : CommandModeDataOrder
 ---@field TaskName string
