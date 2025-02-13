@@ -93,7 +93,7 @@ local MathAtan = math.atan
 -- during command mode (e.g., when you do a move order it turns your cursor into
 -- the blue move marker). This is fixed by reloading the game.
 
----@alias CommandMode 'order' | 'build' | 'buildanchored' | false
+---@alias CommandMode 'order' | 'build' | 'buildanchored' | 'ping' | false
 
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
