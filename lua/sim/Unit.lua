@@ -150,6 +150,9 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Sync { id: string, army: Army } # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
 ---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
 ---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
+---@field Weapons table<string, Weapon> # string is weapon Label
+---@field WeaponInstances Weapon[]
+---@field WeaponCount number
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
@@ -327,6 +330,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
 
         VeterancyComponent.OnCreate(self)
+
+        -- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
+        self:AddOnGivenCallback(self.OnGivenDisableWeapons)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -994,6 +1000,38 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 if cb then
                     cb(newUnit, captor)
                 end
+            end
+        end
+    end,
+
+    --- Enables weapon after waiting its fire rate interval
+    ---@param weapon Weapon
+    OnGivenDisableWeaponsThread = function(weapon)
+        if not weapon:BeenDestroyed() then
+            -- compute delay
+            local bp = weapon.Blueprint
+            local delay = 1 / bp.RateOfFire
+            WaitSeconds(delay)
+
+            -- enable the weapon again if it still exists
+            if not weapon:BeenDestroyed() then
+                weapon:SetEnabled(true)
+            end
+        end
+    end,
+
+    --- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
+    ---@param newUnit Unit
+    OnGivenDisableWeapons = function(newUnit)
+        -- disable all weapons and enable after a delay
+        local disableWeaponsThread = newUnit.OnGivenDisableWeaponsThread
+        for i = 1, newUnit.WeaponCount do
+            local weapon = newUnit.WeaponInstances[i]
+            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
+            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
+            if not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement) then
+                weapon:SetEnabled(false)
+                weapon:ForkThread(disableWeaponsThread)
             end
         end
     end,

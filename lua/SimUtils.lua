@@ -46,22 +46,6 @@ local function TransferUnitsOwnershipComparator(a, b)
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
---- Temporarily disables the weapons of gifted units
----@param weapon Weapon
-local function TransferUnitsOwnershipDelayedWeapons(weapon)
-    if not weapon:BeenDestroyed() then
-        -- compute delay
-        local bp = weapon.Blueprint
-        local delay = 1 / bp.RateOfFire
-        WaitSeconds(delay)
-
-        -- enable the weapon again if it still exists
-        if not weapon:BeenDestroyed() then
-            weapon:SetEnabled(true)
-        end
-    end
-end
-
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
@@ -294,20 +278,6 @@ function TransferUnitsOwnership(units, toArmy, captured)
         end
         if upgradeKennels[1] then
             ForkThread(UpgradeTransferredKennels, upgradeKennels)
-        end
-    end
-
-    -- add delay on turning on each weapon
-    for _, unit in newUnits do
-        -- disable all weapons, enable with a delay
-        for k = 1, unit.WeaponCount do
-            local weapon = unit:GetWeapon(k)
-            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
-            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
-            if not enablingEnhancement or (activeEnhancements and activeEnhancements[enablingEnhancement]) then
-                weapon:SetEnabled(false)
-                weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
-            end
         end
     end
 
