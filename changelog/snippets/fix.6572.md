@@ -1,1 +1,0 @@
-- (#6572) Fix bombers missing when bombing while changing altitude.

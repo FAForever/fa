@@ -1,1 +1,0 @@
-- (#6622) Fix the Seraphim sniper's barrel not rotating when using the lower fidelity model, typically when zoomed out.

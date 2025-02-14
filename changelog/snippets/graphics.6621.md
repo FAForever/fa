@@ -1,1 +1,0 @@
-- (#6621, #6648) Add new terrain shaders that allow better texturing of mesa-like terrain. Slight tweaks to other recently added terrain shaders. These changes have no immediate effects on existing maps, because virtually no maps use these shaders yet.

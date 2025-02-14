@@ -1,1 +1,0 @@
-- (#6627) Annotate code related to collision beam entities.

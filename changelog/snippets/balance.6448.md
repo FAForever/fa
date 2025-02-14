@@ -1,1 +1,0 @@
-- (#6448) Fix projectiles colliding with dead air units. From a balance perspective, this increases the effectiveness of SAMs against groups of aircraft flying directly at them. 

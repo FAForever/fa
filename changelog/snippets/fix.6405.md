@@ -1,1 +1,0 @@
-- (#6405) Transfer unit upgrade progress in modes outside full share, excluding share until death.
