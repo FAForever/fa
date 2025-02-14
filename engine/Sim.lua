@@ -727,11 +727,11 @@ end
 function IsUnit(object)
 end
 
---- Orders a group of units to attack-move to a position
+--- Orders a group of units to attack-move to a target
 ---@param units Unit[]
----@param position Vector
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
-function IssueAggressiveMove(units, position)
+function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target

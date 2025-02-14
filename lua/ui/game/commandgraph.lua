@@ -5,6 +5,10 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+-- About dragging command graph nodes:
+-- If the target of an order is a unit/blip, its node will snap to units/blips in the same army.
+-- If the target of an order is a prop, its node cannot be dragged.
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
