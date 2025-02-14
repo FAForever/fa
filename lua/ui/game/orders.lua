@@ -101,11 +101,6 @@ local function CreateAutoBuildEffect(parent)
 end
 
 function CreateMouseoverDisplay(parent, ID)
-    if controls.mouseoverDisplay then
-        controls.mouseoverDisplay:Destroy()
-        controls.mouseoverDisplay = false
-    end
-
     if not Prefs.GetOption('tooltips') then return end
 
     local createDelay = Prefs.GetOption('tooltip_delay') or 0
@@ -116,7 +111,7 @@ function CreateMouseoverDisplay(parent, ID)
         return
     end
 
-    controls.mouseoverDisplay = Tooltip.CreateMouseoverDisplay(parent, {["text"] = text, ["body"] = desc}, nil, true)
+    Tooltip.CreateMouseoverDisplay(parent, {["text"] = text, ["body"] = desc}, nil, true)
 end
 
 local function CreateOrderButtonGrid()
@@ -382,9 +377,7 @@ local function BuildOrderBehavior(self, modifiers)
             self._curHelpText = self._data.helpText
             self.autoBuildEffect:Destroy()
         end
-        if controls.mouseoverDisplay.text then
-            controls.mouseoverDisplay.text:SetText(self._curHelpText)
-        end
+        Tooltip.SetTooltipText(self._curHelpText)
         SetAutoMode(currentSelection, self:IsChecked())
     end
 end
@@ -451,9 +444,7 @@ local function DiveOrderBehavior(self, modifiers)
             self.autoModeIcon:SetAlpha(1)
             self._isAutoMode = true
         end
-        if controls.mouseoverDisplay.text then
-            controls.mouseoverDisplay.text:SetText(self._curHelpText)
-        end
+        Tooltip.SetTooltipText(self._curHelpText)
         SetAutoSurfaceMode(currentSelection, self._isAutoMode)
     end
 end
@@ -587,9 +578,7 @@ local function ScriptButtonOrderBehavior(self, modifiers, subState)
         ToggleScriptBit(currentSelection, self._data.extraInfo, state)
     end
 
-    if controls.mouseoverDisplay.text then
-        controls.mouseoverDisplay.text:SetText(self._curHelpText)
-    end
+    Tooltip.SetTooltipText(self._curHelpText)
     if subState == nil then
         Checkbox.OnClick(self)
     end
@@ -642,9 +631,7 @@ local function StatToggleOrderBehavior(self, modifiers, subState)
         SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = not state}}, true)
     end
 
-    if controls.mouseoverDisplay.text then
-        controls.mouseoverDisplay.text:SetText(self._curHelpText)
-    end
+    Tooltip.SetTooltipText(self._curHelpText)
     if subState == nil then
         Checkbox.OnClick(self)
     else
@@ -798,10 +785,7 @@ local function CreateFirestatePopup(parent, selected)
             if event.Type == 'MouseEnter' then
                 CreateMouseoverDisplay(control, control.info.helpText, 1)
             elseif event.Type == 'MouseExit' then
-                if controls.mouseoverDisplay then
-                    controls.mouseoverDisplay:Destroy()
-                    controls.mouseoverDisplay = false
-                end
+                Tooltip.DestroyMouseoverDisplay()
             end
             return Checkbox.HandleEvent(control, event)
         end
@@ -1021,9 +1005,7 @@ function OverchargeBehavior(self, modifiers)
             self._isAutoMode = true
         end
 
-        if controls.mouseoverDisplay.text then
-            controls.mouseoverDisplay.text:SetText(self._curHelpText)
-        end
+        Tooltip.SetTooltipText(self._curHelpText)
 
         SimCallback({Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }, true)
     end
@@ -1303,10 +1285,7 @@ local function AddOrder(orderInfo, slot, batchMode)
                 glowThread = CreateOrderGlow(self)
             end
         elseif event.Type == 'MouseExit' then
-            if controls.mouseoverDisplay then
-                controls.mouseoverDisplay:Destroy()
-                controls.mouseoverDisplay = false
-            end
+            Tooltip.DestroyMouseoverDisplay()
             if controls.orderGlow then
                 controls.orderGlow:Destroy()
                 controls.orderGlow = false
@@ -1699,10 +1678,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
 end
 
 function CreateControls()
-    if controls.mouseoverDisplay then
-        controls.mouseoverDisplay:Destroy()
-        controls.mouseoverDisplay = false
-    end
+    Tooltip.DestroyMouseoverDisplay()
     if not controls.bg then
         controls.bg = Bitmap(controls.controlClusterGroup)
     end
