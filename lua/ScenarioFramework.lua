@@ -261,8 +261,8 @@ end
 
 ---
 ---@param unit Unit
----@param army number
----@param triggerOnGiven boolean
+---@param army Army
+---@param triggerOnGiven? boolean
 ---@return Unit
 function GiveUnitToArmy(unit, army, triggerOnGiven)
     -- Shared army mod will result in different players having the same army number
