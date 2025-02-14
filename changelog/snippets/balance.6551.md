@@ -1,6 +1,6 @@
 - (#6551) Improve the performance of the currently underused Czar by increasing its survivability and improving the targeting of its flak cannons.
 
-  - CZAR: Experimental Aircraft Carrier (UAA0310):
+  - **CZAR: Experimental Aircraft Carrier (UAA0310):**
     - Intel  
       - VisionRadius: 70 --> 100
     - Defense

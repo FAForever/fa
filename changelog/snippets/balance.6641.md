@@ -1,6 +1,6 @@
 - (#6641) Nerf the Brick against Percivals and other T3, as the 32 -> 34 range buff from #5547 made it obsolete Percivals and a bit too strong against Harbingers/Othuums, which resulted in huge spam of Bricks instead of moving onto the other units in the Cybran faction.
 
-  - The Brick: T3 Armored Assault Bot (XRL0305):
+  - **The Brick: T3 Armored Assault Bot (XRL0305):**
     - Heavy Disintegrator Pulse Laser
         - Max radius: 34 -> 33
 

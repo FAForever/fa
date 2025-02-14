@@ -1,6 +1,6 @@
 - (#6606) Buff the power of sniper bots as they have become too expensive and micro-intensive to use compared to saving for a T4 to counter Bricks and Percivals. The changes improve the leniency for their micro and improve their firing accuracy.
 
-  - Aeon and Seraphim snipers (XAL0305 & XSL0305):
+  - **Aeon and Seraphim snipers (XAL0305 & XSL0305):**
 
     - Speed: 2.2 (Seraphim) / 2.4 (Aeon) -> 2.3 (Seraphim) / 2.5 (Aeon)
 
@@ -12,7 +12,7 @@
 
       The firing randomness is reduced so that snipers can reliably hit T3 units at max range, since the random chance to miss was annoying and snipers no longer need such a downside due to their cost changes.
 
-  - Seraphim Sniper (XSL0305):
+  - **Seraphim Sniper (XSL0305):**
 
     - Sniper mode speed: 1.65 -> 2.0
 
