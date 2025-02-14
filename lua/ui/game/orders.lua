@@ -100,6 +100,8 @@ local function CreateAutoBuildEffect(parent)
     return glow
 end
 
+---@param parent Control
+---@param ID string
 function CreateMouseoverDisplay(parent, ID)
     if not Prefs.GetOption('tooltips') then return end
 
@@ -783,7 +785,7 @@ local function CreateFirestatePopup(parent, selected)
         btn.index = index
         btn.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
-                CreateMouseoverDisplay(control, control.info.helpText, 1)
+                CreateMouseoverDisplay(control, control.info.helpText)
             elseif event.Type == 'MouseExit' then
                 Tooltip.DestroyMouseoverDisplay()
             end
@@ -1275,7 +1277,7 @@ local function AddOrder(orderInfo, slot, batchMode)
     -- Set up tooltips
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, self._curHelpText, 1)
+            CreateMouseoverDisplay(self, self._curHelpText)
 
             if not self:IsDisabled() then
                 if controls.orderGlow then
