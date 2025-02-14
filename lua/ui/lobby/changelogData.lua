@@ -1,8 +1,23 @@
 ---@type number
-last_version = 3818
+last_version = 3819
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3819,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3819 (14th of February 2025)",
+            "",
+            "This hotfix removes the newly added textures that were causing problems when rolling out the new patch.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
     {
         version = 3818,
         name = "Game patch",
@@ -59,21 +74,21 @@ gamePatches = {
             "",
         },
     },
-        {
-            version = 3816,
-            name = "Hotfix",
-            hasPrettyGithubRelease = true,
-            hasPrettyPatchnotes = false,
-            description = {
-                "# Game version 3816 (10th of December, 2024)",
-                "",
-                "This hotfix primarily fixes the bug that ratings and divisions were not displayed in matchmaker games.",
-                "",
-                "With kind regards,",
-                "",
-                "BlackYps",
-            },
+    {
+        version = 3816,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3816 (10th of December, 2024)",
+            "",
+            "This hotfix primarily fixes the bug that ratings and divisions were not displayed in matchmaker games.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
         },
+    },
     {
         version = 3815,
         name = "Hotfix",
