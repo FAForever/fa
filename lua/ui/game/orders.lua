@@ -100,22 +100,6 @@ local function CreateAutoBuildEffect(parent)
     return glow
 end
 
----@param parent Control
----@param ID string
-function CreateMouseoverDisplay(parent, ID)
-    if not Prefs.GetOption('tooltips') then return end
-
-    local createDelay = Prefs.GetOption('tooltip_delay') or 0
-    local text = TooltipInfo['Tooltips'][ID]['title'] or ID
-    local desc = TooltipInfo['Tooltips'][ID]['description'] or ID
-
-    if not text or not desc then
-        return
-    end
-
-    Tooltip.CreateMouseoverDisplay(parent, {["text"] = text, ["body"] = desc}, nil, true)
-end
-
 local function CreateOrderButtonGrid()
     controls.orderButtonGrid = Grid(controls.bg, GameCommon.iconWidth, GameCommon.iconHeight)
     controls.orderButtonGrid:SetName("Orders Grid")
@@ -785,7 +769,7 @@ local function CreateFirestatePopup(parent, selected)
         btn.index = index
         btn.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
-                CreateMouseoverDisplay(control, control.info.helpText)
+                Tooltip.CreateMouseoverDisplay(control, control.info.helpText, nil, true)
             elseif event.Type == 'MouseExit' then
                 Tooltip.DestroyMouseoverDisplay()
             end
@@ -1277,7 +1261,7 @@ local function AddOrder(orderInfo, slot, batchMode)
     -- Set up tooltips
     checkbox.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            CreateMouseoverDisplay(self, self._curHelpText)
+            Tooltip.CreateMouseoverDisplay(self, self._curHelpText, nil, true)
 
             if not self:IsDisabled() then
                 if controls.orderGlow then
