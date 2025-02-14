@@ -1,1 +1,0 @@
-- (#6647) Fix a buffer overflow exploit in the `InternalSaveGame` user global

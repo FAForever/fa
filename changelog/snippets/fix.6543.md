@@ -1,1 +1,0 @@
-- (#6543) Fix dead units having collision with projectiles and beams for 0.1-0.6 seconds after death.

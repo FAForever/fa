@@ -1,1 +1,0 @@
-- (#6544, #6651) Fix unit transfer enabling weapons locked by enhancements, such as the TML of the Seraphim SACU.

@@ -1,1 +1,0 @@
-- (#6651) Fix the Megalith's hack peg launcher becoming enabled after being transferred. The hack peg launcher is the origin of the bright red beams under the Megalith that appear in games sometimes.

@@ -1,1 +1,0 @@
-- (#6415) Make Ahwassa's bomb ignore collisions with ASF, same as strategic bombers.

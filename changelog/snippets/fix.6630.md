@@ -1,1 +1,0 @@
-- (#6630) Fix ACUs spawned on the right side of the map not facing towards the middle of the map.
