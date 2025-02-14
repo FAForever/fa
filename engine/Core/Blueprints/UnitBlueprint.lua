@@ -36,6 +36,9 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
+--- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
+--- The `OrderInfo.behavior` is overwritten in `orders.lua`.
+---@field Abilities table<string, OrderInfo>
 --- the number of build bots a Cybran builder has
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons
@@ -127,7 +130,9 @@
 
 
 ---@class UnitBlueprintAI
---- under what angle the unit attacks its target after getting an attack order
+--- At what angle (to either side) the unit attacks its target after getting an attack order. 
+--- If one of the unit's weapons has a target and has `SlavedToBody = true`, it will rotate when idle and attacking.
+--- Overrides Weapon `SlavedToBody` and `SlavedToBodyArcRange` behavior.
 ---@field AttackAngle number
 --- automatically surface to attack ground targets
 ---@field AutoSurfaceToAttack boolean
@@ -484,8 +489,9 @@
 ---@field AnimationIdle? FileName
 --- used by several transports' scripts
 ---@field AnimationLand? FileName
----@field AnimationLoop? FileName used but present on the Cybran builder bot
---- Animation open file is linked here: '/units/UnitID/UnitID_aopen.sca'
+--- unused but present on the Cybran builder bot
+---@field AnimationLoop? FileName
+--- Used by various units in various circumstances to open something. Base game path is typically `'/units/UnitID/UnitID_aopen.sca'` but mods should use their mod path `'/mods/ModName/...'`.
 ---@field AnimationOpen? FileName
 --- The animation that is played when the unit is done building
 ---@field AnimationPermOpen? FileName
@@ -499,7 +505,7 @@
 ---@field AnimationUpgrade FileName
 --- A table of animations to use while upgrading, depending on the unit it is upgrading to.
 ---@field AnimationUpgradeTable? table<UnitId, FileName>
---- Animation walk file is linked here: '/units/UnitID/UnitID_??.sca'
+--- Full path to file. Base game path is typically `'/units/UnitID/UnitID_awalk.sca'` but mods should use their mod path `'/mods/ModName/...'`.
 ---@field AnimationWalk? FileName
 --- controls the speed of the animation. Adjusting this number can cause or prevent "skating"
 ---@field AnimationWalkRate number
@@ -563,15 +569,16 @@
 ---@field BuildMeshBlueprint BlueprintId
 
 ---@class UnitBlueprintAnimationDeath
---- animation death file is linked here: '/units/UnitID/UnitID_??.sca'
----@field Animation string
+--- Full path of the animation file. Typically `'/units/UnitID/UnitID_ADeath.sca'` but mods should use their mod path `'/mods/ModName/...'`.
+--- The animation will be removed in blueprint postprocessing if this file does not exist.
+---@field Animation FileName
 --- the maximum speed this animation is played at
 ---@field AnimationRateMax number
 --- the minimum speed this animation is played at
 ---@field AnimationRateMin number
---- this number affects how often a death animation is used when there are more than one. This value is relative rather than absolute
 ---@field Mesh? FileName
 ---@field HitBox? HitBox
+--- this number affects how often a death animation is used when there are more than one. This value is relative rather than absolute
 ---@field Weight? number
 
 ---@class UnitBlueprintDamageEffect
@@ -1167,8 +1174,11 @@
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
 ---@field StandUpright boolean
---- used by XSB3202 when the vertical layer changes from top to sub
+--- used by XSB3202 (T2 sonar) and XSS0201 (Destroyer) when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
+--- How much this unit slows down transports it is loaded in.  
+--- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).
+---@field TransportSpeedReduction number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,

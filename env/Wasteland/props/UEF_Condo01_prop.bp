@@ -1,0 +1,34 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+					AlbedoName = 'UEF_Condo01_albedo.dds',
+                    NormalsName = 'UEF_Condo01_normalsTS.dds',
+					SpecName = 'UEF_Condo01_specteam.dds',
+                    LODCutoff = 350,
+                    ShaderName = 'Unit',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 14,
+        ReclaimTime = 15,
+    },
+    Interface = {
+        HelpText = 'UEF Administration',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 3,
+    SizeY = 2,
+    SizeZ = 3,
+}

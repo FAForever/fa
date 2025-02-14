@@ -1,0 +1,38 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+	Defense = {
+        Health = 800,
+        MaxHealth = 800,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+					AlbedoName = 'UEF_Warehouse02_albedo.dds',
+                    NormalsName = 'UEF_Warehouse02_normalsTS.dds',
+					SpecName = 'UEF_Warehouse02_specteam.dds',
+                    LODCutoff = 350,
+                    ShaderName = 'Unit',
+                },
+            },
+        },
+        UniformScale = 0.05,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 10,
+        ReclaimTime = 15,
+    },
+    Interface = {
+        HelpText = 'UEF Warehouse',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 3,
+    SizeY = 1,
+    SizeZ = 3,
+}
