@@ -93,7 +93,12 @@ local MathAtan = math.atan
 -- during command mode (e.g., when you do a move order it turns your cursor into
 -- the blue move marker). This is fixed by reloading the game.
 
----@alias CommandMode 'order' | 'build' | 'buildanchored' | false
+---@alias CommandMode
+---| 'order' 
+---| 'build' 
+---| 'buildanchored' 
+---| 'ping' # Does not issue commands or get canceled by right click. Basically passes data from `StartCommandMode` to `EndCommandMode`.
+---| false
 
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
@@ -106,7 +111,12 @@ local MathAtan = math.atan
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
 
+--- Like 'build' mode but can only place structures within `MaxBuildDistance` of all selected units.
+--- Shows the distance as a range ring which jitters while the unit moves due to not using interpolated position.
+--- This distance does not represent the actual maximum build range (which adds builder footprint and target skirt).
+--- Not recommended for use.
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
+---@field name string # blueprint id of the unit being built
 
 ---@class CommandModeDataOrderScript : CommandModeDataOrder
 ---@field TaskName string
@@ -184,7 +194,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
+---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
     if ignoreSelection then
         return
