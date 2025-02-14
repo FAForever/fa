@@ -1,0 +1,1 @@
+- (#6608) Fix text overflow in mods manager tooltips
