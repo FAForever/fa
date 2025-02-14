@@ -14,7 +14,7 @@ gamePatches = {
             "This is the first patch of the new year. This time we have a lot of balance changes thanks to the renewed activity of the balance team.",
             "",
             "With kind regards,",
-            ",
+            "",
             "BlackYps",
         },
     },
