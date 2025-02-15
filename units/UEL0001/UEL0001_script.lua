@@ -465,6 +465,31 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:RemoveToggleCap('RULEUTC_ShieldToggle')
     end,
 
+    -- Advanced Bubble Shield
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementAdvancedShieldGeneratorField = function(self, bp)
+        self:AddToggleCap('RULEUTC_ShieldToggle')
+        self:DestroyShield()
+        self:ForkThread(
+            function()
+                WaitTicks(1)
+                self:CreateShield(bp)
+                self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+                self:SetMaintenanceConsumptionActive()
+            end
+        )
+    end,
+
+    ---@param self UEL0001
+    ---@param bp UnitBlueprintEnhancement
+    ProcessEnhancementAdvancedShieldGeneratorFieldRemove = function(self, bp)
+        self:DestroyShield()
+        self:SetMaintenanceConsumptionInactive()
+        self:RemoveToggleCap('RULEUTC_ShieldToggle')
+    end,
+
     -- T2 Engineering Suite
 
     ---@param self UEL0001
