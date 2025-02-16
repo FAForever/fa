@@ -532,6 +532,7 @@ end
 --- Removes resources from brain.
 ---@param type 'ENERGY' | 'MASS'
 ---@param amount number # how much to take.
+---@return number # actual amount taken
 function CAiBrain:TakeResource(type, amount)
 end
 
