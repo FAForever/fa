@@ -114,7 +114,7 @@ end
 ---@unknown
 function CAiBrain:FindClosestArmyWithBase()
 end
- 
+
 --- Takes a builder and returns the closest point that the structure can be
 --- built at in the list of building templates with matching builder types.
 ---
@@ -191,9 +191,9 @@ end
 ---@alias AIBrainBlueprintStatEconomy
 --- | 'Economy_TotalProduced_Energy'
 --- | 'Economy_TotalConsumed_Energy'
---- | 'Economy_Income_Energy' 
---- | 'Economy_Output_Energy' 
---- | 'Economy_Stored_Energy' 
+--- | 'Economy_Income_Energy'
+--- | 'Economy_Output_Energy'
+--- | 'Economy_Stored_Energy'
 --- | 'Economy_Reclaimed_Energy'
 --- | 'Economy_Ratio_Energy'
 --- | 'Economy_MaxStorage_Energy'
@@ -228,19 +228,19 @@ end
 function CAiBrain:GetAvailableFactories(location, radius)
 end
 
----@alias AIBrainBlueprintStatUnits 
+---@alias AIBrainBlueprintStatUnits
 --- | 'Units_History'
 --- | 'Units_Killed'
---- | 'Units_BeingBuilt' 
---- | 'Units_Active' 
---- | 'Units_TotalDamageDealt' 
+--- | 'Units_BeingBuilt'
+--- | 'Units_Active'
+--- | 'Units_TotalDamageDealt'
 --- | 'Units_TotalDamageReceive'
 
 ---@alias AIBrainBlueprintStatEnemies
 --- | 'Enemies_Killed'
 --- | 'Enemies_MassValue_Destroyed'
---- | 'Enemies_EnergyValue_Destroyed' 
---- | 'Enemies_Commanders_Destroyed' 
+--- | 'Enemies_EnergyValue_Destroyed'
+--- | 'Enemies_Commanders_Destroyed'
 
 ---@alias AIBrainBlueprintStatDamage
 --- | 'DamageStats_TotalDamageReceived'
@@ -313,7 +313,7 @@ end
 --- Always reports a threatvalue of zero for Allies or self.
 --- threatType and armyIndex are not required.
 ----@param ring number 1 or 2
---- 1 = Single, 2 = With surrounding IMPA blocks 
+--- 1 = Single, 2 = With surrounding IMPA blocks
 --- ..........   ..........
 --- ..........   ....xxx...
 --- .....X....   ....xXx...
@@ -502,7 +502,7 @@ end
 ---@param triggerName string # unique name of the trigger. See `RemoveArmyStatsTrigger` to remove occupied names.
 ---@param compareType ComparatorString # available types: `LessThan`, `LessThanOrEqual`, `GreaterThan`, `GreaterThanOrEqual`, `Equal`
 ---@param value number #
----@param category EntityCategory? # 
+---@param category EntityCategory? #
 function CAiBrain:SetArmyStatsTrigger(statName, triggerName, compareType, value, category)
 end
 
