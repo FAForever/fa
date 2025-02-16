@@ -114,9 +114,7 @@ EnergyManagerBrainComponent = ClassSimple {
             unitToProcess:OnNoExcessEnergy()
         end
 
-        __moduleinfo.track_imports = true
         local fabricatorParameters = import("/lua/shared/fabricatorbehaviorparams.lua")
-        __moduleinfo.track_imports = false
         local disableRatio = fabricatorParameters.DisableRatio
         local disableStorage = fabricatorParameters.DisableStorage
 
@@ -153,8 +151,6 @@ EnergyManagerBrainComponent = ClassSimple {
         local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
         local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
 
-        local lastSwitchTick = 0
-
         while true do
 
             local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
@@ -174,22 +170,16 @@ EnergyManagerBrainComponent = ClassSimple {
                 -- consuming more energy than our storage allows (if we're working off overflow), disable consumers
                 or overflowStorageMin < 0
             then
-                local newSwitchTick = GetGameTick()
-                local dt = newSwitchTick - lastSwitchTick
-                LOG('disable reason:',
-                    energyStoredRatio < disableRatio and energyStored < disableStorage and energyStored < overflowStorageMin * disableRatio and dt .. ' low on storage: ' .. tostring(energyStored) or
-                    overflowStorageMin < 0 and dt .. ' overflowStorageMin below 0: ' .. tostring(overflowStorageMin)
-                )
-                lastSwitchTick = newSwitchTick
-
                 -- while we have units to disable
                 for id, unit in EnergyExcessUnitsEnabled do
                     if not unit:BeenDestroyed() then
 
                         local ecobp = unit.Blueprint.Economy
                         local energyConsumption = ecobp.MaintenanceConsumptionPerSecondEnergy
+
                         -- if we disable this unit then the min storage will go above our current storage, which will cause flickering in the eco bar when we rely on overflow
                         if overflowStorageMin > 0 and energyConsumption * 0.1 > overflowStorageMin then continue end
+
                         self.EnergyExcessConsumed = self.EnergyExcessConsumed -
                             ecobp.MaintenanceConsumptionPerSecondEnergy
                         self.EnergyExcessRequired = self.EnergyExcessRequired +
@@ -218,22 +208,15 @@ EnergyManagerBrainComponent = ClassSimple {
                 -- compare to -1 because of floating point errors
                 or energyStored >= overflowStorageMin and energyTrend >= -1
             then
-                local newSwitchTick = GetGameTick()
-                local dt = newSwitchTick - lastSwitchTick
-                LOG('enable reason:',
-                    energyStoredRatio >= enableRatio and dt .. ' stored above ratio: ' .. tostring(enableRatio) or
-                    energyStored > enableStorage and dt .. ' stored above limit: ' .. tostring(enableStorage) or
-                    energyStored >= overflowStorageMin and energyTrend >= -1 and dt .. ' storing above overflow min: ' .. tostring(overflowStorageMin)
-                )
-                lastSwitchTick = newSwitchTick
-
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
                     if not unit:BeenDestroyed() then
                         local ecobp = unit.Blueprint.Economy
                         local energyConsumption = ecobp.MaintenanceConsumptionPerSecondEnergy
+
                         -- if we enable this unit then the min storage will go negative, which will cause flickering in the eco bar when we rely on overflow
                         if energyConsumption * 0.1 > overflowStorageMin then continue end
+
                         self.EnergyExcessConsumed = self.EnergyExcessConsumed +
                             ecobp.MaintenanceConsumptionPerSecondEnergy
                         self.EnergyExcessRequired = self.EnergyExcessRequired -
@@ -255,14 +238,6 @@ EnergyManagerBrainComponent = ClassSimple {
                         break
                     end
                 end
-            else
-                -- LOG('idled'
-                -- , '\n energyStoredRatio', energyStoredRatio
-                -- , '\n energyStored', energyStored
-                -- , '\n overflowStorageMin', overflowStorageMin
-                -- , '\n energyTrend', energyTrend
-                -- , '\n overflowStorageMin disable at: ', overflowStorageMin * disableRatio
-                -- )
             end
 
             if self.Army == GetFocusArmy() then
