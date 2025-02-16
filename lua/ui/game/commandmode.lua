@@ -16,6 +16,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
+local AbortNavigation = import("/lua/keymap/misckeyactions.lua").AbortNavigation
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -485,6 +486,22 @@ end
 
 ---@param command UserCommand
 local function OnGuardIssued(command)
+    local autoAbortNavigation = Prefs.GetOption("auto_abort_navigation")
+	if autoAbortNavigation == nil then
+        autoAbortNavigation = true
+    end
+	
+    WARN("OnGuardIssued is called!")
+	if autoAbortNavigation then
+	  if not OnGuardIssued.lastCalled or GetSystemTimeSeconds() - OnGuardIssued.lastCalled > 0.1 then
+			OnGuardIssued.lastCalled = GetSystemTimeSeconds()
+			ForkThread(function()
+            WaitSeconds(0.1)
+            SimCallback({ Func = 'AbortNavigation', Args = {} }, true)
+			end)
+		end	
+	end 
+
     if command.Target.EntityId then
         local unit = GetUnitById(command.Target.EntityId) ---@cast unit UserUnit
         local guards = command.Units
