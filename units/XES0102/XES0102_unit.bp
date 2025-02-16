@@ -102,9 +102,9 @@ UnitBlueprint{
         UniformScale = 0.065,
     },
     Economy = {
-        BuildCostEnergy = 6480,
-        BuildCostMass = 810,
-        BuildTime = 3240,
+        BuildCostEnergy = 6000,
+        BuildCostMass = 750,
+        BuildTime = 3000,
     },
     Footprint = {
         SizeX = 3,
@@ -196,7 +196,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 10/33, --10/integer interval in ticks
+            RateOfFire = 10/32, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
