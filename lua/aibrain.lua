@@ -82,7 +82,6 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param self AIBrain
     ---@param planName string
     CreateBrainShared = function(self, planName)
-        self.PlanName = planName
         self.Army = self:GetArmyIndex()
         self.Trash = TrashBag()
         self.TriggerList = {}
@@ -1524,49 +1523,3 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --#endregion
     -------------------------------------------------------------------------------
 }
-
-__moduleinfo.OnDirty = function()
-    -- force a reload since the engine wont do it
-    ForkThread(function ()
-        -- wait a tick because OnDirty is called before the module is removed from the table of loaded modules
-        WaitTicks(1)
-        import('/lua/aibrain.lua')
-    end)
-end
-__moduleinfo.OnReload = function(newModule)
-    ---@module '/lua/aibrain.lua'
-    LOG('reloading brains...')
-    ---@param oldBrain AIBrain
-    for i, oldBrain in ArmyBrains do
-        ---@type AIBrain
-        local newBrain = table.assimilate(newModule.AIBrain(), oldBrain)
-        if newBrain.BrainType == 'Human' then
-            newBrain:OnCreateHuman(newBrain.PlanName)
-        else
-            newBrain:OnCreateAI(newBrain.PlanName)
-        end
-
-        local function clearLuaObjects(t)
-            for i, v in t do
-                -- engine rawgets the c object so it must exist in the original table
-                if i == '_c_object' then continue end
-                -- skip script modules and c objects (such as units)
-                if getmetatable(v).__index == _G or v._c_object then continue end
-                -- Destroy with a destroy method if given (threads, trashbags)
-                if v.Destroy then
-                    v:Destroy()
-                elseif type(v) == "table" then
-                    clearLuaObjects(v)
-                end
-                t[i] = nil
-            end
-        end
-        clearLuaObjects(oldBrain)
-        -- old table could be in variables or accessed with `GetArmyBrain`
-        setmetatable(oldBrain, {__index = newBrain, __newindex = newBrain})
-        ArmyBrains[i] = newBrain
-
-        LOG('brain reloaded:', oldBrain, '->', newBrain)
-    end
-    LOG('brains reloaded')
-end
