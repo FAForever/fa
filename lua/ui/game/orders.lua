@@ -1752,3 +1752,27 @@ function Expand()
         controls.bg:Hide()
     end
 end
+
+--#region Backwards compatibility
+function CreateMouseoverDisplay(parent, ID)
+    Tooltip.CreateMouseoverDisplay(parent, ID, nil, true)
+end
+local _mouseoverDisplay = setmetatable({}, { __index = { Destroy = Tooltip.DestroyMouseoverDisplay, text = { SetText = Tooltip.SetTooltipText } }, __newindex = function() end })
+setmetatable(controls, {
+    __index = function(t, k)
+        if k == 'mouseoverDisplay' then
+            LOG('__index')
+            return _mouseoverDisplay
+        else
+            return rawget(t, k)
+        end
+    end,
+    __newindex = function(t, k, v)
+        if k == 'mouseoverDisplay' then
+            LOG('__newindex')
+            return
+        else
+            rawset(t, k, v)
+        end
+    end,
+})
