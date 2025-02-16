@@ -60,7 +60,7 @@ end
 -- Usually passed table with only one factory as AI picks the highest tech factory as a primary and others are assisting.
 ---@param template table # Platoon's template.
 ---@param factories table # containing units-factories.
----@return table: tblUnits # containing units-factories.
+---@return table tblUnits # containing units-factories.
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 
@@ -137,14 +137,14 @@ end
 --- structure blueprint has the `"HYDROCARBON"` category) are queried and no
 --- points in the template are used.
 ---
----@param type          string
+---@param type string
 ---@param structureName FileName # blueprint file
 ---@param buildingTypes BuildingTemplate[]
----@param relative      boolean
----@param builder       Unit
----@param optIgnoreAlliance?   AllianceType | nil # defaults to `nil`
----@param optOverridePosX?     number  # defaults to 0.0; ignored if `optOverridePosZ` is absent
----@param optOverridePosZ?     number  # defaults to 0.0
+---@param relative boolean
+---@param builder Unit
+---@param optIgnoreAlliance? AllianceType # defaults to `nil`
+---@param optOverridePosX? number # defaults to 0.0; ignored if `optOverridePosZ` is absent
+---@param optOverridePosZ? number # defaults to 0.0
 ---@param optIgnoreThreatOver? integer # defaults to 0 (accept all)
 ---@return Vector2 location # a new table of `{x, z, 0}` for resource builder types, the actual point otherwise
 function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
@@ -183,8 +183,8 @@ end
 -- return x, z
 
 --- Returns the army start position
----@return number X coordinate
----@return number Z coordinate
+---@return number Xcoordinate
+---@return number Zcoordinate
 function CAiBrain:GetArmyStartPos()
 end
 
@@ -285,7 +285,7 @@ function CAiBrain:GetEconomyStored(resource)
 end
 
 --- Returns the ratio between resource in storage to maximum storage amout.
----@param resource  'ENERGY' | 'MASS'
+---@param resource 'ENERGY' | 'MASS'
 ---@return number
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
@@ -338,7 +338,7 @@ function CAiBrain:GetListOfUnits(category, needToBeIdle, requireBuilt)
 end
 
 --- Returns a ratio between water and land.
----@return number 0.0 - 1.0
+---@return number # 0.0 - 1.0
 function CAiBrain:GetMapWaterRatio()
 end
 
@@ -431,7 +431,7 @@ function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Gives resources to brain.
----@param type  'ENERGY' | 'MASS'
+---@param type 'ENERGY' | 'MASS'
 ---@param amount number
 function CAiBrain:GiveResource(type, amount)
 end
@@ -455,7 +455,7 @@ function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
----@param name string   # unique name for platoon
+---@param name string # unique name for platoon
 ---@param aiPlan string # to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
 ---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
