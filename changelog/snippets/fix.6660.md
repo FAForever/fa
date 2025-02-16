@@ -1,0 +1,1 @@
+- (#6660) Fix mass fabs not always using overflowed energy.
