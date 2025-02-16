@@ -180,10 +180,8 @@ EnergyManagerBrainComponent = ClassSimple {
                         -- if we disable this unit then the min storage will go above our current storage, which will cause flickering in the eco bar when we rely on overflow
                         if overflowStorageMin > 0 and energyConsumption * 0.1 > overflowStorageMin then continue end
 
-                        self.EnergyExcessConsumed = self.EnergyExcessConsumed -
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessRequired = self.EnergyExcessRequired +
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.EnergyExcessConsumed = self.EnergyExcessConsumed - energyConsumption
+                        self.EnergyExcessRequired = self.EnergyExcessRequired + energyConsumption
                         self.EnergyExcessConverted = self.EnergyExcessConverted - ecobp.ProductionPerSecondMass
 
                         -- update internal state
@@ -217,10 +215,8 @@ EnergyManagerBrainComponent = ClassSimple {
                         -- if we enable this unit then the min storage will go negative, which will cause flickering in the eco bar when we rely on overflow
                         if energyConsumption * 0.1 > overflowStorageMin then continue end
 
-                        self.EnergyExcessConsumed = self.EnergyExcessConsumed +
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessRequired = self.EnergyExcessRequired -
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.EnergyExcessConsumed = self.EnergyExcessConsumed + energyConsumption
+                        self.EnergyExcessRequired = self.EnergyExcessRequired - energyConsumption
                         self.EnergyExcessConverted = self.EnergyExcessConverted + ecobp.ProductionPerSecondMass
 
                         -- update internal state
