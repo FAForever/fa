@@ -1433,3 +1433,36 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
     --#endregion
 }
+--Name Ping
+local armiesDetails = GetArmiesTable().armiesTable
+
+local orgDisplayPing = WorldView.DisplayPing 
+
+WorldView.DisplayPing = function(self, pingData)
+    orgDisplayPing(self, pingData) 
+
+    if pingData and not pingData.Marker and not pingData.Renew then
+        local armyIndex = pingData.Owner + 1
+        local armyName = armiesDetails[armyIndex].nickname
+
+        local nameTag = Bitmap(GetFrame(0))
+        nameTag.Width:Set(10)
+        nameTag.Height:Set(10)
+        nameTag:SetNeedsFrameUpdate(true)
+        nameTag.OnFrame = function(self, delta)
+                local worldView = import('/lua/ui/game/worldview.lua').viewLeft
+                local pos = worldView:Project(pingData.Location)
+                LayoutHelpers.AtLeftTopIn(nameTag, worldView, 
+                    pos.x - (nameTag.Width() / 2), 
+                    pos.y - (nameTag.Height() / 2) + 20)
+            end
+        nameTag.text = UIUtil.CreateText(nameTag, armyName, 14, UIUtil.bodyFont)
+        nameTag.text:SetDropShadow(true)
+         LayoutHelpers.AtCenterIn(nameTag.text, nameTag, 0, 0)
+		
+		ForkThread(function()
+			WaitSeconds(5)
+			nameTag:Destroy()
+		end)
+    end
+end
