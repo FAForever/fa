@@ -276,16 +276,16 @@ end
 function CAiBrain:GetCurrentUnits(category)
 end
 
---- Returns current resource income.
----@param resource 'ENERGY'|'MASS'.
--- @return Number.
+--- Returns current income per tick of the resouce.
+---@param resource 'ENERGY'|'MASS'
+---@return number
 function CAiBrain:GetEconomyIncome(resource)
 end
 
---- Return how much of the resource the brains wants to use.
--- This is used for calculating Paragon's production.
----@param resource 'ENERGY'|'MASS'.
--- @return Number.
+--- Returns how much of the resource the brain wants to use per tick.
+--- This is used for calculating Paragon's production.
+---@param resource 'ENERGY'|'MASS'
+---@return number
 function CAiBrain:GetEconomyRequested(resource)
 end
 
