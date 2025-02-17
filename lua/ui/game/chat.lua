@@ -888,9 +888,6 @@ function ReceiveChatFromSim(sender, msg)
             GUI.chatContainer:ScrollToBottom()
         end
     end
-    if SessionIsReplay() then
-        PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Diplomacy_Close'}))
-    end
 end
 
 function ToggleChat()

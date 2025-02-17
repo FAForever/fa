@@ -1,0 +1,1 @@
+- (#6646) Remove the chat bleeps when watching a replay
