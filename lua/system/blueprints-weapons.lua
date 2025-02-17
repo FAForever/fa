@@ -3,7 +3,8 @@ local weaponTargetCheckUpperLimit = 6000
 ---@param unit UnitBlueprint
 ---@param weapon WeaponBlueprint
 ---@param projectile? ProjectileBlueprint
-local function ProcessWeapon(unit, weapon, projectile)
+---@param weaponIndex number
+local function ProcessWeapon(unit, weapon, projectile, weaponIndex)
     -- pre-compute flags
     local isAir = false
     local isStructure = false
@@ -22,7 +23,11 @@ local function ProcessWeapon(unit, weapon, projectile)
         end
     end
 
-    -- process weapon
+    -- Add an identifier to the weapon
+    local label = weapon.Label or "Unlabelled"
+    weapon.BlueprintId = unit.BlueprintId .. "-" .. weaponIndex .. "-" .. label
+
+    -- process tracking radius
 
     -- Death weapons of any kind
     if weapon.DamageType == "DeathExplosion" or weapon.Label == "DeathWeapon" or weapon.Label == "DeathImpact" then
@@ -157,7 +162,7 @@ function ProcessWeapons(allBlueprints, units)
     for _, unit in units do
         if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId or "")] then
             if unit.Weapon then
-                for _, weapon in unit.Weapon do
+                for weaponIndex, weapon in unit.Weapon do
                     if not weapon.DummyWeapon then
 
                         local projectile
@@ -169,7 +174,7 @@ function ProcessWeapons(allBlueprints, units)
                             end
                         end
 
-                        ProcessWeapon(unit, weapon, projectile)
+                        ProcessWeapon(unit, weapon, projectile, weaponIndex)
                     end
                 end
             end

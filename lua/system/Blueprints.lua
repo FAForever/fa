@@ -808,13 +808,6 @@ function PreModBlueprints(all_bps)
             -- Add faction category
             bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
 
-            -- Adjust weapon blueprints
-            for i, w in bp.Weapon or {} do
-                -- add in weapon blueprint id
-                local label = w.Label or "Unlabelled"
-                w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
-            end
-
             -- Hotfix for naval wrecks
             if bp.CategoriesHash.NAVAL and not bp.Wreckage then
                 bp.Wreckage = {
