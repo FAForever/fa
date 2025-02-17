@@ -466,6 +466,10 @@ function CreateTabs(type)
                 sortedOptions[slotName] = {}
                 for enhName, enhTable in enhancements do
                     if enhTable.Slot == slotName then
+                        ---@class EnhQueueData: UnitBlueprintEnhancement
+                        ---@field ID Enhancement
+                        ---@field UnitID UnitId
+
                         enhTable.ID = enhName
                         enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
                         table.insert(sortedOptions[slotName], enhTable)

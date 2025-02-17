@@ -278,13 +278,26 @@ local function AttackOrderBehavior(self, modifiers)
     end
 end
 
--- Used by orders that happen immediately and don't change the command mode (ie the stop button)
+--- Dock all units on left click, dock only damaged units on right click
+---@param self Checkbox
+---@param modifiers EventModifiers
 local function DockOrderBehavior(self, modifiers)
-    if modifiers.Shift then
-        IssueDockCommand(false)
-    else
-        IssueDockCommand(true)
+    if modifiers.Left then
+        if modifiers.Shift then
+            IssueDockCommand(false)
+        else
+            IssueDockCommand(true)
+        end
     end
+
+    if modifiers.Right then
+        if modifiers.Shift then
+            import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9, false)
+        else
+            import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9, true)
+        end
+    end
+
     self:SetCheck(false)
 end
 
@@ -329,7 +342,7 @@ function Stop(units)
             if not GetIsPausedOfUnit(silo) then
                 local missileInfo = silo:GetMissileInfo()
                 if missileInfo.nukeSiloBuildCount > 0 or missileInfo.tacticalSiloBuildCount > 0 then
-                    IssueUnitCommand(silo, 'Pause')
+                    IssueUnitCommandToUnit(silo, 'Pause')
                 end
             end
         end

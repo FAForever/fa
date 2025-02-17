@@ -1,8 +1,38 @@
 ---@type number
-last_version = 3816
+last_version = 3819
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3819,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3819 (14th of February 2025)",
+            "",
+            "This hotfix removes the newly added textures that were causing problems when rolling out the new patch.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
+    {
+        version = 3818,
+        name = "Game patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "# Game version 3818 (14th of February 2025)",
+            "",
+            "This is the first patch of the new year. This time we have a lot of balance changes thanks to the renewed activity of the balance team.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
     {
         version = 3817,
         name = "Hotfix",
@@ -44,21 +74,21 @@ gamePatches = {
             "",
         },
     },
-        {
-            version = 3816,
-            name = "Hotfix",
-            hasPrettyGithubRelease = true,
-            hasPrettyPatchnotes = false,
-            description = {
-                "# Game version 3816 (10th of December, 2024)",
-                "",
-                "This hotfix primarily fixes the bug that ratings and divisions were not displayed in matchmaker games.",
-                "",
-                "With kind regards,",
-                "",
-                "BlackYps",
-            },
+    {
+        version = 3816,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3816 (10th of December, 2024)",
+            "",
+            "This hotfix primarily fixes the bug that ratings and divisions were not displayed in matchmaker games.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
         },
+    },
     {
         version = 3815,
         name = "Hotfix",
@@ -2698,7 +2728,7 @@ gamePatches = {
             "",
             "- (#4757) Fix hot build not being reset after a build order",
             "",
-            "- (#4759) Fix beam weapons continiously restarting as they ground fire",
+            "- (#4759) Fix beam weapons continuously restarting as they ground fire",
             "    This also fixes the bug where beam weapons that are firing on the ground apply the damage twice",
             "",
             "- (#4763) Fix veterancy triggering before death weapons do",
@@ -2911,7 +2941,7 @@ gamePatches = {
             "    Only original campaign maps support this feature at the moment.",
             "",
             "- (#4689, #4690, #4691) Add hotkey that resembles the 'hard move' functionality introduced by Strogo",
-            "    For those unware: it allows you to continiously issue move orders without queueing them and without accidentally converting them to ",
+            "    For those unware: it allows you to continuously issue move orders without queueing them and without accidentally converting them to ",
             "    patrol orders. This is particularly useful for ASF battles",
             "",
             "- (#4095) Adds a partial share game option",
