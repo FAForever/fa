@@ -23,4 +23,17 @@
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 
 ---@class AirStagingPlatformUnit : StructureUnit
-AirStagingPlatformUnit = ClassUnit(StructureUnit) {}
+AirStagingPlatformUnit = ClassUnit(StructureUnit) {
+    ---@param self AirStagingPlatformUnit
+    ---@param instigator Unit
+    ---@param damageType DamageType
+    ---@param excessDamageRatio number
+    Kill = function(self, instigator, damageType, excessDamageRatio)
+        self:TransportDetachAllUnits(false)
+        if instigator then
+            StructureUnit.Kill(self, instigator, damageType, excessDamageRatio)
+        else
+            StructureUnit.Kill(self)
+        end
+    end,
+}
