@@ -127,7 +127,7 @@
 
   [Lobby](/lua/ui/lobby/lobby.lua):
 
-  - <details><summary>Add LOC entries for the following 6 options:
+  - <details><summary>Add LOC entries for the following 6 options:</summary>
 
     ```
     <LOC _Briefing>Briefing
