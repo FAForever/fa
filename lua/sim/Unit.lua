@@ -3244,12 +3244,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end;
 
     ---@param self Unit
-    ---@param enh Enhancement
+    ---@param enh Enhancement | false
     ---@return boolean
     CreateEnhancement = function(self, enh)
+        -- enh == false due to a merge blueprint
+        if not enh then
+            return false
+        end
         local bp = self.Blueprint.Enhancements[enh]
         if not bp then
-            error('*ERROR: Got CreateEnhancement call with an enhancement that doesnt exist in the blueprint.', 2)
+            WARN(string.format('Got `CreateEnhancement` call with enhancement "%s" that does not exist in the blueprint.\n%s', tostring(enh), debug.traceback()))
             return false
         end
 

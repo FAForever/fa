@@ -3,7 +3,8 @@ local weaponTargetCheckUpperLimit = 6000
 ---@param unit UnitBlueprint
 ---@param weapon WeaponBlueprint
 ---@param projectile? ProjectileBlueprint
-local function ProcessWeapon(unit, weapon, projectile)
+---@param weaponIndex number
+local function ProcessWeapon(unit, weapon, projectile, weaponIndex)
     -- pre-compute flags
     local isAir = false
     local isStructure = false
@@ -22,7 +23,11 @@ local function ProcessWeapon(unit, weapon, projectile)
         end
     end
 
-    -- process weapon
+    -- Add an identifier to the weapon
+    local label = weapon.Label or "Unlabelled"
+    weapon.BlueprintId = unit.BlueprintId .. "-" .. weaponIndex .. "-" .. label
+
+    -- process tracking radius
 
     -- Death weapons of any kind
     if weapon.DamageType == "DeathExplosion" or weapon.Label == "DeathWeapon" or weapon.Label == "DeathImpact" then
@@ -138,6 +143,11 @@ local function ProcessWeapon(unit, weapon, projectile)
 
     -- Floor target check interval to ticks
     weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
+
+    -- Game will constantly give warnings without any info when a weapon has 0 radius, so give some info in case it happens
+    if weapon.MaxRadius == 0 then
+        WARN(string.format('%s has 0 max radius for weapon %s', unit.BlueprintId, weapon.BlueprintId))
+    end
 end
 
 ---@param allBlueprints BlueprintsTable
@@ -152,7 +162,7 @@ function ProcessWeapons(allBlueprints, units)
     for _, unit in units do
         if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId or "")] then
             if unit.Weapon then
-                for _, weapon in unit.Weapon do
+                for weaponIndex, weapon in unit.Weapon do
                     if not weapon.DummyWeapon then
 
                         local projectile
@@ -164,7 +174,7 @@ function ProcessWeapons(allBlueprints, units)
                             end
                         end
 
-                        ProcessWeapon(unit, weapon, projectile)
+                        ProcessWeapon(unit, weapon, projectile, weaponIndex)
                     end
                 end
             end

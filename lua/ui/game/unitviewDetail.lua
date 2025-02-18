@@ -453,7 +453,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
     if builder and bp.EnhancementPresetAssigned then
         table.insert(lines, LOC('<LOC uvd_upgrades>')..':')
         for _, v in bp.EnhancementPresetAssigned.Enhancements do
-            table.insert(lines, '    '..LOC(bp.Enhancements[v].Name))
+            local bpEnh = bp.Enhancements[v]
+            if bpEnh then
+                table.insert(lines, '    ' .. LOC(bpEnh.Name))
+            end
         end
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})
     elseif bp then
