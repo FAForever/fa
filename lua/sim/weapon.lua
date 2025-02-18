@@ -20,7 +20,7 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComp
 --- Table of damage information passed from the weapon to the projectile
 --- Can be assigned as a meta table to the projectile's damage table to reduce memory usage for unchanged values
 ---@class WeaponDamageTable
----@field DamageToShields number        # weaponBlueprint.DamageToShields 
+---@field DamageToShields number        # weaponBlueprint.DamageToShields
 ---@field InitialDamageAmount number    # weaponBlueprint.InitialDamage or 0
 ---@field DamageRadius number           # weaponBlueprint.DamageRadius + Weapon.DamageRadiusMod
 ---@field DamageAmount number           # weaponBlueprint.Damage + Weapon.DamageMod
@@ -233,7 +233,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
             if yawBone2 then
                 aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2, yawBone2)
-                aimYaw2:SetPrecedence(precedence-1)
+                aimYaw2:SetPrecedence(precedence - 1)
                 if EntityCategoryContains(categories.STRUCTURE, unit) then
                     aimYaw2:SetResetPoseTime(9999999)
                 end
@@ -277,7 +277,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 aimRight:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
                 aimLeft:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
             end
-            
+
             if aimYaw2 then
                 local turretYawMin2 = turretyawmin
                 local turretYawMax2 = turretyawmax
@@ -290,7 +290,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, turretpitchmin, turretpitchmax, turretpitchspeed)
             end
         else
-            local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: '.. unit.UnitId
+            local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: ' .. unit.UnitId
             error(strg, 2)
         end
     end,
@@ -384,7 +384,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     OnGotTarget = function(self)
         -- a few non-walker units may use `Animator` as well
-        local animator = self.unit--[[@as WalkingLandUnit]].Animator
+        local animator = self.unit--[[@as WalkingLandUnit]] .Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, false)
@@ -395,7 +395,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     OnLostTarget = function(self)
         -- a few non-walker units may use `Animator` as well
-        local animator = self.unit--[[@as WalkingLandUnit]].Animator
+        local animator = self.unit--[[@as WalkingLandUnit]] .Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, true)
@@ -661,7 +661,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param dmgMod number 
+    ---@param dmgMod number
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
         self.damageTableCache = false
