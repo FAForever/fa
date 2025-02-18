@@ -127,7 +127,7 @@
 
   [Lobby](/lua/ui/lobby/lobby.lua):
 
-  - Add LOC entries for the following 6 options:
+  - <details><summary>Add LOC entries for the following 6 options:
 
     ```
     <LOC _Briefing>Briefing
@@ -137,3 +137,5 @@
     <LOC lobui_0467>Version control
     <LOC lobui_0468>Game version: %s\nGame type: %s\nCommit hash: %s
     ```
+
+    </details>
