@@ -1393,7 +1393,7 @@ function CreateDialog()
 
     local mouseover = false
     local function SetUnitImage(bitmap, id, smol)
-        local icon = UIUtil.UIFile('/textures/ui/common/icons/units/' .. id .. '_icon.dds', true)
+        local icon = UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)
         local lods = __blueprints[id].Display.Mesh.LODs
         local albedo = lods[smol and lods and table.getn(lods) or 1].AlbedoName
 
@@ -2013,7 +2013,7 @@ function CreateTemplateOptionsMenu(button)
                 end
             end
             for iconType, _ in contents do
-                local bmp = Bitmap(group, '/textures/ui/common/icons/units/'..iconType..'_icon.dds')
+                local bmp = Bitmap(group, UIUtil.UIFile('/icons/units/' .. iconType .. '_icon.dds', true))
                 bmp.Height:Set(30 * UIScale)
                 bmp.Width:Set(30 * UIScale)
                 bmp.ID = iconType
