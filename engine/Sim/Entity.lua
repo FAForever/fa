@@ -280,7 +280,7 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
----@overload fun(): 
+---@overload fun()
 ---@param instigator Unit
 ---@param damageType DamageType
 ---@param excessDamageRatio number
