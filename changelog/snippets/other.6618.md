@@ -35,6 +35,17 @@
 
     </details>
 
+  [Input Dialog](/lua/ui/controls/popups/inputdialog.lua):
+
+  - <details><summary>Add LOC entries for the following 2 options:</summary>
+
+    ```
+    <LOC _Ok>Ok
+    <LOC _Cancel>Cancel
+    ```
+
+    </details>
+
   [Unit creation dialog](/lua/ui/dialogs/createunit.lua):
 
   - <details><summary>Add LOC entries for the following 25 options:</summary>
@@ -116,9 +127,13 @@
 
   [Lobby](/lua/ui/lobby/lobby.lua):
 
-  - Add LOC entriy for the following 2 options:
+  - Add LOC entries for the following 6 options:
 
     ```
     <LOC _Briefing>Briefing
     <LOC lobui_0464>Game Rules
+    <LOC lobui_0466>Game version
+    <LOC lobui_0465>Game Title
+    <LOC lobui_0467>Version control
+    <LOC lobui_0468>Game version: %s\nGame type: %s\nCommit hash: %s
     ```
