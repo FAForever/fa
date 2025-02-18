@@ -1440,6 +1440,7 @@ function CreateDialog()
 
         for i = 3, table.getn(td) do
             local id = td[i][1]
+            if not __blueprints[id] then return end
             local w, h = GetUnitSkirtSizes(id)
             local posX, posZ = td[i][3], td[i][4]
             local cOffX, cOffZ = GetSkirtCentreOffset(id)
@@ -1474,7 +1475,7 @@ function CreateDialog()
 
         mouseover.Left:Set(x+20  * UIScale)
         mouseover.Top:Set(y+20 * UIScale)
-        LayoutHelpers.SetDimensions(mouseover.img, 300, 300)
+        LayoutHelpers.SetDimensions(mouseover, 300, 300)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
     local function CreateElementMouseover(unitData,x,y)
