@@ -3346,7 +3346,7 @@ function CreateUI(maxPlayers)
     end
 
     -- Create mission briefing button
-    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "<LOC _Briefing>Briefing")
     GUI.briefingButton = briefingButton
     LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
@@ -6368,7 +6368,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog()
-    CreateInputDialog(GUI, "Game Rules",
+    CreateInputDialog(GUI, "<LOC lobui_0464>Game Rules",
         function(self, text)
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
