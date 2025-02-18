@@ -31,12 +31,11 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
         local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
         self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
-        self._font._family.OnDirty = function(var)
+        local onFontChanged = function(var)
             self:_internalSetFont()
         end
-        self._font._pointsize.OnDirty = function(var)
-            self:_internalSetFont()
-        end
+        self._font._family.OnDirty = onFontChanged
+        self._font._pointsize.OnDirty = onFontChanged
 
         self._fg = LazyVar.Create()
         self._fg.OnDirty = function(var)
