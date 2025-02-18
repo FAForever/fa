@@ -693,11 +693,10 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     DisableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = true
+            self.damageTableCache = false
         else
-            -- Error
-            error('ERROR: DisableBuff in weapon.lua does not have a buffname')
+            error('DisableBuff in weapon.lua does not have a buffname')
         end
-        self.damageTableCache = false
     end,
 
     ---@param self Weapon
@@ -705,11 +704,10 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ReEnableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = nil
+            self.damageTableCache = false
         else
-            -- Error
-            error('ERROR: ReEnableBuff in weapon.lua does not have a buffname')
+            error('ReEnableBuff in weapon.lua does not have a buffname')
         end
-        self.damageTableCache = false
     end,
 
     --- Method to mark weapon when parent unit gets loaded on to a transport unit
