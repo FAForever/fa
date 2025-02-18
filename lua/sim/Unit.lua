@@ -4051,13 +4051,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param bone Bone
+    ---@param bone? Bone
     ---@return boolean
     ValidateBone = function(self, bone)
-        if self:IsValidBone(bone) then
+        if bone and self:IsValidBone(bone) then
             return true
         end
-        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. (self.UnitId or self:GetUnitId()) .. ' and it does not exist in the model.', 2)
+        WARN('Trying to use the bone, `' .. tostring(bone) .. '` on unit ' .. (self.UnitId or self:GetUnitId()) .. ' and it does not exist in the model.', 2)
 
         return false
     end,
