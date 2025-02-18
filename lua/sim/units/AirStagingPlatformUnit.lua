@@ -24,12 +24,15 @@ local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 
 ---@class AirStagingPlatformUnit : StructureUnit
 AirStagingPlatformUnit = ClassUnit(StructureUnit) {
+    --- Detach units from air staging on death to allow working around an engine bug 
+    --- where units get stuck in the air staging.
     ---@param self AirStagingPlatformUnit
     ---@param instigator Unit
     ---@param damageType DamageType
     ---@param excessDamageRatio number
     Kill = function(self, instigator, damageType, excessDamageRatio)
         self:TransportDetachAllUnits(false)
+        -- `Kill` can only be called with 4 args or 1 arg
         if instigator then
             StructureUnit.Kill(self, instigator, damageType, excessDamageRatio)
         else
