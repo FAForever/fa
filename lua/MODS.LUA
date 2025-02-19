@@ -205,6 +205,8 @@ make the blueprint only add or override the fields it defines (including nested 
 subtable isn't replaced in this mode), leaving the rest intact (which could possibly also have been
 changed by other mods).
 To remove a field from the original blueprint, set the field to `"__nil"` in your merge blueprint.
+To add or remove categories from a blueprint, set `AddCategories` and `DelCategories` to tables of
+category names (strings) you want to add or remove.
 
 
 ----------
