@@ -840,10 +840,14 @@ function PreModBlueprints(all_bps)
     end
 end
 
+--#region Blueprint modding utilities
+
 -- Hook for mods to manipulate the entire blueprint table
 ---@param all_bps BlueprintsTable
 function ModBlueprints(all_bps)
 end
+
+--#endregion
 
 local NewDummies = {}
 
