@@ -450,6 +450,7 @@ function ExtractMeshBlueprint(bp)
 
         if type(disp.Mesh) == 'table' then
             local meshbp = disp.Mesh
+            -- the engine adds missing fields to the mesh blueprint based on the Source
             meshbp.Source = meshbp.Source or bp.Source
             meshbp.BlueprintId = disp.MeshBlueprint
             -- roates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
