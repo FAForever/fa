@@ -72,6 +72,39 @@ doscript("/lua/system/blueprints-units.lua")
 doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
 
+--- Special table merge function that allows setting a field to `nil`.
+---@param t1 table
+---@param t2 table # Overwrites t1
+---@param nilValue? string # Fields in t2 with this value set the field to nil in the result. Defaults to `"__nil"`.
+local function BlueprintMerged(t1, t2, nilValue)
+    if not nilValue then nilValue = '__nil' end
+    if t1==t2 then
+        return t1
+    end
+
+    if type(t1)~='table' or type(t2)~='table' then
+        return t2
+    end
+
+    local copied = nil
+    for k,v in t2 do
+        if type(v)=='table' then
+            v = BlueprintMerged(t1[k], v, nilValue)
+        end
+        if t1[k] ~= v then
+            copied = copied or table.copy(t1)
+            t1 = copied
+            if v == nilValue then
+                t1[k] = nil
+            else
+                t1[k] = v
+            end
+        end
+    end
+
+    return t1
+end
+
 ---@class PreGameData
 ---@field CurrentMapDir string          ## is obsolete, set for removal
 ---@field IconReplacements ModInfo[]
@@ -374,7 +407,7 @@ local function StoreBlueprint(group, bp)
     if t[id] and bp.Merge then
         bp.Merge = nil
         bp.Source = nil
-        t[id] = table.merged(t[id], bp)
+        t[id] = BlueprintMerged(t[id], bp)
     else
         t[id] = bp
     end
@@ -904,7 +937,7 @@ function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
 
     for i, w in weaponTable do
         if w.Label == label then
-            weaponTable[i] = table.merged(w, newBp)
+            weaponTable[i] = BlueprintMerged(w, newBp)
             return
         end
     end
