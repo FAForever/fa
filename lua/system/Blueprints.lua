@@ -355,9 +355,10 @@ local function GetSource()
     local there
     while true do
         there = getinfo(n, 'S').source
-        if there ~= here then break end
+        if there ~= '=[C]' and there ~= here then break end
         n = n + 1
     end
+    if not there then error('GetSource was not able to find a Lua source outside Blueprints.lua') end
     if sub(there, 1, 1) == "@" then
         there = sub(there, 2)
     end
