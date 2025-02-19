@@ -52,6 +52,8 @@ local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
 local getinfo = debug.getinfo
+local TableInsert = table.insert
+local TableFind = table.find
 local here = getinfo(1).source
 
 ---@type BlueprintsTable
@@ -867,6 +869,22 @@ local function RunModBlueprintFunctions(all_bps)
         LOG('Running ModBp function from ' .. file)
         func(all_bps)
         ModBlueprintsFunctions[file] = nil
+    end
+end
+
+--- Adds a category string to a blueprint.
+---@param bp EntityBlueprint
+---@param cat CategoryName
+function AddCategoryToBp(bp, cat)
+    local cats = bp.Categories
+    if not cats then
+        bp.Categories = { cat }
+        bp.CategoriesHash = { [cat] = true}
+        return
+    end
+    if not TableFind(cats, cat) then
+        TableInsert(cats, cat)
+        bp.CategoriesHash[cat] = true
     end
 end
 
