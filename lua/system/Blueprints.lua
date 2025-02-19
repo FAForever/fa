@@ -888,6 +888,40 @@ function AddCategoryToBp(bp, cat)
     end
 end
 
+--- Merges the weapon bp into the weapon bp found with the label.  
+--- If the label is not found, the weapon is inserted at the desired index or at the end of the array.  
+--- This helps with weapon merge blueprints and adding AI-controlling weapons (index 1).
+---@param baseBp UnitBlueprint
+---@param label string
+---@param insertPos? integer
+---@param newBp WeaponBlueprint
+function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
+    local weaponTable = baseBp.Weapon
+    if not weaponTable then
+        baseBp.Weapon = { newBp }
+        return
+    end
+
+    for i, w in weaponTable do
+        if w.Label == label then
+            weaponTable[i] = table.merged(w, newBp)
+            return
+        end
+    end
+
+    if insertPos then
+        local size = table.getn(weaponTable)
+        if insertPos > size + 1 then
+            WARN("Tried to insert a weapon bp in a position beyond the end of the Weapon array! Inserting at the end instead.")
+            TableInsert(weaponTable, newBp)
+        else
+            TableInsert(weaponTable, insertPos, newBp)
+        end
+    else
+        TableInsert(weaponTable, newBp)
+    end
+end
+
 --#endregion
 
 local NewDummies = {}
