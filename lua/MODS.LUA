@@ -204,6 +204,7 @@ replace the one currently there unless the `Merge = true` flag is set in the blu
 make the blueprint only add or override the fields it defines (including nested tables - the entire
 subtable isn't replaced in this mode), leaving the rest intact (which could possibly also have been
 changed by other mods).
+To remove a field from the original blueprint, set the field to `"__nil"` in your merge blueprint.
 
 
 ----------
