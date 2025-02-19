@@ -1,0 +1,24 @@
+-- The filename starts with Z so that blueprint loading finds it after the `XSL0301_unit.bp` file
+
+UnitBlueprint {
+    Merge = true,
+    BlueprintId = 'xsl0301',
+    Weapon = {
+        -- without dependency tracking, reloading gives a warning because Weapon[1] is nil:
+        --[[```
+            Initializing unit blueprint for xsl0301
+                Initializing field Weapon of RUnitBlueprint at 0x196c7400
+                    WARNING: Invalid type for RUnitBlueprintWeapon at 0x196da000: nil
+        ```]]
+
+        ---@type WeaponBlueprint
+        [2] = {
+            -- In startup load order this overwrites mergeTest_A's display name, but not if A is reloaded.
+            DisplayName = 'second weapon Variant B',
+            -- Since `WeaponCategory` is not used by the engine, this field is set to nil after bp reload,
+            -- and the weapon disappears from the unitviewdetail UI.
+            -- This behavior applies to many fields, like the selection sound, but I do not know them all.
+            -- WeaponCategory = 'Direct Fire',
+        },
+    },
+}
