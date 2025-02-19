@@ -66,6 +66,7 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay, allianceDefe
     end
 
     if allianceDefeat then
+        -- filter out defeated brains that have living allies
         for defeatedArmy, _ in defeatedBrains do
             for aliveArmy, _ in aliveBrains do
                 if not defeatedBrains[aliveArmy] and IsAlly(aliveArmy, defeatedArmy) then
