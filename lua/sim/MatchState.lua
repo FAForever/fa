@@ -75,6 +75,7 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay, allianceDefe
             end
         end
     end
+    reprsl(defeatedBrains, {depth = 1})
 
     return defeatedBrains
 end
