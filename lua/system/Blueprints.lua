@@ -354,7 +354,7 @@ local function GetSource()
     local n = 2
     local there
     while true do
-        there = getinfo(n).source
+        there = getinfo(n, 'S').source
         if there ~= here then break end
         n = n + 1
     end
