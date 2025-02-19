@@ -847,6 +847,29 @@ end
 function ModBlueprints(all_bps)
 end
 
+--- Reload compatibility for modding from non-hook blueprint modding
+---@type table<FileName, fun(all_bps: BlueprintsTable)>
+local ModBlueprintsFunctions = {}
+
+--- Add a function to call after `ModBlueprints`.
+--- The function is overriden if this is called from the same file again.
+--- This allows modding blueprints from reloadable files (like bp files).
+---@param func fun(all_bps: BlueprintsTable)
+function SetModBlueprintFunction(func)
+    local file = GetSource()
+    LOG('Added ModBp function from ' .. file)
+    ModBlueprintsFunctions[GetSource()] = func
+end
+
+---@param all_bps BlueprintsTable
+local function RunModBlueprintFunctions(all_bps)
+    for file, func in ModBlueprintsFunctions do
+        LOG('Running ModBp function from ' .. file)
+        func(all_bps)
+        ModBlueprintsFunctions[file] = nil
+    end
+end
+
 --#endregion
 
 local NewDummies = {}
@@ -1085,6 +1108,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Modding...')
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    RunModBlueprintFunctions(original_blueprints)
     PostModBlueprints(original_blueprints)
 
     stats.UnitsTotal = table.getsize(original_blueprints.Unit)
@@ -1120,6 +1144,7 @@ function ReloadBlueprint(file)
     ExtractAllMeshBlueprints()
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    RunModBlueprintFunctions(original_blueprints)
     PostModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
