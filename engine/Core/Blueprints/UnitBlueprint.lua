@@ -101,6 +101,7 @@
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
 ---@field Weapon? WeaponBlueprint[]
+---@field ModWeapon? WeaponBlueprint[] # Used during blueprint loading to mod `Weapon` table
 ---@field Wreckage? UnitBlueprintWreckage
 ---
 --- Auto-generated unit id from the folder name. When modifying a blueprint, this must be defined to

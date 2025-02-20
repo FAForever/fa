@@ -20,6 +20,11 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class WeaponBlueprint: Blueprint
+--- During blueprint loading, which Label to look for when merging into a weapon blueprint.
+---@field MergeLabel? string
+--- During blueprint loading, if `MergeLabel` is not found, which index the weapon should be added at.  
+--- For example, index 1 controls the unit's weapon AI. Defaults to adding to the end of the `Weapon` table.
+---@field AddIndex? number
 --- if this weapon will only fire if it is above water
 ---@field AboveWaterFireOnly? boolean
 --- if this weapon will only fire at targets above water

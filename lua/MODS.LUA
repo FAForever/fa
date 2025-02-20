@@ -207,6 +207,10 @@ changed by other mods).
 To remove a field from the original blueprint, set the field to `"__nil"` in your merge blueprint.
 To add or remove categories from a blueprint, set `AddCategories` and `DelCategories` to tables of
 category names (strings) you want to add or remove.
+To add or merge weapons in a blueprint, place your weapon blueprint in the `ModWeapon` table with 
+`MergeLabel` corresponding to the weapon label to merge the new blueprint with, and in case the 
+label doesn't exist, use `AddIndex` to specify where in the Weapon array the new blueprint should
+be placed, which is useful to place weapons at index 1 which controls the unit AI. 
 
 
 ----------
