@@ -2,5 +2,6 @@
 
   - **All ACUs, as well as Aeon and Seraphim SACUs**
     - Personal Teleporter
-      - TeleportDelay: 15 --> 17.5
-      - TeleportFlatEnergyCost: 75000 --> 87500
+      - TeleportDelay: 15 --> 20
+      - TeleportFlatEnergyCost: 75000 --> 100000
+      - Introduce a new forumla for teleport time and energy usage
