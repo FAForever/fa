@@ -901,7 +901,7 @@ local ModBlueprintsFunctions = {}
 ---@param func fun(all_bps: BlueprintsTable)
 function SetModBlueprintFunction(func)
     local file = GetSource()
-    LOG('Added ModBp function from ' .. file)
+    LOG('Set ModBp function for ' .. file)
     ModBlueprintsFunctions[GetSource()] = func
 end
 
