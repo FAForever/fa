@@ -871,6 +871,15 @@ function PreModBlueprints(all_bps)
             bp.Categories = table.unhash(bp.CategoriesHash)
         end
 
+        local addWeapon = bp.ModWeapon
+        if addWeapon then
+            for _, bpWeapon in addWeapon do
+                local mergeLabel = bpWeapon.MergeLabel
+                local insertPos = bpWeapon.AddIndex
+                MergeWeaponByLabel(bp, mergeLabel, insertPos, bpWeapon)
+            end
+        end
+
         BlueprintLoaderUpdateProgress()
     end
 end
