@@ -1,0 +1,72 @@
+-- The filename starts with Z so that blueprint loading finds it after the `XSL0301_unit.bp` file
+
+UnitBlueprint {
+    Merge = true,
+    BlueprintId = 'xsl0301',
+    EnhancementPresets = {
+        -- test that removing a field works
+
+        Rambo = "__nil",
+    },
+    -- test modding of weapons
+    ModWeapon = {
+        {
+            -- add a new weapon in position 1
+            -- it has a max radius of 5 so it should make the unit move close when attacking
+            MergeLabel = "Suicide",
+            AddIndex = 1,
+            AboveWaterTargetsOnly = true,
+            CollideFriendly = false,
+            Damage = 1,
+            DamageFriendly = false,
+            DamageRadius = 6.5,
+            DamageType = "FireBeetleExplosion",
+            DisplayName = "Suicide",
+            FireTargetLayerCapsTable = {
+                Land = "Land|Water|Seabed",
+                Water = "Land|Water|Seabed",
+            },
+            FiringTolerance = 180,
+            Label = "Suicide",
+            MaxRadius = 5,
+            TargetCheckInterval = 0.3,
+            TargetPriorities = {
+                "MOBILE",
+                "(STRUCTURE * DEFENSE - ANTIMISSILE)",
+                "ALLUNITS",
+            },
+            TargetRestrictDisallow = "UNTARGETABLE",
+            Turreted = false,
+            WeaponCategory = "Kamikaze",
+        },
+        {
+            -- make changes a weapon by label, as making changes by index
+            -- is unreliable as mods can add weapons thus changing indices
+            MergeLabel = "LightChronatronCannon",
+            Damage = 30000,
+            DamageRadius = 1,
+            EnergyRequired = 4000,
+            EnergyDrainPerSecond = 4000,
+            Audio = "__nil",
+        },
+    },
+}
+
+SetModBlueprintFunction(function(all_bps)
+    local bp = all_bps.Unit.xsl0301--[[@as UnitBlueprint]]
+    -- unit needs to sync abilities from sim to ui unfortunately
+    -- so this doesn't work so easily
+    bp.Abilities = {
+        TargetLocation = {
+            bitmapId = "skry-target",
+            helpText = "scry_target",
+        },
+    }
+    -- can view the categories in the AI blueprint viewer
+    AddCategoryToBp(bp, "OPTICS")
+    AddCategoryToBp(bp, "ABILITYBUTTON")
+    MergeWeaponByLabel(bp, 'AutoOverCharge', nil, {
+        RateOfFire = 10/1,
+        EnergyRequired = 0,
+    })
+end)
