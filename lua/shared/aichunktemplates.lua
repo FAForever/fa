@@ -47,7 +47,13 @@
 ---@field BuildAreas AIChunkOffset[][]
 ---@field Faction FactionCategory
 
---- Verifies the chunk so that it 
+local TableGetn = table.getn
+local TableInsert = table.insert
+local TableConcat = table.concat
+
+local StringFormat = string.format
+
+--- Verifies the chunk so that it
 ---@param template AIChunkTemplate
 function VerifyChunkTemplate(template)
     if not template.Faction then
@@ -65,19 +71,19 @@ function VerifyChunkTemplate(template)
         return false
     end
 
-    local count = table.getn(template.BuildAreas)
+    local count = TableGetn(template.BuildAreas)
     if count < 16 then
         WARN("AIChunkTemplates - not sufficient offsets in the 'BuildAreas' field: should be at least 16")
         return false
     end
 
-    for k = 1, table.getn(template.BuildAreas) do
+    for k = 1, TableGetn(template.BuildAreas) do
         local offsets = template.BuildAreas[k]
-        for i = 1, table.getn(offsets) do
+        for i = 1, TableGetn(offsets) do
             local offset = offsets[i]
 
             if not (offset[1] or offset[2]) then
-                WARN(string.format("AIChunkTemplates - invalid offset at size %d at index %d: (%f, %f) ", k, i, unpack(offset)))
+                WARN(StringFormat("AIChunkTemplates - invalid offset at size %d at index %d: (%f, %f) ", k, i, unpack(offset)))
             end
         end
     end
@@ -91,19 +97,19 @@ end
 function CreateChunkTemplate(size, faction)
 
     if size < 1 then
-        WARN(string.format("AIChunkTemplates - size is too small: %s", tostring(size)))
+        WARN(StringFormat("AIChunkTemplates - size is too small: %s", tostring(size)))
         return nil
     end
 
     if size > 256 then
-        WARN(string.format("AIChunkTemplates - size is too large: %s", tostring(size)))
+        WARN(StringFormat("AIChunkTemplates - size is too large: %s", tostring(size)))
         return nil
     end
 
     ---@type AIChunkTemplate
     local template = {
         Faction = faction,
-        BuildAreas = { },
+        BuildAreas = {},
         Size = size,
     }
 
@@ -117,33 +123,27 @@ function CreateChunkTemplate(size, faction)
     return template
 end
 
---- Copies the template 
----@param template AIChunkTemplate
-function CopyChunkTemplate(template)
-
-end
-
---- Turns the template into a stringified Lua table
+--- Turns the template into a stringified Lua table. Useful for debugging
 ---@param template AIChunkTemplate
 function StringifyChunkTemplate(template)
 
-    local lines = { }
+    local lines = {}
 
-    table.insert(lines, "{\r\n")
-    table.insert(lines, string.format("  Faction = %s, \r\n", tostring(template.Faction)))
-    table.insert(lines, string.format("  Size = %d, \r\n", tostring(template.Size)))
-    table.insert(lines, string.format("  BuildAreas = { \r\n", tostring(template.Size)))
-    for k = 1, table.getn(template.BuildAreas) do
+    TableInsert(lines, "{\r\n")
+    TableInsert(lines, StringFormat("  Faction = %s, \r\n", tostring(template.Faction)))
+    TableInsert(lines, StringFormat("  Size = %d, \r\n", tostring(template.Size)))
+    TableInsert(lines, StringFormat("  BuildAreas = { \r\n", tostring(template.Size)))
+    for k = 1, TableGetn(template.BuildAreas) do
         local buildOffsets = template.BuildAreas[k]
-        local content = { }
-        for l = 1, table.getn(buildOffsets) do
+        local content = {}
+        for l = 1, TableGetn(buildOffsets) do
             local offset = buildOffsets[l]
-            content[l] = string.format("{ %.2f, %.2f }, ", offset[1], offset[2])
+            content[l] = StringFormat("{ %.2f, %.2f }, ", offset[1], offset[2])
         end
-        table.insert(lines, string.format("    { %s }, \r\n", table.concat(content, "")))
+        TableInsert(lines, StringFormat("    { %s }, \r\n", TableConcat(content, "")))
     end
-    table.insert(lines, "  }, \r\n")
-    table.insert(lines, "} \r\n")
+    TableInsert(lines, "  }, \r\n")
+    TableInsert(lines, "} \r\n")
 
-    return table.concat(lines, "")
+    return TableConcat(lines, "")
 end
