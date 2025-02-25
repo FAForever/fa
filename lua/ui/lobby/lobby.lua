@@ -3296,7 +3296,6 @@ function CreateUI(maxPlayers)
         GUI.OptionContainer:ScrollSetTop('Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
-
     GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Актуальный баланс")
     Tooltip.AddButtonTooltip(GUI.patchnotesButton, {text=LOC("Актуальный баланс GAF"), body=LOC("Кликни что-бы узнать про величайший баланс")})
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, 630)
@@ -3304,8 +3303,25 @@ function CreateUI(maxPlayers)
 	LayoutHelpers.SetWidth(GUI.patchnotesButton, 300)
     LayoutHelpers.SetHeight(GUI.patchnotesButton, 45)
     GUI.patchnotesButton.OnClick = function(self, event)
+	    OpenURL('http://gapforever2.github.io/patchnotes') 
         Changelog.Changelog(GUI)
     end
+	
+	
+	-- KickObs
+	
+	GUI.kickobs = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>KickObs")
+    Tooltip.AddButtonTooltip(GUI.kickobs, {text=LOC("KickObs"), body=LOC("Кикнуть всех обсов")})
+    LayoutHelpers.AtBottomIn(GUI.kickobs, GUI.optionsPanel, -95)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.kickobs, GUI.optionsPanel, -200)
+	LayoutHelpers.SetWidth(GUI.kickobs, 100)
+    LayoutHelpers.SetHeight(GUI.kickobs, 45)
+	UIUtil.setVisible(GUI.kickobs, isHost)
+    GUI.kickobs.OnClick = function(self, event)
+	    HostUtils.KickObservers("GameLaunched")
+    end
+	
+	
     -- Patchnotes Button
     GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Discord GAF")
     Tooltip.AddButtonTooltip(GUI.patchnotesButton, {text=LOC("Discord GAF"), body=LOC("Официальный дискорд GAPForever")})
@@ -4333,21 +4349,29 @@ function CreateUI(maxPlayers)
             local teams = {}
             local numTeams = 0
             for i, player in gameInfo.PlayerOptions:pairs() do
-                if not teams[player.Team] and player.Team != 1 then
-                    teams[player.Team] = 1
+                if not teams[player.Team] and player.Team ~= 1 then
+                    teams[player.Team] = true
                     numTeams = numTeams + 1
                 end
             end
             -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
             -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
             local obsIndex = row + 1
-            if numTeams < 3 then
-                obsIndex = obsIndex - numTeams
+            local maxObsIndex = self:GetItemCount()
+            -- adjust index by the number of rows taken up by team ratings. 
+            ---@see refreshObserverList
+            if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+                if numTeams < 3 then
+                    obsIndex = obsIndex - numTeams
+                else
+                    -- 3+ teams has ratings at the end of the list, don't allow kicking when clicking those rating rows
+                    maxObsIndex = maxObsIndex - numTeams
+                end
             end
 
             -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
             -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
-            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID ~= localPlayerID and obsIndex <= maxObsIndex then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                         "<LOC lobui_0167>Kick Player", function()
                                             SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
