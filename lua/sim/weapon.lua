@@ -404,14 +404,14 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param label string
+    ---@param label string # label of the aim controller that started tracking
     OnStartTracking = function(self, label)
         self:PlayWeaponSound('BarrelStart')
         self:PlayWeaponAmbientSound('BarrelLoop')
     end,
 
     ---@param self Weapon
-    ---@param label string
+    ---@param label string # label of the aim controller that stopped tracking
     OnStopTracking = function(self, label)
         self:PlayWeaponSound('BarrelStop')
         self:StopWeaponAmbientSound('BarrelLoop')
