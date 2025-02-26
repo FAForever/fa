@@ -275,7 +275,7 @@ UnitBlueprint{
             MaxRadius = 24,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 35,
+            MuzzleVelocity = 12,
             NotExclusive = true,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/CDFBolter02/CDFBolter02_proj.bp",
