@@ -232,7 +232,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             end
 
             if yawBone2 then
-                aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2, yawBone2)
+                aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2)
                 aimYaw2:SetPrecedence(precedence - 1)
                 if EntityCategoryContains(categories.STRUCTURE, unit) then
                     aimYaw2:SetResetPoseTime(9999999)
@@ -287,7 +287,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 end
 
                 local turretYawSpeed2 = bp.TurretDualYawSpeed or turretyawspeed
-                aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, turretpitchmin, turretpitchmax, turretpitchspeed)
+                aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, 0, 0, 0)
             end
         else
             local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: ' .. unit.UnitId
