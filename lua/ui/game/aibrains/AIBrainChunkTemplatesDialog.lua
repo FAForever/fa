@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local CategoryPreferences = {
+local TypePreferences = {
     categories.GATE,
     categories.FACTORY,
     categories.ENERGYPRODUCTION,
@@ -38,9 +38,9 @@ local CategoryPreferences = {
 --- Computes the category preference of the given blueprint
 ---@param unitBlueprint UnitBlueprint
 ---@return EntityCategory
-local function ComputeCategoryPreference(unitBlueprint)
+local function ComputeTypePreference(unitBlueprint)
     local unitId = unitBlueprint.BlueprintId
-    for _, category in CategoryPreferences do
+    for _, category in TypePreferences do
         if EntityCategoryContains(category, unitId) then
             return category
         end
