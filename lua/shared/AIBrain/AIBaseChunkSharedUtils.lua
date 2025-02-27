@@ -241,27 +241,55 @@ end
 
 --- Stringifies a building site into a syntax-wise valid Lua table.
 ---@param buildingSite AIBaseChunkBuildingSite
+---@return string   # stringified results
+---@return string   # type
+---@return string   # tech
 local function StringifyBuildingSite(buildingSite)
+    local stringifiedTechPreference = StringifyTechPreference(buildingSite.TechPreference)
+    local stringifiedTypePreference = StringifyTypePreference(buildingSite.TypePreference)
+
     return string.format(
         "{ TypePreference = %s, TechPreference = %s, OffsetX = %f, OffsetZ = %f, Size = %f }",
-        StringifyTypePreference(buildingSite.TypePreference),
-        StringifyTechPreference(buildingSite.TypePreference),
+        stringifiedTechPreference,
+        stringifiedTypePreference,
         buildingSite.OffsetX, buildingSite.OffsetZ, buildingSite.Size
-    )
+    ), stringifiedTypePreference, stringifiedTechPreference
 end
 
 --- Stringifies a base chunk into a syntax-wise valid Lua table.
 ---@param template AIBaseChunk
 function StringifyBaseChunk(template)
-    local lines = {}
-    TableInsert(lines, "BaseChunk = {\r\n")
-    TableInsert(lines, StringFormat("  Size = %d, \r\n", tostring(template.Size)))
-    TableInsert(lines, StringFormat("  BuildingSites = { \r\n", tostring(template.Size)))
-    for _, buildingSite in template.BuildingSites do
-        TableInsert(lines, StringFormat("    %s,\r\n", StringifyBuildingSite(buildingSite)))
-    end
-    TableInsert(lines, "  }, \r\n")
-    TableInsert(lines, "} \r\n")
 
-    return TableConcat(lines, "")
+    -- stringify template
+    local lines = {}
+    local typeCount = {}
+    local techCount = {}
+    TableInsert(lines, "BaseChunk = {")
+    TableInsert(lines, StringFormat("  Size = %d,", tostring(template.Size)))
+    TableInsert(lines, StringFormat("  BuildingSites = {", tostring(template.Size)))
+    for _, buildingSite in template.BuildingSites do
+        local stringifiedBuildingSite, type, tech = StringifyBuildingSite(buildingSite)
+        typeCount[type] = (typeCount[type] or 0) + 1
+        techCount[tech] = (techCount[tech] or 0) + 1
+        TableInsert(lines, StringFormat("      %s,", stringifiedBuildingSite))
+    end
+    TableInsert(lines, "    },")
+    TableInsert(lines, "}")
+
+    -- comments with meta data at the top
+    local comments = {}
+    TableInsert(comments, "-- Count per type:")
+    for type, count in typeCount do
+        TableInsert(comments, StringFormat("-- - %s: %d", type, count))
+    end
+    TableInsert(comments, "\r\n")
+
+    TableInsert(comments, "-- Count per tech:")
+    for tech, count in techCount do
+        TableInsert(comments, StringFormat("-- - %s: %d,", tech, count))
+    end
+    TableInsert(comments, "\r\n")
+
+    -- combine it all together
+    return TableConcat(comments, "\r\n") .. TableConcat(lines, "\r\n")
 end
