@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 local TableInsert = table.insert
-local VerifyChunkTemplate = import("/lua/shared/aichunktemplates.lua").VerifyChunkTemplate
+local VerifyBaseChunk = import("/lua/shared/AIBrain/AIBaseChunkSharedUtils.lua").VerifyBaseChunk
 
 --- Responsible for managing the available chunks of a brain.
 ---@class AIChunkBrainComponent
@@ -56,7 +56,7 @@ AIChunkTemplateBrainComponent = ClassSimple {
         end
 
         -- validity check
-        if not VerifyChunkTemplate(chunk) then
+        if not VerifyBaseChunk(chunk) then
             WARN(string.format("Invalid chunk: %s", modulePath))
             return 'ChunkIsInvalid'
         end
@@ -66,25 +66,23 @@ AIChunkTemplateBrainComponent = ClassSimple {
         TableInsert(self.ChunksBySize[chunk.Size], chunk)
     end,
 
-    --- Retrieves a random chunk of a given size.
+    --- Retrieves a random base chunk of a given chunk size.
     ---@param self AIChunkBrainComponent | moho.aibrain_methods
-    ---@param size number           # a number between 1 and 16
-    ---@return AIChunkTemplate?
+    ---@param chunkSize number           # a number between 1 and 16
+    ---@return AIBaseChunk?
     ---@return 'NoChunksOfSize' | 'InvalidInput' | nil
-    GetChunk = function(self, size)
-        if size < 1 or size > 16 then
-            return nil, 'InvalidInput'
-        end
+    GetChunkBySize = function(self, chunkSize)
+        -- todo
+        return nil
+    end,
 
-        local chunks = self.ChunksBySize[size]
-        if not chunks then
-            return nil, 'NoChunksOfSize'
-        end
-
-        if table.empty(chunks) then
-            return nil, 'NoChunksOfSize'
-        end
-
-        return table.random(chunks)
+    --- Retrieves a base chunk of a given chunk size that has at least one building site that has a type preference that matches the given unitId.
+    ---@param self AIChunkBrainComponent | moho.aibrain_methods
+    ---@param chunkSize number
+    ---@param unitId UnitId
+    ---@return AIBaseChunk?
+    GetChunkByUnitId = function(self, chunkSize, unitId, force)
+        -- todo 
+        return nil
     end,
 }
