@@ -389,6 +389,7 @@ local function OnGuardUpgrade(guardees, unit)
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH1, unit)
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 
     if upgradeRadarTech2 and
@@ -396,6 +397,7 @@ local function OnGuardUpgrade(guardees, unit)
         unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 
     -- check for mass extractors
@@ -406,6 +408,7 @@ local function OnGuardUpgrade(guardees, unit)
         EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * categories.TECH1, unit)
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 
     if upgradeExtractorTech2 and
@@ -413,6 +416,7 @@ local function OnGuardUpgrade(guardees, unit)
         unitBlueprint.Economy.ProductionPerSecondMass < unit:GetEconData().massProduced -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 end
 
