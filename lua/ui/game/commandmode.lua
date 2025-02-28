@@ -350,10 +350,17 @@ local function UpgradeUnit(unit)
         return
     end
 
+    -- verify build restrictions ui-side so sim doesn't log a warning
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandDataOfUnit(unit)
+    local unitUpgrade = unit:GetBlueprint().General.UpgradesTo
+    if not unitUpgrade or not EntityCategoryContains(buildableCategories, unitUpgrade) then
+        return
+    end
+
     -- issue the upgrade
     IssueBlueprintCommandToUnit(
         unit, "UNITCOMMAND_Upgrade",
-        unit:GetBlueprint().General.UpgradesTo,
+        unitUpgrade,
         1, true
     )
 
