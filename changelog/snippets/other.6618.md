@@ -80,7 +80,7 @@
 
     </details>
     
-  [Map Selection](lua/ui/dialogs/mapselect.lua):
+  [Map Selection](/lua/ui/dialogs/mapselect.lua):
 
   - <details><summary>Add a LOC function to properly translate Map name:</summary>
 
