@@ -11,14 +11,13 @@
   "Lua.workspace.checkThirdParty": false,
   "Lua.runtime.path": ["/?"],
   "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
-  "Lua.workspace.ignoreDir": [".vscode", "loc/*", "*.bp", "lua", "engine", "units", "projectiles"],
+  "Lua.workspace.ignoreDir": [".vscode", "loc", "*.bp"],
   "[lua]": {
     "editor.wordBasedSuggestions": "off"
   },
   "files.associations": {
     "*.bp": "lua"
   },
-  "Lua.misc.parameters": ["--develop=true"],
   "Lua.completion.requireSeparator": "/",
   "Lua.diagnostics.enable": true,
   "Lua.runtime.pathStrict": false,

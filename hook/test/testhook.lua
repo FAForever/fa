@@ -1,3 +1,0 @@
-
-require("/test/testhook.lua")
-
