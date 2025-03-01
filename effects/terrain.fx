@@ -2594,7 +2594,8 @@ float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     if (halfRange) {
         mask0 = saturate(mask0 * 2 - 1);
-        mask1 = saturate(mask1 * 2 - 1);
+        // Don't touch the roughness mask
+        mask1.xyz = saturate(mask1.xyz * 2 - 1);
     }
 
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
@@ -2780,7 +2781,8 @@ float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     if (halfRange) {
         mask0 = saturate(mask0 * 2 - 1);
-        mask1 = saturate(mask1 * 2 - 1);
+        // Don't touch the roughness mask
+        mask1.xyz = saturate(mask1.xyz * 2 - 1);
     }
 
     // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
@@ -2969,7 +2971,8 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     if (halfRange) {
         mask0 = saturate(mask0 * 2 - 1);
-        mask1 = saturate(mask1 * 2 - 1);
+        // Don't touch the roughness mask
+        mask1.xyz = saturate(mask1.xyz * 2 - 1);
     }
 
     // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
