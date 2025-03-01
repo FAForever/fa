@@ -79,6 +79,17 @@
       ```
 
     </details>
+    
+  [Map Selection](lua/ui/dialogs/mapselect.lua):
+
+  - <details><summary>Add a LOC function to properly translate Map name:</summary>
+
+    ```
+    if scen.name then
+        description:AddItem(LOC(scen.name))
+    ```
+
+    </details>
 
   [Unit Description](lua/ui/game/unitviewDetail.lua):
 
