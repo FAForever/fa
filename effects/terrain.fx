@@ -2737,6 +2737,14 @@ float4 Terrain200NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, rotated_pos * Stratum6AlbedoTile.xy).rgb * 2 - 1);
 
+    // We need to rotate the normal vectors back.
+    // I thought we would have to flip the multiplication order,
+    // compared to the uv rotation, but empirically this is correct.
+    stratum0Normal.xy = mul(stratum0Normal.xy, rotationMatrix);
+    stratum2Normal.xy = mul(stratum2Normal.xy, rotationMatrix);
+    stratum4Normal.xy = mul(stratum4Normal.xy, rotationMatrix);
+    stratum6Normal.xy = mul(stratum6Normal.xy, rotationMatrix);
+
     float stratum0Height = sampleHeight(rotated_pos, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position.xy, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, float2(0.0, 0.5), true);
     float stratum2Height = sampleHeight(rotated_pos, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, float2(0.5, 0.5), true);
@@ -2908,6 +2916,11 @@ float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, rotated_pos * Stratum4AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, rotated_pos * Stratum6AlbedoTile.xy).rgb * 2 - 1);
+
+    // we need to rotate the normal vectors back
+    stratum0Normal.xy = mul(stratum0Normal.xy, rotationMatrix);
+    stratum4Normal.xy = mul(stratum4Normal.xy, rotationMatrix);
+    stratum6Normal.xy = mul(stratum6Normal.xy, rotationMatrix);
 
     float stratum0Height = sampleHeight(rotated_pos, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position.xy, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, float2(0.0, 0.5), true);
