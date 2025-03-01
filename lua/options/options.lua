@@ -636,7 +636,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_heavy_artillery_title>Assist to cap end game artillery with power",
+                title = "<LOC structure_ringing_end_artillery_title>Assist to cap end game artillery with power",
                 key = 'structure_ringing_artillery_end_game',
                 type = 'toggle',
                 default = "on",
