@@ -1,5 +1,7 @@
+---@declare-global
+
 --******************************************************************************************************
---** Copyright (c) 2024 FAForever
+--** Copyright (c) 2024 Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +22,22 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----------------------------------------------------------------------------
---#region Workflow automation
+do
+    local DebugAllocatedSize = debug.allocatedsize
+    local oldInternalSaveGame = _G.InternalSaveGame
 
--- The following fields are overwritten when a deployment happens. See also:
--- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml
--- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml
--- - https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml
+    --- Hook to fix a buffer overflow security issue in the engine
+    ---@param filename string
+    _G.InternalSaveGame = function(filename, friendlyFilename, onCompletionCallback)
+        local characterLimit = 100
+        if DebugAllocatedSize(filename) > characterLimit then
+            filename = filename:sub(1, characterLimit)
+        end
 
-local GameType = 'unknown'  -- The use of `'` instead of `"` is **intentional**
+        if DebugAllocatedSize(friendlyFilename) > characterLimit then
+            friendlyFilename = friendlyFilename:sub(1, characterLimit)
+        end
 
-local Commit = 'unknown'    -- The use of `'` instead of `"` is **intentional**
-
---#endregion
-
-local Version = "3819"
----@alias PATCH "3819"
----@alias VERSION "1.5.3819"
----@return PATCH    # Game release
-function GetVersion()
-    LOG(string.format('Supreme Commander: Forged Alliance Lua version %s at %s (%s)', Version, GameType, Commit))
-    return Version
-end
-
----@return PATCH
----@return string # game type
----@return string # commit hash
-function GetVersionData()
-    return Version, GameType, Commit
+        return oldInternalSaveGame(filename, friendlyFilename, onCompletionCallback)
+    end
 end

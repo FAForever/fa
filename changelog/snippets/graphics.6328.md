@@ -1,1 +1,0 @@
-- (#6328) Speed up the death animations of some Seraphim structures: T1 land factories, T2/T3 land support factories, T3 land HQ, air staging, T2/T3 anti-air, T2/T3 radars, and T3 artillery.

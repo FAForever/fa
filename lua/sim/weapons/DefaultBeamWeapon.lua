@@ -1,4 +1,3 @@
-
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
@@ -6,6 +5,8 @@ local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 ---@field DisableBeamThreadInstance? thread
 ---@field Beams { Beam: CollisionBeam, Muzzle: string, Destroyables: table}[]
 ---@field BeamStarted boolean
+---@field HoldFireThread? thread # deprecated
+---@field ContBeamOn? boolean
 DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
@@ -33,12 +34,12 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
-                local beam
-                beam = self.BeamType {
+                ---@type CollisionBeam
+                local beam = self.BeamType {
                     Weapon = self,
                     BeamBone = 0,
                     OtherBone = muzzle,
-                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- Why is this multiplied by 10? IceDreamer
+                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
                 }
                 local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
                 table.insert(self.Beams, beamTable)
@@ -108,13 +109,14 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- enable the beam
         beam:Enable()
 
-        -- non-continious beams that just end
+        -- non-continuous beams that just end
         if bp.BeamLifetime > 0 then
             self:ForkThread(self.BeamLifetimeThread, beam, bp.BeamLifetime or 1)
         end
 
-        -- continious beams
+        -- continuous beams
         if bp.BeamLifetime == 0 then
+            ---@diagnostic disable-next-line: deprecated
             self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)
         end
 
@@ -243,6 +245,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     -- Weapon States Section
 
     IdleState = State(DefaultProjectileWeapon.IdleState) {
+        ---@param self DefaultBeamWeapon
         Main = function(self)
             DefaultProjectileWeapon.IdleState.Main(self)
             self:PlayFxBeamEnd()
@@ -251,6 +254,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     },
 
     WeaponPackingState = State(DefaultProjectileWeapon.WeaponPackingState) {
+        ---@param self DefaultBeamWeapon
         Main = function(self)
             local bp = self.Blueprint
             if bp.BeamLifetime > 0 then
@@ -269,6 +273,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     end,
 
     RackSalvoFireReadyState = State(DefaultProjectileWeapon.RackSalvoFireReadyState) {
+        ---@param self DefaultBeamWeapon
         Main = function(self)
             if not self:EconomySupportsBeam() then
                 self:PlayFxBeamEnd()

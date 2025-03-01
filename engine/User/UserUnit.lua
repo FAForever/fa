@@ -127,7 +127,7 @@ end
 function UserUnit:GetBuildRate()
 end
 
---- Returns a table of commands
+--- Returns a table of commands. If the unit has the `FACTORY` category, returns the rally point command queue.
 ---@return UICommandInfo[]
 function UserUnit:GetCommandQueue()
 end
