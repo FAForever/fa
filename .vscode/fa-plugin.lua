@@ -26,5 +26,15 @@ function OnSetText(uri, text)
             text = '--'
         }
     end
+    -- Change `{&1 &1}` (valid Supcom Lua) to `{}` (valid in language server's lua)
+    -- It's changed inside comments too, but lua regex doesn't make that easy to fix.
+    for start, finish in (text):gmatch('(){&%d+ &%d+}()') do
+        diffs[#diffs + 1] = {
+            start = start,
+            finish = finish - 1,
+            text = '{}',
+        }
+    end
+
     return diffs
 end
