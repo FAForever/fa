@@ -1787,36 +1787,40 @@ technique LowFidelityLighting
 /* # Blending techniques # */
 
 float splatLerp(float t1, float t2, float t2height, float opacity, uniform float blurriness) {
-    float height1 = 1;
-    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
-    float ma = max(height1, height2) - blurriness;
-    float factor1 = max(height1 - ma, 0);
-    float factor2 = max(height2 - ma, 0);
-    return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
+    // We need to increase the contrast of the height
+    float height2 = (1.6 * (t2height * (1 - 2 * blurriness) + blurriness) - 0.3) + opacity;
+    float threshold = max(1, height2) - blurriness;
+    float factor = 0;
+    if (opacity > 0) {
+        factor = (opacity >= 1) ? 1 : max(height2 - threshold, 0) / blurriness;
+    }
+    return lerp(t1, t2, factor);
 }
 
 float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.06) {
-    float height1 = 1;
-    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
-    float ma = max(height1, height2) - blurriness;
-    float factor1 = max(height1 - ma, 0);
-    float factor2 = max(height2 - ma, 0);
-    return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
+    // We need to increase the contrast of the height
+    float height2 = (1.6 * (t2height * (1 - 2 * blurriness) + blurriness) - 0.3) + opacity;
+    float threshold = max(1, height2) - blurriness;
+    float factor = 0;
+    if (opacity > 0) {
+        factor = (opacity >= 1) ? 1 : max(height2 - threshold, 0) / blurriness;
+    }
+    return lerp(t1, t2, factor);
 }
 
 float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.06) {
-    float height1 = 1;
-    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
-    float ma = max(height1, height2) - blurriness;
-    float factor1 = max(height1 - ma, 0);
-    float factor2 = max(height2 - ma, 0);
-    // These factors are to make low opacity normal maps more visible,
+    float height2 = (1.6 * (t2height * (1 - 2 * blurriness) + blurriness) - 0.3) + opacity;
+    float threshold = max(1, height2) - blurriness;
+    float factor = 0;
+    if (opacity > 0) {
+        factor = (opacity >= 1) ? 1 : max(height2 - threshold, 0) / blurriness;
+    }
+    // This modification is to make low opacity normal maps more visible,
     // as we notice small changes to the albedo maps more easily.
-    // The value of 0.5 is just eyeballed.
-    float factor1modified = pow(factor1 / (factor1 + factor2), 0.6);
-    float factor2modified = pow(factor2 / (factor1 + factor2), 0.6);
+    // The value of 0.6 is just eyeballed.
+    float factormodified = pow(factor, 0.6);
     // UDN blending
-    return normalize(float3((n1.xy * factor1modified + n2.xy * factor2modified), n1.z));
+    return normalize(float3((n1.xy * (1 - factormodified) + n2.xy * factormodified), n1.z));
 }
 
 /* # Sample a 2D 2x2 texture atlas # */
@@ -1824,8 +1828,8 @@ float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uni
 float4 atlas2D(sampler2D s, float2 uv, uniform float2 offset) {
     // We need to manually provide the derivatives to prevent seams.
     // See https://forum.unity.com/threads/tiling-textures-within-an-atlas-by-wrapping-uvs-within-frag-shader-getting-artifacts.535793/
-    float2 uv_ddx = ddx(uv) / 4;
-    float2 uv_ddy = ddy(uv) / 4;
+    float2 uv_ddx = ddx(uv) / 8;
+    float2 uv_ddy = ddy(uv) / 8;
     uv.x = frac(uv.x) / 4 + offset.x + 0.125;
     uv.y = frac(uv.y) / 4 + offset.y + 0.125;
     return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
