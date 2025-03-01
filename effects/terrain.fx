@@ -348,23 +348,24 @@ bool ShaderUsesTerrainInfoTexture() {
     // The tile value basically says how often the texture gets repeated on the map.
     // A value less than one doesn't make sense under normal conditions, so it is
     // relatively save to use it as our switch.
-    // We use the upper layer slot to store the terrain info texture, so we don't need
+    // We use the stratum 7 albedo slot to store the terrain info texture, so we don't need
     // the tile value for anything else.
 
     // In order to trigger this you need to set the albedo scale to be bigger than the 
-    // map size in the editor. Use the value 10000 to be safe for any map
-    return UpperAlbedoTile.x < 1.0;
+    // map size in ogrids in the editor. For example a scale of 1024 for a 10km map (which has
+    // a size of 512 ogrids) produces a tile value of 0.5.
+    return Stratum7AlbedoTile.x < 1.0;
 }
 
 bool ShaderUsesPbrRendering() {
-    // The tile value basically says how often the texture gets repeated on the map.
-    // A value less than one doesn't make sense under normal conditions, so it is
-    // relatively save to use it as our switch.
-    // We use the stratum 7 normal slot to store the roughness texture, so we don't need
+    // We use the upper layer slot to store the roughness texture, so we don't need
     // the tile value for anything else.
+    return UpperAlbedoTile.x < 1.0;
+}
 
-    // In order to trigger this you need to set the normal scale to be bigger than the 
-    // map size in the editor. Use the value 10000 to be safe for any map
+bool UseMapNormalFromTexture() {
+    // We use the stratum 7 normal slot to store the map normals, so we don't need
+    // the tile value for anything else.
     return Stratum7NormalTile.x < 1.0;
 }
 
@@ -443,7 +444,7 @@ float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo,
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow(shadowCoords) : 1;
     if (ShaderUsesTerrainInfoTexture()) {
         float3 position = TerrainScale * worldTerrain;
-        float terrainShadow = tex2D(UpperAlbedoSampler, position.xy).w;
+        float terrainShadow = tex2D(Stratum7AlbedoSampler, position.xy).g;
         shadow = shadow * terrainShadow;
     }
 
@@ -509,7 +510,7 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness, float waterD
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float terrainShadow = tex2D(UpperAlbedoSampler, TerrainScale * inV.mTexWT).w; // 1 where sun is, 0 where shadow is
+        float terrainShadow = tex2D(Stratum7AlbedoSampler, TerrainScale * inV.mTexWT).g; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
         shadow *= terrainShadow;
     }
@@ -849,9 +850,9 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    if (ShaderUsesTerrainInfoTexture()) {
+    if (UseMapNormalFromTexture()) {
         float4 position = TerrainScale * inV.mTexWT;
-        result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
+        result = (float4(1, 1, tex2D(Stratum7NormalSampler, position.xy).ag));
     } else {
         float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
         float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
@@ -1832,7 +1833,7 @@ float4 atlas2D(float2 uv, uniform float2 offset) {
     float2 uv_ddy = ddy(uv) / 8;
     uv.x = frac(uv.x) / 4 + offset.x + 0.125;
     uv.y = frac(uv.y) / 4 + offset.y + 0.125;
-    return tex2Dgrad(Stratum7NormalSampler, uv, uv_ddx, uv_ddy);
+    return tex2Dgrad(UpperAlbedoSampler, uv, uv_ddx, uv_ddy);
 }
 
 float3 sampleNormal(sampler2D s, float2 position, uniform float2 scale, float mask) {
@@ -2072,7 +2073,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 //    }
 //}
 
-// Naming Conventions:
+// == Naming Conventions ==
 // Terrain0XX for shaders using legacy specularity calculations
 // Terrain1XX for shaders using PBR roughness
 // Terrain2XX for shaders using PBR roughness and advanced splatting
@@ -2083,25 +2084,57 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 // TerrainXX0 for the "default" experience, last digit can be used for variations
 // Append a "B" to the name, if the shader uses Biplanar mapping.
 
+
+// == Layout ==
+//
+// Layer| Albedo stratum                                               | Normal stratum
+//      | R           | G             | B            | A               | R              | G         | B              | A         |
+//  ----            ---             ---             ---              ---              ---         ---              ---         ---
+// | U  | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | 
+//  ----            ---             ---             ---              ---              ---         ---              ---         ---
+// | S7 | amb. occl.    shadow          shadow (copy)  water depth     | normal.z (copy)  normal.z    normal.z (copy)  normal.x  |
+// | S6 | R             G               B              unused          | X                Y           Z                unused    |
+// | S5 | R             G               B              unused          | X                Y           Z                unused    |
+// | S4 | R             G               B              unused          | X                Y           Z                unused    |
+//  ----            ---             ---            ---               ---              ---         ---              ---         ---
+// | S3 | R             G               B              unused          | X                Y           Z                unused    |
+// | S2 | R             G               B              unused          | X                Y           Z                unused    |
+// | S1 | R             G               B              unused          | X                Y           Z                unused    |
+// | S0 | R             G               B              unused          | X                Y           Z                unused    |
+//  ----            ---             ---             ---              ---              ---         ---              ---         ---
+// | L  | R             G               B              unused/opacity  | X                Y           Z                unused    |
+
+// The texture slots in S7 and U are consistent in all following shaders unless explicitly noted.
+// This greatly reduces the effort to change the shader on a map.
+// The copied channels are to allow compressing the textures while minimizing compression artifacts.
+
+// The alpha channels of regular strata are mostly unused because there is no real use case for the normals
+// and the GPG albedo textures already have varying alpha values for the TTerrain and TTerrainXP shaders.
+// If we repurposed the alpha channel, it would make it very difficult to use GPG textures without having
+// to adjust their alpha channel. Fiddling with the alpha channel in an image editor is always a pain, so
+// it's best if we don't need it. The base layer sometimes serves as a macrotexture, then the alpha channel
+// is relevant.
+
 // ----------------------------------------------------------------------------
 //#region TTerrainXPExt, Terrain000 and Terrain050
 
-// Layer| Albedo stratum                                               | Normal stratum
-//      | R           | G             | B            | A               | R             | G             | B             | A            |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | L  | R             G               B              specularity     | X               Y               Z               unused       |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | S0 | R             G               B              specularity     | X               Y               Z               unused       |
-// | S1 | R             G               B              specularity     | X               Y               Z               unused       |
-// | S2 | R             G               B              specularity     | X               Y               Z               unused       |
-// | S3 | R             G               B              specularity     | X               Y               Z               unused       |
-//  ----            ---             ---            ---               ---             ---             ---             ---            ---
-// | S4 | R             G               B              specularity     | X               Y               Z               unused       |
-// | S5 | R             G               B              specularity     | X               Y               Z               unused       |
-// | S6 | R             G               B              specularity     | X               Y               Z               unused       |
-// | S7 | R             G               B              specularity     | X               Y               Z               unused       |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        waterDepth     shadow          | 
+// Changes from default layout:
+// Layer| Albedo stratum                                                      |
+//      | R               | G               | B               | A             |
+//  ----
+// | U  | macrotexture.r    macrotexture.g    macrotexture.b    opacity       | 
+//  ----                ---               ---                ---           ---  
+
+// | S6 | R                 G                 B                 specularity   |
+// | S5 | R                 G                 B                 specularity   |
+// | S4 | R                 G                 B                 specularity   |
+//  ----                ---               ---                ---            ---
+// | S3 | R                 G                 B                 specularity   |
+// | S2 | R                 G                 B                 specularity   |
+// | S1 | R                 G                 B                 specularity   |
+// | S0 | R                 G                 B                 specularity   |
+//  ----                ---               ---                ---           ---
+// | L  | R                 G                 B                 specularity   |
 
 // These shaders are similar to the usual TTerrainXP shader. They
 // are designed as a drop-in replacement that solely introduce the map-wide
@@ -2126,7 +2159,7 @@ float4 Terrain000NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
     // - x = stratum layer 4
     // - y = stratum layer 5
     // - z = stratum layer 6
-    // - w = stratum layer 7
+    // - w = unused
     float4 mask1 = tex2D(UtilitySamplerB, coordinates);
 
     if (halfRange) {
@@ -2134,7 +2167,6 @@ float4 Terrain000NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    // these normals are pre-baked on top of the terrain
     float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx)    * 2 - 1);
     float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, coordinates * Stratum0NormalTile.xx) * 2 - 1);
     float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, coordinates * Stratum1NormalTile.xx) * 2 - 1);
@@ -2143,9 +2175,7 @@ float4 Terrain000NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
     float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, coordinates * Stratum4NormalTile.xx) * 2 - 1);
     float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, coordinates * Stratum5NormalTile.xx) * 2 - 1);
     float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, coordinates * Stratum6NormalTile.xx) * 2 - 1);
-    float4 stratum7Normal = normalize(tex2D(Stratum7NormalSampler, coordinates * Stratum7NormalTile.xx) * 2 - 1);
 
-    // blend the normals
     float4 normal = lowerNormal;
     normal = normalize(lerp(normal,stratum0Normal,mask0.x));
     normal = normalize(lerp(normal,stratum1Normal,mask0.y));
@@ -2154,7 +2184,6 @@ float4 Terrain000NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
     normal = normalize(lerp(normal,stratum4Normal,mask1.x));
     normal = normalize(lerp(normal,stratum5Normal,mask1.y));
     normal = normalize(lerp(normal,stratum6Normal,mask1.z));
-    normal = normalize(lerp(normal,stratum7Normal,mask1.w));
 
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
@@ -2172,7 +2201,7 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     // - x = stratum layer 4
     // - y = stratum layer 5
     // - z = stratum layer 6
-    // - w = stratum layer 7
+    // - w = unused
     float4 mask1 = tex2D(UtilitySamplerB, coordinates.xy);
 
     if (halfRange) {
@@ -2180,31 +2209,25 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    // x = normals-x
-    // y = normals-z
-    // z = water depth
-    // w = shadows
-    float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float terrainShadow = terrainInfo.w;
-    float waterDepth = terrainInfo.b;
+    float4 terrainInfo = tex2D(Stratum7AlbedoSampler, coordinates.xy);
+    float terrainShadow = terrainInfo.g;
+    float waterDepth = terrainInfo.a;
 
     // disable shadows when game settings tell us to
-    if (0 == ShadowsEnabled) {
+    if (ShadowsEnabled == 0) {
         terrainShadow = 1.0f;
     }
 
-    // sample the albedo's
-    float4 lowerAlbedo    = tex2Dproj(LowerAlbedoSampler,    coordinates * LowerAlbedoTile);
-    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler, coordinates * Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler, coordinates * Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler, coordinates * Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler, coordinates * Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler, coordinates * Stratum4AlbedoTile);
-    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler, coordinates * Stratum5AlbedoTile);
-    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler, coordinates * Stratum6AlbedoTile);
-    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler, coordinates * Stratum7AlbedoTile);
+    float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    coordinates * LowerAlbedoTile);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, coordinates * Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, coordinates * Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, coordinates * Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, coordinates * Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, coordinates * Stratum4AlbedoTile);
+    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, coordinates * Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, coordinates * Stratum6AlbedoTile);
+    float4 upperAlbedo    = tex2D(UpperAlbedoSampler,    coordinates * UpperAlbedoTile);
 
-    // blend the albedo
     float4 albedo = lowerAlbedo;
     albedo = lerp(albedo,stratum0Albedo,mask0.x);
     albedo = lerp(albedo,stratum1Albedo,mask0.y);
@@ -2213,7 +2236,7 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo,stratum4Albedo,mask1.x);
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
-    albedo = lerp(albedo,stratum7Albedo,mask1.w);
+    albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
@@ -2235,24 +2258,6 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo.rgb = ApplyWaterColor(-inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
-}
-
-/* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
-   # textures.                                                   #
-   # It is designed to be a drop-in replacement for TTerrainXP.  # */
-technique TTerrainXPExt <
-    string usage = "composite";
-    string normals = "TTerrainNormalsXP";
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain000AlbedoPS(true);
-    }
 }
 
 technique Terrain000Normals
@@ -2279,6 +2284,21 @@ technique Terrain000 <
 
         VertexShader = compile vs_1_1 TerrainVS(true);
         PixelShader = compile ps_2_a Terrain000AlbedoPS(false);
+    }
+}
+
+technique TTerrainXPExt <
+    string usage = "composite";
+    string normals = "Terrain000Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain000AlbedoPS(true);
     }
 }
 
@@ -2314,22 +2334,15 @@ technique Terrain050 <
 // ----------------------------------------------------------------------------
 //#region Terrain001 and Terrain051
 
-// Layer| Albedo stratum                                               | Normal stratum
-//      | R           | G             | B            | A               | R             | G             | B             | A            |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | L  | R             G               B              unused          | X               Y               Z               unused       |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | S0 | R             G               B              unused          | X               Y               Z               unused       |
-// | S1 | R             G               B              unused          | X               Y               Z               unused       |
-// | S2 | R             G               B              unused          | X               Y               Z               unused       |
-// | S3 | R             G               B              unused          | X               Y               Z               unused       |
-//  ----            ---             ---            ---               ---             ---             ---             ---            ---
-// | S4 | R             G               B              unused          | X               Y               Z               unused       |
-// | S5 | R             G               B              unused          | X               Y               Z               unused       |
-// | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | albedo.r      albedo.g        albedo.b       transparency    | specular.r      specular.g      specular.b      specular sharpness  |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        unused         shadow  | 
+// Changes from default layout:
+// Layer| Albedo stratum                                                      |
+//      | R             | G             | B             | A                   |
+//  ----
+// | U  | specular.r      specular.g      specular.b      specular sharpness  |
+
+// This shader uses UDN blending for the normals. The lower albedo shows up as
+// base layer and gets blended on top of everything again according to its alpha.
+// The specularity texture allows fine control over the specularity of the map.
 
 float4 UDNBlending(float4 n1, float4 n2, float factor) {
     n2.xy *= factor;
@@ -2357,7 +2370,6 @@ float4 Terrain001NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    // these normals are pre-baked on top of the terrain
     float4 base =           normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx   ) * 2 - 1);
     float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, coordinates * Stratum0NormalTile.xx) * 2 - 1);
     float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, coordinates * Stratum1NormalTile.xx) * 2 - 1);
@@ -2367,7 +2379,6 @@ float4 Terrain001NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
     float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, coordinates * Stratum5NormalTile.xx) * 2 - 1);
     float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, coordinates * Stratum6NormalTile.xx) * 2 - 1);
 
-    // blend the normals
     float4 normal = base;
     normal = UDNBlending(normal,stratum0Normal,mask0.x);
     normal = UDNBlending(normal,stratum1Normal,mask0.y);
@@ -2401,12 +2412,12 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    // x = normals-x
-    // y = normals-z
-    // z = unused
-    // w = shadows
-    float4 terrainInfo = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float terrainShadow = terrainInfo.w;
+    // x = ambient occlusion
+    // y = shadows
+    // z = shadows
+    // w = water depth
+    float4 terrainInfo = tex2D(Stratum7AlbedoSampler, coordinates.xy);
+    float terrainShadow = terrainInfo.g;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
@@ -2417,7 +2428,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     // y = specular green
     // z = specular blue
     // w = specular sharpness
-    float4 mapSpecular = tex2D(Stratum7NormalSampler, coordinates.xy);
+    float4 mapSpecular = tex2D(UpperAlbedoSampler, coordinates.xy);
 
     // sample the albedos
     float4 lowerAlbedo =    tex2D(LowerAlbedoSampler,    coordinates * LowerAlbedoTile.xx);
@@ -2428,7 +2439,6 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, coordinates * Stratum4AlbedoTile.xx);
     float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, coordinates * Stratum5AlbedoTile.xx);
     float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, coordinates * Stratum6AlbedoTile.xx);
-    float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, coordinates * Stratum7AlbedoTile.xx);
 
     // blend the albedo
     float4 albedo = lowerAlbedo;
@@ -2438,9 +2448,10 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo, stratum3Albedo, mask0.w);
     albedo = lerp(albedo, stratum4Albedo, mask1.x);
     albedo = lerp(albedo, stratum5Albedo, mask1.y);
+    albedo = lerp(albedo, stratum6Albedo, mask1.z);
 
     // blend macrotexture
-    albedo = lerp(albedo, stratum7Albedo, stratum7Albedo.w);
+    albedo = lerp(albedo, lowerAlbedo, lowerAlbedo.w);
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; 
@@ -2527,25 +2538,8 @@ technique Terrain051 <
 
 // ----------------------------------------------------------------------------
 //#region Terrain100
-// These shaders use roughness maps for PBR rendering
 
-// Layer| Albedo stratum                                               | Normal stratum
-//      | R           | G             | B            | A               | R             | G             | B             | A            |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | L  | R             G               B              unused          | X               Y               Z               unused       |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | S0 | R             G               B              unused          | X               Y               Z               unused       |
-// | S1 | R             G               B              unused          | X               Y               Z               unused       |
-// | S2 | R             G               B              unused          | X               Y               Z               unused       |
-// | S3 | R             G               B              unused          | X               Y               Z               unused       |
-//  ----            ---             ---            ---               ---             ---             ---             ---            ---
-// | S4 | R             G               B              unused          | X               Y               Z               unused       |
-// | S5 | R             G               B              unused          | X               Y               Z               unused       |
-// | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        waterDepth     shadow          | 
-//  ----
+// These shaders use PBR rendering.
 // The normal map scales are controlled by the albedo scales to ensure that they use the same values.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 
@@ -2582,7 +2576,7 @@ float4 Terrain100NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
+float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
 {
     float2 position = TerrainScale * inV.mTexWT;
 
@@ -2615,13 +2609,18 @@ float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo,stratum4Albedo,mask1.x);
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
-    float4 macrotexture = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
-    albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
+    if (macrotextureblend == 1) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
+    } else if (macrotextureblend == 2) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo.rgb = lerp(albedo.rgb, 2 * macrotexture.rgb * albedo.rgb, macrotexture.a);
+    }
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
 
-    float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position.xy).a;
     float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
@@ -2651,7 +2650,7 @@ technique Terrain100 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain100AlbedoPS(false);
+        PixelShader = compile ps_2_a Terrain100AlbedoPS(false, 0);
     }
 }
 
@@ -2678,7 +2677,7 @@ technique Terrain150 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain100AlbedoPS(true);
+        PixelShader = compile ps_2_a Terrain100AlbedoPS(true, 0);
     }
 }
 
@@ -2687,25 +2686,8 @@ technique Terrain150 <
 
 // ----------------------------------------------------------------------------
 //#region Terrain200
-// These shaders use roughness maps for PBR rendering and height maps for texture splatting
 
-// Layer| Albedo stratum                                               | Normal stratum
-//      | R           | G             | B            | A               | R             | G             | B             | A            |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | L  | R             G               B              unused          | X               Y               Z               unused       |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | S0 | R             G               B              unused          | X               Y               Z               unused       |
-// | S1 | R             G               B              unused          | X               Y               Z               unused       |
-// | S2 | R             G               B              unused          | X               Y               Z               unused       |
-// | S3 | R             G               B              unused          | X               Y               Z               unused       |
-//  ----            ---             ---            ---               ---             ---             ---             ---            ---
-// | S4 | R             G               B              unused          | X               Y               Z               unused       |
-// | S5 | R             G               B              unused          | X               Y               Z               unused       |
-// | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
-//  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        waterDepth     shadow          | 
-//  ----
+// These shaders use PBR rendering and height maps for texture splatting. UDN blending is used for the normals.
 // The normal map scales are controlled by the albedo scales to ensure that they use the same values.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 // Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
@@ -2766,7 +2748,7 @@ float4 Terrain200NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
+float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
 {
     float2 position = TerrainScale * inV.mTexWT;
     // 30° rotation
@@ -2811,13 +2793,18 @@ float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
-    float4 macrotexture = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
-    albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
+    if (macrotextureblend == 1) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
+    } else if (macrotextureblend == 2) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo.rgb = lerp(albedo.rgb, 2 * macrotexture.rgb * albedo.rgb, macrotexture.a);
+    }
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
     
-    float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position.xy).a;
     float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
@@ -2847,7 +2834,7 @@ technique Terrain200 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain200AlbedoPS(false);
+        PixelShader = compile ps_2_a Terrain200AlbedoPS(false, 0);
     }
 }
 
@@ -2874,29 +2861,12 @@ technique Terrain250 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain200AlbedoPS(true);
-    }
-}
-
-// This is a remenant of the old naming scheme. The random map generator
-// Uses this shader, so we need to keep it for compatibility.
-technique Terrain301 <
-    string usage = "composite";
-    string normals = "Terrain250Normals";
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain200AlbedoPS(true);
+        PixelShader = compile ps_2_a Terrain200AlbedoPS(true, 0);
     }
 }
 
 // Stratum2 and Stratum3 use biplanar mapping to improve cliff texturing
-float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
+float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
 {
     // height is now in the z coordinate
     float3 position = TerrainScale.xxx * inV.mTexWT;
@@ -2930,7 +2900,7 @@ float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
     float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
-    float2 terrainNormal = tex2D(UpperAlbedoSampler, position.xy).xy * 2 - 1;
+    float2 terrainNormal = tex2D(Stratum7NormalSampler, position.xy).xy * 2 - 1;
     float2 blendWeights = pow(abs(terrainNormal), 3);
     blendWeights = blendWeights / (blendWeights.x + blendWeights.y);
 
@@ -2989,7 +2959,7 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
     float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
-    float2 terrainNormal = tex2D(UpperAlbedoSampler, position.xy).xy * 2 - 1;
+    float2 terrainNormal = tex2D(Stratum7NormalSampler, position.xy).xy * 2 - 1;
     float2 blendWeights = pow(abs(terrainNormal), 3);
     blendWeights = blendWeights / (blendWeights.x + blendWeights.y);
 
@@ -3011,13 +2981,18 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
-    float4 macrotexture = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
-    albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
+    if (macrotextureblend == 1) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
+    } else if (macrotextureblend == 2) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo.rgb = lerp(albedo.rgb, 2 * macrotexture.rgb * albedo.rgb, macrotexture.a);
+    }
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
     
-    float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position.xy).a;
     float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
@@ -3047,7 +3022,7 @@ technique Terrain200B <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain200BAlbedoPS(false);
+        PixelShader = compile ps_2_a Terrain200BAlbedoPS(false, 0);
     }
 }
 
@@ -3074,7 +3049,7 @@ technique Terrain250B <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain200BAlbedoPS(true);
+        PixelShader = compile ps_2_a Terrain200BAlbedoPS(true, 0);
     }
 }
 
