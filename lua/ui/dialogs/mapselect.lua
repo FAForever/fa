@@ -966,7 +966,7 @@ function SetDescription(scen)
     local errors = false
     description:DeleteAllItems()
     if scen.name then
-        description:AddItem(scen.name)
+        description:AddItem(LOC(scen.name))
     else
         description:AddItem(LOC("<LOC map_select_0006>No Scenario Name"))
         errors = true
