@@ -146,7 +146,7 @@ Tooltips = {
     },
     dock = {
         title = "<LOC tooltipui0425>Dock",
-        description = "<LOC tooltipui0477>Recall aircraft to nearest air staging facility for refueling and repairs",
+        description = "<LOC tooltipui0477>Recall aircraft to nearest air staging facility for refueling and repairs. Right-click to only recall aircraft below 90% health.",
         keyID = "dock",
     },
     deploy = {

@@ -131,7 +131,7 @@ end
 --- bots share the welding point which each other, as does the builder with
 --- itself.
 ---@param builder Unit A builder with builder.buildEffectBones set
----@param bots Unit[] The bots of the builder
+---@param bots? Unit[] The bots of the builder
 ---@param unitBeingBuilt Unit The unit that we're building
 ---@param buildEffectsBag TrashBag The bag that we use to store / trash all effects
 ---@param noBuilderBeams boolean Whether or not the builder is a building
