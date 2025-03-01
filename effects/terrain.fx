@@ -1825,14 +1825,14 @@ float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uni
 
 /* # Sample a 2D 2x2 texture atlas # */
 /* To prevent bleeding from the neighboring tiles, we need to work with padding */
-float4 atlas2D(sampler2D s, float2 uv, uniform float2 offset) {
+float4 atlas2D(float2 uv, uniform float2 offset) {
     // We need to manually provide the derivatives to prevent seams.
     // See https://forum.unity.com/threads/tiling-textures-within-an-atlas-by-wrapping-uvs-within-frag-shader-getting-artifacts.535793/
     float2 uv_ddx = ddx(uv) / 8;
     float2 uv_ddy = ddy(uv) / 8;
     uv.x = frac(uv.x) / 4 + offset.x + 0.125;
     uv.y = frac(uv.y) / 4 + offset.y + 0.125;
-    return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
+    return tex2Dgrad(Stratum7NormalSampler, uv, uv_ddx, uv_ddy);
 }
 
 float3 sampleNormal(sampler2D s, float2 position, uniform float2 scale, float mask) {
@@ -1850,11 +1850,11 @@ float4 sampleAlbedo(sampler2D s, float2 position, uniform float2 scale, uniform 
     float4 albedoRotated = tex2D(s, mul(position, rotationMatrix) * scale);
     // store roughness in albedo alpha so we get the roughness splatting for free
     if (firstBatch) {
-        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).y;
-        albedoRotated.a = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * scale, offset).y;
+        albedo.a = atlas2D(position * scale, offset).y;
+        albedoRotated.a = atlas2D(mul(position, rotationMatrix) * scale, offset).y;
     } else {
-        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).w;
-        albedoRotated.a = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * scale, offset).w;
+        albedo.a = atlas2D(position * scale, offset).w;
+        albedoRotated.a = atlas2D(mul(position, rotationMatrix) * scale, offset).w;
     }
     return splatLerp(albedo, albedoRotated, 0.5, mask, 0.03);
 }
@@ -1863,24 +1863,24 @@ float4 sampleAlbedo(sampler2D s, float2 position, uniform float2 scale, uniform 
     float4 albedo = tex2D(s, position * scale);
     // store roughness in albedo alpha so we get the roughness splatting for free
     if (firstBatch) {
-        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).y;
+        albedo.a = atlas2D(position * scale, offset).y;
     } else {
-        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).w;
+        albedo.a = atlas2D(position * scale, offset).w;
     }
     return albedo;
 }
 
 float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 farScale, uniform float2 offset, uniform bool firstBatch, float mask) {
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
-    float2 heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).xz;
-    float2 heightNearRotated = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * nearScale, offset).xz;
+    float2 heightNear = atlas2D(position * nearScale, offset).xz;
+    float2 heightNearRotated = atlas2D(mul(position, rotationMatrix) * nearScale, offset).xz;
     float heightFar;
     if (firstBatch) {
         heightNear.x = splatLerp(heightNear.x, heightNearRotated.x, 0.5, mask, 0.03);
-        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).x;
+        heightFar = atlas2D(position * farScale, offset).x;
     } else {
         heightNear.x = splatLerp(heightNear.y, heightNearRotated.y, 0.5, mask, 0.03);
-        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).z;
+        heightFar = atlas2D(position * farScale, offset).z;
     }
     return (heightNear.x + heightFar) / 2;
 }
@@ -1889,11 +1889,11 @@ float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 far
     float heightNear;
     float heightFar;
     if (firstBatch) {
-        heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).x;
-        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).x;
+        heightNear = atlas2D(position * nearScale, offset).x;
+        heightFar = atlas2D(position * farScale, offset).x;
     } else {
-        heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).z;
-        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).z;
+        heightNear = atlas2D(position * nearScale, offset).z;
+        heightFar = atlas2D(position * farScale, offset).z;
     }
     return (heightNear + heightFar) / 2;
 }
@@ -1904,15 +1904,15 @@ float blendHeight(float3 position, float2 blendWeights, uniform float2 nearscale
     float heightNearYZ;
     float heightFarYZ;
     if (firstBatch) {
-        heightNearXZ = atlas2D(Stratum7NormalSampler, position.xz * nearscale, offset).x;
-        heightFarXZ = atlas2D(Stratum7NormalSampler, position.xz * farscale, offset).x;
-        heightNearYZ = atlas2D(Stratum7NormalSampler, position.yz * nearscale, offset).x;
-        heightFarYZ = atlas2D(Stratum7NormalSampler, position.yz * farscale, offset).x;
+        heightNearXZ = atlas2D(position.xz * nearscale, offset).x;
+        heightFarXZ = atlas2D(position.xz * farscale, offset).x;
+        heightNearYZ = atlas2D(position.yz * nearscale, offset).x;
+        heightFarYZ = atlas2D(position.yz * farscale, offset).x;
     } else {
-        heightNearXZ = atlas2D(Stratum7NormalSampler, position.xz * nearscale, offset).z;
-        heightFarXZ = atlas2D(Stratum7NormalSampler, position.xz * farscale, offset).z;
-        heightNearYZ = atlas2D(Stratum7NormalSampler, position.yz * nearscale, offset).z;
-        heightFarYZ = atlas2D(Stratum7NormalSampler, position.yz * farscale, offset).z;
+        heightNearXZ = atlas2D(position.xz * nearscale, offset).z;
+        heightFarXZ = atlas2D(position.xz * farscale, offset).z;
+        heightNearYZ = atlas2D(position.yz * nearscale, offset).z;
+        heightFarYZ = atlas2D(position.yz * farscale, offset).z;
     }
     return (heightNearYZ + heightFarYZ) / 2 * blendWeights.x + (heightNearXZ + heightFarXZ) / 2 * blendWeights.y;
 }
