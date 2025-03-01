@@ -1436,7 +1436,6 @@ end
 function AddTooltip(control, title, description, width, padding, fontSize, position)
     if not fontSize then fontSize = 14 end
     if not position then position = 'left' end
-    if width then width = LayoutHelpers.ScaleNumber(width) end
     import("/lua/ui/game/tooltip.lua").AddControlTooltipManual(control, title, description, 0, width, 6, fontSize or 14, fontSize, position or 'left')
 end
 
