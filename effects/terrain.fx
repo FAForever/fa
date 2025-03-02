@@ -2866,7 +2866,7 @@ technique Terrain250 <
 }
 
 // Stratum2 and Stratum3 use biplanar mapping to improve cliff texturing
-float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
+float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     // height is now in the z coordinate
     float3 position = TerrainScale.xxx * inV.mTexWT;
@@ -2926,7 +2926,7 @@ float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange, uniform flo
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
+float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
 {
     float3 position = TerrainScale.xxx * inV.mTexWT;
     // 30° rotation
