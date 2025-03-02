@@ -80,18 +80,6 @@ function OnSetText(uri, text)
             end
         end
     end
-    -- add pairs() as a default iterator in foreach loops
-    -- check for newlines to avoid changing comments
-    for start, obj, finish in StringGmatch(text, '\n%s*for%s+[%S ]+%s+in%s+()([%S ]+)()%s+do') do
-        -- ignore if there is a function call that might be for an iterator
-        if not StringFind(obj, '%b()') then
-            diffs[#diffs + 1] = {
-                start = start,
-                finish = finish - 1,
-                text = 'pairs(' .. obj .. ')'
-            }
-        end
-    end
 
     return diffs
 end
