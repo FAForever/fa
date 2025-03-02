@@ -36,6 +36,7 @@ end
 ---@param  text string # The content of file
 ---@return nil|diff[]
 function OnSetText(uri, text)
+    ---@type diff[]
     local diffs = {}
     -- Change `#` (valid Supcom Lua comment) to `--` (valid in language server's lua)
     -- get first line
@@ -71,7 +72,7 @@ function OnSetText(uri, text)
         if hookDir then
             local repoFile = IoOpen(locationOfRepository .. hookDir)
             if repoFile then
-                diffs[#diffs+1] = {
+                diffs[#diffs + 1] = {
                     start = 1,
                     finish = 1,
                     text = repoFile:read("*a")
