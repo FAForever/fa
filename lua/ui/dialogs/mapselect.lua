@@ -966,7 +966,9 @@ end
 function LOCN(str, type)
     local name = str
     name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-    if type == 'campaign_coop' then
+    if string.find(str, '<LOC') then
+        return LOC(str)
+    elseif type == 'campaign_coop' then
         return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
     else
         return LOC('<LOC '..name..'_name>'..str)
