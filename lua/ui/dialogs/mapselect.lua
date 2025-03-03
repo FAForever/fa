@@ -962,11 +962,25 @@ function SetupOptionsPanel(parent, curOptions)
     UIUtil.CreateLobbyVertScrollbar(OptionContainer, -1, -5, -27)
 end
 
+-- Generate LOC entries for scenario names
+function LOCN(str)
+    local name = str
+    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+end
+
+-- Generate LOC entries for scenario descriptions
+function LOCD(str1, str2)
+    local name = str1
+    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+end
+
 function SetDescription(scen)
     local errors = false
     description:DeleteAllItems()
     if scen.name then
-        description:AddItem(LOC(scen.name))
+        description:AddItem(LOCN(scen.name))
     else
         description:AddItem(LOC("<LOC map_select_0006>No Scenario Name"))
         errors = true
@@ -998,7 +1012,7 @@ function SetDescription(scen)
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
-        local wrapped = import("/lua/maui/text.lua").WrapText(LOC(scen.description), textBoxWidth,
+        local wrapped = import("/lua/maui/text.lua").WrapText(LOCD(scen.description), textBoxWidth,
             function(curText) return description:GetStringAdvance(curText) end)
         for i, line in wrapped do
             description:AddItem(line)
@@ -1050,7 +1064,7 @@ function PopulateMapList()
                 reselectRow = count
             end
             count = count + 1
-            mapList:AddItem(LOC(sceninfo.name))
+            mapList:AddItem(LOCN(sceninfo.name))
         end
     end
 
