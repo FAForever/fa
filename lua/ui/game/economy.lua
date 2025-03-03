@@ -478,3 +478,6 @@ end
 function InitialAnimation()
     import(UIUtil.GetLayoutFilename('economy')).InitAnimation()
 end
+
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Button = import("/lua/maui/button.lua").Button
