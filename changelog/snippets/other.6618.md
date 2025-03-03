@@ -82,7 +82,7 @@
     
   [Map Selection](/lua/ui/dialogs/mapselect.lua):
 
-  - <details><summary>Add LOC entry auto-generation function:</summary>
+  - <details><summary>Add LOC entry auto-generation function for coop maps:</summary>
 
     ```
     function LOCN(str)
