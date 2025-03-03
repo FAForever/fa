@@ -963,24 +963,34 @@ function SetupOptionsPanel(parent, curOptions)
 end
 
 -- Generate LOC entries for scenario names
-function LOCN(str)
+function LOCN(str, type)
     local name = str
-    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-    return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+    name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    if type == 'campaign_coop' then
+        return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+    else
+        return LOC('<LOC '..name..'_name>'..str)
+    end
 end
 
 -- Generate LOC entries for scenario descriptions
-function LOCD(str1, str2)
+function LOCD(str1, str2, type)
     local name = str1
-    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-    return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+    name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    if string.find(str2, '<LOC') or str2 == '' then
+        return LOC(str2)
+    elseif type == 'campaign_coop' then
+        return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+    else
+        return LOC('<LOC '..name..'_desc>'..str2)
+    end
 end
 
 function SetDescription(scen)
     local errors = false
     description:DeleteAllItems()
     if scen.name then
-        description:AddItem(LOCN(scen.name))
+        description:AddItem(LOCN(scen.name, scen.type))
     else
         description:AddItem(LOC("<LOC map_select_0006>No Scenario Name"))
         errors = true
@@ -1012,7 +1022,7 @@ function SetDescription(scen)
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
-        local wrapped = import("/lua/maui/text.lua").WrapText(LOCD(scen.description), textBoxWidth,
+        local wrapped = import("/lua/maui/text.lua").WrapText(LOCD(scen.name, scen.description, scen.type), textBoxWidth,
             function(curText) return description:GetStringAdvance(curText) end)
         for i, line in wrapped do
             description:AddItem(line)
@@ -1064,7 +1074,7 @@ function PopulateMapList()
                 reselectRow = count
             end
             count = count + 1
-            mapList:AddItem(LOCN(sceninfo.name))
+            mapList:AddItem(LOCN(sceninfo.name, sceninfo.type))
         end
     end
 
