@@ -965,14 +965,14 @@ end
 -- Generate LOC entries for scenario names
 function LOCN(str)
     local name = str
-    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
     return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
 end
 
 -- Generate LOC entries for scenario descriptions
 function LOCD(str1, str2)
     local name = str1
-    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    name = name:gsub(' %- ', ' '):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
     return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
 end
 
