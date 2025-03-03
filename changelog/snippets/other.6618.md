@@ -85,17 +85,30 @@
   - <details><summary>Add LOC entry auto-generation function for coop maps:</summary>
 
     ```
-    function LOCN(str)
+    -- Generate LOC entries for scenario names
+    function LOCN(str, type)
         local name = str
-        name = name:gsub(' %- ', ' '):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-        return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+        name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+        if string.find(str, '<LOC') then
+            return LOC(str)
+        elseif type == 'campaign_coop' then
+            return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+        else
+            return LOC('<LOC '..name..'_name>'..str)
+        end
     end
     
-    
-    function LOCD(str1, str2)
+    -- Generate LOC entries for scenario descriptions
+    function LOCD(str1, str2, type)
         local name = str1
-        name = name:gsub(' %- ', ' '):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-        return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+        name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+        if string.find(str2, '<LOC') or str2 == '' then
+            return LOC(str2)
+        elseif type == 'campaign_coop' then
+            return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+        else
+            return LOC('<LOC '..name..'_desc>'..str2)
+        end
     end
     ```
 
