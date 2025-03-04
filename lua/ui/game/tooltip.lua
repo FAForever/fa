@@ -199,6 +199,11 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
     -- when adjusting position of tooltip elements
     -- default padding should be 2-4 to text is not to close to tooltip border but kept original value
     padding = LayoutHelpers.ScaleNumber(padding or 0)
+    -- scale width by UI scaling factor so we do not need to do this later in code adjusting tooltip width.
+    -- If width is absent, the text advance will be used instead, which is already scaled through font size.
+    if width then
+        width = LayoutHelpers.ScaleNumber(width)
+    end
     -- using passed font size or falling back to default values which should be the same but kept original values
     descFontSize = descFontSize or 12
     textFontSize = textFontSize or 14
@@ -261,7 +266,7 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
                     textBoxWidth = math.max(textBoxWidth, tooltip.title.TextAdvance())
                 end
             else
-                textBoxWidth = LayoutHelpers.ScaleNumber(width - padding - padding)
+                textBoxWidth = width - padding - padding
             end
             tempTable = import("/lua/maui/text.lua").WrapText(desc, textBoxWidth,
             function(text)
