@@ -6339,7 +6339,7 @@ function SetGameTitleText(title)
 end
 
 function ShowTitleDialog()
-    CreateInputDialog(GUI, "Game Title",
+    CreateInputDialog(GUI, "<LOC lobui_0465>Game Title",
         function(self, text)
             -- remove new lines from the text
             text = text:gsub("\r", "")
