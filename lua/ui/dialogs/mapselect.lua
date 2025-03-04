@@ -970,8 +970,10 @@ function LOCN(str, type)
         return LOC(str)
     elseif type == 'campaign_coop' then
         return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+    elseif type == 'skirmish' then
+        return LOC('<LOC '..name..'_Name>'..str)
     else
-        return LOC('<LOC '..name..'_name>'..str)
+        return str
     end
 end
 
@@ -983,8 +985,10 @@ function LOCD(str1, str2, type)
         return LOC(str2)
     elseif type == 'campaign_coop' then
         return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+    elseif type == 'skirmish' then
+        return LOC('<LOC '..name..'_Desc>'..str2)
     else
-        return LOC('<LOC '..name..'_desc>'..str2)
+        return str2
     end
 end
 
