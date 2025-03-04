@@ -7664,6 +7664,9 @@ ALT="使用ALT"
 _Obs="僅觀察者"
 _Always="永遠顯示"
 strat_icon_scale_150="150%(可能會輕微變形)"
+_Tech="T"
+_OnlyT1="僅T1"
+_MaxTech="最高科技等級"
 
 -- Lobby Options/Tips
 EXITDLG_0007="遊戲尚未結束!\n如需查看分數，請於遊戲結束後至重播中觀看"
