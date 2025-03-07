@@ -442,10 +442,12 @@ float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo,
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow(shadowCoords) : 1;
+    float ambientOcclusion = 1;
     if (ShaderUsesTerrainInfoTexture()) {
         float3 position = TerrainScale * worldTerrain;
-        float terrainShadow = tex2D(Stratum7AlbedoSampler, position.xy).g;
-        shadow = shadow * terrainShadow;
+        float4 terrainInfo = tex2D(Stratum7AlbedoSampler, position.xy);
+        shadow *= terrainInfo.a;
+        ambientOcclusion = terrainInfo.g;
     }
 
     // calculate some specular
@@ -455,7 +457,7 @@ float4 CalculateLighting( float3 inNormal, float3 worldTerrain, float3 inAlbedo,
     float3 R = SunDirection - 2.0f * SunDotNormal * inNormal;
     float specular = pow( saturate( dot(R, viewDirection) ), 80) * SpecularColor.x * specAmount;
 
-    float3 light = SunColor * saturate( SunDotNormal) * shadow + SunAmbience + specular;
+    float3 light = SunColor * saturate( SunDotNormal) * shadow + SunAmbience * ambientOcclusion + specular;
     light = LightingMultiplier * light + ShadowFillColor * ( 1 - light );
     color.rgb = light * inAlbedo;
 
@@ -510,9 +512,13 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness, float waterD
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float terrainShadow = tex2D(Stratum7AlbedoSampler, TerrainScale * inV.mTexWT).g; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-        shadow *= terrainShadow;
+    }
+    float ambientOcclusion = 1;
+    if (ShaderUsesTerrainInfoTexture()) {
+        float4 terrainInfo = tex2D(Stratum7AlbedoSampler, TerrainScale * inV.mTexWT);
+        shadow *= terrainInfo.a;
+        ambientOcclusion = terrainInfo.g;
     }
 
     float facingSpecular = 0.04;
@@ -548,7 +554,7 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness, float waterD
     float3 color = (refracted + reflected) * irradiance;
 
     float3 shadowColor = (1 - (SunColor * shadow * nDotL + SunAmbience)) * ShadowFillColor;
-    float3 ambient = SunAmbience * LightingMultiplier + shadowColor;
+    float3 ambient = SunAmbience * ambientOcclusion * LightingMultiplier + shadowColor;
 
     // we simplify here for the ambient lighting
     color += albedo * ambient;
@@ -1925,11 +1931,10 @@ float2 calculateBlendWeights(float2 position) {
     return blendWeights;
 }
 
-float3 applyPbrShading(VS_OUTPUT inV, float2 position, float4 albedo, float3 normal, float roughnessVariation) {
+float3 applyPbrShading(VS_OUTPUT inV, float2 waterDepth, float4 albedo, float3 normal, float roughnessVariation) {
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * roughnessVariation * 2 + 0.01);
 
-    float waterDepth = tex2D(Stratum7AlbedoSampler, position).a;
     float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
     return color;
@@ -2062,7 +2067,8 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
-    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
+    float waterDepth = tex2D(UtilitySamplerC, position).g;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
     // SpecularColor.ba, LowerNormalTile and Stratum7AlbedoTile are unused now
@@ -2635,7 +2641,8 @@ float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
     albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
+    float waterDepth = tex2D(UtilitySamplerC, position).g;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
@@ -2834,7 +2841,8 @@ float4 Terrain100BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform floa
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
     albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position).r;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
@@ -3069,7 +3077,8 @@ float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
     albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
+    float waterDepth = tex2D(UtilitySamplerC, position).g;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
@@ -3300,7 +3309,8 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform floa
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
     albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position).r;
+    float3 color = applyPbrShading(inV, waterDepth, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
