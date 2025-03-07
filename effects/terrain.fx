@@ -1918,6 +1918,35 @@ float blendHeight(float3 position, float2 blendWeights, uniform float2 nearscale
     return (heightNearYZ + heightFarYZ) / 2 * blendWeights.x + (heightNearXZ + heightFarXZ) / 2 * blendWeights.y;
 }
 
+float2 calculateBlendWeights(float2 position) {
+    float2 terrainNormal = tex2D(Stratum7NormalSampler, position).ag * 2 - 1;
+    float2 blendWeights = pow(abs(terrainNormal), 3);
+    blendWeights = blendWeights / (blendWeights.x + blendWeights.y);
+    return blendWeights;
+}
+
+float3 applyPbrShading(VS_OUTPUT inV, float2 position, float4 albedo, float3 normal, float roughnessVariation) {
+    // We need to add 0.01 as the reflection disappears at 0
+    float roughness = saturate(albedo.a * roughnessVariation * 2 + 0.01);
+
+    float waterDepth = tex2D(Stratum7AlbedoSampler, position).a;
+    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
+    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    return color;
+}
+
+float3 blendMacrotexture (float2 position, uniform float macrotextureblend, float3 albedo) {
+    if (macrotextureblend == 1) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo = lerp(albedo, macrotexture.rgb, macrotexture.a);
+    } else if (macrotextureblend == 2) {
+        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
+        albedo = lerp(albedo, 2 * macrotexture.rgb * albedo, macrotexture.a);
+    }
+    return albedo;
+}
+
+
 /* # TerrainPBR # */
 /* a worksite to test new things and an agglomeration of all kinds of stuff you can do to improve the visuals */
 /* similar to Terrain301 but additionally uses rotated sampling of all textures to break up repetition patterns */
@@ -2033,12 +2062,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
-    // We need to add 0.01 as the reflection disappears at 0
-    float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-
-    float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
-    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
     // SpecularColor.ba, LowerNormalTile and Stratum7AlbedoTile are unused now
@@ -2609,20 +2633,9 @@ float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
     albedo = lerp(albedo,stratum4Albedo,mask1.x);
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
-    if (macrotextureblend == 1) {
-        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
-        albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
-    } else if (macrotextureblend == 2) {
-        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
-        albedo.rgb = lerp(albedo.rgb, 2 * macrotexture.rgb * albedo.rgb, macrotexture.a);
-    }
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    // We need to add 0.01 as the reflection disappears at 0
-    float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-
-    float waterDepth = tex2D(Stratum7AlbedoSampler, position.xy).a;
-    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
@@ -2793,20 +2806,9 @@ float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
-    if (macrotextureblend == 1) {
-        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
-        albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
-    } else if (macrotextureblend == 2) {
-        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
-        albedo.rgb = lerp(albedo.rgb, 2 * macrotexture.rgb * albedo.rgb, macrotexture.a);
-    }
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    // We need to add 0.01 as the reflection disappears at 0
-    float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-    
-    float waterDepth = tex2D(Stratum7AlbedoSampler, position.xy).a;
-    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
@@ -2900,10 +2902,7 @@ float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
     float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
-    float2 terrainNormal = tex2D(Stratum7NormalSampler, position.xy).xy * 2 - 1;
-    float2 blendWeights = pow(abs(terrainNormal), 3);
-    blendWeights = blendWeights / (blendWeights.x + blendWeights.y);
-
+    float2 blendWeights = calculateBlendWeights(position.xy);
     float3 stratum2NormalXZ = normalize(tex2D(Stratum2NormalSampler, position.xz * Stratum2AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum2NormalYZ = normalize(tex2D(Stratum2NormalSampler, position.yz * Stratum2AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum2Normal = stratum2NormalYZ * blendWeights.x + stratum2NormalXZ * blendWeights.y;
@@ -2959,10 +2958,7 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform floa
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
     float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
 
-    float2 terrainNormal = tex2D(Stratum7NormalSampler, position.xy).xy * 2 - 1;
-    float2 blendWeights = pow(abs(terrainNormal), 3);
-    blendWeights = blendWeights / (blendWeights.x + blendWeights.y);
-
+    float2 blendWeights = calculateBlendWeights(position.xy);
     float4 stratum2AlbedoXZ = sampleAlbedo(Stratum2AlbedoSampler, position.xz, inV.nearScales.zz, float2(0.5, 0.5), true);
     float4 stratum2AlbedoYZ = sampleAlbedo(Stratum2AlbedoSampler, position.yz, inV.nearScales.zz, float2(0.5, 0.5), true);
     float4 stratum2Albedo = stratum2AlbedoYZ * blendWeights.x + stratum2AlbedoXZ * blendWeights.y;
@@ -2981,20 +2977,9 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform floa
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x, SpecularColor.r);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y, SpecularColor.r);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z, SpecularColor.r);
-    if (macrotextureblend == 1) {
-        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
-        albedo.rgb = lerp(albedo.rgb, macrotexture.rgb, macrotexture.a);
-    } else if (macrotextureblend == 2) {
-        float4 macrotexture = tex2D(LowerAlbedoSampler, position.xy * LowerAlbedoTile.xy);
-        albedo.rgb = lerp(albedo.rgb, 2 * macrotexture.rgb * albedo.rgb, macrotexture.a);
-    }
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
 
-    // We need to add 0.01 as the reflection disappears at 0
-    float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-    
-    float waterDepth = tex2D(Stratum7AlbedoSampler, position.xy).a;
-    float3 color = PBR(inV, albedo, normal, roughness, waterDepth);
-    color = ApplyWaterColor(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
+    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
 
     return float4(color, 0.01f);
 }
