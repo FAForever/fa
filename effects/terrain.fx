@@ -2667,6 +2667,36 @@ technique Terrain100 <
     }
 }
 
+technique Terrain101 <
+    string usage = "composite";
+    string normals = "Terrain100Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100AlbedoPS(false, 1);
+    }
+}
+
+technique Terrain102 <
+    string usage = "composite";
+    string normals = "Terrain100Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100AlbedoPS(false, 2);
+    }
+}
+
 technique Terrain150Normals
 {
     pass P0
@@ -2693,6 +2723,237 @@ technique Terrain150 <
         PixelShader = compile ps_2_a Terrain100AlbedoPS(true, 0);
     }
 }
+
+technique Terrain151 <
+    string usage = "composite";
+    string normals = "Terrain150Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100AlbedoPS(true, 1);
+    }
+}
+
+technique Terrain152 <
+    string usage = "composite";
+    string normals = "Terrain150Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100AlbedoPS(true, 2);
+    }
+}
+
+float4 Terrain100BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
+{
+    // height is now in the z coordinate
+    float3 position = TerrainScale.xxx * inV.mTexWT;
+
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
+
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy).rgb * 2 - 1);
+
+    float2 blendWeights = calculateBlendWeights(position.xy);
+    float3 stratum2NormalXZ = normalize(tex2D(Stratum2NormalSampler, position.xz * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum2NormalYZ = normalize(tex2D(Stratum2NormalSampler, position.yz * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum2Normal = stratum2NormalYZ * blendWeights.x + stratum2NormalXZ * blendWeights.y;
+    float3 stratum3NormalXZ = normalize(tex2D(Stratum3NormalSampler, position.xz * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3NormalYZ = normalize(tex2D(Stratum3NormalSampler, position.yz * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3Normal = stratum3NormalYZ * blendWeights.x + stratum3NormalXZ * blendWeights.y;
+
+    float3 normal = lowerNormal;
+    normal = normalize(lerp(normal,stratum0Normal,mask0.x));
+    normal = normalize(lerp(normal,stratum1Normal,mask0.y));
+    normal = normalize(lerp(normal,stratum2Normal,mask0.z));
+    normal = normalize(lerp(normal,stratum3Normal,mask0.w));
+    normal = normalize(lerp(normal,stratum4Normal,mask1.x));
+    normal = normalize(lerp(normal,stratum5Normal,mask1.y));
+    normal = normalize(lerp(normal,stratum6Normal,mask1.z));
+
+    return float4( 0.5 + 0.5 * normal.rgb, 1);
+}
+
+float4 Terrain100BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float macrotextureblend ) : COLOR
+{
+    float3 position = TerrainScale.xxx * inV.mTexWT;
+
+    float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
+
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        // Don't touch the roughness mask
+        mask1.xyz = saturate(mask1.xyz * 2 - 1);
+    }
+
+    float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
+    float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, position.xy, Stratum0AlbedoTile.xy, float2(0.5, 0.0), true);
+    float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position.xy, Stratum1AlbedoTile.xy, float2(0.0, 0.5), true);
+    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, position.xy, Stratum4AlbedoTile.xy, float2(0.5, 0.0), false);
+    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, Stratum5AlbedoTile.xy, float2(0.0, 0.5), false);
+    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, position.xy, Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+
+    float2 blendWeights = calculateBlendWeights(position.xy);
+    float4 stratum2AlbedoXZ = sampleAlbedo(Stratum2AlbedoSampler, position.xz, Stratum2AlbedoTile.xy, float2(0.5, 0.5), true);
+    float4 stratum2AlbedoYZ = sampleAlbedo(Stratum2AlbedoSampler, position.yz, Stratum2AlbedoTile.xy, float2(0.5, 0.5), true);
+    float4 stratum2Albedo = stratum2AlbedoYZ * blendWeights.x + stratum2AlbedoXZ * blendWeights.y;
+    float4 stratum3AlbedoXZ = sampleAlbedo(Stratum3AlbedoSampler, position.xz, Stratum3AlbedoTile.xy, float2(0.0, 0.0), false);
+    float4 stratum3AlbedoYZ = sampleAlbedo(Stratum3AlbedoSampler, position.yz, Stratum3AlbedoTile.xy, float2(0.0, 0.0), false);
+    float4 stratum3Albedo = stratum3AlbedoYZ * blendWeights.x + stratum3AlbedoXZ * blendWeights.y;
+
+    float4 albedo = lowerAlbedo;
+    albedo = lerp(albedo,stratum0Albedo,mask0.x);
+    albedo = lerp(albedo,stratum1Albedo,mask0.y);
+    albedo = lerp(albedo,stratum2Albedo,mask0.z);
+    albedo = lerp(albedo,stratum3Albedo,mask0.w);
+    albedo = lerp(albedo,stratum4Albedo,mask1.x);
+    albedo = lerp(albedo,stratum5Albedo,mask1.y);
+    albedo = lerp(albedo,stratum6Albedo,mask1.z);
+    albedo.rgb = blendMacrotexture(position.xy, macrotextureblend, albedo.rgb);
+
+    float3 color = applyPbrShading(inV, position.xy, albedo, normal, mask1.w);
+
+    return float4(color, 0.01f);
+}
+
+
+technique Terrain100BNormals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain100BNormalsPS(false);
+    }
+}
+
+technique Terrain100B <
+    string usage = "composite";
+    string normals = "Terrain100BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100BAlbedoPS(false, 0);
+    }
+}
+
+technique Terrain101B <
+    string usage = "composite";
+    string normals = "Terrain100BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100BAlbedoPS(false, 1);
+    }
+}
+
+technique Terrain102B <
+    string usage = "composite";
+    string normals = "Terrain100BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100BAlbedoPS(false, 2);
+    }
+}
+
+technique Terrain150BNormals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain100BNormalsPS(true);
+    }
+}
+
+technique Terrain150B <
+    string usage = "composite";
+    string normals = "Terrain150BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100BAlbedoPS(true, 0);
+    }
+}
+
+technique Terrain151B <
+    string usage = "composite";
+    string normals = "Terrain150BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100BAlbedoPS(true, 1);
+    }
+}
+
+technique Terrain152B <
+    string usage = "composite";
+    string normals = "Terrain150BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain100BAlbedoPS(true, 2);
+    }
+}
+
 
 //#endregion
 // ----------------------------------------------------------------------------
@@ -2840,6 +3101,36 @@ technique Terrain200 <
     }
 }
 
+technique Terrain201 <
+    string usage = "composite";
+    string normals = "Terrain200Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200AlbedoPS(false, 1);
+    }
+}
+
+technique Terrain202 <
+    string usage = "composite";
+    string normals = "Terrain200Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200AlbedoPS(false, 2);
+    }
+}
+
 technique Terrain250Normals
 {
     pass P0
@@ -2864,6 +3155,36 @@ technique Terrain250 <
 
         VertexShader = compile vs_1_1 TerrainVS(true);
         PixelShader = compile ps_2_a Terrain200AlbedoPS(true, 0);
+    }
+}
+
+technique Terrain251 <
+    string usage = "composite";
+    string normals = "Terrain250Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200AlbedoPS(true, 1);
+    }
+}
+
+technique Terrain252 <
+    string usage = "composite";
+    string normals = "Terrain250Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200AlbedoPS(true, 2);
     }
 }
 
@@ -3011,6 +3332,36 @@ technique Terrain200B <
     }
 }
 
+technique Terrain201B <
+    string usage = "composite";
+    string normals = "Terrain200BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200BAlbedoPS(false, 1);
+    }
+}
+
+technique Terrain202B <
+    string usage = "composite";
+    string normals = "Terrain200BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200BAlbedoPS(false, 2);
+    }
+}
+
 technique Terrain250BNormals
 {
     pass P0
@@ -3035,6 +3386,36 @@ technique Terrain250B <
 
         VertexShader = compile vs_1_1 TerrainVS(true);
         PixelShader = compile ps_2_a Terrain200BAlbedoPS(true, 0);
+    }
+}
+
+technique Terrain251B <
+    string usage = "composite";
+    string normals = "Terrain250BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200BAlbedoPS(true, 1);
+    }
+}
+
+technique Terrain252B <
+    string usage = "composite";
+    string normals = "Terrain250BNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain200BAlbedoPS(true, 2);
     }
 }
 
