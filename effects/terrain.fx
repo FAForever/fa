@@ -2442,12 +2442,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    // x = ambient occlusion
-    // y = shadows
-    // z = shadows
-    // w = water depth
-    float4 terrainInfo = tex2D(Stratum7AlbedoSampler, coordinates.xy);
-    float terrainShadow = terrainInfo.g;
+    float terrainShadow = tex2D(Stratum7AlbedoSampler, coordinates.xy).a;
 
     // disable shadows when game settings tell us to
     if (0 == ShadowsEnabled) {
