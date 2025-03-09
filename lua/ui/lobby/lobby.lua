@@ -12,7 +12,6 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local RadioButton = import("/lua/ui/controls/radiobutton.lua").RadioButton
-local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
 local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
 local Slider = import("/lua/maui/slider.lua").Slider
@@ -34,7 +33,6 @@ local Presets = import("/lua/ui/lobby/presets.lua")
 local utils = import("/lua/system/utils.lua")
 
 local Trueskill = import("/lua/ui/lobby/trueskill.lua")
-local round = Trueskill.round
 local Player = Trueskill.Player
 local Rating = Trueskill.Rating
 local ModBlacklist = import("/etc/faf/blacklist.lua").Blacklist
@@ -117,7 +115,6 @@ local rehostPlayerOptions = {} -- Player options loaded from preset, used for re
 
 local formattedOptions = {}
 local nonDefaultFormattedOptions = {}
-local Warning_MAP = false
 local LrgMap = false
 
 local HostUtils
@@ -192,16 +189,6 @@ local argv = parseCommandlineArguments()
 
 local playerRating = math.floor(Trueskill.round2((argv.playerMean - 3 * argv.playerDeviation) / 100.0) * 100)
 
-local teamNumbers = {
-    "<LOC _No>",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-}
-
 local function ParseWhisper(params)
     local delimStart = string.find(params, " ")
     if delimStart then
@@ -235,7 +222,6 @@ local GUI = false
 local localPlayerID = false
 ---@type GameData | WatchedGameData
 local gameInfo = false
-local pmDialog = false
 local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
@@ -498,8 +484,6 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
     local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
     local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
-
-    
 
     -- compute the rating
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
@@ -3045,12 +3029,7 @@ end
 
 -- create UI won't typically be called directly by another module
 function CreateUI(maxPlayers)
-    local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
-    local Text = import("/lua/maui/text.lua").Text
     local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
-    local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
-    local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
-    local EffectHelpers = import("/lua/maui/effecthelpers.lua")
     local ItemList = import("/lua/maui/itemlist.lua").ItemList
     local Prefs = import("/lua/user/prefs.lua")
     local Tooltip = import("/lua/ui/game/tooltip.lua")
@@ -6704,17 +6683,6 @@ end
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
 function CreateInputDialog(parent, title, listener, str)
     UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit, str)
-end
-
--- Find the key for the given value in a table.
--- Nil keys are not supported.
-function indexOf(table, needle)
-    for k, v in table do
-        if v == needle then
-            return k
-        end
-    end
-    return nil
 end
 
 -- Update the combobox for the given slot so it correctly shows the set of available colours.
