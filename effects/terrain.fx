@@ -2374,9 +2374,9 @@ technique Terrain050 <
 // base layer and gets blended on top of everything again according to its alpha.
 // The specularity texture allows fine control over the specularity of the map.
 
-float4 UDNBlending(float4 n1, float4 n2, float factor) {
+float3 UDNBlending(float3 n1, float3 n2, float factor) {
     n2.xy *= factor;
-    return normalize(float4(n1.xy + n2.xy, n1.z, 0));
+    return normalize(float3(n1.xy + n2.xy, n1.z));
 }
 
 float4 Terrain001NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
@@ -2400,16 +2400,16 @@ float4 Terrain001NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    float4 base =           normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx   ) * 2 - 1);
-    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, coordinates * Stratum0NormalTile.xx) * 2 - 1);
-    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, coordinates * Stratum1NormalTile.xx) * 2 - 1);
-    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, coordinates * Stratum2NormalTile.xx) * 2 - 1);
-    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, coordinates * Stratum3NormalTile.xx) * 2 - 1);
-    float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, coordinates * Stratum4NormalTile.xx) * 2 - 1);
-    float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, coordinates * Stratum5NormalTile.xx) * 2 - 1);
-    float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, coordinates * Stratum6NormalTile.xx) * 2 - 1);
+    float3 base =           normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx   ) * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, coordinates * Stratum0NormalTile.xx) * 2 - 1);
+    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, coordinates * Stratum1NormalTile.xx) * 2 - 1);
+    float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, coordinates * Stratum2NormalTile.xx) * 2 - 1);
+    float3 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, coordinates * Stratum3NormalTile.xx) * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, coordinates * Stratum4NormalTile.xx) * 2 - 1);
+    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, coordinates * Stratum5NormalTile.xx) * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, coordinates * Stratum6NormalTile.xx) * 2 - 1);
 
-    float4 normal = base;
+    float3 normal = base;
     normal = UDNBlending(normal,stratum0Normal,mask0.x);
     normal = UDNBlending(normal,stratum1Normal,mask0.y);
     normal = UDNBlending(normal,stratum2Normal,mask0.z);
@@ -2418,7 +2418,7 @@ float4 Terrain001NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
     normal = UDNBlending(normal,stratum5Normal,mask1.y);
     normal = UDNBlending(normal,stratum6Normal,mask1.z);
 
-    return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
+    return float4( (normal.xyz * 0.5 + 0.5) , 1);
 }
 
 float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
@@ -2569,8 +2569,7 @@ technique Terrain051 <
 // ----------------------------------------------------------------------------
 //#region Terrain100
 
-// These shaders use PBR rendering.
-// The normal map scales are controlled by the albedo scales to ensure that they use the same values.
+// These shaders use PBR rendering. UDN blending is used for the normals.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 
 float4 Terrain100NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
@@ -2585,23 +2584,23 @@ float4 Terrain100NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
-    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, position.xy * Stratum2AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, position.xy * Stratum3AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy).rgb * 2 - 1);
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   ).rgb * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0NormalTile.xy).rgb * 2 - 1);
+    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1NormalTile.xy).rgb * 2 - 1);
+    float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, position.xy * Stratum2NormalTile.xy).rgb * 2 - 1);
+    float3 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, position.xy * Stratum3NormalTile.xy).rgb * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy).rgb * 2 - 1);
+    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy).rgb * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy).rgb * 2 - 1);
 
     float3 normal = lowerNormal;
-    normal = normalize(lerp(normal,stratum0Normal,mask0.x));
-    normal = normalize(lerp(normal,stratum1Normal,mask0.y));
-    normal = normalize(lerp(normal,stratum2Normal,mask0.z));
-    normal = normalize(lerp(normal,stratum3Normal,mask0.w));
-    normal = normalize(lerp(normal,stratum4Normal,mask1.x));
-    normal = normalize(lerp(normal,stratum5Normal,mask1.y));
-    normal = normalize(lerp(normal,stratum6Normal,mask1.z));
+    normal = UDNBlending(normal,stratum0Normal,mask0.x);
+    normal = UDNBlending(normal,stratum1Normal,mask0.y);
+    normal = UDNBlending(normal,stratum2Normal,mask0.z);
+    normal = UDNBlending(normal,stratum3Normal,mask0.w);
+    normal = UDNBlending(normal,stratum4Normal,mask1.x);
+    normal = UDNBlending(normal,stratum5Normal,mask1.y);
+    normal = UDNBlending(normal,stratum6Normal,mask1.z);
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
@@ -2610,7 +2609,6 @@ float4 Terrain100AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
 {
     float2 position = TerrainScale * inV.mTexWT;
 
-    // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
@@ -2774,29 +2772,29 @@ float4 Terrain100BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
-    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy).rgb * 2 - 1);
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   ).rgb * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0NormalTile.xy).rgb * 2 - 1);
+    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1NormalTile.xy).rgb * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy).rgb * 2 - 1);
+    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy).rgb * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy).rgb * 2 - 1);
 
     float2 blendWeights = calculateBlendWeights(position.xy);
-    float3 stratum2NormalXZ = normalize(tex2D(Stratum2NormalSampler, position.xz * Stratum2AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum2NormalYZ = normalize(tex2D(Stratum2NormalSampler, position.yz * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum2NormalXZ = normalize(tex2D(Stratum2NormalSampler, position.xz * Stratum2NormalTile.xy).rgb * 2 - 1);
+    float3 stratum2NormalYZ = normalize(tex2D(Stratum2NormalSampler, position.yz * Stratum2NormalTile.xy).rgb * 2 - 1);
     float3 stratum2Normal = stratum2NormalYZ * blendWeights.x + stratum2NormalXZ * blendWeights.y;
-    float3 stratum3NormalXZ = normalize(tex2D(Stratum3NormalSampler, position.xz * Stratum3AlbedoTile.xy).rgb * 2 - 1);
-    float3 stratum3NormalYZ = normalize(tex2D(Stratum3NormalSampler, position.yz * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3NormalXZ = normalize(tex2D(Stratum3NormalSampler, position.xz * Stratum3NormalTile.xy).rgb * 2 - 1);
+    float3 stratum3NormalYZ = normalize(tex2D(Stratum3NormalSampler, position.yz * Stratum3NormalTile.xy).rgb * 2 - 1);
     float3 stratum3Normal = stratum3NormalYZ * blendWeights.x + stratum3NormalXZ * blendWeights.y;
 
     float3 normal = lowerNormal;
-    normal = normalize(lerp(normal,stratum0Normal,mask0.x));
-    normal = normalize(lerp(normal,stratum1Normal,mask0.y));
-    normal = normalize(lerp(normal,stratum2Normal,mask0.z));
-    normal = normalize(lerp(normal,stratum3Normal,mask0.w));
-    normal = normalize(lerp(normal,stratum4Normal,mask1.x));
-    normal = normalize(lerp(normal,stratum5Normal,mask1.y));
-    normal = normalize(lerp(normal,stratum6Normal,mask1.z));
+    normal = UDNBlending(normal,stratum0Normal,mask0.x);
+    normal = UDNBlending(normal,stratum1Normal,mask0.y);
+    normal = UDNBlending(normal,stratum2Normal,mask0.z);
+    normal = UDNBlending(normal,stratum3Normal,mask0.w);
+    normal = UDNBlending(normal,stratum4Normal,mask1.x);
+    normal = UDNBlending(normal,stratum5Normal,mask1.y);
+    normal = UDNBlending(normal,stratum6Normal,mask1.z);
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
@@ -2970,9 +2968,9 @@ technique Terrain152B <
 //#region Terrain200
 
 // These shaders use PBR rendering and height maps for texture splatting. UDN blending is used for the normals.
-// The normal map scales are controlled by the albedo scales to ensure that they use the same values.
-// The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 // Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
+// Consequently the normal map scales are controlled by the albedo scales except on the lower layer.
+// The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 // SpecularColor.r is used to control the blurriness of the texture splatting
 // Every second stratum is rotated by 30 degrees to help break up texture repetion by loading the same texture into two adjacent slots.
 // The better texture splatting allows this, traditional lerping would just produce mushed results if attempting this. That's why the
@@ -2993,7 +2991,7 @@ float4 Terrain200NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   ).rgb * 2 - 1);
     float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, rotated_pos * Stratum0AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, rotated_pos * Stratum2AlbedoTile.xy).rgb * 2 - 1);
@@ -3214,7 +3212,7 @@ float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   ).rgb * 2 - 1);
     float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, rotated_pos * Stratum0AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
     float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, rotated_pos * Stratum4AlbedoTile.xy).rgb * 2 - 1);
