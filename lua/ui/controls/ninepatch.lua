@@ -15,15 +15,15 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 NinePatch = ClassUI(Group) {
     ---@param self NinePatch
     ---@param parent Control
-    ---@param center Lazy<FileName> | nil
-    ---@param topLeft Lazy<FileName>
-    ---@param topRight Lazy<FileName>
-    ---@param bottomLeft Lazy<FileName>
-    ---@param bottomRight Lazy<FileName>
-    ---@param left Lazy<FileName>
-    ---@param right Lazy<FileName>
-    ---@param top Lazy<FileName>
-    ---@param bottom Lazy<FileName>
+    ---@param center LazyValue<FileName>?
+    ---@param topLeft LazyValue<FileName>
+    ---@param topRight LazyValue<FileName>
+    ---@param bottomLeft LazyValue<FileName>
+    ---@param bottomRight LazyValue<FileName>
+    ---@param left LazyValue<FileName>
+    ---@param right LazyValue<FileName>
+    ---@param top LazyValue<FileName>
+    ---@param bottom LazyValue<FileName>
     __init = function(self, parent, center, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
         Group.__init(self, parent)
 
