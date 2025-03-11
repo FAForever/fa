@@ -14,10 +14,10 @@ ScrollAxis = {
 }
 
 ---@class Scrollbar : moho.scrollbar_methods, Control, InternalObject
----@field _bg LazyVar<FileName>
----@field _tm LazyVar<FileName>
----@field _tt LazyVar<FileName>
----@field _tb LazyVar<FileName>
+---@field _bg Lazy<FileName>
+---@field _tm Lazy<FileName>
+---@field _tt Lazy<FileName>
+---@field _tb Lazy<FileName>
 ---@field UpButton? Button
 ---@field DownButton? Button
 Scrollbar = ClassUI(moho.scrollbar_methods, Control) {

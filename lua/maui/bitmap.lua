@@ -31,12 +31,12 @@ local Control = import("/lua/maui/control.lua").Control
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
 ---@class BitmapTexture
----@field _texture LazyVar<FileName>
+---@field _texture Lazy<FileName>
 ---@field _border number
 
 ---@class Bitmap : moho.bitmap_methods, Control, InternalObject
 ---@field _filename BitmapTexture
----@field _color LazyVar<Color>
+---@field _color Lazy<Color>
 Bitmap = ClassUI(moho.bitmap_methods, Control) {
     ---@param self Bitmap
     ---@param parent Control

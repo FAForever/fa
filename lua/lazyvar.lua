@@ -15,7 +15,8 @@ local WeakKeyMeta = { __mode = 'k' }
 
 ---@alias Lazy<T> T | LazyVar<T> | fun(): T
 
----@class LazyVar<T> : Destroyable, OnDirtyListener, function
+---@class LazyVar<T> : { Set:(fun(self:LazyVar<T>, value:Lazy<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>) }
+---@class LazyVar: Destroyable, OnDirtyListener
 ---@field OnDirty? function
 ---@field [1] any                           # Cached result of what we represent
 ---@field [2] boolean                       # Flag whether the lazy var is busy
@@ -281,7 +282,7 @@ LazyVarMetaTable.__index = LazyVarMetaTable
 
 ---@generic T
 ---@param initial? T defaults to `0`
----@return LazyVar<T>
+---@return Lazy<T>
 function Create(initial)
     local setmetatable = setmetatable
     local WeakKeyMeta = WeakKeyMeta
