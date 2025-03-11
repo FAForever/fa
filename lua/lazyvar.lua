@@ -13,9 +13,10 @@ local ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
----@alias Lazy<T> T | LazyVar<T> | fun(): T
+---@alias Lazy<T> LazyVar<T> | fun(): T
+---@alias LazyValue<T> Lazy<T> | T
 
----@class LazyVar<T> : { Set:(fun(self:LazyVar<T>, value:Lazy<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>) }
+---@class LazyVar<T> : { Set: (fun(self:LazyVar<T>, value:LazyValue<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>), SetValue: fun(self:LazyVar<T>, value:T), SetFunction: fun(self:LazyVar<T>, f: Lazy<T>) }
 ---@class LazyVar: Destroyable, OnDirtyListener
 ---@field OnDirty? function
 ---@field [1] any                           # Cached result of what we represent
