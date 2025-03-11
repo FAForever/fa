@@ -4,4 +4,4 @@
     - Personal Teleporter
       - TeleportDelay: 15 --> 20
       - TeleportFlatEnergyCost: 75000 --> 100000
-      - Introduce a new forumla for teleport time and energy usage
+      - Introduce a new formula for teleport time and energy usage
