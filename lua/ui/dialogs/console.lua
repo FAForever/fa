@@ -145,6 +145,7 @@ function CreateDialog()
                 conFuncsList.Height:Set(function()
                     return math.min(consoleOutput.Height(), conFuncsList:GetRowHeight() * numMatches)
                 end)
+                -- guarantee order so it is sorted alphabetically (case-insensitive)
                 for i,v in ipairs(matches) do
                     conFuncsList:AddItem(v)
                 end
