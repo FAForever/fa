@@ -2416,7 +2416,8 @@ function SetSecondaryDisplay(type)
                         table.insert(data, {type = 'enhancementqueue', unitID = item.id, icon = item.icon, name = item.name, enhancement = item.enhancement})
                     else
                         newStack = {type = 'queuestack', id = item.id, count = item.displayCount or item.count, position = index}
-                        if lastStack and lastStack.id == newStack.id then
+                        -- stacking the queue while dragging an item will make dragging show the wrong index
+                        if not dragging and lastStack and lastStack.id == newStack.id then
                             newStack.position = index - 1
                         else
                             index = index + 1
