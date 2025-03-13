@@ -118,7 +118,7 @@ end
 
 --- Sets a control's height to the height of a texture (with optional padding)
 ---@param control Control
----@param filename Lazy<FileName>
+---@param filename LazyValue<FileName>
 ---@param padding? number
 function SetHeightFromTexture(control, filename, padding)
     if iscallable(filename) then -- skinnable file
@@ -1284,7 +1284,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the left edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param left Lazy<number>
+    ---@param left LazyValue<number>
     ---@return T
     Left = function(self, left)
         self.layoutControl.Left:Set(left)
@@ -1294,7 +1294,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the top edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param top Lazy<number>
+    ---@param top LazyValue<number>
     ---@return T
     Top = function(self, top)
         self.layoutControl.Top:Set(top)
@@ -1304,7 +1304,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the right edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param right Lazy<number>
+    ---@param right LazyValue<number>
     ---@return T
     Right = function(self, right)
         self.layoutControl.Right:Set(right)
@@ -1314,7 +1314,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the bottom edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param bottom Lazy<number>
+    ---@param bottom LazyValue<number>
     ---@return T
     Bottom = function(self, bottom)
         self.layoutControl.Bottom:Set(bottom)
