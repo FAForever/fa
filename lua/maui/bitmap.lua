@@ -40,7 +40,7 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 Bitmap = ClassUI(moho.bitmap_methods, Control) {
     ---@param self Bitmap
     ---@param parent Control
-    ---@param filename? LazyValue<FileName>
+    ---@param filename? LazyOrValue<FileName>
     ---@param debugname? string
     __init = function(self, parent, filename, debugname)
         InternalCreateBitmap(self, parent)
@@ -64,7 +64,7 @@ Bitmap = ClassUI(moho.bitmap_methods, Control) {
     end,
 
     ---@param self Bitmap
-    ---@param texture LazyValue<FileName>
+    ---@param texture LazyOrValue<FileName>
     ---@param border? number defaults to 1
     SetTexture = function(self, texture, border)
         if self._filename then
@@ -75,7 +75,7 @@ Bitmap = ClassUI(moho.bitmap_methods, Control) {
     end,
 
     ---@param self Bitmap
-    ---@param color LazyValue<Color>
+    ---@param color LazyOrValue<Color>
     SetSolidColor = function(self, color)
         self._color:Set(color)
     end,

@@ -588,7 +588,7 @@ end
 ---@param parent Control
 ---@param label? UnlocalizedString
 ---@param pointSize? number
----@param font? LazyValue<string>
+---@param font? LazyOrValue<string>
 ---@param dropshadow? boolean
 ---@return Text
 function CreateText(parent, label, pointSize, font, dropshadow)
@@ -624,7 +624,7 @@ function CreateBitmapStd(parent, filename, border)
 end
 
 ---@param parent Control
----@param color LazyValue<Color>
+---@param color LazyOrValue<Color>
 ---@return Bitmap
 function CreateBitmapColor(parent, color)
     local bitmap = Bitmap(parent)
@@ -652,11 +652,11 @@ end
 
 
 ---@param control Edit
----@param foreColor? LazyValue<Color>
----@param backColor? LazyValue<Color>
----@param highlightFore? LazyValue<Color>
----@param highlightBack? LazyValue<Color>
----@param fontFace? LazyValue<string>
+---@param foreColor? LazyOrValue<Color>
+---@param backColor? LazyOrValue<Color>
+---@param highlightFore? LazyOrValue<Color>
+---@param highlightBack? LazyOrValue<Color>
+---@param fontFace? LazyOrValue<string>
 ---@param fontSize? number
 ---@param charLimit? number
 function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBack, fontFace, fontSize, charLimit)
@@ -693,10 +693,10 @@ end
 
 --- Returns a button set up with a text overlay and a click sound
 ---@param parent Control
----@param up LazyValue<FileName>
----@param down LazyValue<FileName>
----@param over LazyValue<FileName>
----@param disabled LazyValue<FileName>
+---@param up LazyOrValue<FileName>
+---@param down LazyOrValue<FileName>
+---@param over LazyOrValue<FileName>
+---@param disabled LazyOrValue<FileName>
 ---@param label? UnlocalizedString
 ---@param pointSize? number
 ---@param textOffsetVert? number
@@ -1257,7 +1257,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 end
 
 ---@param parent Control
----@param colorOverride? LazyValue<Color> defaults to black
+---@param colorOverride? LazyOrValue<Color> defaults to black
 function CreateWorldCover(parent, colorOverride)
     colorOverride = colorOverride or "ff000000"
     local NumFrame = GetNumRootFrames() - 1
@@ -1478,10 +1478,10 @@ local windowTextures = {
 ---@param lockSize? boolean Toggle to allow the user to adjust the size of the window.
 ---@param lockPosition? boolean Toggle to allow the user to adjust the position of the window.
 ---@param preferenceID? string Identifier used in the preference file to remember where this window was located last
----@param defaultLeft? LazyValue<number> The default left boundary of the window, defaults to 10
----@param defaultTop? LazyValue<number> The default top boundary of the window, defaults to 300
----@param defaultBottom? LazyValue<number> The default bottom boundary of the window, defaults to 600
----@param defaultRight? LazyValue<number> The default right boundary of the window, defaults to 210
+---@param defaultLeft? LazyOrValue<number> The default left boundary of the window, defaults to 10
+---@param defaultTop? LazyOrValue<number> The default top boundary of the window, defaults to 300
+---@param defaultBottom? LazyOrValue<number> The default bottom boundary of the window, defaults to 600
+---@param defaultRight? LazyOrValue<number> The default right boundary of the window, defaults to 210
 ---@return Window
 function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
     parent = parent or GetFrame(0)

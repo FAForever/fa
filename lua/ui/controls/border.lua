@@ -5,14 +5,14 @@ local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
 Border = ClassUI(NinePatch) {
     ---@param self Border
     ---@param parent Control
-    ---@param topLeft LazyValue<FileName>
-    ---@param topRight LazyValue<FileName>
-    ---@param bottomLeft LazyValue<FileName>
-    ---@param bottomRight LazyValue<FileName>
-    ---@param left LazyValue<FileName>
-    ---@param right LazyValue<FileName>
-    ---@param top LazyValue<FileName>
-    ---@param bottom LazyValue<FileName>
+    ---@param topLeft LazyOrValue<FileName>
+    ---@param topRight LazyOrValue<FileName>
+    ---@param bottomLeft LazyOrValue<FileName>
+    ---@param bottomRight LazyOrValue<FileName>
+    ---@param left LazyOrValue<FileName>
+    ---@param right LazyOrValue<FileName>
+    ---@param top LazyOrValue<FileName>
+    ---@param bottom LazyOrValue<FileName>
     __init = function(self, parent, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
         NinePatch.__init(self, parent, nil, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
     end

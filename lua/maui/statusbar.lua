@@ -19,7 +19,7 @@ StatusBar = ClassUI(Bitmap) {
     ---@param rangeMax number
     ---@param vertical boolean # When true, the bar grows vertically instead of horizontally
     ---@param negative boolean # When true, the bar grows in the other direction
-    ---@param background LazyValue<FileName>
+    ---@param background LazyOrValue<FileName>
     ---@param bar FileName
     ---@param stretchTextures boolean
     ---@param debugname string

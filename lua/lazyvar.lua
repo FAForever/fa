@@ -17,9 +17,9 @@ local WeakKeyMeta = { __mode = 'k' }
 ---@alias Lazy<T> LazyVar<T> | fun(): T
 
 ---Repesents Lazy instance of Lazy T or the value itself
----@alias LazyValue<T> Lazy<T> | T
+---@alias LazyOrValue<T> Lazy<T> | T
 
----@class LazyVar<T> : { Set: (fun(self:LazyVar<T>, value:LazyValue<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>), SetValue: fun(self:LazyVar<T>, value:T), SetFunction: fun(self:LazyVar<T>, f: Lazy<T>) }
+---@class LazyVar<T> : { Set: (fun(self:LazyVar<T>, value:LazyOrValue<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>), SetValue: fun(self:LazyVar<T>, value:T), SetFunction: fun(self:LazyVar<T>, f: Lazy<T>) }
 ---@class LazyVar: Destroyable, OnDirtyListener
 ---@field OnDirty? function
 ---@field [1] any                           # Cached result of what we represent

@@ -79,10 +79,10 @@ Scrollbar = ClassUI(moho.scrollbar_methods, Control) {
     end,
 
     ---@param self Scrollbar
-    ---@param background  LazyValue<FileName>?
-    ---@param thumbMiddle LazyValue<FileName>?
-    ---@param thumbTop    LazyValue<FileName>?
-    ---@param thumbBottom LazyValue<FileName>?
+    ---@param background  LazyOrValue<FileName>?
+    ---@param thumbMiddle LazyOrValue<FileName>?
+    ---@param thumbTop    LazyOrValue<FileName>?
+    ---@param thumbBottom LazyOrValue<FileName>?
     SetTextures = function(self, background, thumbMiddle, thumbTop, thumbBottom)
         if background and self._bg then self._bg:Set(background) end
         if thumbMiddle and self._tm then self._tm:Set(thumbMiddle) end

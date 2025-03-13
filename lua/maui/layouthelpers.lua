@@ -118,7 +118,7 @@ end
 
 --- Sets a control's height to the height of a texture (with optional padding)
 ---@param control Control
----@param filename LazyValue<FileName>
+---@param filename LazyOrValue<FileName>
 ---@param padding? number
 function SetHeightFromTexture(control, filename, padding)
     if iscallable(filename) then -- skinnable file
@@ -1284,7 +1284,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the left edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param left LazyValue<number>
+    ---@param left LazyOrValue<number>
     ---@return T
     Left = function(self, left)
         self.layoutControl.Left:Set(left)
@@ -1294,7 +1294,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the top edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param top LazyValue<number>
+    ---@param top LazyOrValue<number>
     ---@return T
     Top = function(self, top)
         self.layoutControl.Top:Set(top)
@@ -1304,7 +1304,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the right edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param right LazyValue<number>
+    ---@param right LazyOrValue<number>
     ---@return T
     Right = function(self, right)
         self.layoutControl.Right:Set(right)
@@ -1314,7 +1314,7 @@ local LayouterAttributeControl = ClassSimple {
     --- Sets the bottom edge of the control
     ---@generic T : LayouterAttributeControl
     ---@param self T
-    ---@param bottom LazyValue<number>
+    ---@param bottom LazyOrValue<number>
     ---@return T
     Bottom = function(self, bottom)
         self.layoutControl.Bottom:Set(bottom)
@@ -2109,7 +2109,7 @@ local LayouterAttributeColor = ClassSimple {
     --- Sets the color of the control
     ---@generic T : LayouterAttributeColor
     ---@param self T
-    ---@param color LazyValue<Color> color as a hexcode
+    ---@param color LazyOrValue<Color> color as a hexcode
     ---@return T
     Color = function(self, color)
         local control = self.layoutControl
