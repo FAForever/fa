@@ -22,12 +22,9 @@ UEA0304 = ClassUnit(TAirUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         TAirUnit.OnStopBeingBuilt(self, builder, layer)
-        -- Don't turn off jamming for AI so that it uses it by default
-        if self.Brain.BrainType == 'Human' then
-            self:SetScriptBit('RULEUTC_JammingToggle', true)
-        else
-            self:SetMaintenanceConsumptionActive()
-        end
+
+        --Turns Jamming off when unit is built
+        self:SetScriptBit('RULEUTC_JammingToggle', true)
     end,
 
     --- Do not allow friendly fire from our own army's strategic bombers

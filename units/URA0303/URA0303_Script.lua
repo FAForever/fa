@@ -26,12 +26,7 @@ URA0303 = ClassUnit(CAirUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CAirUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionInactive()
-        -- Don't turn off stealth for AI so that it uses it by default
-        if self.Brain.BrainType == 'Human' then
-            self:SetScriptBit('RULEUTC_StealthToggle', true)
-        else
-            self:SetMaintenanceConsumptionActive()
-        end
+        self:SetScriptBit('RULEUTC_StealthToggle', true)
         self:RequestRefreshUI()
     end,
 }
