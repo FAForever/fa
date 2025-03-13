@@ -13,7 +13,10 @@ local ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
+---Repesents callable instance of LazyVar
 ---@alias Lazy<T> LazyVar<T> | fun(): T
+
+---Repesents Lazy instance of Lazy T or the value itself
 ---@alias LazyValue<T> Lazy<T> | T
 
 ---@class LazyVar<T> : { Set: (fun(self:LazyVar<T>, value:LazyValue<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>), SetValue: fun(self:LazyVar<T>, value:T), SetFunction: fun(self:LazyVar<T>, f: Lazy<T>) }
