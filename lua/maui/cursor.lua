@@ -6,7 +6,7 @@
 ---@class UICursor : moho.cursor_methods, InternalObject
 ---@field _hotspotX number
 ---@field _hotspotY number
----@field _filename LazyVar<FileName>
+---@field _filename Lazy<FileName>
 ---@field _animThread? thread
 ---@field ReticleInformation UIReticle
 Cursor = ClassUI(moho.cursor_methods) {
@@ -43,6 +43,7 @@ Cursor = ClassUI(moho.cursor_methods) {
         KillThread(self._animThread)
         if filename and numFrames and numFrames != 1 then
             local extPos = filename:find(".dds")
+            ---@diagnostic disable-next-line:cast-local-type
             filename = filename:sub(1, extPos - 1)
             self._animThread = ForkThread(function()
                 fps = 1 / fps

@@ -2109,7 +2109,7 @@ local LayouterAttributeColor = ClassSimple {
     --- Sets the color of the control
     ---@generic T : LayouterAttributeColor
     ---@param self T
-    ---@param color Lazy<Color> color as a hexcode
+    ---@param color LazyValue<Color> color as a hexcode
     ---@return T
     Color = function(self, color)
         local control = self.layoutControl
