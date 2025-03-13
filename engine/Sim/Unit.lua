@@ -618,7 +618,7 @@ function Unit:SetRegenRate(rate)
 end
 
 --- sets the script bit
----@param bit number|string
+---@param bit number | ToggleCap
 ---@param state boolean
 function Unit:SetScriptBit(bit, state)
 end
@@ -700,6 +700,7 @@ end
 --- Tests if the unit has this toggle cap specified in the blueprint spec.
 --- May not always work.
 ---@param capName ToggleCap
+---@return boolean
 function Unit:TestToggleCaps(capName)
 end
 
