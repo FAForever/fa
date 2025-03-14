@@ -169,10 +169,6 @@ function OnSync()
         import("/lua/ui/game/profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
     end
 
-    if Sync.BenchmarkProgress then
-        import("/lua/ui/game/profiler.lua").ReceiveBenchmarkProgress(Sync.BenchmarkProgress)
-    end
-
     if Sync.GameHasAIs ~= nil then 
         import("/lua/ui/game/gamemain.lua").GameHasAIs = Sync.GameHasAIs
     end

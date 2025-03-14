@@ -56,7 +56,7 @@
 
 --- Constructs an empty table that the profiler can populate
 ---@return ProfilerData
-function CreateEmptyProfilerTable() 
+function CreateEmptyProfilerTable()
     return {
         Lua = {
             ["field"]  = {},
@@ -91,23 +91,4 @@ function CreateEmptyProfilerTable()
             ["upval"]  = {},
         },
     }
-end
-
--- the profiler benchmarks must be guarded so that players can't maliciously send requests
-local devs = {"jip", "hdt80bro"}
----@param player Army | AIBrain | string
----@return boolean
-function PlayerIsDev(player)
-    local t = type(player)
-    if t == "number" then -- army
-        player = ArmyBrains[player].Nickname:lower()
-    elseif t ~= "string" then -- AIBrain
-        player = player.Nickname:lower()
-    end
-    for _, dev in devs do
-        if player == dev then
-            return true
-        end
-    end
-    return false
 end

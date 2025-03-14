@@ -1,5 +1,18 @@
---- meh. ill comment later
+--- A library dedicated to investigating the bytecode of functions.
+--- At a minimum, it can be used like
+---
+---   import("/lua/shared/DebugFunction.lua").PrintOut(<your fn>)
+---
+--- The majority of the code is to pretty-up the output of the default
+--- `debug.listcode` function.
 
+
+local MathLdexp = math.ldexp
+local MathMod = math.mod
+local StringChar = string.char
+
+
+local cacheInstructions = false
 
 
 
@@ -19,59 +32,9 @@ function CollapseDebugInfo(info)
 end
 
 
---- Broken, can only get the first parameter
----@param fn function
----@param numparams number
----@return string[]
-function GetParameterNames(fn, numparams)
-    local parameters = {}
-    if numparams == 1 then
-        -- it appears that we can still pull out the first parameter name, regardless of if
-        -- we're inside it
-        parameters[1] = debug.listlocals(fn, 1)
-    elseif numparams ~= 1 then
-        -- the else case crashes the game, so this is the solution
-        parameters[1] = debug.listlocals(fn, 1)
-        for i = 2, numparams do
-            parameters[i] = "unknown"
-        end
-    else
-        -- little bit of a hack to pull out the parameter names, since the function needs to be
-        -- running to get able to get more than the first parameter
-        local th = coroutine.create(fn)
-        -- save the currently debug hook (use of this file probably means that the profiler is on)
-        local restoreHook, restoreMask, restoreCount = debug.gethook()
-        local ignore = true
-        debug.sethook(function()
-            -- ignore initial `coroutine.resume` call
-            if ignore then
-                ignore = false
-                return
-            end
-            local fun = debug.getinfo(2, "f").func -- `debug.listlocals` doesn't accept a function level
-            local parameters = parameters
-            local DebugListlocal = debug.listlocals
-            for i = 1, numparams do
-                -- doesn't work
-                parameters[i] = DebugListlocal(fun, i)
-            end
-            KillThread(th)
-            ignore = true -- ignore debug.sethook too?
-        end, "c")
-        coroutine.resume(th) -- immediately ends
-        if restoreHook ~= nil then
-            debug.sethook(restoreHook, restoreMask, restoreCount)
-        else
-            debug.sethook()
-        end
-    end
-    return parameters
-end
-
 ---@class RawFunctionDebugInfo : debuginfo
 ---@field bytecode Bytecode
 ---@field constants any[]
----@field parameters string[]
 -- @field prototypes nil -- we don't have access to these!
 ---@field upvalueNames string[]
 ---@field upvalues any[]
@@ -86,8 +49,6 @@ function GetDebugPrototypeInfo(f)
         upvalueNames[i] = (debug.getupvalue(fn, i))
     end
     info.constants = debug.listk(fn)
-    local bytecode = debug.listcode(fn)
-    info.parameters = GetParameterNames(fn, bytecode.numparams)
     info.upvalueNames = upvalueNames
     return info
 end
@@ -104,12 +65,10 @@ function GetDebugFunctionInfo(f)
     end
     local constants = debug.listk(fn)
     local bytecode = debug.listcode(fn)
-    local parameters = GetParameterNames(fn, bytecode.numparams)
     return {
         bytecode = bytecode,
         constants = constants,
         info = info,
-        parameters = parameters,
         upvalueNames = upvalueNames,
         upvalues = upvalues,
     }
@@ -139,13 +98,14 @@ local addressPattern = "%0#" .. (hexWidth + 2) .. "x"
 local addressZero = "0x" .. string.rep("0", hexWidth)
 
 ---@alias DebugOpArgKind
+---| "boolean"
 ---| "const"
 ---| "double"
----| "global"
 ---| "offset"
 ---| "prototype"
 ---| "register"
 ---| "register_or_const"
+---| "register_range"
 ---| "upvalue"
 ---| "value"
 ---@alias DebugOpControlFlow "call" | "jump" | "return" | "skip" | "tailcall"
@@ -154,7 +114,7 @@ local addressZero = "0x" .. string.rep("0", hexWidth)
 
 ---@param address? integer defaults to the instruction address
 ---@return string
-local function AddressToString(address)
+function AddressToString(address)
     if address ~= 0 then
         return addressPattern:format(address)
     end
@@ -165,49 +125,50 @@ end
 ---@param arg? DebugOpArgKind
 ---@return boolean
 local function ArgKindIsDouble(arg)
-    return arg == "double" or arg == "global" or arg == "offset" or arg == "prototype"
+    return arg == "const" or arg == "double" or arg == "offset" or arg == "prototype"
 end
 
----@type table<DebugOpArgKind, fun(intr: DebugInstruction, arg: integer, fn?: DebugFunction): string>
-DebugOpcodeArgFormatters = {
-    default = function(instr, arg, fn)
+---@type table<DebugOpArgKind, fun(intr: DebugInstruction, val: integer, fn?: DebugFunction, addr?: integer, arg?: integer): string>
+DebugOpcodeArgPrettyFormatters = {
+    default = function(instr, arg, fn, addr)
         return tostring(arg)
     end,
 
-    const = function(instr, arg, fn)
+    boolean = function(instr, arg, fn, addr)
+        if arg == 1 then
+            return "true"
+        end
+        return "false"
+    end,
+    const = function(instr, arg, fn, addr)
         if fn then
             return Representation(fn:GetConstant(arg + 1))
         end
         return "K(" .. arg .. ')'
     end,
-    global = function(instr, arg, fn)
-        if fn then
-            return Representation(fn:GetConstant(arg + 1))
-        end
-        return "G(K(" .. arg .. "))"
-    end,
-    offset = function(instr, arg, fn)
+    offset = function(instr, arg, fn, addr)
         -- adjust address offsets to absolute addresses
-        return AddressToString(instr:GetJump(arg))
+        addr = addr or 0
+        return AddressToString(addr + instr:GetJump(arg))
     end,
-    prototype = function(instr, arg, fn)
+    prototype = function(instr, arg, fn, addr)
         return "P(" .. arg .. ')'
     end,
-    register = function(instr, arg, fn)
+    register = function(instr, arg, fn, addr)
         return 'R' .. arg
     end,
-    register_or_const = function(instr, arg, fn)
+    register_or_const = function(instr, arg, fn, addr)
         if arg < MAXSTACK then
-            return 'R' .. arg
-        else
-            arg = arg - MAXSTACK
-            if fn then
-                return Representation(fn:GetConstant(arg + 1))
-            end
-            return "K(" .. arg .. ')'
+            return DebugOpcodeArgPrettyFormatters.register(instr, arg, fn, addr)
         end
+        arg = arg - MAXSTACK
+        return DebugOpcodeArgPrettyFormatters.const(instr, arg, fn, addr)
     end,
-    upvalue = function(instr, arg, fn)
+    register_range = function(instr, val, fn, addr, arg)
+        val = val + instr[arg - 1]
+        return DebugOpcodeArgPrettyFormatters.register(instr, val, fn, addr)
+    end,
+    upvalue = function(instr, arg, fn, addr)
         if fn then
             return Representation(fn:GetUpvalueName(arg + 1))
         end
@@ -216,13 +177,13 @@ DebugOpcodeArgFormatters = {
 
     -- SETLIST is mangled to shove two numbers into one argument asymmetrically in Lua 5.0
     -- (SETLISTO reuses the first one)
-    double = function(instr, arg, fn)
-        local len = math.mod(arg, FIELDS_PER_FLUSH) + 1
+    double = function(instr, arg, fn, addr)
+        local len = MathMod(arg, FIELDS_PER_FLUSH) + 1
         local start = arg - len + 2
         return start .. ',' .. len
     end,
 }
-setmetatable(DebugOpcodeArgFormatters, {
+setmetatable(DebugOpcodeArgPrettyFormatters, {
     __index = function(tbl, key)
         if key ~= nil then
             return tbl.default
@@ -277,10 +238,22 @@ DebugOpcode = ClassSimple {
         return self.name
     end,
 
+    GetSkip = function(self, instr)
+        if self.controlFlow == "skip" then
+            return 1
+        else
+            return 0
+        end
+    end,
+
+    ArgKind = function(self, arg)
+        return self[StringChar(96 + arg) .. "Kind"]
+    end,
+
     ---@param self DebugOpcode
     ---@param instr DebugInstruction
     ---@return string
-    InstructionName = function(self, instr)
+    InstructionPrettyFormatName = function(self, instr)
         return self.name
     end,
 
@@ -288,13 +261,15 @@ DebugOpcode = ClassSimple {
     ---@param instr DebugInstruction
     ---@param arg integer
     ---@param fn? DebugFunction optional function to resolve constants from
+    ---@param addr? integer
     ---@return string | nil
-    InstructionArgToString = function(self, instr, arg, fn)
-        local type = self[string.char(64 + arg) .. "Kind"]
-        if not type then
+    InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        local kind = self:ArgKind(arg)
+        if not kind then
             return nil
         end
-        return DebugOpcodeArgFormatters[type](instr, instr[arg + 1], fn)
+        arg = arg + 1
+        return DebugOpcodeArgPrettyFormatters[kind](instr, instr[arg], fn, addr, arg)
     end,
 }
 
@@ -305,56 +280,74 @@ DebugVarNameOpcode = Class(DebugOpcode) {
     ---@param self DebugVarNameOpcode
     ---@param instr DebugInstruction
     ---@return string
-    InstructionName = function(self, instr)
+    InstructionPrettyFormatName = function(self, instr)
+        -- the first arg is the opcode
         if instr[self.renamingArg + 1] == 0 then
-            return self.name
+            return self.notName
         end
-        return self.notName
+        return self.name
     end,
 
     ---@param self DebugVarNameOpcode
     ---@param instr DebugInstruction
     ---@param arg integer
     ---@param fn? DebugFunction optional function to resolve constants from
+    ---@param addr? integer
     ---@return string | nil
-    InstructionArgToString = function(self, instr, arg, fn)
+    InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
         if arg == self.renamingArg then
             return nil
         end
-        return DebugOpcode.InstructionArgToString(self, instr, arg, fn)
+        return DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+    end,
+}
+
+---@class DebugRangedOpcode : DebugOpcode
+DebugRangedOpcode = Class(DebugOpcode) {
+    ---@param self DebugVarNameOpcode
+    ---@param instr DebugInstruction
+    ---@param arg integer
+    ---@param fn? DebugFunction optional function to resolve constants from
+    ---@return string | nil
+    InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        if arg == self.renamingArg then
+            return nil
+        end
+        return DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
     end,
 }
 
 ---@type table<string, DebugOpcode>
 OPCODE = {}
-local opcodeForIndex = {}
 do
     -- store these strings so we can format the opcode construction 'prettily'
+    local ___
+    local BOL = "boolean"
     local CON = "const"
     local DBL = "double"
-    local GLO = "global"
     local OFF = "offset"
     local PRO = "prototype"
     local REG = "register"
+    local RRG = "register_range"
     local RK  = "register_or_const" -- if x < MAXSTACK then REG(x) else CON(x-MAXSTACK)
     local UPV = "upvalue"
     local VAL = "value"
+
     local CALL = "call"
     local JUMP = "jump"
     local SKIP = "skip"
     local RET  = "return"
     local TAIL = "tailcall"
-    local ___
     -- OPCODE.NAME   = OpcodeClass(index, argA, argB, argC, controlFlow)
                                                               -- PC++ assumes that the skipped instruction is a jump
     OPCODE.MOVE      = DebugOpcode(0x00, REG, REG)            -- R(A) := R(B)
     OPCODE.LOADK     = DebugOpcode(0x01, REG, CON)            -- R(A) := Kst(Bx)
-    OPCODE.LOADBOOL  = DebugOpcode(0x02, REG, VAL, VAL, SKIP) -- R(A) := (Bool)B; if (C) PC++
-    OPCODE.LOADNIL   = DebugOpcode(0x03, REG, REG)            -- R(A) := ... := R(B) := nil
+    OPCODE.LOADBOOL  = DebugOpcode(0x02, REG, BOL, BOL, SKIP) -- R(A) := (Bool)B; if (C) PC++
+    OPCODE.LOADNIL   = DebugOpcode(0x03, REG, RRG)            -- R(A) := ... := R(B) := nil
     OPCODE.GETUPVAL  = DebugOpcode(0x04, REG, UPV)            -- R(A) := UpValue[B]
-    OPCODE.GETGLOBAL = DebugOpcode(0x05, REG, GLO)            -- R(A) := Gbl[Kst(Bx)]
+    OPCODE.GETGLOBAL = DebugOpcode(0x05, REG, CON)            -- R(A) := Gbl[Kst(Bx)]
     OPCODE.GETTABLE  = DebugOpcode(0x06, REG, REG, RK)        -- R(A) := R(B)[RK(C)]
-    OPCODE.SETGLOBAL = DebugOpcode(0x07, REG, GLO)            -- Gbl[Kst(Bx)] := R(A)
+    OPCODE.SETGLOBAL = DebugOpcode(0x07, REG, CON)            -- Gbl[Kst(Bx)] := R(A)
     OPCODE.SETUPVAL  = DebugOpcode(0x08, REG, UPV)            -- UpValue[B] := R(A)
     OPCODE.SETTABLE  = DebugOpcode(0x09, REG, RK,  RK)        -- R(A)[RK(B)] := RK(C)
     OPCODE.NEWTABLE  = DebugOpcode(0x0a, REG, VAL, VAL)       -- R(A) := {} (arrsize = B, hashsize = C)
@@ -367,32 +360,32 @@ do
     OPCODE.BOR       = DebugOpcode(0x11, REG, RK,  RK)        -- R(A) := RK(B) | RK(C)
     OPCODE.BSHL      = DebugOpcode(0x12, REG, RK,  RK)        -- R(A) := RK(B) << RK(C)
     OPCODE.BSHR      = DebugOpcode(0x13, REG, RK,  RK)        -- R(A) := RK(B) >> RK(C)
-    OPCODE.POW       = DebugOpcode(0x14, REG, RK,  RK)        -- R(A) := RK(B) ^ RK(C)
+    OPCODE.POW       = DebugOpcode(0x14, REG, RK,  RK)        -- R(A) := RK(B) ^ RK(C)  also BXOR
     OPCODE.UNM       = DebugOpcode(0x15, REG, REG)            -- R(A) := -R(B)
     OPCODE.NOT       = DebugOpcode(0x16, REG, REG)            -- R(A) := not R(B)
-    OPCODE.CONCAT    = DebugOpcode(0x17, REG, REG, REG)       -- R(A) := R(B)... R(B+1) ... R(C-1) ...R(C)
+    OPCODE.CONCAT    = DebugOpcode(0x17, REG, REG, RRG)       -- R(A) := R(B)... R(B+1) ... R(C-1) ...R(C)
     OPCODE.JMP       = DebugOpcode(0x18, ___, OFF, ___, JUMP) -- PC += sBx
-    OPCODE.EQ = DebugVarNameOpcode(0x19, VAL, RK,  RK,  SKIP) -- if ((RK(B) == RK(C)) ~= A) then PC++
-    OPCODE.LT = DebugVarNameOpcode(0x1a, VAL, RK,  RK,  SKIP) -- if ((RK(B) <  RK(C)) ~= A) then PC++
-    OPCODE.LE = DebugVarNameOpcode(0x1b, VAL, RK,  RK,  SKIP) -- if ((RK(B) <= RK(C)) ~= A) then PC++
-    OPCODE.TEST=DebugVarNameOpcode(0x1c, REG, REG, VAL, SKIP) -- if ((Bool)R(B) == C) then R(A) := R(B) else PC++   C specifies what conditions the test should accept
-    OPCODE.CALL      = DebugOpcode(0x1d, REG, VAL, VAL, CALL) -- R(A), ... ,R(A+C-2) := R(A)(R(A+1), ... ,R(A+B-1))   if (B == 0) then B = top. C is the number of returns - 1, and can be 0: CALL then sets `top' to last_result+1, so next open instruction (CALL, RETURN, SETLIST) may use `top'.
+    OPCODE.EQ = DebugVarNameOpcode(0x19, BOL, RK,  RK,  SKIP) -- if ((RK(B) == RK(C)) ~= A) then PC++
+    OPCODE.LT = DebugVarNameOpcode(0x1a, BOL, RK,  RK,  SKIP) -- if ((RK(B) <  RK(C)) ~= A) then PC++
+    OPCODE.LE = DebugVarNameOpcode(0x1b, BOL, RK,  RK,  SKIP) -- if ((RK(B) <= RK(C)) ~= A) then PC++
+    OPCODE.TEST=DebugVarNameOpcode(0x1c, REG, REG, BOL, SKIP) -- if ((Bool)R(B) == C) then R(A) := R(B) else PC++   C specifies what conditions the test should accept
+    OPCODE.CALL      = DebugOpcode(0x1d, REG, VAL, VAL, CALL) -- R(A), ... ,R(A+C-2) := R(A)(R(A+1), ... ,R(A+B-1))   if (B == 0) then B = top. C is the number of returns + 1, and can be 0: CALL then sets `top' to last_result+1, so next open instruction (CALL, RETURN, SETLIST) may use `top'.
     OPCODE.TAILCALL  = DebugOpcode(0x1e, REG, VAL, VAL, TAIL) -- return R(A)(R(A+1), ... ,R(A+B-1))
     OPCODE.RETURN    = DebugOpcode(0x1f, REG, VAL, ___, RET)  -- return R(A), ... ,R(A+B-2)    if (B == 0) then return up to `top'
     OPCODE.FORLOOP   = DebugOpcode(0x20, REG, OFF)            -- R(A)+=R(A+2); if R(A) <?= R(A+1) then PC+= sBx
     OPCODE.TFORLOOP  = DebugOpcode(0x21, REG, ___, VAL, SKIP) -- R(A+2), ... ,R(A+2+C) := R(A)(R(A+1), R(A+2)); if R(A+2) ~= nil then pc++
-    OPCODE.TFORPREP  = DebugOpcode(0x22, REG, OFF, ___, SKIP) -- if type(R(A)) == table then R(A+1) := R(A), R(A) := next; finally, PC += sBx
+    OPCODE.TFORPREP  = DebugOpcode(0x22, REG, OFF, ___, JUMP) -- if type(R(A)) == table then R(A+1) := R(A), R(A) := next; finally, PC += sBx
     OPCODE.SETLIST   = DebugOpcode(0x23, REG, DBL)            -- R(A)[Bx-Bx%FPF+i] := R(A+i), 1 <= i <= Bx%FPF
     OPCODE.SETLISTO  = DebugOpcode(0x24, REG, DBL)            -- R(A)[Bx-Bx%FPF+i] := R(A+i), 1 <= i <= top-A
     OPCODE.CLOSE     = DebugOpcode(0x25, REG)                 -- close all variables in the stack up to (>=) R(A) to upvalues
-    OPCODE.CLOSURE   = DebugOpcode(0x26, REG, PRO)            -- R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+n))
+    OPCODE.CLOSURE   = DebugOpcode(0x26, REG, PRO)            -- R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+nups))
 
     -- we could have included the redundant opcode name information in the constructor, but...
     --          ...it looks better to omit it above
     for name, opcode in OPCODE do
         opcode.name = name
-        opcodeForIndex[opcode.index] = opcode
     end
+
     -- it's easier to see the comparation mode argument as part of the name; merge them
     -- (the logic is already setup--this is why these use different opcode classes)
     OPCODE.TEST.notName = "NTEST"
@@ -403,53 +396,195 @@ do
     OPCODE.LE.renamingArg = 1
     OPCODE.EQ.notName = "NEQ"
     OPCODE.EQ.renamingArg = 1
-end
 
----@param opcode DebugOpcode
----@param a integer
----@param b integer
----@param c? integer
----@return integer
-function InstructionToInt32(opcode, a, b, c)
-    -- If you'll recall, instructions have this weird bit pattern of 6-8-9-9 (for opcode, a, b,
-    -- and c size, respectively) which means a similarly weird mapping into 32 bits.
-    -- It works like this:
-    --
-    --     {C[9:8],OP[6:1], B[9],C[7:1], B[8:1], A[8:1]}
-    --          byte 1        byte 2     byte 3  byte 4
-    --
-    -- (represented with Verilog bit operators + Lua 1-indexing). The most confusing part
-    -- is the little endianness not splicing pleasantly--otherwise, it'd just be
-    -- `{A[1:8],B[1:9],C[1:9],OP[1:6]}` in big-endian
-    local int = opcode.index << 24
-    if c then
-        return int |
-            ((c & 3) << 30) |
-            ((b & 1) << 23) | (c & 0xfc << 14) |
-            (b & 0xfe) << 7 |
-            a
+    OPCODE.TEST.InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        if arg == 1 then
+            if instr:A() == instr:B() then
+                return nil
+            end
+        end
+        return DebugVarNameOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
     end
-    -- actually, if `C` is absent, it's replaced by `B`
-    --
-    --     {B[9:8],OP[6:1], 1'b0,B[7:1], 8'b0, A[8:1]}
-    if opcode.format == "AsBx" then
-        b = 0x1ffff + b -- recenter signed numbers
+
+    OPCODE.NEWTABLE.InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        local norm = DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+        if norm == "0" then
+            return nil
+        end
+        if arg == 2 then
+            return "arr:" .. norm
+        end
+        if arg == 3 then
+            return "hash:" .. norm
+        end
+        return norm
     end
-    int = ((b & 3) << 30) | int
-    local byte2 = b >> 2
-    if ArgKindIsDouble(opcode.bKind) then
-        -- unless `B` is really a double, `Bx`
-        --
-        --     {Bx[9:8],OP[6:1], Bx[10],Bx[7:1], Bx[18:11], A[8:1]}
-        byte2 = byte2 & 0xff
-        byte3 = (b >> 10) & 0xff
+
+    -- `LOADBOOL`'s arg C determines whether to skip the next instruction
+    OPCODE.LOADBOOL.GetSkip = function(self, instr)
+        return instr:C()
     end
-    int = int | byte2 << 16
-    return int
+    OPCODE.LOADBOOL.InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        if arg == 3 then
+            if instr:C() == 1 then
+                return "(skip)"
+            else
+                return nil
+            end
+        end
+        return DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+    end
+
+    OPCODE.RETURN.InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        local numRet = instr:B() - 1
+        if numRet == -1 then
+            if arg == 1 then
+                return "<jump to top>"
+            end
+            return nil
+        end
+
+        if numRet == 0 then
+            return nil
+        end
+        if arg == 1 then
+            local first = DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+            if numRet > 2 then
+                local a = instr:A()
+                local last = DebugOpcodeArgPrettyFormatters.register(instr, a + numRet - 1, fn, addr)
+                return first .. "..." .. last
+            end
+            return first
+        end
+
+        if numRet ~= 2 then
+            return nil
+        end
+        local a = instr:A()
+        local reg = DebugOpcodeArgPrettyFormatters.register(instr, a + numRet - 1, fn, addr)
+        return reg
+    end
+
+    OPCODE.SETLISTO.InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        local norm = DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+        if arg ~= 2 then
+            return norm
+        end
+        local a = instr:A()
+        local start = norm:sub(1, norm:find(',', 1, true))
+        if a == 0 then
+            return start .. "<top>"
+        end
+        return start .. "<top-" .. a .. '>'
+    end
+
+    OPCODE.TFORLOOP.InstructionPrettyFormatArg = function(self, instr, arg, fn, addr)
+        local a = instr:A()
+        if arg == 1 then
+            local regFn = DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+            local regState = DebugOpcodeArgPrettyFormatters.register(instr, a + 1, fn, addr)
+            local regCont = DebugOpcodeArgPrettyFormatters.register(instr, a + 2, fn, addr)
+            return regFn .. '(' .. regState .. ", " .. regCont .. ')'
+        end
+
+        if arg == 2 then
+            return "=>"
+        end
+
+        if arg == 3 then
+            local c = instr:C()
+            local first = DebugOpcodeArgPrettyFormatters.register(instr, a + 2, fn, addr)
+            if c == 0 then
+                return first
+            end
+            local last = DebugOpcodeArgPrettyFormatters.register(instr, a + 2 + c, fn, addr)
+            return first .. "..." .. last
+        end
+    end
+
+    ---@param self DebugOpcode
+    ---@param instr DebugInstruction
+    ---@param arg integer
+    ---@param fn? DebugFunction optional function to resolve constants from
+    ---@param addr? integer
+    ---@return string | nil
+    local function CallFormatArg(self, instr, arg, fn, addr)
+        if arg == 1 then
+            local regFn = DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+            local params = instr:B() - 1
+            if params == -1 then
+                return regFn .. "(...<top>)"
+            end
+            if params == 0 then
+                return regFn .. "()" -- no parameters
+            end
+            local a = instr:A()
+            local last = DebugOpcodeArgPrettyFormatters.register(instr, a + params, fn, addr)
+            if params == 1 then
+                return regFn .. '(' .. last .. ')'
+            end
+            local first = DebugOpcodeArgPrettyFormatters.register(instr, a + 1, fn, addr)
+            return regFn .. '(' .. first .. "..." .. last .. ')'
+        end
+
+        local numRet = instr:C() - 1
+        if arg == 2 then
+            if numRet > 0 then
+                return "=>"
+            end
+        end
+
+        if arg == 3 then
+            if numRet == -1 then
+                return "<set top>"
+            end
+            if numRet == 0 then
+                return nil -- no returns
+            end
+            local a = instr:A()
+            local first = DebugOpcodeArgPrettyFormatters.register(instr, a, fn, addr)
+            if numRet == 1 then
+                return first
+            end
+            local last = DebugOpcodeArgPrettyFormatters.register(instr, a + numRet - 1, fn, addr)
+            return first .. "..." .. last
+        end
+    end
+    OPCODE.CALL.InstructionPrettyFormatArg = CallFormatArg
+    OPCODE.TAILCALL.InstructionPrettyFormatArg = CallFormatArg
+
+    ---@param self DebugOpcode
+    ---@param instr DebugInstruction
+    ---@param arg integer
+    ---@param fn? DebugFunction optional function to resolve constants from
+    ---@param addr? integer
+    ---@return string | nil
+    local function UpvalueableFormatArg(self, instr, arg, fn, addr)
+        -- recieve signal from a CLOSURE that this instruction will be used to close
+        -- an upvalue; it will therefore not have a destination
+        if arg == 1 and instr:A() == -1 then
+            return nil
+        end
+        return DebugOpcode.InstructionPrettyFormatArg(self, instr, arg, fn, addr)
+    end
+    OPCODE.MOVE.InstructionPrettyFormatArg = UpvalueableFormatArg
+    OPCODE.GETUPVAL.InstructionPrettyFormatArg = UpvalueableFormatArg
+
+    ---@param self DebugOpcode
+    ---@param instr DebugInstruction
+    ---@param fn DebugFunction
+    ---@return integer
+    OPCODE.CLOSURE.GetSkip = function(self, instr, fn)
+        if fn then
+            return fn.prototype.prototypeUpvalues[instr:B() + 1]
+        else
+            return 0
+        end
+    end
 end
 
 ---@class DebugInstruction
----@field [1] DebugOpcode
+---@field [1] DebugOpcode opcode
 ---@field [2]? integer A
 ---@field [3]? integer B
 ---@field [4]? integer C
@@ -466,135 +601,150 @@ DebugInstruction = ClassSimple {
         self[4] = argC
     end,
 
-    ---@param self DebugInstruction
-    ---@return string
-    GetName = function(self)
-        return self[1]:InstructionName(self)
+    ---@return DebugOpcode
+    Opcode = function(self)
+        return self[1]
     end,
-
-    ---@param self DebugInstruction
-    ---@param arg integer
-    ---@param fn? DebugFunction
-    ---@return string | nil
-    ArgToString = function(self, arg, fn)
-        return self[1]:InstructionArgToString(self, arg, fn)
+    A = function(self)
+        return self[2]
+    end,
+    B = function(self)
+        return self[3]
+    end,
+    C = function(self)
+        return self[4]
     end,
 
     ---@param self DebugInstruction
     ---@return integer
     GetJump = function(self)
-        if self[1].bKind == "offset" then
-            return self[3] + 1 -- add one because the PC would automatically increment
+        if self:Opcode().bKind == "offset" then
+            return self:B() + 1 -- add one because the PC would automatically increment
         end
         return 0
     end,
 
     ---@param self DebugInstruction
     ---@param fn? DebugFunction
+    ---@param addr? integer
     ---@return string
-    InstructionToString = function(self, fn)
-        local str = self:GetName()
-        for i = 1, self[1].args do
-            local arg = self:ArgToString(i, fn)
+    PrettyFormat = function(self, fn, addr)
+        local str = self:PrettyFormatName()
+        local opcode = self:Opcode()
+        local last
+        for i = 1, opcode.args do
+            local arg = self:PrettyFormatArg(i, fn, addr)
             if arg then
-                str = str .. ' ' .. arg
+                if opcode:ArgKind(i) == "register_range" then
+                    if arg ~= last then
+                        str = str .. "..." .. arg
+                    end
+                else
+                    str = str .. ' ' .. arg
+                end
+                last = arg
             end
         end
         return str
     end,
 
     ---@param self DebugInstruction
-    ---@return integer
-    AsInt32 = function(self)
-        return InstructionToInt32(self[1], self[2] or 0, self[3], self[4])
+    ---@return string
+    PrettyFormatName = function(self)
+        return self:Opcode():InstructionPrettyFormatName(self)
     end,
 
     ---@param self DebugInstruction
-    ---@return string
-    Serialize = function(self)
-        -- see comments above for `InstructionToInt32`
-        local byte1, byte2, byte3, byte4
-        local opcode = self[1]
-        byte1 = opcode.index
-        byte4 = self[2] or 0
-        local b = self[3]
-        local c = self[4]
-        if c then
-            byte1 = ((c & 3) << 6) | byte1
-            byte2 = ((b & 1) << 7) | (c >> 2)
-            byte3 =  b >> 1
-        else
-            if opcode.format == "Asbx" then
-                b = 0x1ffff + b
-            end
-            byte1 = ((b & 3) << 6) | byte1
-            byte2 = b >> 2
-            if ArgKindIsDouble(opcode.bKind) then
-                byte2 = byte2 & 0xff
-                byte3 = (b >> 10) & 0xff
-            else
-                byte3 = 0
-            end
-        end
-        return ("%02x %02x %02x %02x"):format(byte1, byte2, byte3, byte4)
+    ---@param arg integer
+    ---@param fn? DebugFunction
+    ---@param addr? integer
+    ---@return string | nil
+    PrettyFormatArg = function(self, arg, fn, addr)
+        return self:Opcode():InstructionPrettyFormatArg(self, arg, fn, addr)
     end,
 }
 
-local instructionCache = {}
+---@param opcode DebugOpcode
+---@param a integer
+---@param b integer
+---@param c? integer
+---@return number
+function InstructionCacheKey(opcode, a, b, c)
+    -- Instructions have this bit pattern of 6-8-9-9 (for opcode, a, b, and c size, respectively)
+    -- note: numbers are a float32, so we'll need every piece of information we can fit into it
+    -- to store all 32 bits
+    -- floats have 23 bits for a mantissa, 1 bit for a sign, and 8 bits for the exponent
+    local op = opcode.index
+    if opcode.format == "AsBx" then
+        b = 0x1ffff + b
+    end
+    local mantissa = (op & 0x1f) | (b << 5)
+    if c then
+        mantissa = mantissa | (c << 14)
+    end
+    if op & 0x20 ~= 0 then
+        mantissa =- mantissa
+    end
+    return MathLdexp(mantissa, a - 23)
+end
+
+local instructionCache
+if cacheInstructions then
+    instructionCache = {}
+end
 ---@param opcode DebugOpcode
 ---@param a integer
 ---@param b integer
 ---@param c? integer
 ---@return DebugInstruction
 function InstructionFor(opcode, a, b, c)
-    local int32 = InstructionToInt32(opcode, a, b, c)
-    local existing = instructionCache[int32]
+    if not cacheInstructions then
+        return DebugInstruction(opcode, a, b, c)
+    end
+    local num = InstructionCacheKey(opcode, a, b, c)
+    local existing = instructionCache[num]
     if not existing then
         existing = DebugInstruction(opcode, a, b, c)
-        instructionCache[int32] = existing
+        instructionCache[num] = existing
     end
     return existing
 end
 
 
-
----@class DebugLine : DebugInstruction[]
----@field lineNumber integer
----@field instructionCount integer
-DebugLine = ClassSimple {
-    ---@param self DebugLine
-    ---@param lineNum integer
-    __init = function(self, lineNum)
-        self.lineNumber = lineNum
-    end,
-}
-
 ---@class DebugPrototype
 ---@field constantCount    integer
 ---@field constants        (number | string)[]
+---@field knownPrototypes  integer
 ---@field instructionCount integer
 ---@field instructions     DebugInstruction[]
+---@field lineCount        integer
+---@field lineAddresses    integer[]
+---@field lineNumbers      integer[]
 ---@field jumps?           table<integer[]>
 ---@field maxstack         integer
 ---@field numparams        integer
+---@field prototypeUpvalues integer[]
 DebugPrototype = ClassSimple {
     __init = function(self, bytecode, constants)
         self.constants = constants
         self.constantCount = table.getn(constants)
 
-        local lines = {}
-        self.lines = lines
-
         local instructions = {}
         self.instructions = instructions
 
+        local lineNumbers = {}
+        self.lineNumbers = lineNumbers
+        local lineAddresses = {}
+        self.lineAddresses = lineAddresses
         local lineCount = 0
-        local debugLine
+
         local instructionCount = 0
-        local totalInstrCount = 0
         local lastLine = nil
         local knownPrototypes = 0
+        local prototypeUpvalues = {}
+        local processingUpvalues, numUpvalues, curProto = false, 0, 0
         for _, line in bytecode do
+            -- ignore `maxstack` and `numparams` for now
             if type(line) == "number" then
                 continue
             end
@@ -614,8 +764,31 @@ DebugPrototype = ClassSimple {
                 elseif opcode.bKind == "prototype" then
                     -- check for prototypes, since we aren't provided with that information
                     local proto = argB + 1
-                    if proto > knownPrototypes then
-                        knownPrototypes = proto
+                    if prototypeUpvalues[proto] == nil then
+                        if proto > knownPrototypes then
+                            knownPrototypes = proto
+                        end
+                        processingUpvalues = lineNum
+                        curProto = proto
+                    end
+                end
+            end
+
+            -- CLOSURE will have the next instructions (the number being the number
+            -- of upvalues it has) be either MOVE or UPVALUE and the LVM will process
+            -- them during the CLOSURE instruction; give these instructions a signal
+            if processingUpvalues then
+                if lineNum ~= processingUpvalues then
+                    processingUpvalues = false
+                    prototypeUpvalues[curProto] = numUpvalues
+                    curProto = nil
+                    numUpvalues = 0
+                else
+                    -- arg B holds the variable that's the upvalue
+                    if opcode == OPCODE.CLOSURE then
+                    elseif opcode == OPCODE.MOVE or opcode == OPCODE.GETUPVAL then
+                        numUpvalues = numUpvalues + 1
+                        argA = -1
                     end
                 end
             end
@@ -624,30 +797,22 @@ DebugPrototype = ClassSimple {
 
             -- instruction starts a different line
             if lastLine ~= lineNum then
-                if debugLine ~= nil then
-                    debugLine.instructionCount = instructionCount
-                end
-                debugLine = DebugLine(lineNum)
                 lineCount = lineCount + 1
-                lines[lineCount] = debugLine
-                instructionCount = 0
+                lineNumbers[lineCount] = lineNum
+                lineAddresses[lineCount] = addr
                 lastLine = lineNum
             end
             instructionCount = instructionCount + 1
-            debugLine[instructionCount] = instr
-            totalInstrCount = totalInstrCount + 1
-            instructions[totalInstrCount] = instr
-        end
-        if debugLine ~= nil then
-            debugLine.instructionCount = instructionCount
+            instructions[instructionCount] = instr
         end
 
-        -- the bytecode table reports two numbers: maxstack and numparams--transfer them here
+        -- the bytecode table reports two numbers: `maxstack` and `numparams`--transfer them here
         self.maxstack = bytecode.maxstack
         self.numparams = bytecode.numparams
         self.lineCount = lineCount
-        self.instructionCount = totalInstrCount
+        self.instructionCount = instructionCount
         self.knownPrototypes = knownPrototypes
+        self.prototypeUpvalues = prototypeUpvalues
     end,
 
     ---@param self DebugPrototype
@@ -655,14 +820,6 @@ DebugPrototype = ClassSimple {
     ---@return any
     GetConstant = function(self, k)
         return self.constants[k]
-    end,
-
-    ---@param self DebugPrototype
-    ---@param k number
-    ---@return any
-    GetGlobal = function(self, k)
-        local key = self:GetConstant(k)
-        return _G[key]
     end,
 
     --- Returns a table with keys being line numbers and values being an array of lines that jump to
@@ -674,21 +831,25 @@ DebugPrototype = ClassSimple {
         if jumps then
             return jumps
         end
-        local TableInsert = table.insert
         jumps = {}
         self.jumps = jumps
+
+        local TableInsert = table.insert
         local instructions = self.instructions
         for i = 1, self.instructionCount do
-            local instr = instructions[i]
-            if instr[1].bKind == "offset" then
-                local loc = i + instr:GetJump() + 1
-                local jump = jumps[loc]
-                if not jump then
-                    jump = {}
-                    jumps[loc] = jump
-                end
-                TableInsert(jump, i - 1)
+            local jmp = instructions[i]:GetJump()
+            if jmp == 0 then
+                continue
             end
+            local addr = i - 1
+
+            local loc = addr + jmp
+            local jump = jumps[loc]
+            if not jump then
+                jump = {}
+                jumps[loc] = jump
+            end
+            TableInsert(jump, addr)
         end
         return jumps
     end,
@@ -696,22 +857,24 @@ DebugPrototype = ClassSimple {
 
 ---@class DebugFunction
 ---@field currentline?     number
+---@field fenv             table
 ---@field func             function
----@field knownPrototypes  number
----@field lineCount        number
----@field lines            DebugLine[]
 ---@field location         string
+---@field name             string
+---@field prototype        DebugPrototype
+---@field scope            string
 ---@field short_loc        string
 ---@field source           ProfilerSource
+---@field upvalues         string[]
 DebugFunction = ClassSimple {
     ---@param self DebugFunction
     ---@param f integer | function | RawFunctionDebugInfo
     __init = function(self, f)
-        local info, parameters, upvalues, constants, bytecode = f.info, f.parameters, f.upvalueNames, f.constants, f.bytecode
-        if info and parameters and upvalues and constants and bytecode then
+        local info, upvalues, constants, bytecode = f.info, f.upvalueNames, f.constants, f.bytecode
+        if info and upvalues and constants and bytecode then
         else
             f = GetDebugFunctionInfo(f)
-            info, parameters, upvalues, constants, bytecode = f.info, f.parameters, f.upvalueNames, f.constants, f.bytecode
+            info, upvalues, constants, bytecode = f.info, f.upvalueNames, f.constants, f.bytecode
         end
 
         self.source, self.scope, self.name = CollapseDebugInfo(info)
@@ -722,6 +885,7 @@ DebugFunction = ClassSimple {
         end
         local fn = info.func
         self.func = fn
+        self.fenv = getfenv(fn)
 
         local currentline = info.currentline
         if currentline and currentline ~= -1 then
@@ -729,178 +893,141 @@ DebugFunction = ClassSimple {
         end
 
         self.upvalues = upvalues
-        self.parameters = parameters
-        self.constants = constants
-        self.constantCount = table.getn(constants)
-
-        local lines = {}
-        self.lines = lines
-
-        local instructions = {}
-        self.instructions = instructions
-
-        local lineCount = 0
-        local debugLine
-        local instructionCount = 0
-        local totalInstrCount = 0
-        local lastLine = nil
-        local knownPrototypes = 0
-        for _, line in bytecode do
-            if type(line) == "number" then
-                continue
-            end
-            -- each line is in a format like `(<lineNumber>) <instrNumber> - <OPCODE> <A> [<B> [<C>]]`
-            -- e.g. `(  35)   58 - JUMP 0 -4`
-            local chunker = line:gmatch("-?[%w]+")
-            local lineNum, addr = tonumber(chunker()), tonumber(chunker())
-            local opcode, argA, argB = OPCODE[chunker()], tonumber(chunker()), chunker()
-            local argC
-
-            -- construct instruction
-            if argB then -- fill up arguments
-                argB = tonumber(argB)
-                argC = chunker()
-                if argC then
-                    argC = tonumber(argC)
-                elseif opcode.B == "prototype" then
-                    -- check for prototypes, since we aren't provided with that information
-                    local proto = argB + 1
-                    if proto > knownPrototypes then
-                        knownPrototypes = proto
-                    end
-                end
-            end
-
-            local instr = DebugInstruction(addr, opcode, argA, argB, argC)
-
-            -- instruction starts a different line
-            if lastLine ~= lineNum then
-                if debugLine ~= nil then
-                    debugLine.instructionCount = instructionCount
-                end
-                debugLine = DebugLine(lineNum)
-                lineCount = lineCount + 1
-                lines[lineCount] = debugLine
-                instructionCount = 0
-                lastLine = lineNum
-            end
-            instructionCount = instructionCount + 1
-            debugLine[instructionCount] = instr
-            totalInstrCount = totalInstrCount + 1
-            instructions[totalInstrCount] = instr
-        end
-        if debugLine ~= nil then
-            debugLine.instructionCount = instructionCount
-        end
-
-        -- the bytecode table reports two numbers: maxstack and numparams--transfer them here
-        -- (excluding these two values is entirely why we recreated the bytecode table)
-        self.maxstack = bytecode.maxstack
-        self.numparams = bytecode.numparams
-        self.lineCount = lineCount
-        self.instructionCount = totalInstrCount
-        self.knownPrototypes = knownPrototypes
-
-        -- let them call the debug function directly, I guess?
-        setmetatable(self, {
-            __index = DebugFunction,
-            __call = self.func
-        })
+        self.prototype = DebugPrototype(bytecode, constants)
     end,
 
     ---@param self DebugFunction
-    ---@param k number
+    ---@param ... any
+    ---@return ...
+    Call = function(self, ...)
+        return self.func(unpack(arg))
+    end,
+
+    ---@param self DebugFunction
+    ---@param k integer
     ---@return any
     GetConstant = function(self, k)
-        return self.constants[k]
+        return self.prototype:GetConstant(k)
     end,
 
     ---@param self DebugFunction
-    ---@param k number
+    ---@param k integer
     ---@return any
     GetGlobal = function(self, k)
         local key = self:GetConstant(k)
-        return _G[key]
+        return self.fenv[key]
     end,
 
     ---@param self DebugFunction
-    ---@param k number
+    ---@param k integer
     ---@return string
     GetUpvalueName = function(self, k)
         return self.upvalues[k]
     end,
 
     ---@param self DebugFunction
-    ---@param k number
+    ---@param k integer
     ---@return any
     GetUpvalue = function(self, k)
         local _, val = debug.getupvalue(self.func, k)
         return val
     end,
 
-    --- Returns a table with keys being line numbers and values being an array of lines that jump to
-    --- those lines
+
+    ----------
+    -- Pretty Formatting
+    ----------
+
     ---@param self DebugFunction
-    ---@return table<number[]>
-    ResolveJumps = function(self)
-        local jumps = self.jumps
-        if jumps then
-            return jumps
+    ---@param inlineLines? boolean whether line numbers are inline with its first address
+    PrettyPrint = function(self, inlineLines)
+        for _, line in self:PrettyFormat(inlineLines) do
+            LOG(line)
         end
-        local TableInsert = table.insert
-        jumps = {}
-        self.jumps = jumps
-        local instructions = self.instructions
-        for i = 1, self.instructionCount do
-            local instr = instructions[i]
-            if instr.opcode.B == "offset" then
-                local loc = instr:ResolveAbsoluteAddress(instr.B) + 1
-                local jump = jumps[loc]
-                if not jump then
-                    jump = {}
-                    jumps[loc] = jump
-                end
-                TableInsert(jump, i - 1)
-            end
-        end
-        return jumps
     end,
 
     ---@param self DebugFunction
+    ---@param inlineLines? boolean whether line numbers are inline with its first address
     ---@return string[]
-    PrettyPrint = function(self)
-        local lines = {}
+    PrettyFormat = function(self, inlineLines)
+        local output = {}
+        local outputCount = 0
+
+        local prototype = self.prototype
+        local jumps = prototype:ResolveJumps()
+        local lineNumbers = prototype.lineNumbers
+        local lineAddresses = prototype.lineAddresses
+
         local lineLocalizer = LOC("<LOC debug_0000>Line %d:")
-        local jumps = self:ResolveJumps()
-        local instructionCount = 0
-        local lineCount = 0
-        for _, line in self.lines do
-            lineCount = lineCount + 1
-            lines[lineCount] = lineLocalizer:format(line.lineNumber)
-            local prepend
-            for i = 1, line.instructionCount do
-                local instr = line[i]
-                -- insert jump indicator if the instruction is jumped to by another instruction
-                local str = instr:OperationToString(self)
-                instructionCount = instructionCount + 1
-                if jumps[instructionCount] then
-                    str = '>' .. str
-                end
+        local curLine = 1
+        local nextLineAddr = lineAddresses[curLine]
 
-                local controlFlow = instr.opcode.controlFlow
-                if prepend then
-                    str = prepend .. str
-                    prepend = nil
-                end
-                if controlFlow == "skip" then
-                    prepend = "    "
-                end
-
-                str = "    " .. instr:AddressToString() .. "  " .. str
-                lineCount = lineCount + 1
-                lines[lineCount] = str
-            end
+        local indent = "    "
+        local margin = indent
+        if inlineLines then
+            local maxLine = lineNumbers[prototype.lineCount]
+            margin = (' '):rep(lineLocalizer:format(maxLine):len() + 1)
         end
-        return lines
+
+        local skipping = 0
+        for k, instr in prototype.instructions do
+            local addr = k - 1
+            local prefix = margin
+
+            if addr == nextLineAddr then
+                local lineNum = lineLocalizer:format(lineNumbers[curLine])
+                curLine = curLine + 1
+                nextLineAddr = lineAddresses[curLine]
+
+                if not inlineLines then
+                    outputCount = outputCount + 1
+                    output[outputCount] = lineNum
+                else
+                    prefix = lineNum .. margin:sub(lineNum:len() + 1)
+                end
+            end
+
+            local indentation
+            if skipping > 0 then
+                indentation = indent
+                skipping = skipping - 1
+            else
+                local curSkip = instr:Opcode():GetSkip(instr, self)
+                if curSkip > 0 then
+                    skipping = curSkip
+                end
+            end
+            local outputLine = self:PrettyFormatLine(instr, addr, jumps[addr], indentation)
+
+            outputCount = outputCount + 1
+            output[outputCount] = prefix .. outputLine
+        end
+        return output
+    end,
+
+    ---@param self DebugFunction
+    ---@param instr DebugInstruction
+    ---@param addr integer
+    ---@param jmpInd? boolean
+    ---@param indentation? string
+    ---@return string line
+    PrettyFormatLine = function(self, instr, addr, jmpInd, indentation)
+        local prettyAddr = AddressToString(addr)
+        if jmpInd then
+            prettyAddr = prettyAddr .. " >"
+        else
+            prettyAddr = prettyAddr .. "  "
+        end
+
+        local prettyInstr = instr:PrettyFormat(self, addr)
+        if indentation then
+            prettyInstr = indentation .. prettyInstr
+        end
+
+        return prettyAddr .. prettyInstr
     end,
 }
+
+function PrintOut(f)
+    DebugFunction(f):PrettyPrint()
+end

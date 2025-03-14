@@ -4,11 +4,13 @@ local Statistics = import("/lua/shared/statistics.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Combo = import("/lua/ui/controls/combo.lua").Combo
 local Group = import("/lua/maui/group.lua").Group
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local Layouter = LayoutHelpers.ReusedLayoutFor
 --local ScrollPolicy = import("/lua/maui/scrollbar.lua").ScrollPolicy
 
+local AddressToString = import("/lua/shared/debugfunction.lua").AddressToString
 
 ---@class ProfilerElementRow : Group
 ---@field name Text
@@ -21,7 +23,7 @@ ProfilerElementRow = Class(Group) {
     ---@param self ProfilerElementRow
     ---@param parent Control
     ---@param size number
-    ---@param font LazyVarString
+    ---@param font LazyVar<string>
     __init = function(self, parent, size, font)
         Group.__init(self, parent)
 
@@ -30,7 +32,7 @@ ProfilerElementRow = Class(Group) {
         self.scope = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Scope"), size, font, false)
         self.value = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Value"), size, font, false)
         self.growth = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Growth"), size, font, false)
-    end;
+    end,
 
     ---@param self ProfilerElementRow
     Layout = function(self)
@@ -58,7 +60,7 @@ ProfilerElementRow = Class(Group) {
             :AtTopIn(self, 0)
             :End()
         return self
-    end;
+    end,
 
     ---@param self ProfilerElementRow
     ---@param color Color
@@ -68,7 +70,7 @@ ProfilerElementRow = Class(Group) {
         self.scope:SetColor(color)
         self.value:SetColor(color)
         self.growth:SetColor(color)
-    end;
+    end,
 }
 
 ---@param control ProfilerElementRow
@@ -105,7 +107,7 @@ end
 ---@return ProfilerElementRow
 function CreateTitle(parent)
     local title = ProfilerElementRow(parent, 16, UIUtil.titleFont)
-    title.SetColor("F1F382")
+    title:SetColor("F1F382")
     return title
 end
 
@@ -126,6 +128,61 @@ function DepopulateDefaultElement(element)
     element.scope:SetText("")
     element.value:SetText("")
     element.growth:SetText("")
+end
+
+function DoStats(stats, baselines, mode, removeOutliers)
+    local sn, bn = stats.n, baselines.n
+    local mean, deviation, skewness = "0", "∞", "∞"
+
+    local function InterestingStuff(t, n)
+        local m, d, s = 0, 0, 0
+        if n > 0 then
+            m = Statistics.Mean(t, n)
+            if sn > 1 then
+                d = Statistics.Deviation(t, n, m)
+                if sn > 2 then
+                    if d > 0 then
+                        s = Statistics.Skewness(t, n, m, d)
+                    else
+                        s = 0
+                    end
+                end
+            end
+        end
+        return m, d, s
+    end
+
+    if mode == "none" then
+        if removeOutliers then
+            stats, sn = Statistics.RemoveOutliers(stats, sn)
+        end
+        mean, deviation, skewness = InterestingStuff(stats, sn)
+    elseif mode == "paired" then
+        local paired = {}
+        for k = 1, sn do
+            paired[k] = stats[k] / baselines[k]
+        end
+        if removeOutliers then
+            paired, sn = Statistics.RemoveOutliers(paired, sn)
+        end
+        mean, deviation, skewness = InterestingStuff(paired, sn)
+    elseif mode == "ratio" then
+        if removeOutliers then
+            stats, sn = Statistics.RemoveOutliers(stats, sn)
+            baselines, bn = Statistics.RemoveOutliers(baselines, bn)
+        end
+        mean, deviation, skewness = InterestingStuff(stats, sn)
+        local bMean, bDeviation, bSkewness = InterestingStuff(baselines, bn)
+        -- to percent error
+        skewness = skewness / mean + bSkewness / bMean
+        deviation = deviation / mean + bDeviation / bMean
+
+        mean = mean / bMean
+        -- to absolute error
+        deviation = deviation * mean
+        skewness = skewness * mean
+    end
+    return sn, mean, deviation, skewness
 end
 
 ---@class ProfilerScrollArea : Group
@@ -256,7 +313,7 @@ ProfilerScrollArea = ClassUI(Group) {
 
     -- called to determine if the control is scrollable on a particular access. Must return true or false.
     ---@param self ProfilerScrollArea
-    ---@param axis string
+    ---@param axis? string
     IsScrollable = function(self, axis)
         return self._scrollable
     end,
@@ -322,13 +379,20 @@ StatisticSummary = Class(Group) {
         self.skewness = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
         -- THIS MUST CHANGE IT'S AWFUL
         self.clearButton = UIUtil.CreateButtonStd(groupSummary, '/widgets02/small', "<LOC profiler_{auto}>Clear Stats", 12, 2)
+        self.mode = Combo(groupSummary, 14, 3)
+        self.mode:AddItems({"none", "paired", "ratio"})
 
         self.clearButton.OnClick = function()
             self.OnClickClearSummary(self)
         end
-    end;
+        self.mode.OnClick = function()
+            self:SetStats(self.stats, self.baselines)
+        end
+    end,
 
     Layout = function(self)
+        local topToBot = false
+
         local groupSummary = Layouter(self.summary)
             :FillFixedBorder(self, 5)
             :End()
@@ -340,28 +404,54 @@ StatisticSummary = Class(Group) {
             :End()
         -- Summary details
 
-        local summaryLabel = Layouter(self.summaryLabel)
-            :AtTopCenterIn(groupSummary, 5)
-            :End()
+        local summaryLabel, samplesLabel, meanLabel, deviationLabel, skewnessLabel
 
-        local samplesLabel = Layouter(self.samplesLabel)
-            :Below(summaryLabel, 5)
-            :AtLeftIn(groupSummary, 6)
-            :End()
+        if topToBot then
+            summaryLabel = Layouter(self.summaryLabel)
+                :AtTopCenterIn(groupSummary, 5)
+                :End()
 
-        local meanLabel = Layouter(self.meanLabel)
-            :Below(samplesLabel, 3)
-            :End()
+            samplesLabel = Layouter(self.samplesLabel)
+                :Below(summaryLabel, 5)
+                :AtLeftIn(groupSummary, 6)
+                :End()
 
-        local deviationLabel = Layouter(self.deviationLabel)
-            :Below(meanLabel, 3)
-            :End()
+            meanLabel = Layouter(self.meanLabel)
+                :Below(samplesLabel, 3)
+                :End()
 
-        local skewnessLabel = Layouter(self.skewnessLabel)
-            :Below(deviationLabel, 3)
-            :End()
+            deviationLabel = Layouter(self.deviationLabel)
+                :Below(meanLabel, 3)
+                :End()
 
-        local width = 10 + math.max(samplesLabel.Width(), meanLabel.Width(),
+            skewnessLabel = Layouter(self.skewnessLabel)
+                :Below(deviationLabel, 3)
+                :End()
+        else
+            skewnessLabel = Layouter(self.skewnessLabel)
+                :AtBottomCenterIn(groupSummary, 3)
+                :End()
+
+            deviationLabel = Layouter(self.deviationLabel)
+                :Above(skewnessLabel, 3)
+                :End()
+
+            meanLabel = Layouter(self.meanLabel)
+                :Above(deviationLabel, 3)
+                :End()
+
+            samplesLabel = Layouter(self.samplesLabel)
+                :Above(meanLabel, 5)
+                --:AtLeftIn(groupSummary, 6)
+                :End()
+
+            summaryLabel = Layouter(self.summaryLabel)
+                :Above(samplesLabel, 5)
+                :AtHorizontalCenterIn(groupSummary)
+                :End()
+        end
+
+        local width = 20 + math.max(samplesLabel.Width(), meanLabel.Width(),
                 deviationLabel.Width(), skewnessLabel.Width())
 
         -- next column
@@ -391,74 +481,48 @@ StatisticSummary = Class(Group) {
             :AtLeftTopIn(groupSummary)
             :End()
         Tooltip.AddButtonTooltip(clearButton, "pls replace me")
-        self.ClearButton = clearButton
 
-        LayoutHelpers.AtBottomIn(self, skewnessLabel, -10)
-    end;
+        local baselineMode = Layouter(self.mode)
+            :AtRightIn(groupSummary, 10)
+            :AtVerticalCenterIn(summaryLabel)
+            :Width(70)
+            :End()
+        Tooltip.AddComboTooltip(baselineMode, {
+            "profiler_benchmark_baseline_mode_none",
+            "profiler_benchmark_baseline_mode_paired",
+            "profiler_benchmark_baseline_mode_ratio",
+        })
+
+        if topToBot then
+            LayoutHelpers.AtBottomIn(self, skewnessLabel, -10)
+        else
+            LayoutHelpers.AtTopIn(self, summaryLabel, 5)
+        end
+    end,
 
     ---@param self StatisticSummary
     OnClickClearSummary = function(self)
-        SPEW("I should not be nil: " .. tostring(self))
         self:SetStats(nil)
-    end;
+    end,
 
     ---@param self StatisticSummary
     ---@param stats? number[]
-    SetStats = function(self, stats)
+    ---@param baselines? number[]
+    SetStats = function(self, stats, baselines)
         if stats then
-            local n = stats.n
-            local samples, mean, deviation, skewness = n, "0", "∞", "∞"
-
-            ---[[ To be replaced when the statistics branch is merged
-            if n > 0 then
-                mean = Statistics.Mean(stats, n)
-                if n > 1 then
-                    -- from population variance to sample standard deviation
-                    deviation = math.sqrt(Statistics.Deviation(stats, n, mean) * n / (n - 1))
-                    if n > 2 then
-                        if deviation > 0 then
-                            skewness = 0
-                            for i = 1, n do
-                                local residual = (stats[i] - mean)
-                                skewness = residual*residual*residual
-                            end
-                            skewness = skewness / deviation
-                        else
-                            skewness = "0"
-                        end
-                    end
-                end
-            end
-            --]]
-
-            --[[ Code for statistics merge
-            local obj = Statistics.StatObject(stats, n)
-
-            if n > 0 then
-               mean = obj.mean
-               if n > 1 then
-                   deviation = obj.deviation
-                   if n > 2 then
-                       if deviation > 0 then
-                           skewness = obj.skewness
-                       else
-                           skewness = "0"
-                       end
-                   end
-               end
-            end
-            --]]
-
+            self.stats = stats
+            self.baselines = baselines
+            local _, mode = self.mode:GetItem()
+            local samples, mean, deviation, skewness = DoStats(stats, baselines, mode, true)
             self.samples:SetText(samples)
             self.mean:SetText(mean)
             self.deviation:SetText(deviation)
             self.skewness:SetText(skewness)
             self.summary:Show()
         else
-            SPEW("HUDING")
             self.summary:Hide()
         end
-    end;
+    end,
 }
 
 ---@class BytecodeArea : Group
@@ -513,7 +577,7 @@ BytecodeArea = Class(Group) {
 
     Layout = function(self)
         local logButton = Layouter(self.logButton)
-            :AtRightTopIn(self)
+            :AtRightTopIn(self, 6)
             :Over(self, 1)
             :End()
         Tooltip.AddButtonTooltip(logButton, "profiler_print_to_log")
@@ -522,7 +586,7 @@ BytecodeArea = Class(Group) {
             :AtLeftIn(self, 5)
             :LeftOf(logButton)
             :AtTopIn(logButton)
-            :AtBottomIn(logButton)
+            :AtBottomIn(logButton, -5)
             :End()
 
         local groupBytecode = Layouter(self.groupBytecode)
@@ -574,22 +638,24 @@ BytecodeArea = Class(Group) {
         --]]
 
         bytecode:ShowMouseoverItem(true)
-    end;
+    end,
 
     ---@param self BytecodeArea
     OnLog = function(self)
+        local fn = self.DebugFunction.prototype
+        LOG(self.DebugFunction.name .. " (Parameters: " .. fn.numparams .. ", Max Stack: " .. fn.maxstack .. ", Upvalues: "
+            .. table.getn(self.DebugFunction.upvalues) .. ", Constants: " .. fn.constantCount .. ")")
         local area = self.bytecode
         for i = 1, area:GetItemCount() do
             LOG(area:GetItem(i - 1)) -- list is 0-indexed
         end
-        -- import("/lua/debug/UtilsDev.lua").SpewDebugFunction(self.benchmarkDebugFunction.func)
-    end;
+    end,
 
     ---@param self BytecodeArea
     ---@param index number
     GetBytecodeTooltip = function(self, index)
         local text = self.bytecode:GetItem(index)
-        local jumpTooltipFormater = LOC("<LOC profiler_{auto}>Jump from %s")
+        local jumpTooltipFormatter = LOC("<LOC profiler_{auto}>Jump from %s")
         local jumpInd = text:find('>', nil, true)
         if jumpInd and jumpInd < 20 then
             -- pull the instruction address directly from the text
@@ -597,20 +663,19 @@ BytecodeArea = Class(Group) {
             if not addr then
                 return
             end
-            addr = tonumber(addr, 16) + 1
+            addr = tonumber(addr, 16)
             local fn = self.DebugFunction
-            local jumps = fn:ResolveJumps()[addr]
-            local instructions = fn.instructions
+            local jumps = fn.prototype:ResolveJumps()[addr]
             -- string together all jump-from locations
-            local addrFrom = instructions[jumps[1] + 1]:AddressToString()
-            local tooltip = jumpTooltipFormater:format(addrFrom)
+            local addrFrom = AddressToString(jumps[1])
+            local tooltip = jumpTooltipFormatter:format(addrFrom)
             for i = 2, table.getn(jumps) do
-                addrFrom = instructions[jumps[i] + 1]:AddressToString()
-                tooltip = tooltip .. "; " .. jumpTooltipFormater:format(addrFrom)
+                addrFrom = AddressToString(jumps[i])
+                tooltip = tooltip .. "; " .. jumpTooltipFormatter:format(addrFrom)
             end
             return tooltip
         end
-    end;
+    end,
 
     ---@param self any
     ---@param data string | DebugFunction | nil
@@ -629,22 +694,22 @@ BytecodeArea = Class(Group) {
         end
         self:UpdateDetails()
         self:UpdateBytecode()
-    end;
+    end,
 
     ---@param self BytecodeArea
     UpdateDetails = function(self)
-        local fn = self.DebugFunction
+        local fn = self.DebugFunction.prototype
         local details = self.details
         if fn then
             self.parameters:SetText(LOC("<LOC profiler_{auto}>Parameters: %d"):format(fn.numparams))
             self.maxStack:SetText(LOC("<LOC profiler_{auto}>Max Stack: %d"):format(fn.maxstack))
-            self.upvalues:SetText(LOC("<LOC profiler_{auto}>Upvalues: %d"):format(fn.nups))
+            self.upvalues:SetText(LOC("<LOC profiler_{auto}>Upvalues: %d"):format(table.getn(self.DebugFunction.upvalues)))
             self.constants:SetText(LOC("<LOC profiler_{auto}>Constants: %d"):format(fn.constantCount))
             details:Show()
         else
             details:Hide()
         end
-    end;
+    end,
 
     ---@param self BytecodeArea
     UpdateBytecode = function(self)
@@ -656,10 +721,10 @@ BytecodeArea = Class(Group) {
         else
             local fn = self.DebugFunction
             if fn then
-                for _, line in ipairs(fn:PrettyPrint()) do
+                for _, line in ipairs(fn:PrettyFormat()) do
                     bytecode:AddItem(line)
                 end
             end
         end
-    end;
+    end,
 }

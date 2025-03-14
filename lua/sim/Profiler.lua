@@ -6,12 +6,17 @@
 -- Useful sources to read: 
 -- - https://www.lua.org/pil/23.1.html
 
-local Statistics = import("/lua/shared/statistics.lua")
 
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
-local PlayerIsDev = import("/lua/shared/profiler.lua").PlayerIsDev
+
+
+---@class BenchmarkOutput
+---@field runs? integer
+---@field data? number[]
+---@field baselines? number[]
+---@field success? boolean
 
 
 -- upvalue for performance
@@ -38,10 +43,6 @@ local benchmarkTargetTime = 0.5
 local benchmarkBaselines
 
 local function CanUseProfiler()
-    if ScenarioInfo.GameHasAIs then
-        SPEW("Profiler can be toggled: game has AIs")
-        return true
-    end
     if CheatsEnabled() then
         SPEW("Profiler can be toggled: game has cheats enabled")
         return true
@@ -49,14 +50,6 @@ local function CanUseProfiler()
     if SessionIsReplay() then
         SPEW("Profiler can be toggled: session is a replay")
         return true
-    end
-
-    -- exception to allow toggling the profiler
-    for _, brain in ArmyBrains do
-        if PlayerIsDev(brain) then
-            SPEW("Profiler can be toggled: a game developer is in the game")
-            return true
-        end
     end
     return false
 end
@@ -210,10 +203,7 @@ end
 function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     -- the threshold time for a benchmark to start running more than once a tick
     local tickThreshold = 0.09
-    -- how many times longer the benchmark needs to take than the baseline to not get its adjustment
-    -- cancelled 
-    local cancelAdjustThres = 3
-
+    local runGCEachTest = true
 
     local unpack = unpack
 
@@ -235,127 +225,96 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
         baselineLoop = nil
     end
 
-    -- initial benchmark sample time to scale sample rate based on
-    -- we'll also use the sample as output
-    local output = test(unpack(parameters))
-    local time = output
-    local adjust = 0
-    if baselineLoop then
-        adjust = baselineLoop(unpack(parameters))
-        -- test the cancel-adjustment condition
-        if output <= adjust * cancelAdjustThres then
-            baselineLoop = nil
-        else
-            output = output - adjust
+    local testNumber, baselines, output
+    local function RunTest()
+        testNumber = testNumber + 1
+        if baselineLoop then
+            if runGCEachTest then
+                collectgarbage()
+            end
+            baselines[testNumber] = baselineLoop(unpack(parameters))
         end
+        if runGCEachTest then
+            collectgarbage() -- make sure the GC doesn't happen during our test
+        end
+        output[testNumber] = test(unpack(parameters))
     end
 
+    testNumber = 0
+    if baselineLoop then
+        baselines = {}
+    end
+    output = {}
+
+    -- initial benchmark sample time to scale sample rate based on
+    local startTime = GetSystemTimeSecondsOnlyForProfileUse()
+    RunTest()
+    local time = GetSystemTimeSecondsOnlyForProfileUse() - startTime
+    if type(output[1]) ~= "number" then
+        SPEW("Bad benchmark: expected total time output")
+        Sync.BenchmarkOutput = {success = false}
+        return
+    end
     -- calculate how many at a time and for how many ticks we should sample the benchmark
-    local ticks = benchmarkRuns
+    local ticks
     local atATime = 1
 
-    local targetTime = benchmarkTargetTime
-    if time > targetTime then
+    if time > benchmarkTargetTime then
         ticks = 1
     else
         if time < tickThreshold then
-            atATime = math.min(ticks, math.floor(tickThreshold / time))
-            ticks = math.ceil(ticks / atATime)
+            atATime = math.min(benchmarkRuns, math.floor(tickThreshold / time))
+            ticks = math.ceil(benchmarkRuns / atATime)
         else
-            ticks = math.ceil(ticks / time)
+            ticks = benchmarkRuns
         end
     end
 
     -- run the rest of the samples this tick
-    output = {output}
-    local testNumber = 1
     for _ = 2, atATime do
-        testNumber = testNumber + 1
-        output[testNumber] = test(unpack(parameters)) - adjust
+        RunTest()
     end
 
-    SPEW("Syncing " .. atATime .. "  " .. ticks)
+    SPEW("Running benchmark " .. atATime .. " at a time for " .. ticks .. " ticks")
 
     -- send over how many samples we're going to run
-    Sync.BenchmarkProgress = {complete = atATime, runs = ticks * atATime}
-
-    -- check to make sure we haven't been stopped
-    if benchmarkThread then
-        -- run benchmark multiple times (remember, we've already done the first tick)
-        for _ = 2, ticks do
-            WaitTicks(1)
-            -- if we've been stopped, return early
-            if not benchmarkThread then
-                break
-            end
-
-            -- recalculate each tick in case the system strain changes
-            if baselineLoop then
-                adjust = baselineLoop(unpack(parameters))
-            end
-            for _ = 1, atATime do
-                testNumber = testNumber + 1
-                output[testNumber] = test(unpack(parameters)) - adjust
-            end
-
-            Sync.BenchmarkProgress = {complete = atATime}
-        end
-    end
-
-    -- outliers are created by the garbage collector kicking in
-
-    ---[[
-    local trimmed = {}
-    local size = 0
-    if testNumber == 1 then
-        trimmed = output
-        size = 1
-    elseif testNumber > 1 then
-        table.sort(output)
-        local rawHalf = testNumber * 0.5
-        local quart2 = math.ceil(rawHalf)
-
-        local rawQuart = quart2 * 0.5
-        local quart1 = math.floor(rawQuart)
-        local quart3 = quart2 + quart1
-
-        local q2 = output[quart2]
-        if quart2 == rawHalf then
-            q2 = (q2 + output[quart2 + 1]) * 0.5
-            quart3 = quart3 + 1 -- exclude the median
-        end
-
-        local q1 = output[quart1]
-        local q3 = output[quart3]
-        if quart1 ~= rawQuart then
-            q1 = (q1 + output[quart1 + 1]) * 0.5
-            q3 = (q3 + output[quart3 + 1]) * 0.5
-        end
-        local iqr15 = (q3 - q1) * 1.5
-
-        for i = 1, testNumber do
-            local result = output[i]
-            if math.abs(result - q2) < iqr15 then
-                size = size + 1
-                trimmed[size] = result
-            end
-        end
-    end
-    --]]
-
-    --[[ to be merged with statistics branch
-    local trimmed, size = Statistics.StatObject(output):RemoveOutliers()
-    --]]
-
-    -- sync to UI
     Sync.BenchmarkOutput = {
-        samples = size,
-        data = trimmed,
-        rawtime = not baselineLoop,
-        success = true,
+        runs = ticks * atATime,
+        data = output,
+        baselines = baselines,
     }
+
+    if not benchmarkThread then
+        Sync.BenchmarkOutput.success = false
+        return
+    end
+    -- run benchmark multiple times (remember, we've already done the first tick)
+    for _ = 2, ticks do
+        WaitTicks(1)
+        -- if we've been stopped, return early
+        if not benchmarkThread then
+            Sync.BenchmarkOutput = {success = false}
+            return
+        end
+
+        testNumber = 0
+        if baselineLoop then
+            baselines = {}
+        end
+        output = {}
+        for _ = 1, atATime do
+            RunTest()
+        end
+
+        Sync.BenchmarkOutput = {
+            data = output,
+            baselines = baselines,
+        }
+    end
+    Sync.BenchmarkOutput.success = true
+
     benchmarkThread = false
-    SPEW("Done with benchmark: " .. size)
+    SPEW("Done with benchmark")
 end
 
 ---@class UserBenchmarkModule
@@ -407,8 +366,9 @@ end
 BenchmarkModuleLoader = Class() {
     excludeFunctions = {
         import = true,
+        lazyimport = true,
         __moduleinfo = true,
-    };
+    },
 
     ---@param self BenchmarkModuleLoader
     ---@param path FileName
@@ -422,7 +382,7 @@ BenchmarkModuleLoader = Class() {
         self.benchmarkSorter = self:NewBenchmarkSorter "benchmarkSort"
         -- loop baselines to subtract the time from
         self.loopBaseline = {}
-    end;
+    end,
 
     -- sorts by the `name` field, but first it groups by the `sort` field
     -- (1) Positive sorts (closer to zero first)
@@ -449,7 +409,7 @@ BenchmarkModuleLoader = Class() {
             end
             return aname:lower() < bname:lower()
         end
-    end;
+    end,
 
     -- same as benchmark sorter, but groups by `path` first, then `sort`, then `file`
     ---@param self BenchmarkModuleLoader
@@ -478,7 +438,7 @@ BenchmarkModuleLoader = Class() {
             end
             return afile:lower() < bfile:lower()
         end
-    end;
+    end,
 
     ---@param self BenchmarkModuleLoader
     ---@param metadata BenchmarkModuleMetadata
@@ -493,6 +453,13 @@ BenchmarkModuleLoader = Class() {
         end
         local info = GetDebugFunctionInfo(fn)
         info.info.func = nil -- can't serialize functions
+        for k, v in info.upvalues do
+            if type(v) == "function" then
+                info.upvalues[k] = "<func>"
+            elseif type(v) == "cfunction" then
+                info.upvalues[k] = "<cfunc>"
+            end
+        end
         return {
             name = funName,
             title = metadata.titles[funName] or "",
@@ -503,7 +470,7 @@ BenchmarkModuleLoader = Class() {
             parameters = info.bytecode.numparams,
             info = info,
         }
-    end;
+    end,
 
     ---@overload fun(self: BenchmarkModuleLoader, module: Module, metadata: BenchmarkModuleMetadata, error: string)
     ---@param self BenchmarkModuleLoader
@@ -543,7 +510,7 @@ BenchmarkModuleLoader = Class() {
             file = file,
             path = path,
         }
-    end;
+    end,
 
     ---@param self BenchmarkModuleLoader
     ---@param module Module
@@ -565,6 +532,7 @@ BenchmarkModuleLoader = Class() {
                     SPEW("Module " .. module.__moduleinfo.name .. " excluded from benchmarking list")
                     return nil
                 end
+                continue
             end
             if k == "ModuleName" then
                 if type(val) == "string" then
@@ -642,7 +610,7 @@ BenchmarkModuleLoader = Class() {
             sort = sortOrder,
             titles = titles,
         }
-    end;
+    end,
 
     ---@param self BenchmarkModuleLoader
     ---@param file FileName
@@ -662,12 +630,12 @@ BenchmarkModuleLoader = Class() {
                 metadata.file = file
                 return obj, metadata
             end
-            WARN("Skipping empty benchmark module \"" .. file .. "\"; there's likely a 'WARNING: SCR_LuaDoFileConcat' right above me'")
+            WARN("Skipping empty benchmark module \"" .. file .. "\", there's likely a 'WARNING: SCR_LuaDoFileConcat' right above me'")
             return obj, nil
         end
         WARN("Couldn't load benchmark module \"" .. file .. "\": " .. obj)
         return nil, {}, obj
-    end;
+    end,
 
     ---@param self BenchmarkModuleLoader
     ---@param path FileName
@@ -713,7 +681,7 @@ BenchmarkModuleLoader = Class() {
 
         local modulesUser, modulesSim = self.modulesUser, self.modulesSim
         modulesUser[moduleCount], modulesSim[moduleCount] = self:FormatModuleData(module, metadata, benchmarksUser, benchmarksSim)
-    end;
+    end,
 
     ---@param self BenchmarkModuleLoader
     ---@param location? FileName
@@ -722,11 +690,11 @@ BenchmarkModuleLoader = Class() {
         for _, file in DiskFindFiles(path, "*.lua") do
             self:AddBenchmarkModule(path, file)
         end
-    end;
+    end,
 
     ---@param self BenchmarkModuleLoader
     SortModules = function(self)
         table.sort(self.modulesUser, self.moduleSorter)
         table.sort(self.modulesSim, self.moduleSorter)
-    end;
+    end,
 }

@@ -26,12 +26,7 @@ local Window = import("/lua/maui/window.lua").Window
 
 local ObservableCreate = import("/lua/shared/observable.lua").Create
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
-local Layouter = import("/lua/maui/layouter.lua").Layout
-local EditLayouter = import("/lua/maui/layouter.lua").LayoutEdit
-local TextLayouter = import("/lua/maui/layouter.lua").LayoutText
-local ListLayouter = import("/lua/maui/layouter.lua").LayoutList
-local BitmapLayouter = import("/lua/maui/layouter.lua").LayoutBitmap
-local PlayerIsDev = import("/lua/shared/profiler.lua").PlayerIsDev
+local Layouter = LayoutHelpers.ReusedLayoutFor
 
 
 
@@ -67,6 +62,8 @@ local State = {
     Benchmarks = {
         BenchmarkProgress = 0,
         BenchmarkRunning = false,
+        BenchmarkRunningMod = false,
+        BenchmarkRunningBen = false,
         BenchmarkRuns = 0,
         ---@type UserBenchmarkModule[]
         Modules = false,
@@ -75,13 +72,14 @@ local State = {
         SelectedModule = 1,
         ---@type table<string, number[]>
         StatCache = {},
+        ---@type table<string, number[]>
+        BaselineCache = {},
     },
     Options = {},
 }
 
 local BenchmarkModuleSelected = ObservableCreate()
 local BenchmarkSelected = ObservableCreate()
-local BenchmarkProgressReceived = ObservableCreate()
 local BenchmarkModulesReceived = ObservableCreate()
 local BenchmarkInfoReceived = ObservableCreate()
 local BenchmarkOutputReceived = ObservableCreate()
@@ -140,16 +138,9 @@ function ReceiveBenchmarkInfo(data)
     BenchmarkInfoReceived:Set(data)
 end
 
----@param data {samples?: number, data?: number[], success: boolean}
+---@param data BenchmarkOutput
 function ReceiveBenchmarkOutput(data)
-    SPEW("Received benchmark output")
     BenchmarkOutputReceived:Set(data)
-end
-
----@param data {complete: number, runs?: number}
-function ReceiveBenchmarkProgress(data)
-    SPEW("Receiving progress")
-    BenchmarkProgressReceived:Set(data)
 end
 
 --- Toggles the profiler in the simulation, sends along the army that initiated the call
@@ -170,10 +161,8 @@ end
 ---@return boolean
 local function CanUseProfiler(player)
     return
-        GameMain.GameHasAIs or
         sessionInfo.Options.CheatsEnabled == "true" or
-        SessionIsReplay() or
-        PlayerIsDev(player)
+        SessionIsReplay()
 end
 
 
@@ -271,45 +260,59 @@ end
 ---@param benIndex? number
 ---@return number[] | nil
 local function GetBenchmarkStatCache(modIndex, benIndex)
-    return State.Benchmarks.StatCache[GetBenchmarkCacheKey(modIndex, benIndex)]
+    local key = GetBenchmarkCacheKey(modIndex, benIndex)
+    return State.Benchmarks.StatCache[key], State.Benchmarks.BaselineCache[key]
 end
 
 ---@param data number[] | nil
+---@param baselines number[] | nil
 ---@param modIndex? number
 ---@param benIndex? number
-local function SetBenchmarkStatCache(data, modIndex, benIndex)
-    State.Benchmarks.StatCache[GetBenchmarkCacheKey(modIndex, benIndex)] = data
+local function SetBenchmarkStatCache(data, baselines, modIndex, benIndex)
+    local key = GetBenchmarkCacheKey(modIndex, benIndex)
+    State.Benchmarks.StatCache[key] = data
+    State.Benchmarks.BaselineCache[key] = baselines
 end
 
 ---@param data number[] | nil
+---@param baselines number[] | nil
 ---@param modIndex? number
 ---@param benIndex? number
----@return number[] | nil
-local function AddBenchmarkStatCache(data, modIndex, benIndex)
+---@return number[] | nil data
+---@return number[] | nil baselines
+local function AddBenchmarkStatCache(data, baselines, modIndex, benIndex)
     local key = GetBenchmarkCacheKey(modIndex, benIndex)
     local statCaches = State.Benchmarks.StatCache
-    local cache = statCaches[key]
-    if not cache then
+    local baseCaches = State.Benchmarks.BaselineCache
+    local sCache = statCaches[key]
+    local bCache = baseCaches[key]
+    if not sCache then
         if data then
             local n = data.n
-            cache = {n = n}
+            sCache = {n = n}
+            bCache = {n = n}
             for i = 1, n do
-                cache[i] = data[i]
+                sCache[i] = data[i]
+                bCache[i] = baselines[i]
             end
-            statCaches[key] = cache
+            statCaches[key] = sCache
+            baseCaches[key] = bCache
         end
     elseif data then
-        local n = data.n
-        local offset = cache.n
+        local n = table.getn(data)
+        local offset = table.getn(sCache)
         for i = 1, n do
-            cache[offset + i] = data[i]
+            sCache[offset + i] = data[i]
+            bCache[offset + i] = baselines[i]
         end
-        cache.n = offset + n
+        table.setn(sCache, offset + n)
+        table.setn(bCache, offset + n)
     else
         statCaches[key] = nil
+        baseCaches[key] = nil
         return nil
     end
-    return cache
+    return sCache, bCache
 end
 
 ---@param module number
@@ -332,14 +335,14 @@ function StartBenchmark(module, benchmark)
     -- to the sim while one is running.
     local benchmarkState = State.Benchmarks
     benchmarkState.BenchmarkRunning = true
+    benchmarkState.BenchmarkRunningMod = benchmarkState.SelectedModule
+    benchmarkState.BenchmarkRunningBen = benchmarkState.SelectedBenchmark
     local params = benchmarkState.ParameterCount
     if not params then
         WARN("Missing debug function to start benchmark")
         return
     end
-    local parameters = {
-        rawtime = true,
-    }
+    local parameters = {}
     local benchmarkParams = benchmarkState.Parameters
     for i = 1, params do
         parameters[i] = benchmarkParams[i]
@@ -391,9 +394,6 @@ ProfilerWindow = ClassUI(Window) {
         end)
         BenchmarkInfoReceived:AddObserver(function(info)
             self:ReceiveBenchmarkInfo(info)
-        end)
-        BenchmarkProgressReceived:AddObserver(function(progress)
-            self:ReceiveBenchmarkProgress(progress)
         end)
         BenchmarkOutputReceived:AddObserver(function(output)
             self:ReceiveBenchmarkOutput(output)
@@ -556,21 +556,6 @@ ProfilerWindow = ClassUI(Window) {
     end,
 
     ---@param self ProfilerWindow
-    ---@param progress table
-    ReceiveBenchmarkProgress = function(self, progress)
-        local benchmarkState = State.Benchmarks
-        local benchmarksTab = self.Tabs.Benchmarks
-        if progress.runs then
-            benchmarkState.BenchmarkRuns = progress.runs
-            benchmarksTab:UpdateRunButtonState()
-            benchmarkState.BenchmarkProgress = progress.complete
-        else
-            benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + progress.complete
-        end
-        benchmarksTab:UpdateBenchmarkProgress()
-    end,
-
-    ---@param self ProfilerWindow
     ---@param info RawFunctionDebugInfo
     ReceiveBenchmarkInfo = function(self, info)
         local benchmarkState = State.Benchmarks
@@ -579,11 +564,23 @@ ProfilerWindow = ClassUI(Window) {
     end,
 
     ---@param self ProfilerWindow
-    ---@param output Module
+    ---@param output BenchmarkOutput
     ReceiveBenchmarkOutput = function(self, output)
-        State.Benchmarks.BenchmarkRunning = false
         local benchmarksTab = self.Tabs.Benchmarks
-        benchmarksTab:AddBenchmarkStats(output)
+        local benchmarkState = State.Benchmarks
+
+        benchmarkState.BenchmarkRunning = output.success == nil
+        local complete = 0
+        if output.data then
+            complete = table.getn(output.data)
+        end
+        if output.runs then
+            benchmarkState.BenchmarkRuns = output.runs
+            benchmarkState.BenchmarkProgress = complete
+        else
+            benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + complete
+        end
+        benchmarksTab:AddBenchmarkStats(output.data, output.baselines)
         benchmarksTab:UpdateBenchmarkProgress()
         benchmarksTab:UpdateRunButtonState()
     end,
@@ -623,7 +620,7 @@ local function CreateSearchBar(parent, tab)
             :Over(self, 10)
             :End()
 
-        EditLayouter(self.edit)
+        Layouter(self.edit)
             :CenteredRightOf(text, 6)
             :AnchorToLeft(clearButton, 6)
             :Over(self, 10)
@@ -787,8 +784,8 @@ ProfilerBenchmarks = Class(Group) {
         self.benchmarkText = UIUtil.CreateText(self.groupNavigation, "", 16, UIUtil.bodyFont, true) -- should immediately update, so no need to set label
         self.benchmarkList = ItemList(self.groupNavigation)
         self.benchmarkList.background = Bitmap(self.benchmarkList)
-        self.summary = ProfilerElements.StatisticSummary(self.groupOutput)
         self.bytecode = ProfilerElements.BytecodeArea(self.groupOutput)
+        self.summary = ProfilerElements.StatisticSummary(self.groupOutput)
 
         self.runButton.OnClick = function(button_self)
             self:OnClickRunButton()
@@ -852,7 +849,7 @@ ProfilerBenchmarks = Class(Group) {
             :End()
 
         local parametersLabel = self.parametersLabel
-        ListLayouter(parametersLabel)
+        Layouter(parametersLabel)
             :AtLeftIn(groupInteraction)
             :AnchorToLeft(runButton)
             :AtVerticalCenterIn(groupInteraction)
@@ -890,7 +887,7 @@ ProfilerBenchmarks = Class(Group) {
             :AtLeftIn(groupNavigation, 10)
             :End()
 
-        local benchmarkList = ListLayouter(self.benchmarkList)
+        local benchmarkList = Layouter(self.benchmarkList)
             :OffsetIn(groupNavigation, 10, 5, 10 + 14) -- leave space for scrollbar
             :AnchorToBottom(benchmarkText, 10)
             :Over(groupNavigation, 10)
@@ -904,7 +901,7 @@ ProfilerBenchmarks = Class(Group) {
             :End()
         UIUtil.CreateLobbyVertScrollbar(benchmarkList, 0, 0, 0)
 
-        BitmapLayouter(benchmarkList.background)
+        Layouter(benchmarkList.background)
             :FillFixedBorder(benchmarkList)
             :Under(benchmarkList, 5)
             :Color("7f000000")
@@ -913,12 +910,13 @@ ProfilerBenchmarks = Class(Group) {
         -- Output components
 
         local summary = Layouter(self.summary)
-            :Fill(groupOutput)
+            :FillHorizontally(groupOutput)
+            :AtBottomIn(groupOutput)
             :End()
 
         Layouter(self.bytecode)
             :Fill(groupOutput)
-            :Top(summary.Bottom)
+            :Bottom(summary.Top)
             :End()
     end,
 
@@ -1059,14 +1057,22 @@ ProfilerBenchmarks = Class(Group) {
     end,
 
     ---@param self ProfilerBenchmarks
-    ---@param data table
-    AddBenchmarkStats = function(self, data)
-        if data.success then
-            local toAdd = data.data
-            toAdd.n = data.samples
-            local stats = AddBenchmarkStatCache(toAdd)
-            self.summary:SetStats(stats)
+    ---@param data number[]
+    ---@param baselines? number[]
+    AddBenchmarkStats = function(self, data, baselines)
+        if not data then
+            return
         end
+        if not baselines then
+            baselines = {}
+        end
+        data.n = table.getn(data)
+        baselines.n = table.getn(baselines)
+
+        local benchmarkState = State.Benchmarks
+        local mod = benchmarkState.BenchmarkRunningMod
+        local ben = benchmarkState.BenchmarkRunningBen
+        self.summary:SetStats(AddBenchmarkStatCache(data, baselines, mod, ben))
     end,
 
     ---@param self ProfilerBenchmarks
