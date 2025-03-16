@@ -1,0 +1,1 @@
+- (#6692) Fix factories not immediately starting to build queued units after the factory finishes upgrading.
