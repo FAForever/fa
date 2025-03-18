@@ -806,7 +806,6 @@ DebugPrototype = ClassSimple {
             instructions[instructionCount] = instr
         end
 
-        -- the bytecode table reports two numbers: `maxstack` and `numparams`--transfer them here
         self.maxstack = bytecode.maxstack
         self.numparams = bytecode.numparams
         self.lineCount = lineCount

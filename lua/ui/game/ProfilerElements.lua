@@ -629,13 +629,7 @@ BytecodeArea = Class(Group) {
             :Font(UIUtil.fixedFont, 14)
             :End()
 
-        ---[[
         UIUtil.CreateLobbyVertScrollbar(bytecode)
-        --]]
-
-        --[[ To be merged with scrollbar branch
-        UIUtil.CreateLobbyScrollBars(bytecode, groupBytecode, ScrollPolicy.AsNeeded, ScrollPolicy.AsNeeded)
-        --]]
 
         bytecode:ShowMouseoverItem(true)
     end,
@@ -643,7 +637,7 @@ BytecodeArea = Class(Group) {
     ---@param self BytecodeArea
     OnLog = function(self)
         local fn = self.DebugFunction.prototype
-        LOG(self.DebugFunction.name .. " (Parameters: " .. fn.numparams .. ", Max Stack: " .. fn.maxstack .. ", Upvalues: "
+        LOG(self.DebugFunction.short_loc .. '#' .. self.DebugFunction.name .. " (Parameters: " .. fn.numparams .. ", Max Stack: " .. fn.maxstack .. ", Upvalues: "
             .. table.getn(self.DebugFunction.upvalues) .. ", Constants: " .. fn.constantCount .. ")")
         local area = self.bytecode
         for i = 1, area:GetItemCount() do

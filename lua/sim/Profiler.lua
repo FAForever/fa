@@ -452,7 +452,10 @@ BenchmarkModuleLoader = Class() {
             return
         end
         local info = GetDebugFunctionInfo(fn)
-        info.info.func = nil -- can't serialize functions
+        info.info.name = funName -- the name won't be added for some reason
+
+        -- can't serialize functions
+        info.info.func = nil
         for k, v in info.upvalues do
             if type(v) == "function" then
                 info.upvalues[k] = "<func>"
@@ -460,6 +463,7 @@ BenchmarkModuleLoader = Class() {
                 info.upvalues[k] = "<cfunc>"
             end
         end
+
         return {
             name = funName,
             title = metadata.titles[funName] or "",

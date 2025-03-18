@@ -2,8 +2,8 @@
 local TableGetn = table.getn
 
 --- Computes the sum of an array of values
--- @param t Table to compute values over, only array elements are used.
--- @param n Number of elements, defaults to table.getn(t)
+---@param t number[]
+---@param n? integer
 function Sum(t, n)
     -- allow for optionals
     n = n or TableGetn(t)
@@ -17,11 +17,14 @@ function Sum(t, n)
 end
 
 --- Computes the mean of an array of values
--- @param t Table to compute values over, only array elements are used.
--- @param n Number of elements, defaults to table.getn(t)
+---@param t number[]
+---@param n? integer
 function Mean(t, n)
     -- allow for optionals
     n = n or TableGetn(t)
+    if n == 0 then
+        return 0
+    end
 
     -- compute mean
     local mean = 0
@@ -33,13 +36,15 @@ function Mean(t, n)
 end
 
 --- Computes the deviation of an array of values
----@param t number[] Table to compute values over, only array elements are used.
----@param n? integer Number of elements, defaults to table.getn(t)
----@param m? number Mean of table, defaults to Mean(t, n)
+---@param t number[]
+---@param n? integer
+---@param m? number center of the data, defaults to the mean
 function Deviation(t, n, m)
-
     -- allow for optionals
     n = n or TableGetn(t)
+    if n < 2 then
+        return 0
+    end
     m = m or Mean(t, n)
 
     -- compute deviation
@@ -53,12 +58,16 @@ function Deviation(t, n, m)
 end
 
 
+--- Computes the skewness of an array of values
 ---@param t number[]
 ---@param n? integer
----@param m? number
----@param d? number
+---@param m? number center of the data, defaults to the mean
+---@param d? number deviation of the data, defaults to the standard deviation
 function Skewness(t, n, m, d)
     n = n or TableGetn(t)
+    if n < 2 then
+        return 0
+    end
     m = m or Mean(t, n)
 
     if d then
@@ -67,18 +76,19 @@ function Skewness(t, n, m, d)
             local residual = t[k] - m
             skewness = skewness + residual * residual * residual
         end
-        return skewness / d
+        return skewness / (n * d)
     else
-        local variance = 0
+        local stddev = 0
         local skewness = 0
         for k = 1, n do
             local residual = t[k] - m
             local residualSq = residual * residual
-            variance = variance + residualSq
+            stddev = stddev + residualSq
             skewness = skewness + residualSq * residual
         end
-        variance = variance / (n - 1)
-        return skewness / math.sqrt(variance)
+        stddev = math.sqrt(stddev / (n - 1))
+        skewness = skewness / n
+        return skewness / (stddev * stddev * stddev)
     end
 end
 
@@ -90,15 +100,16 @@ end
 ---@return integer newSize
 function RemoveOutliers(t, n)
     n = n or TableGetn(t)
-    if n < 5 then
-        return t, n -- no quartiles
-    end
 
     local sorted = {}
     for i = 1, n do
         sorted[i] = t[i]
     end
     table.sort(sorted)
+    if n < 5 then
+        return sorted, n -- no quartiles
+    end
+
     local rawHalf = n * 0.5
     local quart2 = math.ceil(rawHalf)
 

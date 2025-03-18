@@ -39,9 +39,15 @@ luft.describe("Utils", function()
         luft.expect(StringComma(100)).to.equal("100")
         luft.expect(StringComma(1000)).to.equal("1,000")
         luft.expect(StringComma(10000)).to.equal("10,000")
-        -- Maybe not desired, but included for documentation purposes
+        -- Use different comment rules in Lua 5.0 and 5.1 to get different
+        -- tests to run in different environments
+        --[=[      -- In-game version
+        luft.expect(StringComma(100000)).to.equal("100,000")
+        luft.expect(StringComma(1000000)).to.equal("1,000,000")
+        --[[ ]=]   -- Github action version
         luft.expect(StringComma(100000)).to.equal("1e+05")
         luft.expect(StringComma(1000000)).to.equal("1e+06")
+        --]]
     end)
 
     luft.test("StringPrepend", function()
