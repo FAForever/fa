@@ -11,30 +11,30 @@
 local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
-local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
-local loading = false
 
----@class URS0303 : AircraftCarrier
-URS0303 = ClassUnit(AircraftCarrier) {
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon02.lua").CDFMissileRedirectWeapon02
+
+
+---@class URS0303 : AircraftCarrier, ExternalFactoryComponent
+URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
 
     Weapons = {
-    -- Weapons
-    --  4 AA Autocannon w/ Guided Rounds
-    --  1 "Zapper" Anti-Missile
-
         AAGun01 = ClassWeapon(CAAAutocannon) {},
         AAGun02 = ClassWeapon(CAAAutocannon) {},
         AAGun03 = ClassWeapon(CAAAutocannon) {},
         AAGun04 = ClassWeapon(CAAAutocannon) {},
-
-        Zapper = ClassWeapon(CAMZapperWeapon) {},
-
+        RedirectMissile = ClassWeapon(CDFMissileRedirectWeapon02) {
+            SphereEffectBp = '/effects/emitters/zapper_electricity_03_emit.bp',
+        },
     },
 
-    BuildAttachBone = 'Attachpoint',
+    FactoryAttachBone = 'ExternalFactoryPoint',
+    BuildAttachBone = 'Launchpoint',
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AircraftCarrier.OnStopBeingBuilt(self, builder, layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -43,10 +43,20 @@ URS0303 = ClassUnit(AircraftCarrier) {
         ChangeState(self, self.IdleState)
     end,
 
+    OnLayerChange = function(self, new, old)
+        AircraftCarrier.OnLayerChange(self, new, old)
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        AircraftCarrier.OnKilled(self, instigator, type, overkillRatio)
+        ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
+            self:OnIdle()
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -62,37 +72,20 @@ URS0303 = ClassUnit(AircraftCarrier) {
             self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
+            unitBuilding:AttachTo(self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
-            ChangeState(self, self.FinishedBuildingState)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
-
-    FinishedBuildingState = State {
-        Main = function(self)
-            self:SetBusy(true)
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
-            end
-            self:SetBusy(false)
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
-        end,
-    },
-
-
 }
 
 TypeClass = URS0303
 
+-- backwards compatibility with mods
+
+local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon03

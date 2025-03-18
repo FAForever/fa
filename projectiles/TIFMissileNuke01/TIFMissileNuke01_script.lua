@@ -1,8 +1,7 @@
---
--- Terran Nuke Missile
---
 local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
 
+--- Terran Nuke Missile
+---@class TIFMissileNuke01: TIFMissileNuke
 TIFMissileNuke01 = ClassProjectile(TIFMissileNuke) {
 
     InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
@@ -16,11 +15,11 @@ TIFMissileNuke01 = ClassProjectile(TIFMissileNuke) {
         '/effects/emitters/nuke_munition_launch_trail_06_emit.bp',
     },
 
+    ---@param self TIFMissileNuke01
     OnCreate = function(self)
         TIFMissileNuke.OnCreate(self)
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp'
         self:LauncherCallbacks()
     end,
 }
-
 TypeClass = TIFMissileNuke01

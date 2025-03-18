@@ -34,6 +34,8 @@
 ---@field CameraFollowTimeout number
 --- how large is the strategic icon square for the projectile
 ---@field StrategicIconSize number
+--- flag to not use generic scorch splats
+---@field NoGenericScorchSplats? boolean
 
 ---@class ProjectileBlueprintEconomy
 --- energy cost to build this projectile
@@ -50,6 +52,12 @@
 ---@field CollideEntity boolean
 --- if this projectile should turn to track its target
 ---@field TrackTarget boolean
+--- if this projectile should track as if it was an attack-ground attack
+---@field TrackTargetGround boolean
+--- acts as a multiplier to the location of where the missile will act like a ground attack. A value of 1.0 will encompass the entire collision box of the target. Defaults to 0.8
+---@field TrackTargetGroundFuzziness? number
+--- acts as a flat offset to the location where the missile will act like a ground attack. Defaults to 0
+---@field TrackTargetGroundOffset? number
 --- if this projectile should always face the direction its moving
 ---@field VelocityAlign boolean
 --- if this projectile should always remain upright
@@ -58,7 +66,7 @@
 ---@field LeadTarget boolean
 --- Whether projectiles should try to stay underwater. Applies only to tracking projectiles.
 ---@field StayUnderwater boolean
---- if the projectile is initially affected by gravity
+--- if the projectile is initially affected by gravity (-4.9 ogrids/second/second)
 ---@field UseGravity boolean
 --- projectile will detonate when going above this height above ground
 ---@field DetonateAboveHeight number
@@ -125,7 +133,11 @@
 ---@field MaxZigZag number
 --- frequency of zig-zag directional changes, in seconds
 ---@field ZigZagFrequency number
---- realistic free fall ordinance type weapon
+--- When true and weapon muzzle velocity is 0, the projectile's horizontal velocity is set in the direction of the target with the speed of the weapon firing the projectile.
+--- Used for realistic free fall ordinance type weapons like bombs
 ---@field RealisticOrdinance boolean
 --- bombs that always drop stright down
 ---@field StraightDownOrdinance boolean
+--- for projectiles that spawn spreads of sub-projectiles, how large the impact radius should be
+---@field FragmentRadius number
+---@field OnLostTargetLifetime? number

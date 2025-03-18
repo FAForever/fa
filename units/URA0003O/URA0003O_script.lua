@@ -11,7 +11,7 @@ local CreateBuilderArmController = CreateBuilderArmController
 -- upvalued moho functions for performance
 local BuilderArmManipulatorSetAimingArc = _G.moho.BuilderArmManipulator.SetAimingArc
 local BuilderArmManipulatorSetPrecedence = _G.moho.BuilderArmManipulator.SetPrecedence
-BuilderArmManipulator = nil 
+BuilderArmManipulator = nil
 
 -- upvalued trashbag functions for performance
 local TrashBagAdd = _G.TrashBag.Add
@@ -26,7 +26,7 @@ URA0003O = ClassDummyUnit(CBuildBotUnit) {
         self:SetCollisionShape('None')
 
         -- make the drone aim for the target
-        local BuildArmManipulator = CreateBuilderArmController(self, 'URA0003' , 'URA0003', 0)
+        local BuildArmManipulator = CreateBuilderArmController(self, 'URA0003', 'URA0003', 0)
         BuilderArmManipulatorSetAimingArc(BuildArmManipulator, -180, 180, 360, -90, 90, 360)
         BuilderArmManipulatorSetPrecedence(BuildArmManipulator, 5)
         TrashBagAdd(self.Trash, BuildArmManipulator)

@@ -12,6 +12,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local Factions = import("/lua/factions.lua").Factions
 
+---@type { [string]: WorldView }
 MapControls = {}
 
 view = false
@@ -306,6 +307,7 @@ function ToggleMainCartographicView()
     end
 end
 
+---@param view WorldView
 function RegisterWorldView(view)
     if not MapControls[view._cameraName] then MapControls[view._cameraName] = {} end
     MapControls[view._cameraName] = view
@@ -317,12 +319,33 @@ function RegisterWorldView(view)
     end
 end
 
+---@param view WorldView
 function UnregisterWorldView(view)
     if MapControls[view._cameraName] then
         MapControls[view._cameraName] = nil
     end
 end
 
+---@return { [string]: WorldView }
 function GetWorldViews()
     return MapControls
+end
+
+--- Returns the top-most WorldView at a screen location
+---@param screenPosX number
+---@param screenPosY number
+---@return WorldView
+function GetTopmostWorldViewAt(screenPosX, screenPosY)
+    local topView = nil
+    local topViewDepth = nil
+    for _, worldView in MapControls do
+        if worldView:HitTest(screenPosX, screenPosY) and worldView.Depth() > topViewDepth then
+            local viewDepth = worldView.Depth()
+            if viewDepth > topViewDepth then
+                topView = worldView
+                topViewDepth = viewDepth
+            end
+        end
+    end
+    return topView
 end

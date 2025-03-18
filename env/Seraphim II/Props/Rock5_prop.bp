@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'INVULNERABLE',
+        "INVULNERABLE",
+        "OBSTRUCTSBUILDING",
     },
     Defense = {
         Health = 50,
@@ -11,9 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 3000,
-                    ShaderName = 'NormalMappedAlpha',
+                    LODCutoff = 1000,
+                    ShaderName = "NormalMappedAlpha",
                 },
             },
         },
@@ -24,15 +24,11 @@ PropBlueprint {
         ReclaimMassMax = 1,
         ReclaimTime = 1,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Huge Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Huge Rock" },
+    Physics = { BlockPath = true },
+    ScriptClass = "PropInvulnerable",
+    ScriptModule = "/lua/sim/prop.lua",
     SizeX = 34,
     SizeY = 9,
     SizeZ = 22,

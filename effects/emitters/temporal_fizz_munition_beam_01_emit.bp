@@ -1,8 +1,18 @@
-BeamBlueprint {
-    Lifetime = 10,
-    TextureName = '/textures/particles/bubble_02.dds',
-    Thickness = 0.125,
-    StartColor = {x=0.5,y=0.5,z=1,w=0.0}, -- R,G,B,Glow
-    EndColor = {x=0.5,y=0.5,z=1,w=0.0}, -- R,G,B,Glow
+BeamBlueprint{
+    EndColor = {
+        w = 0.0,
+        x = 0.5,
+        y = 0.5,
+        z = 1,
+    },
     Length = 0.25,
+    Lifetime = 10,
+    StartColor = {
+        w = 0.0,
+        x = 0.5,
+        y = 0.5,
+        z = 1,
+    },
+    TextureName = "/textures/particles/bubble_02.dds",
+    Thickness = 0.125,
 }

@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,9 +12,9 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'Tund_Rock02_albedo.dds',
-                    LODCutoff = 300,
-                    ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 120,
+                    ShaderName = "NormalMappedTerrain",
+                    AlbedoName = "Tund_Rock02_albedo.dds",
                 },
             },
         },
@@ -24,9 +25,7 @@ PropBlueprint {
         ReclaimMassMax = 2.5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Tiny Rock',
-    },
+    Interface = { HelpText = "Tiny Rock" },
     SizeX = 0.5,
     SizeY = 0.25,
     SizeZ = 0.25,

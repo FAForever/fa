@@ -9,10 +9,11 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 -- something more involved, or use it as-is if you want to manually assemble your popup UI Group.
 ---@class Popup : Group
 Popup = ClassUI(Group) {
+
     --- Create a new popup
-    --
-    -- @param GUI A reference to the lobby's GUI object (dialogs should all be parented off there)
-    -- @param content A Group containing the UI to show inside the popup.
+    ---@param self Popup
+    ---@param GUI Control       -- A reference to the lobby's GUI object (dialogs should all be parented off there)
+    ---@param content Control   -- A Group containing the UI to show inside the popup.
     __init = function(self, GUI, content)
         Group.__init(self, GUI)
         self.content = content
@@ -39,7 +40,6 @@ Popup = ClassUI(Group) {
         -- Plant the dialog in the middle of the screen.
         LayoutHelpers.AtCenterIn(self, GUI)
 
-        
         -- Dismiss dialog when shadow is clicked.
         shadow.HandleEvent = function(shadow, event)
             if event.Type == 'ButtonPress' then
@@ -55,22 +55,26 @@ Popup = ClassUI(Group) {
     end,
 
     --- Close the dialog.
+    ---@param self Popup
     Close = function(self)
         self:OnClosed()
         self:Destroy()
     end,
 
     --- Called when escape is pressed if the dialog is open. Defaults to closing the dialog.
+    ---@param self Popup
     OnEscapePressed = function(self)
         self:Close()
     end,
 
     --- Called when the shadow is clicked. Defaults to closing the dialog.
+    ---@param self Popup
     OnShadowClicked = function(self)
         self:Close()
     end,
 
     --- Called when the dialog is closed via any method.
+    ---@param self Popup
     OnClosed = function(self)
         EscapeHandler.PopEscapeHandler()
     end,

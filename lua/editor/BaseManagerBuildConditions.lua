@@ -13,6 +13,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 ---@param baseName string
 ---@return boolean
 function NeedAnyStructure(aiBrain, baseName)
+
     if not aiBrain.BaseManagers[baseName] then
         return false
     end
@@ -93,14 +94,8 @@ end
 ---@param baseName string
 ---@return boolean
 function BaseManagerNeedsEngineers(aiBrain, baseName)
-    if not aiBrain.BaseManagers[baseName] then
-        return false
-    end
-    local bManager = aiBrain.BaseManagers[baseName]
-    if bManager.EngineerQuantity > bManager.CurrentEngineerCount then
-        return true
-    end
-    return false
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
 end
 
 ---@param aiBrain AIBrain
@@ -290,7 +285,7 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     return false
 end
 
----@param aiBrain ArmiesTable
+--@param aiBrain ArmiesTable
 ---@param level number
 ---@param baseName string
 ---@return boolean
@@ -303,17 +298,9 @@ function HighestFactoryLevel(aiBrain, level, baseName)
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager.Radius)
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager.Radius)
     if t3FacList and not table.empty(t3FacList) then
-        if level == 3 then
-            return true
-        else
-            return false
-        end
+		return level == 3
     elseif t2FacList and not table.empty(t2FacList) then
-        if level == 2 then
-            return true
-        else
-            return false
-        end
+        return level == 2
     end
     return true
 end
@@ -367,18 +354,16 @@ end
 ---@return boolean
 function UnfinishedBuildingsCheck(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then
-        return false
-    end
-    -- Return out if the list is empty or all buildings are finished
-    if table.empty(bManager.UnfinishedBuildings) then
+	
+	-- Return if the BaseManager doesn't exist, or the list is empty, or all buildings are finished
+    if not bManager or table.empty(bManager.UnfinishedBuildings) then
         return false
     end
 
     -- Check list
-    local armyIndex = bManager.AIBrain:GetArmyIndex()
+    local armyIndex = aiBrain:GetArmyIndex()
     local beingBuiltList = {}
-    local buildingEngs = bManager.AIBrain:GetListOfUnits(categories.ENGINEER, false)
+    local buildingEngs = aiBrain:GetListOfUnits(categories.ENGINEER, false)
     for _, v in buildingEngs do
         local buildingUnit = v.UnitBeingBuilt
         if buildingUnit and buildingUnit.UnitName then
@@ -419,17 +404,9 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager.Radius)
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager.Radius)
     if t3FacList and not table.empty(t3FacList) then
-        if level == 3 then
-            return true
-        else
-            return false
-        end
+        return level == 3
     elseif t2FacList and not table.empty(t2FacList) then
-        if level == 2 then
-            return true
-        else
-            return false
-        end
+        return level == 2
     end
     return true
 end
@@ -438,81 +415,73 @@ end
 ---@param baseName string
 ---@return boolean
 function BaseActive(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.Active
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.Active
 end
 
+--- Deprecated, it was supposed to be a condition for an unfinished reclaim function/thread
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function BaseReclaimEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.EngineerReclaiming
+	local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.EngineerReclaiming
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function BasePatrollingEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.Patrolling
+	local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.Patrolling
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function BaseBuildingEngineers(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.BuildEngineers
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.FunctionalityStates.BuildEngineers
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function BaseEngineersEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.Engineers
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.FunctionalityStates.Engineers
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function LandScoutingEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.LandScouting
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.FunctionalityStates.LandScouting
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function AirScoutingEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.AirScouting
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.FunctionalityStates.AirScouting
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function ExpansionBasesEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.ExpansionBases
+	local bManager = aiBrain.BaseManagers[baseName]
+	return bManager and bManager.FunctionalityStates.ExpansionBases
 end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@return boolean
 function TMLsEnabled(aiBrain, baseName)
-    local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.TMLs
+	local bManager = aiBrain.BaseManagers[baseName]
+    return bManager and bManager.FunctionalityStates.TMLs
 end
 
 ---@param aiBrain AIBrain
@@ -520,8 +489,7 @@ end
 ---@return boolean
 function NukesEnabled(aiBrain, baseName)
     local bManager = aiBrain.BaseManagers[baseName]
-    if not bManager then return false end
-    return bManager.FunctionalityStates.Nukes
+    return bManager and bManager.FunctionalityStates.Nukes 
 end
 
 --- Moved Unused Imports for mod compatibility

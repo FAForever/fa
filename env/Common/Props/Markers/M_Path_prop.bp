@@ -1,22 +1,25 @@
-PropBlueprint {
+PropBlueprint{
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    ShaderName = 'EditorMarker',
+                    LODCutoff = 210,
+                    ShaderName = "EditorMarker",
                 },
             },
         },
         UniformScale = 0.05,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = '',
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
     },
-    Interface = {
-        HelpText = 'Used as a node in a path graph.',
-    },
+    Interface = { HelpText = "Used as a node in a path graph." },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

@@ -7,6 +7,7 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
+-- Note some mods will replace this file, any new templates that need to be added should be added to EngineerPlatoonNewTemplates.lua
 -- Engineer platoons to be formed
 
 PlatoonTemplate {
@@ -20,14 +21,6 @@ PlatoonTemplate {
 PlatoonTemplate {
     Name = 'CommanderBuilder',
     Plan = 'EngineerBuildAI',
-    GlobalSquads = {
-        { categories.COMMAND, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'CommanderInitialBuilder',
-    Plan = 'CommanderInitialBOAI',
     GlobalSquads = {
         { categories.COMMAND, 1, 1, 'support', 'None' }
     },
@@ -58,45 +51,12 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
-    Name = 'EngineerDrop',
-    Plan = 'EngineerDropAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH1, 6, 6, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
     Name = 'T1EngineerReclaimer',
     Plan = 'ReclaimAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
     },
 }
-
-PlatoonTemplate {
-    Name = 'T1EngineerGridReclaimer',
-    Plan = 'ReclaimGridAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'T2EngineerGridReclaimer',
-    Plan = 'ReclaimGridAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'T3EngineerGridReclaimer',
-    Plan = 'ReclaimGridAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH3, 1, 1, 'support', 'None' }
-    },
-}
-
 
 PlatoonTemplate {
     Name = 'T2EngineerAssist',
@@ -163,14 +123,6 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
-    Name = 'T123EngineerBuilder',
-    Plan = 'EngineerBuildAI',
-    GlobalSquads = {
-        { categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.ENGINEERSTATION - categories.COMMAND, 1, 1, 'support', 'none' },
-    },
-}
-
-PlatoonTemplate {
     Name = 'AeonT3EngineerBuilder',
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
@@ -199,6 +151,30 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.SERAPHIM * categories.ENGINEER * (categories.TECH3 + categories.SUBCOMMANDER), 1, 1, 'support', 'None' }
+    },
+}
+
+PlatoonTemplate {
+    Name = 'StateMachineEngineerT1',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.ENGINEER * categories.TECH1 - categories.COMMAND, 1, 1, 'support', 'None' },
+    },
+}
+
+PlatoonTemplate {
+    Name = 'StateMachineEngineerT2',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.ENGINEER * categories.TECH2 - categories.COMMAND, 1, 1, 'support', 'None' },
+    },
+}
+
+PlatoonTemplate {
+    Name = 'StateMachineEngineerT3',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.ENGINEER * categories.TECH3 - categories.COMMAND, 1, 1, 'support', 'None' },
     },
 }
 

@@ -13,17 +13,25 @@ categories = {
     ALLPROJECTILES = categoryValue,
     ALLUNITS = categoryValue,
     AMPHIBIOUS = categoryValue,
+    --- Used for units that can target air units
     ANTIAIR = categoryValue,
+    --- Used by support commander presets
     ANTIAIRPRESET = categoryValue,
+    --- Used for units that can target missiles
     ANTIMISSILE = categoryValue,
+    --- Used for units that can target submarines (torpedoes and depth charges)
     ANTINAVY = categoryValue,
+    --- Used for units that are specifically designed to target shields
     ANTISHIELD = categoryValue,
+    --- Unused, see `ANTINAVY` instead
     ANTISUB = categoryValue,
+    --- Used for units that can target torpedoes
     ANTITORPEDO = categoryValue,
     ARTILLERY = categoryValue,
     ASF = categoryValue,
     BATTLESHIP = categoryValue,
     BENIGN = categoryValue,
+    --- Used for units that die when attacking
     BOMB = categoryValue,
     BOMBER = categoryValue,
     BOT = categoryValue,
@@ -51,6 +59,8 @@ categories = {
     CANTRANSPORTCOMMANDER = categoryValue,
     CAPTURE = categoryValue,
     CARRIER = categoryValue,
+    --- Allows the unit to land on water. Is introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
+    CANLANDONWATER = categoryValue,
     CIVILIAN = categoryValue,
     CIVILLIAN = categoryValue,
     CLOAKPRESET = categoryValue,
@@ -112,8 +122,11 @@ categories = {
     NANOCOMBATPRESET = categoryValue,
     NAVALCARRIER = categoryValue,
     NAVAL = categoryValue,
+
+    -- Allows this unit to be build by engineers
     NEEDMOBILEBUILD = categoryValue,
     NOFORMATION = categoryValue,
+    --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
     NUKESUB = categoryValue,
@@ -124,6 +137,7 @@ categories = {
     OVERLAYANTIAIR = categoryValue,
     OVERLAYANTINAVY = categoryValue,
     OVERLAYCOUNTERINTEL = categoryValue,
+    OVERLAYCOUNTERMEASURE = categoryValue,
     OVERLAYDEFENSE = categoryValue,
     OVERLAYDIRECTFIRE = categoryValue,
     OVERLAYINDIRECTFIRE = categoryValue,
@@ -236,6 +250,9 @@ categories = {
     StealthGenerator = categoryValue,
     Switchback = categoryValue,
     SystemIntegrityCompensator = categoryValue,
+
+    -- Populates a dummy factory that can take over the factory aspect of the unit
+    EXTERNALFACTORY = categoryValue
 }
 
 ---@alias CategoryName
@@ -285,6 +302,7 @@ categories = {
 ---| "CANTRANSPORTCOMMANDER"
 ---| "CAPTURE"
 ---| "CARRIER"
+---| "CANLANDONWATER"
 ---| "CIVILIAN"
 ---| "CIVILLIAN"
 ---| "CLOAKPRESET"
@@ -351,6 +369,7 @@ categories = {
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
+---| "OBSTRUCTSBUILDING"
 ---| "OMNI"
 ---| "OPERATION"
 ---| "OPTICS"

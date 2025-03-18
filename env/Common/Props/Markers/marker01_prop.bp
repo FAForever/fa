@@ -1,23 +1,26 @@
-PropBlueprint {
+PropBlueprint{
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    ShaderName = 'EditorMarker',
+                    LODCutoff = 210,
+                    ShaderName = "EditorMarker",
                 },
             },
         },
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 0,
         ReclaimTime = 0,
     },
-    Interface = {
-        HelpText = 'Marker for general use',
-    },
+    Interface = { HelpText = "Marker for general use" },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

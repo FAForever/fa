@@ -964,7 +964,7 @@ NavUI = ClassUI(Window) {
     end,
 
     OnClose = function(self)
-        SimCallback({Func = 'NavDisableDebugging', Args = { }})
+        -- SimCallback({Func = 'NavDisableDebugging', Args = { }})
         self:Hide()
     end,
 }

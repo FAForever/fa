@@ -1,10 +1,8 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
-    CollisionOffsetX = 1.6,
-    CollisionOffsetY = 0,
-    CollisionOffsetZ = -0.35,
     Defense = {
         Health = 50,
         MaxHealth = 50,
@@ -14,21 +12,21 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = '../Ficus02_s1_albedo.dds',
-                    LODCutoff = 60,
-                    NormalsName = '../Ficus01_s1_normalsTS.dds',
-                    ShaderName = 'UndulatingNormalMappedAlpha',
+                    LODCutoff = 40,
+                    ShaderName = "UndulatingNormalMappedAlpha",
+                    AlbedoName = "../Ficus02_s1_albedo.dds",
+                    NormalsName = "../Ficus01_s1_normalsTS.dds",
                 },
                 {
-                    AlbedoName = '../Ficus02_s1_albedo.dds',
-                    LODCutoff = 200,
-                    NormalsName = '../Ficus01_s1_normalsTS.dds',
-                    ShaderName = 'NormalMappedAlpha',
+                    LODCutoff = 150,
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "../Ficus02_s1_albedo.dds",
+                    NormalsName = "../Ficus01_s1_normalsTS.dds",
                 },
                 {
-                    AlbedoName = 'Ficus02_Group1_LOD2_albedo.dds',
-                    LODCutoff = 750,
-                    ShaderName = 'VertexNormal',
+                    LODCutoff = 330,
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "Ficus02_Group1_LOD2_albedo.dds",
                 },
             },
         },
@@ -39,14 +37,13 @@ PropBlueprint {
         ReclaimMassMax = 6,
         ReclaimTime = 50,
     },
-    Interface = {
-        HelpText = 'Group of Medium Trees',
-    },
-    Physics = {
-        BlockPath = false,
-    },
-    ScriptClass = 'TreeGroup',
-    ScriptModule = '/lua/proptree.lua',
+    Interface = { HelpText = "Group of Medium Trees" },
+    Physics = { BlockPath = false },
+    ScriptClass = "TreeGroup",
+    ScriptModule = "/lua/proptree.lua",
+    CollisionOffsetX = 1.6,
+    CollisionOffsetY = 0,
+    CollisionOffsetZ = -0.35,
     SizeX = 5.2,
     SizeY = 1,
     SizeZ = 8.1,

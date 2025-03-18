@@ -1,13 +1,13 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Physics = {
-        MinBounceCount = 1,
-        MaxBounceCount = 3,
         BounceVelDamp = 1,
         DestroyOnWater = false,
         InitialSpeed = 5,
         InitialSpeedRange = 0,
         Lifetime = 6,
+        MaxBounceCount = 3,
         MaxSpeed = 100,
+        MinBounceCount = 1,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0.5,
         TurnRate = 0,

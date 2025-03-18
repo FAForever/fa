@@ -9,74 +9,51 @@ local TSubUnit = import("/lua/terranunits.lua").TSubUnit
 local WeaponFile = import("/lua/terranweapons.lua")
 local TIFCruiseMissileLauncherSub = WeaponFile.TIFCruiseMissileLauncherSub
 local TIFStrategicMissileWeapon = WeaponFile.TIFStrategicMissileWeapon
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class UES0304 : TSubUnit
 UES0304 = ClassUnit(TSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
         CruiseMissiles = ClassWeapon(TIFCruiseMissileLauncherSub) {
-            CurrentRack = 1,
-
-            PlayFxMuzzleSequence = function(self, muzzle)
-                local bp = self:GetBlueprint()
-                self.Rotator = CreateRotator(self.unit, bp.RackBones[self.CurrentRack].RackBone, 'z', nil, 90, 90, 90)
-                muzzle = bp.RackBones[self.CurrentRack].MuzzleBones[1]
-                self.Rotator:SetGoal(90)
-                TIFCruiseMissileLauncherSub.PlayFxMuzzleSequence(self, muzzle)
-                WaitFor(self.Rotator)
-                WaitSeconds(1)
-                self.Rotator:SetGoal(0) -- This tells the door to close without affecting launch time
-            end,
-
-            CreateProjectileAtMuzzle = function(self, muzzle)
-                muzzle = self:GetBlueprint().RackBones[self.CurrentRack].MuzzleBones[1]
-                if self.CurrentRack >= 6 then
-                    self.CurrentRack = 1
-                else
-                    self.CurrentRack = self.CurrentRack + 1
-                end
-                return TIFCruiseMissileLauncherSub.CreateProjectileAtMuzzle(self, muzzle)
+            PlayFxMuzzleChargeSequence = function(self, muzzle)
+                --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
+                self.Rotator = CreateRotator(self.unit, self:GetBlueprint().RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
+                TIFCruiseMissileLauncherSub.PlayFxMuzzleChargeSequence(self, muzzle)
             end,
 
             PlayFxRackReloadSequence = function(self)
-                WaitSeconds(1)
-                self.Rotator:SetGoal(0)
-                WaitFor(self.Rotator)
-                self.Rotator:Destroy()
-                self.Rotator = nil
+                self.Trash:Add(ForkThread(function()
+                    -- Wait 1 second for the missile to clear the hatch.
+                    WaitSeconds(1)
+                    self.Rotator:SetGoal(0)
+                    WaitFor(self.Rotator)
+                    self.Rotator:Destroy()
+                    self.Rotator = nil
+                end))
+                TIFCruiseMissileLauncherSub.PlayFxRackReloadSequence(self)
             end,
         },
 
         NukeMissiles = ClassWeapon(TIFStrategicMissileWeapon) {
-            CurrentRack = 1,
+            FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
 
-            PlayFxMuzzleSequence = function(self, muzzle)
-                local bp = self:GetBlueprint()
-                self.Rotator = CreateRotator(self.unit, bp.RackBones[self.CurrentRack].RackBone, 'z', nil, 90, 90, 90)
-                muzzle = bp.RackBones[self.CurrentRack].MuzzleBones[1]
-                self.Rotator:SetGoal(90)
-                TIFCruiseMissileLauncherSub.PlayFxMuzzleSequence(self, muzzle)
-                WaitFor(self.Rotator)
-                WaitSeconds(1)
-                self.Rotator:SetGoal(0) -- This tells the door to close without affecting launch time
-            end,
-
-            CreateProjectileAtMuzzle = function(self, muzzle)
-                muzzle = self:GetBlueprint().RackBones[self.CurrentRack].MuzzleBones[1]
-                if self.CurrentRack >= 2 then
-                    self.CurrentRack = 1
-                else
-                    self.CurrentRack = self.CurrentRack + 1
-                end
-                return TIFCruiseMissileLauncherSub.CreateProjectileAtMuzzle(self, muzzle)
+            PlayFxMuzzleChargeSequence = function(self, muzzle)
+                --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
+                self.Rotator = CreateRotator(self.unit, self:GetBlueprint().RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
+                TIFCruiseMissileLauncherSub.PlayFxMuzzleChargeSequence(self, muzzle)
             end,
 
             PlayFxRackReloadSequence = function(self)
-                WaitSeconds(1)
-                self.Rotator:SetGoal(0)
-                WaitFor(self.Rotator)
-                self.Rotator:Destroy()
-                self.Rotator = nil
+                self.Trash:Add(ForkThread(function()
+                    -- Wait 1 second for the missile to clear the hatch.
+                    WaitSeconds(1)
+                    self.Rotator:SetGoal(0)
+                    WaitFor(self.Rotator)
+                    self.Rotator:Destroy()
+                    self.Rotator = nil
+                end))
+                TIFCruiseMissileLauncherSub.PlayFxRackReloadSequence(self)
             end,
         },
     },

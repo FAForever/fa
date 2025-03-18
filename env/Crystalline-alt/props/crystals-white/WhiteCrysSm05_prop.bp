@@ -1,39 +1,34 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 60,
+        MaxHealth = 60,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
+                    LODCutoff = 230,
+                    ShaderName = "NormalMappedTerrain",
                     AlbedoName = "WhiteCrysSm03_albedo.dds",
-                    LODCutoff = 500,
-                    ShaderName = 'NormalMappedTerrain',
                 },
             },
         },
         UniformScale = 0.15,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 30,
         ReclaimTime = 15,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Small Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Small Rock" },
+    Physics = { BlockPath = true },
     SizeX = 1,
-    SizeY = 0.50,
+    SizeY = 0.5,
     SizeZ = 2,
 }

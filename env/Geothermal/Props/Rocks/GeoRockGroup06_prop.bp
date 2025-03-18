@@ -1,19 +1,20 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 350,
+        MaxHealth = 350,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = '/env/geothermal/props/rocks/GeoRock04_albedo.dds',
-                    LODCutoff = 750,
-                    ShaderName = 'VertexNormal',
+                    LODCutoff = 370,
+                    ShaderName = "VertexNormal",
+                    AlbedoName = "/env/geothermal/props/rocks/GeoRock04_albedo.dds",
                 },
             },
         },
@@ -24,9 +25,7 @@ PropBlueprint {
         ReclaimMassMax = 175,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Medium Rockpile',
-    },
+    Interface = { HelpText = "Medium Rockpile" },
     SizeX = 4,
     SizeY = 0.25,
     SizeZ = 4,

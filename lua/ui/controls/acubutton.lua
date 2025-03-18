@@ -21,6 +21,10 @@ local teamIcons = {
 -- an exciting pulsating blue mouse-over effect.
 ---@class ACUButton : Group
 ACUButton = ClassUI(Group) {
+
+    ---@param self ACUButton
+    ---@param parent Control
+    ---@param enabled boolean
     __init = function(self, parent, enabled)
         Group.__init(self, parent)
         LayoutHelpers.SetDimensions(self, 8, 10)
@@ -112,6 +116,9 @@ ACUButton = ClassUI(Group) {
         self.textOverlay = textOverlay
     end,
 
+    ---@param self ACUButton
+    ---@param hidden boolean
+    ---@return boolean
     OnHide = function(self, hidden)
         self:ApplyFunction(function (control)
             if control ~= self then
@@ -122,25 +129,28 @@ ACUButton = ClassUI(Group) {
     end,
 
     --- Returns true if the control is enabled.
+    ---@param self ACUButton
+    ---@return boolean
     IsEnabled = function(self)
         return self.enabled
     end,
 
     --- Set the enabledness of the control to the given value.
-    --
-    -- @param enabled Should the control be enabled?
+    ---@param self ACUButton
+    ---@param enabled boolean -- Should the control be enabled?
     SetEnabled = function(self, enabled)
         self.enabled = enabled
     end,
 
     --- Set the colour of the control to the given value.
-    --
-    -- @param color New colour for the ACU icon.
+    ---@param self ACUButton
+    ---@param color Color -- New colour for the ACU icon.
     SetColor = function(self, color)
         self.marker:SetSolidColor(color)
     end,
 
     --- Clear all data from the control, returning it to the "teamless, translucent" state.
+    ---@param self ACUButton
     Clear = function(self)
         self:SetColor('00777777')
         self:SetTeam(1)
@@ -148,9 +158,8 @@ ACUButton = ClassUI(Group) {
 
     --- Set the team for the control: team is displayed as a small white number to the bottom right
     -- of the ACU icon
-    --
-    -- @param team A value one greater than the team value to display. A value of 1 represents "no
-    --             team".
+    ---@param self ACUButton
+    ---@param team number  -- team A value one greater than the team value to display. A value of 1 represents "no team".
     SetTeam = function(self, team)
         if team == 1 then
             self.teamIndicator:SetSolidColor("00000000")
@@ -161,8 +170,8 @@ ACUButton = ClassUI(Group) {
 
     --- Set if the control should represent a "closed" slot. A closed slot is represented with a red
     -- X drawn over the ACU icon
-    --
-    -- @param Should this UI element represent a closed slot?
+    ---@param self ACUButton
+    ---@param closed boolean -- Should this UI element represent a closed slot?
     SetClosed = function(self, closed)
         -- Opening the slot is a simple matter of deleting the "X".
         self:RemoveTextOverlay()
@@ -181,6 +190,7 @@ ACUButton = ClassUI(Group) {
 
     --- Set if the control should represent a "closed - spawn mex" slot. A closed - spawn mex slot is represented with a green
     -- X drawn over the ACU icon
+    ---@param self ACUButton
     SetClosedSpawnMex = function(self)
         self:RemoveTextOverlay()
 
@@ -192,11 +202,15 @@ ACUButton = ClassUI(Group) {
         self:draw("2c7f33", "O")
     end,
 
+    ---@param self ACUButton
+    ---@param color Color
+    ---@param text string
     draw = function(self, color, text)
         self.textOverlay:SetColor(color)
         self.textOverlay:SetText(text)
     end,
 
+    ---@param self ACUButton
     RemoveTextOverlay = function(self)
         self.textOverlay:SetColor('00000000')
         self.textOverlay:SetText('')
@@ -204,10 +218,14 @@ ACUButton = ClassUI(Group) {
 
     -- Override for events...
     --- Called when the button is clicked.
+    ---@param self ACUButton
     OnClick = function(self) end,
 
     --- Called when the button is right-clicked.
+    ---@param self ACUButton
     OnRightClick = function(self) end,
 
+    ---@param self ACUButton
+    ---@param state State
     OnRollover = function(self, state) end,
 }

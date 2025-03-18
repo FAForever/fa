@@ -1,21 +1,22 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'IceDebris_albedo.dds',
-                    LODCutoff = 750,
-                    NormalsName = 'IceDebris_normalsTS.dds',
-                    ShaderName = 'NormalMappedAlpha',
-                    SpecularName = 'IceDebris_specteam.dds',
+                    LODCutoff = 730,
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "IceDebris_albedo.dds",
+                    NormalsName = "IceDebris_normalsTS.dds",
+                    SpecularName = "IceDebris_specteam.dds",
                 },
             },
         },
@@ -26,15 +27,9 @@ PropBlueprint {
         ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Large Rock - Ice',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Large Rock - Ice" },
+    Physics = { BlockPath = true },
     SizeX = 17,
     SizeY = 3,
     SizeZ = 14,

@@ -33,8 +33,11 @@ XSB3202 = ClassUnit(SSubUnit) {
         self.IdleEffectsBag:Add(idleEffectsThread)
     end,
 
+    ---@param self XSB3202
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
-        local mult = self.Blueprint.Physics.SubSpeedMultiplier
+        local mult = self.Blueprint.Physics.SubSpeedMultiplier or 1
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:SetSpeedMult(1)

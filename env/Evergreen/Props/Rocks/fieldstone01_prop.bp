@@ -1,18 +1,19 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 225.0,
+        MaxHealth = 225.0,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
-                    ShaderName = 'NormalMappedAlpha',
+                    LODCutoff = 370,
+                    ShaderName = "NormalMappedAlpha",
                 },
             },
         },
@@ -23,15 +24,9 @@ PropBlueprint {
         ReclaimMassMax = 112.5,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Large Rock',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Large Rock" },
+    Physics = { BlockPath = true },
     SizeX = 3,
     SizeY = 0.5,
     SizeZ = 5,

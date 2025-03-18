@@ -21,11 +21,10 @@ local ScenarioFramework = import("/lua/scenarioframework.lua")
 -- upvalue table operations for performance
 local TableInsert = table.insert
 local TableEmpty = table.empty
-local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
 
--- upvalue globals for performance
+-- upvalue scope for performance
 local type = type
 local Vector = Vector
 local IsEntity = IsEntity
@@ -33,6 +32,8 @@ local GetEntityById = GetEntityById
 local GetSurfaceHeight = GetSurfaceHeight
 local OkayToMessWithArmy = OkayToMessWithArmy
 local EntityCategoryFilterDown = EntityCategoryFilterDown
+local GetCurrentCommandSource = GetCurrentCommandSource
+local GetSystemTimeSecondsOnlyForProfileUse = GetSystemTimeSecondsOnlyForProfileUse
 
 local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
@@ -42,29 +43,36 @@ local IssueFerry = IssueFerry
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
-local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
-
---- Used to warn users (mainly developers) once for invalid use of functionality 
-local Warnings = { }
 
 --- List of callbacks that is being populated throughout this file
----@type table<string, function>
+---@type table<string, fun(data: table, units?: Unit[])>
 local Callbacks = {}
 
+---@param name string
+---@param data table
+---@param units? Unit[]
 function DoCallback(name, data, units)
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
     local fn = Callbacks[name];
     if fn then
         fn(data, units)
     else
-        SPEW('No callback named: ' .. repr(name))
+        SPEW('No callback named: ' .. tostring(name))
+    end
+
+    local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
+    if (timeTaken > 0.005) then
+        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
     end
 end
 
 --- Common utility function to retrieve the actual units.
+---@param units Unit[]
+---@return Unit[]
 function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
-        units = {units}
+        units = { units }
     end
 
     for _, u in units or {} do
@@ -84,6 +92,28 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+--- Callback takes a boolean and toggles a stat on given units between 0 and 1
+---@param data table<string, boolean>
+Callbacks.SetStatByCallback = function(data, units)
+    for stat, value in data do
+        if not type(value) == 'boolean' then
+            WARN('SetStatByCallback: received non boolean value ' ..
+                tostring(value) .. ' for stat ' .. tostring(stat) .. '!')
+            continue
+        end
+        value = (value and 1) or 0 -- numerize our bool
+        for _, u in units or {} do
+            if IsEntity(u) and OkayToMessWithArmy(u.Army) then
+                if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
+                    WARN('SetStatByCallback: ' .. tostring(stat) .. ' is not a valid stat for this unit!')
+                    continue
+                end
+                u:UpdateStat(stat, value)
+            end
+        end
+    end
+end
+
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
         if IsEntity(u) and OkayToMessWithArmy(u.Army) and u.SetAutoOvercharge then
@@ -99,388 +129,16 @@ Callbacks.PersistFerry = function(data, units)
 
     -- function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
     local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
-    TableInsert (units, helper)
+    TableInsert(units, helper)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
     end
 end
 
-Callbacks.TransportLock = function(data)
-    local units = SecureUnits(data.ids)
-    if not units[1] then return end
-
-    for _, u in units do
-        u:TransportLock(data.lock == true)
-    end
-end
-
 Callbacks.ClearCommands = function(data, units)
     local safe = SecureUnits(data.ids or units)
     IssueClearCommands(safe)
-end
-
-local LetterArray = { 
-    ["Aeon"] = "ua", 
-    ["AEON"] = "ua",
-    ["UEF"] = "ue", 
-    ["Cybran"] = "ur", 
-    ["CYBRAN"] = "ur", 
-    ["Seraphim"] = "xs",
-    ["SERAPHIM"] = "xs",
-}
-
---- Compute the faction-specific blueprint identifier
-local function ConstructBlueprintID (faction, blueprintID)
-    return LetterArray[faction] .. blueprintID 
-end
-
---- Allocated once to prevent re-allocations and de-allocations 
-local buildLocation = Vector(0, 0, 0)
-
---- Templates for units with a skirt size of 1, such as point defense
-local skirtSize1 = {
-    { {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, },
-}
-
---- Templates for units with a skirtSize of 1 such as radars and mass extractors
-local skirtSize2 = { 
-    -- inner layer for storages
-    { {2, 0}, {0, 2}, {-2, 0}, {0, -2}, },
-
-    -- outer layer for fabricators
-    {  {-2, 2}, {2, 2}, {2, -2}, {-2, -2}, {-4, 0},{0, 4}, {4, 0}, {0, -4}, },
-}
-
---- Templates for units with a skirtSize of 3 such as fabricators
-local skirtSize6 = { 
-    -- inner layer for storages
-    { {-2, 4}, {0, 4}, {2, 4}, {4, 2}, {4, 0}, {4, -2}, {2, -4}, {0, -4}, {-2, -4}, {-4, -2}, {-4, 0}, {-4, 2}, },
-}
-
---- Easy to use table for direct skirtSize size -> template conversion
-local skirtSizes = {
-    [1] = skirtSize1,
-    [2] = skirtSize2,
-    [6] = skirtSize6
-}
-
---- Computes the n'th layer of a previous layer.
----@param skirtSize number skirt size of the unit
----@param nthLayer number nth layer we'd like to have for this unit
-local function RetrieveNthStructureLayer (skirtSize, nthLayer)
-
-    -- attempt to retrieve the right set of layers for this skirtSize
-    local layers = skirtSizes[skirtSize]
-
-    -- if we have some layers for this skirtSize
-    if layers then 
-
-        -- attempt to retrieve the right layer count
-        local layer = layers[nthLayer]
-
-        -- if we have that too
-        if layer then 
-
-            -- then we can return that
-            return layer 
-        end
-    end
-
-    -- no structure layer available
-    local identifier = "RetrieveNthStructureLayer" .. skirtSize .. " - " .. nthLayer
-    if not Warnings[identifier] then 
-        Warnings[identifier] = true
-        WARN("Attempted to retrieve a build layer for skirtSize " .. skirtSize .. " and layer " .. nthLayer .. " which is not supported. The only supported values are: skirtSize 1 with layer 1, skirtSize 2 with layer 1 and 2, skirtSize 6 with layer 0.")
-    end
-
-    -- boo
-    return false
-end
-
---- Called by the UI when right-clicking a mass extractor
-Callbacks.CapStructure = function(data, units)
-
-    -- check if we have a structure
-    -- if army is not set then the structure is not 'our' structure (e.g., we're trying to cap an allied or hostile extractor)
-    local structure = GetEntityById(data.target)
-    if (not structure) or (not structure.Army) then return end 
-
-    -- check if we're allowed to mess with this structure
-    if not OkayToMessWithArmy(structure.Army) then return end
-
-    -- check if we have units
-    local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
-    if not units[1] then return end
-
-    -- check if it is our structure
-    if structure.Army ~= units[1].Army then return end
-
-    -- check if we have buildings we want to use for capping
-    if (not data.id) or (not data.layer) then return end 
-
-    -- populate faction table
-    local otherBuilders = { }
-    local buildersByFaction = { }
-
-    -- determine of all units in selection what they can build
-    for _, unit in units do
-        -- make sure we're allowed to mess with this unit, if not we exclude
-        if unit.Army and OkayToMessWithArmy(unit.Army) then 
-            -- compute blueprint id
-            local faction = unit.Blueprint.FactionCategory
-            local blueprintID = ConstructBlueprintID(faction, data.id)
-
-            -- check if this unit can build it
-            if unit:CanBuild(blueprintID) then
-                buildersByFaction[faction] = buildersByFaction[faction] or { }
-                TableInsert(buildersByFaction[faction], unit)
-            else
-                TableInsert(otherBuilders, unit)
-            end
-        end
-    end 
-
-    -- sanity check: find at least one engineer that can build the structure in question
-    local oneCanBuild = nil 
-    for k, faction in buildersByFaction do 
-        oneCanBuild = true
-    end 
-
-    -- check if we have units
-    if not oneCanBuild then return end 
-
-    -- find majority
-    local faction = ""
-    local builders = { }
-    for k, engineers in buildersByFaction do 
-        if TableGetn(builders) < TableGetn(engineers) then 
-            builders = engineers 
-            faction = k
-        end
-    end
-
-    -- append the rest to other builders
-    for k, engineers in buildersByFaction do 
-        if k ~= faction then 
-            for k, engineer in engineers do 
-                TableInsert(otherBuilders, engineer)
-            end
-        end
-    end
-
-    -- -- only keep at most six builders due to performance
-    -- local allBuilders = builders
-    -- builders = { }
-    -- for k, engineer in allBuilders do 
-    --     if k < 7 then 
-    --         builders[k] = engineer 
-    --     else 
-    --         TableInsert(otherBuilders, engineer)
-    --     end
-    -- end
-
-    -- compute / retrieve information for capping
-    local blueprintID = ConstructBlueprintID(faction, data.id)
-    local blueprint = structure:GetBlueprint()
-    local skirtSize = blueprint.Physics.SkirtSizeX
-
-    -- compute the layer locations
-    local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
-
-    -- check if we got anything valid
-    if layer then 
-
-        -- compute build locations and issue the capping
-        local cx, cy, cz = structure:GetPositionXYZ()
-    
-        -- full extent of search rectangle for other buildings
-        local x1 = cx - (skirtSize + 10)
-        local z1 = cz - (skirtSize + 10)
-        local x2 = cx + (skirtSize + 10)
-        local z2 = cz + (skirtSize + 10)
-
-        -- find all units that may prevent us from building
-        local structures = GetUnitsInRect(x1, z1, x2, z2)
-        structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
-
-        -- determine offset to enlarge unit skirt to include structure we're trying to use to cap
-        -- this is a hard-coded fix to make walls work
-        local offset = 1
-        if skirtSize == 1 then 
-            offset = 0.5 
-        end
-
-        -- replace unit -> skirt to prevent allocating a new table
-        for k, unit in structures do 
-            local blueprint = unit:GetBlueprint()
-            local px, py, pz = unit:GetPositionXYZ()
-            local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
-            local rect = { 
-                px - sx - offset, -- top left
-                pz - sz - offset, -- top left
-                px + sx + offset, -- bottom right
-                pz + sz + offset  -- bottom right
-            }
-
-            structures[k] = rect
-        end
-
-        -- name convention
-        local skirts = structures
-
-        -- loop over build locations in given layer
-        for k, location in layer do 
-
-            -- determine build location using cached value
-            buildLocation[1] = cx + location[1]
-            buildLocation[3] = cz + location[2]
-            buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
-
-            -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
-            local freeToBuild = true
-            for k, skirt in skirts do 
-                if buildLocation[1] > skirt[1] and buildLocation[1] < skirt[3] then 
-                    if buildLocation[3] > skirt[2] and buildLocation[3] < skirt[4] then 
-                        freeToBuild = false 
-                        break 
-                    end
-                end
-            end
-
-            -- issue if we can build here
-            if freeToBuild then
-                for _, builder in builders do 
-                    IssueBuildMobile({builder}, buildLocation, blueprintID, {})
-                end
-            end
-        end
-
-        -- assist for all other builders, spread over the number of actual builders
-        local t = { }
-        local builderIndex = 1
-        local builderCount = TableGetn(builders)
-        for k, builder in otherBuilders do 
-            t[1] = builder 
-            IssueGuard(t, builders[builderIndex])
-
-            builderIndex = builderIndex + 1 
-            if builderIndex > builderCount then 
-                builderIndex = 1 
-            end
-        end
-    end
-end
-
-local SpawnedMeshes = {}
-
-local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
-    local bp = __blueprints[id]
-    local bpD = bp.Display
-    if __blueprints[bpD.MeshBlueprint] then
-        SPEW("Spawning mesh of "..id)
-        local entity = import('/lua/sim/Entity.lua').Entity()
-        if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
-            y = y-bp.CollisionOffsetY
-        end
-        entity:SetPosition(Vector(x,y,z), true)
-        entity:SetMesh(bpD.MeshBlueprint)
-        entity:SetDrawScale(bpD.UniformScale)
-        entity:SetVizToAllies'Intel'
-        entity:SetVizToNeutrals'Intel'
-        entity:SetVizToEnemies'Intel'
-        table.insert(SpawnedMeshes, entity)
-        return entity
-    else
-        SPEW("Can\' spawn mesh of "..id.." no mesh found")
-    end
-end
-
-local function SetWorldCameraToUnitIconAngle(location, zoom)
-    local sx = 1/6
-    local th = 1 + (location[2] - GetSurfaceHeight(location[1], location[3]))
-    -- Note: The maths for setting zoom is kinda all over the place, and is just 'good enough' for what I used it for.
-    --_ALERT(location[2], GetSurfaceHeight(location[1], location[3]), th)
-    --_ALERT(zoom, th)
-    Sync.CameraRequests = Sync.CameraRequests or { }
-    table.insert( Sync.CameraRequests, {
-        Name = 'WorldCamera',
-        Type = 'CAMERA_UNIT_SPIN',
-        Marker = {
-            orientation = VECTOR3(math.pi*(1+sx), math.pi*sx, 0),
-            position = location,
-            zoom = FLOAT(zoom*th),
-        },
-        HeadingRate = 0,
-        Callback = {
-            Func = 'OnCameraFinish',
-            Args = 'WorldCamera',
-        }
-    })
-end
-
-Callbacks.ClearSpawnedMeshes = function()
-    if not CheatsEnabled() then return end
-
-    for i, v in SpawnedMeshes do
-        v:Destroy()
-    end
-    SpawnedMeshes = {}
-end
-
-Callbacks.CheatBoxSpawnProp = function(data)
-    if not CheatsEnabled() then return end
-
-    local offsetX = data.bpId.SizeX or 1
-    local offsetZ = data.bpId.SizeZ or 1
-
-    local squareX = math.ceil(math.sqrt(data.count or 1))
-    local squareZ = math.ceil((data.count or 1)/squareX)
-
-    local startOffsetX = (squareX-1) * 0.5 * offsetX
-    local startOffsetZ = (squareZ-1) * 0.5 * offsetZ
-
-    for i = 1, (data.count or 1) do
-        local x = data.pos[1] - startOffsetX + math.mod(i,squareX) * offsetX
-        local z = data.pos[3] - startOffsetZ + math.mod(math.floor(i/squareX), squareZ) * offsetZ
-        if data.rand and data.rand ~= 0 then
-            x = (x - data.rand*0.5) + data.rand*Random()
-            z = (z - data.rand*0.5) + data.rand*Random()
-            if math.mod(data.yaw or 0, 360) == 0 then
-                data.yaw = 360*Random()
-            end
-        end
-        CreatePropHPR(data.bpId, x, GetTerrainHeight(x,z), z, data.yaw or 0, 0, 0)--blueprint, x, y, z, heading, pitch, roll
-    end
-end
-
-Callbacks.CheatSpawnUnit = function(data)
-    if not CheatsEnabled() then return end
-
-    local pos = data.pos
-    if data.MeshOnly then
-        SpawnUnitMesh(data.bpId, pos[1], pos[2], pos[3], 0, data.yaw, 0)
-    else
-        local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
-        local unitbp = __blueprints[data.bpId]
-        if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
-            unit:CreateTarmac(true,true,true,false,false)
-        end
-        if data.UnitIconCameraMode then
-            local size = math.max(
-                (unitbp.SizeX or 1),
-                (unitbp.SizeY or 1) * 3,
-                (unitbp.SizeZ or 1),
-                (unitbp.Physics.SkirtSizeX or 1),
-                (unitbp.Physics.SkirtSizeZ or 1)
-            ) + math.abs(unitbp.CollisionOffsetY or 0)
-            local dist = size / math.tan(60 --[[* (9/16)]] * 0.5 * ((math.pi*2)/360))
-            SetWorldCameraToUnitIconAngle(pos, dist)
-        end
-        if data.veterancy and data.veterancy ~= 0 and unit.SetVeterancy then
-            unit:SetVeterancy(data.veterancy)
-        end
-    end
 end
 
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
@@ -538,14 +196,13 @@ Callbacks.OnControlGroupAssign = function(units)
     if ScenarioInfo.tutorial then
         local function OnUnitKilled(unit)
             if ScenarioInfo.ControlGroupUnits then
-                for i,v in ScenarioInfo.ControlGroupUnits do
-                   if unit == v then
+                for i, v in ScenarioInfo.ControlGroupUnits do
+                    if unit == v then
                         TableRemove(ScenarioInfo.ControlGroupUnits, i)
-                   end
+                    end
                 end
             end
         end
-
 
         if not ScenarioInfo.ControlGroupUnits then
             ScenarioInfo.ControlGroupUnits = {}
@@ -553,13 +210,13 @@ Callbacks.OnControlGroupAssign = function(units)
 
         -- add units to list
         local entities = {}
-        for k,v in units do
+        for k, v in units do
             TableInsert(entities, GetEntityById(v))
         end
         ScenarioInfo.ControlGroupUnits = TableMerged(ScenarioInfo.ControlGroupUnits, entities)
 
         -- remove units on death
-        for k,v in entities do
+        for k, v in entities do
             SimTriggers.CreateUnitDeathTrigger(OnUnitKilled, v)
             SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes
         end
@@ -578,21 +235,9 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
-
-Callbacks.ValidateAssist = function(data, units)
-    units = SecureUnits(units)
-    local target = GetEntityById(data.target)
-    if units and target then
-        for k, u in units do
-            if IsEntity(u) and u.Army == target.Army and IsInvalidAssist(u, target) then
-                IssueClearCommands({target})
-                return
-            end
-        end
-    end
-end
-
+---@param unit Unit
+---@param target? Unit
+---@return boolean
 function IsInvalidAssist(unit, target)
     if target and target.EntityId == unit.EntityId then
         return true
@@ -600,6 +245,22 @@ function IsInvalidAssist(unit, target)
         return false
     else
         return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end
+
+--- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
+---@param data { target: EntityId}
+---@param units any
+Callbacks.ValidateAssist = function(data, units)
+    units = SecureUnits(units)
+    local target = GetEntityById(data.target)
+    if units and target then
+        for k, u in units do
+            if IsEntity(u) and u.Army == target.Army and IsInvalidAssist(u, target) then
+                IssueToUnitClearCommands(target)
+                return
+            end
+        end
     end
 end
 
@@ -627,35 +288,189 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
+-------------------------------------------------------------------------------
+--#region General orders
+
+---@param data { }
+---@param selection Unit[]
+Callbacks.SelfDestruct = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- suppress self destruct in tutorial missions as they screw up the mission
+    if ScenarioInfo.tutorial then
+        return
+    end
+
+    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Advanced orders
+
 Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
 
-Callbacks.ToggleDebugChainByName = function (data, units)
-    LOG("ToggleDebugChainByName")
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingWithStorages = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local extractor = GetUnitById(data.target) --[[@as Unit]]
+    if (not extractor) or
+        (not extractor.Army) or
+        (not OkayToMessWithArmy(extractor.Army)) or
+        (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-storages.lua").RingExtractor(extractor, engineers)
 end
 
-Callbacks.ToggleDebugMarkersByType = function (data, units)
-    import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
+---@param data { target: EntityId, allFabricators: boolean }
+---@param selection Unit[]
+Callbacks.RingWithFabricators = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local extractor = GetUnitById(data.target) --[[@as Unit]]
+    if (not extractor) or
+        (not extractor.Army) or
+        (not OkayToMessWithArmy(extractor.Army)) or
+        (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-fabricators.lua").RingExtractor(extractor, engineers, data.allFabricators)
 end
 
---- Toggles the profiler on / off
-Callbacks.ToggleProfiler = function (data)
-    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false )
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingRadar = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains((categories.RADAR + categories.OMNI) * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power-tech1.lua").RingWithPower(target, engineers)
 end
 
--- Allows searching for benchmarks
-Callbacks.FindBenchmarks = function (data)
-    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
-end
-Callbacks.LoadBenchmark = function(data)
-    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingArtilleryTech2 = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains(categories.ARTILLERY * categories.TECH2 * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power-tech1.lua").RingWithPower(target, engineers)
 end
 
--- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmark = function(data)
-    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingArtilleryTech3Exp = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (
+        not
+            EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) *
+                categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power-tech3.lua").RingWithPower(target, engineers)
 end
-Callbacks.StopBenchmark = function(data)
-    import("/lua/sim/profiler.lua").StopBenchmark()
+
+---@param data any
+---@param selection Unit[]
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+        -- check for cheats
+        local target = GetUnitById(data.TargetId) --[[@as Unit]]
+        if not target or not target.Army then return end
+        if not OkayToMessWithArmy(target.Army) then return end
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
 end
 
 do
@@ -680,22 +495,22 @@ do
         local xrb0204 = EntityCategoryFilterDown(cxrb0204, units)
 
         -- upgrade tech 1 hives
-        if xrb0104[1] then 
+        if xrb0104[1] then
 
             -- oof for performance, but this doesn't get run that often
             local notUpgradingh = 1
-            local notUpgrading = { }
-            
-            local upgradingh = 1 
-            local upgrading = { }
+            local notUpgrading = {}
+
+            local upgradingh = 1
+            local upgrading = {}
 
             -- split between upgrading / and not upgrading hives for different behavior
-            for k, unit in xrb0104 do 
-                if not unit:IsUnitState('Upgrading') then 
-                    notUpgrading[notUpgradingh] = unit 
+            for k, unit in xrb0104 do
+                if not unit:IsUnitState('Upgrading') then
+                    notUpgrading[notUpgradingh] = unit
                     notUpgradingh = notUpgradingh + 1
-                else 
-                    upgrading[upgradingh] = unit 
+                else
+                    upgrading[upgradingh] = unit
                     upgradingh = upgradingh + 1
                 end
             end
@@ -704,171 +519,858 @@ do
             IssueClearCommands(notUpgrading)
 
             -- upgrading to t2 from t1
-            if data.UpgradeTo == "xrb0204" then 
-                IssueUpgrade( notUpgrading, "xrb0204")
-            
-            -- upgrading to t3 from t1
-            elseif data.UpgradeTo == "xrb0304" then 
-                IssueUpgrade( notUpgrading, "xrb0204")
-                IssueUpgrade( xrb0104, "xrb0304")
+            if data.UpgradeTo == "xrb0204" then
+                IssueUpgrade(notUpgrading, "xrb0204")
+
+                -- upgrading to t3 from t1
+            elseif data.UpgradeTo == "xrb0304" then
+                IssueUpgrade(notUpgrading, "xrb0204")
+                IssueUpgrade(xrb0104, "xrb0304")
             end
         end
 
         -- upgrade tech 2 hives
-        if xrb0204[1] then 
+        if xrb0204[1] then
 
             -- always clear things out
-            if data.ClearCommands then 
+            if data.ClearCommands then
                 IssueClearCommands(xrb0204)
             end
 
             -- upgrading to t3 form t1
-            if data.UpgradeTo == "xrb0304" then 
-                IssueUpgrade( xrb0204, "xrb0304")
+            if data.UpgradeTo == "xrb0304" then
+                IssueUpgrade(xrb0204, "xrb0304")
             end
         end
     end
 end
 
 do
-    --- Allows the player to force a target recheck on the selected units
-    ---@param data table   an empty table
-    ---@param units Unit[] table of units
-    Callbacks.RecheckTargetsOfWeapons = function(data, units)
 
-        -- make sure we have valid units with the correct command source
-        units = SecureUnits(units)
-        local tick = GetGameTick()
-        local rechecks = 0 
+    --- Processes the orders and re-distributes them over the units
+    ---@param data { Target: EntityId, ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.DistributeOrders = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
 
-        -- reset their weapons
-        for k, unit in units do
-            if
-                -- unit should still exist
-                not unit:BeenDestroyed() and
-                (   -- do not allow players to spam this
-                    not unit.RecheckTargetsOfWeaponsTick or
-                    (tick - unit.RecheckTargetsOfWeaponsTick > 10)
-                ) 
-            then
-                rechecks = rechecks + 1
-                unit.RecheckTargetsOfWeaponsTick = tick
-                for l = 1, unit.WeaponCount do
-                    unit:GetWeapon(l):ResetTarget()
-                end
+        -- verify the target
+        local target = (data.Target and GetUnitById(data.Target)) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(selection, target, data.ClearCommands or false
+            , true)
+    end
+end
+
+do
+    --- Processes the orders and re-distributes them over the units
+    ---@param data { Target: EntityId, ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.CopyOrders = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the target
+        local target = GetUnitById(data.Target) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/copy-queue.lua").CopyOrders(selection, target, data.ClearCommands or false, true)
+    end
+end
+
+do
+
+    ---@param data { ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.LoadIntoTransports = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+        local transportees = EntityCategoryFilterDown(categories.ALLUNITS - (categories.AIR + categories.TRANSPORTATION)
+            , selection)
+        local transportedUnits, transportsUsed, remUnits, remTransports = import("/lua/sim/commands/load-in-transport.lua")
+            .LoadIntoTransports(transportees, transports, data.ClearCommands or false, true)
+    end
+end
+
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.AbortNavigation = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to interrupt path finding")
+            end
+
+            return
+        end
+
+        -- only apply this to engineers
+        local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
+        if table.empty(engineers) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to interrupt path finding")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to interrupt path finding")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(engineers, true)
+    end
+end
+
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.DischargeShields = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- only apply this to units with shields
+        local shead = 1
+        local unitsWithShields = {}
+        for k = 1, table.getn(selection) do
+            local unit = selection[k]
+            if unit.MyShield then
+                unitsWithShields[shead] = unit
+                shead = shead + 1
             end
         end
 
-        -- user feedback
-        if rechecks > 0 then 
-            if units[1].Army == GetFocusArmy() then
-                if rechecks == 1 then 
-                    print("1 weapon target recheck")
-                else 
-                    print(string.format("%d weapon target rechecks", rechecks))
-                end
+        if table.empty(unitsWithShields) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/discharge-shields.lua").DischargeShields(unitsWithShields, true)
+    end
+end
+
+do
+
+    local Width = import("/lua/shared/commands/area-reclaim-order.lua").MaximumWidth
+    local MaximumDistance = import("/lua/shared/commands/area-reclaim-order.lua").MaximumDistance
+
+    ---@param data { Origin: number, Destination: Vector}
+    ---@param selection Unit[]
+    Callbacks.ExtendReclaimOrder = function(data, selection)
+        do  -- feature: area commands
+            return
+        end
+
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 19 and lastCommand.target) then
+            return
+        end
+
+        local ps = lastCommand.target:GetPosition()
+        local pe = data.Destination
+        local dx = pe[1] - ps[1]
+        local dz = pe[3] - ps[3]
+        local distance = math.sqrt(dx * dx + dz * dz)
+
+        -- limit the maximum distance
+        if distance > MaximumDistance then
+            pe[1] = (1 / distance) * MaximumDistance * dx + ps[1]
+            pe[3] = (1 / distance) * MaximumDistance * dz + ps[3]
+        end
+
+
+        -- radius = math.min(distance, maximumDistance)
+
+        -- local width = 5
+        -- local ox = nz
+        -- local oz = -nx
+
+        -- DrawCircle(ps, 1, 'ffffff')
+        -- DrawCircle(pe, 1, 'ffffff')
+        -- local ps1 = { ps[1] + width * ox, ps[2], ps[3] + width * oz }
+        -- local ps2 = { ps[1] - width * ox, ps[2], ps[3] - width * oz }
+
+        -- DrawCircle(ps1, 1, 'ffffff')
+        -- DrawCircle(ps2, 1, 'ffffff')
+
+        -- local pe1 = { pe[1] + width * ox, pe[2], pe[3] + width * oz }
+        -- local pe2 = { pe[1] - width * ox, pe[2], pe[3] - width * oz }
+
+        -- DrawCircle(pe1, 1, 'ffffff')
+        -- DrawCircle(pe2, 1, 'ffffff')
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimProps(selection, ps, pe, Width, true)
+        SPEW("Time taken for area reclaim order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start),
+            "miliseconds")
+    end
+
+    ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendAttackOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 10) or lastCommand.target then
+            return
+        end
+
+        local target = lastCommand.target --[[@as Unit | Prop]]
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+        import("/lua/sim/commands/area-attack-ground-order.lua").AreaAttackOrder(selection,
+            { lastCommand.x, lastCommand.y, lastCommand.z }, data.Radius)
+        SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
+    end
+
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Development / debug related functionality
+
+--- An anti cheat check that passes when there is only 1 player or cheats are enabled
+---@return boolean
+local PassesAntiCheatCheck = function()
+    -- allow when cheats are enabled
+    return CheatsEnabled()
+end
+
+--- A simplified check that also passes when the game has AIs
+---@return boolean
+local PassesAIAntiCheatCheck = function()
+    -- allow when there are AIs
+    if ScenarioInfo.GameHasAIs then
+        return true
+    end
+
+    -- allow when cheats are enabled
+    return PassesAntiCheatCheck()
+end
+
+local SpawnedMeshes = {}
+
+local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
+    local bp = __blueprints[id]
+    local bpD = bp.Display
+    if __blueprints[bpD.MeshBlueprint] then
+        SPEW("Spawning mesh of " .. id)
+        local entity = import('/lua/sim/Entity.lua').Entity()
+        if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
+            y = y - bp.CollisionOffsetY
+        end
+        entity:SetPosition(Vector(x, y, z), true)
+        entity:SetMesh(bpD.MeshBlueprint)
+        entity:SetDrawScale(bpD.UniformScale)
+        entity:SetVizToAllies 'Intel'
+        entity:SetVizToNeutrals 'Intel'
+        entity:SetVizToEnemies 'Intel'
+        table.insert(SpawnedMeshes, entity)
+        return entity
+    else
+        SPEW("Can\' spawn mesh of " .. id .. " no mesh found")
+    end
+end
+
+local function SetWorldCameraToUnitIconAngle(location, zoom)
+    local sx = 1 / 6
+    local th = 1 + (location[2] - GetSurfaceHeight(location[1], location[3]))
+    -- Note: The maths for setting zoom is kinda all over the place, and is just 'good enough' for what I used it for.
+    --_ALERT(location[2], GetSurfaceHeight(location[1], location[3]), th)
+    --_ALERT(zoom, th)
+    Sync.CameraRequests = Sync.CameraRequests or {}
+    table.insert(Sync.CameraRequests, {
+        Name = 'WorldCamera',
+        Type = 'CAMERA_UNIT_SPIN',
+        Marker = {
+            orientation = VECTOR3(math.pi * (1 + sx), math.pi * sx, 0),
+            position = location,
+            zoom = FLOAT(zoom * th),
+        },
+        HeadingRate = 0,
+        Callback = {
+            Func = 'OnCameraFinish',
+            Args = 'WorldCamera',
+        }
+    })
+end
+
+local function ShowRaisedPlatforms(self)
+    local plats = self:GetBlueprint().Physics.RaisedPlatforms
+    if not plats then return end
+    local pos = self:GetPosition()
+    local entities = {}
+    for i = 1, (table.getn(plats) / 12) do
+        entities[i] = {}
+        for b = 1, 4 do
+            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
+            self.Trash:Add(entities[i][b])
+            entities[i][b]:SetPosition(Vector(
+                pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
+                pos[2] + plats[((i - 1) * 12) + (b * 3)],
+                pos[3] + plats[((i - 1) * 12) + (b * 3) - 1]
+            ), true)
+        end
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][2], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][3], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][2], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][3], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+    end
+end
+
+Callbacks.ClearSpawnedMeshes = function()
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    for i, v in SpawnedMeshes do
+        v:Destroy()
+    end
+    SpawnedMeshes = {}
+end
+
+Callbacks.CheatBoxSpawnProp = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    local offsetX = data.bpId.SizeX or 1
+    local offsetZ = data.bpId.SizeZ or 1
+
+    local squareX = math.ceil(math.sqrt(data.count or 1))
+    local squareZ = math.ceil((data.count or 1) / squareX)
+
+    local startOffsetX = (squareX - 1) * 0.5 * offsetX
+    local startOffsetZ = (squareZ - 1) * 0.5 * offsetZ
+
+    for i = 1, (data.count or 1) do
+        local x = data.pos[1] - startOffsetX + math.mod(i, squareX) * offsetX
+        local z = data.pos[3] - startOffsetZ + math.mod(math.floor(i / squareX), squareZ) * offsetZ
+        if data.rand and data.rand ~= 0 then
+            x = (x - data.rand * 0.5) + data.rand * Random()
+            z = (z - data.rand * 0.5) + data.rand * Random()
+            if math.mod(data.yaw or 0, 360) == 0 then
+                data.yaw = 360 * Random()
+            end
+        end
+        CreatePropHPR(data.bpId, x, GetTerrainHeight(x, z), z, data.yaw or 0, 0, 0) --blueprint, x, y, z, heading, pitch, roll
+    end
+end
+
+Callbacks.CheatSpawnUnit = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    local pos = data.pos
+    if data.MeshOnly then
+        SpawnUnitMesh(data.bpId, pos[1], pos[2], pos[3], 0, data.yaw, 0)
+    else
+        -- allow creating multiple units to make it easier to test specific scenarios
+        for i = 1, (data.count or 1) do
+            local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
+            local unitbp = __blueprints[data.bpId]
+            if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
+                unit:CreateTarmac(true, true, true, false, false)
+            end
+            if data.UnitIconCameraMode then
+                local size = math.max(
+                    (unitbp.SizeX or 1),
+                    (unitbp.SizeY or 1) * 3,
+                    (unitbp.SizeZ or 1),
+                    (unitbp.Physics.SkirtSizeX or 1),
+                    (unitbp.Physics.SkirtSizeZ or 1)
+                ) + math.abs(unitbp.CollisionOffsetY or 0)
+                local dist = size / math.tan(60 --[[* (9/16)]] * 0.5 * ((math.pi * 2) / 360))
+                SetWorldCameraToUnitIconAngle(pos, dist)
+            end
+            if data.veterancy and data.veterancy ~= 0 and unit.SetVeterancy then
+                unit:SetVeterancy(data.veterancy)
+            end
+            if data.ShowRaisedPlatforms then
+                ShowRaisedPlatforms(unit)
             end
         end
     end
 end
 
-Callbacks.MapResoureCheck = function(data)
+--- Toggles the profiler on / off
+Callbacks.ToggleProfiler = function(data)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false)
+end
+
+-- Allows searching for benchmarks
+Callbacks.FindBenchmarks = function(data)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+end
+
+-- Allows a benchmark to be run in the sim
+Callbacks.RunBenchmarks = function(data)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+end
+
+Callbacks.ToggleDebugMarkersByType = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
+end
+
+Callbacks.MapResoureCheck = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
     import("/lua/sim/maputilities.lua").MapResourceCheck()
 end
 
-Callbacks.iMapSwitchPerspective = function(data)
+Callbacks.iMapSwitchPerspective = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
     import("/lua/sim/maputilities.lua").iMapSwitchPerspective(data.Army)
 end
 
-Callbacks.iMapToggleRendering = function(data)
+Callbacks.iMapToggleRendering = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
     import("/lua/sim/maputilities.lua").iMapToggleRendering()
 end
 
-Callbacks.iMapToggleThreat = function(data)
+Callbacks.iMapToggleThreat = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
     import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
 end
 
-Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
-    if selection then
-
-        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
-
-        ---@type Unit
-        local target = GetEntityById(data.TargetId)
-
-        IssueClearCommands(noACU)
-        IssueGuard(noACU, target)
+Callbacks.NavEnableDebugging = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
     end
+
+    import("/lua/sim/navdebug.lua").EnableDebugging()
 end
 
----@class CargoSlots
----@field Large number 
----@field Medium number 
----@field Small number
-
----@type CargoSlots[]
-local GetCargoSlotsCache = {}
-
----@param unit Unit
----@return CargoSlots
-local function GetCargoSlots(unit)
-
-    -- try the cache first
-    if GetCargoSlotsCache[unit.UnitId] then 
-        return GetCargoSlotsCache[unit.UnitId]
+Callbacks.NavDisableDebugging = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
     end
 
-    ---@type CargoSlots
-    local slots = {
-        Large = 0,
-        Medium = 0,
-        Small = 0,
-    }
-
-    -- based on attachment points
-    for i = 1, unit:GetBoneCount() do
-        if unit:GetBoneName(i) ~= nil then
-            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
-                slots.Large = slots.Large + 1
-            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
-                slots.Medium = slots.Medium + 1
-            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
-                slots.Small = slots.Small + 1
-            end
-        end
-    end
-
-    -- based on blueprint definitions
-    slots.Large = math.min(slots.Large, unit.Blueprint.Transport.SlotsLarge or slots.Large)
-    slots.Medium = math.min(slots.Medium, unit.Blueprint.Transport.SlotsMedium or slots.Medium)
-    slots.Small = math.min(slots.Small, unit.Blueprint.Transport.SlotsSmall or slots.Small)
-
-    -- cache it and return
-    GetCargoSlotsCache[unit.UnitId] = slots
-    return slots
+    import("/lua/sim/navdebug.lua").DisableDebugging()
 end
 
-Callbacks.NavEnableDebugging = import("/lua/sim/NavDebug.lua").EnableDebugging
-Callbacks.NavDisableDebugging = import("/lua/sim/NavDebug.lua").DisableDebugging
-Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
-Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
-Callbacks.NavDebugStatisticsToUI = import("/lua/sim/navdebug.lua").StatisticsToUI
-Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
-Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
-Callbacks.NavDebugPathToWithThreatThreshold = import("/lua/sim/navdebug.lua").PathToWithThreatThreshold
-Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
-Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta
-Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate
+Callbacks.NavToggleScanLayer = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
 
-Callbacks.GridReclaimDebugEnable = import("/lua/ai/gridreclaim.lua").EnableDebugging
-Callbacks.GridReclaimDebugDisable = import("/lua/ai/gridreclaim.lua").DisableDebugging
-Callbacks.GridReconDebugEnable = import("/lua/ai/gridrecon.lua").EnableDebugging
-Callbacks.GridReconDebugDisable = import("/lua/ai/gridrecon.lua").DisableDebugging
-Callbacks.GridPresenceDebugEnable = import("/lua/ai/gridpresence.lua").EnableDebugging
-Callbacks.GridPresenceDebugDisable = import("/lua/ai/gridpresence.lua").DisableDebugging
+    import("/lua/sim/navdebug.lua").ToggleScanLayer(data)
+end
 
-Callbacks.AIBrainEconomyDebugEnable = import("/lua/aibrains/components/economy.lua").EnableDebugging
-Callbacks.AIBrainEconomyDebugDisable = import("/lua/aibrains/components/economy.lua").DisableDebugging
+Callbacks.NavToggleScanLabels = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
 
-Callbacks.AIPlatoonSiloTacticalBehavior = import("/lua/aibrains/platoons/platoon-silo.lua").DebugAssignToUnits
-Callbacks.AIPlatoonSimpleRaidBehavior = import("/lua/aibrains/platoons/platoon-simple-raid.lua").DebugAssignToUnits
+    import("/lua/sim/navdebug.lua").ToggleScanLabels(data)
+end
+
+Callbacks.NavDebugStatisticsToUI = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug.lua").StatisticsToUI()
+end
+
+Callbacks.NavDebugCanPathTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug.lua").CanPathTo(data)
+end
+
+Callbacks.NavDebugPathTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug.lua").PathTo(data)
+end
+
+Callbacks.NavDebugPathToWithThreatThreshold = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug.lua").PathToWithThreatThreshold(data)
+end
+
+Callbacks.NavDebugGetLabel = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug.lua").GetLabel(data)
+end
+
+Callbacks.NavDebugEnableDirectionsFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionsfrom.lua").Enable()
+end
+
+Callbacks.NavDebugDisableDirectionsFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionsfrom.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateDirectionsFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionsfrom.lua").Update(data)
+end
+
+Callbacks.NavDebugUpdateRandomDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/randomdirectionfrom.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableRandomDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/randomdirectionfrom.lua").Enable()
+end
+
+Callbacks.NavDebugDisableRandomDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/randomdirectionfrom.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateRetreatDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/retreatdirectionfrom.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableRetreatDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/retreatdirectionfrom.lua").Enable()
+end
+
+Callbacks.NavDebugDisableRetreatDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/retreatdirectionfrom.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Enable()
+end
+
+Callbacks.NavDebugDisableDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Enable()
+end
+
+Callbacks.NavDebugDisableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Disable()
+end
+
+Callbacks.NavDebugGetLabelMetadata = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug.lua").GetLabelMeta(data)
+end
+
+Callbacks.NavGenerate = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navgenerator.lua").Generate()
+end
+
+-- Allows searching for benchmarks
+Callbacks.FindBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+end
+Callbacks.LoadBenchmark = function(data)
+    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
+end
+
+-- Allows a benchmark to be run in the sim
+Callbacks.RunBenchmark = function(data)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+end
+Callbacks.StopBenchmark = function(data)
+    import("/lua/sim/profiler.lua").StopBenchmark()
+end
+
+
+Callbacks.GridReclaimDebugEnable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/ai/gridreclaim.lua").EnableDebugging()
+end
+
+Callbacks.GridReclaimDebugDisable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/ai/gridreclaim.lua").DisableDebugging()
+end
+
+Callbacks.GridReconDebugEnable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/ai/gridrecon.lua").EnableDebugging()
+end
+
+Callbacks.GridReconDebugDisable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/ai/gridrecon.lua").DisableDebugging()
+end
+
+Callbacks.GridPresenceDebugEnable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/ai/gridpresence.lua").EnableDebugging()
+end
+
+Callbacks.GridPresenceDebugDisable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/ai/gridpresence.lua").DisableDebugging()
+end
+
+
+Callbacks.AIBrainEconomyDebugEnable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/aibrains/components/economy.lua").EnableDebugging()
+end
+
+Callbacks.AIBrainEconomyDebugDisable = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/aibrains/components/economy.lua").DisableDebugging()
+end
+
+
+Callbacks.AIPlatoonSimpleRaidBehavior = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/aibrains/platoons/platoon-simple-raid.lua").DebugAssignToUnits(data, units)
+end
+
+Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Moderator related functionality
+
+---@class CallbackModeratorEventData
+---@field From number
+---@field Message string
+
+---@param data CallbackModeratorEventData
+Callbacks.ModeratorEvent = function(data)
+    -- show up in the game logs
+    local brain = GetArmyBrain(GetCurrentCommandSource())
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
+end
+
+--#endregion

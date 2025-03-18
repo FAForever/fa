@@ -1,39 +1,23 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Water_Splash_CYBRAN',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        Impact      = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater = Sound { Bank = 'Impacts', Cue = 'Impact_Water_Splash_CYBRAN', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'CYBRAN',
-        'PROJECTILE',
-        'ANTITORPEDO',
+        "ANTITORPEDO",
+        "CYBRAN",
+        "PROJECTILE",
     },
-    Display = {
-        StrategicIconSize = 1,
-    },
-    General = {
-        Category = 'Defense',
-    },
-    Interface = {
-        HelpText = 0,
-    },
+    Display = { StrategicIconSize = 1 },
+    General = { Category = "Defense" },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 1,
         DestroyOnWater = false,
         MaxSpeed = 3,
-
-        -- this is a workaround for tracking projectiles not intercepting correctly.  Original value: true
-        StayUnderwater = false,
+        StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 270,
+        TurnRate = 540,
         UseGravity = true,
         VelocityAlign = true,
     },

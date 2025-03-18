@@ -43,7 +43,6 @@ XSA0402 = ClassUnit(SAirUnit) {
     end,
 
     OnAnimTerrainCollision = function(self, bone,x,y,z)
-        DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone( self, bone, 5.0 )
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
     end,

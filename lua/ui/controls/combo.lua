@@ -363,12 +363,17 @@ Combo = ClassUI(Group) {
     end,
 
     -- helper function to (re)set scrollbar offsets for dialogs or UI parts using Vanila design (Replays, Multiplayer LAN, etc)
+    ---@param self Combo
+    ---@param offset_right number
+    ---@param offset_bottom number
+    ---@param offset_top number
     SetScrollBarOffsets = function(self, offset_right, offset_bottom, offset_top)
         self._scrollbarOffsetRight = offset_right or 0
         self._scrollbarOffsetBottom = offset_bottom or 0
         self._scrollbarOffsetTop = offset_top or 0
     end,
 
+    ---@param self Combo
     ClearItems = function(self)
         self._visibleItems:Set(0)
         self._list:DeleteAllItems()
@@ -380,7 +385,8 @@ Combo = ClassUI(Group) {
         end
     end,
 
-    -- set the index selected (1 based!)
+    ---@param self Combo
+    ---@param index number set the index selected (1 based!)
     SetItem = function(self, index)
         ItemList.OnClick(self._list, index - 1)
         if not self._staticTitle then
@@ -392,6 +398,9 @@ Combo = ClassUI(Group) {
     end,
 
     -- get the index selected (1 based!) and the item
+    ---@param self Combo
+    ---@return number
+    ---@return number|nil
     GetItem = function(self)
         local sel = self._list:GetSelection()
         if sel >= 0 then
@@ -401,6 +410,8 @@ Combo = ClassUI(Group) {
         end
     end,
 
+    ---@param self Combo
+    ---@param text string
     SetTitleText = function(self, text)
         self._text:SetText(text)
     end,
@@ -420,17 +431,25 @@ Combo = ClassUI(Group) {
     end,
 
     -- overload to get clicks
+    ---@param self Combo
+    ---@param index number
+    ---@param text string
     OnClick = function(self, index, text)
         --if line.combo.EnableColor then line.combo:SetTitleTextColor('BADBBA') end -- Green
     end,
 
+    ---@param self Combo
     OnEvent = function(self)
     end,
 
+    ---@param self Combo
     OnMouseExit = function(self)
     end,
 
     -- overload to get rolled over item index
+    ---@param self Combo
+    ---@param index number
+    ---@param text string
     OnOverItem = function(self, index, text)
     end,
 
@@ -438,6 +457,7 @@ Combo = ClassUI(Group) {
     OnHide = function()
     end,
 
+    ---@param self Combo
     OnDisable = function(self)
         local button = self.buttonBitmaps
         self._btnLeft:SetTexture(button.left.dis)
@@ -449,6 +469,7 @@ Combo = ClassUI(Group) {
         self._dropdown:Hide()
     end,
 
+    ---@param self Combo
     OnEnable = function(self)
         local button = self.buttonBitmaps
         self._btnLeft:SetTexture(button.left.up)
@@ -459,6 +480,9 @@ Combo = ClassUI(Group) {
         end
     end,
 
+    ---@param self Combo
+    ---@param event Event
+    ---@return boolean
     HandleEvent = function(self, event)
         local eventHandled = false
 
@@ -508,6 +532,7 @@ Combo = ClassUI(Group) {
         return eventHandled
     end,
 
+    ---@param self Combo
     OnDestroy = function(self)
         if self._globalMouseClickFn then
             UIMain.RemoveOnMouseClickedFunc(self._globalMouseClickFn)
@@ -538,6 +563,16 @@ Combo = ClassUI(Group) {
 ---@field _globalMouseClickFn function
 ---@field _isColor? boolean
 BitmapCombo = ClassUI(Group) {
+
+    ---@param self BitmapCombo
+    ---@param parent Group
+    ---@param bitmapArray any
+    ---@param defaultIndex any
+    ---@param isColor any
+    ---@param bitmaps ComboBitmaps
+    ---@param rolloverCue any
+    ---@param clickCue any
+    ---@param debugName string
     __init = function(self, parent, bitmapArray, defaultIndex, isColor, bitmaps, rolloverCue, clickCue, debugName)
         bitmaps = bitmaps or defaultBitmaps
         debugName = debugName or "BitmapCombo"
@@ -678,6 +713,9 @@ BitmapCombo = ClassUI(Group) {
     end,
 
     -- Nuke the old bitmap array and replace it
+    ---@param self BitmapCombo
+    ---@param bitmapArray BitmapCombo[]
+    ---@param isColor boolean?
     ChangeBitmapArray = function(self, bitmapArray, isColor)
         if self._list then
             for k,v in self._list do
@@ -751,6 +789,9 @@ BitmapCombo = ClassUI(Group) {
         end
     end,
 
+    ---@param self BitmapCombo
+    ---@param bmp BitmapCombo
+    ---@param name string
     SetBitmap = function(self, bmp, name)
         if self._isColor then
             bmp:SetSolidColor(name)
@@ -765,29 +806,42 @@ BitmapCombo = ClassUI(Group) {
     end,
 
     -- set the index selected
+    ---@param self BitmapCombo
+    ---@param index number
     SetItem = function(self, index)
         self:SetBitmap(self._bitmap, self._array[index])
         self._curIndex = index
     end,
 
+    ---@param self BitmapCombo
+    ---@return number
     GetItem = function(self)
         return self._curIndex
     end,
 
+    ---@param self BitmapCombo
     OnEvent = function(self)
     end,
 
     -- overload to get the selection
+    ---@param self BitmapCombo
+    ---@param index number
+    ---@param name string
     OnClick = function(self, index, name)
     end,
 
+    ---@param self BitmapCombo
     OnMouseExit = function(self)
     end,
 
     -- overload to get rolled over item index
+    ---@param self BitmapCombo
+    ---@param index number
+    ---@param name string
     OnOverItem = function(self, index, name)
     end,
 
+    ---@param self BitmapCombo
     OnDisable = function(self)
         local bitmap_button = self._bitmaps.button
         self._btnLeft:SetTexture(bitmap_button.left.dis)
@@ -796,6 +850,7 @@ BitmapCombo = ClassUI(Group) {
         self._dropdown:Hide()
     end,
 
+    ---@param self BitmapCombo
     OnEnable = function(self)
         local bitmap_button = self._bitmaps.button
         self._btnLeft:SetTexture(bitmap_button.left.up)
@@ -804,6 +859,9 @@ BitmapCombo = ClassUI(Group) {
     end,
 
     -- set up control logic
+    ---@param self BitmapCombo
+    ---@param event Event
+    ---@return boolean
     HandleEvent = function(self, event)
         if self:IsDisabled() then
             return
@@ -848,6 +906,7 @@ BitmapCombo = ClassUI(Group) {
         return eventHandled
     end,
 
+    ---@param self BitmapCombo
     OnDestroy = function(self)
         if self._globalMouseClickFn then
             UIMain.RemoveOnMouseClickedFunc(self._globalMouseClickFn)

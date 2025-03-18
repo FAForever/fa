@@ -134,7 +134,7 @@ BuilderManager = ClassSimple {
                 ', line:' ..
                 debug.getinfo(1).currentline ..
                 '] *BUILDERMANAGER ERROR: Invalid builder type: ' ..
-                repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
+                tostring(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
             return
         end
 
@@ -219,14 +219,23 @@ BuilderManager = ClassSimple {
             end
         end
 
-        -- only one candidate
+        -- only one builder found
+        local candidate
         if candidateNext == 2 then
-            return candidates[1]
+            candidate = candidates[1]
 
-        -- multiple candidates, choose one at random
+        -- multiple builders found
         elseif candidateNext > 2 then
-            return candidates[Random(1, candidateNext - 1)]
+            candidate = candidates[Random(1, candidateNext - 1)]
         end
+
+        -- apply the builder delay
+        if candidate and candidate.DelayEqualBuildPlattons then
+            local delay = candidate.DelayEqualBuildPlattons
+            self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
+        end
+
+        return candidate
     end,
 
     --- Returns true if the given builders matches the manager-specific parameters
@@ -286,7 +295,6 @@ BuilderManager = ClassSimple {
             local PlatoonName = specs[1] --[[@as string]]
             local timeThreshold = self.Brain.DelayEqualBuildPlattons[PlatoonName]
             if (not timeThreshold) or (timeThreshold < CheckDelayTime) then
-                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + specs[2]
                 return false
             else
                 return true
@@ -419,43 +427,39 @@ BuilderManager = ClassSimple {
     --- Called by a unit as it starts being built
     ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitStartBeingBuilt = function(self, unit)
+    OnStartBeingBuilt = function(self, unit)
     end,
 
     --- Called by a unit as it is finished being built
     ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitStopBeingBuilt = function(self, unit)
+    OnStopBeingBuilt = function(self, unit)
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
     end,
 
     --- Called by a unit as it starts building
     ---@param self BuilderManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
     end,
 
     --- Called by a unit as it stops building
     ---@param self BuilderManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
     end,
 
     --------------------------------------------------------------------------------------------
     --- debug functionality
 
     DebugThread = function(self)
-        while true do
-            WaitTicks(1)
-            DrawCircle(self.Location, self.Radius, 'ffffff')
-        end
     end,
 
     --------------------------------------------------------------------------------------------

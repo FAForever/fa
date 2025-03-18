@@ -194,17 +194,7 @@ end
 function GetKeyActions()
     local ret = {}
 
-    local keyActions = import("/lua/keymap/keyactions.lua").keyActions
-    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
-
-    for k,v in keyActions do
-        ret[k] = v
-    end
-
-    for k,v in debugKeyActions do
-        ret[k] = v
-    end
-
+    -- load actions from preference file
     local userActions = Prefs.GetFromCurrentProfile("UserKeyActions")
     if userActions ~= nil then
         for k,v in userActions do
@@ -212,9 +202,29 @@ function GetKeyActions()
         end
     end
 
-    -- remove invalid key actions
+    -- load default keyactions, overwrite those in the preference when applicable
+    local keyActions = import("/lua/keymap/keyactions.lua").keyActions
+    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
+
+    for k,v in keyActions do
+        if ret[k] and ret[k] != v.action then
+            WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
+        end
+
+        ret[k] = v
+    end
+
+    for k,v in debugKeyActions do
+        if ret[k] and ret[k] != v.action then
+            WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
+        end
+
+        ret[k] = v
+    end
+
     for k,v in ret do
         if string.find(k, '-') then
+            WARN(string.format("Removed invalid key action '%s' for using '-'", k))
             ret[k] = nil
         end
     end
@@ -281,18 +291,19 @@ function GenerateHotbuildModifiers()
                 local altModKey = "Alt-" .. key
                 local shiftModBinding = keyDetails[shiftModKey]
                 local altModBinding = keyDetails[altModKey]
-                if not shiftModBinding and not altModBinding then
-                    modifiers[shiftModKey] =  info.action
-                    modifiers[altModKey] =  info.action
-                elseif not shiftModBinding then
-                    modifiers[shiftModKey] =  info.action
-                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
-                elseif not altModBinding then
-                    modifiers[altModKey] =  info.action
-                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
+
+                if shiftModBinding then
+                    WARN(string.format('Shift modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Shift modifier of the Hotbuild action will not work!'
+                        , info.name, key, shiftModBinding.name, shiftModKey))
                 else
-                    WARN('Hotbuild key '..shiftModKey..' is already bound to action "'..shiftModBinding.name..'" under "'..shiftModBinding.category..'" category')
-                    WARN('Hotbuild key '..altModKey..' is already bound to action "'..altModBinding.name..'" under "'..altModBinding.category..'" category')
+                    modifiers[shiftModKey] = info.action
+                end
+
+                if altModBinding then
+                    WARN(string.format('Alt modifier for Hotbuild action "%s" (%s)  is already bound to action "%s" (%s)\nThe Alt modifier of the Hotbuild action will not work!'
+                        , info.name, key, altModBinding.name, altModKey))
+                else
+                    modifiers[altModKey] =  info.action
                 end
             end
         end

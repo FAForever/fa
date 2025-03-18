@@ -1,11 +1,11 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    ShaderName = 'TMeshQuantumNuke',
-                    NormalsName = 'QuantumWarheadEffect01_normals.dds',
                     LODCutoff = 600.0,
+                    ShaderName = "TMeshQuantumNuke",
+                    NormalsName = "QuantumWarheadEffect01_normals.dds",
                 },
             },
         },

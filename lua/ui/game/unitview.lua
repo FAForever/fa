@@ -19,7 +19,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
-local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
+local unitViewLayout = nil -- Holds the current layout, updated by SetLayout().
 local unitviewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local Grid = import("/lua/maui/grid.lua").Grid
 local Construction = import("/lua/ui/game/construction.lua")
@@ -136,11 +136,30 @@ local function FormatTime(seconds)
 end
 
 local statFuncs = {
+    -- combined stats showing mass trend for own units or army icon + nickname for others' units
     function(info)
         local massUsed = math.max(info.massRequested, info.massConsumed)
         if info.massProduced > 0 or massUsed > 0 then
-            return string.format('%+d', math.ceil(info.massProduced - massUsed)),
-                UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+            local netMass = info.massProduced - massUsed
+            local absNetMass = math.abs(netMass)
+            local str
+            -- Thanks to an engine patch, `GetRolloverInfo` returns floats for economy values:
+            -- - https://github.com/FAForever/FA-Binary-Patches/pull/75
+            -- This allows us to show adjacency-affected values better.
+            if absNetMass < 5 then
+                str = string.format('%+.3g', netMass)
+            elseif absNetMass < 10 then
+                str = string.format('%+.2g', netMass)
+            elseif absNetMass < 100 then
+                str = string.format('%+.3g', netMass)
+            else
+                str = string.format('%+d', math.round(netMass))
+            end
+
+            return str
+                , UIUtil.UIFile('/game/unit_view_icons/mass.dds')
+                , '00000000'
+
         elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
             local armyData = GetArmiesTable().armiesTable[info.armyIndex + 1]
             local icon = Factions.Factions[armyData.faction + 1].Icon
@@ -153,14 +172,27 @@ local statFuncs = {
             return false
         end
     end,
+    -- energy trend
     function(info)
         local energyUsed = math.max(info.energyRequested, info.energyConsumed)
         if info.energyProduced > 0 or energyUsed > 0 then
-            return string.format('%+d', math.ceil(info.energyProduced - energyUsed))
+            local netEnergy = info.energyProduced - energyUsed
+            local absNetEnergy = math.abs(netEnergy)
+            -- Thanks to an engine patch, `GetRolloverInfo` returns floats for economy values:
+            -- - https://github.com/FAForever/FA-Binary-Patches/pull/75
+            -- This allows us to show adjacency-affected values better.
+            if absNetEnergy < 10 then
+                return string.format('%+.2g', netEnergy)
+            elseif absNetEnergy < 100 then
+                return string.format('%+.3g', netEnergy)
+            else
+                return string.format('%+d', math.round(netEnergy))
+            end
         else
             return false
         end
     end,
+    -- vet xp
     function(info)
         if UnitData[info.entityId].xp ~= nil then
             local nextLevel = 0
@@ -181,6 +213,7 @@ local statFuncs = {
 
 
     end,
+    -- kill count
     function(info)
         if info.kills > 0 then
             return string.format('%d', info.kills)
@@ -188,7 +221,7 @@ local statFuncs = {
             return false
         end
     end,
-
+    -- tactical/strategic missile count
     function(info)
         if info.tacticalSiloMaxStorageCount > 0 or info.nukeSiloMaxStorageCount > 0 then
             if info.userUnit:IsInCategory('VERIFYMISSILEUI') then
@@ -219,6 +252,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- shield % HP
     function(info, bp)
         if info.shieldRatio > 0 then
             return string.format('%d%%', math.floor(info.shieldRatio * 100))
@@ -226,6 +260,7 @@ local statFuncs = {
             return false
         end
     end,
+    -- fuel remaining time
     function(info, bp)
         if info.fuelRatio > -1 then
             return FormatTime(bp.Physics.FuelUseTime * info.fuelRatio)
@@ -233,12 +268,13 @@ local statFuncs = {
             return false
         end
     end,
+    -- buildrate
     function(info, bp)
         if options.gui_detailed_unitview == 0 then
             return false
         end
-        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
-            return string.format("%d", math.floor(info.userUnit:GetBuildRate()))
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 1 then
+            return string.format("%.6g", info.userUnit:GetBuildRate())
         end
         return false
     end,
@@ -271,6 +307,68 @@ function CreateQueueGrid(parent)
 
     for id = 1, 7 do
         controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
+    end
+
+    LayoutHelpers.SetDimensions(controls.queue, 316, 48)
+    LayoutHelpers.FillParent(controls.queue.bg, controls.queue)
+    LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
+
+    controls.queue:DisableHitTest()
+    controls.queue.grid:DisableHitTest()
+    controls.queue.bg:DisableHitTest()
+    
+    for id, item in controls.queue.grid.items do
+        if id > 1 then
+           local before = controls.queue.grid.items[id-1]
+           LayoutHelpers.RightOf(item, before, -6) 
+        else
+           LayoutHelpers.AtLeftTopIn(item, controls.queue.grid, 2)
+        end
+        item:DisableHitTest()
+        LayoutHelpers.DepthOverParent(item.icon, item)
+        LayoutHelpers.FillParentFixedBorder(item.icon, item, 8)
+        LayoutHelpers.DepthOverParent(item.text, item.icon)
+        LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
+    end
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.leftBracket, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToLeft(controls.queue.bg.leftBracket, controls.queue.bg, -6)
+    LayoutHelpers.SetHeight(controls.queue.bg.leftBracket, 54)
+    controls.queue.bg.leftBracket.Depth:Set(function() return controls.queue.bg.Depth() + 10 end)
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.leftGlowTop, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToLeft(controls.queue.bg.leftGlowTop, controls.queue.bg, -10)
+    LayoutHelpers.AtBottomIn(controls.queue.bg.leftGlowBottom, controls.queue.bg, -4)
+    controls.queue.bg.leftGlowBottom.Left:Set(controls.queue.bg.leftGlowTop.Left)
+    controls.queue.bg.leftGlowMiddle.Top:Set(controls.queue.bg.leftGlowTop.Bottom)
+    controls.queue.bg.leftGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.leftGlowTop.Bottom(), controls.queue.bg.leftGlowBottom.Top()) end)
+    controls.queue.bg.leftGlowMiddle.Left:Set(function() return controls.queue.bg.leftGlowTop.Left() end)
+    
+    LayoutHelpers.AtTopIn(controls.queue.bg.rightGlowTop, controls.queue.bg, -4)
+    LayoutHelpers.AnchorToRight(controls.queue.bg.rightGlowTop, controls.queue.bg, -8)
+    LayoutHelpers.AtBottomIn(controls.queue.bg.rightGlowBottom, controls.queue.bg, -4)
+    controls.queue.bg.rightGlowBottom.Left:Set(controls.queue.bg.rightGlowTop.Left)
+    controls.queue.bg.rightGlowMiddle.Top:Set(controls.queue.bg.rightGlowTop.Bottom)
+    controls.queue.bg.rightGlowMiddle.Bottom:Set(function() return math.max(controls.queue.bg.rightGlowTop.Bottom(), controls.queue.bg.rightGlowBottom.Top()) end)
+    controls.queue.bg.rightGlowMiddle.Right:Set(function() return controls.queue.bg.rightGlowTop.Right() end)
+
+    --- Set textures according to the current theme
+    --- @param - self queue control
+    controls.queue.SetThemeTextures = function(self)
+        self.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
+        self.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
+
+        for id, item in self.grid.items do
+            item:SetTexture(UIUtil.UIFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
+        end
+    
+        self.bg.leftGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_t.dds'))
+        self.bg.leftGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_m.dds'))
+        self.bg.leftGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-left-energy/bracket_bmp_b.dds'))
+        
+        self.bg.rightGlowTop:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_t.dds'))
+        self.bg.rightGlowMiddle:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_m.dds'))
+        self.bg.rightGlowBottom:SetTexture(UIUtil.UIFile('/game/bracket-right-energy/bracket_bmp_b.dds'))
     end
 
     controls.queue.grid.UpdateQueue = function(self, queue)
@@ -317,8 +415,9 @@ function UpdateWindow(info)
         controls.ReclaimGroup:Hide()
     else
         local bp = __blueprints[info.blueprintId]
-        if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true)) then
-            controls.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true))
+        local icon = '/icons/units/' .. (bp.BaseBlueprintId or bp.BlueprintId) .. '_icon.dds'
+        if DiskGetFileInfo(UIUtil.UIFile(icon, true)) then
+            controls.icon:SetTexture(UIUtil.UIFile(icon, true))
         else
             controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
         end
@@ -481,7 +580,7 @@ function UpdateWindow(info)
                         elseif upperThreshold >= 10000 then
                             text = string.format('%.1fK/%.1fK', experience / 1000, upperThreshold / 1000)
                         else
-                            text = experience .. '/' .. upperThreshold
+                            text = experience .. '/' .. string.format('%d', upperThreshold)
                         end
                         controls.nextVet:SetText(text)
 
@@ -531,9 +630,9 @@ function UpdateWindow(info)
 
         -- -- Build queue upon hovering of unit
 
-        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local always = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
-        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+        local whenObserving = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'only-obs'
 
         if always or (whenObserving and isObserver) then
             if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and
@@ -551,8 +650,7 @@ function UpdateWindow(info)
                 end
 
                 -- show that queue
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
-                ClearCurrentFactoryForQueueDisplay()
+                controls.queue.grid:UpdateQueue(PeekCurrentFactoryForQueueDisplay(factory))
             else
                 controls.queue:Hide()
             end
@@ -739,12 +837,14 @@ function ShowROBox()
 end
 
 function SetLayout(layout)
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
     unitViewLayout.SetLayout()
 end
 
 function SetupUnitViewLayout(mapGroup, orderControl)
     controls.parent = mapGroup
     controls.orderPanel = orderControl
+    unitViewLayout = import(UIUtil.GetLayoutFilename('unitview')) -- SetLayout() will set this too but let's make sure CreateUI() does not use nil, even though it only sets up an OnFrame function.
     CreateUI()
     SetLayout(UIUtil.currentLayout)
 end

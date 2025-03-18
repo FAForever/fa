@@ -14,6 +14,13 @@ local DEFAULT_MASS_ICON_SIZE = 10
 --- UI control to show a preview image of a map, with optional resource markers.
 ---@class ResourceMapPreview : Group
 ResourceMapPreview = ClassUI(Group) {
+
+    ---@param self ResourceMapPreview
+    ---@param parent Control
+    ---@param size number
+    ---@param massIconSize number
+    ---@param hydroIconSize number
+    ---@param buttonsDisabled boolean
     __init = function(self, parent, size, massIconSize, hydroIconSize, buttonsDisabled)
         Group.__init(self, parent)
         self.size = size
@@ -41,6 +48,7 @@ ResourceMapPreview = ClassUI(Group) {
     end,
 
     --- Discard all resource markers
+    ---@param self ResourceMapPreview
     DestroyResourceMarkers = function(self)
         for k, v in pairs(self.massmarkers) do
             self.massIconPool:Dispose(v)
@@ -69,6 +77,7 @@ ResourceMapPreview = ClassUI(Group) {
     end,
 
     --- Delete all resource markers and clear the map preview.
+    ---@param self ResourceMapPreview
     Clear = function(self)
         self:DestroyResourceMarkers()
         self.mapPreview:ClearTexture()
@@ -77,13 +86,16 @@ ResourceMapPreview = ClassUI(Group) {
     --- Update the control to display the map given by a specified scenario file.
     --
     -- @param scenarioFile Path to the scenario file from which to load map data to display.
+    ---@param self ResourceMapPreview
+    ---@param scenarioFile FileName
     SetScenarioFromFile = function(self, scenarioFile)
         self:SetScenario(MapUtil.LoadScenario(scenarioFile))
     end,
 
     --- Update the control to display the map given by a specific scenario object.
-    --
-    -- @param scenarioInfo Scenario info object from which to extract map data.
+    ---@param self ResourceMapPreview
+    ---@param scenarioInfo string
+    ---@param enableWreckage boolean
     SetScenario = function(self, scenarioInfo, enableWreckage)
         self:DestroyResourceMarkers()
 
@@ -240,9 +252,10 @@ ResourceMapPreview = ClassUI(Group) {
     end,
 
     --- Update the representation of a particular player.
-    -- @param slot The slot index of the player to update.
-    -- @param playerInfo The player's PlayerInfo object.
-    -- @param hideColours A flag indicating if the player's colour should be shown or now.
+    ---@param self ResourceMapPreview
+    ---@param slot number The slot index of the player to update.
+    ---@param playerInfo PlayerData The player's PlayerInfo object.
+    ---@param hideColours boolean A flag indicating if the player's colour should be shown or now.
     UpdatePlayer = function(self, slot, playerInfo, hideColours)
         -- The ACUButton instance representing this slot, if any.
         local marker = self.startPositions[slot]
@@ -274,6 +287,7 @@ ResourceMapPreview = ClassUI(Group) {
         end
     end,
 
+    ---@param self ResourceMapPreview
     OnDestroy = function(self)
         self.massIconPool:Destroy()
         self.hydroIconPool:Destroy()

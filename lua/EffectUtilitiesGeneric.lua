@@ -28,7 +28,7 @@ local TrashBagAdd = TrashBag.Add
 --- It does not return a table with all of the effects.
 --- Call `CreateEffectsInTrashbag` if you'd like to capture them.
 ---@param obj Entity
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 function CreateEffectsOpti(obj, army, effectTable)
     for _, effect in effectTable do
@@ -39,7 +39,7 @@ end
 --- Creates all effects in a table at an entity and adds them to a trashbag.
 --- Call `CreateEffectsOpti` if you don't need the effects for later.
 ---@param obj Entity | Unit
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param trashbag TrashBag
 function CreateEffectsInTrashbag(obj, army, effectTable, trashbag)
@@ -52,7 +52,7 @@ end
 --- It does not return a table with all of the effects.
 --- Call `CreateEffectsWithOffsetInTrashbag` if you'd like to capture them.
 ---@param obj Entity | Unit
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -67,7 +67,7 @@ end
 --- to a trashbag.
 --- Call `CreateEffectsWithOffsetOpti` if you don't need the effects for later.
 ---@param obj Entity
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -83,7 +83,7 @@ end
 --- It does not return a table with all of the effects.
 --- Call `CreateEffectsWithRandomOffsetInTrashbag` if you'd like to capture them.
 ---@param obj Entity | Unit
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param xRange number
 ---@param yRange number
@@ -98,7 +98,7 @@ end
 --- to a trashbag.
 --- Call `CreateEffectsWithRandomOffsetOpti` if you don't need the effects for later.
 ---@param obj Entity | Unit
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param xRange number
 ---@param yRange number
@@ -115,7 +115,7 @@ end
 --- Call `CreateBoneEffectsInTrashbag` if you'd like to capture them.
 ---@param obj Entity | Unit
 ---@param bone string | number
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 function CreateBoneEffectsOpti(obj, bone, army, effectTable)
     for _, effect in effectTable do
@@ -128,7 +128,7 @@ end
 --- Call `CreateBoneEffectsOpti` if you don't need the effects for later.
 ---@param obj Entity
 ---@param bone string | number
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param trashbag TrashBag
 function CreateBoneEffectsInTrashbag(obj, bone, army, effectTable, trashbag)
@@ -142,7 +142,7 @@ end
 --- Call `CreateBoneEffectsOffsetInTrashbag` if you'd like to capture them.
 ---@param obj Entity | Unit
 ---@param bone string | number
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -158,7 +158,7 @@ end
 --- Call `CreateBoneEffectsOffsetOpti` if you don't need the effects for later.
 ---@param obj Entity | Unit
 ---@param bone string | number
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
 ---@param y number
@@ -174,9 +174,9 @@ end
 --- It does not return a table with all of the effects.
 --- Call `CreateRandomEffectsInTrashbag` if you'd like to capture them.
 ---@param obj Entity | Unit
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
----@param numEffects integer number of random effects to create
+---@param numEffects number number of random effects to create
 function CreateRandomEffectsOpti(obj, army, effectTable, numEffects)
     local numTableEntries = TableGetn(effectTable)
     for _ = 1, numEffects do
@@ -188,9 +188,9 @@ end
 --- to a trashbag.
 --- Call `CreateRandomEffectsOpti` if you don't need the effects for later.
 ---@param obj Entity | Unit
----@param army integer
+---@param army number
 ---@param effectTable string[] Emitter blueprint names
----@param numEffects integer number of random effects to create
+---@param numEffects number number of random effects to create
 ---@param trashbag TrashBag
 function CreateRandomEffectsInTrashbag(obj, army, effectTable, numEffects, trashbag)
     local numTableEntries = TableGetn(effectTable)

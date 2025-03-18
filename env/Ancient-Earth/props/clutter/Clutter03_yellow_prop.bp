@@ -1,16 +1,18 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'Clutter03_yellow_albedo.dds',
-                    LODCutoff = 100,
-                    ShaderName = 'NormalMappedAlpha',
-					NormalsName = 'Clutter03_normalsTS.dds',
+                    LODCutoff = 110,
+                    ShaderName = "NormalMappedAlpha",
+                    AlbedoName = "Clutter03_yellow_albedo.dds",
+                    NormalsName = "Clutter03_normalsTS.dds",
                 },
             },
         },
@@ -21,12 +23,8 @@ PropBlueprint {
         ReclaimMassMax = 0,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Clutter',
-    },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "Clutter" },
+    Physics = { BlockPath = false },
     SizeX = 0.25,
     SizeY = 0.25,
     SizeZ = 0.25,

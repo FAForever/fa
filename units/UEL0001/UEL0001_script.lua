@@ -19,27 +19,97 @@ local Shield = import("/lua/shield.lua").Shield
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local TerranWeaponFile = import("/lua/terranweapons.lua")
 local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
-local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
+local ACUDeathWeapon = import("/lua/sim/defaultweapons.lua").ACUDeathWeapon
 local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0001 : ACUUnit
+---@field LeftPod TConstructionPodUnit
+---@field RightPod TConstructionPodUnit
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        DeathWeapon = ClassWeapon(ACUDeathWeapon) {},
         RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
         OverCharge = ClassWeapon(TDFOverchargeWeapon) {},
         AutoOverCharge = ClassWeapon(TDFOverchargeWeapon) {},
-        TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {},
-        TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {},
+        TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            PlayFxRackSalvoChargeSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    hatch:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
+                end
+            end,
+
+            PlayFxRackSalvoReloadSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    self.Trash:Add(
+                        ForkThread(
+                            self.CloseHatchThread, self, hatch
+                        )
+                    )
+                end
+            end,
+
+            CloseHatchThread = function(self, slider)
+                -- wait for the launch effects to clear
+                WaitTicks(30)
+
+                if IsDestroyed(slider) then
+                    return
+                end
+
+                slider:SetGoal(0, 0, 0)
+                slider:SetSpeed(1.12) -- speed matches reload time
+            end,
+        },
+
+        TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            PlayFxRackSalvoChargeSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
+                end
+            end,
+
+            PlayFxRackSalvoReloadSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    self.Trash:Add(
+                        ForkThread(
+                            self.CloseHatchThread, self, hatch
+                        )
+                    )
+                end
+            end,
+
+            CloseHatchThread = function(self, slider)
+                -- wait for the launch effects to clear
+                WaitTicks(30)
+
+                if IsDestroyed(slider) then
+                    return
+                end
+
+                -- speed matches reload time
+                slider:SetGoal(0, 0, 0)
+                slider:SetSpeed(0.077)
+            end,
+        },
     },
 
+    ---@param self UEL0001
     __init = function(self)
         ACUUnit.__init(self, 'RightZephyr')
     end,
 
+    ---@param self UEL0001
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -51,19 +121,24 @@ UEL0001 = ClassUnit(ACUUnit) {
         self.HasRightPod = false
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+
+        local hatchBone = 'Back_Upgrade_B02'
+        if self:IsValidBone(hatchBone) then
+            self.MissileHatchSlider = CreateSlider(self, hatchBone)
+        else
+            WARN('*ERROR: Trying to use the bone, ' ..
+                hatchBone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.')
+        end
     end,
 
+    ---@param self UEL0001
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
         if self:BeenDestroyed() then return end
         self.Animator = CreateAnimator(self)
         self.Animator:SetPrecedence(0)
-        if self.IdleAnim then
-            self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true)
-            for k, v in self.DisabledBones do
-                self.Animator:SetBoneEnabled(v, false)
-            end
-        end
         self:BuildManipulatorSetEnabled(false)
         self:SetWeaponEnabledByLabel('RightZephyr', true)
         self:SetWeaponEnabledByLabel('TacMissile', false)
@@ -71,22 +146,68 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:ForkThread(self.GiveInitialResources)
     end,
 
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         if self.Animator then
             self.Animator:SetRate(0)
         end
+        self:RefreshPodFocus()
     end,
 
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        ACUUnit.OnStopBuild(self, unitBeingBuilt, order)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param unitBeingRepaired Unit
+    OnStartRepair = function(self, unitBeingRepaired)
+        ACUUnit.OnStartRepair(self, unitBeingRepaired)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param unitBeingRepaired Unit
+    OnStopRepair = function(self, unitBeingRepaired)
+        ACUUnit.OnStopRepair(self, unitBeingRepaired)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param target Unit|Prop
+    OnStartReclaim = function(self, target)
+        ACUUnit.OnStartReclaim(self, target)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param target Unit|Prop
+    OnStopReclaim = function(self, target)
+        ACUUnit.OnStopReclaim(self, target)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
-            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones,
+                self.BuildEffectsBag)
         else
             EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
+    ---@param self UEL0001
+    ---@param PodNumber integer
     RebuildPod = function(self, PodNumber)
         if PodNumber == 1 then
             -- Force pod rebuilds to queue up
@@ -130,6 +251,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:RequestRefreshUI()
     end,
 
+    ---@param self UEL0001
+    ---@param pod string
+    ---@param rebuildDrone boolean
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
             if pod == 'LeftPod' then
@@ -142,10 +266,44 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end
         else
-            self:CreateEnhancement(pod..'Remove')
+            self:CreateEnhancement(pod .. 'Remove')
         end
     end,
 
+    ---Calling this function will pull any pods without explicit orders to our current task
+    ---@param self UEL0001
+    RefreshPodFocus = function(self)
+        for _, pod in self:GetPods() do
+            if not pod.Dead and pod:GetCommandQueue()[1].commandType == 29 then
+                IssueToUnitClearCommands(pod)
+            end
+        end
+    end,
+
+    ---@param self UEL0001
+    ---@return Unit[]? pods
+    GetPods = function(self)
+        return {self.LeftPod, self.RightPod}
+    end,
+
+    ---@param self UEL0001
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportAttach = function(self, bone, attachee)
+        ACUUnit.OnTransportAttach(self, bone, attachee)
+        attachee:SetDoNotTarget(true)
+    end,
+
+    ---@param self UEL0001
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportDetach = function(self, bone, attachee)
+        ACUUnit.OnTransportDetach(self, bone, attachee)
+        attachee:SetDoNotTarget(false)
+    end,
+
+    ---@param self UEL0001
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
@@ -207,18 +365,21 @@ UEL0001 = ClassUnit(ACUUnit) {
             RemoveUnitEnhancement(self, 'ShieldRemove')
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
+            self:AddToggleCap('RULEUTC_ShieldToggle')
             self:DestroyShield()
-            self:ForkThread(function()
-                WaitTicks(1)
-                self:CreateShield(bp)
-                self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-                self:SetMaintenanceConsumptionActive()
-            end)
+            self:ForkThread(
+                function()
+                    WaitTicks(1)
+                    self:CreateShield(bp)
+                    self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+                    self:SetMaintenanceConsumptionActive()
+                end
+            )
         elseif enh == 'ShieldGeneratorFieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh =='AdvancedEngineering' then
+        elseif enh == 'AdvancedEngineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['UEFACUT2BuildRate'] then
@@ -230,7 +391,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -245,16 +406,18 @@ UEL0001 = ClassUnit(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
-        elseif enh =='AdvancedEngineeringRemove' then
+        elseif enh == 'AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.UEF *
+                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.UEF *
+                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
             end
-        elseif enh =='T3Engineering' then
+        elseif enh == 'T3Engineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['UEFACUT3BuildRate'] then
@@ -266,7 +429,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -281,15 +444,16 @@ UEL0001 = ClassUnit(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
-        elseif enh =='T3EngineeringRemove' then
+        elseif enh == 'T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
-            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        elseif enh =='DamageStabilization' then
+            self:AddBuildRestriction(categories.UEF *
+                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        elseif enh == 'DamageStabilization' then
             if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint {
                     Name = 'UEFACUDamageStabilization',
@@ -310,11 +474,11 @@ UEL0001 = ClassUnit(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
-        elseif enh =='DamageStabilizationRemove' then
+        elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
                 Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
             end
-        elseif enh =='HeavyAntiMatterCannon' then
+        elseif enh == 'HeavyAntiMatterCannon' then
             local wep = self:GetWeaponByLabel('RightZephyr')
             wep:AddDamageMod(bp.ZephyrDamageMod)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -322,7 +486,7 @@ UEL0001 = ClassUnit(ACUUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
-        elseif enh =='HeavyAntiMatterCannonRemove' then
+        elseif enh == 'HeavyAntiMatterCannonRemove' then
             local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
             if not bp then return end
             local wep = self:GetWeaponByLabel('RightZephyr')
@@ -343,11 +507,11 @@ UEL0001 = ClassUnit(ACUUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh =='TacticalMissile' then
+        elseif enh == 'TacticalMissile' then
             self:AddCommandCap('RULEUCC_Tactical')
             self:AddCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('TacMissile', true)
-        elseif enh =='TacticalNukeMissile' then
+        elseif enh == 'TacticalNukeMissile' then
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:AddCommandCap('RULEUCC_Nuke')

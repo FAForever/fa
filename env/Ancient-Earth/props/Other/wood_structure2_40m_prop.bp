@@ -1,32 +1,33 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
+    },
+    Defense = {
+        Health = 80,
+        MaxHealth = 80,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'boards_1_tiled_albedo.dds',
-                    LODCutoff = 350,
-                    ShaderName = 'TMeshNoNormals',
-                    SpecularName = 'boards_1_tiled_albedo.dds',
+                    LODCutoff = 330,
+                    ShaderName = "TMeshNoNormals",
+                    AlbedoName = "boards_1_tiled_albedo.dds",
+                    SpecularName = "boards_1_tiled_albedo.dds",
                 },
             },
         },
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = '',
+        ReclaimEnergyMax = 0,
         ReclaimMassMax = 40,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Wood Warehouse',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Interface = { HelpText = "Wood Warehouse" },
+    Physics = { BlockPath = true },
     SizeX = 3,
     SizeY = 1,
     SizeZ = 3,

@@ -139,16 +139,114 @@ local function AssignIcons(units, assignments, identifier)
         for _, info in assignments do
             if info.BlueprintId and info.IconSet then
                 AssignBlueprintId(units, info.BlueprintId, info.IconSet)
-                continue
-            end
-
-            if info.TypeId and info.Iconset then
+            elseif info.TypeId and info.Iconset then
                 AssignTypeId(units, info.TypeId, info.IconSet)
-                continue
             end
         end
     end
 end
+
+
+--- Creates a new basic environment that's safe for the UI to interact with
+---@return table
+local function NewSafeEnv()
+    local env = {
+        -- libraries
+        table = table.copy(table),
+        math = table.copy(math),
+        string = table.copy(string),
+
+        -- standard functions
+        ipairs = ipairs,
+        next = next,
+        pairs = pairs,
+        rawequal = rawequal,
+        rawget = rawget,
+        rawset = rawset,
+        tonumber = tonumber,
+        tostring = tostring,
+        type = type,
+        unpack = unpack,
+        pcall = pcall,
+        _VERSION = _VERSION,
+        -- __pow = __pow,
+
+        -- moholog-interacting functions
+        _ALERT = _ALERT,
+        -- _TRACEBACK = _TRACEBACK,
+        LOG = LOG,
+        SPEW = SPEW,
+        WARN = WARN,
+        assert = assert,
+        error = error,
+
+        -- core moho functions
+        Basename = Basename,
+        Dirname = Dirname,
+        EnumColorNames = EnumColorNames,
+        EulerToQuaternion = EulerToQuaternion,
+        exists = exists,
+        FileCollapsePath = FileCollapsePath,
+        GetVersion = GetVersion,
+        MATH_IRound = MATH_IRound,
+        MATH_Lerp = MATH_Lerp,
+        MinLerp = MinLerp,
+        MinSlerp = MinSlerp,
+        OrientFromDir = OrientFromDir,
+        Rect = Rect,
+        STR_GetTokens = STR_GetTokens,
+        STR_Utf8Len = STR_Utf8Len,
+        STR_Utf8SubString = STR_Utf8SubString,
+        STR_itox = STR_itox,
+        STR_xtoi = STR_xtoi,
+        VAdd = VAdd,
+        VDiff = VDiff,
+        VDist2 = VDist2,
+        VDist2Sq = VDist2Sq,
+        VDist3 = VDist3,
+        VDist3Sq = VDist3Sq,
+        VDot = VDot,
+        VMult = VMult,
+        VPerpDot = VPerpDot,
+        Vector = Vector,
+        Vector2 = Vector2,
+
+        -- representation functions
+        repr = repr,
+        reprs = reprs,
+        reprsl = reprsl,
+        repru = repru,
+
+        -- utility functions
+        iscallable = iscallable,
+        printField = printField,
+        safecall = safecall,
+        Sort = Sort,
+        sort_by = sort_by,
+        sort_down_by = sort_down_by,
+        sortedpairs = sortedpairs,
+        StringCapitalize = StringCapitalize,
+        StringComma = StringComma,
+        StringEnds = StringEnds,
+        StringExtract = StringExtract,
+        StringJoin = StringJoin,
+        StringPrepend = StringPrepend,
+        StringReverse = StringReverse,
+        StringSplit = StringSplit,
+        StringSplitCamel = StringSplitCamel,
+        StringStarts = StringStarts,
+        StringStartsWith = StringStartsWith,
+    }
+    -- these can cause desyncs
+    env.table.shuffle = nil
+    env.table.random = nil
+    env.math.random = nil
+    -- add the same behavior for non-existent globals as usual
+    setmetatable(env, getmetatable(_G))
+    return env
+end
+
+
 
 --- Finds and applies custom strategic icons defined by UI mods
 --- @param all_bps BlueprintsTable the table with all blueprint values
@@ -166,36 +264,8 @@ local function FindCustomStrategicIcons(all_bps)
             -- info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
             -- info.UID = uid
 
-            local safemath = table.copy(math)
-            safemath.random = nil
-
             -- all the functionality that is available in the _icons.lua
-            local state = {
-                -- moholog-interacting statements
-                LOG = LOG,
-                WARN = WARN,
-                _ALERT = _ALERT,
-                SPEW = SPEW,
-                error = error,
-                assert = assert,
-
-                -- debugging statements
-                repr = repr,
-
-                -- compatibility statements
-                pairs = pairs,
-                ipairs = ipairs,
-                next = next,
-
-                -- typical statements
-                table = table,
-                math = safemath,
-                string = string,
-                tonumber = tonumber,
-                type = type,
-                unpack = unpack,
-                tostring = tostring,
-            }
+            local state = NewSafeEnv()
 
             -- try to get the icons file
             local ok, msg = pcall(
@@ -602,6 +672,12 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
             tempBp.Economy.BuildTime = preset.BuildTimeOverride or (tempBp.Economy.BuildTime + t)
 
+            -- adjust veterancy so that it is as easy to vet with preset SCUs as upgraded SCUs
+            if not bp.VeteranMass then
+                -- blueprints-units.lua gives a default multiplier of 2 for SUBCOMMANDER category units.
+                tempBp.VeteranMassMult = (tempBp.VeteranMassMult or 2) * bp.Economy.BuildCostMass / tempBp.Economy.BuildCostMass
+            end
+
             -- teleport cost adjustments. Manually enhanced SCU with teleport is cheaper than a prebuild SCU because the latter has its cost
             -- adjusted (up). This code sets bp values used in the code to calculate with different base values than the unit cost.
             if preset.TeleportNoCostAdjustment ~= false then
@@ -626,7 +702,9 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.BaseBlueprintId = tempBp.BlueprintId
             tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
+            tempBp.General.SelectionPriority = preset.SelectionPriority or tempBp.General.SelectionPriority or 1
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
+            tempBp.Interface = tempBp.Interface or { }
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
             tempBp.Description = preset.Description or tempBp.Description
             tempBp.CategoriesHash['ISPREENHANCEDUNIT'] = true
@@ -642,6 +720,10 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             BlueprintLoaderUpdateProgress()
         end
     end
+end
+
+function HandleUnitsWithExternalFactories(bps, all_bps)
+
 end
 
 -- Assign shader and mesh for visual Cloaking FX
@@ -685,85 +767,75 @@ function PreModBlueprints(all_bps)
         ExtractCloakMeshBlueprint(bp)
 
         -- Units with no categories are skipped
-        if not bp.Categories then
-            continue
-        end
+        if bp.Categories then
 
-        -- Construct hash-based categories
-        bp.CategoriesHash = table.hash(bp.Categories)
+            -- Construct hash-based categories
+            bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- Allow to add or delete categories for mods
-        if bp.DelCategories then
-            for _, v in bp.DelCategories do
-                bp.CategoriesHash[v] = false
+            -- Allow to add or delete categories for mods
+            if bp.DelCategories then
+                for _, v in bp.DelCategories do
+                    bp.CategoriesHash[v] = false
+                end
+                bp.DelCategories = nil
             end
-            bp.DelCategories = nil
-        end
 
-        if bp.AddCategories then
-            for _, v in bp.AddCategories do
-                bp.CategoriesHash[v] = true
+            if bp.AddCategories then
+                for _, v in bp.AddCategories do
+                    bp.CategoriesHash[v] = true
+                end
+                bp.AddCategories = nil
             end
-            bp.AddCategories = nil
-        end
 
-        -- Build range overlay
-        if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
-            if not bp.AI then bp.AI = {} end
-            bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
-                bp.CategoriesHash.OVERLAYMISC = true
+            -- Add common category values for easier lookup
+
+            -- Add tech category
+            for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
+                if bp.CategoriesHash[category] then
+                    bp.TechCategory = category
+                    break
+                end
             end
-        end
 
-        -- Add common category values for easier lookup
-
-        -- Add tech category
-        for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
-            if bp.CategoriesHash[category] then
-                bp.TechCategory = category
-                break
+            -- Add layer category
+            for _, category in {'LAND', 'AIR', 'NAVAL'} do
+                if bp.CategoriesHash[category] then
+                    bp.LayerCategory = category
+                    break
+                end
             end
-        end
 
-        -- Add layer category
-        for _, category in {'LAND', 'AIR', 'NAVAL'} do
-            if bp.CategoriesHash[category] then
-                bp.LayerCategory = category
-                break
+            -- Add faction category
+            bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
+
+            -- Adjust weapon blueprints
+            for i, w in bp.Weapon or {} do
+                -- add in weapon blueprint id
+                local label = w.Label or "Unlabelled"
+                w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
             end
+
+            -- Hotfix for naval wrecks
+            if bp.CategoriesHash.NAVAL and not bp.Wreckage then
+                bp.Wreckage = {
+                    Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+                    EnergyMult = 0,
+                    HealthMult = 0.9,
+                    MassMult = 0.9,
+                    ReclaimTimeMultiplier = 1,
+                    WreckageLayers = {
+                        Air = false,
+                        Land = false,
+                        Seabed = true,
+                        Sub = true,
+                        Water = true,
+                    },
+                }
+            end
+
+            -- Synchronize hashed categories with actual categories
+            bp.Categories = table.unhash(bp.CategoriesHash)
         end
-
-        -- Add faction category
-        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
-
-        -- Adjust weapon blueprints
-        for i, w in bp.Weapon or {} do
-            -- add in weapon blueprint id
-            local label = w.Label or "Unlabelled"
-            w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
-        end
-
-        -- Hotfix for naval wrecks
-        if bp.CategoriesHash.NAVAL and not bp.Wreckage then
-            bp.Wreckage = {
-                Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-                EnergyMult = 0,
-                HealthMult = 0.9,
-                MassMult = 0.9,
-                ReclaimTimeMultiplier = 1,
-                WreckageLayers = {
-                    Air = false,
-                    Land = false,
-                    Seabed = true,
-                    Sub = true,
-                    Water = true,
-                },
-            }
-        end
-
-        -- Synchronize hashed categories with actual categories
-        bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
     end
@@ -791,9 +863,12 @@ end
 
 local function SpawnMenuDummyChanges(all_bps)
     for id, bp in pairs(all_bps) do
-        if bp.Categories and not table.find(bp.Categories, 'DRAGBUILD') then
+
+        -- allow all mobile units to be dragged while being built
+        if bp.Categories and table.find(bp.Categories, 'MOBILE') then
             table.insert(bp.Categories, 'DRAGBUILD')
         end
+
         if bp.Physics and bp.Physics.MotionType ~= 'RULEUMT_Air' then
             local FootX, FootZ = GetFoot(bp, 'SizeX'), GetFoot(bp, 'SizeZ')
             local SkirtX, SkirtZ = GetSkirt(bp, 'SizeX'), GetSkirt(bp, 'SizeZ')
@@ -816,6 +891,9 @@ local function SpawnMenuDummyChanges(all_bps)
                         MeshBlueprint = '/meshes/game/nil_mesh',
                         UniformScale = 0,
                         HideLifebars = true,
+                    },
+                    Intel = {
+                        WaterVisionRadius = 0,
                     },
                     Physics = {
                         SkirtOffsetX = SOffsetX,
@@ -854,32 +932,32 @@ function PostModBlueprints(all_bps)
     
     for _, bp in all_bps.Unit do
         -- skip units without categories
-        if not bp.Categories then
-            continue
-        end
+        if bp.Categories then
+            -- check if blueprint was changed in ModBlueprints(all_bps)
+            if bp.Mod or table.getsize(bp.CategoriesHash) ~= table.getsize(bp.Categories) then
+            bp.CategoriesHash = table.hash(bp.Categories)
+            end
 
-        -- check if blueprint was changed in ModBlueprints(all_bps)
-        if bp.Mod or table.getsize(bp.CategoriesHash) ~= table.getsize(bp.Categories) then
-           bp.CategoriesHash = table.hash(bp.Categories)
-        end
-
-        if bp.CategoriesHash.USEBUILDPRESETS then
-            -- HUSSAR adding logic for finding issues in enhancements table
-            local issues = {}
-            if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
-            if type(bp.Enhancements) ~= 'table' then table.insert(issues, 'no Enhancements table') end
-            if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
-            if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
-            -- check blueprint, if correct info for presets then put this unit on the list to handle later
-            if table.empty(issues) then
-                table.insert(preset_bps, table.deepcopy(bp))
-            else
-                issues = table.concat(issues, ', ')
-                WARN('UnitBlueprint ' .. repr(bp.BlueprintId) .. ' has a category USEBUILDPRESETS but ' .. issues)
+            if bp.CategoriesHash.USEBUILDPRESETS then
+                -- HUSSAR adding logic for finding issues in enhancements table
+                local issues = {}
+                if not bp.Enhancements then table.insert(issues, 'no Enhancements value') end
+                if type(bp.Enhancements) ~= 'table' then table.insert(issues, 'no Enhancements table') end
+                if not bp.EnhancementPresets then table.insert(issues, 'no EnhancementPresets value') end
+                if type(bp.EnhancementPresets) ~= 'table' then table.insert(issues, 'no EnhancementPresets table') end
+                -- check blueprint, if correct info for presets then put this unit on the list to handle later
+                if table.empty(issues) then
+                    table.insert(preset_bps, table.deepcopy(bp))
+                else
+                    issues = table.concat(issues, ', ')
+                    WARN('UnitBlueprint ' .. repr(bp.BlueprintId) .. ' has a category USEBUILDPRESETS but ' .. issues)
+                end
             end
         end
+
         BlueprintLoaderUpdateProgress()
     end
+
     HandleUnitWithBuildPresets(preset_bps, all_bps)
 
     -- find custom strategic icons defined by ui mods, this should be the very last thing 
@@ -890,10 +968,10 @@ function PostModBlueprints(all_bps)
 
     -- dynamically compute the unit threat values that are used by the AI to make sense
     -- of a units capabilities
-    SetUnitThreatValues(all_bps.Unit)
+    SetThreatValuesOfUnits(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
-    ProcessWeapons(all_bps.Unit)
+    ProcessWeapons(all_bps, all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity
@@ -902,7 +980,7 @@ function PostModBlueprints(all_bps)
 
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
-    PostProcessUnits(all_bps.Unit)
+    PostProcessUnits(all_bps, all_bps.Unit)
     PostProcessProps(all_bps.Prop)
 end
 

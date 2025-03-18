@@ -1,24 +1,20 @@
---unused by faf
-
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'ANTINAVY',
-        'TORPEDO',
-        'NOSPLASHDAMAGE',
+        "AEON",
+        "ANTINAVY",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TORPEDO",
     },
-    Defense = {
-        Health = 1,
-    },
+    Defense = { Health = 1 },
     Display = {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds',
-                    MeshName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm',
-                    ShaderName = 'TMeshGlow',
                     LODCutoff = 130,
+                    ShaderName = "TMeshGlow",
+                    MeshName = "/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm",
+                    AlbedoName = "/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds",
                 },
             },
         },
@@ -26,20 +22,11 @@ ProjectileBlueprint {
         UniformScale = 0.03,
     },
     General = {
-        Category = 'Anti Navy',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTINAVY',
-            'TORPEDO',
-            'NOSPLASHDAMAGE',
-        },
-        Faction = 'Aeon',
-        Weapon = 'Chrono Torpedo',
+        Category = "Anti Navy",
+        Faction = "Aeon",
+        Weapon = "Chrono Torpedo",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 5,
         DestroyOnWater = false,
@@ -48,7 +35,8 @@ ProjectileBlueprint {
         MaxSpeed = 5,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 190,
+        TurnRateRange = 10,
         VelocityAlign = true,
     },
 }

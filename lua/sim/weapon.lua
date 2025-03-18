@@ -14,6 +14,8 @@ local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEn
 local cachedPriorities = false
 local RecycledPriTable = {}
 
+local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComponent.lua").DebugWeaponComponent
+
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
@@ -45,7 +47,9 @@ local function ParsePriorities()
     return finalPriorities
 end
 
----@class Weapon : moho.weapon_methods
+local WeaponMethods = moho.weapon_methods
+
+---@class Weapon : moho.weapon_methods, InternalObject, DebugWeaponComponent
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
@@ -62,7 +66,9 @@ end
 ---@field NumTargets number
 ---@field Trash TrashBag
 ---@field unit Unit
-Weapon = ClassWeapon(moho.weapon_methods) {
+---@field MaxRadius? number
+---@field MinRadius? number
+Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
     DamageMod = 0,
@@ -396,8 +402,8 @@ Weapon = ClassWeapon(moho.weapon_methods) {
     end,
 
     ---@param self Weapon
-    ---@param new any
-    ---@param old any
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
     end,
 
@@ -405,6 +411,8 @@ Weapon = ClassWeapon(moho.weapon_methods) {
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self.Blueprint
         local damageTable = {}
+        
+        damageTable.DamageToShields = weaponBlueprint.DamageToShields
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
         damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
@@ -451,7 +459,10 @@ Weapon = ClassWeapon(moho.weapon_methods) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
 
-        -- store the original target, can be nil if ground firing
+        -- used for the retargeting feature
+        proj.CreatedByWeapon = self
+
+        -- used for tactical / strategic defenses to ignore all other collisions
         proj.OriginalTarget = self:GetCurrentTarget()
         if proj.OriginalTarget.GetSource then
             proj.OriginalTarget = proj.OriginalTarget:GetSource()
@@ -673,24 +684,82 @@ Weapon = ClassWeapon(moho.weapon_methods) {
     ---@param self Weapon
     ---@param enable boolean
     SetWeaponEnabled = function(self, enable)
-        if not enable then
-            self:SetEnabled(enable)
-            return
-        end
-        local enabledByEnh = self.Blueprint.EnabledByEnhancement
-        if enabledByEnh then
-            local enhancements = SimUnitEnhancements[self.unit.EntityId]
-            if enhancements then
-                for _, enh in enhancements do
-                    if enh == enabledByEnh then
-                        self:SetEnabled(enable)
-                        return
+        if not IsDestroyed(self) then
+            if not enable then
+                self:SetEnabled(enable)
+                return
+            end
+            local enabledByEnh = self.Blueprint.EnabledByEnhancement
+            if enabledByEnh then
+                local enhancements = SimUnitEnhancements[self.unit.EntityId]
+                if enhancements then
+                    for _, enh in enhancements do
+                        if enh == enabledByEnh then
+                            self:SetEnabled(enable)
+                            return
+                        end
                     end
                 end
+                -- enhancement needed, but doesn't have it; don't allow weapon to be enabled
+                return
             end
-            -- enhancement needed, but doesn't have it; don't allow weapon to be enabled
-            return
+            self:SetEnabled(enable)
         end
-        self:SetEnabled(enable)
+    end,
+
+    ---@param self Weapon
+    ---@param rateOfFire number
+    DisabledWhileReloadingThread = function(self, rateOfFire)
+
+        -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+        -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
+        -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon.
+
+        local reloadTime = math.floor(10 * rateOfFire) - 1
+        if reloadTime > 4 then
+            if IsDestroyed(self) then
+                return
+            end
+
+            self:SetEnabled(false)
+            WaitTicks(reloadTime)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            self:SetEnabled(true)
+        end
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Properties
+
+    ---@param self Weapon
+    ---@return number
+    GetMaxRadius = function(self)
+        return self.MaxRadius or self.Blueprint.MaxRadius
+    end,
+
+    ---@param self Weapon
+    GetMinRadius = function(self)
+        return self.MinRadius or self.Blueprint.MinRadius
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Hooks
+
+    ---@param self Weapon
+    ---@param radius number
+    ChangeMaxRadius = function(self, radius)
+        WeaponMethods.ChangeMaxRadius(self, radius)
+        self.MaxRadius = radius
+    end,
+
+    ---@param self Weapon
+    ---@param radius number
+    ChangeMinRadius = function(self, radius)
+        WeaponMethods.ChangeMinRadius(self, radius)
+        self.MinRadius = radius
     end,
 }

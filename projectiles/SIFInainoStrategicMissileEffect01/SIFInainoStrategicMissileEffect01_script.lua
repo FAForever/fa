@@ -5,6 +5,8 @@
 ----------------------------------------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+--- Ohwalli Strategic Bomb effect script, non-damaging
+---@class SIFInainoStrategicMissileEffect01 : EmitterProjectile
 SIFInainoStrategicMissileEffect01 = ClassProjectile(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
 	FxTrails = EffectTemplate.SIFInainoPlumeFxTrails01,
 }

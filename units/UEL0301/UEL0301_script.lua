@@ -29,6 +29,7 @@ UEL0301 = ClassUnit(CommandUnit) {
         DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
+    ---@param self UEL0301
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -37,16 +38,23 @@ UEL0301 = ClassUnit(CommandUnit) {
         self:SetupBuildBones()
     end,
 
+    ---@param self UEL0301
     __init = function(self)
         CommandUnit.__init(self, 'RightHeavyPlasmaCannon')
     end,
 
+    ---@param self UEL0301
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         -- Block Jammer until Enhancement is built
         self:DisableUnitIntel('Enhancement', 'Jammer')
     end,
 
+    ---@param self UEL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -56,6 +64,51 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    ---@param self UEL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        CommandUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        CommandUnit.OnStopBuild(self, unitBeingBuilt, order)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
+    ---@param unitBeingRepaired Unit
+    OnStartRepair = function(self, unitBeingRepaired)
+        CommandUnit.OnStartRepair(self, unitBeingRepaired)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
+    ---@param unitBeingRepaired Unit
+    OnStopRepair = function(self, unitBeingRepaired)
+        CommandUnit.OnStopRepair(self, unitBeingRepaired)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
+    ---@param target Unit|Prop
+    OnStartReclaim = function(self, target)
+        CommandUnit.OnStartReclaim(self, target)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
+    ---@param target Unit|Prop
+    OnStopReclaim = function(self, target)
+        CommandUnit.OnStopReclaim(self, target)
+        self:RefreshPodFocus()
+    end,
+
+    ---@param self UEL0301
     RebuildPod = function(self)
         if self.HasPod == true then
             self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
@@ -73,6 +126,9 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    ---@param self UEL0301
+    ---@param pod TConstructionPodUnit
+    ---@param rebuildDrone boolean
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
             if self.HasPod == true then
@@ -83,6 +139,40 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    ---Calling this function will pull any pods without explicit orders to our current task
+    ---@param self UEL0301
+    RefreshPodFocus = function(self)
+        for _, pod in self:GetPods() do
+            if not pod.Dead and pod:GetCommandQueue()[1].commandType == 29 then
+                IssueToUnitClearCommands(pod)
+            end
+        end
+    end,
+
+    ---@param self UEL0301
+    ---@return Unit[]? pods
+    GetPods = function(self)
+        return {self.Pod}
+    end,
+
+    ---@param self UEL0301
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportAttach = function(self, bone, attachee)
+        CommandUnit.OnTransportAttach(self, bone, attachee)
+        attachee:SetDoNotTarget(true)
+    end,
+
+    ---@param self UEL0301
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportDetach = function(self, bone, attachee)
+        CommandUnit.OnTransportDetach(self, bone, attachee)
+        attachee:SetDoNotTarget(false)
+    end,
+
+    ---@param self UEL0301
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
@@ -175,6 +265,8 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    ---@param self UEL0301
+    ---@param intel IntelType
     OnIntelEnabled = function(self, intel)
         CommandUnit.OnIntelEnabled(self, intel)
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
@@ -187,6 +279,8 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    ---@param self UEL0301
+    ---@param intel IntelType
     OnIntelDisabled = function(self, intel)
         CommandUnit.OnIntelDisabled(self, intel)
         if self.RadarJammerEnh and not self:IsIntelEnabled('Jammer') then

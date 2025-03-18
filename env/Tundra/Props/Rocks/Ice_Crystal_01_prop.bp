@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,9 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 500,
-                    ShaderName = 'NormalMappedTerrain',
+                    LODCutoff = 180,
+                    ShaderName = "NormalMappedTerrain",
                 },
             },
         },
@@ -24,9 +24,7 @@ PropBlueprint {
         ReclaimMassMax = 5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Ice Crystal',
-    },
+    Interface = { HelpText = "Ice Crystal" },
     SizeX = 0.75,
     SizeY = 0.75,
     SizeZ = 0.75,

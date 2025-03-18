@@ -1,27 +1,23 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'DIRECTFIRE',
+        "DIRECTFIRE",
+        "PROJECTILE",
+        "UEF",
     },
     Display = {
-        ImpactEffects = {
-            Type = 'Small01',
-        },
+        ImpactEffects = { Type = "Small01" },
         StrategicIconSize = 1,
     },
     General = {
-        Category = 'Direct Fire',
+        Category = "Direct Fire",
         EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'DIRECTFIRE',
+            "UEF",
+            "PROJECTILE",
+            "DIRECTFIRE",
         },
-        Faction = 'UEF',
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 22,

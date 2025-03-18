@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,8 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 750,
-                    ShaderName = 'VertexNormal',
+                    LODCutoff = 220,
+                    ShaderName = "VertexNormal",
                 },
             },
         },
@@ -23,9 +24,7 @@ PropBlueprint {
         ReclaimMassMax = 15,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Medium Rock',
-    },
+    Interface = { HelpText = "Medium Rock" },
     SizeX = 1,
     SizeY = 0.5,
     SizeZ = 1.5,

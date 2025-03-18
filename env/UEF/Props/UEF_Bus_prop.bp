@@ -1,20 +1,21 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 150,
+        MaxHealth = 150,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'UEF_Bus_Albedo.dds',
-                    SpecName = 'UEF_Bus_SpecTeam.dds',
-                    LODCutoff = 500,
-                    ShaderName = 'Unit',
+                    LODCutoff = 150,
+                    ShaderName = "Unit",
+                    SpecName = "UEF_Bus_SpecTeam.dds",
+                    AlbedoName = "UEF_Bus_Albedo.dds",
                 },
             },
         },
@@ -25,9 +26,7 @@ PropBlueprint {
         ReclaimMassMax = 75,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'UEF Bus',
-    },
+    Interface = { HelpText = "UEF Bus" },
     SizeX = 0.3,
     SizeY = 0.5,
     SizeZ = 0.7,

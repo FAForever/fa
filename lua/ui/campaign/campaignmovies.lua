@@ -21,6 +21,8 @@ local creditsMovies = {
 
 local subtitleThread = nil
 
+---@param textControl any
+---@param captions any
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
         function()
@@ -48,6 +50,12 @@ end
 --- - over = control to play above (to make sure depth is correct)
 --- - exitBehavior = function that will get called when the movie is done playing (optional)
 --- - returns `true` if movie played, else `false`
+---@param movieName string
+---@param over any
+---@param exitBehavior any
+---@param cue string
+---@param voice string
+---@return boolean
 function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
 
     GetCursor():Hide()
@@ -66,7 +74,7 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
     LayoutHelpers.FillParentPreserveAspectRatio(movie, parent)
 
     movie:DisableHitTest()    -- get clicks to parent group
-    
+
     -- black background for subtitles (only impacts 16:9 ratio slightly)
     local subtitleBG = Bitmap(movie)
 

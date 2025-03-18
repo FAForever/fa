@@ -1,20 +1,21 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
-        Health = 50,
-        MaxHealth = 50,
+        Health = 600,
+        MaxHealth = 600,
     },
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'cybran_car_Albedo.dds',
-                    SpecName = 'cybran_car_SpecTeam.dds',
-                    LODCutoff = 750,
-                    ShaderName = 'Unit',
+                    LODCutoff = 290,
+                    ShaderName = "Unit",
+                    SpecName = "cybran_car_SpecTeam.dds",
+                    AlbedoName = "cybran_car_Albedo.dds",
                 },
             },
         },
@@ -25,15 +26,9 @@ PropBlueprint {
         ReclaimMassMax = 300,
         ReclaimTime = 5,
     },
-    Footprint = {
-        OccupancyCaps = 3,
-    },
-    Interface = {
-        HelpText = 'Cybran Car',
-    },
-    Physics = {
-        BlockPath = true,
-    },
+    Footprint = { OccupancyCaps = 3 },
+    Interface = { HelpText = "Cybran Car" },
+    Physics = { BlockPath = true },
     SizeX = 2,
     SizeY = 0.2,
     SizeZ = 3,

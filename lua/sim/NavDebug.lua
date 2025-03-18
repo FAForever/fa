@@ -1,4 +1,4 @@
---******************************************************************************************************
+--**********************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,7 @@
 --** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
---******************************************************************************************************
+--**********************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
@@ -129,7 +129,7 @@ function ScanOver(mouse, layer)
         local over = navGrid:FindLeaf(mouse)
         if over then
             if over.Label then
-                local color = Shared.LabelToColor(over.Label)
+                local color = Shared.LayerColors[navGrid.Layer]
                 local size = over.Size
                 local h = 0.5 * size
                 NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.1)
@@ -137,10 +137,9 @@ function ScanOver(mouse, layer)
                 NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.2)
 
                 for k = 1, table.getn(over) do
-                    local neighbor = over[k]
+                    local neighbor = NavGenerator.NavLeaves[over[k]]
                     local size = neighbor.Size
                     local h = 0.5 * size
-                    local color = Shared.LabelToColor(neighbor.Label)
                     NavGenerator.DrawSquare(neighbor.px - h, neighbor.pz - h, size, color, 0.1)
                 end
             else
@@ -153,7 +152,7 @@ function ScanOver(mouse, layer)
             end
         end
 
-        -- local points, n = NavUtils.DirectionsFrom(layer, mouse, 45, 16)
+        -- local points, n = NavUtils.DirectionsFrom(layer, mouse, 45)
         -- if points then
         --     for k = 1, n do 
         --         DrawCircle(points[k], 5, 'ffffff')
@@ -268,9 +267,7 @@ function Scan()
                 end
 
                 if PathToState.Origin and PathToState.Destination then
-                    local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination
-                        ,
-                        ArmyBrains[1])
+                    local path, n, label = NavUtils.DetailedPathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination)
 
                     if not path then
                         DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')
@@ -307,7 +304,7 @@ function Scan()
                     PathToWithThreatThresholdState.Threshold and
                     PathToWithThreatThresholdState.Army
                 then
-                    local path, n, label = NavUtils.PathToWithThreatThreshold(
+                    local path, pn, distance, threats, tn = NavUtils.PathToWithThreatThreshold(
                         PathToWithThreatThresholdState.Layer,
                         PathToWithThreatThresholdState.Origin,
                         PathToWithThreatThresholdState.Destination,
@@ -317,13 +314,28 @@ function Scan()
                         PathToWithThreatThresholdState.Radius
                     )
 
+                    if threats then
+                        local position = { 0, 0, 0 }
+                        for k = 1, tn do
+                            local threat = threats[k]
+                            local tx = threat[1]
+                            local tz = threat[2]
+                            local t = threat[3]
+
+                            position[1] = tx
+                            position[3] = tz
+                            position[2] = GetSurfaceHeight(tx, tz)
+                            DrawCircle(position, math.sqrt(t), 'ff0000')
+                        end
+                    end
+
                     if not path then
                         DrawLinePop(PathToWithThreatThresholdState.Origin, PathToWithThreatThresholdState.Destination,
                             'ff0000')
                     else
-                        if n >= 2 then
+                        if pn >= 2 then
                             local last = path[1]
-                            for k = 2, n do
+                            for k = 2, pn do
                                 DrawLinePop(last, path[k], 'ff0000')
                                 last = path[k]
                             end

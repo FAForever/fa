@@ -2,17 +2,14 @@
 
 ---@alias AIBuilderGroupManager 'EngineeManager' | 'FactoryManager' | 'StructureManager'
 
----@class AIBuilderGroupTemplate : string[]
+---@class AIBuilderGroupTemplate
 ---@field BuilderGroupName string
----@field ManagerName AIBuilderGroupManager
-
---- Global list of all builder groups
----@type table<string, AIBuilderGroupTemplate>
-AIBuilderGroupTemplates = {}
+---@field BuilderGroupType string
+---@field BuilderTemplates AIBuilderTemplate[]
 
 --- Register a builder group, or override an existing builder group
 ---@param spec AIBuilderGroupTemplate
----@return string String reference to the builder group
+---@return AIBuilderGroupTemplate?
 function AIBuilderGroupTemplate(spec)
     -- it should be a table
     if type(spec) ~= 'table' then
@@ -20,29 +17,29 @@ function AIBuilderGroupTemplate(spec)
         return
     end
 
-    -- should have a name, as that is used as its identifier
+    -- required field
     if not spec.BuilderGroupName then
         WARN('Builder group excluded for missing "BuilderGroupName": ', reprs(spec))
         return
     end
 
-    -- should have a type
-    if not spec.ManagerName then
-        WARN('Builder group excluded for missing "ManagerName": ', reprs(spec))
+    -- required field
+    if not spec.BuilderTemplates then
+        WARN('Builder group excluded for missing "BuilderTemplates": ', reprs(spec))
         return
     end
 
-    -- overwrite any existing definitions
-    if AIBuilderGroupTemplates[spec.BuilderGroupName] then
-        SPEW(string.format('Overwriting builder group template: %s', spec.BuilderGroupName))
-        for k, v in spec do
-            AIBuilderGroupTemplates[spec.BuilderGroupName][k] = v
-        end
-
-        -- first one, we become the definition
-    else
-        AIBuilderGroupTemplates[spec.BuilderGroupName] = spec
+    -- copy over the builder templates so that we can override information as needed
+    for k, builderTemplate in spec.BuilderTemplates do
+        spec[k] = table.deepcopy(builderTemplate)
     end
 
-    return spec.BuilderGroupName
+    -- override the 'BuilderType' field
+    if spec.BuilderGroupType then
+        for k, builderTemplate in spec.BuilderTemplates do
+            builderTemplate.BuilderType = builderTemplate.BuilderType or spec.BuilderGroupType
+        end
+    end
+
+    return spec
 end

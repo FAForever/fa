@@ -1,35 +1,30 @@
-PropBlueprint {
-    Categories = {
-        'RECLAIMABLE',
+PropBlueprint{
+    Categories = { "RECLAIMABLE" },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
     },
-   
     Display = {
         Mesh = {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    AlbedoName = 'kelp_01_Albedo.dds',
-                    LODCutoff = 50,
-                    SpecName = 'kelp_01_SpecTeam.dds',
-                    NormalsName = 'kelp_01_normalsTS.dds',
-                    ShaderName = 'UnderwaterClutter',
+                    LODCutoff = 520,
+                    ShaderName = "UnderwaterClutter",
+                    SpecName = "kelp_01_SpecTeam.dds",
+                    AlbedoName = "kelp_01_Albedo.dds",
+                    NormalsName = "kelp_01_normalsTS.dds",
                 },
             },
         },
         UniformScale = 0.2,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = '',
-        },
-
-   
-    Interface = {
-        HelpText = 'Kelp Bed',
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
     },
-    Physics = {
-        BlockPath = false,
-    },
+    Interface = { HelpText = "Kelp Bed" },
+    Physics = { BlockPath = false },
     SizeX = 2,
     SizeY = 5,
     SizeZ = 12,

@@ -1,19 +1,17 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
-        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        MeshBlueprint = "/meshes/projectiles/torpedo_default_mesh.bp",
         StrategicIconSize = 2,
         UniformScale = 0.1,
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 0.5,
         DestroyOnWater = false,
         MaxSpeed = 2,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 600,
+        TurnRate = 140,
         VelocityAlign = true,
     },
 }

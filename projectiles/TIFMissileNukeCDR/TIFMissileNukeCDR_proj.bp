@@ -1,43 +1,32 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Audio = {
-        ImpactTerrain = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        ImpactWater = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
-        NukeExplosion = Sound {
-            Bank = 'Explosions',
-            Cue = 'UEF_Nuke_Impact',
-            LodCutoff = 'Weapon_LodCutoff',
-        },
+        ImpactTerrain = Sound { Bank = 'Explosions', Cue = 'UEF_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        ImpactWater   = Sound { Bank = 'Explosions', Cue = 'UEF_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
+        NukeExplosion = Sound { Bank = 'Explosions', Cue = 'UEF_Nuke_Impact', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
-        'UEF',
-        'PROJECTILE',
-        'INDIRECTFIRE',
-        'TACTICAL',
-        'TACTICALNUKE',
-        'MISSILE',
-        'NOSPLASHDAMAGE',
+        "INDIRECTFIRE",
+        "MISSILE",
+        "NOSPLASHDAMAGE",
+        "PROJECTILE",
+        "TACTICAL",
+        "TACTICALNUKE",
+        "UEF",
     },
     Defense = {
         Health = 4,
         MaxHealth = 4,
     },
+    DesiredShooterCap = 4,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/projectiles/tifmissilecruise01/tifmissilecruise01_albedo.dds',
-                    MeshName = '/projectiles/tifmissilecruise01/tifmissilecruise01_lod0.scm',
-                    ShaderName = 'TMeshAlpha',
+                    ShaderName = "TMeshAlpha",
+                    MeshName = "/projectiles/tifmissilecruise01/tifmissilecruise01_lod0.scm",
+                    AlbedoName = "/projectiles/tifmissilecruise01/tifmissilecruise01_albedo.dds",
                 },
             },
         },
@@ -50,17 +39,16 @@ ProjectileBlueprint {
         BuildTime = 3060,
     },
     General = {
-        Category = 'Missile',
-        Faction = 'UEF',
+        Category = "Missile",
+        Faction = "UEF",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         Acceleration = 3,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        MaxSpeed = 12,
+        MaxSpeed = 16,
+        MaxZigZag = 1,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
@@ -68,5 +56,7 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+        ZigZagFrequency = 1,
     },
+    StrategicIconName = "/textures/ui/common/game/strategicicons/icon_tactical_nuke_missile.dds",
 }

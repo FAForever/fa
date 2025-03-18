@@ -39,6 +39,8 @@
 ---@field ArtilleryShieldBlocks? boolean
 --- information about the audio files used by the weapon
 ---@field Audio WeaponBlueprintAudio
+--- How many times the engine calls OnFire for the weapon when attacking ground before moving on to the next ground attack order. Defaults to 3
+---@field AttackGroundTries? number
 --- if the unit has no issued commands and has a weapon that has `AutoInitiateAttackCommand` set,
 --- then if it finds a suitable target it will issue an attack command to go after the target
 ---@field AutoInitiateAttackCommand? boolean
@@ -51,7 +53,7 @@
 ---@field BeamLifetime number
 --- if the weapon will only fire when underwater
 ---@field BelowWaterFireOnly? boolean
---- threshold to release point before releasing ordnance
+--- Distance from bomb firing solution's position to the target's position within which the weapon will fire 
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
@@ -81,22 +83,21 @@
 ---@field DamageFriendly boolean
 --- blast radius
 ---@field DamageRadius number
---- used by the Absolver script to pass how much damage is done to shields, instead of `Damage`
+--- how much additional damage is dealt to shields using the "FAF_AntiShield" damagetype
 ---@field DamageToShields? number
 --- the type of damage the unit will do
 ---@field DamageType DamageType
 --- used by some projectile scripts to pass depth charge information
----@field DepthCharge? {Radius: number}
+---@field DepthCharge? WeaponBlueprintDepthCharge
 --- If true, will set the projectile launched from this weapon to detonate once it pass the height
 --- of the target it was launched at.
 --- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
 ---@field DetonatesAtTargetHeight? boolean
+--- Disables the weapon while it is reloading
+---@field DisableWhileReloading boolean
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
---- Use the `DoNotCollideList` in the projectile blueprint instead--this table is only used
---- by anti-artillery shields
----@field DoNotCollideList? UnparsedCategory[]
 --- number of times the Damage over Time damage will be dealt
 ---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds
@@ -139,7 +140,7 @@
 ---@field FixedSpreadRadius? number
 --- flares that this weapons launches
 ---@field Flare WeaponBlueprintFlare
---- if the weapon doesn't unpack (used for all counted projectiles)
+--- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
 --- controls what the weapon is allowed to target in reference to the heading of the unit
 ---@field HeadingArcCenter number
@@ -162,10 +163,13 @@
 ---@field Label string
 --- for tracking weapons, if the weapon should lead its target when aiming
 ---@field LeadTarget? boolean
---- if this weapon never fires automatically
+--- if set, requires a player to directly issue an attack / launch order for the unit to fire. Is set for all SMLs and 
+--- stationary TMLs. Requires _some_ kind of delay between the firing (such as a charge delay) or queued orders are not 
+--- registered properly by the engine and the unit will remain stuck on the first order, never firing again until the
+--- player clears the command queue and re-issues the order
 ---@field ManualFire? boolean
---- changes the weapon range from spherical to cylindrical, where the cylinder has a height of
---- this twice this value
+--- The maximum height difference upon which the weapon can fire at targets (cylindrical range).
+--- Defaults to nil, which gives infinite vertical range.
 ---@field MaxHeightDiff? number
 --- this weapon can only hold this many counted projectiles
 ---@field MaxProjectileStorage number
@@ -203,8 +207,8 @@
 --- if `NeedProp` is true then whenever the unit aquires a new target and is ready to attack it, it
 --- will first run the `OnGotTarget` script on the weapon
 ---@field NeedPrep? boolean
---- currently just sets `AlwaysRecheckTarget = false` so that bombers don't retarget halfway through
---- a bombing run
+--- sets `AlwaysRecheckTarget = false` and prevents automatic target resetting
+--- so that bombers don't retarget halfway through a bombing run
 ---@field NeedToComputeBombDrop? boolean
 --- if the unit is set as "busy" while the weapon charges
 ---@field NotExclusive? boolean
@@ -285,12 +289,15 @@
 ---@field SkipReadyState? boolean
 --- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
 ---@field SlavedToBody? boolean
---- range of arc to be considered "slaved" to a target
+--- Range of arc in both directions to be considered "slaved" to a target. With multiple weapons, 
+--- the first weapon in the blueprint that currently has a target is used for turning.
 ---@field SlavedToBodyArcRange? number
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean
 --- interval of time between looking for a target
 ---@field TargetCheckInterval number
+--- issues a `ResetTarget` half way the firing sequence
+---@field TargetResetWhenReady boolean
 --- table of category strings that define the targetting order of this weapon
 ---@field TargetPriorities UnparsedCategory[]
 --- comma separated list of category names that are always invalid targets
@@ -378,6 +385,10 @@
 --- if two additional flares should be created on the Z axis, each offset by
 --- `OffsetMult * Radius` for its collision center
 ---@field Stack? boolean
+
+---@class WeaponBlueprintDepthCharge
+---@field Radius number
+---@field ProjectilesToDeflect number
 
 ---@class WeaponBlueprintOvercharge
 --- flat damage applied to commanders, regardless of energy storage

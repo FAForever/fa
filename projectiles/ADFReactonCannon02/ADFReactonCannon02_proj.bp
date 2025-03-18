@@ -1,24 +1,15 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'DIRECTFIRE',
+        "AEON",
+        "DIRECTFIRE",
+        "PROJECTILE",
     },
-    Display = {
-        StrategicIconSize = 1,
-    },
+    Display = { StrategicIconSize = 1 },
     General = {
-        Category = 'Direct Fire',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'DIRECTFIRE',
-        },
-        Faction = 'Aeon',
+        Category = "Direct Fire",
+        Faction = "Aeon",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         InitialSpeed = 14,

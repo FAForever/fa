@@ -1,6 +1,7 @@
-PropBlueprint {
+PropBlueprint{
     Categories = {
-        'RECLAIMABLE',
+        "OBSTRUCTSBUILDING",
+        "RECLAIMABLE",
     },
     Defense = {
         Health = 50,
@@ -11,9 +12,8 @@ PropBlueprint {
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    -- share other rock's albedo and specteam
-                    LODCutoff = 750,
-                    ShaderName = 'BloatingNormalMappedAlpha',
+                    LODCutoff = 110,
+                    ShaderName = "BloatingNormalMappedAlpha",
                 },
             },
         },
@@ -24,9 +24,7 @@ PropBlueprint {
         ReclaimMassMax = 0.5,
         ReclaimTime = 5,
     },
-    Interface = {
-        HelpText = 'Small Pod',
-    },
+    Interface = { HelpText = "Small Pod" },
     SizeX = 0.3,
     SizeY = 0.25,
     SizeZ = 0.3,

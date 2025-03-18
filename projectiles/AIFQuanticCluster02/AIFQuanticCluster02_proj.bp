@@ -1,27 +1,27 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Categories = {
-        'AEON',
-        'PROJECTILE',
-        'INDIRECTFIRE',
+        "AEON",
+        "INDIRECTFIRE",
+        "PROJECTILE",
     },
     Display = {
         CameraFollowsProjectile = true,
-        MeshBlueprint = '/projectiles/TIFMortar01/TIFMortar01_mesh.bp',
+        MeshBlueprint = "/projectiles/TIFMortar01/TIFMortar01_mesh.bp",
         StrategicIconSize = 1,
         UniformScale = 0.1,
     },
     General = {
-        Category = 'Artillery',
-        Faction = 'Aeon',
+        Category = "Artillery",
+        Faction = "Aeon",
         TechLevel = 1,
-        Weapon = 'Quantic Artillery',
+        Weapon = "Quantic Artillery",
     },
-    Interface = {
-        HelpText = 0,
-    },
+    Interface = { HelpText = 0 },
     Physics = {
         DestroyOnWater = true,
         DetonateBelowHeight = 3,
+        FragmentId = "/projectiles/AIFQuanticCluster03/AIFQuanticCluster03_proj.bp",
+        Fragments = 3,
         InitialSpeed = 14.6,
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,

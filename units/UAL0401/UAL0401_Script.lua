@@ -27,7 +27,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = ClassWeapon(ADFPhasonLaser) {
             CreateProjectileAtMuzzle = function(self, muzzle)
-                ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
+                local projectile = ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
 
                 -- if possible, try not to fire on units that we're tractoring
                 local target = self:GetCurrentTarget()
@@ -37,6 +37,8 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
                         self:ResetTarget()
                     end
                 end
+
+                return projectile
             end,
         },
         RightArmTractor = ClassWeapon(ADFTractorClaw) {},
@@ -45,7 +47,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
 
     OnCreate = function(self, spec)
         AWalkingLandUnit.OnCreate(self, spec)
-        self.Trash:Add(ForkThread(self.AdjustWeaponsThread,self))
+        self.Trash:Add(ForkThread(self.AdjustWeaponsThread, self))
     end,
 
     AdjustWeaponsThread = function(self)
@@ -86,6 +88,14 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonColossusBuildingEffects(self)
+        -- adjust collision box due to build animation
+        self:SetCollisionShape('Box',0.3,3.25,-0.65,self.Blueprint.SizeX * 0.5, self.Blueprint.SizeY * 0.5, (self.Blueprint.SizeZ * 0.7))
+    end,
+
+    OnStopBeingBuilt = function(self,builder,layer)
+        AWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+        -- adjust collision box due to build animation
+        self:RevertCollisionShape()
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -111,17 +121,25 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
             { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
-        WaitTicks(2)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
-        WaitTicks(2)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
-        WaitTicks(2)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
-        WaitTicks(4)
+        WaitTicks(3)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
-        WaitTicks(36)
+
+        WaitTicks(15)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B02', 1.0)
+        WaitTicks(38)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
         end

@@ -1,12 +1,12 @@
-ProjectileBlueprint {
+ProjectileBlueprint{
     Display = {
         Mesh = {
             LODs = {
                 {
-                    MeshName = '/meshes/generic/cube01_lod0.scm',
-                    ShaderName = 'AlphaFade',
-                    AlbedoName = '/meshes/generic/cube02_albedo.dds',
                     LODCutoff = 150.0,
+                    ShaderName = "AlphaFade",
+                    MeshName = "/meshes/generic/cube01_lod0.scm",
+                    AlbedoName = "/meshes/generic/cube02_albedo.dds",
                 },
             },
         },
