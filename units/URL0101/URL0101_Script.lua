@@ -21,6 +21,10 @@ URL0101 = ClassUnit(CWalkingLandUnit) {
             self:SetScriptBit('RULEUTC_CloakToggle', true)
         else
             self:SetMaintenanceConsumptionActive()
+            -- `StopBeingBuiltEffects` is a thread that sets our mesh, and since it is a thread
+            -- it will act after the cloak update from OnStopBeingBuilt so we add another
+            -- thread to update the cloak again after the built effects are done.
+            ForkThread(self.UpdateCloakEffect, self, true, "Cloak")
         end
     end,
 }
