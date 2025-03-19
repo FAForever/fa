@@ -18,9 +18,7 @@ URL0101 = ClassUnit(CWalkingLandUnit) {
 
         -- Don't turn off cloak for AI so that it uses it by default
         if self.Brain.BrainType == 'Human' then
-            self:SetMaintenanceConsumptionInactive()
             self:SetScriptBit('RULEUTC_CloakToggle', true)
-            self:RequestRefreshUI()
         else
             self:SetMaintenanceConsumptionActive()
         end
