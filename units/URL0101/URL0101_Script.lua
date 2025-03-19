@@ -15,9 +15,15 @@ URL0101 = ClassUnit(CWalkingLandUnit) {
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         self.Trash:Add(CreateRotator(self, 'Spinner', 'y', nil, 90, 5, 90))
-        self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_CloakToggle', true)
-        self:RequestRefreshUI()
+
+        -- Don't turn off cloak for AI so that it uses it by default
+        if self.Brain.BrainType == 'Human' then
+            self:SetMaintenanceConsumptionInactive()
+            self:SetScriptBit('RULEUTC_CloakToggle', true)
+            self:RequestRefreshUI()
+        else
+            self:SetMaintenanceConsumptionActive()
+        end
     end,
 }
 
