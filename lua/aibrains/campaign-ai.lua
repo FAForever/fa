@@ -99,28 +99,6 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ----------------------------------------------------------------------------------------
-    --#region Unit Events
-
-    --- Called by a unit as it is finished being built
-    ---@param self CampaignAIBrain
-    ---@param unit Unit
-    ---@param builder Unit
-    ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
-
-        -- enable counterintel since campaign platoons may not handle this manually
-        -- cloaking is ignored because it is expensive and uncommon
-        if unit:TestToggleCaps("RULEUTC_StealthToggle") then
-            unit:SetScriptBit('RULEUTC_StealthToggle', false)
-        end
-        if unit:TestToggleCaps("RULEUTC_JammingToggle") then
-            unit:SetScriptBit('RULEUTC_JammingToggle', false)
-        end
-    end,
-
-    --#endregion
-    ----------------------------------------------------------------------------------------
     --#region campaign functionality
 
     ---@param self CampaignAIBrain
