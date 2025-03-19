@@ -169,28 +169,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
     end,
 
-    --#region Unit Events
-
-    --- Called by a unit as it is finished being built
-    ---@param self AIBrainTech
-    ---@param unit Unit
-    ---@param builder Unit
-    ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
-
-        -- enable counterintel
-        -- cloaking is ignored because it is expensive and uncommon
-        if unit:TestToggleCaps("RULEUTC_StealthToggle") then
-            unit:SetScriptBit('RULEUTC_StealthToggle', false)
-        end
-        if unit:TestToggleCaps("RULEUTC_JammingToggle") then
-            unit:SetScriptBit('RULEUTC_JammingToggle', false)
-        end
-    end,
-
-    --#endregion
-
     ---@param self AIBrainTech
     ---@param planName FileName
     ---@return string[]|nil
