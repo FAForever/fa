@@ -32,7 +32,6 @@ URA0303 = ClassUnit(CAirUnit) {
         else
             self:SetMaintenanceConsumptionActive()
         end
-        self:RequestRefreshUI()
     end,
 }
 
