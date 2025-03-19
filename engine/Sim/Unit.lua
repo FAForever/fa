@@ -617,9 +617,9 @@ end
 function Unit:SetRegenRate(rate)
 end
 
---- sets the script bit
----@param bit number | ToggleCap
----@param state boolean
+--- sets the script bit, which calls `OnScriptBitSet` or `OnScriptBitClear` for the Sim Unit and `OnSelectionChanged` on the User side if the bit is toggled
+---@param bit ToggleCap
+---@param state boolean # `true` -> `OnScriptBitSet`; `false` -> `OnScriptBitClear`
 function Unit:SetScriptBit(bit, state)
 end
 
