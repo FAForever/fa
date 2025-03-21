@@ -1,0 +1,1 @@
+- (#6698) Update hover cursor texture only when changed
