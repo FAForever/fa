@@ -196,6 +196,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
+        -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
+        self.UnitBeingBuilt:SetCollisionShape('None')
         StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
