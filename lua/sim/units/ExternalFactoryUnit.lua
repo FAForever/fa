@@ -47,6 +47,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
         -- do not allow the unit to be killed or to take damage
         self.CanTakeDamage = false
+        self.CanBeKilled = false
 
         -- is inherited by units, mimic what factories have as their default
         self:SetFireState(2)
