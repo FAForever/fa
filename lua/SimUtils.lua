@@ -156,6 +156,12 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         unit.IsBeingTransferred = true
 
+        -- For external factories, destroy the unit being built since otherwise it will be transferred as a built unit because it is attached indirectly
+        local externalUnitBeingBuilt = unit.ExternalFactory.UnitBeingBuilt
+        if externalUnitBeingBuilt then
+            externalUnitBeingBuilt:Destroy()
+        end
+
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy)
         if not newUnit then
