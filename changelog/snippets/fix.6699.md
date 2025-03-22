@@ -1,0 +1,1 @@
+- (#6699) Fix being able to ctrl-k external factories.
