@@ -184,7 +184,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     PlayFxRollOff = function(self)
-        self.Parent:StopBuPlayFxRollOffildFx()
+        self.Parent:PlayFxRollOff()
     end,
 
     ---@param self ExternalFactoryUnit
