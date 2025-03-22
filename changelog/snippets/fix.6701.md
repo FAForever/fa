@@ -1,0 +1,1 @@
+- (#6701) Fix an exploit where transferring external factories with unbuilt units would spawn built units instead.
