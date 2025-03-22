@@ -137,6 +137,11 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self.DisabledAssist = nil
         end
 
+        -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
+        if unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
+        end
+
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
             self:StopBuildFx()
 
