@@ -95,7 +95,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     ---@param unitbuilding Unit
-    ---@param order Layer
+    ---@param order "FactoryBuild" | "Repair" | "MobileBuild"
     OnStartBuild = function(self, unitbuilding, order)
         UnitOnStartBuild(self, unitbuilding, order)
         self.Parent:OnStartBuild(unitbuilding, order)
@@ -112,9 +112,10 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     ---@param unitBeingBuilt Unit
-    OnStopBuild = function(self, unitBeingBuilt)
-        UnitOnStopBuild(self, unitBeingBuilt)
-        self.Parent:OnStopBuild(unitBeingBuilt)
+    ---@param order "FactoryBuild" | "Repair" | "MobileBuild"
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        UnitOnStopBuild(self, unitBeingBuilt, order)
+        self.Parent:OnStopBuild(unitBeingBuilt, order)
         self.UnitBeingBuilt = nil
 
         if self.UpdateParentProgressThread then
