@@ -99,7 +99,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ----------------------------------------------------------------------------------------
-    --- campaign functionality
+    --#region campaign functionality
 
     ---@param self CampaignAIBrain
     ---@param planName FileName
@@ -1727,8 +1727,9 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
+    --#endregion
     ----------------------------------------------------------------------------------------
-    --- legacy functionality
+    --#region legacy functionality
     ---
     --- All functions below solely exist because the code is too tightly coupled. We can't
     --- remove them without drastically changing how the code base works. We can't do that
@@ -1745,4 +1746,5 @@ AIBrain = Class(StandardBrain) {
     ForceManagerSort = function(self)
     end,
 
+    --#endregion
 }

@@ -7,16 +7,26 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 
 local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbient
 
 -- Setup as RemoteViewing child of AStructureUnit
 local RemoteViewing = import("/lua/remoteviewing.lua").RemoteViewing
-AStructureUnit = RemoteViewing( AStructureUnit )
+---@diagnostic disable-next-line: cast-local-type
+AStructureUnit = RemoteViewing(AStructureUnit)
 
-XAB3301 = ClassUnit( AStructureUnit ) {
-
+---@class XAB3301: AStructureUnit, RemoteViewingUnit
+---@field Animator moho.AnimationManipulator
+---@field RotatorBot moho.RotateManipulator
+---@field RotatorTop moho.RotateManipulator
+---@field TrashAmbientEffects TrashBag
+---@field ScryEnabled boolean
+XAB3301 = ClassUnit(AStructureUnit) {
+    ---@param self XAB3301
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -35,20 +45,21 @@ XAB3301 = ClassUnit( AStructureUnit ) {
         self.TrashAmbientEffects = TrashBag()
     end,
 
+    ---@param self XAB3301
     CreateVisibleEntity = function(self)
         AStructureUnit.CreateVisibleEntity(self)
 
         if self.RemoteViewingData.VisibleLocation and self.RemoteViewingData.DisableCounter == 0 and self.RemoteViewingData.IntelButton then
 
-            if self.ScryEnabled then 
+            if self.ScryEnabled then
                 CreateLightParticle(self, "spin02", self.Army, 1, 20, 'glow_02', 'ramp_blue_16')
-            else 
+            else
                 CreateLightParticle(self, "spin02", self.Army, 10, 20, 'glow_02', 'ramp_blue_22')
             end
 
             if not self.ScryEnabled then
-                self.ScryEnabled = true 
-                
+                self.ScryEnabled = true
+
                 self.Animator:SetRate(1)
                 self.RotatorBot:SetTargetSpeed(12)
                 self.RotatorTop:SetTargetSpeed(-8)
@@ -61,6 +72,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
 
     end,
 
+    ---@param self XAB3301
     DisableVisibleEntity = function(self)
         AStructureUnit.DisableVisibleEntity(self)
 
@@ -69,7 +81,7 @@ XAB3301 = ClassUnit( AStructureUnit ) {
         self.RotatorTop:SetTargetSpeed(-4)
 
         self.TrashAmbientEffects:Destroy()
-        self.ScryEnabled = false 
+        self.ScryEnabled = false
     end,
 }
 

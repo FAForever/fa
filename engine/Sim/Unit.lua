@@ -125,6 +125,11 @@ end
 function Unit:EnableManipulators(bone, Enable)
 end
 
+---Forces game to use AltFootprint for the unit
+---@param state boolean
+function Unit:ForceAltFootprint(state)
+end
+
 --- Returns the unit's multiplier to a damage type
 ---@param damageTypeName DamageType
 ---@return number
@@ -269,7 +274,6 @@ end
 ---@param statName string
 ---@param defaultVal? number
 ---@return number
--- Special case for the Salem: GetStat("h1_SetSalemAmph", 0 or 1) will Disable/Enable amphibious mode
 function Unit:GetStat(statName, defaultVal)
 end
 
@@ -613,9 +617,9 @@ end
 function Unit:SetRegenRate(rate)
 end
 
---- sets the script bit
----@param bit number|string
----@param state boolean
+--- sets the script bit, which calls `OnScriptBitSet` or `OnScriptBitClear` for the Sim Unit and `OnSelectionChanged` on the User side if the bit is toggled
+---@param bit ToggleCap
+---@param state boolean # `true` -> `OnScriptBitSet`; `false` -> `OnScriptBitClear`
 function Unit:SetScriptBit(bit, state)
 end
 
@@ -696,6 +700,7 @@ end
 --- Tests if the unit has this toggle cap specified in the blueprint spec.
 --- May not always work.
 ---@param capName ToggleCap
+---@return boolean
 function Unit:TestToggleCaps(capName)
 end
 
