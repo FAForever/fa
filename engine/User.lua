@@ -818,10 +818,9 @@ end
 function IsKeyDown(keyCode)
 end
 
----
----@param playerId string
+---Returns whether current focus army is an observer.
 ---@return boolean
-function IsObserver(playerId)
+function IsObserver()
 end
 
 --- Issue a factory build or upgrade command to your selection
