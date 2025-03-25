@@ -158,9 +158,20 @@ ChatArea = ClassUI(Group) {
             end
         end
         line.author.HandleEvent = function(control, event)
-            if event.Type == 'ButtonPress' and control.name then
-                self.Parent.edit:SetText('/w '.. control.name..' ')
+          if event.Type == 'ButtonPress' then
+        local playerName = control.name
+        if playerName then
+            playerName = string.gsub(playerName, "[^%w%s_%-]", "")
+            local spaceIndex = string.find(playerName, " ")
+            if spaceIndex then
+                playerName = string.sub(playerName, spaceIndex + 1)
             end
+
+            playerName = string.gsub(string.gsub(playerName, "^%s*", ""), "%s*$", "")
+
+            self.Parent.edit:SetText('/w '.. playerName ..' ')
+        end
+    end
         end
         line.author:EnableHitTest()
         return line
