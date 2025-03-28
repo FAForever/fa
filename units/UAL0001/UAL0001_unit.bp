@@ -288,9 +288,9 @@ UnitBlueprint{
             Slot = "Back",
         },
         CrysalisBeam = {
-            BuildCostEnergy = 6000,
+            BuildCostEnergy = 9000,
             BuildCostMass = 300,
-            BuildTime = 350,
+            BuildTime = 300,
             Icon = "cba",
             Name = "<LOC enhancements_0004>Enhanced Quantum Disruptor",
             NewMaxRadius = 30,
