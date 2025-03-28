@@ -130,7 +130,7 @@ UnitBlueprint{
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.8,
-    LifeBarSize = 0.6,
+    LifeBarSize = 0.7,
     Physics = {
         BackUpDistance = 5,
         CatchUpAcc = 10,
