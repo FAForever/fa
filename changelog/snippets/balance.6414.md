@@ -4,14 +4,14 @@
     - Angler Torpedo 
       - RateOfFire: 10/33 --> 10/32
       - DPS: 97 --> 100
+    - Display
+      - UniformScale: 0.65 --> 0.7
     - Economy
       - BuildCostEnergy: 6480 --> 6000
       - BuildCostMass: 810 --> 750
       - BuildTime: 3240 --> 3000
     - Intel
         SonarRadius: 36 --> 72
-    - Physics
-      - MaxAcceleration: 6 --> 5.5
-      - MaxBrake: 6 --> 5.5
-      - MaxSpeed: 6 --> 5.5
-      - MaxSpeedReverse: 6 --> 5.5
+    - SizeX = 0.75 --> 0.8
+    - SizeY = 0.925 --> 1.0
+    - SizeZ = 2.0 --> 2.2
