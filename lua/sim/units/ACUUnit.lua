@@ -1,7 +1,15 @@
 local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
+---@field TickCreated number
+---@field CustomName string
 ACUUnit = ClassUnit(CommandUnit) {
+    ---@param self ACUUnit
+    OnCreate = function(self)
+        CommandUnit.OnCreate(self)
+        self.TickCreated = GetGameTick()
+    end,
+
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
     ---@param bpShield any
@@ -124,6 +132,38 @@ ACUUnit = ClassUnit(CommandUnit) {
 
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
+
+        self:SpawnTombstone()
+    end,
+
+    ---@param self ACUUnit
+    SpawnTombstone = function(self)
+        local px, py, pz = self:GetPositionXYZ()
+        local orient = self:GetOrientation()
+        local tombstone = CreateUnit('rip0001', self.Army, px, py, pz, orient[1], orient[2], orient[3], orient[4], 'Land')
+
+        local nickname = self.CustomName
+        local text = 'RIP '
+        if nickname then
+            text = text .. tostring(nickname)
+        else
+            local ainames = import('/lua/ui/lobby/aiNames.lua').ainames[string.lower(self.Blueprint.FactionCategory)]
+            if ainames then
+                text = text .. tostring(table.random(ainames))
+            end
+        end
+        text = text .. ' ' .. self.TickCreated .. '-' .. GetGameTick()
+        tombstone:SetCustomName(text)
+
+        -- tombstone should be relatively easy to kill either by reclaiming or dealing 10000 aoe groundfire damage
+        -- so it blocking things won't be an issue
+    end,
+
+    ---@param self ACUUnit
+    ---@param name string
+    SetCustomName = function(self, name)
+        CommandUnit.SetCustomName(self, name)
+        self.CustomName = name
     end,
 
     ---@param self ACUUnit
