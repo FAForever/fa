@@ -27,11 +27,11 @@ ProfilerElementRow = Class(Group) {
     __init = function(self, parent, size, font)
         Group.__init(self, parent)
 
-        self.name = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Function"), size, font, false)
-        self.source = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Source"), size, font, false)
-        self.scope = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Scope"), size, font, false)
-        self.value = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Value"), size, font, false)
-        self.growth = UIUtil.CreateText(self, LOC("<LOC profiler_{auto}>Growth"), size, font, false)
+        self.name = UIUtil.CreateText(self, LOC("<LOC profiler_0020>Function"), size, font, false)
+        self.source = UIUtil.CreateText(self, LOC("<LOC profiler_0021>Source"), size, font, false)
+        self.scope = UIUtil.CreateText(self, LOC("<LOC profiler_0022>Scope"), size, font, false)
+        self.value = UIUtil.CreateText(self, LOC("<LOC profiler_0023>Value"), size, font, false)
+        self.growth = UIUtil.CreateText(self, LOC("<LOC profiler_0024>Growth"), size, font, false)
     end,
 
     ---@param self ProfilerElementRow
@@ -366,11 +366,11 @@ StatisticSummary = Class(Group) {
         self.summary = groupSummary
 
         -- Summary details
-        self.summaryLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Summary"), 16, UIUtil.bodyFont, true)
-        self.samplesLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Samples"), 14, UIUtil.bodyFont, true)
-        self.meanLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Mean"), 14, UIUtil.bodyFont, true)
-        self.deviationLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Deviation"), 14, UIUtil.bodyFont, true)
-        self.skewnessLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_{auto}>Skewness"), 14, UIUtil.bodyFont, true)
+        self.summaryLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_0025>Summary"), 16, UIUtil.bodyFont, true)
+        self.samplesLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_0026>Samples"), 14, UIUtil.bodyFont, true)
+        self.meanLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_0027>Mean"), 14, UIUtil.bodyFont, true)
+        self.deviationLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_0028>Deviation"), 14, UIUtil.bodyFont, true)
+        self.skewnessLabel = UIUtil.CreateText(groupSummary, LOC("<LOC profiler_0029>Skewness"), 14, UIUtil.bodyFont, true)
 
         -- next column
         self.samples = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
@@ -378,7 +378,7 @@ StatisticSummary = Class(Group) {
         self.deviation = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
         self.skewness = UIUtil.CreateText(groupSummary, "", 14, UIUtil.bodyFont, true)
         -- THIS MUST CHANGE IT'S AWFUL
-        self.clearButton = UIUtil.CreateButtonStd(groupSummary, '/widgets02/small', "<LOC profiler_{auto}>Clear Stats", 12, 2)
+        self.clearButton = UIUtil.CreateButtonStd(groupSummary, '/widgets02/small', "<LOC profiler_0030>Clear Stats", 12, 2)
         self.mode = Combo(groupSummary, 14, 3)
         self.mode:AddItems({"none", "paired", "ratio"})
 
@@ -649,7 +649,7 @@ BytecodeArea = Class(Group) {
     ---@param index number
     GetBytecodeTooltip = function(self, index)
         local text = self.bytecode:GetItem(index)
-        local jumpTooltipFormatter = LOC("<LOC profiler_{auto}>Jump from %s")
+        local jumpTooltipFormatter = LOC("<LOC profiler_0019>Jump from %s")
         local jumpInd = text:find('>', nil, true)
         if jumpInd and jumpInd < 20 then
             -- pull the instruction address directly from the text
@@ -695,10 +695,10 @@ BytecodeArea = Class(Group) {
         local fn = self.DebugFunction.prototype
         local details = self.details
         if fn then
-            self.parameters:SetText(LOC("<LOC profiler_{auto}>Parameters: %d"):format(fn.numparams))
-            self.maxStack:SetText(LOC("<LOC profiler_{auto}>Max Stack: %d"):format(fn.maxstack))
-            self.upvalues:SetText(LOC("<LOC profiler_{auto}>Upvalues: %d"):format(table.getn(self.DebugFunction.upvalues)))
-            self.constants:SetText(LOC("<LOC profiler_{auto}>Constants: %d"):format(fn.constantCount))
+            self.parameters:SetText(LOC("<LOC profiler_0015>Parameters: %d"):format(fn.numparams))
+            self.maxStack:SetText(LOC("<LOC profiler_0016>Max Stack: %d"):format(fn.maxstack))
+            self.upvalues:SetText(LOC("<LOC profiler_0017>Upvalues: %d"):format(table.getn(self.DebugFunction.upvalues)))
+            self.constants:SetText(LOC("<LOC profiler_0018>Constants: %d"):format(fn.constantCount))
             details:Show()
         else
             details:Hide()

@@ -2262,19 +2262,19 @@ Tooltips = {
     },
 
     profiler_print_to_log = {
-        title = "<LOC profiler_{auto}>Print to log",
-        description = "<LOC profiler_{auto}>Print function bytecode to log",
+        title = "<LOC profiler_0013>Print to log",
+        description = "<LOC profiler_0014>Print function bytecode to log",
     },
     profiler_benchmark_baseline_mode_none = {
-        title = "<LOC profiler_{auto}>No baseline data",
-        description = "<LOC profiler_{auto}>Ignore each samples' baseline",
+        title = "<LOC profiler_0031>No baseline data",
+        description = "<LOC profiler_0032>Ignore each samples' baseline",
     },
     profiler_benchmark_baseline_mode_paired = {
-        title = "<LOC profiler_{auto}>Paired baseline data",
-        description = "<LOC profiler_{auto}>Divide each samples' baseline into itself",
+        title = "<LOC profiler_0033>Paired baseline data",
+        description = "<LOC profiler_0034>Divide each samples' baseline into itself",
     },
     profiler_benchmark_baseline_mode_ratio = {
-        title = "<LOC profiler_{auto}>Baseline data ratio",
-        description = "<LOC profiler_{auto}>Treat the data and its baselines independently and perform a ratio test",
+        title = "<LOC profiler_0035>Baseline data ratio",
+        description = "<LOC profiler_0036>Treat the data and its baselines independently and perform a ratio test",
     }
 }

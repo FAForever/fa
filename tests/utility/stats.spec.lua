@@ -1,7 +1,7 @@
-local luft = require "luft"
+local luft = require "./tests/packages/luft"
 
 -- color library
-dofile "../lua/shared/statistics.lua"
+dofile "./lua/shared/statistics.lua"
 
 local testSets = {
     { -- subtest 1

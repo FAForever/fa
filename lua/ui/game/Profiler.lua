@@ -173,12 +173,6 @@ function OpenWindow()
         WARN("Unable to open Profiler window: no AIs or no cheats")
         return
     end
-    import("/lua/debug/devutils.lua").SpewMissingLoc({
-        "/lua/ui/game/profiler.lua",
-        "/lua/ui/game/profilerelements.lua",
-        "/lua/sim/profiler.lua",
-        "/lua/shared/profiler.lua",
-    })
 
     local State = State
 
@@ -375,7 +369,7 @@ ProfilerWindow = ClassUI(Window) {
     ---@param self ProfilerWindow
     ---@param parent Control
     __init = function(self, parent)
-        Window.__init(self, parent, LOC("<LOC profiler_{auto}>Profiler"),
+        Window.__init(self, parent, LOC("<LOC profiler_0000>Profiler"),
             false, false, false, true, false, "profiler2", {
             Left = 10,
             Top = 300,
@@ -415,11 +409,11 @@ ProfilerWindow = ClassUI(Window) {
         clientGroup.header = header
 
         self.Headers = {}
-        self:InitHeaderButton(header, "Overview", "<LOC profiler_{auto}>Overview")
-        self:InitHeaderButton(header, "Timers", "<LOC profiler_{auto}>Timers")
-        self:InitHeaderButton(header, "Stamps", "<LOC profiler_{auto}>Stamps")
-        self:InitHeaderButton(header, "Benchmarks", "<LOC profiler_{auto}>Benchmarks")
-        self:InitHeaderButton(header, "Options", "<LOC profiler_{auto}>Options")
+        self:InitHeaderButton(header, "Overview", "<LOC profiler_0001>Overview")
+        self:InitHeaderButton(header, "Timers", "<LOC profiler_0002>Timers")
+        self:InitHeaderButton(header, "Stamps", "<LOC profiler_0003>Stamps")
+        self:InitHeaderButton(header, "Benchmarks", "<LOC profiler_0004>Benchmarks")
+        self:InitHeaderButton(header, "Options", "<LOC profiler_0005>Options")
     end,
 
     ---@param self ProfilerWindow
@@ -597,8 +591,8 @@ ProfilerWindow = ClassUI(Window) {
 local function CreateSearchBar(parent, tab)
     local searchbar = Group(parent)
 
-    local text = UIUtil.CreateText(searchbar, LOC("<LOC profiler_{auto}>Search"), 18, UIUtil.bodyFont, true)
-    local clearButton = UIUtil.CreateButtonStd(searchbar, "/widgets02/small", LOC("<LOC profiler_{auto}>Clear"), 14, 2)
+    local text = UIUtil.CreateText(searchbar, LOC("<LOC profiler_0037>Search"), 18, UIUtil.bodyFont, true)
+    local clearButton = UIUtil.CreateButtonStd(searchbar, "/widgets02/small", LOC("<LOC profiler_0038>Clear"), 14, 2)
     local edit = Edit(searchbar)
 
     searchbar.text = text
@@ -654,9 +648,9 @@ end
 local function CreateSortBar(parent, tab)
     local sortbar = Group(parent)
 
-    local buttonName = UIUtil.CreateButtonStd(sortbar, "/widgets02/small", LOC("<LOC profiler_{auto}>Name"), 16, 2)
-    local buttonCount = UIUtil.CreateButtonStd(sortbar, "/widgets02/small", LOC("<LOC profiler_{auto}>Count"), 16, 2)
-    local buttonGrowth = UIUtil.CreateButtonStd(sortbar, "/widgets02/small", LOC("<LOC profiler_{auto}>Growth"), 16, 2)
+    local buttonName = UIUtil.CreateButtonStd(sortbar, "/widgets02/small", LOC("<LOC profiler_0039>Name"), 16, 2)
+    local buttonCount = UIUtil.CreateButtonStd(sortbar, "/widgets02/small", LOC("<LOC profiler_0040>Count"), 16, 2)
+    local buttonGrowth = UIUtil.CreateButtonStd(sortbar, "/widgets02/small", LOC("<LOC profiler_0024>Growth"), 16, 2)
 
     buttonName.SortOn = "name"
     buttonCount.SortOn = "value"
@@ -776,10 +770,10 @@ ProfilerBenchmarks = Class(Group) {
         self.groupOutput = Group(self)
         self.groupInteraction = Group(self.groupInput)
         self.groupNavigation = Group(self.groupInput)
-        self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_{auto}>Run"), 16, 2)
+        self.runButton = UIUtil.CreateButtonStd(self.groupInteraction, "/widgets02/small", LOC("<LOC profiler_0006>Run"), 16, 2)
         self.parametersLabel = ItemList(self.groupInteraction, 0, 0)
         self.progressLabel = UIUtil.CreateText(self.groupInteraction, "", 10, UIUtil.bodyFont, true)
-        self.fileText = UIUtil.CreateText(self.groupNavigation, LOC("<LOC profiler_{auto}>Benchmark Modules"), 16, UIUtil.bodyFont, true)
+        self.fileText = UIUtil.CreateText(self.groupNavigation, LOC("<LOC profiler_0007>Benchmark Modules"), 16, UIUtil.bodyFont, true)
         self.modulePicker = Combo(self.groupNavigation, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
         self.benchmarkText = UIUtil.CreateText(self.groupNavigation, "", 16, UIUtil.bodyFont, true) -- should immediately update, so no need to set label
         self.benchmarkList = ItemList(self.groupNavigation)
@@ -959,7 +953,7 @@ ProfilerBenchmarks = Class(Group) {
         self:HideBenchmarkStats()
         LoadBenchmark(State.Benchmarks.SelectedModule, index)
         if index ~= 0 then
-            self:UpdateBenchmarkInfo(LOC("<LOC profiler_{auto}>waiting for benchmark data..."))
+            self:UpdateBenchmarkInfo(LOC("<LOC profiler_0012>waiting for benchmark data..."))
         else
             self:UpdateBenchmarkInfo()
         end
@@ -1092,7 +1086,7 @@ ProfilerBenchmarks = Class(Group) {
     ---@param moduleData UserBenchmarkModule
     UpdateBenchmarkDetails = function(self, moduleData)
         local n = moduleData.faulty and "<LOC lobui_0458>Unknown" or table.getn(moduleData.benchmarks)
-        self.benchmarkText:SetText(LOCF("<LOC profiler_{auto}>Benchmarks in module: %s", n))
+        self.benchmarkText:SetText(LOCF("<LOC profiler_0011>Benchmarks in module: %s", n))
     end,
 
     ---@param self ProfilerBenchmarks
@@ -1104,7 +1098,7 @@ ProfilerBenchmarks = Class(Group) {
             label:Hide()
             label:DeleteAllItems()
             if params > 0 then
-                local paramFormatter = LOC("<LOC profiler_{auto}>Parameter %d: %s")
+                local paramFormatter = LOC("<LOC profiler_0008>Parameter %d: %s")
                 local parameters = benchmarkState.Parameters
                 for i = 1, params do
                     label:AddItem(paramFormatter:format(i, tostring(parameters[i])))
@@ -1146,9 +1140,9 @@ ProfilerBenchmarks = Class(Group) {
             runButton:Enable()
         end
         if running then
-            runButton.label:SetText(LOC("<LOC profiler_{auto}>Stop"))
+            runButton.label:SetText(LOC("<LOC profiler_0010>Stop"))
         else
-            runButton.label:SetText(LOC("<LOC profiler_{auto}>Run"))
+            runButton.label:SetText(LOC("<LOC profiler_0006>Run"))
         end
     end,
 
@@ -1159,7 +1153,7 @@ ProfilerBenchmarks = Class(Group) {
         local progressLabel = self.progressLabel
         if prog < runs then
             progressLabel:Show()
-            progressLabel:SetText(LOC("<LOC profiler_{auto}>%d / %d"):format(prog, runs))
+            progressLabel:SetText(LOC("<LOC profiler_0009>%d / %d"):format(prog, runs))
         else
             progressLabel:Hide()
         end
