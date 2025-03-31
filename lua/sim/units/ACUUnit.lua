@@ -139,7 +139,8 @@ ACUUnit = ClassUnit(CommandUnit) {
     ---@param self ACUUnit
     SpawnTombstone = function(self)
         local px, py, pz = self:GetPositionXYZ()
-        local orient = self:GetOrientation()
+        local orient = {0,0,0,0}
+        --that quaternion gives a warning about being invalid but it works so I'm leaving it XD
         local tombstone = CreateUnit('rip0001', self.Army, px, py, pz, orient[1], orient[2], orient[3], orient[4], 'Land')
 
         local nickname = self.CustomName
