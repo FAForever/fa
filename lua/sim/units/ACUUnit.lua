@@ -138,10 +138,11 @@ ACUUnit = ClassUnit(CommandUnit) {
 
     ---@param self ACUUnit
     SpawnTombstone = function(self)
-        local px, py, pz = self:GetPositionXYZ()
+        local px, _, pz = self:GetPositionXYZ()
+        px, pz = math.floor(px) + 0.5, math.floor(pz) + 0.5
         local orient = {0,0,0,1}
 
-        local tombstone = CreateUnit('rip0001', self.Army, px, py, pz, orient[1], orient[2], orient[3], orient[4], 'Land')
+        local tombstone = CreateUnit('rip0001', self.Army, px, GetTerrainHeight(px, pz), pz, orient[1], orient[2], orient[3], orient[4], 'Land')
 
         local nickname = self.CustomName
         local text = 'RIP '
