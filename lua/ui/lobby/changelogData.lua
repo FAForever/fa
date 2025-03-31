@@ -12,7 +12,7 @@ gamePatches = {
             "# Game version 3820 (1st of April 2025)",
             "",
             "This hotfix fixes a free unit exploit and savegames failing to save.",
-            "There are also some technical changes to UI, AI, and graphics.",
+            "There are also some technical changes to UI and graphics.",
             "",
             "With kind regards,",
             "",
