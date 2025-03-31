@@ -1,1 +1,0 @@
-- (#6697) Fix saving games failing due to file path length limitations.
