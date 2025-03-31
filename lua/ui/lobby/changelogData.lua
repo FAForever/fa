@@ -1,8 +1,24 @@
 ---@type number
-last_version = 3819
+last_version = 3820
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3820,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3820 (1st of April 2025)",
+            "",
+            "This hotfix fixes a free unit exploit and savegames failing to save.",
+            "There are also some technical changes to UI, AI, and graphics.",
+            "",
+            "With kind regards,",
+            "",
+            "BlackYps",
+        },
+    },
     {
         version = 3819,
         name = "Hotfix",
