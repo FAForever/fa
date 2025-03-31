@@ -11,7 +11,6 @@ UnitBlueprint {
         "BENIGN",
         "DEFENSE",
         "DRAGBUILD",
-        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SORTDEFENSE",
@@ -24,7 +23,6 @@ UnitBlueprint {
         ArmorType = "Structure",
         Health = 10000,
         MaxHealth = 10000,
-        RegenRate = 0,
     },
     Display = {
         Mesh = {
@@ -38,7 +36,6 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.6,
-        HideLifebars = true,
     },
     Economy = {
         BuildCostEnergy = 100,
@@ -73,9 +70,9 @@ UnitBlueprint {
     SelectionSizeX = 0.75,
     SelectionSizeZ = 0.2,
     SelectionThickness = 0.66,
-    SizeX = 0.08,
-    SizeY = 0.115,
-    SizeZ = 0.015,
+    SizeX = 1.2,
+    SizeY = 1.725,
+    SizeZ = 0.225,
     StrategicIconName = "icon_cross",
     StrategicIconSortPriority = 0,
     Wreckage = {
