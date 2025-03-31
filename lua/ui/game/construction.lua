@@ -1982,7 +1982,7 @@ function CreateExtraControls(controlType)
                         break
                     end
                 end
-            elseif not v:IsInCategory(faction) then
+            elseif not faction or not v:IsInCategory(faction) then
                 validForTemplate = false
                 break
             end
