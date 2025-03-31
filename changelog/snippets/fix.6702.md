@@ -1,0 +1,1 @@
+- (#6702) Fix being able to store unbuilt units inside carriers and place unbuilt units on the ground with the fatboy.
