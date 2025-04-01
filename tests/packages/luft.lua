@@ -916,15 +916,15 @@ function Assertion:CallEach(test, args)
                 -- are displayed in the error instead of only the current value of each iterator
                 for k, list in ipairs(lists) do
                     if not iterators[k] then continue end
-                    local rep = repru(list[1])
+                    local rep = repr(list[1])
                     for j = 2, list.n do
-                        rep = rep .. ", " .. repru(list[j])
+                        rep = rep .. ", " .. repr(list[j])
                     end
                     arguments[ iterators[k] ] = '{' .. rep .. '}'
                 end
             end
             for j = 1, argCount do
-                err = err:gsub("$" .. j, repru(arguments[j]))
+                err = err:gsub("$" .. j, repr(arguments[j]))
             end
             error(err, 3)
         end
@@ -1055,7 +1055,7 @@ do
         ---@return boolean
         Test = function(t, x)
             if type(t) ~= "table" then
-                error(strings.expectation1be:format(repru(t), strings.condition_unnegated, "a table"))
+                error(strings.expectation1be:format(repr(t), strings.condition_unnegated, "a table"))
             end
             for _, v in pairs(t) do
                 if v == x then return true end
@@ -1217,7 +1217,7 @@ do
                 end
                 return false
             end
-            error("invalid type " .. repru(x))
+            error("invalid type " .. repr(x))
         end;
         Parameters = 2,
         FailFormat = strings.expectation1be:format("$1", "%s", strings.cond_an:format("$2"))
