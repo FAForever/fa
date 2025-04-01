@@ -940,18 +940,22 @@ ExternalFactoryComponent = ClassSimple {
     ---@param self Unit | ExternalFactoryComponent
     ---@param unitBeingBuilt Unit
     OnStopBuildWithStorage = function(self, unitBeingBuilt)
-        --local unitBeingBuilt = self.UnitBeingBuilt
-        unitBeingBuilt:DetachFrom(true)
-        self:DetachAll(self.BuildAttachBone)
-
-        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
-            unitBeingBuilt:ShowBone(0, true)
+        -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled. They shouldn't be put into storage.
+        if unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
         else
-            self:AddUnitToStorage(unitBeingBuilt)
-            ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
-        end
+            unitBeingBuilt:DetachFrom(true)
+            self:DetachAll(self.BuildAttachBone)
 
-        self:RequestRefreshUI()
+            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+                unitBeingBuilt:ShowBone(0, true)
+            else
+                self:AddUnitToStorage(unitBeingBuilt)
+                ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
+            end
+
+            self:RequestRefreshUI()
+        end
         ChangeState(self, self.IdleState)
     end,
 

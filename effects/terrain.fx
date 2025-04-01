@@ -1795,33 +1795,26 @@ technique LowFidelityLighting
 /* # Blending techniques # */
 
 float splatLerp(float t1, float t2, float t2height, float opacity, uniform float blurriness) {
-    // We need to increase the contrast of the height
-    float height2 = (1.6 * (t2height * (1 - 2 * blurriness) + blurriness) - 0.3) + opacity;
-    float threshold = max(1, height2) - blurriness;
-    float factor = 0;
-    if (opacity > 0) {
-        factor = (opacity >= 1) ? 1 : max(height2 - threshold, 0) / blurriness;
-    }
-    return lerp(t1, t2, factor);
+    return splatLerp(t1.xxxx, t2.xxxx, t2height, opacity, blurriness).x;
 }
 
 float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.06) {
-    // We need to increase the contrast of the height
-    float height2 = (1.6 * (t2height * (1 - 2 * blurriness) + blurriness) - 0.3) + opacity;
-    float threshold = max(1, height2) - blurriness;
+    t2height = lerp(t2height, 0.5, blurriness);
+    // Increase the contrast of the height. 0.6 is a good default value for SpecularColor.g
+    t2height = (1 + SpecularColor.g) * t2height - 0.5 * SpecularColor.g;
     float factor = 0;
     if (opacity > 0) {
-        factor = (opacity >= 1) ? 1 : max(height2 - threshold, 0) / blurriness;
+        factor = (opacity >= 1) ? 1 : saturate((t2height + opacity - 1 + 0.5 * blurriness) / blurriness);
     }
     return lerp(t1, t2, factor);
 }
 
 float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.06) {
-    float height2 = (1.6 * (t2height * (1 - 2 * blurriness) + blurriness) - 0.3) + opacity;
-    float threshold = max(1, height2) - blurriness;
+    t2height = lerp(t2height, 0.5, blurriness);
+    t2height = (1 + SpecularColor.g) * t2height - 0.5 * SpecularColor.g;
     float factor = 0;
     if (opacity > 0) {
-        factor = (opacity >= 1) ? 1 : max(height2 - threshold, 0) / blurriness;
+        factor = (opacity >= 1) ? 1 : saturate((t2height + opacity - 1 + 0.5 * blurriness) / blurriness);
     }
     // This modification is to make low opacity normal maps more visible,
     // as we notice small changes to the albedo maps more easily.
@@ -2976,7 +2969,7 @@ float4 Terrain200NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     float2 position = TerrainScale * inV.mTexWT;
     // 30° rotation
-    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
+    float2x2 rotationMatrix = float2x2(float2(SpecularColor.b, -SpecularColor.a), float2(SpecularColor.a, SpecularColor.b));
     float2 rotated_pos = mul(position.xy, rotationMatrix);
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
@@ -3028,7 +3021,7 @@ float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
 {
     float2 position = TerrainScale * inV.mTexWT;
     // 30° rotation
-    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
+    float2x2 rotationMatrix = float2x2(float2(SpecularColor.b, -SpecularColor.a), float2(SpecularColor.a, SpecularColor.b));
     float2 rotated_pos = mul(position.xy, rotationMatrix);
 
     // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
@@ -3197,7 +3190,7 @@ float4 Terrain200BNormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     // height is now in the z coordinate
     float3 position = TerrainScale.xxx * inV.mTexWT;
     // 30° rotation
-    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
+    float2x2 rotationMatrix = float2x2(float2(SpecularColor.b, -SpecularColor.a), float2(SpecularColor.a, SpecularColor.b));
     float2 rotated_pos = mul(position.xy, rotationMatrix);
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
@@ -3253,7 +3246,7 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform floa
 {
     float3 position = TerrainScale.xxx * inV.mTexWT;
     // 30° rotation
-    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
+    float2x2 rotationMatrix = float2x2(float2(SpecularColor.b, -SpecularColor.a), float2(SpecularColor.a, SpecularColor.b));
     float2 rotated_pos = mul(position.xy, rotationMatrix);
 
     // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)

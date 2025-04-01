@@ -102,6 +102,10 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+        -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
+        if unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
+        end
         self.BuildingUnit = false
     end,
 
@@ -186,6 +190,13 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+            -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
+            if unitBeingBuilt:GetFractionComplete() < 1 then
+                unitBeingBuilt:Destroy()
+                ChangeState(self, self.IdleState)
+                return
+            end
+
             ChangeState(self, self.RollingOffState)
         end,
     },

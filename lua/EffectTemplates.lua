@@ -4433,6 +4433,7 @@ AQuantumBeamGeneratorMuzzleFlash01 = {
 }
 
 AQuantumBeamGeneratorHit01 = {
+    EmtBpPath .. 'sprinkles_emit.bp',
     EmtBpPath .. 'quantum_generator_end_01_emit.bp',
     EmtBpPath .. 'quantum_generator_end_03_emit.bp',
     EmtBpPath .. 'quantum_generator_end_04_emit.bp',
