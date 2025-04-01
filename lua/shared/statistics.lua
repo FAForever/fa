@@ -31,7 +31,6 @@ function Sum(t, n)
 
     local sum = 0
     for k = 1, n do
-    for k = 1, n do
         sum = sum + t[k]
     end
 
@@ -50,7 +49,6 @@ function Mean(t, n)
 
     -- compute mean
     local mean = 0
-    for k = 1, n do
     for k = 1, n do
         mean = mean + t[k]
     end

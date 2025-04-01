@@ -228,14 +228,11 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
     local testNumber, baselines, output
     local function RunTest()
         testNumber = testNumber + 1
-        if baselineLoop then
-            if runGCEachTest then
-                collectgarbage()
-            end
-            baselines[testNumber] = baselineLoop(unpack(parameters))
-        end
         if runGCEachTest then
             collectgarbage() -- make sure the GC doesn't happen during our test
+        end
+        if baselineLoop then
+            baselines[testNumber] = baselineLoop(unpack(parameters))
         end
         output[testNumber] = test(unpack(parameters))
     end

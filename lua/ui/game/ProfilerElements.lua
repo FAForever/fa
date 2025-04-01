@@ -391,6 +391,10 @@ StatisticSummary = Class(Group) {
     end,
 
     Layout = function(self)
+        -- Depending on how this element is laid out by our parent, we need to
+        -- lay out our subcomponents either anchored to the bottom or the top so
+        -- we can resize ourself to fit our subcomponents with a circular
+        -- dependency. It's non-ideal.
         local topToBot = false
 
         local groupSummary = Layouter(self.summary)
@@ -476,11 +480,10 @@ StatisticSummary = Class(Group) {
             :AtLeftIn(skewnessLabel, width)
             :End()
 
-        -- THIS MUST CHANGE IT'S AWFUL
         local clearButton = Layouter(self.clearButton)
             :AtLeftTopIn(groupSummary)
             :End()
-        Tooltip.AddButtonTooltip(clearButton, "pls replace me")
+        Tooltip.AddButtonTooltip(clearButton, "profiler_benchmark_clear_stats")
 
         local baselineMode = Layouter(self.mode)
             :AtRightIn(groupSummary, 10)
@@ -637,8 +640,11 @@ BytecodeArea = Class(Group) {
     ---@param self BytecodeArea
     OnLog = function(self)
         local fn = self.DebugFunction.prototype
-        LOG(self.DebugFunction.short_loc .. '#' .. self.DebugFunction.name .. " (Parameters: " .. fn.numparams .. ", Max Stack: " .. fn.maxstack .. ", Upvalues: "
-            .. table.getn(self.DebugFunction.upvalues) .. ", Constants: " .. fn.constantCount .. ")")
+        LOG(self.DebugFunction.short_loc .. '#' .. self.DebugFunction.name .. " ("
+            .. LOC("<LOC profiler_0015>Parameters: %d"):format(fn.numparams) .. ", "
+            .. LOC("<LOC profiler_0016>Max Stack: %d"):format(fn.maxstack) .. ", "
+            .. LOC("<LOC profiler_0017>Upvalues: %d"):format(table.getn(self.DebugFunction.upvalues)) .. ", "
+            .. LOC("<LOC profiler_0018>Constants: %d"):format(fn.constantCount) .. ')')
         local area = self.bytecode
         for i = 1, area:GetItemCount() do
             LOG(area:GetItem(i - 1)) -- list is 0-indexed

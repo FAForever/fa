@@ -2276,5 +2276,9 @@ Tooltips = {
     profiler_benchmark_baseline_mode_ratio = {
         title = "<LOC profiler_0035>Baseline data ratio",
         description = "<LOC profiler_0036>Treat the data and its baselines independently and perform a ratio test",
-    }
+    },
+    profiler_benchmark_clear_stats = {
+        title = "<LOC profiler_0041>Clear stats",
+        description = "<LOC profiler_0042>Clear all samples for this benchmark",
+    },
 }
