@@ -7,16 +7,15 @@
     - BuildCostMass: 810 --> 750
     - BuildTime: 3240 --> 3000
     
-    Building Coopers is now less punishing, and they can defend themselves more effectively against Destroyers.
+      Building Coopers is now less punishing, and they can defend themselves more effectively against Destroyers.
 
     - SonarRadius: 36 --> 72
 
-    Previously, its `SonarRadius` was smaller than its `WaterVisionRadius`, rendering this stat pointless. With the increased sonar radius, the Cooper can now spot other naval units more effectively.
+      Previously, its `SonarRadius` was smaller than its `WaterVisionRadius`, rendering this stat pointless. With the increased sonar radius, the Cooper can now spot other naval units more effectively.
 
     - SizeX = 0.75 --> 0.8
     - SizeY = 0.925 --> 1.0
     - SizeZ = 2.0 --> 2.2
     - UniformScale: 0.65 --> 0.7
 
-    The unit is made slightly larger to prevent it from becoming too effective against Exodus in the early Tech 2 naval stage.
-
+      The unit is made slightly larger to prevent it from becoming too effective against Exodus in the early Tech 2 naval stage.
