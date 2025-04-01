@@ -15,6 +15,7 @@
 -- scaled (e.g. large UI mode) the pixel scale factor will keep the layout correct.
 
 
+local iscallable = iscallable
 local GetTextureDimensions = GetTextureDimensions
 local MathFloor = math.floor
 local MathCeil = math.ceil
@@ -259,7 +260,6 @@ end
 function ResetBottom(control)
     control.Bottom:SetFunction(function() return control.Top() + control.Height() end)
 end
-
 
 --- Resets a control's width to be calculated from its left and right edges.  
 --- Make sure `control.Left` and `control.Right` are not reset.
@@ -1047,7 +1047,6 @@ end
 ------------------------------
 -- Compound Functions
 ------------------------------
-
 
 -- These functions layout multiple controls at once
 
@@ -2030,7 +2029,6 @@ local LayouterAttributeControl = ClassSimple {
     end;
 }
 
-
 ------------------------------
 -- Drop Shadow Attribute
 ------------------------------
@@ -2149,7 +2147,6 @@ local LayouterAttributeTexture = Class(LayouterAttributeColor) {
     end;
 }
 
-
 ------------------------------
 -- Selection Color Attribute
 ------------------------------
@@ -2199,7 +2196,6 @@ local LayouterAttributeSelection = ClassSimple {
 --------------------------------------------------------------------------------
 -- Base Layouter
 --------------------------------------------------------------------------------
-
 
 -- While it can be useful to build specific layouters for individual controls, this monolithic
 -- class is the most versatile
@@ -2316,4 +2312,3 @@ function ReusedLayoutFor(control)
     reusedLayouter:__init(control)
     return reusedLayouter
 end
-
