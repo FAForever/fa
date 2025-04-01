@@ -46,22 +46,6 @@ local function TransferUnitsOwnershipComparator(a, b)
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
---- Temporarily disables the weapons of gifted units
----@param weapon Weapon
-local function TransferUnitsOwnershipDelayedWeapons(weapon)
-    if not weapon:BeenDestroyed() then
-        -- compute delay
-        local bp = weapon.Blueprint
-        local delay = 1 / bp.RateOfFire
-        WaitSeconds(delay)
-
-        -- enable the weapon again if it still exists
-        if not weapon:BeenDestroyed() then
-            weapon:SetEnabled(true)
-        end
-    end
-end
-
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
@@ -74,7 +58,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         return
     end
     local categoriesENGINEERSTATION = categories.ENGINEERSTATION
-    local shareUpgrades = ScenarioInfo.Options.Share == 'FullShare'
+    local shareUpgrades = ScenarioInfo.Options.Share ~= 'ShareUntilDeath'
 
     -- do not gift insignificant units
     units = EntityCategoryFilterDown(transferUnitsCategory, units)
@@ -171,6 +155,12 @@ function TransferUnitsOwnership(units, toArmy, captured)
         end
 
         unit.IsBeingTransferred = true
+
+        -- For external factories, destroy the unit being built since otherwise it will be transferred as a built unit because it is attached indirectly
+        local externalUnitBeingBuilt = unit.ExternalFactory.UnitBeingBuilt
+        if externalUnitBeingBuilt then
+            externalUnitBeingBuilt:Destroy()
+        end
 
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy)
@@ -297,16 +287,6 @@ function TransferUnitsOwnership(units, toArmy, captured)
         end
     end
 
-    -- add delay on turning on each weapon
-    for _, unit in newUnits do
-        -- disable all weapons, enable with a delay
-        for k = 1, unit.WeaponCount do
-            local weapon = unit:GetWeapon(k)
-            weapon:SetEnabled(false)
-            weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
-        end
-    end
-
     return newUnits
 end
 
@@ -371,14 +351,14 @@ function UpgradeTransferredKennels(kennels)
 end
 
 --- Takes the units and tries to rebuild them for each army (in order).
---- The transfer procedure is fairly expensive, so it is filtered to important units (EXPs and T3 arty).
 ---@param units Unit[]
 ---@param armies Army[]
 function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unbuiltUnits = {}
     local unbuiltUnitCount = 0
     for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
-        if unit:IsBeingBuilt() then
+        -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
+        if unit:IsBeingBuilt() and not unit.IsUpgrade then
             unbuiltUnitCount = unbuiltUnitCount + 1
             unbuiltUnits[unbuiltUnitCount] = unit
         end
@@ -767,3 +747,28 @@ function OnAllianceResult(resultData)
 end
 
 import("/lua/simplayerquery.lua").AddResultListener("OfferAlliance", OnAllianceResult)
+
+local vectorCross = import('/lua/utilities.lua').Cross
+local upVector = Vector(0, 1, 0)
+
+--- Draw XYZ axes of an entity's bone for one tick
+---@param entity moho.entity_methods
+---@param bone Bone
+---@param length number? # length of axes, defaults to 0.2
+function DrawBone(entity, bone, length)
+    if not length then length = 0.2 end
+
+    local pos = entity:GetPosition(bone)
+    local dirX, dirY, dirZ = entity:GetBoneDirection(bone)
+
+    local forward = Vector(dirX, dirY, dirZ)
+    local left = vectorCross(upVector, forward)
+    local up = vectorCross(forward, left)
+
+    -- X axis
+    DrawLine(pos, pos + left * length, 'FF0000')
+    -- Y axis
+    DrawLine(pos, pos + up * length, '00ff00')
+    -- Z axis
+    DrawLine(pos, pos + forward * length, '0000ff')
+end

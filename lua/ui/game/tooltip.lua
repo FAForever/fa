@@ -21,14 +21,14 @@ local mouseoverDisplay = false
 local createThread = false
 
 -- creates a tooltip box from ID table and with optional parameters
--- @param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
--- @param extended boolean indicates whether to just create tooltip header or also tooltip description
--- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
--- @param forced boolean determine if the tooltip should override hiding tooltips set in game options
--- @param padding number is optional space between tooltip description text and border of tooltip 
--- @param descFontSize number is optional font size for description text of tooltip 
--- @param textFontSize number is optional font size for header text of tooltip  
--- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+---@param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
+---@param extended? boolean indicates whether to just create tooltip header or also tooltip description
+---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param forced? boolean determine if the tooltip should override hiding tooltips set in game options
+---@param padding? number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize? number is optional font size for description text of tooltip 
+---@param textFontSize? number is optional font size for header text of tooltip  
+---@param position? string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
 function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padding, descFontSize, textFontSize, position)
 
     -- values used throughout the function
@@ -186,12 +186,12 @@ function CreateToolTip(parent, text)
 end
 
 -- creates a tooltip box with title text and/or description and with optional parameters
--- @param text string displayed in header of tooltip
--- @param desc string displayed in description of tooltip, this text is wrapped into multiple if longer than width
--- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
--- @param padding is optional space between tooltip description text and border of tooltip 
--- @param descFontSize number is optional font size for description text of tooltip 
--- @param textFontSize number is optional font size for header text of tooltip
+---@param text string displayed in header of tooltip
+---@param desc string displayed in description of tooltip, this text is wrapped into multiple if longer than width
+---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param padding? number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize? number is optional font size for description text of tooltip 
+---@param textFontSize? number is optional font size for header text of tooltip
 function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize, textFontSize)
     text = LOC(text)
     desc = LOC(desc)
@@ -199,6 +199,11 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
     -- when adjusting position of tooltip elements
     -- default padding should be 2-4 to text is not to close to tooltip border but kept original value
     padding = LayoutHelpers.ScaleNumber(padding or 0)
+    -- scale width by UI scaling factor so we do not need to do this later in code adjusting tooltip width.
+    -- If width is absent, the text advance will be used instead, which is already scaled through font size.
+    if width then
+        width = LayoutHelpers.ScaleNumber(width)
+    end
     -- using passed font size or falling back to default values which should be the same but kept original values
     descFontSize = descFontSize or 12
     textFontSize = textFontSize or 14
@@ -261,7 +266,7 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
                     textBoxWidth = math.max(textBoxWidth, tooltip.title.TextAdvance())
                 end
             else
-                textBoxWidth = LayoutHelpers.ScaleNumber(width - padding - padding)
+                textBoxWidth = width - padding - padding
             end
             tempTable = import("/lua/maui/text.lua").WrapText(desc, textBoxWidth,
             function(text)
@@ -363,12 +368,12 @@ end
 -- creates a tooltip box with specified title and description
 ---@param title string displayed in tooltip header
 ---@param description string displayed in tooltip body
----@param delay number is optional milliseconds used to delay tooltip popup
----@param width number is optional width of tooltip or it is auto calculated based on length of header/description
----@param padding number is optional space between tooltip description text and border of tooltip 
----@param descFontSize number is optional font size for description text of tooltip 
----@param textFontSize number is optional font size for header text of tooltip  
----@param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+---@param delay? number is optional milliseconds used to delay tooltip popup
+---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param padding? number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize? number is optional font size for description text of tooltip 
+---@param textFontSize? number is optional font size for header text of tooltip  
+---@param position? string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
 function AddControlTooltipManual(control, title, description, delay, width, padding, descFontSize, textFontSize, position)
 
     if not control.oldHandleEvent then

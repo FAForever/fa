@@ -192,6 +192,9 @@ AirUnit = ClassUnit(MobileUnit) {
                 self:DoUnitCallbacks('OnKilled')
                 self:DisableShield()
 
+                -- The unit falling is a death animation, so it needs collision turned off
+                self.DisallowCollisions = true
+
                 -- Store our death weapon's damage on the unit so it can be edited remotely by the shield bouncer projectile
                 local bp = self.Blueprint
                 local i = 1
@@ -253,10 +256,13 @@ AirUnit = ClassUnit(MobileUnit) {
         local selfBlueprintCategoriesHashed = self.Blueprint.CategoriesHash
         local otherBlueprintCategoriesHashed = other.Blueprint.CategoriesHash
 
-        -- allow regular air units to be destroyed by the projectiles of SMDs and SMLs
-        if otherBlueprintCategoriesHashed["KILLAIRONCOLLISION"] and (not selfBlueprintCategoriesHashed["EXPERIMENTAL"]) then
-            self:Kill()
-            return false
+        -- allow regular air units to be killed by the projectiles of SMDs and SMLs
+        -- prevent falling satellites from blocking projectiles of SMDs and SMLs
+        if otherBlueprintCategoriesHashed["KILLAIRONCOLLISION"] then
+            if not selfBlueprintCategoriesHashed["EXPERIMENTAL"] or selfBlueprintCategoriesHashed["SATELLITE"] and self.Dead then
+                self:Kill()
+                return false
+            end
         end
 
         -- disallow ASF to intercept certain projectiles

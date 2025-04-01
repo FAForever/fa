@@ -131,9 +131,7 @@ sampler2D MaskSampler = sampler_state
 	AddressV  = CLAMP;	
 };
 
-//
 // surface water color
-//
 float3 waterColor = float3(0,0.7,1.5);
 float3 waterColorLowFi = float3(0.7647,0.8784,0.9647);
 
@@ -141,10 +139,8 @@ float3 waterColorLowFi = float3(0.7647,0.8784,0.9647);
 float2 waterLerp = 0.3;
 float refractionScale = 0.015;
 
-//
 // fresnel parameters
 // both are unused by the shaders
-//
 float fresnelBias = 0.1;
 float fresnelPower = 1.5;
 
@@ -152,14 +148,9 @@ float fresnelPower = 1.5;
 float unitreflectionAmount = 0.5;
 float skyreflectionAmount = 1.5;
 
-
-//
 // 4 repeat rates for the 4 wave texture layers
-//
 float4  normalRepeatRate = float4(0.0009, 0.009, 0.05, 0.5);
 
-
-//
 // 4 vectors of normal movements
 float2 normal1Movement = float2(0.5, -0.95);
 float2 normal2Movement = float2(0.05, -0.095);
@@ -176,9 +167,6 @@ float       sunReflectionAmount = 5;
 // unused by the shaders
 float       SunGlow;
 
-///
-///
-///
 
 struct LOWFIDELITY_VERTEX
 {
@@ -432,19 +420,19 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
 	// we need to exclude the unit refraction above the water line. This creats small areas with
 	// no refraction, but the water color in the next step will make this mostly unnoticeable
-	refractedPixels.xyz = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.a * 255)).xyz;
+	refractedPixels.rgb = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.a * 255)).rgb;
 	// we want to lerp in the water color based on depth, but clamped
-    float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
-    refractedPixels.xyz = lerp(refractedPixels.xyz, waterColor, waterLerp);
+    float factor = clamp(waterDepth, waterLerp.x, waterLerp.y);
+    refractedPixels.rgb = lerp(refractedPixels.rgb, waterColor, factor);
 
 	// We can't compute wich part of the unit we would hit with our reflection vector,
 	// so we have to resort to an approximation using the refractionPos
-	float4 reflectedPixels = tex2D(ReflectionSampler, refractionPos);
+	float4 unitReflections = tex2D(ReflectionSampler, refractionPos);
 
 	float4 skyReflection = texCUBE(SkySampler, R);
 	// The alpha channel acts as a mask for unit parts above the water and probably
 	// uses unitReflectionAmount as the positive value of the mask
-    reflectedPixels.xyz = lerp(skyReflection.xyz, reflectedPixels.xyz, saturate(reflectedPixels.a));
+    float3 reflections = lerp(skyReflection.rgb, unitReflections.rgb, saturate(unitReflections.a));
    
    	// Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
@@ -453,21 +441,22 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	// the default value of 1.5 is way to high, but we want to preserve manually set values in existing maps
 	if (skyreflectionAmount == 1.5)
 		skyreflectionAmount = 1.0;
-    refractedPixels = lerp(refractedPixels, reflectedPixels, saturate(fresnel * skyreflectionAmount));
+    float3 water = lerp(refractedPixels, reflections, saturate(fresnel * skyreflectionAmount));
 
     // add in the sun reflection
 	float3 sunReflection = calculateSunReflection(R, viewVector, N);
 	// the sun shouldn't be visible where a unit reflection is
-	sunReflection *= (1 - saturate(reflectedPixels.a * 4));
+	sunReflection *= (1 - saturate(unitReflections.a * 4));
 	// we can control this value to have terrain cast a shadow on the water surface
 	sunReflection *= waterTexture.r;
-    refractedPixels.xyz += sunReflection;
+    water += sunReflection;
 
     // Lerp in the wave crests
-    refractedPixels.xyz = lerp(refractedPixels.xyz, waveCrestColor, (1 - waterTexture.a) * (1 - waterTexture.b) * waveCrest);
+    water = lerp(water, waveCrestColor, (1 - waterTexture.a) * (1 - waterTexture.b) * waveCrest);
 
     // return the pixels masked out by the water mask
-    float4 returnPixels = refractedPixels;
+    float4 returnPixels;
+	returnPixels.rgb = water;
     returnPixels.a = 1 - mask;
     return returnPixels;
 }

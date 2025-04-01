@@ -278,13 +278,26 @@ local function AttackOrderBehavior(self, modifiers)
     end
 end
 
--- Used by orders that happen immediately and don't change the command mode (ie the stop button)
+--- Dock all units on left click, dock only damaged units on right click
+---@param self Checkbox
+---@param modifiers EventModifiers
 local function DockOrderBehavior(self, modifiers)
-    if modifiers.Shift then
-        IssueDockCommand(false)
-    else
-        IssueDockCommand(true)
+    if modifiers.Left then
+        if modifiers.Shift then
+            IssueDockCommand(false)
+        else
+            IssueDockCommand(true)
+        end
     end
+
+    if modifiers.Right then
+        if modifiers.Shift then
+            import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9, false)
+        else
+            import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9, true)
+        end
+    end
+
     self:SetCheck(false)
 end
 
@@ -296,14 +309,6 @@ end
 local function MomentaryOrderBehavior(self, modifiers)
     IssueCommand(GetUnitCommandFromCommandCap(self._order))
     self:SetCheck(false)
-end
-
-function Stop(units)
-    local units = units or GetSelectedUnits()
-
-    if units[1] then
-        IssueUnitCommand(units, 'Stop')
-    end
 end
 
 function ClearCommands(units)
@@ -326,8 +331,30 @@ function ClearCommands(units)
     SimCallback(cb, true)
 end
 
+-- This command (hard stop) will filter out non-construction silo units to avoid wasting partially completed missiles
+-- Those units will have their commands cleared, but will be paused instead of stopped
+function Stop(units)
+    units = units or GetSelectedUnits()
+    local silos = EntityCategoryFilterDown(categories.SILO - categories.CONSTRUCTION, units)
+    if silos[1] then
+        ClearCommands(silos)
+        for _, silo in silos do
+            if not GetIsPausedOfUnit(silo) then
+                local missileInfo = silo:GetMissileInfo()
+                if missileInfo.nukeSiloBuildCount > 0 or missileInfo.tacticalSiloBuildCount > 0 then
+                    IssueUnitCommandToUnit(silo, 'Pause')
+                end
+            end
+        end
+    end
+    units = EntityCategoryFilterOut(categories.SILO - categories.CONSTRUCTION, units)
+    if units[1] then
+        IssueUnitCommand(units, 'Stop')
+    end
+end
+
 function SoftStop(units)
-    local units = units or GetSelectedUnits()
+    units = units or GetSelectedUnits()
     Construction.ResetOrderQueues(units)
     ClearCommands(EntityCategoryFilterDown(categories.SILO, units))
     Stop(EntityCategoryFilterOut((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.SILO, units))

@@ -439,6 +439,9 @@ end
 
 --- Get a PlayerData object for the local player, configured using data from their profile.
 function GetLocalPlayerData()
+
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
     return PlayerData(
         {
             PlayerName = localPlayerName,
@@ -452,6 +455,11 @@ function GetLocalPlayerData()
             MEAN = argv.playerMean,
             DEV = argv.playerDeviation,
             Country = argv.PrefLanguage,
+
+            Version = version,
+            GameType = gametype,
+            Commit = commit,
+
         }
 )
 end
@@ -3146,11 +3154,15 @@ function CreateUI(maxPlayers)
     GUI.logo = Bitmap(GUI, '/textures/ui/common/scx_menu/lan-game-lobby/logo.dds')
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
-    -- Version texts
-    local bool ShowPatch = false
-    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game Patch " .. GameVersion(), 9, UIUtil.bodyFont)
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game version " .. version, 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
+
+    Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
+        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit:sub(1, 8)
+    ))
+
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
 
     -- Player Slots
@@ -5259,7 +5271,6 @@ local MessageHandlers = {
                 end
             end
 
-
             if not data.PlayerOptions.OwnerID then
                 return false
             end
@@ -5271,11 +5282,20 @@ local MessageHandlers = {
             if FindNameForID(data.SenderID) then
                 return false
             end
-            
+
+            -- check game version and reject if there is a missmatch
+            local hostVersion, hostGametype, hostCommit = import("/lua/version.lua").GetVersionData()
+            local playerVersion, playerGameType, playerCommit = tostring(data.PlayerOptions.Version), tostring(data.PlayerOptions.GameType), tostring(data.PlayerOptions.Commit)
+            if hostVersion ~= playerVersion or hostGametype ~= playerGameType or hostCommit ~= playerCommit then
+                local playerName = data.PlayerOptions.PlayerName
+                AddChatText(LOCF("<LOC lobui_666>Game version missmatch detected with %s. \r\n - host: %s (@%s)\r\n - %s: %s (@%s). \r\n\r\nTo prevent desyncs, %s is ejected automatically. It is possible that a new game version is released. If this keeps happening then it is better to rehost.", playerName, hostVersion, hostCommit:sub(1, 8), playerName, playerVersion, playerCommit:sub(1, 8), playerName))
+                return false
+            end
+
             return lobbyComm:IsHost()
         end,
         Reject = function(data)
-            lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
+            lobbyComm:EjectPeer(data.SenderID, "Game version missmatch or invalid player data.")
         end,
         Handle = function(data)
             -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
@@ -6568,7 +6588,7 @@ function ShowLobbyOptionsDialog()
     if true then
         --snowflakes count
         local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
-        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0447>Snowflakes count").. currentSnowFlakesCount, 14, 'Arial', true)
         LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
 
         -- slider for changing chat font size
@@ -6581,7 +6601,7 @@ function ShowLobbyOptionsDialog()
         slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
         slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
             local sliderValue = math.floor(newValue)
-            slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+            slider_SnowFlakes_Count_TEXT:SetText(LOC("<LOC lobui_0447>Snowflakes count").. sliderValue)
             Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
             import("/lua/ui/events/SnowFlake.lua").Clear()
             import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)

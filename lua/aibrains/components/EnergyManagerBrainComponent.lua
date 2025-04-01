@@ -99,7 +99,7 @@ EnergyManagerBrainComponent = ClassSimple {
         end
     end,
 
-    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
+    --- A continuous thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
     ---@param self AIBrain
     ToggleEnergyExcessUnitsThread = function(self)
 
@@ -241,7 +241,7 @@ EnergyManagerBrainComponent = ClassSimple {
     end,
 
     OnStatsTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" then
+        if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" or triggerName == "SwitchEnergyViableTrigger" then
             self:OnEnergyTrigger(triggerName)
         end
     end,
@@ -250,18 +250,41 @@ EnergyManagerBrainComponent = ClassSimple {
     ---@param self AIBrain
     ---@param triggerName string
     OnEnergyTrigger = function(self, triggerName)
-        if triggerName == "EnergyDepleted" then
+        if triggerName == "EnergyDepleted" or triggerName == "SwitchEnergyViableTrigger" then
             -- add trigger when we can recover units
-            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
-            self.EnergyDepleted = true
+            local energyStorageThreshold = 100000
+            local storageRatio = 0.1
 
-            -- recurse over the list of units and do callbacks accordingly
-            for id, entity in self.EnergyDependingUnits do
-                if not IsDestroyed(entity) then
-                    entity:OnEnergyDepleted()
+            if self:GetArmyStat('Economy_MaxStorage_Energy', 0).Value < energyStorageThreshold then
+                -- When we have little storage, turn back on above the ratio, or switch trigger after building enough storage.
+                self:RemoveArmyStatsTrigger("Economy_Stored_Energy", "EnergyViable")
+                self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', storageRatio)
+
+                self:RemoveArmyStatsTrigger("Economy_Stored_Energy", "SwitchEnergyViableTrigger")
+                self:SetArmyStatsTrigger("Economy_MaxStorage_Energy", "SwitchEnergyViableTrigger", "GreaterThanOrEqual", energyStorageThreshold)
+            else
+                -- When we have a lot of storage, turn back on above the ratio of the threshold, or switch trigger after losing enough storage.
+                self:RemoveArmyStatsTrigger("Economy_Ratio_Energy", "EnergyViable")
+                self:SetArmyStatsTrigger("Economy_Stored_Energy", "EnergyViable", "GreaterThanOrEqual", energyStorageThreshold * storageRatio)
+
+                self:RemoveArmyStatsTrigger("Economy_MaxStorage_Energy", "SwitchEnergyViableTrigger")
+                self:SetArmyStatsTrigger("Economy_MaxStorage_Energy", "SwitchEnergyViableTrigger", "LessThan", energyStorageThreshold)
+            end
+
+            if triggerName == "EnergyDepleted" then
+                self.EnergyDepleted = true
+
+                -- recurse over the list of units and do callbacks accordingly
+                for id, entity in self.EnergyDependingUnits do
+                    if not IsDestroyed(entity) then
+                        entity:OnEnergyDepleted()
+                    end
                 end
             end
         else
+            -- clean up the trigger switcher
+            self:RemoveArmyStatsTrigger("Economy_MaxStorage_Energy", "SwitchEnergyViableTrigger")
+
             -- add trigger when we're depleted
             self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
             self.EnergyDepleted = false

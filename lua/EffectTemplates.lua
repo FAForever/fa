@@ -1456,7 +1456,7 @@ CArtilleryFlash01 = {
     EmtBpPath .. 'proton_artillery_muzzle_08_emit.bp',
 }
 CArtilleryFlash02 = {
-    EmtBpPath .. 'proton_artillery_muzzle_07_emit.bp',
+    EmtBpPath .. 'proton_artillery_muzzle_07_emit.bp', -- Large, faint rings of air expanding outwards
 }
 
 CArtilleryHit01 = DefaultHitExplosion01
@@ -4433,6 +4433,7 @@ AQuantumBeamGeneratorMuzzleFlash01 = {
 }
 
 AQuantumBeamGeneratorHit01 = {
+    EmtBpPath .. 'sprinkles_emit.bp',
     EmtBpPath .. 'quantum_generator_end_01_emit.bp',
     EmtBpPath .. 'quantum_generator_end_03_emit.bp',
     EmtBpPath .. 'quantum_generator_end_04_emit.bp',

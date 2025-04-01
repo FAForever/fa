@@ -22,57 +22,55 @@ local CreateRotator = CreateRotator
 DRA0202 = ClassUnit(CAirUnit) {
     Weapons = {
         AntiAirMissiles = ClassWeapon(CAAMissileNaniteWeapon) {},
+        ---@class DRA0202_GroundMissile : CIFMissileCorsairWeapon
         GroundMissile = ClassWeapon(CIFMissileCorsairWeapon) {
 
-        IdleState = State (CIFMissileCorsairWeapon.IdleState) {
+            IdleState = State(CIFMissileCorsairWeapon.IdleState) {
+                ---@param self DRA0202_GroundMissile
+                Main = function(self)
+                    CIFMissileCorsairWeapon.IdleState.Main(self)
+                end,
+                ---@param self DRA0202_GroundMissile
+                OnGotTarget = function(self)
+                    if self.unit:IsUnitState('Moving') then
+                        self.unit:SetSpeedMult(1.0)
+                    else
+                        self.unit:SetBreakOffTriggerMult(2.0)
+                        self.unit:SetBreakOffDistanceMult(8.0)
+                        self.unit:SetSpeedMult(0.67)
+                        CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
+                    end
+                end,
+            },
 
-        Main = function(self)
-            CIFMissileCorsairWeapon.IdleState.Main(self)
-        end,
+            ---@param self DRA0202_GroundMissile
+            OnGotTarget = function(self)
+                local unit = self.unit
 
-        OnGotTarget = function(self)
-            if self.unit:IsUnitState('Moving') then
-               self.unit:SetSpeedMult(1.0)
-            else
-               self.unit:SetBreakOffTriggerMult(2.0)
-               self.unit:SetBreakOffDistanceMult(8.0)
-               self.unit:SetSpeedMult(0.67)
-               CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
-            end
-        end,
-    },
+                if unit:IsUnitState('Moving') then
+                    unit:SetSpeedMult(1.0)
+                else
+                    unit:SetBreakOffTriggerMult(2.0)
+                    unit:SetBreakOffDistanceMult(8.0)
+                    unit:SetSpeedMult(0.67)
+                    CIFMissileCorsairWeapon.OnGotTarget(self)
+                end
+            end,
 
-    OnGotTarget = function(self)
-        local unit = self.unit
+            ---@param self DRA0202_GroundMissile
+            OnLostTarget = function(self)
+                local unit = self.unit
 
-        if unit:IsUnitState('Moving') then
-           unit:SetSpeedMult(1.0)
-        else
-           unit:SetBreakOffTriggerMult(2.0)
-           unit:SetBreakOffDistanceMult(8.0)
-           unit:SetSpeedMult(0.67)
-           CIFMissileCorsairWeapon.OnGotTarget(self)
-        end
-    end,
-
-    OnLostTarget = function(self)
-        local unit = self.unit
-
-        unit:SetBreakOffTriggerMult(1.0)
-        unit:SetBreakOffDistanceMult(1.0)
-        unit:SetSpeedMult(1.0)
-        CIFMissileCorsairWeapon.OnLostTarget(self)
-    end,
+                unit:SetBreakOffTriggerMult(1.0)
+                unit:SetBreakOffDistanceMult(1.0)
+                unit:SetSpeedMult(1.0)
+                CIFMissileCorsairWeapon.OnLostTarget(self)
+            end,
         },
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
-        self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
-        self:RequestRefreshUI()
-    end,
-
+    ---@param self DRA0202
+    ---@param target? Unit | Blip
     RotateWings = function(self, target)
         local trash = self.Trash
 
@@ -82,7 +80,7 @@ DRA0202 = ClassUnit(CAirUnit) {
         end
         if not self.RWingRotator then
             self.RWingRotator = CreateRotator(self, 'B03', 'x')
-            TrashBagAdd(trash,self.RWingRotator)
+            TrashBagAdd(trash, self.RWingRotator)
         end
         local fighterAngle = 0
         local bomberAngle = -90
@@ -109,17 +107,19 @@ DRA0202 = ClassUnit(CAirUnit) {
         end
     end,
 
+    ---@param self DRA0202
     OnCreate = function(self)
         CAirUnit.OnCreate(self)
         local trash = self.Trash
-        TrashBagAdd(trash,ForkThread(self.MonitorWings,self))
+        TrashBagAdd(trash, ForkThread(self.MonitorWings, self))
     end,
 
+    ---@param self DRA0202
     MonitorWings = function(self)
         local airTarget
         while self and not self.Dead do
             local airTargetWeapon = self:GetWeaponByLabel('AntiAirMissiles')
-            if airTargetWeapon then     
+            if airTargetWeapon then
                 airTarget = airTargetWeapon:GetCurrentTarget()
             end
 
