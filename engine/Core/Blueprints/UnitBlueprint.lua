@@ -694,8 +694,8 @@
 ---@field AdjacentEnergyProductionMod? number
 ---@field AdjacentMassProductionMod? number
 ---@field AdjacentStructureEnergyMod? number
---- this define what units could be produced
----@field BuildableCategory CategoryName[]
+--- Defines what units can be built. Used by the engine.
+---@field BuildableCategory UnparsedCategory[]
 --- Defines what buildable units can only be produced through upgrading. Used in Lua.
 ---@field UpgradeOnlyCategory UnparsedCategory[]
 --- energy cost to build this unit
