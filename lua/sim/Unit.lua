@@ -110,10 +110,16 @@ SyncMeta = {
 ---@field UnitBeingBuiltBehavior? thread
 ---@field Combat? boolean
 
+---@class CampaignAIUnitProperties
+---@field BaseName string Name of the BaseManager the unit belongs to
+---@field UnitName string Name of the unit from the map editor (_save.lua)
+---@field SetToUpgrade boolean|nil Unit marked by the BaseManager for upgrade
+---@field CDRData table|nil Copy of the platoon data when the BaseManager upgrades the commander
+
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields, DebugUnitComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -5440,7 +5446,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@deprecated
     ---@param self Unit
-    ---@param val number
+    ---@param val boolean
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
@@ -5462,14 +5468,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@deprecated
     ---@param self Unit
-    ---@param val number
+    ---@param val boolean
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
     ---@deprecated
     ---@param self Unit
-    ---@return boolean
+    ---@return Unit
     GetUnitBeingBuilt = function(self)
         return self.UnitBeingBuilt
     end,

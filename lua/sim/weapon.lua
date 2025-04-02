@@ -323,7 +323,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     ---@param speed number
-    ---@param bp WeaponBlueprint
+    ---@param bp? WeaponBlueprint
     SetTurretPitchSpeed = function(self, speed, bp)
         local aimControl = self.AimControl
         if aimControl then
