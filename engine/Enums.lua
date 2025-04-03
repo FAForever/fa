@@ -294,3 +294,9 @@
 ---| "Yellow"               #FFFF00
 ---| "YellowGreen"          #9CCF31
 ---| "transparent"          #00000000
+
+---@alias BuildOrderType
+---| "Repair"
+---| "MobileBuild"
+---| "FactoryBuild"
+---| "Upgrade"
