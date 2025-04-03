@@ -254,20 +254,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             -- OnStartTransportLoading = {}
             -- OnStopTransportLoading = {}
         }
-    end,
-
-    ---@param self Unit
-    OnCreate = function(self)
-        local bp = self:GetBlueprint()
-
-        -- cache often accessed values into inner table
-        self.Blueprint = bp
 
         -- cache engine calls
+        -- weapons call OnCreate before the unit and they may use these values, so it should in PreCreate
+        self.Blueprint = self:GetBlueprint()
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
+    end,
+
+    ---@param self Unit
+    OnCreate = function(self)
+        local bp = self.Blueprint
 
         -- used for rebuilding mechanic
         self.Repairers = {}
@@ -314,7 +313,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
-        if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+        if bp.General.CommandCapsHash['RULEUCC_Reclaim'] then
             self.ReclaimedMass = 0
             self.ReclaimedEnergy = 0
             self:UpdateStat("ReclaimedMass", 0)
@@ -322,7 +321,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         -- add support for automated jamming reset
-        if self.Blueprint.Intel.JammerBlips > 0 then
+        if bp.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
@@ -4072,13 +4071,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param bone Bone
+    ---@param bone? Bone
     ---@return boolean
     ValidateBone = function(self, bone)
-        if self:IsValidBone(bone) then
+        if bone and self:IsValidBone(bone) then
             return true
         end
-        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. (self.UnitId or self:GetUnitId()) .. ' and it does not exist in the model.', 2)
+        WARN('Trying to use the bone, `' .. tostring(bone) .. '` on unit ' .. (self.UnitId or self:GetUnitId()) .. ' and it does not exist in the model.', 2)
 
         return false
     end,
