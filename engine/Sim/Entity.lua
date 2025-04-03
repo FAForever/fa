@@ -314,6 +314,7 @@ end
 function Entity:RemoveShooter(shooter)
 end
 
+--- Calls OnSelectionChanged if the unit is currently selected.
 function Entity:RequestRefreshUI()
 end
 

@@ -79,18 +79,6 @@ function setUpgradeAndAllowing(upgradesTo_, allowOthers_)
     allowOthers = allowOthers_
 end
 
-if options.gui_draggable_queue ~= 0 then
-    -- Add gameparent handleevent for if the drag ends outside the queue window
-    local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
-    local oldGameParentHandleEvent = gameParent.HandleEvent
-    gameParent.HandleEvent = function(self, event)
-        if event.Type == 'ButtonRelease' then
-            import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
-        end
-        oldGameParentHandleEvent(self, event)
-    end
-end
-
 local cutA = 0
 local cutB = 0
 if options.gui_visible_template_names ~= 0 then
@@ -1982,7 +1970,7 @@ function CreateExtraControls(controlType)
                         break
                     end
                 end
-            elseif not v:IsInCategory(faction) then
+            elseif not faction or not v:IsInCategory(faction) then
                 validForTemplate = false
                 break
             end
