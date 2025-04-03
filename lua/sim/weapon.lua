@@ -11,6 +11,7 @@
 local Entity = import("/lua/sim/entity.lua").Entity
 local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
 local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEntityCategoryProperly
+---@type false | EntityCategory[]
 local cachedPriorities = false
 local RecycledPriTable = {}
 
@@ -34,6 +35,7 @@ local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComp
 ---@field Buffs BlueprintBuff[]         # Active buffs for the weapon
 ---@field __index WeaponDamageTable
 
+---@return EntityCategory[]
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
     local finalPriorities = {}
@@ -72,13 +74,16 @@ local WeaponMethods = moho.weapon_methods
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
 ---@field Army Army
+---@field AmbientSounds table<SoundBlueprint, Entity>
 ---@field Blueprint WeaponBlueprint
 ---@field Brain AIBrain
 ---@field CollideFriendly boolean
 ---@field DamageMod number
+---@field DamageModifiers number[] # Set of damage multipliers used by collision beams for the weapon
 ---@field DamageRadiusMod number
 ---@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
 ---@field DisabledBuffs table
+---@field DisabledFiringBones Bone[] # Bones that `Unit.Animator` cannot move when this weapon has a target
 ---@field EnergyRequired? number
 ---@field EnergyDrainPerSecond? number
 ---@field Label string
@@ -87,6 +92,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field unit Unit
 ---@field MaxRadius? number
 ---@field MinRadius? number
+---@field onTransport boolean # True if the parent unit has been loaded on to a transport unit.
 Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
@@ -172,6 +178,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
 
         local unit = self.unit
+        ---@diagnostic disable-next-line: param-type-mismatch
         if not (unit:ValidateBone(yawBone) and unit:ValidateBone(pitchBone) and unit:ValidateBone(muzzleBone)) then
             error('*ERROR: Bone aborting turret setup due to bone issues.', 2)
             return
@@ -316,7 +323,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     ---@param speed number
-    ---@param bp WeaponBlueprint
+    ---@param bp? WeaponBlueprint
     SetTurretPitchSpeed = function(self, speed, bp)
         local aimControl = self.AimControl
         if aimControl then
@@ -376,7 +383,8 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     OnGotTarget = function(self)
-        local animator = self.unit.Animator
+        -- a few non-walker units may use `Animator` as well
+        local animator = self.unit--[[@as WalkingLandUnit]].Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, false)
@@ -386,7 +394,8 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     OnLostTarget = function(self)
-        local animator = self.unit.Animator
+        -- a few non-walker units may use `Animator` as well
+        local animator = self.unit--[[@as WalkingLandUnit]].Animator
         if self.DisabledFiringBones and animator then
             for _, value in self.DisabledFiringBones do
                 animator:SetBoneEnabled(value, true)
@@ -412,7 +421,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound SoundBlueprint | string # The string is the key for the audio in the weapon blueprint
     PlayWeaponSound = function(self, sound)
         local weaponSound = self.Blueprint.Audio[sound]
         if not weaponSound then return end
@@ -420,7 +429,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound SoundBlueprint | string # The string is the key for the audio in the weapon blueprint
     PlayWeaponAmbientSound = function(self, sound)
         local audio = self.Blueprint.Audio[sound]
         if not audio then return end
@@ -431,6 +440,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
         local ambientSound = ambientSounds[sound]
         if not ambientSound then
+            ---@type Entity
             ambientSound = Entity {}
             ambientSounds[sound] = ambientSound
             self.Trash:Add(ambientSound)
@@ -440,7 +450,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param sound SoundBlueprint
+    ---@param sound SoundBlueprint | string # The string is the key for the audio in the weapon blueprint
     StopWeaponAmbientSound = function(self, sound)
         local ambientSounds = self.AmbientSounds
         if not ambientSounds then return end
@@ -561,7 +571,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param priorities number
+    ---@param priorities? EntityCategory[] | UnparsedCategory[] | false
     SetWeaponPriorities = function(self, priorities)
         if priorities then
             if type(priorities[1]) == 'string' then

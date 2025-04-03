@@ -216,6 +216,11 @@ local orderToCursorCallback = {
 }
 
 ---@class WorldView : moho.UIWorldView, Control
+---@field _cameraName string        # Name of the camera this world view is attached to.
+---@field _disableMarkers boolean   # If true then markers won't show.
+---@field _displayName string       # Used in the interface
+---@field _order number             # Appears unused
+---@field _registered boolean       # Flag that indicates if this world view is registered with the world view manager.
 ---@field Cursor table
 ---@field CursorTrash TrashBag
 ---@field CursorLastEvent any
@@ -475,15 +480,16 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param enabled boolean
     ---@param changed boolean
     OnCursorCommandHover = function(self, identifier, enabled, changed)
-        if self:ShowConvertToPatrolCursor() then
-            local cursor = self.Cursor
-            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("MOVE2PATROLCOMMAND")
-        else
-            local cursor = self.Cursor
-            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('HOVERCOMMAND')
+        if changed then
+            if self:ShowConvertToPatrolCursor() then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("MOVE2PATROLCOMMAND")
+            else
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('HOVERCOMMAND')
+            end
+            self:ApplyCursor()
         end
-
-        self:ApplyCursor()
     end,
 
     --- Called when the order `RULEUCC_Move` is being applied

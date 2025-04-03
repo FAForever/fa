@@ -45,7 +45,7 @@ end
 ---@param builder Unit
 ---@param blueprintID UnitId
 ---@param buildLocation Vector
----@param buildRelative boolean if true, the location is used as an offset to the builders current location
+---@param buildRelative? boolean if true, the location is used as an offset to the builders current location
 function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
 end
 
@@ -229,8 +229,8 @@ function CAiBrain:GetAttackVectors()
 end
 
 --- Returns a list of factories at a location
----@param location table table with location, it's not a position but location created by PBMAddBuildLocation function
----@param radius number
+---@param location? table table with location, it's not a position but location created by PBMAddBuildLocation function
+---@param radius? number
 ---@return FactoryUnit[]
 function CAiBrain:GetAvailableFactories(location, radius)
 end
@@ -331,8 +331,8 @@ end
 --- ..........   ....xxx...
 --- ..........   ..........
 ---@param restriction boolean
----@param threatType BrainThreatType
----@param armyIndex number defaults to use all enemy armies.
+---@param threatType? BrainThreatType
+---@param armyIndex? number defaults to use all enemy armies.
 ---@return Vector
 ---@return number
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
@@ -436,7 +436,7 @@ end
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number
----@param alliance AllianceType
+---@param alliance? AllianceType
 ---@return Unit[]
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
@@ -478,8 +478,14 @@ end
 function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBuildee, entityCategoryOfBuilder)
 end
 
---- TODO.
-function CAiBrain:PickBestAttackVector()
+---TODO.
+---@param platoon Platoon
+---@param squad PlatoonSquads
+---@param alliance AllianceType
+---@param category EntityCategory
+---@param compareType any
+---@return Vector
+function CAiBrain:PickBestAttackVector(platoon, squad, alliance, category, compareType)
 end
 
 --- Returns true if platoon exists.

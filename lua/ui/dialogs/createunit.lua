@@ -465,7 +465,7 @@ GetNameFilters = {
                     {
                         key = 'eco',
                         display = '<LOC spawn_filter_build_eco>Economy',
-                        tooltip = '<LOC spawn_filter_build_eco>_tipToggle Economy units',
+                        tooltip = '<LOC spawn_filter_build_eco_tip>Toggle Economy units',
                         sortFunc = Logic.IsEconomy,
                     },
                     {
@@ -942,14 +942,14 @@ function CreateDialog()
     local NumberInputFields = {
         units = {
             -- creating input fields for count, vet, and rotation
-            {label='Count', name = 'Count',     default=1,   check=math.max},
-            {label='Vet',   name = 'Veterancy', default=0,   check=math.max, max=5},
-            {label='Yaw',   name = 'Rotation',  default=360, check=math.mod},
+            {label='Count', name = '<LOC spawn_filter_count>Count',     default=1,   check=math.max},
+            {label='Vet',   name = '<LOC spawn_filter_veterancy>Veterancy', default=0,   check=math.max, max=5},
+            {label='Yaw',   name = '<LOC spawn_filter_rotation>Rotation',  default=360, check=math.mod},
         },
         props = {
-            {label='Count', name = 'Count',    default=1,   check=math.max},
-            {label='Yaw',   name = 'Rotation', default=360, check=math.mod},
-            {label='Rand',  name = 'Scatter',  default=0,   check=math.max},
+            {label='Count', name = '<LOC spawn_filter_count>Count',    default=1,   check=math.max},
+            {label='Yaw',   name = '<LOC spawn_filter_rotation>Rotation', default=360, check=math.mod},
+            {label='Rand',  name = '<LOC spawn_filter_scatter>Scatter',  default=0,   check=math.max},
         },
     }
 
@@ -1267,7 +1267,7 @@ function CreateDialog()
 
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
-    local filterPresetLabel = UIUtil.CreateText(windowGroup, 'Filter Preset', 14, UIUtil.bodyFont)
+    local filterPresetLabel = UIUtil.CreateText(windowGroup, '<LOC spawn_filter_preset>Filter Preset', 14, UIUtil.bodyFont)
     LayoutHelpers.Below(filterPresetLabel, armiesGroup, 5)
     LayoutHelpers.AtLeftIn(filterPresetLabel, windowGroup, 5)
     filterPresetLabel.Width:Set(function() return FilterHeaderWidth end)
@@ -1311,11 +1311,11 @@ function CreateDialog()
         return btn
     end
 
-    local filterSaveButton = CreatePressButton 'Save'
+    local filterSaveButton = CreatePressButton '<LOC spawn_filter_save>Save'
     LayoutHelpers.Below(filterSaveButton, armiesGroup)
     LayoutHelpers.RightOf(filterSaveButton, filterPresetCombo, 10)
     LayoutHelpers.AtVerticalCenterIn(filterSaveButton, filterPresetCombo)
-    Tooltip.AddControlTooltip(filterSaveButton, { text = ' Save current filter as preset ' })
+    Tooltip.AddControlTooltip(filterSaveButton, { text = LOC("<LOC spawn_filter_save_tip>Save current filter as preset") })
     filterSaveButton.OnClick = function(self, modifiers)
         NameSet(function(name)
             local newFilterListing = {}
@@ -1330,11 +1330,11 @@ function CreateDialog()
         end)
     end
 
-    local filterDeleteButton = CreatePressButton 'Delete'
+    local filterDeleteButton = CreatePressButton '<LOC spawn_filter_delete>Delete'
     LayoutHelpers.Below(filterDeleteButton, armiesGroup)
     LayoutHelpers.RightOf(filterDeleteButton, filterSaveButton)
     LayoutHelpers.AtVerticalCenterIn(filterDeleteButton, filterPresetCombo)
-    Tooltip.AddControlTooltip(filterDeleteButton, { text = ' Delete current filter preset ' })
+    Tooltip.AddControlTooltip(filterDeleteButton, { text = LOC("<LOC spawn_filter_delete_tip>Delete current filter preset") })
     filterDeleteButton.OnClick = function(self, modifiers)
         local index = filterPresetCombo:GetItem()
         if index >= 1 then
@@ -1348,11 +1348,11 @@ function CreateDialog()
        end
     end
 
-    local filterClearButton = CreatePressButton('Clear All')
+    local filterClearButton = CreatePressButton('<LOC spawn_filter_clear>Clear All')
     LayoutHelpers.Below(filterClearButton, armiesGroup)
     LayoutHelpers.RightOf(filterClearButton, filterDeleteButton)
     LayoutHelpers.AtVerticalCenterIn(filterClearButton, filterPresetCombo)
-    Tooltip.AddControlTooltip(filterClearButton, { text = ' Clear all filters' })
+    Tooltip.AddControlTooltip(filterClearButton, { text = LOC("<LOC spawn_filter_clear_tip>Clear all filters") })
     filterClearButton.OnClick = ClearFilters
 
     RefreshFilterList()
@@ -1393,7 +1393,7 @@ function CreateDialog()
 
     local mouseover = false
     local function SetUnitImage(bitmap, id, smol)
-        local icon = __blueprints[id].Source and (__blueprints[id].Source):gsub('/units/.*', '')..'/textures/ui/common/icons/units/'..id..'_icon.dds'
+        local icon = UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)
         local lods = __blueprints[id].Display.Mesh.LODs
         local albedo = lods[smol and lods and table.getn(lods) or 1].AlbedoName
 
@@ -1440,6 +1440,7 @@ function CreateDialog()
 
         for i = 3, table.getn(td) do
             local id = td[i][1]
+            if not __blueprints[id] then return end
             local w, h = GetUnitSkirtSizes(id)
             local posX, posZ = td[i][3], td[i][4]
             local cOffX, cOffZ = GetSkirtCentreOffset(id)
@@ -1474,7 +1475,7 @@ function CreateDialog()
 
         mouseover.Left:Set(x+20  * UIScale)
         mouseover.Top:Set(y+20 * UIScale)
-        LayoutHelpers.SetDimensions(mouseover.img, 300, 300)
+        LayoutHelpers.SetDimensions(mouseover, 300, 300)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
     local function CreateElementMouseover(unitData,x,y)
@@ -2013,7 +2014,7 @@ function CreateTemplateOptionsMenu(button)
                 end
             end
             for iconType, _ in contents do
-                local bmp = Bitmap(group, '/textures/ui/common/icons/units/'..iconType..'_icon.dds')
+                local bmp = Bitmap(group, UIUtil.UIFile('/icons/units/' .. iconType .. '_icon.dds', true))
                 bmp.Height:Set(30 * UIScale)
                 bmp.Width:Set(30 * UIScale)
                 bmp.ID = iconType

@@ -88,7 +88,7 @@ function ObserverAfterDeath(armyIndex)
     end
 end
 
---- Continiously scans the game for brains being defeated or changes in alliances that can cause the game to end
+--- Continuously scans the game for brains being defeated or changes in alliances that can cause the game to end
 local function MatchStateThread()
 
     -- determine game conditions

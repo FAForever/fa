@@ -1,0 +1,1 @@
+- (#6652) Annotate "ping" and "buildanchored" command modes.
