@@ -2802,7 +2802,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param built Unit
-    ---@param order "Upgrade" | "Repair" | "MobileBuild" | "FactoryBuild"
+    ---@param order BuildOrderType
     ---@return boolean
     OnStartBuild = function(self, built, order)
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
