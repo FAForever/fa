@@ -79,9 +79,11 @@ function SetInvincible(area, invinBool)
     end
 end
 
---- This will move the camera to the position of a marker
+--- This will move the camera to the position of a marker.
+---
+--- If the transition duration isn't provided, the camera is snapped to the marker.
 ---@param marker Marker
----@param seconds number
+---@param seconds? number
 function CameraMoveToMarker(marker, seconds)
     -- Adding this in case we just want to start the camera somewhere at the beginning of an operation without playing a full NIS
     if not ScenarioInfo.Camera then
