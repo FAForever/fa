@@ -1,13 +1,13 @@
 ---@meta
 
 ---@class moho.control_methods : Destroyable
----@field Left LazyVar<number>
----@field Width LazyVar<number>
----@field Right LazyVar<number>
----@field Top LazyVar<number>
----@field Height LazyVar<number>
----@field Bottom LazyVar<number>
----@field Depth LazyVar<number>
+---@field Left Lazy<number>
+---@field Width Lazy<number>
+---@field Right Lazy<number>
+---@field Top Lazy<number>
+---@field Height Lazy<number>
+---@field Bottom Lazy<number>
+---@field Depth Lazy<number>
 local CMauiControl = {}
 
 ---

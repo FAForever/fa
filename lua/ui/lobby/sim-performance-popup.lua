@@ -41,7 +41,8 @@ local Instance = nil
 ---@field Background Bitmap
 ---@field Foreground Group
 ---@field MaximumUnits number
----@field Percentage LazyVar
+---@field PercentageTop Lazy<number>
+---@field PercentageBottom Lazy<number>
 ---@field Bar Bitmap
 ---@field Label Text
 UISimPerformanceElement = ClassUI(Group) {
