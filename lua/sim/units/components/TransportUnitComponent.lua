@@ -117,13 +117,9 @@ BaseTransport = ClassSimple {
 
             -- cache the cargo so we can impact it later (if needed)
             -- exception for command units, which explode immediately
-            if not EntityCategoryContains(categories.COMMAND, unit) then
-                if cacheCargo then
-                    unit.killedInTransport = true
-                    TableInsert(self.cargoCache, unit)
-                end
-            else
-                unit.UseTransportDeathMessage = true
+            if not EntityCategoryContains(categories.COMMAND, unit) and cacheCargo then
+                unit.killedInTransport = true
+                TableInsert(self.cargoCache, unit)
             end
 
             -- record the veterancy value of the unit
