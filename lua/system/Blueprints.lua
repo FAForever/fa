@@ -88,7 +88,7 @@ doscript("/lua/system/blueprints-weapons.lua")
 ---@param t1 table
 ---@param t2 table # Overwrites t1
 ---@param nilValue? string # Fields in t2 with this value set the field to nil in the result. Defaults to `"__nil"`.
-local function BlueprintMerged(t1, t2, nilValue)
+function BlueprintMerged(t1, t2, nilValue)
     if not nilValue then nilValue = '__nil' end
     if t1==t2 then
         return t1
