@@ -69,7 +69,7 @@ XAB1401 = ClassUnit(AStructureUnit) {
                 end
                 self:SetProductionPerSecondEnergy(energyAdd)
 
-                WaitTicks(6)
+                WaitTicks(1)
             end
         end,
     },
