@@ -277,7 +277,6 @@ Callbacks.AttackMove = function(data, units)
     -- assume all units in the selection were given the same order, so we only need to check one unit
     local commandQueue = allNonStructures[1]:GetCommandQueue()
     local lastcommand = commandQueue[TableGetn(commandQueue)]
-    LOG(repr(lastcommand), debug.traceback())
     -- dummy script task should be used, although we can't check the script task's type
     if UnitQueueDataToCommand[lastcommand.commandType].Type ~= "Script" then return end
     -- script tasks issued without a target have x,y,z = 0
