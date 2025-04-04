@@ -90,7 +90,6 @@ CategoriesSkipped  = {
     ["brngrnd2"] = true,
     ["brogrnd1"] = true,
     ["brogrnd2"] = true,
-    ["rip0001"] = true,
 }
 
 -- Blueprints with these categories will be hidden in tooltips
