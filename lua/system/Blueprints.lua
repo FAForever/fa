@@ -48,20 +48,32 @@
 --   default to its old value, not to 0 or its normal default.
 --
 
+-- upvalue for performance
 local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
 local getinfo = debug.getinfo
+local TableGetn = table.getn
+local tostring = tostring
+local pcall = pcall
+local doscript = doscript
+local DiskFindFiles = DiskFindFiles
+
 local here = getinfo(1).source
 
 ---@type BlueprintsTable
 local original_blueprints
+---@type ModInfo
 local current_mod
 
--- upvalue for performance
-pcall = pcall
-doscript = doscript
-DiskFindFiles = DiskFindFiles
+--- Table that tracks load order of blueprints from different sources
+---@class BlueprintIdLoadOrderTable : table<FileName, number>, table<number, FileName>
+
+---@type table<BlueprintId, BlueprintIdLoadOrderTable>
+local loadersPerBpId = {}
+
+local trackDependencies
+local reloadingBlueprint
 
 doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
@@ -353,10 +365,11 @@ local function GetSource()
     local n = 2
     local there
     while true do
-        there = getinfo(n).source
-        if there ~= here then break end
+        there = getinfo(n, 'S').source
+        if there ~= '=[C]' and there ~= here then break end
         n = n + 1
     end
+    if not there then error('GetSource was not able to find a Lua source outside Blueprints.lua') end
     if sub(there, 1, 1) == "@" then
         there = sub(there, 2)
     end
@@ -369,12 +382,54 @@ local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
 
+    local source
+    local loadOrderTable = loadersPerBpId[id]
+    local n
+    local orderNumber
+    if trackDependencies then
+        source = GetSource()
+        if not loadOrderTable then
+            loadersPerBpId[id] = { [source] = 1, [1] = source }
+        else
+            n = TableGetn(loadOrderTable) + 1
+            loadOrderTable[source] = n
+            loadOrderTable[n] = source
+        end
+    end
+    if reloadingBlueprint then
+        source = GetSource()
+        -- prevent recursion
+        reloadingBlueprint = false
+        -- when we're reloading a single bp file, reload the precursor bps
+        orderNumber = loadOrderTable[source]
+        for i = 1, orderNumber - 1 do
+            local file = loadOrderTable[i]
+            LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file)
+            safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file, doscript, file)
+        end
+        reloadingBlueprint = true
+        LOG('Blueprints Reloading: storing ' .. tostring(id) .. ' changes from ' .. source)
+    end
+
     if t[id] and bp.Merge then
         bp.Merge = nil
         bp.Source = nil
         t[id] = table.merged(t[id], bp)
     else
         t[id] = bp
+    end
+
+    if reloadingBlueprint then
+        -- prevent recursion
+        reloadingBlueprint = false
+        -- when we're reloading a single bp file, reload the dependent bps
+        n = TableGetn(loadOrderTable)
+        for i = loadOrderTable[source] + 1, n do
+            local file = loadOrderTable[i]
+            LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file)
+            safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file, doscript, file)
+        end
+        reloadingBlueprint = true
     end
 end
 
@@ -448,6 +503,7 @@ function ExtractMeshBlueprint(bp)
 
         if type(disp.Mesh) == 'table' then
             local meshbp = disp.Mesh
+            -- the engine adds missing fields to the mesh blueprint based on the Source
             meshbp.Source = meshbp.Source or bp.Source
             meshbp.BlueprintId = disp.MeshBlueprint
             -- roates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
@@ -1014,6 +1070,8 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     end
     InitOriginalBlueprints()
 
+    trackDependencies = true
+
     if not skipGameFiles then
         for _, dir in directories do
             task = 'Blueprints Loading: original files from ' .. dir .. ' directory'
@@ -1096,6 +1154,8 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
                                                 .. stats.ProjsMod .. ' modded projectiles')
     end
 
+    trackDependencies = false
+
     if not skipRegistration then
         BlueprintLoaderUpdateProgress()
         LOG('Blueprints Registering...')
@@ -1111,7 +1171,9 @@ end
 function ReloadBlueprint(file)
     InitOriginalBlueprints()
 
+    reloadingBlueprint = true
     safecall("Blueprints Reloading... " .. file, doscript, file)
+    reloadingBlueprint = false
 
     ExtractAllMeshBlueprints()
     PreModBlueprints(original_blueprints)

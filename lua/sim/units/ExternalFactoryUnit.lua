@@ -47,6 +47,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
         -- do not allow the unit to be killed or to take damage
         self.CanTakeDamage = false
+        self.CanBeKilled = false
 
         -- is inherited by units, mimic what factories have as their default
         self:SetFireState(2)
@@ -94,7 +95,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     ---@param unitbuilding Unit
-    ---@param order Layer
+    ---@param order "FactoryBuild" | "Repair" | "MobileBuild"
     OnStartBuild = function(self, unitbuilding, order)
         UnitOnStartBuild(self, unitbuilding, order)
         self.Parent:OnStartBuild(unitbuilding, order)
@@ -111,9 +112,10 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     ---@param unitBeingBuilt Unit
-    OnStopBuild = function(self, unitBeingBuilt)
-        UnitOnStopBuild(self, unitBeingBuilt)
-        self.Parent:OnStopBuild(unitBeingBuilt)
+    ---@param order "FactoryBuild" | "Repair" | "MobileBuild"
+    OnStopBuild = function(self, unitBeingBuilt, order)
+        UnitOnStopBuild(self, unitBeingBuilt, order)
+        self.Parent:OnStopBuild(unitBeingBuilt, order)
         self.UnitBeingBuilt = nil
 
         if self.UpdateParentProgressThread then
@@ -182,7 +184,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     PlayFxRollOff = function(self)
-        self.Parent:StopBuPlayFxRollOffildFx()
+        self.Parent:PlayFxRollOff()
     end,
 
     ---@param self ExternalFactoryUnit
