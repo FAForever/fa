@@ -988,7 +988,8 @@ end
 
 --- Merges the weapon bp into the weapon bp found with the label.  
 --- If the label is not found, the weapon is inserted at the desired index or at the end of the array.  
---- This helps with weapon merge blueprints and adding AI-controlling weapons (index 1).
+--- This helps with weapon merge blueprints and adding AI-controlling weapons (index 1).  
+--- It uses `BlueprintMerged`, so fields in `newBp` set to `"__nil"` will set it to nil in the result.
 ---@param baseBp UnitBlueprint
 ---@param label string
 ---@param insertPos? integer
