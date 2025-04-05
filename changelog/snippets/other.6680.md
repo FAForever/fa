@@ -1,0 +1,1 @@
+- (#6680) Annotate code related to the `SetWeaponPriorites` sim callback.
