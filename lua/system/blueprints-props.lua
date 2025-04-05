@@ -114,9 +114,7 @@ local function ProcessLOD(prop)
 
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
-    if prop.ScriptClass == 'Tree' then
-        weighted = 2.6
-    elseif prop.ScriptClass == 'TreeGroup' then
+    if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
         weighted = 4.2
     end
 
