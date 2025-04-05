@@ -9,6 +9,10 @@
 ---@field Categories CategoryName[]
 --- hash of category names that this entity belongs to
 ---@field CategoriesHash table<CategoryName, true>
+--- list of categories to add during blueprint loading (for merge blueprints)
+---@field AddCategories? CategoryName[]
+--- list of categories to remove during blueprint loading (for merge blueprints)
+---@field DelCategories? CategoryName[]
 --- shape to use for collisions with the entity
 ---@field CollisionShape CollisionShape
 --- the desired maximum number of shooters taking shots at the entity
