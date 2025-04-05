@@ -809,16 +809,6 @@ local function CreateFirestatePopup(parent, selected)
 end
 
 local function RetaliateOrderBehavior(self, modifiers)
-    if not self._OnFirestateSelection then
-        self._OnFirestateSelection = function(self, newState, id)
-            self._toggleState = newState
-            SetFireState(currentSelection, id)
-            self:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[newState].bitmap))
-            self._curHelpText = retaliateStateInfo[newState].helpText
-            self._popup:Destroy()
-            self._popup = nil
-        end
-    end
     if self._popup then
         self._popup:Destroy()
         self._popup = nil
@@ -872,14 +862,27 @@ local function RetaliateInitFunction(control, unitList)
         end
         Checkbox.OnDisable(self)
     end
+    control.CycleFireStateUp = function(self)
+        local newState = self._toggleState >= 2 and 0 or self._toggleState + 1
+        self:_OnFirestateSelection(newState, retaliateStateInfo[newState].id)
+    end
+    control._OnFirestateSelection = function(self, newState, id)
+        self._toggleState = newState
+        SetFireState(currentSelection, id)
+        self:SetNewTextures(GetOrderBitmapNames(retaliateStateInfo[newState].bitmap))
+        self._curHelpText = retaliateStateInfo[newState].helpText
+        if self._popup then
+            self._popup:Destroy()
+            self._popup = nil
+        end
+    end
 end
 
 function CycleRetaliateStateUp()
-    local currentFireState = GetFireState(currentSelection)
-    if currentFireState > 3 then
-        currentFireState = 0
+    local retaliateCheckbox = orderCheckboxMap["RULEUCC_RetaliateToggle"]
+    if retaliateCheckbox then
+        retaliateCheckbox:CycleFireStateUp()
     end
-    ToggleFireState(currentSelection, currentFireState)
 end
 
 local function pauseFunc()
