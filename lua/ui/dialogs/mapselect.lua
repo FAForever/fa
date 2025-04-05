@@ -962,11 +962,41 @@ function SetupOptionsPanel(parent, curOptions)
     UIUtil.CreateLobbyVertScrollbar(OptionContainer, -1, -5, -27)
 end
 
+-- Generate LOC entries for scenario names
+function LOCN(str, type)
+    local name = str
+    name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    if string.find(str, '<LOC') then
+        return LOC(str)
+    elseif type == 'campaign_coop' then
+        return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
+    elseif type == 'skirmish' then
+        return LOC('<LOC '..name..'_Name>'..str)
+    else
+        return str
+    end
+end
+
+-- Generate LOC entries for scenario descriptions
+function LOCD(str1, str2, type)
+    local name = str1
+    name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
+    if string.find(str2, '<LOC') or str2 == '' then
+        return LOC(str2)
+    elseif type == 'campaign_coop' then
+        return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
+    elseif type == 'skirmish' then
+        return LOC('<LOC '..name..'_Desc>'..str2)
+    else
+        return str2
+    end
+end
+
 function SetDescription(scen)
     local errors = false
     description:DeleteAllItems()
     if scen.name then
-        description:AddItem(scen.name)
+        description:AddItem(LOCN(scen.name, scen.type))
     else
         description:AddItem(LOC("<LOC map_select_0006>No Scenario Name"))
         errors = true
@@ -998,7 +1028,7 @@ function SetDescription(scen)
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
-        local wrapped = import("/lua/maui/text.lua").WrapText(LOC(scen.description), textBoxWidth,
+        local wrapped = import("/lua/maui/text.lua").WrapText(LOCD(scen.name, scen.description, scen.type), textBoxWidth,
             function(curText) return description:GetStringAdvance(curText) end)
         for i, line in wrapped do
             description:AddItem(line)
@@ -1050,7 +1080,7 @@ function PopulateMapList()
                 reselectRow = count
             end
             count = count + 1
-            mapList:AddItem(LOC(sceninfo.name))
+            mapList:AddItem(LOCN(sceninfo.name, sceninfo.type))
         end
     end
 
