@@ -5,9 +5,9 @@
 
 -- Conclusion: Lua is much faster, especially when skipping the square root (useful in distance comparisons).
 
-local outerLoop = 1000000
+ModuleName = "VDist2"
 
-function UpvaluedEngineVDist2OnLocals()
+function UpvaluedEngineVDist2OnLocals(loop)
     local p1 = Random()*1000
     local p2 = Random()*1000
     local p3 = Random()*1000
@@ -18,7 +18,7 @@ function UpvaluedEngineVDist2OnLocals()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dist = VDist2(p1, p2, p3, p4)
     end
 
@@ -26,7 +26,8 @@ function UpvaluedEngineVDist2OnLocals()
 
     return final - start
 end
-function UpvaluedEngineVDist2SqOnLocals()
+
+function UpvaluedEngineVDist2SqOnLocals(loop)
     local p1 = Random()*1000
     local p2 = Random()*1000
     local p3 = Random()*1000
@@ -37,7 +38,7 @@ function UpvaluedEngineVDist2SqOnLocals()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dist = VDist2Sq(p1, p2, p3, p4)
     end
 
@@ -45,7 +46,8 @@ function UpvaluedEngineVDist2SqOnLocals()
 
     return final - start
 end
-function UpvaluedLuaVDist2OnLocals()
+
+function UpvaluedLuaVDist2OnLocals(loop)
     local p1 = Random()*1000
     local p2 = Random()*1000
     local p3 = Random()*1000
@@ -56,7 +58,7 @@ function UpvaluedLuaVDist2OnLocals()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local d1 = p3 - p1
         local d2 = p4 - p2
         local dist = MathSqrt(d1 * d1 + d2 * d2)
@@ -66,7 +68,8 @@ function UpvaluedLuaVDist2OnLocals()
 
     return final - start
 end
-function UpvaluedLuaVDist2SqOnLocals()
+
+function UpvaluedLuaVDist2SqOnLocals(loop)
     local p1 = Random()*1000
     local p2 = Random()*1000
     local p3 = Random()*1000
@@ -74,7 +77,7 @@ function UpvaluedLuaVDist2SqOnLocals()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local d1 = p3 - p1
         local d2 = p4 - p2
         local dist = d1 * d1 + d2 * d2

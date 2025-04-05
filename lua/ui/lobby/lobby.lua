@@ -2812,7 +2812,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.HandleEvent = defaultHandler
 
         -- Slot number
-        local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        local slotNumber = UIUtil.CreateText(newSlot, tostring(i), 14, 'Arial')
         newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)

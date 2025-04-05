@@ -8,8 +8,6 @@
 --** clarification
 --**************************************************************************************************
 
--- Useful for better test output
-require "./lua/system/repr.lua"
 
 ---@class Luft
 ---@field print fun(...)      printer used by the `out` function family
@@ -58,6 +56,216 @@ local PathNode = {}
 local Spy = {}
 
 
+
+-- this would be ideal, but it uses functions we're supposing to be testing
+--require "../lua/system/repr.lua"
+
+do
+    local non_identifiers = {
+        ["and"] = true,
+        ["break"] = true,
+        ["continue"] = true,
+        ["do"] = true,
+        ["else"] = true,
+        ["elseif"] = true,
+        ["end"] = true,
+        ["false"] = true,
+        ["for"] = true,
+        ["function"] = true,
+        ["if"] = true,
+        ["in"] = true,
+        ["local"] = true,
+        ["nil"] = true,
+        ["not"] = true,
+        ["or"] = true,
+        ["repeat"] = true,
+        ["return"] = true,
+        ["then"] = true,
+        ["true"] = true,
+        ["until"] = true,
+        ["while"] = true,
+    }
+
+    local string_inv_escapes = {
+        ['\a'] = "\\a",
+        ['\b'] = "\\b",
+        ['\f'] = "\\f",
+        ['\n'] = "\\n",
+        ['\r'] = "\\r",
+        ['\t'] = "\\t",
+        ['\v'] = "\\v",
+    }
+    ---@param chars string
+    ---@param dec ""|'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
+    ---@return string
+    local function ReplaceControlCharacters(chars, dec)
+        local len = chars:len()
+        if dec ~= "" then
+            len = len - 1 -- stop at the last char to handle specially
+        end
+        local str_builder = ""
+        for i = 1, len do
+            local char = string_inv_escapes[chars:sub(i, i)] or ('\\' .. chars:byte(i))
+            str_builder = str_builder .. char
+        end
+        if dec ~= "" then
+            -- If the next character after the control is a digit, we need to
+            -- fill the escape with zeroes so the escape doesn't consume it
+            -- (remember to append the digit in the replacement string since
+            -- checking for it made it part of the pattern being replaced).
+            local char = string_inv_escapes[chars:sub(-1)] or ('\\' .. ("%03d"):format(chars:byte(-1)))
+            -- note that if such a string were to be put back into a Lua
+            -- program, it would fail as an invalid escape sequence.
+            return str_builder .. char .. dec
+        end
+        return str_builder
+    end
+
+    ---@param str string
+    ---@param start? integer
+    ---@return string delimiter
+    ---@return string data
+    ---@return boolean hadControl
+    local function EscapeStringData(str, start)
+        start = start or 1
+        local has_doub = str:find('"', start, true)
+        local has_sing = str:find("'", start, true)
+        local has_ctrl = str:find("[%c\127-\254]", start)
+        str = str:gsub("\\", "\\\\")
+        if has_ctrl then
+            str = str:gsub("([%c\127-\254]+)([0-9]?)", ReplaceControlCharacters)
+        end
+        local smallest, delim = str, '"'
+
+        if has_doub then
+            smallest = str:gsub('"', "\\\"")
+            delimt = "'"
+            if has_sing then
+                local sing = str:gsub("'", "\\\'")
+                if sing:len() < smallest:len() then
+                    smallest = sing
+                    delimt = '"'
+                end
+            end
+        elseif has_sing then
+            smallest = str:gsub("'", "\\\'")
+        end
+
+        return delim, smallest, has_ctrl
+    end
+
+    ---@param str string
+    ---@return string
+    local function ReprStringKey(str)
+        if non_identifiers[str] then
+            return '["' .. str .. '"]'
+        end
+
+        local k = str:find("[_%a][-%w]+")
+        if k == str:len() then
+            return str
+        end
+
+        local delimiter, data = EscapeStringData(str, k)
+        return '[' .. delimiter .. str:sub(1, k - 1) .. data .. delimiter .. ']'
+    end
+
+    ---@param str string
+    ---@return string
+    local function ReprString(str)
+        local delimiter, smallest, has_control = EscapeStringData(str)
+        smallest = delimiter .. smallest .. delimiter
+
+        if not has_control then
+            -- check long string literals
+            local nest = ""
+            local close
+            repeat
+                close = ']' .. nest .. ']'
+                nest = nest .. '='
+            until not str:find(close, 1, true)
+            local long = '[' .. nest .. '[' .. str .. close
+            if long:len() < smallest:len() then
+                smallest = long
+            end
+        end
+
+        return smallest
+    end
+
+    ---@param tbl table
+    ---@param seen table
+    ---@return string
+    local function ReprTable(tbl, seen)
+        if seen[tbl] then
+            return "..."
+        end
+        seen[tbl] = true
+
+        -- add all contiguous integers keys
+        local numeric = {}
+        local rep
+        if tbl[1] then
+            for k, val in ipairs(tbl) do
+                numeric[k] = repr(val, seen)
+            end
+            rep = table.concat(numeric, ',')
+        end
+
+        -- find all remaining keys
+        local map = {}
+        local map_keys = {}
+        for key, val in next, tbl do
+            if not numeric[key] then
+                local rep_key
+                local tt = type(key)
+                if tt == "string" then
+                    rep_key = ReprStringKey(key)
+                elseif tt == "table" then
+                    rep_key = '[' .. ReprTable(key, seen) .. ']'
+                else
+                    rep_key = '[' .. tostring(key) .. ']'
+                end
+                table.insert(map_keys, rep_key)
+                map[rep_key] = repr(val, seen)
+            end
+        end
+
+        if map_keys[1] then
+            if rep then
+                rep = rep .. ';'
+            else
+                rep = ""
+            end
+
+            table.sort(map_keys)
+
+            for _, key in ipairs(map_keys) do
+                rep = rep .. key .. '=' .. map[key] .. ','
+            end
+            rep = rep:sub(1, -2)
+        elseif not rep then
+            return "{}"
+        end
+
+        return '{' .. rep .. '}'
+    end
+
+    ---@param val any
+    ---@param seen table?
+    ---@return string
+    function repr(val, seen)
+        local tt = type(val)
+        if tt == "string" then
+            return ReprString(val)
+        elseif tt == "table" then
+            return ReprTable(val, seen or {})
+        end
+        return tostring(val)
+    end
+end
+
+
 ----------------------------------------
 -- Environment setup
 ----------------------------------------
@@ -65,6 +273,7 @@ local Spy = {}
 Luft.environment = ""
 Luft.tab = '\t'
 Luft.print = print
+Luft.repr = repr
 Luft.strings = {
     pass = "PASS",
     fail = "FAIL",
@@ -229,7 +438,7 @@ Luft.start = Luft.start or function()
     if Luft.assertions then
         Luft.total_module_assertions = Luft.total_module_assertions + Luft.assertions
     end
-    Luft.margin_of_error = 0.01
+    Luft.margin_of_error = 0.00001
     Luft.indentation = ""
     Luft.indentation_level = 0
     Luft.level = 0
@@ -707,15 +916,15 @@ function Assertion:CallEach(test, args)
                 -- are displayed in the error instead of only the current value of each iterator
                 for k, list in ipairs(lists) do
                     if not iterators[k] then continue end
-                    local rep = repru(list[1])
+                    local rep = repr(list[1])
                     for j = 2, list.n do
-                        rep = rep .. ", " .. repru(list[j])
+                        rep = rep .. ", " .. repr(list[j])
                     end
                     arguments[ iterators[k] ] = '{' .. rep .. '}'
                 end
             end
             for j = 1, argCount do
-                err = err:gsub("$" .. j, repru(arguments[j]))
+                err = err:gsub("$" .. j, repr(arguments[j]))
             end
             error(err, 3)
         end
@@ -846,7 +1055,7 @@ do
         ---@return boolean
         Test = function(t, x)
             if type(t) ~= "table" then
-                error(strings.expectation1be:format(repru(t), strings.condition_unnegated, "a table"))
+                error(strings.expectation1be:format(repr(t), strings.condition_unnegated, "a table"))
             end
             for _, v in pairs(t) do
                 if v == x then return true end
@@ -1008,7 +1217,7 @@ do
                 end
                 return false
             end
-            error("invalid type " .. repru(x))
+            error("invalid type " .. repr(x))
         end;
         Parameters = 2,
         FailFormat = strings.expectation1be:format("$1", "%s", strings.cond_an:format("$2"))

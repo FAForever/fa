@@ -6,6 +6,7 @@
 local TableInsert = table.insert
 
 -- setup for a basic meta table
+---@class Observer
 local ObservableMeta = {}
 ObservableMeta.__index = ObservableMeta
 
@@ -29,10 +30,10 @@ end
 
 --- Constructs an observable as described by the observable pattern
 function Create()
-    local observable = {}
+    local observable = {
+        Listeners = {},
+    }
     setmetatable(observable, ObservableMeta)
-
-    observable.Listeners = { }
 
     return observable
 end
