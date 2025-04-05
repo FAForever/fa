@@ -623,24 +623,8 @@ end
 local function OnScriptIssued(command)
     if command.LuaParams then
         if command.LuaParams.TaskName == 'AttackMove' then
-            local avgPoint = { 0, 0 }
-            for _, unit in command.Units do
-                avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
-                avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
-            end
-            avgPoint[1] = avgPoint[1] / TableGetN(command.Units)
-            avgPoint[2] = avgPoint[2] / TableGetN(command.Units)
-
-            avgPoint[1] = command.Target.Position[1] - avgPoint[1]
-            avgPoint[2] = command.Target.Position[3] - avgPoint[2]
-
-            local rotation = MathAtan(avgPoint[1] / avgPoint[2])
-            rotation = rotation * 180 / MathPi
-            if avgPoint[2] < 0 then
-                rotation = rotation + 180
-            end
-            local cb = { Func = "AttackMove", Args = { Target = command.Target.Position, Rotation = rotation,
-                Clear = command.Clear } }
+            ---@type SimCallback
+            local cb = { Func = "AttackMove", Args = { Clear = command.Clear } }
             SimCallback(cb, true)
         elseif command.LuaParams.Enhancement then
             EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
