@@ -53,6 +53,8 @@ local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
 local getinfo = debug.getinfo
+local TableInsert = table.insert
+local TableFind = table.find
 local TableGetn = table.getn
 local tostring = tostring
 local pcall = pcall
@@ -81,6 +83,39 @@ doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
 doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
+
+--- Special table merge function that allows setting a field to `nil`.
+---@param t1 table
+---@param t2 table # Overwrites t1
+---@param nilValue? string # Fields in t2 with this value set the field to nil in the result. Defaults to `"__nil"`.
+function BlueprintMerged(t1, t2, nilValue)
+    if not nilValue then nilValue = '__nil' end
+    if t1==t2 then
+        return t1
+    end
+
+    if type(t1)~='table' or type(t2)~='table' then
+        return t2
+    end
+
+    local copied = nil
+    for k,v in t2 do
+        if type(v)=='table' then
+            v = BlueprintMerged(t1[k], v, nilValue)
+        end
+        if t1[k] ~= v then
+            copied = copied or table.copy(t1)
+            t1 = copied
+            if v == nilValue then
+                t1[k] = nil
+            else
+                t1[k] = v
+            end
+        end
+    end
+
+    return t1
+end
 
 ---@class PreGameData
 ---@field CurrentMapDir string          ## is obsolete, set for removal
@@ -414,7 +449,7 @@ local function StoreBlueprint(group, bp)
     if t[id] and bp.Merge then
         bp.Merge = nil
         bp.Source = nil
-        t[id] = table.merged(t[id], bp)
+        t[id] = BlueprintMerged(t[id], bp)
     else
         t[id] = bp
     end
@@ -892,14 +927,101 @@ function PreModBlueprints(all_bps)
             bp.Categories = table.unhash(bp.CategoriesHash)
         end
 
+        local addWeapon = bp.ModWeapon
+        if addWeapon then
+            for _, bpWeapon in addWeapon do
+                local mergeLabel = bpWeapon.MergeLabel
+                local insertPos = bpWeapon.AddIndex
+                MergeWeaponByLabel(bp, mergeLabel, insertPos, bpWeapon)
+            end
+        end
+
         BlueprintLoaderUpdateProgress()
     end
 end
+
+--#region Blueprint modding utilities
 
 -- Hook for mods to manipulate the entire blueprint table
 ---@param all_bps BlueprintsTable
 function ModBlueprints(all_bps)
 end
+
+--- Reload compatibility for modding from non-hook blueprint modding
+---@type table<FileName, fun(all_bps: BlueprintsTable)>
+local ModBlueprintsFunctions = {}
+
+--- Add a function to call after `ModBlueprints`.
+--- The function is overriden if this is called from the same file again.
+--- This allows modding blueprints from reloadable files (like bp files).
+---@param func fun(all_bps: BlueprintsTable)
+function SetModBlueprintFunction(func)
+    local file = GetSource()
+    LOG('Set ModBp function for ' .. file)
+    ModBlueprintsFunctions[GetSource()] = func
+end
+
+---@param all_bps BlueprintsTable
+local function RunModBlueprintFunctions(all_bps)
+    for file, func in ModBlueprintsFunctions do
+        LOG('Running ModBp function from ' .. file)
+        func(all_bps)
+        ModBlueprintsFunctions[file] = nil
+    end
+end
+
+--- Adds a category string to a blueprint.
+---@param bp EntityBlueprint
+---@param cat CategoryName
+function AddCategoryToBp(bp, cat)
+    local cats = bp.Categories
+    if not cats then
+        bp.Categories = { cat }
+        bp.CategoriesHash = { [cat] = true}
+        return
+    end
+    if not TableFind(cats, cat) then
+        TableInsert(cats, cat)
+        bp.CategoriesHash[cat] = true
+    end
+end
+
+--- Merges the weapon bp into the weapon bp found with the label.  
+--- If the label is not found, the weapon is inserted at the desired index or at the end of the array.  
+--- This helps with weapon merge blueprints and adding AI-controlling weapons (index 1).  
+--- It uses `BlueprintMerged`, so fields in `newBp` set to `"__nil"` will set it to nil in the result.
+---@param baseBp UnitBlueprint
+---@param label string
+---@param insertPos? integer
+---@param newBp WeaponBlueprint
+function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
+    local weaponTable = baseBp.Weapon
+    if not weaponTable then
+        baseBp.Weapon = { newBp }
+        return
+    end
+
+    for i, w in weaponTable do
+        if w.Label == label then
+            weaponTable[i] = BlueprintMerged(w, newBp)
+            return
+        end
+    end
+
+    if insertPos then
+        local size = table.getn(weaponTable)
+        if insertPos > size + 1 then
+            WARN("Tried to insert a weapon bp in a position beyond the end of the Weapon array! Inserting at the end instead.")
+            TableInsert(weaponTable, newBp)
+        else
+            TableInsert(weaponTable, insertPos, newBp)
+        end
+    else
+        TableInsert(weaponTable, newBp)
+    end
+end
+
+--#endregion
 
 local NewDummies = {}
 
@@ -1139,6 +1261,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Modding...')
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    RunModBlueprintFunctions(original_blueprints)
     PostModBlueprints(original_blueprints)
 
     stats.UnitsTotal = table.getsize(original_blueprints.Unit)
@@ -1178,6 +1301,7 @@ function ReloadBlueprint(file)
     ExtractAllMeshBlueprints()
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    RunModBlueprintFunctions(original_blueprints)
     PostModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
