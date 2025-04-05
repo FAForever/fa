@@ -1,0 +1,1 @@
+- (#6715) Enable tree groups to be seen at higher zoom levels. The performance impact of this is minimal.

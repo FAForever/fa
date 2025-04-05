@@ -114,8 +114,10 @@ local function ProcessLOD(prop)
 
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
-    if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
+    if prop.ScriptClass == 'Tree' then
         weighted = 2.6
+    elseif prop.ScriptClass == 'TreeGroup' then
+        weighted = 4.2
     end
 
     -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
@@ -126,12 +128,16 @@ local function ProcessLOD(prop)
         for k = 1, n do
             local data = prop.Display.Mesh.LODs[k]
 
-            -- https://www.desmos.com/calculator (x * x)
-            local factor = (k / n) * (k / n)
-            local LODCutoff = factor * lod
+            -- Do not adjust the LOD of the 'NormalMappedAlpha' shader
+            if data.ShaderName ~= "NormalMappedAlpha" then
 
-            -- sanitize the value
-            data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+                -- https://www.desmos.com/calculator (x * x)
+                local factor = (k / n) * (k / n)
+                local LODCutoff = factor * lod
+
+                -- sanitize the value
+                data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+            end
         end
     end
 end
