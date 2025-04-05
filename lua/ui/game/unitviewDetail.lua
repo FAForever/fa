@@ -759,16 +759,18 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 end
             end
         end
-        --Other parameters
+        -- Other parameters
         lines = {}
         if(bp.Intel.RadarStealthFieldRadius > 0) then
             table.insert(lines, LOCF("<LOC uvd_0022>Radar Stealth: %d, Sonar Stealth: %d",
             bp.Intel.RadarStealthFieldRadius, bp.Intel.SonarStealthFieldRadius))
         end
 
+        -- Insert intel-related parameters
         table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Radar: %d, Sonar: %d, Omni: %d",
             bp.Intel.VisionRadius, bp.Intel.WaterVisionRadius, bp.Intel.RadarRadius, bp.Intel.SonarRadius, bp.Intel.OmniRadius))
         
+        -- Insert movement-related parameters
         if (bp.Physics.MotionType ~= 'RULEUMT_Air' and bp.Physics.MotionType ~= 'RULEUMT_None')
         or (bp.Physics.AltMotionType ~= 'RULEUMT_Air' and bp.Physics.AltMotionType ~= 'RULEUMT_None') then
             table.insert(lines, LOCF("<LOC uvd_0012>Speed: %.3g, Reverse: %.3g, Acceleration: %.3g, Turning: %d",
@@ -783,6 +785,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
             bp.Physics.TransportSpeedReduction))
         end
 
+        -- Insert cap cost if it does not equal 1
         if bp.General.CapCost ~= 1 then
             table.insert(lines, LOCF("<LOC uvd_0023>Cap cost: %.3g",
             bp.General.CapCost))
