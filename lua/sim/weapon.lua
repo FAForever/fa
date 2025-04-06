@@ -244,7 +244,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         end
 
         if yawBone2 then
-            aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2, yawBone2)
+            aimYaw2 = CreateAimController(self, 'Yaw2', yawBone2)
             aimYaw2:SetPrecedence(precedence - 1)
             if EntityCategoryContains(categories.STRUCTURE, unit) then
                 aimYaw2:SetResetPoseTime(9999999)
@@ -296,7 +296,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             end
 
             local turretYawSpeed2 = bp.TurretDualYawSpeed or turretyawspeed
-            aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, turretpitchmin, turretpitchmax, turretpitchspeed)
+            aimYaw2:SetFiringArc(turretYawMin2, turretYawMax2, turretYawSpeed2, 0, 0, 0)
         end
     end,
 
@@ -409,14 +409,14 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     end,
 
     ---@param self Weapon
-    ---@param label string
+    ---@param label string # label of the aim controller that started tracking
     OnStartTracking = function(self, label)
         self:PlayWeaponSound('BarrelStart')
         self:PlayWeaponAmbientSound('BarrelLoop')
     end,
 
     ---@param self Weapon
-    ---@param label string
+    ---@param label string # label of the aim controller that stopped tracking
     OnStopTracking = function(self, label)
         self:PlayWeaponSound('BarrelStop')
         self:StopWeaponAmbientSound('BarrelLoop')

@@ -103,14 +103,15 @@ end
 function CoordinateAttacks()
 end
 
---- Creates a bone manipulator for a weapon, allowing it to aim at a target
+--- Creates a bone manipulator for a weapon, allowing it to aim at a target  
+--- At least one bone must be defined.
 ---@param weapon Weapon
 ---@param label string
----@param turretBone Bone
----@param barrelBone? Bone
+---@param yawBone? Bone # turret bone
+---@param pitchBone? Bone # barrel bone
 ---@param muzzleBone? Bone
 ---@return moho.AimManipulator
-function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
+function CreateAimController(weapon, label, yawBone, pitchBone, muzzleBone)
 end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
