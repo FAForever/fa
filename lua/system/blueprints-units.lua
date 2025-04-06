@@ -328,6 +328,14 @@ local function PostProcessUnit(unit)
         end
     end
 
+    -- Check if a unit's WaterVisionRadius is larger than its SonarRadius
+    if unit.Intel.WaterVisionRadius and unit.Intel.SonarRadius then
+        if unit.Intel.WaterVisionRadius > unit.Intel.SonarRadius then
+            WARN(string.format("SonarRadius of unit ( %s ), is lower than its WaterVisionRadius, it needs to be higher to be relevant!"
+                , tostring(unit.BlueprintId)))
+        end
+    end
+
     -- Fix being able to check for command caps
     local unitGeneral = unit.General
     if unitGeneral then
