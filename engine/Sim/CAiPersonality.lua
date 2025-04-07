@@ -4,7 +4,9 @@
 local CAiPersonality = {}
 
 ---
-function CAiPersonality:AdjustDelay()
+---@param a number
+---@param b number
+function CAiPersonality:AdjustDelay(a, b)
 end
 
 ---
@@ -113,7 +115,7 @@ function CAiPersonality:GetPersonalityName()
 end
 
 ---
---  CAiPersonality:GetPlatoonSize()
+---@return integer
 function CAiPersonality:GetPlatoonSize()
 end
 

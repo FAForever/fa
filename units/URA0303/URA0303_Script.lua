@@ -19,13 +19,20 @@ URA0303 = ClassUnit(CAirUnit) {
         Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
         Missiles2 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
+
+    ---@param self URA0303
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        CAirUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
-        self:RequestRefreshUI()
+        -- Don't turn off stealth for AI so that it uses it by default
+        if self.Brain.BrainType == 'Human' then
+            self:SetScriptBit('RULEUTC_StealthToggle', true)
+        else
+            self:SetMaintenanceConsumptionActive()
+        end
     end,
-    
 }
 
 TypeClass = URA0303

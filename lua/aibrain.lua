@@ -926,7 +926,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param category EntityCategory The categories the units should fit.
     ---@param position Vector The center point to start looking for units.
     ---@param radius number The radius of the circle we look for units in.
-    ---@param alliance AllianceStatus
+    ---@param alliance? AllianceStatus
     ---@return Unit[]
     GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then

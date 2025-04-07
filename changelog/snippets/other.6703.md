@@ -1,0 +1,1 @@
+- (#6703) Update annotation for `IsObserver()`.

@@ -562,4 +562,11 @@ keyDescriptions = {
 
     ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Normal)',
     ['select_torpedo_bombers'] = '<LOC key_desc_0408>Select all Bombers (Torpedo)',
+
+    ['create_build_template_02'] = '<LOC key_desc_create_build_template_02>Create a 2x2 chunk template',
+    ['create_build_template_04'] = '<LOC key_desc_create_build_template_02>Create a 4x4 chunk template',
+    ['create_build_template_08'] = '<LOC key_desc_create_build_template_02>Create a 8x8 chunk template',
+    ['create_build_template_16'] = '<LOC key_desc_create_build_template_02>Create a 16x16 chunk template',
+    ['create_build_template_32'] = '<LOC key_desc_create_build_template_02>Create a 32x32 chunk template',
+
 }
