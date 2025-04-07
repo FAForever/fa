@@ -153,7 +153,6 @@ UnitBlueprint{
         UnitName = "<LOC urs0302_name>Galaxy Class",
     },
     Intel = {
-        RadarRadius = 48,
         VisionRadius = 50,
         WaterVisionRadius = 48,
     },

@@ -151,7 +151,6 @@ UnitBlueprint{
         UnitName = "<LOC xss0302_name>Hauthuum",
     },
     Intel = {
-        RadarRadius = 48,
         VisionRadius = 50,
         WaterVisionRadius = 48,
     },

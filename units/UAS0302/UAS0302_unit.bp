@@ -130,7 +130,6 @@ UnitBlueprint{
         UnitName = "<LOC uas0302_name>Omen Class",
     },
     Intel = {
-        RadarRadius = 48,
         VisionRadius = 50,
         WaterVisionRadius = 48,
     },
