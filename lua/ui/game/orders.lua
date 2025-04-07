@@ -1761,7 +1761,6 @@ local _mouseoverDisplay = setmetatable({}, { __index = { Destroy = Tooltip.Destr
 setmetatable(controls, {
     __index = function(t, k)
         if k == 'mouseoverDisplay' then
-            LOG('__index')
             return _mouseoverDisplay
         else
             return rawget(t, k)
@@ -1769,10 +1768,10 @@ setmetatable(controls, {
     end,
     __newindex = function(t, k, v)
         if k == 'mouseoverDisplay' then
-            LOG('__newindex')
             return
         else
             rawset(t, k, v)
         end
     end,
 })
+--#endregion
