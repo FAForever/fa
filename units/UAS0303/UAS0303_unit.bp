@@ -164,7 +164,6 @@ UnitBlueprint{
     },
     Intel = {
         RadarRadius = 200,
-        SonarRadius = 40,
         VisionRadius = 100,
         WaterVisionRadius = 100,
     },

@@ -92,7 +92,6 @@ UnitBlueprint{
         UnitName = "<LOC ueb2109_name>DN1",
     },
     Intel = {
-        SonarRadius = 36,
         VisionRadius = 12,
         WaterVisionRadius = 44,
     },
