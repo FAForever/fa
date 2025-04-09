@@ -129,6 +129,9 @@ local PlayerLinesHolder = Class()
         for j in lines do
             lines[j] = nil
         end
+        self._i = 1
+        self._curLines = 0
+        self._frameTime = 0
     end
 }
 
@@ -449,8 +452,8 @@ function TacticalPaint()
 end
 
 function Clear()
-    for j in lines do
-        lines[j] = nil
+    for player, holder in linesHolder do
+        holder:ClearAll()
     end
 end
 
