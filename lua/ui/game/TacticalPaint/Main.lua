@@ -351,8 +351,17 @@ local MathFloor = math.floor
 function Main(isReplay)
 
     local KeyMapper = import('/lua/keymap/keymapper.lua')
-    KeyMapper.SetUserKeyAction('Open Tactical Paint canvas', { action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').TacticalPaint()", category = 'Tactical Paint' })
-    KeyMapper.SetUserKeyAction('Clear canvas', { action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').Clear()", category = 'Tactical Paint' })
+    KeyMapper.SetUserKeyAction('Open Tactical Paint canvas',
+        {
+            action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').TacticalPaint()",
+            category = 'Tactical Paint'
+        })
+
+    KeyMapper.SetUserKeyAction('Clear canvas',
+        {
+            action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').Clear()",
+            category = 'Tactical Paint'
+        })
 
     RegisterChatFunc(processPaintData, 'TacticalPaint')
 
