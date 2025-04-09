@@ -242,12 +242,12 @@ end
 local function sendPaintData(data, remove)
     -- local text = data[1].x .. ' ' .. data[1].y .. ' ' .. data[1].z .. ' ' .. data[2].x .. ' ' .. data[2].y .. ' ' ..
     -- data[2].z
-    data.remove = remove
     local msg = {
         to = 'allies',
         TacticalPaint = true,
+        Remove = remove,
         -- text = text,
-        text = data
+        Data = data
     }
     SessionSendChatMessage(FindClients(), msg)
 end
@@ -263,12 +263,7 @@ end
 ---@param pos1 Vector
 ---@param pos2 Vector
 ---@param color string
----@param send boolean
-local function DrawLine(player, pos1, pos2, color, send)
-
-    if send then
-        sendPaintData({ pos1, pos2, color })
-    end
+local function DrawLine(player, pos1, pos2, color)
 
     if VDist2(pos1[1], pos1[3], pos2[1], pos2[3]) < minDist / 2 then
         return
@@ -298,7 +293,8 @@ local function ClearLinesAt(x, z, radiusSq)
 end
 
 local function processPaintData(player, msg)
-    local data = msg.text
+    local data = msg.Data
+    local remove = msg.Remove
     local me = GetFocusArmy()
     -- reprsl(GetArmiesTable())
 
@@ -306,19 +302,23 @@ local function processPaintData(player, msg)
     local isAlly = isAllytoMe(player)
 
     if IsObserver() or not isSenderUs and isAlly then
-        if data.remove then
+        if remove then
             local x, z, offset = data[1], data[2], data[3]
             ClearLinesAt(x, z, offset)
         else
-            DrawLine(player, {
-                data[1][1],
-                data[1][2],
-                data[1][3]
-            }, {
-                data[2][1],
-                data[2][2],
-                data[2][3]
-            }, data[3], false)
+            local holder = linesHolder[player]
+            if not holder then
+                holder = PlayerLinesHolder(getArmyColor(player))
+                linesHolder[player] = holder
+            end
+
+            local prevPos = nil
+            for i, pos in data do
+                if prevPos then
+                    holder:Add(prevPos, pos)
+                end
+                prevPos = pos
+            end
         end
     end
 end
@@ -344,6 +344,8 @@ Canvas = Class(Bitmap)
             :DisableHitTest()
 
         self._text = text
+
+        self._collectedLines = {}
     end,
 
     ---@param self Canvas
@@ -376,17 +378,54 @@ Canvas = Class(Bitmap)
 
     end,
 
+    ---@param self Canvas
+    SendLines = function(self)
+        local lines          = self._collectedLines
+        self._collectedLines = {}
+        local maxPerPackage  = 20
+
+        local n = table.getn(lines)
+        if n > maxPerPackage then
+            local numPackages = math.ceil(n / maxPerPackage)
+            local packageSize = math.ceil(n / numPackages)
+
+            local lineIndex = 1
+
+            for i = 1, numPackages do
+                local package = {}
+                for j = lineIndex, lineIndex + packageSize do
+                    local pos = lines[j]
+                    if pos then
+                        table.insert(package, pos)
+                    end
+                end
+                lineIndex = lineIndex + packageSize
+                sendPaintData(package, false)
+            end
+        else
+            sendPaintData(lines, false)
+        end
+
+    end,
+
     HandleDrawing = function(self, worldview, event)
         local isCanvasActive = self:GetActive()
         if isCanvasActive and
             (
-            event.Type == "MouseMotion" or
+            event.Type == "MouseMotion" or event.Type == "ButtonRelease" or
                 event.Type == "ButtonPress" and (event.Modifiers.Left or event.Modifiers.Right)
             ) then
 
             if event.Type == "ButtonPress" then
                 prevMouseWorldPos = GetMouseWorldPos()
+                table.insert(self._collectedLines, prevMouseWorldPos)
             end
+
+            if event.Type == "ButtonRelease" and not event.Modifiers.Left then
+                prevMouseWorldPos = nil
+                self:SendLines()
+            end
+
 
             local color
             if myColor then
@@ -398,7 +437,8 @@ Canvas = Class(Bitmap)
             if event.Type == "MouseMotion" and event.Modifiers.Left then
                 local pos = GetMouseWorldPos()
                 if VDist2(prevMouseWorldPos[1], prevMouseWorldPos[3], pos[1], pos[3]) > minDist then
-                    DrawLine("me", prevMouseWorldPos, pos, color, true)
+                    table.insert(self._collectedLines, pos)
+                    DrawLine("me", prevMouseWorldPos, pos, color)
                     prevMouseWorldPos = pos
                 end
             elseif event.Type == "MouseMotion" and event.Modifiers.Right then
