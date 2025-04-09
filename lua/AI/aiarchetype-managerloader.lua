@@ -90,7 +90,8 @@ function UnitCapWatchThread(aiBrain)
     -- The cull table describes the types of units we want to cull if we get close to our unit cap
     -- Options :
     -- categories - The category of the units we want to cull
-    -- compare - if we want to validate if another type of unit already exist before we cull them
+    -- compare - If we want to validate if another type of unit already exist before we cull them
+    -- compareTo - The categories we want to compare against
     -- checkAttached - If we want to make sure they are not attached to a transport or air staging before culling them
     -- checkIdle - If we want to make sure they are idle first
     -- Remember that this table will run in order, so we want the most deisred to cull first
@@ -127,7 +128,6 @@ function UnitCapWatchThread(aiBrain)
         T1LandEngineer = {
             categories = categories.MOBILE * categories.TECH1 * categories.LAND * categories.ENGINEER - categories.COMMAND,
             compare = true,
-            compareFrom = categories.MOBILE * categories.TECH1 * categories.LAND * categories.ENGINEER - categories.COMMAND,
             compareTo = categories.MOBILE * categories.LAND * categories.ENGINEER * (categories.TECH2 + categories.TECH3)- categories.COMMAND - categories.SUBCOMMANDER - categories.POD - categories.FIELDENGINEER,
             cullRatio = 0.2,
             checkAttached = true,
@@ -148,7 +148,7 @@ function UnitCapWatchThread(aiBrain)
             local culledUnitCount = 0
             for k, cullType in cullTable do
                 if cullType.compare then
-                    local compareFrom = aiBrain:GetCurrentUnits(cullType.compareFrom)
+                    local compareFrom = aiBrain:GetCurrentUnits(cullType.categories)
                     local compareTo = aiBrain:GetCurrentUnits(cullType.compareTo)
                     if compareTo > 0 and compareFrom > 0 then
                         local ratio = compareFrom / compareTo
