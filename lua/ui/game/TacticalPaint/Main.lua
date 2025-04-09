@@ -67,8 +67,7 @@ local PlayerLinesHolder = Class()
             end
         end
         if k ~= nil then
-            self._lines[k] = nil
-            self._curLines = self._curLines - 1
+            self:Remove(k)
         end
     end,
 
@@ -110,14 +109,14 @@ local PlayerLinesHolder = Class()
             local distSq = dx * dx + dz * dz
             if distSq < radiusSq then
                 removedAny = true
-                lines[j] = nil
+                self:Remove(j)
             else
                 dx     = p2[1] - x
                 dz     = p2[3] - z
                 distSq = dx * dx + dz * dz
                 if distSq < radiusSq then
                     removedAny = true
-                    lines[j] = nil
+                    self:Remove(j)
                 end
             end
         end
