@@ -832,7 +832,7 @@ end
 --- triggered the callback
 ---@return boolean
 local function PassesProfilingAntiCheatCheck()
-    if GetFocusArmy() == GetCurrentCommandSource() then
+    if import("/lua/simutils.lua").OriginalFocusArmy == GetCurrentCommandSource() then
         return SessionIsReplay() or PassesAntiCheatCheck()
     end
     return false

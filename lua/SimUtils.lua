@@ -772,3 +772,5 @@ function DrawBone(entity, bone, length)
     -- Z axis
     DrawLine(pos, pos + forward * length, '0000ff')
 end
+
+OriginalFocusArmy = GetFocusArmy()
