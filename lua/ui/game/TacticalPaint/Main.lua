@@ -1,3 +1,8 @@
+local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
+local Group = import('/lua/maui/group.lua').Group
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local UIUtil = import('/lua/ui/uiutil.lua')
+
 local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local Prefs = import('/lua/user/prefs.lua')
@@ -175,14 +180,6 @@ function isAllytoMe(nickname)
     end
 end
 
-function getKeyBind()
-    for key, value in Prefs.GetFromCurrentProfile('UserKeyMap') do
-        if value == 'Paint Tool' then
-            return keyMap[key]
-        end
-    end
-end
-
 local myColor = getArmyColor()
 
 function FindClients(id)
@@ -322,12 +319,6 @@ local function processPaintData(player, msg)
         end
     end
 end
-
-local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-
 
 ---@class Canvas : Bitmap
 Canvas = Class(Bitmap)
@@ -496,8 +487,6 @@ function Clear()
         holder:ClearAll()
     end
 end
-
-local MathFloor = math.floor
 
 ---@param isReplay boolean
 function Main(isReplay)
