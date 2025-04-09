@@ -11,6 +11,7 @@ PreviousSync = {}
 
 -- Unit specific data that's been sync'd. Data changes are accumulated by merging
 -- the Sync.UnitData table into this table each sync (if there's new data)
+---@type table<EntityId, UnitSyncData>
 UnitData = {}
 
 local UIUtil = import("/lua/ui/uiutil.lua")

@@ -17,8 +17,12 @@ for k, value in SyncDefaults do
     Sync[k] = { }
 end
 
+---@class UnitSyncData
+---@field WepPriority? UnitSyncWepPriority
+
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.
+---@type table<EntityId, { OwnerArmy: Army, Data: UnitSyncData }>
 UnitData = {}
 
 ---@alias EnhancementSyncData table<EnhancementSlot, Enhancement>
