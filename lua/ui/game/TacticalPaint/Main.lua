@@ -3,8 +3,111 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local Prefs = import('/lua/user/prefs.lua')
 local UI_DrawLine = UI_DrawLine
 
-local PrevMouseWorldPos = nil
+local prevMouseWorldPos = nil
 local minDist = 0.5
+local maxLinesPerPlayer = 1000
+
+---@class Line
+---@field p1 Vector
+---@field p2 Vector
+---@field createdAt number
+---@field color Color
+
+---@class PlayerLinesHolder
+---@field _lines Line[]
+---@field _color Color
+---@field _i integer
+---@field _curLines integer
+---@field _frameTime number
+local PlayerLinesHolder = Class()
+{
+    ---@param self PlayerLinesHolder
+    ---@param color Color
+    __init = function(self, color)
+        self._lines = {}
+        self._color = color
+        self._i = 1
+        self._curLines = 0
+        self._frameTime = 0
+    end,
+
+    ---@param self PlayerLinesHolder
+    ---@param pos1 Vector
+    ---@param pos2 Vector
+    Add = function(self, pos1, pos2)
+        self._lines[self._i] = {
+            p1 = pos1,
+            p2 = pos2,
+            createdAt = self._frameTime
+            --"aa" .. string.sub(color, 3),
+            -- lifeTime = Prefs.GetFromCurrentProfile('options')['TPaint_lifetime']
+        }
+        self._i = self._i + 1
+        self._curLines = self._curLines + 1
+    end,
+
+    ---@param self PlayerLinesHolder
+    Remove = function(self, i)
+        self._lines[i] = nil
+        self._curLines = self._curLines - 1
+    end,
+
+    ---@param self PlayerLinesHolder
+    ---@param delta number
+    Render = function(self, delta)
+        local color       = self._color
+        local UI_DrawLine = UI_DrawLine
+
+        for _, line in self._lines do
+            UI_DrawLine(line.p1, line.p2, color, 0.15)
+        end
+
+        self._frameTime = self._frameTime + delta
+    end,
+
+    ---@param self PlayerLinesHolder
+    ---@param x number
+    ---@param z number
+    ---@param radiusSq number
+    ---@return boolean
+    ClearLinesAt = function(self, x, z, radiusSq)
+        local lines = self._lines
+        local removedAny = false
+        for j, line in lines do
+            local p1 = line.p1
+            local p2 = line.p2
+
+            local dx = p1[1] - x
+            local dz = p1[3] - z
+            local distSq = dx * dx + dz * dz
+            if distSq < radiusSq then
+                removedAny = true
+                lines[j] = nil
+            else
+                dx     = p2[1] - x
+                dz     = p2[3] - z
+                distSq = dx * dx + dz * dz
+                if distSq < radiusSq then
+                    removedAny = true
+                    lines[j] = nil
+                end
+            end
+        end
+        return removedAny
+    end,
+
+    ---@param self PlayerLinesHolder
+    ClearAll = function(self)
+        local lines = self._lines
+        for j in lines do
+            lines[j] = nil
+        end
+    end
+}
+
+---@type table<string, PlayerLinesHolder>
+local linesHolder = {}
+
 
 
 function isObs(nickname)
@@ -125,15 +228,13 @@ end
 ---@field lifeTime number
 ---@field color Color
 
----@type Line[]
-local lines = {}
-local i = 1
 
+---@param player string
 ---@param pos1 Vector
 ---@param pos2 Vector
 ---@param color string
 ---@param send boolean
-local function DrawLine(pos1, pos2, color, send)
+local function DrawLine(player, pos1, pos2, color, send)
 
     if send then
         sendPaintData({ pos1, pos2, color })
@@ -143,14 +244,13 @@ local function DrawLine(pos1, pos2, color, send)
         return
     end
 
+    local holder = linesHolder[player]
+    if not holder then
+        holder = PlayerLinesHolder(getArmyColor(player))
+        linesHolder[player] = holder
+    end
 
-    lines[i] = {
-        p1 = pos1,
-        p2 = pos2,
-        color = color, --"aa" .. string.sub(color, 3),
-        -- lifeTime = Prefs.GetFromCurrentProfile('options')['TPaint_lifetime']
-    }
-    i = i + 1
+    holder:Add(pos1, pos2)
 end
 
 ---@param x number
@@ -159,26 +259,11 @@ end
 ---@return boolean
 local function ClearLinesAt(x, z, radiusSq)
     local removedAny = false
-    for j, line in lines do
-        local p1 = line.p1
-        local p2 = line.p2
 
-        local dx = p1[1] - x
-        local dz = p1[3] - z
-        local distSq = dx * dx + dz * dz
-        if distSq < radiusSq then
-            removedAny = true
-            lines[j] = nil
-        else
-            dx     = p2[1] - x
-            dz     = p2[3] - z
-            distSq = dx * dx + dz * dz
-            if distSq < radiusSq then
-                removedAny = true
-                lines[j] = nil
-            end
-        end
+    for player, holder in linesHolder do
+        removedAny = removedAny or holder:ClearLinesAt(x, z, radiusSq)
     end
+
     return removedAny
 end
 
@@ -195,7 +280,7 @@ local function processPaintData(player, msg)
             local x, z, offset = data[1], data[2], data[3]
             ClearLinesAt(x, z, offset)
         else
-            DrawLine({
+            DrawLine(player, {
                 data[1][1],
                 data[1][2],
                 data[1][3]
@@ -212,6 +297,7 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
+
 
 ---@class Canvas : Bitmap
 Canvas = Class(Bitmap)
@@ -254,14 +340,10 @@ Canvas = Class(Bitmap)
     ---@param self Canvas
     ---@param delta number
     Render = function(self, delta)
-        for j, line in lines do
-            -- if line.lifeTime > 0 then
-            -- line.lifeTime = line.lifeTime - delta
-            UI_DrawLine(line.p1, line.p2, line.color, 0.15)
-            -- else
-            --     lines[j] = nil
-            -- end
+        for player, holder in linesHolder do
+            holder:Render(delta)
         end
+
     end,
 
     HandleDrawing = function(self, worldview, event)
@@ -273,7 +355,7 @@ Canvas = Class(Bitmap)
             ) then
 
             if event.Type == "ButtonPress" then
-                PrevMouseWorldPos = GetMouseWorldPos()
+                prevMouseWorldPos = GetMouseWorldPos()
             end
 
             local color
@@ -285,9 +367,9 @@ Canvas = Class(Bitmap)
 
             if event.Type == "MouseMotion" and event.Modifiers.Left then
                 local pos = GetMouseWorldPos()
-                if VDist2(PrevMouseWorldPos[1], PrevMouseWorldPos[3], pos[1], pos[3]) > minDist then
-                    DrawLine(PrevMouseWorldPos, pos, color, true)
-                    PrevMouseWorldPos = pos
+                if VDist2(prevMouseWorldPos[1], prevMouseWorldPos[3], pos[1], pos[3]) > minDist then
+                    DrawLine("me", prevMouseWorldPos, pos, color, true)
+                    prevMouseWorldPos = pos
                 end
             elseif event.Type == "MouseMotion" and event.Modifiers.Right then
                 local offset = GetCamera(worldview._cameraName):GetZoom() / 50
