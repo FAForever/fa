@@ -226,7 +226,7 @@ ProfilerScrollArea = ClassUI(Group) {
 
         -- make as many elements as will fit 
         local element = CreateDefaultElement(self)
-        Layouter(element)
+        previous = Layouter(element)
             :Height(20)
             :AtLeftIn(self)
             :AnchorToBottom(previous)
@@ -260,7 +260,7 @@ ProfilerScrollArea = ClassUI(Group) {
     end,
 
     ---@param self ProfilerScrollArea
-    ---@param elements ProfilerData
+    ---@param elements table
     ---@param count number
     ProvideElements = function(self, elements, count)
         self.Elements = elements
@@ -281,7 +281,7 @@ ProfilerScrollArea = ClassUI(Group) {
     ---@param axis string
     ---@param delta number
     ScrollLines = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.First + math.floor(delta))
+        self:ScrollSetTop(axis, self.First + math.ceil(delta))
     end,
 
     --- Called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
@@ -289,7 +289,7 @@ ProfilerScrollArea = ClassUI(Group) {
     ---@param axis string
     ---@param delta number
     ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.First + math.floor(delta) * self.rowCount)
+        self:ScrollSetTop(axis, self.First + math.ceil(delta) * self.rowCount)
     end,
 
     --- called when the scrollbar wants to set a new visible top line
@@ -299,7 +299,7 @@ ProfilerScrollArea = ClassUI(Group) {
     ScrollSetTop = function(self, axis, top)
         -- compute where we end up
         local size = self.ElementCount
-        local first = math.max(math.min(size - self.ElementCount, math.floor(top)), 0)
+        local first = math.max(math.min(size - self.rowCount, math.ceil(top)), 0)
 
         -- check if it is different
         if first == self.First then

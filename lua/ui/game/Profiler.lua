@@ -629,7 +629,7 @@ local function CreateSearchBar(parent, tab)
     end
     edit.OnTextChanged = function(edit_self, new, old)
         State[tab].Search = new
-        GUI.Tabs[tab].List:ScrollLines(false, 0)
+        GUI.Tabs[tab].list:ScrollLines(false, 0)
     end
 
     return searchbar
