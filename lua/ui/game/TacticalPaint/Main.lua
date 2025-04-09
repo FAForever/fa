@@ -532,10 +532,7 @@ function Main(isReplay)
     ---@param self WorldView
     ---@param event KeyEvent
     WorldView.HandleEvent = function(self, event)
-        local isCanvasActive = self._canvas and self._canvas:HandleDrawing(self, event)
-        if isCanvasActive then
-            return true
-        end
-        return WVH(self, event)
+        local canvas = self._canvas
+        return canvas and canvas:HandleDrawing(self, event) or WVH(self, event)
     end
 end
