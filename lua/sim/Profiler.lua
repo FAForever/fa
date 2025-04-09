@@ -42,32 +42,18 @@ local benchmarkTargetTime = 0.5
 -- parameters as the index 
 local benchmarkBaselines
 
-local function CanUseProfiler()
-    if CheatsEnabled() then
-        SPEW("Profiler can be toggled: game has cheats enabled")
-        return true
-    end
-    if SessionIsReplay() then
-        SPEW("Profiler can be toggled: session is a replay")
-        return true
-    end
-    return false
-end
 
 --- Toggles the profiler on / off
 ---@param army number
 ---@param forceEnable? boolean
-function ToggleProfiler(army, forceEnable)
-    if  not CanUseProfiler() or       -- game currently isn't in a state that would use the profiler
-        GetFocusArmy() ~= army or     -- if we're not the ones that initiated this call, get out
-        (forceEnable and isProfiling) -- let the profiler be on if we are trying to force it on 
-    then
+function ToggleProfiler(forceEnable)
+    if forceEnable and isProfiling then -- let the profiler be on if we are trying to force it on 
         return
     end
 
     if not isProfiling then
         -- Inform us in case of abuse
-        SPEW("Profiler has been toggled on by army: " .. tostring(army))
+        SPEW("Profiler has been toggled on by army: " .. tostring(GetFocusArmy()))
         isProfiling = true
 
         -- Thread to sync information gathered to the UI
@@ -84,7 +70,7 @@ function ToggleProfiler(army, forceEnable)
         end
 
         -- Inform us in case of abuse
-        SPEW("Profiler has been toggled off by army: " .. tostring(army))
+        SPEW("Profiler has been toggled off by army: " .. tostring(GetFocusArmy()))
 
         sethook(nil) -- remove tracking
     end
@@ -130,13 +116,7 @@ function SyncThread()
 end
 
 ---@param army Army
-function FindBenchmarks(army)
-    if not CanUseProfiler() then
-        WARN("Attempt to locate benchmarks while profiler is disabled")
-        return
-    end
-    SPEW("Benchmarks have been searched for by army: " .. tostring(army))
-
+function FindBenchmarks()
     local loader = BenchmarkModuleLoader("/lua/benchmarks")
 
     -- add benchmarks from base game
@@ -159,10 +139,6 @@ end
 ---@param moduleIndex number
 ---@param benchmarkIndex number
 function LoadBenchmark(moduleIndex, benchmarkIndex)
-    if not CanUseProfiler() then
-        WARN("Attempt to load benchmark while profiler is disabled")
-        return
-    end
     local info = benchmarkModules[moduleIndex].benchmarks[benchmarkIndex].info
     if info then
         Sync.BenchmarkInfo = info
@@ -174,10 +150,6 @@ end
 ---@param benchmarkIndex number
 ---@param parameters any[]
 function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
-    if not CanUseProfiler() then
-        WARN("Attempt to run benchmark while profiler is disabled")
-        return
-    end
     if not benchmarkThread then
         local moduleData = benchmarkModules[moduleIndex]
         LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
@@ -189,10 +161,6 @@ end
 
 --- Interrupts a currently running benchmark
 function StopBenchmark()
-    if not CanUseProfiler() then
-        WARN("Attempt to stop benchmark while profiler is disabled")
-        return
-    end
     SPEW("Stopping benchmark")
     benchmarkThread = false
 end

@@ -9,7 +9,6 @@
 
 ---@alias ProfilerTab "Overview" | "Timers" | "Stamps" | "Benchmarks" | "Options"
 
-local GameMain = import("/lua/ui/game/gamemain.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local ProfilerElements = import("/lua/ui/game/profilerelements.lua")
 local ProfilerUtilities = import("/lua/ui/game/profilerutilities.lua")
@@ -148,7 +147,6 @@ function ToggleProfiler()
     SimCallback({
         Func = "ToggleProfiler",
         Args = {
-            Army = GameMain.OriginalFocusArmy,
             ForceEnable = false,
         }
     })
@@ -157,9 +155,8 @@ end
 -- note: this function can be hooked by UI mods to access the window, but the sim still
 -- locks the player out
 
----@param player Army | AIBrain | string
 ---@return boolean
-local function CanUseProfiler(player)
+local function CanUseProfiler()
     return
         sessionInfo.Options.CheatsEnabled == "true" or
         SessionIsReplay()
@@ -168,9 +165,8 @@ end
 
 --- Opens up the window
 function OpenWindow()
-    local originalFocusArmy = GameMain.OriginalFocusArmy
-    if not CanUseProfiler(originalFocusArmy) then
-        WARN("Unable to open Profiler window: no AIs or no cheats")
+    if not CanUseProfiler() then
+        WARN("Unable to open Profiler window")
         return
     end
 
@@ -195,15 +191,12 @@ function OpenWindow()
         -- retrieve benchmarks
         SimCallback({
             Func = "FindBenchmarks",
-            Args = {
-                Army = originalFocusArmy,
-            },
+            Args = {},
         })
         -- toggle the profiler
         SimCallback({
             Func = "ToggleProfiler",
             Args = {
-                Army = originalFocusArmy,
                 ForceEnable = true,
             },
         })
