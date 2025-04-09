@@ -93,7 +93,6 @@ function UnitCapWatchThread(aiBrain)
     -- compare - If we want to validate if another type of unit already exist before we cull them
     -- compareTo - The categories we want to compare against
     -- checkAttached - If we want to make sure they are not attached to a transport or air staging before culling them
-    -- checkIdle - If we want to make sure they are idle first
     -- Remember that this table will run in order, so we want the most deisred to cull first
     -- There is also two configurable settings
     -- cullPressure - Indicates how many units we want to cull per pass. The closer we are to the unit cap the more units we will cull.
@@ -114,7 +113,13 @@ function UnitCapWatchThread(aiBrain)
             checkAttached = true
         },
         T1AirUnits = {
-            categories = categories.MOBILE * categories.TECH1 * categories.AIR - categories.TRANSPORTFOCUS,
+            categories = categories.MOBILE * categories.TECH1 * categories.AIR - categories.TRANSPORTFOCUS - categories.ENGINEER,
+            compare = false,
+            cullRatio = 0.2,
+            checkAttached = true
+        },
+        T1NavalUnits = {
+            categories = categories.MOBILE * categories.TECH1 * categories.NAVAL - categories.ENGINEER,
             compare = false,
             cullRatio = 0.2,
             checkAttached = true
@@ -131,7 +136,6 @@ function UnitCapWatchThread(aiBrain)
             compareTo = categories.MOBILE * categories.LAND * categories.ENGINEER * (categories.TECH2 + categories.TECH3)- categories.COMMAND - categories.SUBCOMMANDER - categories.POD - categories.FIELDENGINEER,
             cullRatio = 0.2,
             checkAttached = true,
-            checkIdle = true
         },
     }
     local unitCapDesiredRatio = 0.9
@@ -155,7 +159,7 @@ function UnitCapWatchThread(aiBrain)
                         if ratio > dynamicRatioThreshold then
                             local toCull = math.min(compareTo, math.ceil(compareTo * ratio * cullType.cullRatio * cullPressure))
                             if toCull > 0 then
-                                culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached, cullType.checkIdle)
+                                culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
                             end
                         end
                     end
@@ -164,7 +168,7 @@ function UnitCapWatchThread(aiBrain)
                     if units > 0 then
                         local toCull = math.min(units, math.ceil(units * cullType.cullRatio * cullPressure))
                         if toCull > 0 then
-                            culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached, cullType.checkIdle)
+                            culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
                         end
                     end
                 end
@@ -176,15 +180,13 @@ function UnitCapWatchThread(aiBrain)
     end
 end
 
-function CullUnitsOfCategory(aiBrain, category, toCull, checkAttached, checkIdle)
+function CullUnitsOfCategory(aiBrain, category, toCull, checkAttached)
+    -- Culls units based on the categories passed in
     local units = aiBrain:GetListOfUnits(category, true)
     local culledUnitCount = 0
     for k, v in units do
         if not v.Dead then
             if checkAttached and v:IsUnitState('Attached') then
-                continue
-            end
-            if checkIdle and not v:IsIdleState() then
                 continue
             end
             culledUnitCount = culledUnitCount + 1
