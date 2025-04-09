@@ -358,7 +358,7 @@ UnitBlueprint{
             MaxRadius = 28,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 36,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/SDFTauCannon01/SDFTauCannon01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
