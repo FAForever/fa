@@ -44,12 +44,40 @@ local PlayerLinesHolder = Class()
         }
         self._i = self._i + 1
         self._curLines = self._curLines + 1
+
+        if self._curLines > maxLinesPerPlayer then
+            self:RemoveOldestLines(self._curLines - maxLinesPerPlayer)
+        end
     end,
 
     ---@param self PlayerLinesHolder
     Remove = function(self, i)
         self._lines[i] = nil
         self._curLines = self._curLines - 1
+    end,
+
+    ---@param self PlayerLinesHolder
+    RemoveOldestLine = function(self)
+        local k, min = nil, self._frameTime
+        for i, line in self._lines do
+            local lineCreatedTime = line.createdAt
+            if lineCreatedTime < min then
+                min = lineCreatedTime
+                k = i
+            end
+        end
+        if k ~= nil then
+            self._lines[k] = nil
+            self._curLines = self._curLines - 1
+        end
+    end,
+
+    ---@param self PlayerLinesHolder
+    ---@param n integer
+    RemoveOldestLines = function(self, n)
+        for i = 1, n do
+            self:RemoveOldestLine()
+        end
     end,
 
     ---@param self PlayerLinesHolder
