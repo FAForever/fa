@@ -134,6 +134,45 @@ function Clear()
     end
 end
 
+local isEnabled = false
+local lock = false
+local function UnlockThread()
+    lock = false
+    WaitSeconds(0.5)
+    while lock do
+        lock = false
+        WaitFrames(5)
+    end
+    isEnabled = false
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
+    for _, view in views do
+        ---@type Canvas?
+        local canvas = view._canvas
+        if canvas then
+            canvas:SetActive(false)
+        end
+    end
+end
+
+function OnHold()
+    lock = true
+    if isEnabled then
+        return
+    end
+    isEnabled = true
+
+    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
+    for _, view in views do
+        ---@type Canvas?
+        local canvas = view._canvas
+        if canvas then
+            canvas:SetActive(true)
+        end
+    end
+
+    ForkThread(UnlockThread)
+end
+
 ---@param isReplay boolean
 function Main(isReplay)
 
@@ -142,6 +181,13 @@ function Main(isReplay)
         {
             action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').TacticalPaint()",
             category = 'Tactical Paint'
+        })
+
+    KeyMapper.SetUserKeyAction('Hold Draw',
+        {
+            action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').OnHold()",
+            category = 'Tactical Paint',
+            keyRepeat = true,
         })
 
     KeyMapper.SetUserKeyAction('Clear canvas',
