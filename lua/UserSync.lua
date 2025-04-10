@@ -364,6 +364,10 @@ function OnSync()
         import("/lua/ui/game/gamemain.lua").OnPause(Sync.Paused);
     end
 
+    if Sync.TacticalPaint then
+        import("/lua/ui/game/TacticalPaint/Main.lua").ProcessSyncPaintData(Sync.TacticalPaint)
+    end
+
     if Sync.PlayerQueries then
         import("/lua/userplayerquery.lua").ProcessQueries(Sync.PlayerQueries)
     end

@@ -1,124 +1,20 @@
-local UI_DrawLine = UI_DrawLine
-
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
-local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
-local FindClients = import('/lua/ui/game/chat.lua').FindClients
 
 local LinesCollection = import("LinesCollection.lua").LinesCollection
 
 local minDist = 0.5
 
----@type table<string, LinesCollection>
+---@type table<integer, LinesCollection>
 local linesHolder = {}
 
 
-function isObs(nickname)
-    for _, player in GetArmiesTable().armiesTable do
-        if player.nickname == nickname then
-            return false
-        end
-    end
-    return true
-end
-
-function getArmyColor(nickname)
-    if nickname then
-        for _, player in GetArmiesTable().armiesTable do
-            if player.nickname == nickname then
-                return player.color
-            end
-        end
-    end
-    local me = GetFocusArmy()
-
-    return GetArmiesTable().armiesTable[me].color
-end
-
-function isAllytoMe(nickname)
-    local focus = GetFocusArmy()
-    if focus == -1 then
-        return false
-    end
-
-    for id, player in GetArmiesTable().armiesTable do
-        if player.nickname == nickname then
-            return IsAlly(focus, id)
-        end
-    end
-end
-
-local myColor = getArmyColor()
-
-function FindClients(id)
-    local t = GetArmiesTable()
-    local focus = t.focusArmy
-    local result = {}
-    if focus == -1 then
-        for index, client in GetSessionClients() do
-            if not client.connected then
-                continue
-            end
-            local playerIsObserver = true
-            for id, player in GetArmiesTable().armiesTable do
-                if player.outOfGame and player.human and player.nickname == client.name then
-                    table.insert(result, index)
-                    playerIsObserver = false
-                    break
-                elseif player.nickname == client.name then
-                    playerIsObserver = false
-                    break
-                end
-            end
-            if playerIsObserver then
-                table.insert(result, index)
-            end
-        end
-    else
-        local srcs = {}
-        for army, info in t.armiesTable do
-            if id then
-                if army == id then
-                    for k, cmdsrc in info.authorizedCommandSources do
-                        srcs[cmdsrc] = true
-                    end
-                    break
-                end
-            else
-                if IsAlly(focus, army) then
-                    for k, cmdsrc in info.authorizedCommandSources do
-                        srcs[cmdsrc] = true
-                    end
-                end
-            end
-        end
-        for index, client in GetSessionClients() do
-            for k, cmdsrc in client.authorizedCommandSources do
-                if srcs[cmdsrc] then
-                    table.insert(result, index)
-                    break
-                end
-            end
-        end
-    end
-    return result
-end
-
-local function SendPaintData(data, remove)
-    -- local text = data[1].x .. ' ' .. data[1].y .. ' ' .. data[1].z .. ' ' .. data[2].x .. ' ' .. data[2].y .. ' ' ..
-    -- data[2].z
-    local msg = {
-        to = 'allies',
-        TacticalPaint = true,
-        Remove = remove,
-        -- text = text,
-        Data = data
-    }
-    SessionSendChatMessage(FindClients(), msg)
+local function GetArmyColor(id)
+    return GetArmiesTable().armiesTable[id].color or "ffffffff"
 end
 
 ---@class Line
@@ -128,11 +24,10 @@ end
 ---@field color Color
 
 
----@param player string
+---@param player integer
 ---@param pos1 Vector
 ---@param pos2 Vector
----@param color string
-local function DrawLine(player, pos1, pos2, color)
+local function DrawLine(player, pos1, pos2)
 
     if VDist2(pos1[1], pos1[3], pos2[1], pos2[3]) < minDist / 2 then
         return
@@ -140,7 +35,7 @@ local function DrawLine(player, pos1, pos2, color)
 
     local holder = linesHolder[player]
     if not holder then
-        holder = LinesCollection(getArmyColor(player))
+        holder = LinesCollection(GetArmyColor(player))
         linesHolder[player] = holder
     end
 
@@ -161,33 +56,59 @@ local function ClearLinesAt(x, z, radiusSq)
     return removedAny
 end
 
-local function ProcessPaintData(player, msg)
-    local data = msg.Data
-    local remove = msg.Remove
+---@param id integer
+---@param tdata TacticalPaintData
+local function ProcessPaintData(id, tdata)
+    local data = tdata.Data
+    local remove = tdata.Remove
     local me = GetFocusArmy()
     -- reprsl(GetArmiesTable())
+    if me == id then
+        return
+    end
 
-    local isSenderUs = GetArmiesTable().armiesTable[me].nickname == player
-    local isAlly = isAllytoMe(player)
+    if not (IsObserver() or IsAlly(me, id)) then
+        return
+    end
 
-    if IsObserver() or not isSenderUs and isAlly then
-        if remove then
-            local x, z, offset = data[1], data[2], data[3]
-            ClearLinesAt(x, z, offset)
-        else
-            local holder = linesHolder[player]
-            if not holder then
-                holder = LinesCollection(getArmyColor(player))
-                linesHolder[player] = holder
+    if remove then
+        local x, z, offset = data[1], data[2], data[3]
+        ClearLinesAt(x, z, offset)
+    else
+        local holder = linesHolder[id]
+        if not holder then
+            holder = LinesCollection(GetArmyColor(id))
+            linesHolder[id] = holder
+        end
+
+        local prevPos = nil
+        for i, pos in data do
+            if prevPos then
+                holder:Add(prevPos, pos)
             end
+            prevPos = pos
+        end
+    end
+end
 
-            local prevPos = nil
-            for i, pos in data do
-                if prevPos then
-                    holder:Add(prevPos, pos)
-                end
-                prevPos = pos
-            end
+---@param data any
+---@param remove boolean
+local function SendPaintData(data, remove)
+
+    SimCallback({
+        Func = "TacticalPaint",
+        Args = {
+            Data = data,
+            Remove = remove,
+        },
+    })
+end
+
+---@param syncData SyncTacticalPaintData
+function ProcessSyncPaintData(syncData)
+    for i, data in pairs(syncData) do
+        for _, samples in data do
+            ProcessPaintData(i, samples)
         end
     end
 end
@@ -216,15 +137,6 @@ Canvas = Class(Bitmap)
 
         self._collectedLines = {}
         self._prevMousePos = nil
-
-        local color
-        if myColor then
-            color = myColor
-        else
-            color = string.lower(Prefs.GetFromCurrentProfile('options')['TPaintobs_color'] or 'ffffffff')
-        end
-
-        self._color = color
     end,
 
     ---@param self Canvas
@@ -302,7 +214,7 @@ Canvas = Class(Bitmap)
         if prevMouseWorldPos then
             if VDist2(prevMouseWorldPos[1], prevMouseWorldPos[3], pos[1], pos[3]) > minDist then
                 table.insert(self._collectedLines, pos)
-                DrawLine("me", prevMouseWorldPos, pos, self._color)
+                DrawLine(GetFocusArmy(), prevMouseWorldPos, pos)
                 self._prevMousePos = pos
             end
         end
@@ -424,8 +336,6 @@ function Main(isReplay)
             action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').Clear()",
             category = 'Tactical Paint'
         })
-
-    RegisterChatFunc(ProcessPaintData, 'TacticalPaint')
 
     local WorldView = import("/lua/ui/controls/worldview.lua").WorldView
 
