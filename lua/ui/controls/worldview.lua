@@ -35,7 +35,7 @@ local KeyCodeShift = 16
 local unitsToWeaponsCached = { }
 
 ---@class Renderable : Destroyable
----@field OnRender fun(self:Renderable, worldView:WorldView)
+---@field OnRender fun(self:Renderable, delta:number, worldView:WorldView)
 
 ---@class WorldViewDecalData
 ---@field texture string
@@ -221,6 +221,7 @@ local orderToCursorCallback = {
 ---@field _displayName string       # Used in the interface
 ---@field _order number             # Appears unused
 ---@field _registered boolean       # Flag that indicates if this world view is registered with the world view manager.
+---@field _canvas Canvas?
 ---@field Cursor table
 ---@field CursorTrash TrashBag
 ---@field CursorLastEvent any
@@ -262,7 +263,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self.Trash = TrashBag()
 
         self.Renderables = {}
-
     end,
 
     ---@param self WorldView
@@ -916,6 +916,12 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param event any
     ---@return boolean
     HandleEvent = function(self, event)
+
+        local canvas = self._canvas
+        if canvas and canvas:HandleDrawing(self, event) then
+            return true
+        end
+
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
             self.CursorOverWorld = true
             if not table.empty(self.Cursor) then
