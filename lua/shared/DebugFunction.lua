@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 --- A library dedicated to investigating the bytecode of functions.
 --- At a minimum, it can be used like
 ---
