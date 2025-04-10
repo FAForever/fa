@@ -95,6 +95,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
                 SimCallback({
                     Func = SyncCategory,
                     Args = {
+                        Identifier = self.ActivePainting.Identifier,
                         Samples = self.ActivePainting.Samples
                     }
                 })
@@ -146,18 +147,29 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             string.len(painting.Color) ~= 8 or -- value should have exactly 8 characters
             not ParseColor(painting.Color) -- value should be a valid color (e.g., ff112233)
         then
+            if self.EnabledWarnings then
+                WARN("Received painting with a malformed color")
+            end
+
             return false
         end
 
         if not painting.Identifier or -- value should exist
             type(painting.Identifier) ~= 'string' -- value should be a string
         then
+            if self.EnabledWarnings then
+                WARN("Received painting with a malformed identifier")
+            end
             return false
         end
 
         if not painting.Samples or -- value should exist
             type(painting.Samples) ~= 'table' -- value should be a table
         then
+            if self.EnabledWarnings then
+                WARN("Received painting with malformed samples")
+            end
+
             return false
         end
 
