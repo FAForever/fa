@@ -82,6 +82,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     HandleEvent = function(self, event)
         if event.Type == 'MouseMotion' and IsKeyDown(17) then
             if not self.ActivePainting then
+                -- we use import directly for developer convenience: it enables you to reload the file without restarting
                 self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
                     self.WorldView, "ffffffff", 0.15
                 )
@@ -101,7 +102,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
                 })
 
                 -- turn it into a regular painting
-                -- we use import directly for developer convenience
+                -- we use import directly for developer convenience: it enables you to reload the file without restarting
                 local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
                     self.WorldView,
                     self.ActivePainting.Samples,
@@ -198,7 +199,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return
         end
 
-        -- we use import directly for developer convenience
+        -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
             self.WorldView, sharedPainting.Samples, sharedPainting.Color, 0.15, PaintingDuration
         )
