@@ -326,6 +326,8 @@ end
 ---@field _color Color
 Canvas = Class(Bitmap)
 {
+    ---@param self Canvas
+    ---@param parent Control
     __init = function(self, parent)
         Bitmap.__init(self, parent)
         self._active = false
@@ -341,7 +343,6 @@ Canvas = Class(Bitmap)
 
         self._collectedLines = {}
         self._prevMousePos = nil
-
 
         local color
         if myColor then
@@ -371,6 +372,8 @@ Canvas = Class(Bitmap)
             self:DisableHitTest()
             -- self:SetAlpha(0.0)
             self._text:Hide()
+
+            self:OnDrawEnd()
         end
     end,
 
@@ -413,6 +416,7 @@ Canvas = Class(Bitmap)
 
     end,
 
+    ---@param self Canvas
     OnDrawStart = function(self)
         self._prevMousePos = GetMouseWorldPos()
         table.insert(self._collectedLines, self._prevMousePos)
@@ -444,6 +448,7 @@ Canvas = Class(Bitmap)
         end
     end,
 
+    ---@param self Canvas
     OnDrawEnd = function(self)
         self._prevMousePos = nil
         self:SendLines()
