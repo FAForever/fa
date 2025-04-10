@@ -1,5 +1,7 @@
+local GetGameTimeSeconds = GetGameTimeSeconds
 local UI_DrawLine = UI_DrawLine
 
+local decayTime = 60
 local maxLinesPerPlayer = 1000
 
 ---@class Line
@@ -13,7 +15,7 @@ local maxLinesPerPlayer = 1000
 ---@field _color Color
 ---@field _i integer
 ---@field _curLines integer
----@field _frameTime number
+---@field _time number
 LinesCollection = Class()
 {
     ---@param self LinesCollection
@@ -23,7 +25,7 @@ LinesCollection = Class()
         self._color = color
         self._i = 1
         self._curLines = 0
-        self._frameTime = 0
+        self._time = 0
     end,
 
     ---@param self LinesCollection
@@ -33,7 +35,7 @@ LinesCollection = Class()
         self._lines[self._i] = {
             p1 = pos1,
             p2 = pos2,
-            createdAt = self._frameTime
+            createdAt = self._time
         }
         self._i = self._i + 1
         self._curLines = self._curLines + 1
@@ -51,7 +53,7 @@ LinesCollection = Class()
 
     ---@param self LinesCollection
     RemoveOldestLine = function(self)
-        local k, min = nil, self._frameTime
+        local k, min = nil, self._time
         for i, line in self._lines do
             local lineCreatedTime = line.createdAt
             if lineCreatedTime < min then
@@ -75,14 +77,19 @@ LinesCollection = Class()
     ---@param self LinesCollection
     ---@param delta number
     Render = function(self, delta)
-        local color       = self._color
         local UI_DrawLine = UI_DrawLine
+        local color       = self._color
+        local time        = GetGameTimeSeconds()
+        local lines       = self._lines
 
-        for _, line in self._lines do
+        for i, line in lines do
             UI_DrawLine(line.p1, line.p2, color, 0.15)
+            if line.createdAt + decayTime < time then
+                self:Remove(i)
+            end
         end
 
-        self._frameTime = self._frameTime + delta
+        self._time = time
     end,
 
     ---@param self LinesCollection
@@ -124,6 +131,6 @@ LinesCollection = Class()
         end
         self._i = 1
         self._curLines = 0
-        self._frameTime = 0
+        self._time = 0
     end
 }
