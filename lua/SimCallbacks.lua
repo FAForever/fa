@@ -811,6 +811,24 @@ end
 
 --#endregion
 
+--#region UI related functionality
+
+---@param data UISharedPainting
+Callbacks.SharePainting = function(data)
+    -- ignore paintings of players we're not allied with
+    if not IsAlly(GetFocusArmy(), GetCurrentCommandSource()) then
+        return
+    end
+
+    -- TODO: determine color
+    data.Color = "55ffffff"
+
+    Sync.SharePainting = Sync.SharePainting or {}
+    table.insert(Sync.SharePainting, data)
+end
+
+--#endregion
+
 -------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
