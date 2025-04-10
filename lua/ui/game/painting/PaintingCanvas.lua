@@ -37,7 +37,8 @@ local SyncCategory = 'SharePainting'
 ---@field Identifier string
 ---@field Samples UIPaintingSample[]
 ---@field Color Color
----@field CommandSource? number
+---@field PeerId? number
+---@field PeerName? string
 
 --- A painting canvas that is responsible for registering the painting efforts of
 --- players. This involves both the painting itself, as the sharing and receiving
@@ -188,15 +189,26 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         local armiesTable = GetArmiesTable().armiesTable
 
         -- if we receive it from the sim then there will be a command source to match
-        if sharedPainting.CommandSource then
+        if sharedPainting.PeerId then
             for k = 1, table.getn(armiesTable) do
                 local armyInfo = armiesTable[k]
-                if table.find(armyInfo.authorizedCommandSources, sharedPainting.CommandSource) then
+                if table.find(armyInfo.authorizedCommandSources, sharedPainting.PeerId) then
                     return armyInfo.color
                 end
             end
         end
 
+        -- if we receive it from a chat message then there will be a peer name
+        if sharedPainting.PeerName then
+            for k = 1, table.getn(armiesTable) do
+                local armyInfo = armiesTable[k]
+                if armyInfo.nickname == sharedPainting.PeerName then
+                    return armyInfo.color
+                end
+            end
+        end
+
+        -- what, how!!
         return 'ffffffff'
     end,
 

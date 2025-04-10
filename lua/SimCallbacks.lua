@@ -824,7 +824,9 @@ Callbacks.SharePainting = function(data)
         return
     end
 
-    data.CommandSource = GetCurrentCommandSource()
+    -- used to determine the color of the painting
+    data.PeerId = GetCurrentCommandSource()
+    data.PeerName = GetArmyBrain(data.PeerId).Nickname
 
     Sync.SharePainting = Sync.SharePainting or {}
     table.insert(Sync.SharePainting, data)
