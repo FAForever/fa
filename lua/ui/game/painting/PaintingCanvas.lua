@@ -37,6 +37,7 @@ local SyncCategory = 'SharePainting'
 ---@field Identifier string
 ---@field Samples UIPaintingSample[]
 ---@field Color Color
+---@field CommandSource? number
 
 --- A painting canvas that is responsible for registering the painting efforts of
 --- players. This involves both the painting itself, as the sharing and receiving
@@ -84,7 +85,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             if not self.ActivePainting then
                 -- we use import directly for developer convenience: it enables you to reload the file without restarting
                 self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
-                    self.WorldView, "ffffffff", 0.15
+                    self.WorldView, self:ComputeColorOfActivePainting(), 0.15
                 )
             end
 
@@ -143,18 +144,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param painting UISharedPainting
     ---@return boolean
     CorrectPaintingFormat = function(self, painting)
-        if not painting.Color or -- value should exist
-            type(painting.Color) ~= 'string' or -- value should be a string
-            string.len(painting.Color) ~= 8 or -- value should have exactly 8 characters
-            not ParseColor(painting.Color) -- value should be a valid color (e.g., ff112233)
-        then
-            if self.EnabledWarnings then
-                WARN("Received painting with a malformed color")
-            end
-
-            return false
-        end
-
         if not painting.Identifier or -- value should exist
             type(painting.Identifier) ~= 'string' -- value should be a string
         then
@@ -175,6 +164,40 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
 
         return true
+    end,
+
+    --- Computes the color of the active painting.
+    ---@param self UIPaintingCanvas
+    ComputeColorOfActivePainting = function(self)
+
+        -- in this case we just want to use the color of the 
+        -- current focus army. This may not always match the
+        -- command source, but the color is only visible to 
+        -- the person drawing it and not to the rest of the
+        -- game.
+
+        local armiesTable = GetArmiesTable().armiesTable
+        return armiesTable[GetFocusArmy()].color
+    end,
+
+    --- Computes the color of a shared painting.
+    ---@param self UIPaintingCanvas
+    ---@param sharedPainting UISharedPainting
+    ---@return Color
+    ComputeColorOfSharedPainting = function(self, sharedPainting)
+        local armiesTable = GetArmiesTable().armiesTable
+
+        -- if we receive it from the sim then there will be a command source to match
+        if sharedPainting.CommandSource then
+            for k = 1, table.getn(armiesTable) do
+                local armyInfo = armiesTable[k]
+                if table.find(armyInfo.authorizedCommandSources, sharedPainting.CommandSource) then
+                    return armyInfo.color
+                end
+            end
+        end
+
+        return 'ffffffff'
     end,
 
     --- Attempts to add a painting that is shared by peers.
@@ -199,9 +222,11 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return
         end
 
+        local paintingColor = self:ComputeColorOfSharedPainting(sharedPainting)
+
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.WorldView, sharedPainting.Samples, sharedPainting.Color, 0.15, PaintingDuration
+            self.WorldView, sharedPainting.Samples, paintingColor, 0.15, PaintingDuration
         )
         self:AddPainting(painting)
     end,

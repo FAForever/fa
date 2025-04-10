@@ -824,8 +824,7 @@ Callbacks.SharePainting = function(data)
         return
     end
 
-    -- TODO: determine color
-    data.Color = "55ffffff"
+    data.CommandSource = GetCurrentCommandSource()
 
     Sync.SharePainting = Sync.SharePainting or {}
     table.insert(Sync.SharePainting, data)
