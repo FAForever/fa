@@ -606,6 +606,16 @@ Tooltips = {
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
+    options_painting = {
+        title = "<LOC options_painting_title>Make and receive paintings",
+        description = "<LOC options_painting_description>When enabled, you can make and receive paintings to or from other players.",
+    },
+
+    options_painting_chat_message = {
+        title = "<LOC options_painting_chat_message_title>Show message in chat of painting",
+        description = "<LOC OPTIONS_0318>When enabled, you will receive a chat message when you made or receiving a painting.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",

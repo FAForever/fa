@@ -786,6 +786,28 @@ options = {
             },
 
             {
+                title = '<LOC OPTIONS_0323>Painting features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC options_painting_title>Make and receive paintings",
+                key = 'painting',
+                type = 'toggle',
+                default = 'on',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 'off' },
+                        { text = "<LOC _On>On", key = 'on' },
+                    },
+                },
+            },
+
+            {
                 title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
 

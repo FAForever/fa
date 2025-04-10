@@ -82,6 +82,12 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
+
+        -- feature: enable/disable the painting feature
+        if GetOptions("painting") ~= "on" then
+            return false
+        end
+
         if event.Type == 'MouseMotion' and IsKeyDown(17) then
             if not self.ActivePainting then
                 -- we use import directly for developer convenience: it enables you to reload the file without restarting
@@ -219,6 +225,12 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param self UIPaintingCanvas
     ---@param sharedPainting UISharedPainting
     AddSharedPainting = function(self, sharedPainting)
+
+        -- feature: enable/disable the painting feature
+        if GetOptions("painting") ~= "on" then
+            return
+        end
+
         -- do not allow malformed paintings
         if not self:CorrectPaintingFormat(sharedPainting) then
             return
