@@ -309,7 +309,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- callbacks for launcher to have an idea what is going on for AIs
         local launcher = self.Launcher
         if not IsDestroyed(launcher) then
-            launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
+            launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition(), self)
 
             -- keep track of the number of intercepted missiles
             if not IsDestroyed(instigator) and instigator.GetStat then
