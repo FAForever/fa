@@ -15,7 +15,6 @@ local maxLinesPerPlayer = 1000
 ---@field _color Color
 ---@field _i integer
 ---@field _curLines integer
----@field _time number
 LinesCollection = Class()
 {
     ---@param self LinesCollection
@@ -25,7 +24,6 @@ LinesCollection = Class()
         self._color = color
         self._i = 1
         self._curLines = 0
-        self._time = 0
     end,
 
     ---@param self LinesCollection
@@ -35,7 +33,7 @@ LinesCollection = Class()
         self._lines[self._i] = {
             p1 = pos1,
             p2 = pos2,
-            createdAt = self._time
+            createdAt = GetGameTimeSeconds()
         }
         self._i = self._i + 1
         self._curLines = self._curLines + 1
@@ -53,7 +51,7 @@ LinesCollection = Class()
 
     ---@param self LinesCollection
     RemoveOldestLine = function(self)
-        local k, min = nil, self._time
+        local k, min = nil, GetGameTimeSeconds()
         for i, line in self._lines do
             local lineCreatedTime = line.createdAt
             if lineCreatedTime < min then
@@ -89,8 +87,6 @@ LinesCollection = Class()
                 UI_DrawLine(line.p1, line.p2, color, 0.15)
             end
         end
-
-        self._time = time
     end,
 
     ---@param self LinesCollection
@@ -132,6 +128,5 @@ LinesCollection = Class()
         end
         self._i = 1
         self._curLines = 0
-        self._time = 0
     end
 }
