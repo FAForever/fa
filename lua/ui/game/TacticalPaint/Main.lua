@@ -94,7 +94,15 @@ end
 ---@param data any
 ---@param remove boolean
 local function SendPaintData(data, remove)
-
+    if GetFocusArmy() == -1 then
+        local FindClients = import('/lua/ui/game/chat.lua').FindClients
+        SessionSendChatMessage(FindClients(), {
+            TacticalPaint = true,
+            Remove = remove,
+            Data = data
+        })
+        return
+    end
     SimCallback({
         Func = "TacticalPaint",
         Args = {
@@ -338,6 +346,17 @@ function Main(isReplay)
         })
 
     local WorldView = import("/lua/ui/controls/worldview.lua").WorldView
+
+    if GetFocusArmy() == -1 then
+        import('/lua/ui/game/gamemain.lua').RegisterChatFunc(function(sender, data)
+            for i, armyData in GetArmiesTable().armiesTable do
+                if armyData.nickname == sender then
+                    return
+                end
+            end
+            ProcessPaintData(-1, data)
+        end, 'TacticalPaint')
+    end
 
     local WorldViewOnRender = WorldView.OnRenderWorld
     WorldView.OnRenderWorld = function(self, delta)
