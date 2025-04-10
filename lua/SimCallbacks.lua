@@ -815,8 +815,12 @@ end
 
 ---@param data UISharedPainting
 Callbacks.SharePainting = function(data)
-    -- ignore paintings of players we're not allied with
-    if not IsAlly(GetFocusArmy(), GetCurrentCommandSource()) then
+    -- spectators should be able to see all paintings
+    local isSpectator = GetFocusArmy() == -1
+
+    -- players should be able to see paintings from allies
+    local fromAlly = IsAlly(GetFocusArmy(), GetCurrentCommandSource())
+    if not (isSpectator or fromAlly) then
         return
     end
 
