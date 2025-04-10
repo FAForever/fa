@@ -8,7 +8,6 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local Prefs = import('/lua/user/prefs.lua')
 local UI_DrawLine = UI_DrawLine
 
-local prevMouseWorldPos = nil
 local minDist = 0.5
 local maxLinesPerPlayer = 1000
 
@@ -236,7 +235,7 @@ function FindClients(id)
     return result
 end
 
-local function sendPaintData(data, remove)
+local function SendPaintData(data, remove)
     -- local text = data[1].x .. ' ' .. data[1].y .. ' ' .. data[1].z .. ' ' .. data[2].x .. ' ' .. data[2].y .. ' ' ..
     -- data[2].z
     local msg = {
@@ -289,7 +288,7 @@ local function ClearLinesAt(x, z, radiusSq)
     return removedAny
 end
 
-local function processPaintData(player, msg)
+local function ProcessPaintData(player, msg)
     local data = msg.Data
     local remove = msg.Remove
     local me = GetFocusArmy()
@@ -321,6 +320,10 @@ local function processPaintData(player, msg)
 end
 
 ---@class Canvas : Bitmap
+---@field _text Text
+---@field _collectedLines Line[]
+---@field _prevMousePos Vector?
+---@field _color Color
 Canvas = Class(Bitmap)
 {
     __init = function(self, parent)
@@ -337,6 +340,17 @@ Canvas = Class(Bitmap)
         self._text = text
 
         self._collectedLines = {}
+        self._prevMousePos = nil
+
+
+        local color
+        if myColor then
+            color = myColor
+        else
+            color = string.lower(Prefs.GetFromCurrentProfile('options')['TPaintobs_color'] or 'ffffffff')
+        end
+
+        self._color = color
     end,
 
     ---@param self Canvas
@@ -391,59 +405,88 @@ Canvas = Class(Bitmap)
                     end
                 end
                 lineIndex = lineIndex + packageSize
-                sendPaintData(package, false)
+                SendPaintData(package, false)
             end
         elseif n > 0 then
-            sendPaintData(lines, false)
+            SendPaintData(lines, false)
         end
 
     end,
 
+    OnDrawStart = function(self)
+        self._prevMousePos = GetMouseWorldPos()
+        table.insert(self._collectedLines, self._prevMousePos)
+    end,
+
+    ---@param self Canvas
+    ---@param pos Vector
+    OnDraw = function(self, pos)
+        local prevMouseWorldPos = self._prevMousePos
+        if prevMouseWorldPos then
+            if VDist2(prevMouseWorldPos[1], prevMouseWorldPos[3], pos[1], pos[3]) > minDist then
+                table.insert(self._collectedLines, pos)
+                DrawLine("me", prevMouseWorldPos, pos, self._color)
+                self._prevMousePos = pos
+            end
+        end
+    end,
+
+    ---@param self Canvas
+    ---@param pos Vector
+    ---@param radius number
+    OnErase = function(self, pos, radius)
+        radius = radius * radius
+        local x, z = pos[1], pos[3]
+        local wasRemoved = ClearLinesAt(x, z, radius)
+
+        if wasRemoved then
+            SendPaintData({ x, z, radius }, true)
+        end
+    end,
+
+    OnDrawEnd = function(self)
+        self._prevMousePos = nil
+        self:SendLines()
+    end,
+
+    ---@param self Canvas
+    ---@param worldview WorldView
+    ---@param event KeyEvent
+    ---@return boolean
     HandleDrawing = function(self, worldview, event)
+
         local isCanvasActive = self:GetActive()
-        if isCanvasActive and
-            (
-            event.Type == "MouseMotion" or event.Type == "ButtonRelease" or
-                event.Type == "ButtonPress" and (event.Modifiers.Left or event.Modifiers.Right)
-            ) then
+        if not isCanvasActive then
+            return false
+        end
 
-            if event.Type == "ButtonPress" then
-                prevMouseWorldPos = GetMouseWorldPos()
-                table.insert(self._collectedLines, prevMouseWorldPos)
+        local isEventMotion = event.Type == "MouseMotion"
+        local isEventPress = event.Type == "ButtonPress"
+        local isEventRelease = event.Type == "ButtonRelease"
+        local isModLeft = event.Modifiers.Left
+        local isModRight = event.Modifiers.Right
+
+        if isEventRelease or (isEventMotion or isEventPress) and (isModLeft or isModRight) then
+
+            if isEventPress and isModLeft then
+                self:OnDrawStart()
             end
 
-            if event.Type == "ButtonRelease" and not event.Modifiers.Left then
-                prevMouseWorldPos = nil
-                self:SendLines()
+            if isEventRelease and not isModLeft then
+                self:OnDrawEnd()
             end
 
-
-            local color
-            if myColor then
-                color = myColor
-            else
-                color = string.lower(Prefs.GetFromCurrentProfile('options')['TPaintobs_color'] or 'ffffffff')
-            end
-
-            if event.Type == "MouseMotion" and event.Modifiers.Left then
+            if isEventMotion then
                 local pos = GetMouseWorldPos()
-                if VDist2(prevMouseWorldPos[1], prevMouseWorldPos[3], pos[1], pos[3]) > minDist then
-                    table.insert(self._collectedLines, pos)
-                    DrawLine("me", prevMouseWorldPos, pos, color)
-                    prevMouseWorldPos = pos
-                end
-            elseif event.Type == "MouseMotion" and event.Modifiers.Right then
-                local offset = GetCamera(worldview._cameraName):GetZoom() / 50
-                offset = offset * offset
-                local pos = GetMouseWorldPos()
-                local x, z = pos[1], pos[3]
-                local wasRemoved = ClearLinesAt(x, z, offset)
 
-                if wasRemoved then
-                    sendPaintData({ x, z, offset }, true)
+                if isModLeft then
+                    self:OnDraw(pos)
+                elseif isModRight then
+                    local offset = GetCamera(worldview._cameraName):GetZoom() / 50
+                    self:OnErase(pos, offset)
                 end
-
             end
+
             return true
         end
         return false
@@ -504,7 +547,7 @@ function Main(isReplay)
             category = 'Tactical Paint'
         })
 
-    RegisterChatFunc(processPaintData, 'TacticalPaint')
+    RegisterChatFunc(ProcessPaintData, 'TacticalPaint')
 
     local WorldView = import("/lua/ui/controls/worldview.lua").WorldView
 
