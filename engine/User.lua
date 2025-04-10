@@ -1288,7 +1288,7 @@ end
 function UIZoomTo(units, seconds)
 end
 
----Draws circle in world. Must be called within `WorldView:OnRenderWorld`
+--- Draws a circle in world. Must be called within `WorldView:OnRenderWorld`
 ---@param pos Vector
 ---@param size number
 ---@param color Color
@@ -1296,12 +1296,20 @@ end
 function UI_DrawCircle(pos, size, color, thickness)
 end
 
----Draws rectangle in world. Must be called within `WorldView:OnRenderWorld`
+--- Draws a rectangle in world. Must be called within `WorldView:OnRenderWorld`
 ---@param pos Vector
 ---@param size number
 ---@param color Color
 ---@param thickness? number
 function UI_DrawRect(pos, size, color, thickness)
+end
+
+--- Draws a line in world. Must be called within `WorldView:OnRenderWorld`
+---@param position1 Vector
+---@param position2 Vector
+---@param color Color
+---@param thickness? number
+function UI_DrawLine(position1, position2, color, thickness)
 end
 
 ---
