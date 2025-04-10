@@ -39,7 +39,7 @@ Canvas = Class(Bitmap)
             :Over(self)
             :DisableHitTest()
 
-        local hideBtn = UIUtil.CreateButtonStd(self, '/BUTTON/medium/', "Hide / Show", 20)
+        local hideBtn = UIUtil.CreateButtonStd(self, '/BUTTON/medium/', "Hide", 20)
         LayoutFor(hideBtn)
             :Below(text, 10)
             :AtHorizontalCenterIn(text)
@@ -47,8 +47,14 @@ Canvas = Class(Bitmap)
             :Over(self)
             :EnableHitTest()
 
+        ---@param btn Button
         hideBtn.OnClick = function(btn)
             self._isHiddenLines = not self._isHiddenLines
+            if self._isHiddenLines then
+                btn.label:SetText("Show")
+            else
+                btn.label:SetText("Hide")
+            end
         end
 
         self._btn = hideBtn
