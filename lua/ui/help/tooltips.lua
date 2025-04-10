@@ -1074,10 +1074,6 @@ Tooltips = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
         description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
     },
-    options_casting_painting = {
-        title = '<LOC OPTIONS_0307>Painting for Observers',
-        description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
-    },
     -- **********************
     -- ** Lobby Strings
     -- **********************

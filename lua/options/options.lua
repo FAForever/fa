@@ -1360,20 +1360,6 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0309>Painting",
-                key = 'casting_painting',
-                type = 'toggle',
-                default = 18,
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = false },
-                        { text = "<LOC CTRL>Use CTRL ", key = 17 },
-                        { text = "<LOC ALT>Use ALT", key = 18 },
-                    },
-                },
-            },
-
-            {
                 title = "<LOC OPTIONS_0315>Show mouse locations of players",
                 key = 'share_mouse',
                 type = 'toggle',
