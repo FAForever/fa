@@ -77,11 +77,11 @@ LinesCollection = Class()
     Render = function(self, delta)
         local UI_DrawLine = UI_DrawLine
         local color       = self._color
-        local time        = GetGameTimeSeconds()
+        local dtime = GetGameTimeSeconds() - decayTime
         local lines       = self._lines
 
         for i, line in lines do
-            if line.createdAt + decayTime < time then
+            if line.createdAt < dtime then
                 self:Remove(i)
             else
                 UI_DrawLine(line.p1, line.p2, color, 0.15)
