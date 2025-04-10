@@ -828,16 +828,6 @@ local function PassesAIAntiCheatCheck()
     return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
 
---- An anti-cheat check for profiling that only passes when the correct army
---- triggered the callback
----@return boolean
-local function PassesProfilingAntiCheatCheck()
-    if import("/lua/simutils.lua").OriginalFocusArmy == GetCurrentCommandSource() then
-        return SessionIsReplay() or PassesAntiCheatCheck()
-    end
-    return false
-end
-
 
 local SpawnedMeshes = {}
 
@@ -991,7 +981,7 @@ end
 
 --- Toggles the profiler on / off
 Callbacks.ToggleProfiler = function(data)
-    if not PassesProfilingAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
@@ -1000,14 +990,14 @@ end
 
 -- Allows searching for benchmarks
 Callbacks.FindBenchmarks = function(data)
-    if not PassesProfilingAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
     import("/lua/sim/profiler.lua").FindBenchmarks()
 end
 Callbacks.LoadBenchmark = function(data)
-    if not PassesProfilingAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
@@ -1016,14 +1006,14 @@ end
 
 -- Allows a benchmark to be run in the sim
 Callbacks.RunBenchmark = function(data)
-    if not PassesProfilingAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
     import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
 end
 Callbacks.StopBenchmark = function(data)
-    if not PassesProfilingAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 

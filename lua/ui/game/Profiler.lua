@@ -157,9 +157,7 @@ end
 
 ---@return boolean
 local function CanUseProfiler()
-    return
-        sessionInfo.Options.CheatsEnabled == "true" or
-        SessionIsReplay()
+    return sessionInfo.Options.CheatsEnabled == "true"
 end
 
 
