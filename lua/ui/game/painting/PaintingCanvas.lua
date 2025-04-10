@@ -28,7 +28,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 
 local Instances = {}
 
-local PaintingDuration = 15
+local PaintingDuration = 25
 
 local SyncIdentifier = "PaintingCanvas.lua"
 local SyncCategory = 'SharePainting'
