@@ -200,7 +200,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         -- we use import directly for developer convenience
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.WorldView, sharedPainting.Samples, sharedPainting.Color, 0.15, 0
+            self.WorldView, sharedPainting.Samples, sharedPainting.Color, 0.15, PaintingDuration
         )
         self:AddPainting(painting)
     end,
