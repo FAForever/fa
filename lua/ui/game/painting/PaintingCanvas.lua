@@ -180,6 +180,11 @@ PaintingCanvas = Class(Bitmap) {
             return
         end
 
+        -- do not allow paintings with excessive samples
+        if table.getn(sharedPainting.Samples) > 150 then
+            return
+        end
+
         -- we use import directly for developer convenience
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
             self.WorldView, sharedPainting.Samples, sharedPainting.Color, 0.15, 0
