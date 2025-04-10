@@ -15,16 +15,22 @@ local minDist = 0.5
 
 ---@class Canvas : Bitmap, Renderable
 ---@field _text Text
+---@field _btn Button
 ---@field _collectedLines Line[]
 ---@field _prevMousePos Vector?
 ---@field _color Color
+---@field _isHiddenLines boolean
 Canvas = Class(Bitmap)
 {
     ---@param self Canvas
     ---@param parent Control
     __init = function(self, parent)
         Bitmap.__init(self, parent)
+
         self._active = false
+        self._collectedLines = {}
+        self._prevMousePos = nil
+        self._isHiddenLines = false
 
         local text = UIUtil.CreateText(self, "Tactical Paint", 20, "Arial")
         LayoutFor(text)
@@ -33,10 +39,20 @@ Canvas = Class(Bitmap)
             :Over(self)
             :DisableHitTest()
 
-        self._text = text
+        local hideBtn = UIUtil.CreateButtonStd(self, '/BUTTON/medium/', "Hide / Show", 20)
+        LayoutFor(hideBtn)
+            :Below(text, 10)
+            :AtHorizontalCenterIn(text)
+            :Width(200)
+            :Over(self)
+            :EnableHitTest()
 
-        self._collectedLines = {}
-        self._prevMousePos = nil
+        hideBtn.OnClick = function(btn)
+            self._isHiddenLines = not self._isHiddenLines
+        end
+
+        self._btn = hideBtn
+        self._text = text
     end,
 
     ---@param self Canvas
@@ -50,13 +66,11 @@ Canvas = Class(Bitmap)
     SetActive = function(self, active)
         self._active = active
         if active then
-            self:EnableHitTest()
-            -- self:SetAlpha(0.1)
+            self._btn:Show()
             self._text:Show()
         else
-            self:DisableHitTest()
-            -- self:SetAlpha(0.0)
             self._text:Hide()
+            self._btn:Hide()
 
             self:OnDrawEnd()
         end
@@ -65,6 +79,10 @@ Canvas = Class(Bitmap)
     ---@param self Canvas
     ---@param delta number
     OnRender = function(self, delta, worldview)
+        if self._isHiddenLines then
+            return
+        end
+
         for player, holder in TacticalPaint.GetLinesCollections() do
             holder:Render(delta)
         end
@@ -145,7 +163,7 @@ Canvas = Class(Bitmap)
     HandleDrawing = function(self, worldview, event)
 
         local isCanvasActive = self:GetActive()
-        if not isCanvasActive then
+        if not isCanvasActive or self._isHiddenLines then
             return false
         end
 

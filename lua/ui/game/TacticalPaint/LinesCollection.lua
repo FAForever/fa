@@ -83,9 +83,10 @@ LinesCollection = Class()
         local lines       = self._lines
 
         for i, line in lines do
-            UI_DrawLine(line.p1, line.p2, color, 0.15)
             if line.createdAt + decayTime < time then
                 self:Remove(i)
+            else
+                UI_DrawLine(line.p1, line.p2, color, 0.15)
             end
         end
 
