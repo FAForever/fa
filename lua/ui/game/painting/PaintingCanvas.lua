@@ -24,8 +24,9 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ParseColor = import("/lua/shared/color.lua").ParseColor
 
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
+
 local Instances = {}
-local Debug = true
 
 local PaintingDuration = 15
 
@@ -40,12 +41,12 @@ local SyncCategory = 'SharePainting'
 --- A painting canvas that is responsible for registering the painting efforts of
 --- players. This involves both the painting itself, as the sharing and receiving
 --- of paintings from peers.
----@class UIPaintingCanvas : Bitmap
+---@class UIPaintingCanvas : Bitmap, DebugComponent
 ---@field Trash TrashBag                        # Contains all (active) paintings.
 ---@field WorldView WorldView                   # Worldview that this canvas is for.
 ---@field ActivePainting? UIActivePainting      # The active painting of the local peer.
 ---@field Paintings UIPainting                  # All paintings, including those shared by peers.
-PaintingCanvas = Class(Bitmap) {
+PaintingCanvas = Class(Bitmap, DebugComponent) {
 
     ---@param self UIPaintingCanvas
     ---@param worldview WorldView
@@ -212,7 +213,7 @@ CreatePaintingCanvas = function(worldview)
     AddOnSyncHashedCallback(
     ---@param sharedPaintings UISharedPainting[]
         function(sharedPaintings)
-            if Debug then
+            if instance.EnabledLogging then
                 LOG(string.format("Received %d paintings for %s", table.getsize(sharedPaintings), SyncIdentifier))
             end
 

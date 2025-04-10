@@ -20,17 +20,19 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
+
 ---@class UIPaintingSample
 ---@field Position Vector
 
 --- Responsible for drawing the painting to a world view.
----@class UIPainting : Renderable
+---@class UIPainting : Renderable, DebugComponent
 ---@field Identifier string
 ---@field WorldView WorldView
 ---@field Color Color
 ---@field Thickness number
 ---@field Samples UIPaintingSample[]
-Painting = ClassSimple {
+Painting = Class(DebugComponent) {
 
     ---@param self UIPainting
     ---@param worldview WorldView
@@ -59,7 +61,10 @@ Painting = ClassSimple {
     --- Destroys the painting and deregisters it from the world view.
     ---@param self UIPainting
     Destroy = function(self)
-        print("Destroyed a painting")
+        if self.EnabledLogging then
+            print("Destroyed a painting")
+        end
+
         self:OnDestroy()
     end,
 
