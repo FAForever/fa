@@ -393,7 +393,7 @@ Canvas = Class(Bitmap)
                 lineIndex = lineIndex + packageSize
                 sendPaintData(package, false)
             end
-        else
+        elseif n > 0 then
             sendPaintData(lines, false)
         end
 
