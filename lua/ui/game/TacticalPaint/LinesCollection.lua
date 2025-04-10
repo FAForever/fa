@@ -8,7 +8,6 @@ local maxLinesPerPlayer = 1000
 ---@field p1 Vector
 ---@field p2 Vector
 ---@field createdAt number
----@field color Color
 
 ---@class LinesCollection
 ---@field _lines Line[]

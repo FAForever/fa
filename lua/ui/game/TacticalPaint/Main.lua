@@ -15,13 +15,6 @@ function GetLinesCollections()
     return linesHolder
 end
 
----@class Line
----@field p1 Vector
----@field p2 Vector
----@field lifeTime number
----@field color Color
-
-
 ---@param player integer
 ---@param pos1 Vector
 ---@param pos2 Vector
