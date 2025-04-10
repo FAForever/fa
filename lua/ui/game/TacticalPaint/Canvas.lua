@@ -1,3 +1,5 @@
+local GetMouseWorldPos = GetMouseWorldPos
+
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
