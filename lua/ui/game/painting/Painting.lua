@@ -20,6 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local ColorUtils = import("/lua/shared/color.lua")
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 ---@class UIPaintingSample
@@ -31,6 +32,8 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field WorldView WorldView
 ---@field Color Color
 ---@field Thickness number
+---@field Duration number   # in seconds
+---@field CreatedAt number  # in seconds
 ---@field Samples UIPaintingSample[]
 Painting = Class(DebugComponent) {
 
@@ -49,6 +52,8 @@ Painting = Class(DebugComponent) {
         self.Color = color
         self.Thickness = thickness
         self.WorldView = worldview
+        self.CreatedAt = GetGameTimeSeconds()
+        self.Duration = duration
 
         -- register ourselves so that we get drawn
         worldview:RegisterRenderable(self, self.Identifier)
@@ -77,13 +82,20 @@ Painting = Class(DebugComponent) {
     ---@param self UIPainting
     ---@param delta number
     OnRender = function(self, delta)
+        local decayProgress = 0
+        if self.Duration > 0 then
+            decayProgress = math.clamp((GetGameTimeSeconds() - self.CreatedAt) / self.Duration, 0, 1)
+        end
+
+        local decayedColor = self:ComputeDecayedColor(self.Color, decayProgress)
+
         local samples = self.Samples
         local sampleCount = table.getn(samples)
         for k = 2, sampleCount do
             local s1 = samples[k - 1]
             local s2 = samples[k]
 
-            UI_DrawLine(s1.Position, s2.Position, self.Color, self.Thickness)
+            UI_DrawLine(s1.Position, s2.Position, decayedColor, self.Thickness)
         end
     end,
 
@@ -93,7 +105,29 @@ Painting = Class(DebugComponent) {
     DecayThread = function(self, duration)
         WaitSeconds(duration)
         self:Destroy()
-    end
+    end,
+
+    ---@param self UIPainting
+    ---@param color Color
+    ---@param progress number   # number between 0 and 1.0
+    ---@return Color
+    ComputeDecayedColor = function(self, color, progress)
+        -- guardrail
+        progress = math.clamp(progress, 0, 1)
+
+        -- get color channel values, default to white
+        local r, g, b, a = ColorUtils.ParseColor(color)
+        if not (r and g and b) then
+            r = 1.0
+            g = 1.0
+            b = 1.0
+        end
+
+        -- compute transparency
+        a = math.sqrt(1 - progress)
+
+        return ColorUtils.ColorRGB(r, g, b, a)
+    end,
 }
 
 ---@param worldview WorldView
