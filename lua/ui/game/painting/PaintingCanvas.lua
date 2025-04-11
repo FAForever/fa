@@ -86,51 +86,85 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         -- feature: enable/disable the painting feature
         if GetOptions("painting") ~= "on" then
+            self:CancelActivePainting()
             return false
         end
 
+        -- limitation: only enable painting when no unit is selected. This limitation enables us 
+        -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
         local selectedUnits = GetSelectedUnits()
         if not table.empty(selectedUnits) then
+            self:CancelActivePainting()
             return false
         end
 
+        -- feature: be able to make a painting!
         if event.Type == 'MouseMotion' and event.Modifiers.Right then
-            if not self.ActivePainting then
-                -- we use import directly for developer convenience: it enables you to reload the file without restarting
-                self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
-                    self.WorldView, self:ComputeColorOfActivePainting()
-                )
-            end
-
-            self.ActivePainting:AddSample(GetMouseWorldPos())
+            self:CreateActivePainting()
         end
 
+        -- feature: share the active painting with all relevant peers
         if event.Type == 'ButtonRelease' and self.ActivePainting then
-            SimCallback({
-                Func = SyncCategory,
-                Args = {
-                    Identifier = self.ActivePainting.Identifier,
-                    Samples = self.ActivePainting.Samples
-                }
-            })
-
-            -- turn it into a regular painting
-            -- we use import directly for developer convenience: it enables you to reload the file without restarting
-            local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-                self.WorldView,
-                self.ActivePainting.Samples,
-                self.ActivePainting.Color,
-                tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
-            )
-
-            self:AddPainting(painting)
-
-            -- destroy the active painting
-            self.ActivePainting:Destroy()
-            self.ActivePainting = nil
+            self:ShareActivePainting()
         end
 
         return false
+    end,
+
+    ---@param self UIPaintingCanvas
+    CreateActivePainting = function(self)
+        if not self.ActivePainting then
+            -- we use import directly for developer convenience: it enables you to reload the file without restarting
+            self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
+                self.WorldView, self:ComputeColorOfActivePainting()
+            )
+        end
+
+        self.ActivePainting:AddSample(GetMouseWorldPos())
+    end,
+
+    --- Removes the active painting.
+    ---@param self UIPaintingCanvas
+    ---@param skipMessage? boolean
+    CancelActivePainting = function(self, skipMessage)
+        if self.ActivePainting then
+            if not skipMessage then
+                -- user feedback
+                local message = "<LOC painting_cancel_message>Cancelled a painting"
+                if Random() < 0.01 then
+                    message = "<LOC painting_cancel_message_rare>Cancelled that work of art"
+                end
+                print(LOC(message))
+            end
+
+            self.ActivePainting:Destroy()
+            self.ActivePainting = nil
+        end
+    end,
+    --- Shares the active painting with all relevant peers.
+    ---@param self UIPaintingCanvas
+    ShareActivePainting = function(self)
+        SimCallback({
+            Func = SyncCategory,
+            Args = {
+                Identifier = self.ActivePainting.Identifier,
+                Samples = self.ActivePainting.Samples
+            }
+        })
+
+        -- turn it into a regular painting
+        -- we use import directly for developer convenience: it enables you to reload the file without restarting
+        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
+            self.WorldView,
+            self.ActivePainting.Samples,
+            self.ActivePainting.Color,
+            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
+        )
+
+        self:AddPainting(painting)
+
+        -- remove the active painting as we replaced it with a regular painting
+        self:CancelActivePainting(true)
     end,
 
     --- Checks if a painting identifier is already in use. This can be the case
@@ -185,7 +219,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- current focus army. This may not always match the
         -- command source, but the color is only visible to 
         -- the person drawing it and not to the rest of the
-        -- game.
+        -- peers.
 
         local armiesTable = GetArmiesTable().armiesTable
         return armiesTable[GetFocusArmy()].color
