@@ -1351,28 +1351,23 @@ options = {
             },
 
             {
-                title = 'Casting tools',
+                title = 'Painting tools',
                 type = 'header',
-
                 -- these are expected everywhere
                 default = '',
                 key = '',
             },
-
             {
-                title = "<LOC OPTIONS_0309>Painting",
-                key = 'casting_painting',
-                type = 'toggle',
-                default = 18,
+                title = "Painting life time",
+                key = 'tpaint_lifetime',
+                type = 'slider',
+                default = 20,
                 custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = false },
-                        { text = "<LOC CTRL>Use CTRL ", key = 17 },
-                        { text = "<LOC ALT>Use ALT", key = 18 },
-                    },
+                    min = 10,
+                    max = 60,
+                    inc = 5,
                 },
             },
-
             {
                 title = "<LOC OPTIONS_0315>Show mouse locations of players",
                 key = 'share_mouse',

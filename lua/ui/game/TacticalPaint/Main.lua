@@ -1,3 +1,4 @@
+local Prefs = import('/lua/user/prefs.lua')
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 
 local LinesCollection = import("LinesCollection.lua").LinesCollection
@@ -30,7 +31,8 @@ end
 ---@param pos1 Vector
 ---@param pos2 Vector
 function DrawLine(id, pos1, pos2)
-    GetCollection(id):Add(pos1, pos2)
+    local lifetime = Prefs.GetFromCurrentProfile('options').ui.tpaint_lifetime or 20
+    GetCollection(id):Add(pos1, pos2, lifetime + GetGameTimeSeconds())
 end
 
 ---@param x number
@@ -67,11 +69,12 @@ local function ProcessPaintData(id, tdata)
         ClearLinesAt(x, z, offset)
     else
         local collection = GetCollection(id)
+        local lifeTime = tdata.LifeTime
 
         local prevPos = nil
         for i, pos in data do
             if prevPos then
-                collection:Add(prevPos, pos)
+                collection:Add(prevPos, pos, lifeTime)
             end
             prevPos = pos
         end
@@ -81,12 +84,15 @@ end
 ---@param data any
 ---@param remove boolean
 function SendPaintData(data, remove)
+    local lifetime = Prefs.GetFromCurrentProfile('options').ui.tpaint_lifetime or 20
+
     if GetFocusArmy() == -1 then
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
         SessionSendChatMessage(FindClients(), {
             TacticalPaint = true,
             Remove = remove,
-            Data = data
+            Data = data,
+            LifeTime = lifetime + GetGameTimeSeconds()
         })
         return
     end
@@ -95,6 +101,7 @@ function SendPaintData(data, remove)
         Args = {
             Data = data,
             Remove = remove,
+            LifeTime = lifetime + GetGameTimeSeconds()
         },
     })
 end

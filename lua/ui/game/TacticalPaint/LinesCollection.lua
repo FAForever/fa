@@ -7,7 +7,7 @@ local maxLinesPerPlayer = 1000
 ---@class Line
 ---@field p1 Vector
 ---@field p2 Vector
----@field createdAt number
+---@field lifeTime number
 
 ---@class LinesCollection
 ---@field _lines Line[]
@@ -30,11 +30,12 @@ LinesCollection = Class()
     ---@param self LinesCollection
     ---@param pos1 Vector
     ---@param pos2 Vector
-    Add = function(self, pos1, pos2)
+    ---@param lifetime number
+    Add = function(self, pos1, pos2, lifetime)
         self._lines[self._i] = {
             p1 = pos1,
             p2 = pos2,
-            createdAt = GetGameTimeSeconds()
+            lifeTime = lifetime,
         }
         self._i = self._i + 1
         self._curLines = self._curLines + 1
@@ -54,9 +55,9 @@ LinesCollection = Class()
     RemoveOldestLine = function(self)
         local k, min = nil, GetGameTimeSeconds()
         for i, line in self._lines do
-            local lineCreatedTime = line.createdAt
-            if lineCreatedTime < min then
-                min = lineCreatedTime
+            local lineLifeTime = line.lifeTime
+            if lineLifeTime < min then
+                min = lineLifeTime
                 k = i
             end
         end
@@ -83,11 +84,11 @@ LinesCollection = Class()
 
         local UI_DrawLine = UI_DrawLine
         local color       = self._color
-        local dtime       = GetGameTimeSeconds() - decayTime
+        local time        = GetGameTimeSeconds()
         local lines       = self._lines
 
         for i, line in lines do
-            if line.createdAt < dtime then
+            if line.lifeTime < time then
                 self:Remove(i)
             else
                 UI_DrawLine(line.p1, line.p2, color, 0.15)

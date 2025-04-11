@@ -174,6 +174,7 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 ---@class TacticalPaintData
 ---@field Data Vector[] | TacticalPaintRemoveData
 ---@field Remove boolean?
+---@field LifeTime number
 
 ---@alias SyncTacticalPaintData table<integer, TacticalPaintData>
 
@@ -193,9 +194,19 @@ Callbacks.TacticalPaint = function(data)
         end
     end
 
+    local lifeTime = data.LifeTime
+    local curTime = GetGameTick() / 10
+    if not lifeTime or lifeTime > curTime + 60 then
+        lifeTime = curTime + 60
+    end
+
     Sync.TacticalPaint = Sync.TacticalPaint or {}
     Sync.TacticalPaint[sourceId] = Sync.TacticalPaint[sourceId] or {}
-    table.insert(Sync.TacticalPaint[sourceId], data)
+    table.insert(Sync.TacticalPaint[sourceId], {
+        Remove = data.Remove,
+        Data = data.Data,
+        LifeTime = lifeTime,
+    })
 end
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect

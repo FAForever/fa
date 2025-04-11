@@ -3,7 +3,6 @@ local GetMouseWorldPos = GetMouseWorldPos
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Prefs = import('/lua/user/prefs.lua')
 
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 
