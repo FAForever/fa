@@ -296,7 +296,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param self UIPaintingCanvas
     ---@param sharedPainting UISharedPainting
     AddSharedPainting = function(self, sharedPainting)
-
         -- feature: enable/disable the painting feature
         if GetOptions("painting") ~= "on" then
             return
@@ -365,7 +364,7 @@ CreatePaintingCanvas = function(worldview)
     local instance = PaintingCanvas(worldview) --[[@as UIPaintingCanvas]]
     PaintingCanvasInstances:Add(instance)
 
-    -- listen to sync events
+    -- feature: share the active painting with all relevant peers
     AddOnSyncHashedCallback(
     ---@param sharedPaintings UISharedPainting[]
         function(sharedPaintings)
