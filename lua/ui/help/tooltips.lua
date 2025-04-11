@@ -611,9 +611,9 @@ Tooltips = {
         description = "<LOC options_painting_description>When enabled, you can make and receive paintings to or from other players.",
     },
 
-    options_painting_chat_message = {
-        title = "<LOC options_painting_chat_message_title>Show message in chat of painting",
-        description = "<LOC OPTIONS_0318>When enabled, you will receive a chat message when you made or receiving a painting.",
+    options_painting_duration = {
+        title = "<LOC options_painting_duration_title>Duration of paintings",
+        description = "<LOC options_painting_duration_description>The higher the value, the longer it takes for a painting to decay and be removed.",
     },
 
     options_wheel_sensitivity = {

@@ -808,6 +808,18 @@ options = {
             },
 
             {
+                title = "<LOC options_painting_duration_title>Duration of paintings",
+                key = 'painting_duration',
+                type = 'slider',
+                default = 25,
+                custom = {
+                    min = 10,
+                    max = 40,
+                    inc = 1,
+                },
+            },
+
+            {
                 title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
 
