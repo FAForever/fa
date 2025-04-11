@@ -382,6 +382,14 @@ CreatePaintingCanvas = function(worldview)
         end, SyncCategory, SyncIdentifier
     )
 
+    -- feature: abort all active paintings when we enter cinematic mode
+    AddOnSyncHashedCallback(
+        function()
+            AbortAllActivePaintings()
+        end, "NISMode", SyncIdentifier
+    )
+
+
     return instance
 end
 
