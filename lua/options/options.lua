@@ -1358,6 +1358,18 @@ options = {
                 key = '',
             },
             {
+                title = "Painting enabled",
+                key = 'tpaint_enabled',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC _Off>", key = 'off' },
+                    },
+                },
+            },
+            {
                 title = "Painting life time",
                 key = 'tpaint_lifetime',
                 type = 'slider',

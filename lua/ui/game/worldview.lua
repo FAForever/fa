@@ -218,6 +218,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         end
     end
 
+    local enabled = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').ui.tpaint_enabled == "on"
     for _, view in { viewLeft, viewRight } do
         if view then
             view._canvas = import("/lua/ui/game/TacticalPaint/Canvas.lua").Canvas(view)
@@ -228,6 +229,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
                 :Over(view)
                 :EnableHitTest()
             view._canvas:SetActive(false)
+            view._canvas:SetHiddenLines(not enabled)
             view:RegisterRenderable(view._canvas, "TacticalPaint.Canvas")
         end
     end

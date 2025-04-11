@@ -78,6 +78,17 @@ Canvas = Class(Bitmap)
     end,
 
     ---@param self Canvas
+    ---@param state boolean
+    SetHiddenLines = function(self, state)
+        self._isHiddenLines = state
+        if self._isHiddenLines then
+            self._btn.label:SetText("Show")
+        else
+            self._btn.label:SetText("Hide")
+        end
+    end,
+
+    ---@param self Canvas
     ---@return boolean
     GetActive = function(self)
         return self._active
