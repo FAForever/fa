@@ -31,9 +31,8 @@ ActivePainting = ClassUI(Painting) {
     ---@param self UIActivePainting
     ---@param worldview WorldView
     ---@param color Color
-    ---@param thickness number
-    __init = function(self, worldview, color, thickness)
-        Painting.__init(self, worldview, {}, color, thickness, 0)
+    __init = function(self, worldview, color)
+        Painting.__init(self, worldview, {}, color, 0)
 
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = {
@@ -75,10 +74,9 @@ ActivePainting = ClassUI(Painting) {
 
 ---@param worldview WorldView
 ---@param color Color
----@param thickness number
 ---@return UIActivePainting
-CreateActivePainting = function(worldview, color, thickness)
-    local instance = ActivePainting(worldview, color, thickness) --[[@as UIActivePainting]]
+CreateActivePainting = function(worldview, color)
+    local instance = ActivePainting(worldview, color) --[[@as UIActivePainting]]
 
     return instance
 end

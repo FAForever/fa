@@ -41,16 +41,14 @@ Painting = Class(DebugComponent) {
     ---@param worldview WorldView
     ---@param samples UIPaintingSample[]
     ---@param color Color
-    ---@param thickness number
     ---@param duration number       # if duration <= 0, then duration is infinite
-    __init = function(self, worldview, samples, color, thickness, duration)
+    __init = function(self, worldview, samples, color, duration)
         -- we use the memory address as our identifier - almost guaranteed to be unique.
         self.Identifier = tostring(self)
 
         -- store parameters
         self.Samples = samples
         self.Color = color
-        self.Thickness = thickness
         self.WorldView = worldview
         self.CreatedAt = GetGameTimeSeconds()
         self.Duration = duration
@@ -95,7 +93,7 @@ Painting = Class(DebugComponent) {
             local s1 = samples[k - 1]
             local s2 = samples[k]
 
-            UI_DrawLine(s1.Position, s2.Position, decayedColor, self.Thickness)
+            UI_DrawLine(s1.Position, s2.Position, decayedColor, 0)
         end
     end,
 
@@ -133,10 +131,9 @@ Painting = Class(DebugComponent) {
 ---@param worldview WorldView
 ---@param samples UIPaintingSample[]
 ---@param color Color
----@param thickness number
 ---@param duration number
 ---@return UIPainting
-CreatePainting = function(worldview, samples, color, thickness, duration)
-    local instance = Painting(worldview, samples, color, thickness, duration) --[[@as UIPainting]]
+CreatePainting = function(worldview, samples, color, duration)
+    local instance = Painting(worldview, samples, color, duration) --[[@as UIPainting]]
     return instance
 end

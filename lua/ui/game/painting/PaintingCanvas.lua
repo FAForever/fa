@@ -29,6 +29,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 local Instances = {}
 
 local DefaultPaintingDuration = 25
+local DefaultPaintingStrokeWidth = 0.15
 
 local SyncIdentifier = "PaintingCanvas.lua"
 local SyncCategory = 'SharePainting'
@@ -92,7 +93,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             if not self.ActivePainting then
                 -- we use import directly for developer convenience: it enables you to reload the file without restarting
                 self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
-                    self.WorldView, self:ComputeColorOfActivePainting(), 0.15
+                    self.WorldView, self:ComputeColorOfActivePainting()
                 )
             end
 
@@ -115,7 +116,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
                     self.WorldView,
                     self.ActivePainting.Samples,
                     self.ActivePainting.Color,
-                    self.ActivePainting.Thickness,
                     tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
                 )
 
@@ -251,7 +251,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.WorldView, sharedPainting.Samples, paintingColor, 0.15, tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
+            self.WorldView, sharedPainting.Samples, paintingColor,
+            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
         )
         self:AddPainting(painting)
     end,
