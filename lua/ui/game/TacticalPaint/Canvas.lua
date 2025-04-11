@@ -121,20 +121,22 @@ Canvas = Class(Bitmap)
 
         for id, army in armies do
             if not army.civilian then
-                local name    = army.nickname
-                local enabled = true
+                if IsObserver() or GetFocusArmy() ~= id and IsAlly(id, GetFocusArmy()) then
+                    local name    = army.nickname
+                    local enabled = true
 
-                local collection = collectionsTable[id]
-                if collection then
-                    enabled = collection:GetEnabled()
+                    local collection = collectionsTable[id]
+                    if collection then
+                        enabled = collection:GetEnabled()
+                    end
+
+                    table.insert(playerData, {
+                        id      = id,
+                        name    = name,
+                        enabled = enabled,
+                        color   = army.color or "ffffffff"
+                    })
                 end
-
-                table.insert(playerData, {
-                    id      = id,
-                    name    = name,
-                    enabled = enabled,
-                    color   = army.color or "ffffffff"
-                })
             end
         end
 
