@@ -22,14 +22,12 @@
 
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ParseColor = import("/lua/shared/color.lua").ParseColor
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 local Instances = {}
 
 local DefaultPaintingDuration = 25
-local DefaultPaintingStrokeWidth = 0.15
 
 local SyncIdentifier = "PaintingCanvas.lua"
 local SyncCategory = 'SharePainting'
