@@ -23,6 +23,8 @@
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
+local GetPaintingCanvasAdapter = import('/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapterFactory.lua').GetPaintingCanvasAdapter
+
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 local PaintingCanvasInstances = TrashBag()
@@ -30,12 +32,10 @@ local PaintingCanvasInstances = TrashBag()
 local DefaultPaintingDuration = 25
 
 local SyncIdentifier = "PaintingCanvas.lua"
-local SyncCategory = 'SharePainting'
 
 ---@class UISharedPainting
----@field Identifier string
+---@field PaintingIdentifier string
 ---@field Samples UIPaintingSample[]
----@field Color Color
 ---@field PeerId? number
 ---@field PeerName? string
 
@@ -43,6 +43,7 @@ local SyncCategory = 'SharePainting'
 --- players. This involves both the painting itself, as the sharing and receiving
 --- of paintings from peers.
 ---@class UIPaintingCanvas : Bitmap, DebugComponent
+---@field Adapter UIPaintingCanvasAdapter
 ---@field Trash TrashBag                        # Contains all (active) paintings.
 ---@field WorldView WorldView                   # Worldview that this canvas is for.
 ---@field ActivePainting? UIActivePainting      # The active painting of the local peer.
@@ -59,6 +60,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Paintings = self.Trash:Add(TrashBag())
         self.WorldView = worldview
         self.AbortedActivePainting = false
+        self.Adapter = GetPaintingCanvasAdapter(self)
 
         self.Trash:Add(ForkThread(self.AbortActivePaintingThread, self))
     end,
@@ -188,13 +190,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         self:AddPainting(painting)
 
-        SimCallback({
-            Func = SyncCategory,
-            Args = {
-                Identifier = painting.Identifier,
-                Samples = self.ActivePainting.Samples
-            }
-        })
+        self.Adapter:SharePainting(painting)
 
         -- remove the active painting as we replaced it with a regular painting
         self:DestroyActivePainting()
@@ -209,7 +205,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- check if we already have this painting
         for k = 1, table.getn(self.Paintings) do
             local painting = self.Paintings[k] --[[@as UIPainting]]
-            if painting.Identifier == id then
+            if painting.PaintingIdentifier == id then
                 return true
             end
         end
@@ -222,8 +218,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param painting UISharedPainting
     ---@return boolean
     CorrectPaintingFormat = function(self, painting)
-        if not painting.Identifier or -- value should exist
-            type(painting.Identifier) ~= 'string' -- value should be a string
+        if not painting.PaintingIdentifier or -- value should exist
+            type(painting.PaintingIdentifier) ~= 'string' -- value should be a string
         then
             if self.EnabledWarnings then
                 WARN("Received painting with a malformed identifier")
@@ -255,7 +251,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- peers.
 
         local armiesTable = GetArmiesTable().armiesTable
-        return armiesTable[GetFocusArmy()].color
+        return armiesTable[GetFocusArmy()].color or 'ffffffff'
     end,
 
     --- Computes the color of a shared painting.
@@ -307,7 +303,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
 
         -- do not allow overwriting and/or duplicate paintings
-        if self:PaintingIdentifierInUse(sharedPainting.Identifier) then
+        if self:PaintingIdentifierInUse(sharedPainting.PaintingIdentifier) then
             return
         end
 
@@ -346,7 +342,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     end,
 }
 
---- Aborts all active paintings. As an example, this can be used to stop 
+--- Aborts all active paintings. As an example, this can be used to stop
 --- all active drawing when you enter cinematic mode.
 AbortAllActivePaintings = function()
     for k = 1, table.getn(PaintingCanvasInstances) do
@@ -363,26 +359,6 @@ CreatePaintingCanvas = function(worldview)
     -- create a new instance
     local instance = PaintingCanvas(worldview) --[[@as UIPaintingCanvas]]
     PaintingCanvasInstances:Add(instance)
-
-    -- feature: share the active painting with all relevant peers
-    AddOnSyncHashedCallback(
-    ---@param sharedPaintings UISharedPainting[]
-        function(sharedPaintings)
-            if instance.EnabledSpewing then
-                LOG(string.format("Received %d paintings for %s", table.getsize(sharedPaintings), SyncIdentifier))
-            end
-
-            -- process event
-            for k = 1, table.getn(PaintingCanvasInstances) do
-                local paintingCanvasInstance = PaintingCanvasInstances[k] --[[@as UIPaintingCanvas]]
-                if not IsDestroyed(paintingCanvasInstance) then
-                    for k, painting in sharedPaintings do
-                        paintingCanvasInstance:AddSharedPainting(painting)
-                    end
-                end
-            end
-        end, SyncCategory, SyncIdentifier
-    )
 
     -- feature: abort all active paintings when we enter cinematic mode
     AddOnSyncHashedCallback(

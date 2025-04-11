@@ -28,7 +28,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 
 --- Responsible for drawing the painting to a world view.
 ---@class UIPainting : Renderable, DebugComponent
----@field Identifier string
+---@field PaintingIdentifier string
 ---@field WorldView WorldView
 ---@field Color Color
 ---@field Thickness number
@@ -44,7 +44,7 @@ Painting = Class(DebugComponent) {
     ---@param duration number       # if duration <= 0, then duration is infinite
     __init = function(self, worldview, samples, color, duration)
         -- we use the memory address as our identifier - almost guaranteed to be unique.
-        self.Identifier = tostring(self)
+        self.PaintingIdentifier = tostring(self)
 
         -- store parameters
         self.Samples = samples
@@ -54,7 +54,7 @@ Painting = Class(DebugComponent) {
         self.Duration = duration
 
         -- register ourselves so that we get drawn
-        worldview:RegisterRenderable(self, self.Identifier)
+        worldview:RegisterRenderable(self, self.PaintingIdentifier)
 
         if duration > 0 then
             ForkThread(self.DecayThread, self, duration)
@@ -69,7 +69,7 @@ Painting = Class(DebugComponent) {
 
     ---@param self UIPainting
     OnDestroy = function(self)
-        self.WorldView:UnregisterRenderable(self.Identifier)
+        self.WorldView:UnregisterRenderable(self.PaintingIdentifier)
     end,
 
     --- Renders the painting to the world view.

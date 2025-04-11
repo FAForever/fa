@@ -40,13 +40,13 @@ ActivePainting = ClassUI(Painting) {
         }
     end,
 
-    --- Responsible for debouncing samples. This is to reduce the 
+    --- Responsible for debouncing samples. This is to reduce the
     --- bandwidth it requires to share the art once it is finished.
     ---@param self UIActivePainting
     ---@return boolean
     ShouldDebounceSample = function(self)
         local now = GetGameTimeSeconds()
-        if now - self.LastEdited > 0.016 then
+        if now - self.LastEdited > 0.025 then
             return false
         end
 

@@ -723,7 +723,7 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
+        do -- feature: area commands
             return
         end
 
@@ -815,12 +815,13 @@ end
 
 ---@param data UISharedPainting
 Callbacks.SharePainting = function(data)
-    -- spectators should be able to see all paintings
     local isSpectator = GetFocusArmy() == -1
 
-    -- players should be able to see paintings from allies
-    local fromAlly = IsAlly(GetFocusArmy(), GetCurrentCommandSource())
-    if not (isSpectator or fromAlly) then
+    if not (
+        -- spectators should be able to see all paintings
+        isSpectator or
+        -- players should be able to see paintings from allies
+        IsAlly(GetFocusArmy(), GetCurrentCommandSource())) then
         return
     end
 
