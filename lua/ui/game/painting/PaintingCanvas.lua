@@ -116,7 +116,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
                     self.ActivePainting.Samples,
                     self.ActivePainting.Color,
                     self.ActivePainting.Thickness,
-                    GetOptions('painting_duration') or DefaultPaintingDuration
+                    tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
                 )
 
                 self:AddPainting(painting)
@@ -251,7 +251,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.WorldView, sharedPainting.Samples, paintingColor, 0.15, GetOptions('painting_duration') or DefaultPaintingDuration
+            self.WorldView, sharedPainting.Samples, paintingColor, 0.15, tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
         )
         self:AddPainting(painting)
     end,
