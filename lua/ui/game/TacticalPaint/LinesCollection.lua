@@ -14,6 +14,7 @@ local maxLinesPerPlayer = 1000
 ---@field _color Color
 ---@field _i integer
 ---@field _curLines integer
+---@field _enabled boolean
 LinesCollection = Class()
 {
     ---@param self LinesCollection
@@ -23,6 +24,7 @@ LinesCollection = Class()
         self._color = color
         self._i = 1
         self._curLines = 0
+        self._enabled = true
     end,
 
     ---@param self LinesCollection
@@ -74,9 +76,13 @@ LinesCollection = Class()
     ---@param self LinesCollection
     ---@param delta number
     Render = function(self, delta)
+        if not self._enabled then
+            return
+        end
+
         local UI_DrawLine = UI_DrawLine
         local color       = self._color
-        local dtime = GetGameTimeSeconds() - decayTime
+        local dtime       = GetGameTimeSeconds() - decayTime
         local lines       = self._lines
 
         for i, line in lines do
@@ -127,5 +133,11 @@ LinesCollection = Class()
         end
         self._i = 1
         self._curLines = 0
+    end,
+
+    ---@param self LinesCollection
+    ---@param state boolean
+    SetEnabled = function(self, state)
+        self._enabled = state
     end
 }

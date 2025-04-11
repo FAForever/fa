@@ -4,7 +4,7 @@ local LinesCollection = import("LinesCollection.lua").LinesCollection
 
 
 ---@type table<integer, LinesCollection>
-local linesHolder = {}
+local collectionsTable = {}
 
 
 local function GetArmyColor(id)
@@ -12,21 +12,25 @@ local function GetArmyColor(id)
 end
 
 function GetLinesCollections()
-    return linesHolder
+    return collectionsTable
 end
 
----@param player integer
+---@param id integer
+---@return LinesCollection
+function GetCollection(id)
+    local collection = collectionsTable[id]
+    if not collection then
+        collection = LinesCollection(GetArmyColor(id))
+        collectionsTable[id] = collection
+    end
+    return collection
+end
+
+---@param id integer
 ---@param pos1 Vector
 ---@param pos2 Vector
-function DrawLine(player, pos1, pos2)
-
-    local holder = linesHolder[player]
-    if not holder then
-        holder = LinesCollection(GetArmyColor(player))
-        linesHolder[player] = holder
-    end
-
-    holder:Add(pos1, pos2)
+function DrawLine(id, pos1, pos2)
+    GetCollection(id):Add(pos1, pos2)
 end
 
 ---@param x number
@@ -36,7 +40,7 @@ end
 function ClearLinesAt(x, z, radiusSq)
     local removedAny = false
 
-    for player, holder in linesHolder do
+    for player, holder in collectionsTable do
         removedAny = removedAny or holder:ClearLinesAt(x, z, radiusSq)
     end
 
@@ -62,16 +66,12 @@ local function ProcessPaintData(id, tdata)
         local x, z, offset = data[1], data[2], data[3]
         ClearLinesAt(x, z, offset)
     else
-        local holder = linesHolder[id]
-        if not holder then
-            holder = LinesCollection(GetArmyColor(id))
-            linesHolder[id] = holder
-        end
+        local collection = GetCollection(id)
 
         local prevPos = nil
         for i, pos in data do
             if prevPos then
-                holder:Add(prevPos, pos)
+                collection:Add(prevPos, pos)
             end
             prevPos = pos
         end
@@ -108,6 +108,14 @@ function ProcessSyncPaintData(syncData)
     end
 end
 
+---@param id integer
+---@param state boolean
+function SetSourceEnabled(id, state)
+    local collection = GetCollection(id)
+
+    collection:SetEnabled(state)
+end
+
 function TacticalPaint()
 
     local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
@@ -129,7 +137,7 @@ function TacticalPaint()
 end
 
 function Clear()
-    for player, holder in linesHolder do
+    for player, holder in collectionsTable do
         holder:ClearAll()
     end
 end
