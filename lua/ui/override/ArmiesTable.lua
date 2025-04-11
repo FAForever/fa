@@ -26,7 +26,7 @@
 ---@field focusArmy number
 
 ---@class ArmyInfo
----@field armyIndex number
+---@field armyIndex number ??? invalid
 ---@field civilian boolean
 ---@field color string
 ---@field faction number

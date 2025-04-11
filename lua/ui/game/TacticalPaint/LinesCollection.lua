@@ -139,5 +139,11 @@ LinesCollection = Class()
     ---@param state boolean
     SetEnabled = function(self, state)
         self._enabled = state
+    end,
+
+    ---@param self LinesCollection
+    ---@return boolean
+    GetEnabled = function(self)
+        return self._enabled
     end
 }

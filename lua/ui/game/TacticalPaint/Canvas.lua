@@ -7,15 +7,18 @@ local Prefs = import('/lua/user/prefs.lua')
 
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 
+local PlayerMuteList = import("PlayerMuteList.lua").PlayerMuteList
 local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 
-local minDist = 0.5
 
+local minDist = 0.5
 
 
 ---@class Canvas : Bitmap, Renderable
 ---@field _text Text
 ---@field _btn Button
+---@field _muteBtn Button
+---@field _list PlayerMuteList?
 ---@field _collectedLines Line[]
 ---@field _prevMousePos Vector?
 ---@field _color Color
@@ -57,6 +60,20 @@ Canvas = Class(Bitmap)
             end
         end
 
+        local muteBtn = UIUtil.CreateButtonStd(self, '/BUTTON/medium/', "Mute", 20)
+        LayoutFor(muteBtn)
+            :Below(text, 10)
+            :AtHorizontalCenterIn(text, -300)
+            :Width(200)
+            :Over(self)
+            :EnableHitTest()
+
+        ---@param btn Button
+        muteBtn.OnClick = function(btn)
+            self:CreatePlayerList()
+        end
+
+        self._muteBtn = muteBtn
         self._btn = hideBtn
         self._text = text
     end,
@@ -73,13 +90,63 @@ Canvas = Class(Bitmap)
         self._active = active
         if active then
             self._btn:Show()
+            self._muteBtn:Show()
             self._text:Show()
         else
-            self._text:Hide()
             self._btn:Hide()
+            self._muteBtn:Hide()
+            self._text:Hide()
+
+            if self._list then
+                self._list:Destroy()
+                self._list = nil
+            end
 
             self:OnDrawEnd()
         end
+    end,
+
+    ---@param self Canvas
+    CreatePlayerList = function(self)
+        if not IsDestroyed(self._list) then
+            return
+        end
+
+        local collectionsTable = TacticalPaint.GetLinesCollections()
+
+        local armies = GetArmiesTable().armiesTable
+
+        ---@type PlayerMuteData[]
+        local playerData = {}
+
+        for id, army in armies do
+            if not army.civilian then
+                local name    = army.nickname
+                local enabled = true
+
+                local collection = collectionsTable[id]
+                if collection then
+                    enabled = collection:GetEnabled()
+                end
+
+                table.insert(playerData, {
+                    id      = id,
+                    name    = name,
+                    enabled = enabled,
+                    color   = army.color or "ffffffff"
+                })
+            end
+        end
+
+
+        self._list = PlayerMuteList(self, TacticalPaint.SetSourceEnabled)
+        self._list:InitStates(playerData)
+
+        LayoutFor(self._list)
+            :AtLeftTopIn(self, 100, 300)
+            :Width(0)
+            :Height(0)
+            :Over(self)
     end,
 
     ---@param self Canvas
