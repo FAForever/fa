@@ -49,6 +49,7 @@ local SyncCategory = 'SharePainting'
 ---@field WorldView WorldView                   # Worldview that this canvas is for.
 ---@field ActivePainting? UIActivePainting      # The active painting of the local peer.
 ---@field Paintings UIPainting                  # All paintings, including those shared by peers.
+---@field AbortedActivePainting boolean
 PaintingCanvas = Class(Bitmap, DebugComponent) {
 
     ---@param self UIPaintingCanvas
@@ -59,8 +60,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Trash = TrashBag()
         self.Paintings = {}
         self.WorldView = worldview
+        self.AbortedActivePainting = false
 
-        self.Trash:Add(ForkThread(self.CancelActivePaintingThread, self))
+        self.Trash:Add(ForkThread(self.AbortActivePaintingThread, self))
     end,
 
     ---@param self UIPaintingCanvas
@@ -85,9 +87,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
-        -- feature: enable/disable the painting feature
+        -- feature: enable/disable painting 
         if GetOptions("painting") ~= "on" then
-            self:CancelActivePainting()
+            self:DestroyActivePainting()
             return false
         end
 
@@ -95,23 +97,28 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
         local selectedUnits = GetSelectedUnits()
         if not table.empty(selectedUnits) then
-            self:CancelActivePainting()
+            self:AbortActivePainting()
             return false
         end
 
         -- feature: be able to make a painting!
-        if event.Type == 'MouseMotion' and event.Modifiers.Right then
+        if event.Type == 'MouseMotion' and event.Modifiers.Right and not self.AbortedActivePainting then
             self:CreateActivePainting()
         end
 
-        -- feature: share the active painting with all relevant peers
-        if event.Type == 'ButtonRelease' and self.ActivePainting then
-            self:ShareActivePainting()
+        if event.Type == 'ButtonRelease' then
+            self.AbortedActivePainting = false
+
+            -- feature: share the active painting with all relevant peers
+            if self.ActivePainting then
+                self:ShareActivePainting()
+            end
         end
 
         return false
     end,
 
+    --- Creates a new active painting, or adds samples to the current active painting.
     ---@param self UIPaintingCanvas
     CreateActivePainting = function(self)
         if not self.ActivePainting then
@@ -124,42 +131,41 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.ActivePainting:AddSample(GetMouseWorldPos())
     end,
 
+    --- Aborts the active painting and prints a message to the user that it happened.
+    ---@param self any
+    AbortActivePainting = function(self)
+        if self.ActivePainting then
+            -- user feedback
+            local message = "<LOC painting_cancel_message>Cancelled a painting"
+            if Random() < 0.01 then
+                message = "<LOC painting_cancel_message_rare>Cancelled that work of art"
+            end
+            print(LOC(message))
+
+            self:DestroyActivePainting()
+        end
+    end,
+
     --- Removes the active painting.
     ---@param self UIPaintingCanvas
     ---@param skipMessage? boolean
-    CancelActivePainting = function(self, skipMessage)
+    DestroyActivePainting = function(self, skipMessage)
         if self.ActivePainting then
-            if not skipMessage then
-                -- user feedback
-                local message = "<LOC painting_cancel_message>Cancelled a painting"
-                if Random() < 0.01 then
-                    message = "<LOC painting_cancel_message_rare>Cancelled that work of art"
-                end
-                print(LOC(message))
-            end
-
             self.ActivePainting:Destroy()
             self.ActivePainting = nil
         end
     end,
 
-    --- An active thread that monitors the 
+    --- An active thread that checks if the user wants to abort the active painting.
     ---@param self UIPaintingCanvas
-    CancelActivePaintingThread = function(self)
-        -- feature: only cancel one painting per click
-        local debounce = false
-
+    AbortActivePaintingThread = function(self)
         while not IsDestroyed(self) do
             local escapePressed = IsKeyDown('ESCAPE')
 
             -- feature: be able to cancel the active painting
-            if escapePressed and self.ActivePainting and not debounce then
-                debounce = true
-                self:CancelActivePainting()
-            end
-
-            if not escapePressed then
-                debounce = false
+            if escapePressed and self.ActivePainting then
+                self.AbortedActivePainting = true
+                self:AbortActivePainting()
             end
 
             WaitFrames(1)
@@ -189,7 +195,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self:AddPainting(painting)
 
         -- remove the active painting as we replaced it with a regular painting
-        self:CancelActivePainting(true)
+        self:DestroyActivePainting()
     end,
 
     --- Checks if a painting identifier is already in use. This can be the case
