@@ -76,6 +76,7 @@ LinesCollection = Class()
     ---@param self LinesCollection
     ---@param delta number
     Render = function(self, delta)
+        --- Should we still check lines to delete?
         if not self._enabled then
             return
         end
