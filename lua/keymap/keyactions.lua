@@ -1954,7 +1954,7 @@ local keyActionsMisc = {
 }
 
 ---@type table<string, UIKeyAction>
-local keyActionsTacticalPaintPaint = {
+local keyActionsTacticalPaint = {
     ["tpaint_open"] = {
         action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').TacticalPaint()",
         category = 'Tactical Paint'
@@ -1988,5 +1988,5 @@ keyActions = table.combine(
     keyActionsChat,
     keyActionsUI,
     keyActionsMisc,
-    keyActionsTacticalPaintPaint
+    keyActionsTacticalPaint
 )
