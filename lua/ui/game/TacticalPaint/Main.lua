@@ -56,7 +56,7 @@ local function ProcessPaintData(id, tdata)
     local remove = tdata.Remove
     local me = GetFocusArmy()
     -- reprsl(GetArmiesTable())
-    if me == id then
+    if me == id and me ~= -1 then
         return
     end
 
