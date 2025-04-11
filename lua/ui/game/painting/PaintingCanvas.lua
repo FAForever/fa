@@ -93,6 +93,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         if not table.empty(selectedUnits) then
             return false
         end
+
+        if event.Type == 'MouseMotion' and event.Modifiers.Right then
             if not self.ActivePainting then
                 -- we use import directly for developer convenience: it enables you to reload the file without restarting
                 self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
@@ -103,31 +105,29 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             self.ActivePainting:AddSample(GetMouseWorldPos())
         end
 
-        if not IsKeyDown(17) then
-            if self.ActivePainting then
-                SimCallback({
-                    Func = SyncCategory,
-                    Args = {
-                        Identifier = self.ActivePainting.Identifier,
-                        Samples = self.ActivePainting.Samples
-                    }
-                })
+        if event.Type == 'ButtonRelease' and self.ActivePainting then
+            SimCallback({
+                Func = SyncCategory,
+                Args = {
+                    Identifier = self.ActivePainting.Identifier,
+                    Samples = self.ActivePainting.Samples
+                }
+            })
 
-                -- turn it into a regular painting
-                -- we use import directly for developer convenience: it enables you to reload the file without restarting
-                local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-                    self.WorldView,
-                    self.ActivePainting.Samples,
-                    self.ActivePainting.Color,
-                    tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
-                )
+            -- turn it into a regular painting
+            -- we use import directly for developer convenience: it enables you to reload the file without restarting
+            local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
+                self.WorldView,
+                self.ActivePainting.Samples,
+                self.ActivePainting.Color,
+                tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
+            )
 
-                self:AddPainting(painting)
+            self:AddPainting(painting)
 
-                -- destroy the active painting
-                self.ActivePainting:Destroy()
-                self.ActivePainting = nil
-            end
+            -- destroy the active painting
+            self.ActivePainting:Destroy()
+            self.ActivePainting = nil
         end
 
         return false
