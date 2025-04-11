@@ -59,6 +59,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Trash = TrashBag()
         self.Paintings = {}
         self.WorldView = worldview
+
+        self.Trash:Add(ForkThread(self.CancelActivePaintingThread, self))
     end,
 
     ---@param self UIPaintingCanvas
@@ -83,7 +85,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
-
         -- feature: enable/disable the painting feature
         if GetOptions("painting") ~= "on" then
             self:CancelActivePainting()
@@ -141,6 +142,30 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             self.ActivePainting = nil
         end
     end,
+
+    --- An active thread that monitors the 
+    ---@param self UIPaintingCanvas
+    CancelActivePaintingThread = function(self)
+        -- feature: only cancel one painting per click
+        local debounce = false
+
+        while not IsDestroyed(self) do
+            local escapePressed = IsKeyDown('ESCAPE')
+
+            -- feature: be able to cancel the active painting
+            if escapePressed and self.ActivePainting and not debounce then
+                debounce = true
+                self:CancelActivePainting()
+            end
+
+            if not escapePressed then
+                debounce = false
+            end
+
+            WaitFrames(1)
+        end
+    end,
+
     --- Shares the active painting with all relevant peers.
     ---@param self UIPaintingCanvas
     ShareActivePainting = function(self)
