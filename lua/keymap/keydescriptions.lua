@@ -218,6 +218,10 @@ keyDescriptions = {
     ['toggle_map_control'] = "<LOC key_desc_0109>Toggles the map control window",
     ['cam_free'] = "<LOC key_desc_0104>Toggles camera free mode",
 
+    ["tpaint_open"] = 'Open Tactical Paint canvas',
+    ["tpaint_hold"] = 'Hold Draw',
+    ["tpaint_clear"] = "Clear canvas",
+
     ['quick_save'] = "<LOC key_desc_0130>Save the game to a special quick save file",
     ['mouse_help'] = "<LOC key_desc_0132>Turn the mouse button help icon on/off",
 

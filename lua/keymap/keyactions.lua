@@ -1954,6 +1954,23 @@ local keyActionsMisc = {
 }
 
 ---@type table<string, UIKeyAction>
+local keyActionsTacticalPaintPaint = {
+    ["tpaint_open"] = {
+        action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').TacticalPaint()",
+        category = 'Tactical Paint'
+    },
+    ["tpaint_hold"] = {
+        action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').OnHold()",
+        category = 'Tactical Paint',
+        keyRepeat = true,
+    },
+    ["tpaint_clear"] = {
+        action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').Clear()",
+        category = 'Tactical Paint'
+    },
+}
+
+---@type table<string, UIKeyAction>
 keyActions = table.combine(
     keyActionsCamera,
     keyActionsSelection,
@@ -1970,5 +1987,6 @@ keyActions = table.combine(
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,
-    keyActionsMisc
+    keyActionsMisc,
+    keyActionsTacticalPaintPaint
 )

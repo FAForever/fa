@@ -190,27 +190,6 @@ end
 
 ---@param isReplay boolean
 function Main(isReplay)
-
-    local KeyMapper = import('/lua/keymap/keymapper.lua')
-    KeyMapper.SetUserKeyAction('Open Tactical Paint canvas',
-        {
-            action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').TacticalPaint()",
-            category = 'Tactical Paint'
-        })
-
-    KeyMapper.SetUserKeyAction('Hold Draw',
-        {
-            action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').OnHold()",
-            category = 'Tactical Paint',
-            keyRepeat = true,
-        })
-
-    KeyMapper.SetUserKeyAction('Clear canvas',
-        {
-            action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').Clear()",
-            category = 'Tactical Paint'
-        })
-
     if IsObserver() then
         import('/lua/ui/game/gamemain.lua').RegisterChatFunc(function(sender, data)
             for i, armyData in GetArmiesTable().armiesTable do
