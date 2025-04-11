@@ -495,7 +495,7 @@ end
 
 ---
 ---@param key string
----@return string[]
+---@return any
 function GetOptions(key)
 end
 
