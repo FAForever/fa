@@ -92,6 +92,7 @@ UnitBlueprint{
         UnitName = "<LOC uab2109_name>Tide",
     },
     Intel = {
+        SonarRadius = 36,
         VisionRadius = 12,
         WaterVisionRadius = 44,
     },

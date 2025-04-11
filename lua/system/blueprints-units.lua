@@ -329,9 +329,9 @@ local function PostProcessUnit(unit)
     end
 
     -- Check if a unit's WaterVisionRadius is larger than its SonarRadius
-    if unit.Intel.WaterVisionRadius and unit.Intel.SonarRadius then
-        if unit.Intel.WaterVisionRadius > unit.Intel.SonarRadius then
-            WARN(string.format("SonarRadius of unit ( %s ), is lower than its WaterVisionRadius, it needs to be higher to be relevant."
+    if unit.Intel.WaterVisionRadius and unit.Intel.SonarRadius and unit.Intel.RadarRadius then
+        if (unit.Intel.WaterVisionRadius > unit.Intel.SonarRadius) and (unit.Intel.RadarRadius > unit.Intel.SonarRadius) then
+            WARN(string.format("SonarRadius of unit ( %s ), is lower than both its WaterVisionRadius and its RadarRadius, it needs to be higher to be relevant!"
                 , tostring(unit.BlueprintId)))
         end
     end
