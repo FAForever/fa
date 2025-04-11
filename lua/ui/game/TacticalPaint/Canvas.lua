@@ -248,7 +248,7 @@ Canvas = Class(Bitmap)
     HandleDrawing = function(self, worldview, event)
 
         local isCanvasActive = self:GetActive()
-        if not isCanvasActive or self._isHiddenLines then
+        if (not isCanvasActive or self._isHiddenLines) and not IsObserver() then
             return false
         end
 
