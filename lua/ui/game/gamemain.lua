@@ -691,6 +691,10 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         end
         local isFactory = newSelection[1]:IsInCategory("FACTORY")
         hotkeyLabelsOnSelectionChanged(upgradesTo, isFactory)
+
+        -- limitation: only enable painting when no unit is selected. This limitation enables us 
+        -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
+        import("/lua/ui/game/painting/PaintingCanvas.lua").AbortAllActivePaintings()
     end
 
     local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)

@@ -25,7 +25,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
-local Instances = {}
+local PaintingCanvasInstances = TrashBag()
 
 local DefaultPaintingDuration = 25
 
@@ -305,7 +305,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
 
         -- do not allow overwriting and/or duplicate paintings
-        LOG(sharedPainting.Identifier)
         if self:PaintingIdentifierInUse(sharedPainting.Identifier) then
             return
         end
@@ -345,26 +344,38 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     end,
 }
 
+--- Aborts all active paintings. As an example, this can be used to stop 
+--- all active drawing when you enter cinematic mode.
+AbortAllActivePaintings = function()
+    for k = 1, table.getn(PaintingCanvasInstances) do
+        local paintingCanvasInstance = PaintingCanvasInstances[k] --[[@as UIPaintingCanvas]]
+        if not IsDestroyed(paintingCanvasInstance) then
+            paintingCanvasInstance:AbortActivePainting()
+        end
+    end
+end
+
 ---@param worldview WorldView
 ---@return UIPaintingCanvas
 CreatePaintingCanvas = function(worldview)
     -- create a new instance
     local instance = PaintingCanvas(worldview) --[[@as UIPaintingCanvas]]
-    table.insert(Instances, instance)
+    PaintingCanvasInstances:Add(instance)
 
     -- listen to sync events
     AddOnSyncHashedCallback(
     ---@param sharedPaintings UISharedPainting[]
         function(sharedPaintings)
-            if instance.EnabledLogging then
+            if instance.EnabledSpewing then
                 LOG(string.format("Received %d paintings for %s", table.getsize(sharedPaintings), SyncIdentifier))
             end
 
             -- process event
-            for l, canvas in Instances do
-                if not IsDestroyed(canvas) then
+            for k = 1, table.getn(PaintingCanvasInstances) do
+                local paintingCanvasInstance = PaintingCanvasInstances[k] --[[@as UIPaintingCanvas]]
+                if not IsDestroyed(paintingCanvasInstance) then
                     for k, painting in sharedPaintings do
-                        canvas:AddSharedPainting(painting)
+                        paintingCanvasInstance:AddSharedPainting(painting)
                     end
                 end
             end
@@ -382,7 +393,7 @@ end
 function __moduleinfo.OnReload(newModule)
     print("Reloading painting canvas instances...")
 
-    for k, v in Instances do
+    for k, v in PaintingCanvasInstances do
         local worldview = v.WorldView
 
         -- clean up old instances
