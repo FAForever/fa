@@ -812,7 +812,13 @@ function GrowthFormation(formationUnits)
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
 
-    if unitsList.Air.Bomb3[1] then
+    if not table.empty(unitsList.Air.Bomb3) then
+        for k,v in unitsList.Air.Bomb3 do
+            if k != 1 then 
+                unitsList.Air.Bomb3[1] = unitsList.Air.Bomb3[k]
+            end
+            break
+        end
         local count = unitsList.Air.Bomb3[1].Count
         local oldAirArea = unitsList.Air.AreaTotal
         local oldUnitTotal = unitsList.Air.UnitTotal
@@ -820,7 +826,7 @@ function GrowthFormation(formationUnits)
         unitsList.Air.AreaTotal = count
         unitsList.Air.UnitTotal = count
 
-        BlockBuilderAirT3Bombers(unitsList.Air, 1.5) --strats formation
+        BlockBuilderAirT3Bombers(unitsList.Air, 1.2) --initial spacing was 1.5 that is a bit too wide
 
         --strats are already in formation so we remove them from table and adjust all parameters.
         unitsList.Air.Bomb3 = {}
