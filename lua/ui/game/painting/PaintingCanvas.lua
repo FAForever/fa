@@ -389,6 +389,12 @@ CreatePaintingCanvas = function(worldview)
         end, "NISMode", SyncIdentifier
     )
 
+    -- feature: abort all active paintings when the local peer switches focus army
+    AddOnSyncHashedCallback(
+        function()
+            AbortAllActivePaintings()
+        end, "FocusArmyChanged", SyncIdentifier
+    )
 
     return instance
 end
