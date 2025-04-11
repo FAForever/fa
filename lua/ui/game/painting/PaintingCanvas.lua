@@ -173,6 +173,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     --- Shares the active painting with all relevant peers.
     ---@param self UIPaintingCanvas
     ShareActivePainting = function(self)
+        if not self.ActivePainting then
+            return
+        end
 
         -- turn it into a regular painting
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
