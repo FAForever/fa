@@ -46,7 +46,7 @@ local SyncCategory = 'SharePainting'
 ---@field Trash TrashBag                        # Contains all (active) paintings.
 ---@field WorldView WorldView                   # Worldview that this canvas is for.
 ---@field ActivePainting? UIActivePainting      # The active painting of the local peer.
----@field Paintings UIPainting                  # All paintings, including those shared by peers.
+---@field Paintings TrashBag                    # All paintings, including those shared by peers.
 ---@field AbortedActivePainting boolean
 PaintingCanvas = Class(Bitmap, DebugComponent) {
 
@@ -56,7 +56,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         Bitmap.__init(self, worldview)
 
         self.Trash = TrashBag()
-        self.Paintings = {}
+        self.Paintings = self.Trash:Add(TrashBag())
         self.WorldView = worldview
         self.AbortedActivePainting = false
 
@@ -85,13 +85,13 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
-        -- feature: enable/disable painting 
+        -- feature: enable/disable painting
         if GetOptions("painting") ~= "on" then
             self:DestroyActivePainting()
             return false
         end
 
-        -- limitation: only enable painting when no unit is selected. This limitation enables us 
+        -- limitation: only enable painting when no unit is selected. This limitation enables us
         -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
         local selectedUnits = GetSelectedUnits()
         if not table.empty(selectedUnits) then
@@ -173,13 +173,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     --- Shares the active painting with all relevant peers.
     ---@param self UIPaintingCanvas
     ShareActivePainting = function(self)
-        SimCallback({
-            Func = SyncCategory,
-            Args = {
-                Identifier = self.ActivePainting.Identifier,
-                Samples = self.ActivePainting.Samples
-            }
-        })
 
         -- turn it into a regular painting
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
@@ -191,6 +184,14 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         )
 
         self:AddPainting(painting)
+
+        SimCallback({
+            Func = SyncCategory,
+            Args = {
+                Identifier = painting.Identifier,
+                Samples = self.ActivePainting.Samples
+            }
+        })
 
         -- remove the active painting as we replaced it with a regular painting
         self:DestroyActivePainting()
@@ -204,7 +205,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     PaintingIdentifierInUse = function(self, id)
         -- check if we already have this painting
         for k = 1, table.getn(self.Paintings) do
-            local painting = self.Paintings[k]
+            local painting = self.Paintings[k] --[[@as UIPainting]]
             if painting.Identifier == id then
                 return true
             end
@@ -244,9 +245,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param self UIPaintingCanvas
     ComputeColorOfActivePainting = function(self)
 
-        -- in this case we just want to use the color of the 
+        -- in this case we just want to use the color of the
         -- current focus army. This may not always match the
-        -- command source, but the color is only visible to 
+        -- command source, but the color is only visible to
         -- the person drawing it and not to the rest of the
         -- peers.
 
@@ -304,6 +305,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
 
         -- do not allow overwriting and/or duplicate paintings
+        LOG(sharedPainting.Identifier)
         if self:PaintingIdentifierInUse(sharedPainting.Identifier) then
             return
         end
@@ -328,7 +330,18 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param painting UIPainting
     AddPainting = function(self, painting)
         self.Trash:Add(painting)
-        table.insert(self.Paintings, painting)
+        self.Paintings:Add(painting)
+
+        if self.EnabledSpewing then
+            SPEW(
+                string.format(
+                    "Active paintings for %s: %d (%d bytes)",
+                    self.WorldView._cameraName,
+                    table.getsize(self.Paintings),
+                    debug.allocatedrsize(self.Paintings, { WorldView = true })
+                )
+            )
+        end
     end,
 }
 
