@@ -89,7 +89,10 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return false
         end
 
-        if event.Type == 'MouseMotion' and IsKeyDown(17) then
+        local selectedUnits = GetSelectedUnits()
+        if not table.empty(selectedUnits) then
+            return false
+        end
             if not self.ActivePainting then
                 -- we use import directly for developer convenience: it enables you to reload the file without restarting
                 self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
