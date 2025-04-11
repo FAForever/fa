@@ -86,7 +86,7 @@ end
 function SendPaintData(data, remove)
     local lifetime = Prefs.GetFromCurrentProfile('options').ui.tpaint_lifetime or 20
 
-    if GetFocusArmy() == -1 then
+    if IsObserver() then
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
         SessionSendChatMessage(FindClients(), {
             TacticalPaint = true,
@@ -211,7 +211,7 @@ function Main(isReplay)
             category = 'Tactical Paint'
         })
 
-    if GetFocusArmy() == -1 then
+    if IsObserver() then
         import('/lua/ui/game/gamemain.lua').RegisterChatFunc(function(sender, data)
             for i, armyData in GetArmiesTable().armiesTable do
                 if armyData.nickname == sender then
