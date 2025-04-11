@@ -51,12 +51,7 @@ Canvas = Class(Bitmap)
 
         ---@param btn Button
         hideBtn.OnClick = function(btn)
-            self._isHiddenLines = not self._isHiddenLines
-            if self._isHiddenLines then
-                btn.label:SetText("Show")
-            else
-                btn.label:SetText("Hide")
-            end
+            self:SetHiddenLines(not self._isHiddenLines)
         end
 
         local muteBtn = UIUtil.CreateButtonStd(self, '/BUTTON/medium/', "Mute", 20)
@@ -69,7 +64,12 @@ Canvas = Class(Bitmap)
 
         ---@param btn Button
         muteBtn.OnClick = function(btn)
-            self:CreatePlayerList()
+            if self._list then
+                self._list:Destroy()
+                self._list = nil
+            else
+                self:CreatePlayerList()
+            end
         end
 
         self._muteBtn = muteBtn
