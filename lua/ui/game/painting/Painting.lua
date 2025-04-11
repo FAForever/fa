@@ -64,10 +64,6 @@ Painting = Class(DebugComponent) {
     --- Destroys the painting and deregisters it from the world view.
     ---@param self UIPainting
     Destroy = function(self)
-        if self.EnabledLogging then
-            print("Destroyed a painting")
-        end
-
         self:OnDestroy()
     end,
 
