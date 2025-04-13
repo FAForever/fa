@@ -148,6 +148,7 @@ UnitBlueprint{
         UnitName = "<LOC ues0302_name>Summit Class",
     },
     Intel = {
+        RadarRadius = 48,
         VisionRadius = 50,
         WaterVisionRadius = 48,
     },
