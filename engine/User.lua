@@ -818,8 +818,7 @@ end
 function IsKeyDown(keyCode)
 end
 
----
----@param playerId string
+---@param playerId? string  # if not provided, will return whether the local player is an observer
 ---@return boolean
 function IsObserver(playerId)
 end
