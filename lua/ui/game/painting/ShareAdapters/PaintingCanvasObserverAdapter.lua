@@ -22,6 +22,8 @@
 
 local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapter.lua").PaintingCanvasAdapter
 
+--- Do not create an instance of this class directly. Instead, use 
+--- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
 ---@class UIPaintingCanvasObserverAdapter : UIPaintingCanvasAdapter
 PaintingCanvasObserverAdapter = Class(PaintingCanvasAdapter) {
 
@@ -36,18 +38,18 @@ PaintingCanvasObserverAdapter = Class(PaintingCanvasAdapter) {
         self:SubscribeToChatEvents()
     end,
 
+    --- Shares the painting with all other observers through the chat message mechanic.
     ---@param self UIPaintingCanvasObserverAdapter
-    ---@param painting UIPainting
-    SharePainting = function(self, painting)
-        PaintingCanvasAdapter.SharePainting(self, painting)
+    ---@param shareablePainting UISharedPainting
+    SendShareablePainting = function(self, shareablePainting)
+        PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
 
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
         local clients = FindClients()
 
         SessionSendChatMessage(clients, {
             Painting = true,
-            Samples = painting.Samples,
-            PaintingIdentifier = painting.PaintingIdentifier,
+            ShareablePainting = shareablePainting,
         })
     end,
 }

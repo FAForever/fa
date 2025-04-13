@@ -21,12 +21,26 @@
 --******************************************************************************************************
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
+local DefaultSharedColor = 'ffffffff'
 
 --- Keeps track of all active canvas adapter instances
 local CanvasAdapterInstances = TrashBag()
 
 ---@alias UIPaintingCanvasAdapterType 'Abstract' | 'Observer' | 'Player'
 
+--- Generic container to use when sharing paintings
+---@class UIShareablePaintingMessage
+---@field ShareablePainting UISharedPainting
+
+--- Container to use when sharing paintings through sim callbacks
+---@class UIShareablePaintingCallbackMessage : UIShareablePaintingMessage
+
+--- Container to use when sharing paintings through chat messages
+---@class UIShareablePaintingChatMessage : UIShareablePaintingMessage
+---@field Painting true
+
+--- Do not create an instance of this class directly. Instead, use
+--- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
 ---@class UIPaintingCanvasAdapter : DebugComponent
 ---@field AdapterType UIPaintingCanvasAdapterType
 ---@field PaintingCanvas UIPaintingCanvas
@@ -48,7 +62,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     ---@param self UIPaintingCanvasAdapter
     Destroy = function(self)
-
+        -- function exists to not break trashbags.
     end,
 
     --- Retrieves the nickname of the local peer.
@@ -71,31 +85,121 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return "PaintingCanvasAdapter" .. tostring(self.PaintingCanvas.WorldView)
     end,
 
+    --- Prepares the painting to be send to all other worldviews and peers.
     ---@param self UIPaintingCanvasAdapter
     ---@param painting UIPainting
     SharePainting = function(self, painting)
-        ---@type UISharedPainting
-        local sharedPainting = {
-            PaintingIdentifier = painting.PaintingIdentifier,
-            PeerName = self:GetLocalPeerName(),
-            Samples = painting.Samples
-        }
+        local sharedPainting = self:ToSharedPainting(painting)
+        sharedPainting.PeerName = self:GetLocalPeerName()
 
-        self:SharePaintingLocally(sharedPainting)
-
-        -- to be extended by subclasses
+        self:SendShareablePainting(sharedPainting)
     end,
 
-    --- Shares a painting between all worldviews of the local peer.
+    --- Sends a shareable painting to all other worldviews and peers.
+    ---
+    --- Do not call this class directly. Use `SharePainting` instead.
     ---@param self UIPaintingCanvasAdapter
-    ---@param painting UISharedPainting
-    SharePaintingLocally = function(self, painting)
+    ---@param sharedPainting UISharedPainting
+    SendShareablePainting = function(self, sharedPainting)
+        -- send it locally to all adapters
+        local painting = self:FromSharedPainting(sharedPainting)
         for k, adapter in CanvasAdapterInstances do
             local paintingCanvas = adapter.PaintingCanvas
             if not IsDestroyed(paintingCanvas) then
                 paintingCanvas:AddSharedPainting(painting)
             end
         end
+
+        -- to be extended by subclasses to send across the network
+    end,
+
+    --- Converts a painting to a something that is easier to share across a network.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param painting UIPainting
+    ---@return UISharedPainting
+    ToSharedPainting = function(self, painting)
+        local samplesX = {}
+        local samplesY = {}
+        local samplesZ = {}
+
+        for k, sample in painting.Samples do
+            table.insert(samplesX, sample.Position[1])
+            table.insert(samplesY, sample.Position[2])
+            table.insert(samplesZ, sample.Position[3])
+        end
+
+        ---@type UISharedPainting
+        local sharedPainting = {
+            SamplesX = samplesX,
+            SamplesY = samplesY,
+            SamplesZ = samplesZ
+        }
+
+        return sharedPainting
+    end,
+
+    --- Computes the color of a shared painting.
+    ---@param self UIPaintingCanvas
+    ---@param peerId number
+    ---@return Color?
+    ComputeColorOfPeerId = function(self, peerId)
+        local armiesTable = GetArmiesTable().armiesTable
+        if peerId then
+            for k = 1, table.getn(armiesTable) do
+                local armyInfo = armiesTable[k]
+                if table.find(armyInfo.authorizedCommandSources, peerId) then
+                    return armyInfo.color
+                end
+            end
+        end
+    end,
+
+    --- Computes the color of a shared painting.
+    ---@param self UIPaintingCanvas
+    ---@param peerName string
+    ---@return Color?
+    ComputeColorOfPeerName = function(self, peerName)
+        local armiesTable = GetArmiesTable().armiesTable
+        for k = 1, table.getn(armiesTable) do
+            local armyInfo = armiesTable[k]
+            if armyInfo.nickname == peerName then
+                return armyInfo.color
+            end
+        end
+    end,
+
+    --- Converts a shared painting to something that is easier to draw.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param sharedPainting UISharedPainting
+    ---@return UIPainting
+    FromSharedPainting = function(self, sharedPainting)
+        local samples = {}
+        local samplesX = sharedPainting.SamplesX
+        local samplesY = sharedPainting.SamplesY
+        local samplesZ = sharedPainting.SamplesZ
+
+        for k = 1, table.getn(sharedPainting.SamplesX) do
+            local sx = samplesX[k]
+            local sy = samplesY[k]
+            local sz = samplesZ[k]
+            if tonumber(sx) and tonumber(sy) and tonumber(sz) then
+                table.insert(samples, { Position = { sx, sy, sz } })
+            end
+        end
+
+        -- color depends on the peer that sent the painting
+        local color = DefaultSharedColor
+        if sharedPainting.PeerName then
+            color = self:ComputeColorOfPeerName(sharedPainting.PeerName) or color
+        elseif sharedPainting.PeerId then
+            color = self:ComputeColorOfPeerId(sharedPainting.PeerId) or color
+        end
+
+        -- we use import directly for developer convenience: it enables you to reload the file without restarting
+        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
+            self.PaintingCanvas.WorldView, samples, color)
+
+        return painting
     end,
 
     --- Subscribe and callback/sync events that are related to paintings.
@@ -107,7 +211,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
         -- feature: share the active painting with all relevant peers
         AddOnSyncHashedCallback(
-        ---@param sharedPaintings UISharedPainting[]
+        ---@param sharedPaintings UIShareablePaintingCallbackMessage[]
             function(sharedPaintings)
                 if paintingCanvas.EnabledSpewing then
                     LOG(string.format("Received %d paintings for %s", table.getsize(sharedPaintings), identifier))
@@ -115,8 +219,10 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
                 -- process event
                 if not IsDestroyed(paintingCanvas) then
-                    for k, sharedPainting in sharedPaintings do
-                        paintingCanvas:AddSharedPainting(sharedPainting)
+                    for k = 1, table.getn(sharedPaintings) do
+                        local data = sharedPaintings[k]
+                        local painting = self:FromSharedPainting(data.ShareablePainting)
+                        paintingCanvas:AddSharedPainting(painting)
                     end
                 end
             end, syncCategory, identifier
@@ -125,14 +231,24 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     --- Subscribe to chat events that are related to paintings.
     SubscribeToChatEvents = function(self)
+
+        --- The chat function is relatively limited. It does not allow us to subscribe with multiple functions
+        --- to a single identifier. As a result, we cheat a little bit here. All adapters of all world views
+        --- try to subscribe with the same identifier. Since only one will end up being used we manually share
+        --- that message with all other adapters.
+
         import("/lua/ui/game/gamemain.lua").RegisterChatFunc(
         ---@param sender string
-        ---@param sharedPainting UISharedPainting
-            function(sender, sharedPainting)
-                sharedPainting.PeerName = sender
+        ---@param data UIShareablePaintingChatMessage
+            function(sender, data)
+                data.ShareablePainting.PeerName = sender
+
+                local painting = self:FromSharedPainting(data.ShareablePainting)
+
+                -- share it with all other adapters as we can only subscribe with one.
                 for k, canvasAdapterInstance in CanvasAdapterInstances do
                     if not IsDestroyed(canvasAdapterInstance.PaintingCanvas) then
-                        canvasAdapterInstance.PaintingCanvas:AddSharedPainting(sharedPainting)
+                        canvasAdapterInstance.PaintingCanvas:AddSharedPainting(painting)
                     end
                 end
             end, "Painting"

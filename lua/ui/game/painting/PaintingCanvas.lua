@@ -33,12 +33,6 @@ local DefaultPaintingDuration = 25
 
 local SyncIdentifier = "PaintingCanvas.lua"
 
----@class UISharedPainting
----@field PaintingIdentifier string
----@field Samples UIPaintingSample[]
----@field PeerId? number
----@field PeerName? string
-
 --- A painting canvas that is responsible for registering the painting efforts of
 --- players. This involves both the painting itself, as the sharing and receiving
 --- of paintings from peers.
@@ -126,6 +120,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
                 self.WorldView, self:ComputeColorOfActivePainting()
             )
+
+            self.ActivePainting:StartRendering()
         end
 
         self.ActivePainting:AddSample(GetMouseWorldPos())
@@ -184,11 +180,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
             self.WorldView,
             self.ActivePainting.Samples,
-            self.ActivePainting.Color,
-            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
+            self.ActivePainting.Color
         )
-
-        self:AddPainting(painting)
 
         self.Adapter:SharePainting(painting)
 
@@ -213,33 +206,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         return false
     end,
 
-    --- Checks if a painting has the correct format.
-    ---@param self UIPaintingCanvas
-    ---@param painting UISharedPainting
-    ---@return boolean
-    CorrectPaintingFormat = function(self, painting)
-        if not painting.PaintingIdentifier or -- value should exist
-            type(painting.PaintingIdentifier) ~= 'string' -- value should be a string
-        then
-            if self.EnabledWarnings then
-                WARN("Received painting with a malformed identifier")
-            end
-            return false
-        end
-
-        if not painting.Samples or -- value should exist
-            type(painting.Samples) ~= 'table' -- value should be a table
-        then
-            if self.EnabledWarnings then
-                WARN("Received painting with malformed samples")
-            end
-
-            return false
-        end
-
-        return true
-    end,
-
     --- Computes the color of the active painting.
     ---@param self UIPaintingCanvas
     ComputeColorOfActivePainting = function(self)
@@ -254,71 +220,28 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         return armiesTable[GetFocusArmy()].color or 'ffffffff'
     end,
 
-    --- Computes the color of a shared painting.
-    ---@param self UIPaintingCanvas
-    ---@param sharedPainting UISharedPainting
-    ---@return Color
-    ComputeColorOfSharedPainting = function(self, sharedPainting)
-        local armiesTable = GetArmiesTable().armiesTable
-
-        -- if we receive it from the sim then there will be a command source to match
-        if sharedPainting.PeerId then
-            for k = 1, table.getn(armiesTable) do
-                local armyInfo = armiesTable[k]
-                if table.find(armyInfo.authorizedCommandSources, sharedPainting.PeerId) then
-                    return armyInfo.color
-                end
-            end
-        end
-
-        -- if we receive it from a chat message then there will be a peer name
-        if sharedPainting.PeerName then
-            for k = 1, table.getn(armiesTable) do
-                local armyInfo = armiesTable[k]
-                if armyInfo.nickname == sharedPainting.PeerName then
-                    return armyInfo.color
-                end
-            end
-        end
-
-        -- what, how!!
-        return 'ffffffff'
-    end,
-
     --- Attempts to add a painting that is shared by peers.
     ---
     --- Since we can not trust our peers (yes, world is tough) there's some additional sanity
     --- checks involved. These may flag a painting to be 'malicious' and therefore ignored.
     ---@param self UIPaintingCanvas
-    ---@param sharedPainting UISharedPainting
-    AddSharedPainting = function(self, sharedPainting)
+    ---@param painting UIPainting
+    AddSharedPainting = function(self, painting)
         -- feature: enable/disable the painting feature
         if GetOptions("painting") ~= "on" then
             return
         end
 
-        -- do not allow malformed paintings
-        if not self:CorrectPaintingFormat(sharedPainting) then
-            return
-        end
-
         -- do not allow overwriting and/or duplicate paintings
-        if self:PaintingIdentifierInUse(sharedPainting.PaintingIdentifier) then
+        if self:PaintingIdentifierInUse(painting.PaintingIdentifier) then
             return
         end
 
         -- do not allow paintings with excessive samples
-        if table.getn(sharedPainting.Samples) > 150 then
+        if table.getn(painting.Samples) > 300 then
             return
         end
 
-        local paintingColor = self:ComputeColorOfSharedPainting(sharedPainting)
-
-        -- we use import directly for developer convenience: it enables you to reload the file without restarting
-        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.WorldView, sharedPainting.Samples, paintingColor,
-            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
-        )
         self:AddPainting(painting)
     end,
 
@@ -328,6 +251,14 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     AddPainting = function(self, painting)
         self.Trash:Add(painting)
         self.Paintings:Add(painting)
+
+        -- start rendering the painting
+        painting:StartRendering()
+
+        -- start the decay of the painting
+        painting:StartDecay(
+            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
+        )
 
         if self.EnabledSpewing then
             SPEW(

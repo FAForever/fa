@@ -23,6 +23,14 @@
 local ColorUtils = import("/lua/shared/color.lua")
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
+--- Represents a shared painting that is send across the network. The data structure is slightly different to reduce network bandwidth.
+---@class UISharedPainting
+---@field SamplesX number[]
+---@field SamplesY number[]
+---@field SamplesZ number[]
+---@field PeerId? number
+---@field PeerName? string
+
 ---@class UIPaintingSample
 ---@field Position Vector
 
@@ -32,8 +40,9 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field WorldView WorldView
 ---@field Color Color
 ---@field Thickness number
----@field Duration number   # in seconds
----@field CreatedAt number  # in seconds
+---@field DecayDuration number   # in seconds
+---@field DecayStartedAt number  # in seconds
+---@field DecayPaintingThreadInstance? thread
 ---@field Samples UIPaintingSample[]
 Painting = Class(DebugComponent) {
 
@@ -41,24 +50,14 @@ Painting = Class(DebugComponent) {
     ---@param worldview WorldView
     ---@param samples UIPaintingSample[]
     ---@param color Color
-    ---@param duration number       # if duration <= 0, then duration is infinite
-    __init = function(self, worldview, samples, color, duration)
-        -- we use the memory address as our identifier - almost guaranteed to be unique.
-        self.PaintingIdentifier = tostring(self)
-
+    __init = function(self, worldview, samples, color, identifier)
         -- store parameters
         self.Samples = samples
         self.Color = color
         self.WorldView = worldview
-        self.CreatedAt = GetGameTimeSeconds()
-        self.Duration = duration
 
-        -- register ourselves so that we get drawn
-        worldview:RegisterRenderable(self, self.PaintingIdentifier)
-
-        if duration > 0 then
-            ForkThread(self.DecayThread, self, duration)
-        end
+        -- we use the memory address as our identifier - almost guaranteed to be unique.
+        self.PaintingIdentifier = tostring(self)
     end,
 
     --- Destroys the painting and deregisters it from the world view.
@@ -77,8 +76,8 @@ Painting = Class(DebugComponent) {
     ---@param delta number
     OnRender = function(self, delta)
         local decayProgress = 0
-        if self.Duration > 0 then
-            decayProgress = math.clamp((GetGameTimeSeconds() - self.CreatedAt) / self.Duration, 0, 1)
+        if self.DecayDuration and self.DecayStartedAt then
+            decayProgress = math.clamp((GetGameTimeSeconds() - self.DecayStartedAt) / self.DecayDuration, 0, 1)
         end
 
         local decayedColor = self:ComputeDecayedColor(self.Color, decayProgress)
@@ -91,14 +90,6 @@ Painting = Class(DebugComponent) {
 
             UI_DrawLine(s1.Position, s2.Position, decayedColor, 0)
         end
-    end,
-
-    --- Destroys the painting after the specified duration.
-    ---@param self UIPainting
-    ---@param duration number
-    DecayThread = function(self, duration)
-        WaitSeconds(duration)
-        self:Destroy()
     end,
 
     ---@param self UIPainting
@@ -122,14 +113,41 @@ Painting = Class(DebugComponent) {
 
         return ColorUtils.ColorRGB(r, g, b, a)
     end,
+
+    --- Starts a thread that will destroy the painting after the specified duration. If the painting is already decaying then the decay duration is reset.
+    ---@param self UIPainting
+    ---@param duration number
+    StartDecay = function(self, duration)
+        if self.DecayPaintingThreadInstance then
+            KillThread(self.DecayPaintingThreadInstance)
+        end
+
+        self.DecayDuration = duration
+        self.DecayStartedAt = GetGameTimeSeconds()
+        self.DecayPaintingThreadInstance = ForkThread(self.DecayThread, self, duration)
+    end,
+
+    --- Destroys the painting after the specified duration.
+    ---@param self UIPainting
+    ---@param duration number
+    DecayThread = function(self, duration)
+        WaitSeconds(duration)
+        self:Destroy()
+    end,
+
+    ---@param self UIPainting
+    StartRendering = function(self)
+        -- register ourselves so that we get drawn
+        self.WorldView:RegisterRenderable(self, self.PaintingIdentifier)
+    end,
 }
 
+--- Creates a painting that can be drawn to a world view.
 ---@param worldview WorldView
 ---@param samples UIPaintingSample[]
 ---@param color Color
----@param duration number
 ---@return UIPainting
-CreatePainting = function(worldview, samples, color, duration)
-    local instance = Painting(worldview, samples, color, duration) --[[@as UIPainting]]
+CreatePainting = function(worldview, samples, color)
+    local instance = Painting(worldview, samples, color) --[[@as UIPainting]]
     return instance
 end

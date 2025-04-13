@@ -813,7 +813,7 @@ end
 
 --#region UI related functionality
 
----@param data UISharedPainting
+---@param data UIShareablePaintingCallbackMessage
 Callbacks.SharePainting = function(data)
     local isSpectator = GetFocusArmy() == -1
 
@@ -826,8 +826,8 @@ Callbacks.SharePainting = function(data)
     end
 
     -- used to determine the color of the painting
-    data.PeerId = GetCurrentCommandSource()
-    data.PeerName = GetArmyBrain(data.PeerId).Nickname
+    data.ShareablePainting.PeerId = GetCurrentCommandSource()
+    data.ShareablePainting.PeerName = GetArmyBrain(data.ShareablePainting.PeerId).Nickname
 
     Sync.SharePainting = Sync.SharePainting or {}
     table.insert(Sync.SharePainting, data)

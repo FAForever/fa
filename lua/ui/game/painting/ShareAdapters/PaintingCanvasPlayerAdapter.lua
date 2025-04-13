@@ -22,6 +22,8 @@
 
 local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapter.lua").PaintingCanvasAdapter
 
+--- Do not create an instance of this class directly. Instead, use 
+--- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
 ---@class UIPaintingCanvasPlayerAdapter : UIPaintingCanvasAdapter
 PaintingCanvasPlayerAdapter = Class(PaintingCanvasAdapter) {
 
@@ -35,18 +37,18 @@ PaintingCanvasPlayerAdapter = Class(PaintingCanvasAdapter) {
         self:SubscribeToSyncEvents()
     end,
 
-    ---@param self UIPaintingCanvasPlayerAdapter
-    ---@param painting UIPainting
-    SharePainting = function(self, painting)
-        PaintingCanvasAdapter.SharePainting(self, painting)
+    --- Shares the painting with all other peers through a sim callback. These paintings are stored in the replay.
+    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param shareablePainting UISharedPainting
+    SendShareablePainting = function(self, shareablePainting)
+        PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
 
         local syncCategory = self.SyncCategory
 
         SimCallback({
             Func = syncCategory,
             Args = {
-                PaintingIdentifier = painting.PaintingIdentifier,
-                Samples = painting.Samples
+                ShareablePainting = shareablePainting
             }
         })
     end,

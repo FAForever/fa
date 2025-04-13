@@ -22,6 +22,8 @@
 
 local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapter.lua").PaintingCanvasAdapter
 
+--- Do not create an instance of this class directly. Instead, use 
+--- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
 ---@class UIPaintingCanvasReplayAdapter : UIPaintingCanvasAdapter
 PaintingCanvasReplayAdapter = Class(PaintingCanvasAdapter) {
 
