@@ -22,38 +22,22 @@
 
 local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapter.lua").PaintingCanvasAdapter
 
----@class UIPaintingCanvasPlayerAdapter : UIPaintingCanvasAdapter
-PaintingCanvasPlayerAdapter = Class(PaintingCanvasAdapter) {
+---@class UIPaintingCanvasReplayAdapter : UIPaintingCanvasAdapter
+PaintingCanvasReplayAdapter = Class(PaintingCanvasAdapter) {
 
-    AdapterType = 'Player',
+    AdapterType = 'Replay',
 
-    ---@param self UIPaintingCanvasPlayerAdapter
+    ---@param self UIPaintingCanvasReplayAdapter
     ---@param paintingCanvas UIPaintingCanvas
     __init = function(self, paintingCanvas)
         PaintingCanvasAdapter.__init(self, paintingCanvas)
 
         self:SubscribeToSyncEvents()
     end,
-
-    ---@param self UIPaintingCanvasPlayerAdapter
-    ---@param painting UIPainting
-    SharePainting = function(self, painting)
-        PaintingCanvasAdapter.SharePainting(self, painting)
-
-        local syncCategory = self.SyncCategory
-
-        SimCallback({
-            Func = syncCategory,
-            Args = {
-                PaintingIdentifier = painting.PaintingIdentifier,
-                Samples = painting.Samples
-            }
-        })
-    end,
 }
 
 ---@param paintingCanvas UIPaintingCanvas
----@return UIPaintingCanvasPlayerAdapter
-CreatePaintingCanvasPlayerAdapter = function(paintingCanvas)
-    return PaintingCanvasPlayerAdapter(paintingCanvas)
+---@return UIPaintingCanvasReplayAdapter
+CreatePaintingCanvasReplayAdapter = function(paintingCanvas)
+    return PaintingCanvasReplayAdapter(paintingCanvas)
 end

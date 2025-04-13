@@ -22,6 +22,7 @@
 
 local PaintingCanvasObserverAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasObserverAdapter.lua")
 local PaintingCanvasPlayerAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasPlayerAdapter.lua")
+local PaintingCanvasReplayAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasReplayAdapter.lua")
 
 ---@class UIPaintingCanvasAdapter
 ---@field SharePainting fun(self:UIPaintingCanvasAdapter, painting: UIPainting)
@@ -30,20 +31,16 @@ local PaintingCanvasPlayerAdapter = import("/lua/ui/game/painting/ShareAdapters/
 --- the painting canvas simple and about painting we use this (network) adapter class to
 --- encapsulate all the logic. In general, it mimics the following rules:
 ---
---- - If watching a replay, painting should not be shared at all.
---- - If playing skirmish, painting should be shared to store it in the replay.
+--- - If watching a replay, painting should not be shared across the network at all.
+--- - If playing skirmish, painting should be shared through SimCallback.
 --- - If playing multiplayer, but you're a player - painting should be shared through SimCallback.
 --- - If playing multiplayer, but you're an observer - painting should be shared through SendChatMessage.
 ---@param paintingCanvas UIPaintingCanvas
 ---@return UIPaintingCanvasAdapter
 GetPaintingCanvasAdapter = function(paintingCanvas)
-
-    -- in this case, act like we're an observer
     if SessionIsReplay() then
-        return PaintingCanvasObserverAdapter.CreatePaintingCanvasObserverAdapter(paintingCanvas)
-    end
-
-    if IsObserver() then
+        return PaintingCanvasReplayAdapter.CreatePaintingCanvasReplayAdapter(paintingCanvas)
+    elseif IsObserver() then
         return PaintingCanvasObserverAdapter.CreatePaintingCanvasObserverAdapter(paintingCanvas)
     else
         return PaintingCanvasPlayerAdapter.CreatePaintingCanvasPlayerAdapter(paintingCanvas)
