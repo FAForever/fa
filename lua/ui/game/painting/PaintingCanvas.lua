@@ -189,23 +189,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self:DestroyActivePainting()
     end,
 
-    --- Checks if a painting identifier is already in use. This can be the case
-    --- when we receive a shared painting that the local peer created.
-    ---@param self UIPaintingCanvas
-    ---@param id string
-    ---@return boolean
-    PaintingIdentifierInUse = function(self, id)
-        -- check if we already have this painting
-        for k = 1, table.getn(self.Paintings) do
-            local painting = self.Paintings[k] --[[@as UIPainting]]
-            if painting.PaintingIdentifier == id then
-                return true
-            end
-        end
-
-        return false
-    end,
-
     --- Computes the color of the active painting.
     ---@param self UIPaintingCanvas
     ComputeColorOfActivePainting = function(self)
@@ -229,11 +212,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     AddSharedPainting = function(self, painting)
         -- feature: enable/disable the painting feature
         if GetOptions("painting") ~= "on" then
-            return
-        end
-
-        -- do not allow overwriting and/or duplicate paintings
-        if self:PaintingIdentifierInUse(painting.PaintingIdentifier) then
             return
         end
 
