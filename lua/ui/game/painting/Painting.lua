@@ -34,15 +34,18 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@class UIPaintingSample
 ---@field Position Vector
 
+---@class UIPaintingDecay
+---@field Duration number       # in seconds
+---@field StartTime number      # in seconds
+---@field ThreadInstance thread
+
 --- Responsible for drawing the painting to a world view.
 ---@class UIPainting : Renderable, DebugComponent
 ---@field PaintingIdentifier string
 ---@field WorldView WorldView
 ---@field Color Color
 ---@field Thickness number
----@field DecayDuration number   # in seconds
----@field DecayStartedAt number  # in seconds
----@field DecayPaintingThreadInstance? thread
+---@field Decay? UIPaintingDecay
 ---@field Samples UIPaintingSample[]
 Painting = Class(DebugComponent) {
 
@@ -76,8 +79,8 @@ Painting = Class(DebugComponent) {
     ---@param delta number
     OnRender = function(self, delta)
         local decayProgress = 0
-        if self.DecayDuration and self.DecayStartedAt then
-            decayProgress = math.clamp((GetGameTimeSeconds() - self.DecayStartedAt) / self.DecayDuration, 0, 1)
+        if self.Decay then
+            decayProgress = math.clamp((GetGameTimeSeconds() - self.Decay.StartTime) / self.Decay.Duration, 0, 1)
         end
 
         local decayedColor = self:ComputeDecayedColor(self.Color, decayProgress)
@@ -118,13 +121,15 @@ Painting = Class(DebugComponent) {
     ---@param self UIPainting
     ---@param duration number
     StartDecay = function(self, duration)
-        if self.DecayPaintingThreadInstance then
-            KillThread(self.DecayPaintingThreadInstance)
+        if self.Decay then
+            KillThread(self.Decay.ThreadInstance)
         end
 
-        self.DecayDuration = duration
-        self.DecayStartedAt = GetGameTimeSeconds()
-        self.DecayPaintingThreadInstance = ForkThread(self.DecayThread, self, duration)
+        self.Decay = {
+            Duration = duration,
+            StartTime = GetGameTimeSeconds(),
+            ThreadInstance = ForkThread(self.DecayThread, self, duration)
+        }
     end,
 
     --- Destroys the painting after the specified duration.
