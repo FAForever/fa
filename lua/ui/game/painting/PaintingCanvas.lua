@@ -36,7 +36,7 @@ local SyncIdentifier = "PaintingCanvas.lua"
 --- A painting canvas that is responsible for registering the painting efforts of
 --- players. This involves both the painting itself, as the sharing and receiving
 --- of paintings from peers.
----@class UIPaintingCanvas : Bitmap, DebugComponent
+---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
 ---@field Adapter UIPaintingCanvasAdapter
 ---@field Trash TrashBag                        # Contains all (active) paintings.
 ---@field WorldView WorldView                   # Worldview that this canvas is for.
@@ -57,6 +57,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Adapter = GetPaintingCanvasAdapter(self)
 
         self.Trash:Add(ForkThread(self.AbortActivePaintingThread, self))
+
+        -- register us to render
+        self.WorldView:RegisterRenderable(self, tostring(self))
     end,
 
     ---@param self UIPaintingCanvas
@@ -75,6 +78,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     Destroy = function(self)
         Bitmap.Destroy(self)
         self.Trash:Destroy()
+
+        -- deregister us to render
+        self.WorldView:UnregisterRenderable(tostring(self))
     end,
 
     ---@param self UIPaintingCanvas
@@ -112,16 +118,36 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         return false
     end,
 
+    ---@param self UIPaintingCanvas
+    ---@param delta any
+    OnRender = function(self, delta)
+        -- render the active painting
+        if (self.ActivePainting) then
+            local ok, msg = pcall(self.ActivePainting.OnRender, self.ActivePainting, delta)
+            if not ok and self.EnabledErrors then
+                WARN(msg)
+                self:DestroyActivePainting()
+            end
+        end
+
+        -- render all other paintings
+        for k, painting in self.Paintings do
+            local ok, msg = pcall(painting.OnRender, painting, delta)
+            if not ok and self.EnabledErrors then
+                WARN(msg)
+                self.Paintings[k] = nil
+            end
+        end
+    end,
+
     --- Creates a new active painting, or adds samples to the current active painting.
     ---@param self UIPaintingCanvas
     CreateActivePainting = function(self)
         if not self.ActivePainting then
             -- we use import directly for developer convenience: it enables you to reload the file without restarting
             self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
-                self.WorldView, self:ComputeColorOfActivePainting()
+                self:ComputeColorOfActivePainting()
             )
-
-            self.ActivePainting:StartRendering()
         end
 
         self.ActivePainting:AddSample(GetMouseWorldPos())
@@ -144,8 +170,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
     --- Removes the active painting.
     ---@param self UIPaintingCanvas
-    ---@param skipMessage? boolean
-    DestroyActivePainting = function(self, skipMessage)
+    DestroyActivePainting = function(self)
         if self.ActivePainting then
             self.ActivePainting:Destroy()
             self.ActivePainting = nil
@@ -178,7 +203,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- turn it into a regular painting
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.WorldView,
             self.ActivePainting.Samples,
             self.ActivePainting.Color
         )
@@ -215,11 +239,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return
         end
 
-        -- do not allow paintings with excessive samples
-        if table.getn(painting.Samples.CoordinatesX) > 300 then
-            return
-        end
-
         self:AddPainting(painting)
     end,
 
@@ -229,9 +248,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     AddPainting = function(self, painting)
         self.Trash:Add(painting)
         self.Paintings:Add(painting)
-
-        -- start rendering the painting
-        painting:StartRendering()
 
         -- start the decay of the painting
         painting:StartDecay(

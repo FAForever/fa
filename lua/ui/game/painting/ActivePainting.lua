@@ -32,10 +32,9 @@ ActivePainting = ClassUI(Painting) {
     DebounceDistanceThreshold = 1.0,
 
     ---@param self UIActivePainting
-    ---@param worldview WorldView
     ---@param color Color
-    __init = function(self, worldview, color)
-        Painting.__init(self, worldview, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color, 0)
+    __init = function(self, color)
+        Painting.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color, 0)
 
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = GetMouseWorldPos()
@@ -81,11 +80,10 @@ ActivePainting = ClassUI(Painting) {
     end,
 }
 
----@param worldview WorldView
 ---@param color Color
 ---@return UIActivePainting
-CreateActivePainting = function(worldview, color)
-    local instance = ActivePainting(worldview, color) --[[@as UIActivePainting]]
+CreateActivePainting = function(color)
+    local instance = ActivePainting(color) --[[@as UIActivePainting]]
 
     return instance
 end

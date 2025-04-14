@@ -261,11 +261,12 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
         self.Trash = TrashBag()
 
+
+        self.Renderables = {}
+
         -- we do not want the module to reload if we reload this
         local CreatePaintingCanvas = import("/lua/ui/game/painting/PaintingCanvas.lua").CreatePaintingCanvas
         self.PaintingCanvas = self.Trash:Add(CreatePaintingCanvas(self))
-
-        self.Renderables = {}
     end,
 
     ---@param self WorldView

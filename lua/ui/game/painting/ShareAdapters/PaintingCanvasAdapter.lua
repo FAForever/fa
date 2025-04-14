@@ -114,10 +114,10 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param sharedPainting UISharedPainting
     SendShareablePainting = function(self, sharedPainting)
         -- send it locally to all adapters
-        local painting = self:FromSharedPainting(sharedPainting)
         for k, adapter in CanvasAdapterInstances do
             local paintingCanvas = adapter.PaintingCanvas
             if not IsDestroyed(paintingCanvas) then
+                local painting = adapter:FromSharedPainting(sharedPainting)
                 paintingCanvas:AddSharedPainting(painting)
             end
         end
@@ -210,8 +210,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         end
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
-        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.PaintingCanvas.WorldView, samples, color)
+        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(samples, color)
 
         return painting
     end,

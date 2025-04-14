@@ -36,8 +36,6 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 
 --- Responsible for drawing the painting to a world view.
 ---@class UIPainting : Renderable, DebugComponent
----@field PaintingIdentifier string
----@field WorldView WorldView
 ---@field Color Color
 ---@field Thickness number
 ---@field Decay? UIPaintingDecay
@@ -45,28 +43,17 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 Painting = Class(DebugComponent) {
 
     ---@param self UIPainting
-    ---@param worldview WorldView
     ---@param samples UIPaintingSamples
     ---@param color Color
-    __init = function(self, worldview, samples, color, identifier)
+    __init = function(self, samples, color, identifier)
         -- store parameters
         self.Samples = samples
         self.Color = color
-        self.WorldView = worldview
-
-        -- we use the memory address as our identifier - almost guaranteed to be unique.
-        self.PaintingIdentifier = tostring(self)
     end,
 
-    --- Destroys the painting and deregisters it from the world view.
-    ---@param self UIPainting
+
     Destroy = function(self)
-        self:OnDestroy()
-    end,
-
-    ---@param self UIPainting
-    OnDestroy = function(self)
-        self.WorldView:UnregisterRenderable(self.PaintingIdentifier)
+        -- ...?
     end,
 
     --- Renders the painting to the world view.
@@ -145,12 +132,6 @@ Painting = Class(DebugComponent) {
         self:Destroy()
     end,
 
-    ---@param self UIPainting
-    StartRendering = function(self)
-        -- register ourselves so that we get drawn
-        self.WorldView:RegisterRenderable(self, self.PaintingIdentifier)
-    end,
-
     ---------------------------------------------------------------------------
     --#region Debug functionality
 
@@ -175,11 +156,10 @@ Painting = Class(DebugComponent) {
 }
 
 --- Creates a painting that can be drawn to a world view.
----@param worldview WorldView
 ---@param samples UIPaintingSamples
 ---@param color Color
 ---@return UIPainting
-CreatePainting = function(worldview, samples, color)
-    local instance = Painting(worldview, samples, color) --[[@as UIPainting]]
+CreatePainting = function(samples, color)
+    local instance = Painting(samples, color) --[[@as UIPainting]]
     return instance
 end
