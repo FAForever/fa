@@ -216,7 +216,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
 
         -- do not allow paintings with excessive samples
-        if table.getn(painting.Samples) > 300 then
+        if table.getn(painting.Samples.CoordinatesX) > 300 then
             return
         end
 
@@ -239,14 +239,16 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         )
 
         if self.EnabledSpewing then
-            SPEW(
-                string.format(
-                    "Active paintings for %s: %d (%d bytes)",
+
+            SPEW("Active paintings:")
+            for k, v in self.Paintings do
+                SPEW(string.format(
+                    " - %s: %d samples (%d bytes)",
                     self.WorldView._cameraName,
-                    table.getsize(self.Paintings),
-                    debug.allocatedrsize(self.Paintings, { WorldView = true })
-                )
-            )
+                    table.getn(v.Samples.CoordinatesX),
+                    v:ComputeAllocatedBytes()
+                ))
+            end
         end
     end,
 }

@@ -23,16 +23,11 @@
 local ColorUtils = import("/lua/shared/color.lua")
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
---- Represents a shared painting that is send across the network. The data structure is slightly different to reduce network bandwidth.
----@class UISharedPainting
----@field SamplesX number[]
----@field SamplesY number[]
----@field SamplesZ number[]
----@field PeerId? number
----@field PeerName? string
-
----@class UIPaintingSample
----@field Position Vector
+--- A structure of arrays that stores samples.
+---@class UIPaintingSamples
+---@field CoordinatesX number[]
+---@field CoordinatesY number[]
+---@field CoordinatesZ number[]
 
 ---@class UIPaintingDecay
 ---@field Duration number       # in seconds
@@ -46,12 +41,12 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field Color Color
 ---@field Thickness number
 ---@field Decay? UIPaintingDecay
----@field Samples UIPaintingSample[]
+---@field Samples UIPaintingSamples
 Painting = Class(DebugComponent) {
 
     ---@param self UIPainting
     ---@param worldview WorldView
-    ---@param samples UIPaintingSample[]
+    ---@param samples UIPaintingSamples
     ---@param color Color
     __init = function(self, worldview, samples, color, identifier)
         -- store parameters
@@ -85,13 +80,23 @@ Painting = Class(DebugComponent) {
 
         local decayedColor = self:ComputeDecayedColor(self.Color, decayProgress)
 
-        local samples = self.Samples
-        local sampleCount = table.getn(samples)
-        for k = 2, sampleCount do
-            local s1 = samples[k - 1]
-            local s2 = samples[k]
+        local position1 = {}
+        local position2 = {}
 
-            UI_DrawLine(s1.Position, s2.Position, decayedColor, 0)
+        local coordinatesX = self.Samples.CoordinatesX
+        local coordinatesY = self.Samples.CoordinatesY
+        local coordinatesZ = self.Samples.CoordinatesZ
+
+        for k = 2, table.getn(coordinatesX) do
+            position1[1] = coordinatesX[k - 1]
+            position1[2] = coordinatesY[k - 1]
+            position1[3] = coordinatesZ[k - 1]
+
+            position2[1] = coordinatesX[k]
+            position2[2] = coordinatesY[k]
+            position2[3] = coordinatesZ[k]
+
+            UI_DrawLine(position1, position2, decayedColor, 0)
         end
     end,
 
@@ -145,11 +150,33 @@ Painting = Class(DebugComponent) {
         -- register ourselves so that we get drawn
         self.WorldView:RegisterRenderable(self, self.PaintingIdentifier)
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    --- Computes the allocated bytes by this painting.
+    ---@param self UIPainting
+    ---@return number
+    ComputeAllocatedBytes = function(self)
+        local allocatedBytesForSamples = debug.allocatedsize(self.Samples) +
+            debug.allocatedsize(self.Samples.CoordinatesX) +
+            debug.allocatedsize(self.Samples.CoordinatesY) +
+            debug.allocatedsize(self.Samples.CoordinatesZ)
+
+        local allocatedBytesForDecay = 0
+        if self.Decay then
+            allocatedBytesForDecay = debug.allocatedsize(self.Decay)
+        end
+
+        return debug.allocatedsize(self) + allocatedBytesForSamples + allocatedBytesForDecay
+    end,
+
+    --#endregion
 }
 
 --- Creates a painting that can be drawn to a world view.
 ---@param worldview WorldView
----@param samples UIPaintingSample[]
+---@param samples UIPaintingSamples
 ---@param color Color
 ---@return UIPainting
 CreatePainting = function(worldview, samples, color)

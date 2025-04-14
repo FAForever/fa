@@ -26,6 +26,13 @@ local DefaultSharedColor = 'ffffffff'
 --- Keeps track of all active canvas adapter instances
 local CanvasAdapterInstances = TrashBag()
 
+--- Represents a shared painting that is send across the network. The data structure is slightly different to reduce network bandwidth.
+---@class UISharedPainting
+---@field PaintingAdapterIdentifier string
+---@field Samples UIPaintingSamples
+---@field PeerId? number
+---@field PeerName? string
+
 ---@alias UIPaintingCanvasAdapterType 'Abstract' | 'Observer' | 'Player'
 
 --- Generic container to use when sharing paintings
@@ -89,6 +96,11 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param self UIPaintingCanvasAdapter
     ---@param painting UIPainting
     SharePainting = function(self, painting)
+        -- check if we have something to share
+        if table.empty(painting.Samples.CoordinatesX) then
+            return
+        end
+
         local sharedPainting = self:ToSharedPainting(painting)
         sharedPainting.PeerName = self:GetLocalPeerName()
 
@@ -118,21 +130,10 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param painting UIPainting
     ---@return UISharedPainting
     ToSharedPainting = function(self, painting)
-        local samplesX = {}
-        local samplesY = {}
-        local samplesZ = {}
-
-        for k, sample in painting.Samples do
-            table.insert(samplesX, sample.Position[1])
-            table.insert(samplesY, sample.Position[2])
-            table.insert(samplesZ, sample.Position[3])
-        end
-
         ---@type UISharedPainting
         local sharedPainting = {
-            SamplesX = samplesX,
-            SamplesY = samplesY,
-            SamplesZ = samplesZ
+            PaintingAdapterIdentifier = tostring(self),
+            Samples = painting.Samples
         }
 
         return sharedPainting
@@ -173,19 +174,32 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param sharedPainting UISharedPainting
     ---@return UIPainting
     FromSharedPainting = function(self, sharedPainting)
-        local samples = {}
-        local samplesX = sharedPainting.SamplesX
-        local samplesY = sharedPainting.SamplesY
-        local samplesZ = sharedPainting.SamplesZ
+        local coordinatesX = {}
+        local coordinatesY = {}
+        local coordinatesZ = {}
+        local samplesX = sharedPainting.Samples.CoordinatesX
+        local samplesY = sharedPainting.Samples.CoordinatesY
+        local samplesZ = sharedPainting.Samples.CoordinatesZ
 
-        for k = 1, table.getn(sharedPainting.SamplesX) do
+        for k = 1, table.getn(samplesX) do
             local sx = samplesX[k]
             local sy = samplesY[k]
             local sz = samplesZ[k]
+
+            -- only keep the valid samples
             if tonumber(sx) and tonumber(sy) and tonumber(sz) then
-                table.insert(samples, { Position = { sx, sy, sz } })
+                table.insert(coordinatesX, sx)
+                table.insert(coordinatesY, sy)
+                table.insert(coordinatesZ, sz)
             end
         end
+
+        ---@type UIPaintingSamples
+        local samples = {
+            CoordinatesX = coordinatesX,
+            CoordinatesY = coordinatesY,
+            CoordinatesZ = coordinatesZ
+        }
 
         -- color depends on the peer that sent the painting
         local color = DefaultSharedColor
@@ -200,6 +214,19 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             self.PaintingCanvas.WorldView, samples, color)
 
         return painting
+    end,
+
+    --- A rough check to see if a shared painting originates from the local peer.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param sharedPainting UISharedPainting
+    SharedPaintingIsKnown = function(self, sharedPainting)
+        for k, canvasAdapterInstance in CanvasAdapterInstances do
+            if tostring(canvasAdapterInstance) == sharedPainting.PaintingAdapterIdentifier then
+                return true
+            end
+        end
+
+        return false
     end,
 
     --- Subscribe and callback/sync events that are related to paintings.
@@ -221,8 +248,12 @@ PaintingCanvasAdapter = Class(DebugComponent) {
                 if not IsDestroyed(paintingCanvas) then
                     for k = 1, table.getn(sharedPaintings) do
                         local data = sharedPaintings[k]
-                        local painting = self:FromSharedPainting(data.ShareablePainting)
-                        paintingCanvas:AddSharedPainting(painting)
+
+                        -- only take into account paintings that we don't already have
+                        if not self:SharedPaintingIsKnown(data.ShareablePainting) then
+                            local painting = self:FromSharedPainting(data.ShareablePainting)
+                            paintingCanvas:AddSharedPainting(painting)
+                        end
                     end
                 end
             end, syncCategory, identifier
@@ -242,6 +273,11 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         ---@param data UIShareablePaintingChatMessage
             function(sender, data)
                 data.ShareablePainting.PeerName = sender
+
+                -- only take into account paintings that we did not share locally
+                if self:SharedPaintingIsKnown(data.ShareablePainting) then
+                    return
+                end
 
                 -- share it with all other adapters as we can only subscribe with one.
                 for k, canvasAdapterInstance in CanvasAdapterInstances do

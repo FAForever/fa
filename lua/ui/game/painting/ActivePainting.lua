@@ -25,19 +25,17 @@ local Painting = import('/lua/ui/game/painting/Painting.lua').Painting
 --- Responsible for managing a painting that is actively being worked on.
 ---@class UIActivePainting : UIPainting
 ---@field LastEdited number
----@field LastSample UIPaintingSample
+---@field LastSample Vector
 ActivePainting = ClassUI(Painting) {
 
     ---@param self UIActivePainting
     ---@param worldview WorldView
     ---@param color Color
     __init = function(self, worldview, color)
-        Painting.__init(self, worldview, {}, color, 0)
+        Painting.__init(self, worldview, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color, 0)
 
         self.LastEdited = GetGameTimeSeconds()
-        self.LastSample = {
-            Position = GetMouseWorldPos()
-        }
+        self.LastSample = GetMouseWorldPos()
     end,
 
     --- Responsible for debouncing samples. This is to reduce the
@@ -67,8 +65,12 @@ ActivePainting = ClassUI(Painting) {
         }
 
         self.LastEdited = GetGameTimeSeconds()
-        self.LastSample = sample
-        table.insert(self.Samples, sample)
+        self.LastSample = position
+
+        local samples = self.Samples
+        table.insert(samples.CoordinatesX, position[1])
+        table.insert(samples.CoordinatesY, position[2])
+        table.insert(samples.CoordinatesZ, position[3])
     end,
 }
 
