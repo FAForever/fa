@@ -28,6 +28,9 @@ local Painting = import('/lua/ui/game/painting/Painting.lua').Painting
 ---@field LastSample Vector
 ActivePainting = ClassUI(Painting) {
 
+    DebounceTimeThreshold = 0.016,
+    DebounceDistanceThreshold = 1.0,
+
     ---@param self UIActivePainting
     ---@param worldview WorldView
     ---@param color Color
@@ -42,27 +45,31 @@ ActivePainting = ClassUI(Painting) {
     --- bandwidth it requires to share the art once it is finished.
     ---@param self UIActivePainting
     ---@return boolean
-    ShouldDebounceSample = function(self)
+    DebounceSample = function(self, sample)
+        local shouldDebounce = false
+
+        -- debounce samples that happen too soon
         local now = GetGameTimeSeconds()
-        if now - self.LastEdited > 0.025 then
-            return false
+        if now - self.LastEdited < self.DebounceTimeThreshold then
+            shouldDebounce = true
         end
 
-        return true
+        -- debounce samples that are too close
+        if VDist3(self.LastSample, sample) < self.DebounceDistanceThreshold then
+            shouldDebounce = true
+        end
+
+        return shouldDebounce
     end,
 
     --- Adds a sample to the painting.
     ---@param self UIActivePainting
     ---@param position Vector
     AddSample = function(self, position)
-        if self:ShouldDebounceSample() then
+        -- basic debouncing to reduce bandwidth requirements
+        if self:DebounceSample(position) then
             return
         end
-
-        ---@type UIPaintingSample
-        local sample = {
-            Position = position
-        }
 
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = position
