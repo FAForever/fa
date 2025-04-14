@@ -45,6 +45,10 @@ ActivePainting = ClassUI(Painting) {
     ---@param self UIActivePainting
     ---@return boolean
     DebounceSample = function(self, sample)
+
+        -- feature: debounce samples that are too close to each other
+        -- feature: debounce samples that are in too quick succession
+
         local shouldDebounce = false
 
         -- debounce samples that happen too soon
