@@ -33,9 +33,7 @@ local DefaultPaintingDuration = 25
 
 local SyncIdentifier = "PaintingCanvas.lua"
 
---- A painting canvas that is responsible for registering the painting efforts of
---- players. This involves both the painting itself, as the sharing and receiving
---- of paintings from peers.
+--- A painting canvas that is responsible for registering and painting the artistic efforts of players.
 ---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
 ---@field Adapter UIPaintingCanvasAdapter
 ---@field Trash TrashBag                        # Contains all (active) paintings.
@@ -157,6 +155,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param self any
     AbortActivePainting = function(self)
         if self.ActivePainting then
+
             -- user feedback
             local message = "<LOC painting_cancel_message>Cancelled a painting"
             if Random() < 0.01 then
@@ -180,6 +179,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     --- An active thread that checks if the user wants to abort the active painting.
     ---@param self UIPaintingCanvas
     AbortActivePaintingThread = function(self)
+
+        -- feature: be able to cancel the active painting
         while not IsDestroyed(self) do
             local escapePressed = IsKeyDown('ESCAPE')
 
@@ -249,13 +250,12 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Trash:Add(painting)
         self.Paintings:Add(painting)
 
-        -- start the decay of the painting
+        -- feature: paintings decay over time
         painting:StartDecay(
             tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
         )
 
         if self.EnabledSpewing then
-
             SPEW("Active paintings:")
             for k, v in self.Paintings do
                 SPEW(string.format(
@@ -272,8 +272,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 --- Aborts all active paintings. As an example, this can be used to stop
 --- all active drawing when you enter cinematic mode.
 AbortAllActivePaintings = function()
-    for k = 1, table.getn(PaintingCanvasInstances) do
-        local paintingCanvasInstance = PaintingCanvasInstances[k] --[[@as UIPaintingCanvas]]
+    for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
         if not IsDestroyed(paintingCanvasInstance) then
             paintingCanvasInstance:AbortActivePainting()
         end

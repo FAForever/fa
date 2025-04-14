@@ -51,9 +51,11 @@ Painting = Class(DebugComponent) {
         self.Color = color
     end,
 
-
+    ---@param self UIPainting
     Destroy = function(self)
-        -- ...?
+        -- do nothing
+
+        -- this function exists to allow a painting to become part of a trashbag. 
     end,
 
     --- Renders the painting to the world view.
@@ -87,12 +89,20 @@ Painting = Class(DebugComponent) {
         end
     end,
 
+    --- Computes the alpha value based on the decay progress of the painting. Defaults to a square root curve.
+    ---@param self UIPainting
+    ---@param value number  # number between 0 and 1.0
+    ---@return number
+    ComputeDecayInterpolation = function(self, value)
+        return math.sqrt(value)
+    end,
+
     ---@param self UIPainting
     ---@param color Color
     ---@param progress number   # number between 0 and 1.0
     ---@return Color
     ComputeDecayedColor = function(self, color, progress)
-        -- guardrail
+        -- defensive programming
         progress = math.clamp(progress, 0, 1)
 
         -- get color channel values, default to white
@@ -104,7 +114,7 @@ Painting = Class(DebugComponent) {
         end
 
         -- compute transparency
-        a = math.sqrt(1 - progress)
+        a = self:ComputeDecayCurve(progress)
 
         return ColorUtils.ColorRGB(r, g, b, a)
     end,
@@ -130,6 +140,11 @@ Painting = Class(DebugComponent) {
     DecayThread = function(self, duration)
         WaitSeconds(duration)
         self:Destroy()
+    end,
+
+    ComputeBoundingBox = function(self)
+
+
     end,
 
     ---------------------------------------------------------------------------
