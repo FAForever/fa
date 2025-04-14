@@ -23,6 +23,14 @@
 local ColorUtils = import("/lua/shared/color.lua")
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
+---@class UIPaintingBoundingBox : number[]
+---@field [1] number # min x
+---@field [2] number # min y
+---@field [3] number # min z
+---@field [4] number # max x
+---@field [5] number # max y
+---@field [6] number # max z
+
 --- A structure of arrays that stores samples.
 ---@class UIPaintingSamples
 ---@field CoordinatesX number[]
@@ -55,7 +63,7 @@ Painting = Class(DebugComponent) {
     Destroy = function(self)
         -- do nothing
 
-        -- this function exists to allow a painting to become part of a trashbag. 
+        -- this function exists to allow a painting to become part of a trashbag.
     end,
 
     --- Renders the painting to the world view.
@@ -94,7 +102,7 @@ Painting = Class(DebugComponent) {
     ---@param value number  # number between 0 and 1.0
     ---@return number
     ComputeDecayInterpolation = function(self, value)
-        return math.sqrt(value)
+        return 1 - math.sqrt(value)
     end,
 
     ---@param self UIPainting
@@ -114,7 +122,7 @@ Painting = Class(DebugComponent) {
         end
 
         -- compute transparency
-        a = self:ComputeDecayCurve(progress)
+        a = self:ComputeDecayInterpolation(progress)
 
         return ColorUtils.ColorRGB(r, g, b, a)
     end,
@@ -142,9 +150,162 @@ Painting = Class(DebugComponent) {
         self:Destroy()
     end,
 
-    ComputeBoundingBox = function(self)
+    --- Computes the bounding box of the painting and caches it.
+    ---@param self UIPainting
+    ---@return UIPaintingBoundingBox
+    GetBoundingBox = function(self)
+        if self.BoundingBox then
+            return self.BoundingBox
+        end
 
+        local minX = 8192
+        local minY = 8192
+        local minZ = 8192
 
+        local maxX = -8192
+        local maxY = -8192
+        local maxZ = -8192
+
+        local coordinatesX = self.Samples.CoordinatesX
+        local coordinatesY = self.Samples.CoordinatesY
+        local coordinatesZ = self.Samples.CoordinatesZ
+
+        for k = 1, table.getn(coordinatesX) do
+            local sx = coordinatesX[k]
+            local sy = coordinatesY[k]
+            local sz = coordinatesZ[k]
+
+            minX = math.min(minX, sx)
+            minY = math.min(minY, sy)
+            minZ = math.min(minZ, sz)
+
+            maxX = math.max(maxX, sx)
+            maxY = math.max(maxY, sy)
+            maxZ = math.max(maxZ, sz)
+        end
+
+        self.BoundingBox = { minX, minY, minZ, maxX, maxY, maxZ }
+        return self.BoundingBox
+    end,
+
+    --- Computes the distance to the bounding box of the painting.
+    ---@param self UIPainting
+    ---@param px number
+    ---@param py number
+    ---@param pz number
+    ---@return number
+    DistanceToBoundingBoxXYZ = function(self, px, py, pz)
+        local box = self:GetBoundingBox()
+
+        local dx = 0.0
+        local dy = 0.0
+        local dz = 0.0
+
+        local minX = box[1]
+        local minY = box[2]
+        local minZ = box[3]
+        local maxX = box[4]
+        local maxY = box[5]
+        local maxZ = box[6]
+
+        -- X axis
+        if px < minX then
+            dx = minX - px
+        elseif px > maxX then
+            dx = px - maxX
+        end
+
+        -- Y axis
+        if py < minY then
+            dy = minY - py
+        elseif py > maxY then
+            dy = py - maxY
+        end
+
+        -- Z axis
+        if pz < minZ then
+            dz = minZ - pz
+        elseif pz > maxZ then
+            dz = pz - maxZ
+        end
+
+        return math.sqrt(dx * dx + dy * dy + dz * dz)
+    end,
+
+    --- Computes the distance to the bounding box of the painting.
+    ---@param self UIPainting
+    ---@param point Vector
+    ---@return number
+    DistanceToBoundingBox = function(self, point)
+        return self:DistanceToBoundingBoxXYZ(point[1], point[2], point[3])
+    end,
+
+    --- Computes a precise distance to the painting. This scales over the number of samples. It's better to first compute the distance to the bounding box.
+    ---@param self UIPainting
+    ---@param px number
+    ---@param py number
+    ---@param pz number
+    ---@return number
+    DistanceToXYZ = function(self, px, py, pz)
+        local distance = 8192
+
+        local coordinatesX = self.Samples.CoordinatesX
+        local coordinatesY = self.Samples.CoordinatesY
+        local coordinatesZ = self.Samples.CoordinatesZ
+
+        for k = 2, table.getn(coordinatesX) do
+            local x1 = coordinatesX[k - 1]
+            local y1 = coordinatesY[k - 1]
+            local z1 = coordinatesZ[k - 1]
+
+            local x2 = coordinatesX[k]
+            local y2 = coordinatesY[k]
+            local z2 = coordinatesZ[k]
+
+            local dx = x2 - x1
+            local dy = y2 - y1
+            local dz = z2 - z1
+
+            local vx = px - x1
+            local vy = py - y1
+            local vz = pz - z1
+
+            local dot = vx * dx + vy * dy + vz * dz
+            local lenSq = dx * dx + dy * dy + dz * dz
+
+            local t = 0.0
+            if lenSq > 0.0 then
+                t = dot / lenSq
+                if t < 0.0 then
+                    t = 0.0
+                elseif t > 1.0 then
+                    t = 1.0
+                end
+            end
+
+            local cx = x1 + t * dx
+            local cy = y1 + t * dy
+            local cz = z1 + t * dz
+
+            local dx2 = px - cx
+            local dy2 = py - cy
+            local dz2 = pz - cz
+
+            local distanceToSegment = math.sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2)
+            if distanceToSegment < distance then
+                distance = distanceToSegment
+            end
+        end
+
+        return distance
+    end,
+
+    --- Computes the distance to the nearest sample point.
+    ---@param self UIPainting
+    ---@param point Vector
+    ---@return number
+    DistanceTo = function(self, point)
+        return self:DistanceToXYZ(point[1], point[2], point[3])
     end,
 
     ---------------------------------------------------------------------------
