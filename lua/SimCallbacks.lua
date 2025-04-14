@@ -813,24 +813,37 @@ end
 
 --#region UI related functionality
 
----@param data UIShareablePaintingCallbackMessage
-Callbacks.SharePainting = function(data)
-    local isSpectator = GetFocusArmy() == -1
+do
+    local OriginalFocusArmy = GetFocusArmy()
 
-    if not (
-        -- spectators should be able to see all paintings
-        isSpectator or
-        -- players should be able to see paintings from allies
-        IsAlly(GetFocusArmy(), GetCurrentCommandSource())) then
-        return
+    ---@param data UIShareablePaintingCallbackMessage
+    local SyncPainting = function(data)
+        -- used to determine the color of the painting
+        data.ShareablePainting.PeerId = GetCurrentCommandSource()
+        data.ShareablePainting.PeerName = GetArmyBrain(data.ShareablePainting.PeerId).Nickname
+
+        Sync.SharePainting = Sync.SharePainting or {}
+        table.insert(Sync.SharePainting, data)
     end
 
-    -- used to determine the color of the painting
-    data.ShareablePainting.PeerId = GetCurrentCommandSource()
-    data.ShareablePainting.PeerName = GetArmyBrain(data.ShareablePainting.PeerId).Nickname
+    ---@param data UIShareablePaintingCallbackMessage
+    Callbacks.SharePainting = function(data)
+        local focusArmy = GetFocusArmy()
+        local currentCommandSource = GetCurrentCommandSource()
 
-    Sync.SharePainting = Sync.SharePainting or {}
-    table.insert(Sync.SharePainting, data)
+        -- spectators are able to see all paintings. We take into account
+        -- the original focus army because spectators can change focus army
+        if OriginalFocusArmy == -1 or focusArmy == -1 then
+            SyncPainting(data)
+            return
+        end
+
+        -- allies are able to see each others paintings
+        if IsAlly(focusArmy, currentCommandSource) then
+            SyncPainting(data)
+            return
+        end
+    end
 end
 
 --#endregion
