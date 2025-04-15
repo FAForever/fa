@@ -12,7 +12,7 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local PlayerMuteList = import("PlayerMuteList.lua").PlayerMuteList
 local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 
-local minDist = 2
+local minDist = 1
 local minDistSq = minDist * minDist
 
 
