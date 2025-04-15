@@ -1,6 +1,6 @@
 - (#6725) Tactical Paint feature:
 
-    This feature adds ability to draw during game which teammates can see and observers can see.
+    This feature adds ability to draw lines during game which teammates and observers can see.
     It is possible thanks to [this binary patch](https://github.com/FAForever/FA-Binary-Patches/pull/110).
 
     - Adds canvas mode where you can draw lines with color of player's army. This mode is enabled via keybind "Toggle Tactical Paint canvas" under "'Tactical Paint" section.
