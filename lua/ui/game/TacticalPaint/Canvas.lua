@@ -276,7 +276,7 @@ Canvas = Class(Bitmap)
                 local zoom = GetCamera(worldview._cameraName):GetZoom()
 
                 if isModLeft then
-                    local offset = zoom * 100
+                    local offset = zoom / 100
                     self:OnDraw(pos, MathMax(offset, minDist))
                 elseif isModRight then
                     local offset = zoom / 50
