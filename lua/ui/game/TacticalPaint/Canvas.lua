@@ -1,4 +1,7 @@
+local IsObserver = IsObserver
 local GetMouseWorldPos = GetMouseWorldPos
+local TableInsert = table.insert
+local GetFocusArmy = GetFocusArmy
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -9,8 +12,8 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local PlayerMuteList = import("PlayerMuteList.lua").PlayerMuteList
 local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 
-
-local minDist = 0.5
+local minDist = 2
+local minDistSq = minDist * minDist
 
 
 ---@class Canvas : Bitmap, Renderable
@@ -206,7 +209,7 @@ Canvas = Class(Bitmap)
     ---@param self Canvas
     OnDrawStart = function(self)
         self._prevMousePos = GetMouseWorldPos()
-        table.insert(self._collectedLines, self._prevMousePos)
+        TableInsert(self._collectedLines, self._prevMousePos)
     end,
 
     ---@param self Canvas
@@ -214,8 +217,12 @@ Canvas = Class(Bitmap)
     OnDraw = function(self, pos)
         local prevMouseWorldPos = self._prevMousePos
         if prevMouseWorldPos then
-            if VDist2(prevMouseWorldPos[1], prevMouseWorldPos[3], pos[1], pos[3]) > minDist then
-                table.insert(self._collectedLines, pos)
+            local x1, y1 = prevMouseWorldPos[1], prevMouseWorldPos[3]
+            local x2, y2 = pos[1], pos[3]
+            local dx = x1 - x2
+            local dy = y1 - y2
+            if dx * dx + dy * dy > minDistSq then
+                TableInsert(self._collectedLines, pos)
                 TacticalPaint.DrawLine(GetFocusArmy(), prevMouseWorldPos, pos)
                 self._prevMousePos = pos
             end
@@ -246,7 +253,6 @@ Canvas = Class(Bitmap)
     ---@param event KeyEvent
     ---@return boolean
     HandleDrawing = function(self, worldview, event)
-
         local isCanvasActive = self:GetActive()
         if (not isCanvasActive or self._isHiddenLines) and not IsObserver() then
             return false
@@ -262,13 +268,9 @@ Canvas = Class(Bitmap)
 
             if isEventPress and isModLeft then
                 self:OnDrawStart()
-            end
-
-            if isEventRelease and not isModLeft then
+            elseif isEventRelease and not isModLeft then
                 self:OnDrawEnd()
-            end
-
-            if isEventMotion then
+            elseif isEventMotion then
                 local pos = GetMouseWorldPos()
 
                 if isModLeft then

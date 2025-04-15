@@ -1,8 +1,8 @@
 local GetGameTimeSeconds = GetGameTimeSeconds
 local UI_DrawLine = UI_DrawLine
 
-local decayTime = 60
-local maxLinesPerPlayer = 1000
+local maxDecayTime = 60
+local maxLinesPerPlayer = 2000
 
 ---@class Line
 ---@field p1 Vector
@@ -41,7 +41,7 @@ LinesCollection = Class()
         self._curLines = self._curLines + 1
 
         if self._curLines > maxLinesPerPlayer then
-            self:RemoveOldestLines(self._curLines - maxLinesPerPlayer)
+            self:RemoveOldestLine()
         end
     end,
 
@@ -53,7 +53,7 @@ LinesCollection = Class()
 
     ---@param self LinesCollection
     RemoveOldestLine = function(self)
-        local k, min = nil, GetGameTimeSeconds()
+        local k, min = nil, GetGameTimeSeconds() + maxDecayTime
         for i, line in self._lines do
             local lineLifeTime = line.lifeTime
             if lineLifeTime < min then
@@ -63,14 +63,6 @@ LinesCollection = Class()
         end
         if k ~= nil then
             self:Remove(k)
-        end
-    end,
-
-    ---@param self LinesCollection
-    ---@param n integer
-    RemoveOldestLines = function(self, n)
-        for i = 1, n do
-            self:RemoveOldestLine()
         end
     end,
 
