@@ -218,7 +218,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         end
     end
 
-    local enabled = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').tpaint_enabled == "on"
+    local enabled = import('/lua/user/prefs.lua').GetFromCurrentProfile('options.tpaint_enabled') == "on"
     for _, view in { viewLeft, viewRight } do
         if view then
             view._canvas = import("/lua/ui/game/TacticalPaint/Canvas.lua").Canvas(view)

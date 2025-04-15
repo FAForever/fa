@@ -31,7 +31,7 @@ end
 ---@param pos1 Vector
 ---@param pos2 Vector
 function DrawLine(id, pos1, pos2)
-    local lifetime = Prefs.GetFromCurrentProfile('options').tpaint_lifetime or 20
+    local lifetime = Prefs.GetFromCurrentProfile('options.tpaint_lifetime') or 20
     GetCollection(id):Add(pos1, pos2, lifetime + GetGameTimeSeconds())
 end
 
@@ -84,7 +84,7 @@ end
 ---@param data any
 ---@param remove boolean
 function SendPaintData(data, remove)
-    local lifetime = Prefs.GetFromCurrentProfile('options').tpaint_lifetime or 20
+    local lifetime = Prefs.GetFromCurrentProfile('options.tpaint_lifetime') or 20
 
     if IsObserver() then
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
