@@ -1,7 +1,9 @@
 local IsObserver = IsObserver
+local GetCamera = GetCamera
 local GetMouseWorldPos = GetMouseWorldPos
-local TableInsert = table.insert
 local GetFocusArmy = GetFocusArmy
+local MathMax = math.max
+local TableInsert = table.insert
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -13,8 +15,6 @@ local PlayerMuteList = import("PlayerMuteList.lua").PlayerMuteList
 local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 
 local minDist = 1
-local minDistSq = minDist * minDist
-
 
 ---@class Canvas : Bitmap, Renderable
 ---@field _text Text
@@ -214,9 +214,10 @@ Canvas = Class(Bitmap)
 
     ---@param self Canvas
     ---@param pos Vector
-    OnDraw = function(self, pos)
+    OnDraw = function(self, pos, minDist)
         local prevMouseWorldPos = self._prevMousePos
         if prevMouseWorldPos then
+            local minDistSq = minDist * minDist
             local x1, y1 = prevMouseWorldPos[1], prevMouseWorldPos[3]
             local x2, y2 = pos[1], pos[3]
             local dx = x1 - x2
@@ -272,11 +273,13 @@ Canvas = Class(Bitmap)
                 self:OnDrawEnd()
             elseif isEventMotion then
                 local pos = GetMouseWorldPos()
+                local zoom = GetCamera(worldview._cameraName):GetZoom()
 
                 if isModLeft then
-                    self:OnDraw(pos)
+                    local offset = zoom * 100
+                    self:OnDraw(pos, MathMax(offset, minDist))
                 elseif isModRight then
-                    local offset = GetCamera(worldview._cameraName):GetZoom() / 50
+                    local offset = zoom / 50
                     self:OnErase(pos, offset)
                 end
             end
