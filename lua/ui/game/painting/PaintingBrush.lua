@@ -28,7 +28,7 @@ local DraggerInit = Dragger.__init
 --- Responsible for all interactions with a painting.
 ---@class UIPaintingBrush : Dragger
 ---@field PaintingCanvas UIPaintingCanvas
----@field ActiveBrushStroke? UIActiveBrushStroke      # The active painting of the local peer.
+---@field ActiveBrushStroke? UIActiveBrushStroke      # The active brush stroke of the local peer.
 ---@field WorldCoordinates Vector
 PaintingBrush = Class(Dragger) {
 
