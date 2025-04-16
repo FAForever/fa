@@ -99,14 +99,14 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         return not table.empty(self.InhibitionSet)
     end,
 
-    --- Lifts a reason to be disabled.
+    --- Lifts a reason to be disabled. Function is idempotent. Calling it twice is the same as calling it once.
     ---@param self UIPaintingCanvas
     ---@param reason string
     LiftInhibition = function(self, reason)
         self.InhibitionSet[reason] = nil
     end,
 
-    --- Adds a reason to be disabled. This operation is not accumulative. All active paintings are destroyed.
+    --- Adds a reason to be disabled. Function is idempotent. Calling it twice is the same as calling it once. All active paintings are destroyed.
     ---@param self UIPaintingCanvas
     ---@param reason string
     AddInhibition = function(self, reason)
@@ -411,6 +411,8 @@ AbortAllActivePaintings = function()
     end
 end
 
+--- Lifts a reason for all paintings to be disabled. Function is idempotent. Calling it twice is the same as calling it once.
+---@param reason string     # for example: 'selection'
 LiftInhibitionOfAllPaintings = function(reason)
     for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
         if not IsDestroyed(paintingCanvasInstance) then
@@ -419,6 +421,8 @@ LiftInhibitionOfAllPaintings = function(reason)
     end
 end
 
+--- Adds a reason for all paintings to be disabled. Function is idempotent. Calling it twice is the same as calling it once.
+---@param reason string     # for example: 'selection'
 InhibitAllPaintings = function(reason)
     for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
         if not IsDestroyed(paintingCanvasInstance) then
