@@ -100,7 +100,9 @@ ActivePainting = ClassUI(Painting) {
         -- 
         -- By naturally limiting the size of a painting we not only overcome the
         -- issue with chat messages but we also prevent players from creating 
-        -- gigantic paintings that often offer little... information.
+        -- gigantic paintings that have relatively high... entropy :). 
+        --
+        -- The value is intentionally hard coded!
 
         if table.getn(samples.CoordinatesX) > 100 then
             return
