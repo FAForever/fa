@@ -150,6 +150,9 @@ Painting = Class(DebugComponent) {
         self:Destroy()
     end,
 
+    ---------------------------------------------------------------------------
+    --#region Collision detection for interactions
+
     --- Computes the bounding box of the painting and caches it.
     ---@param self UIPainting
     ---@return UIPaintingBoundingBox
@@ -193,7 +196,7 @@ Painting = Class(DebugComponent) {
     ---@param px number
     ---@param py number
     ---@param pz number
-    ---@return number
+    ---@return number   # nearest distance to the bounding box of the painting.
     DistanceToBoundingBoxXYZ = function(self, px, py, pz)
         local box = self:GetBoundingBox()
 
@@ -235,17 +238,22 @@ Painting = Class(DebugComponent) {
     --- Computes the distance to the bounding box of the painting.
     ---@param self UIPainting
     ---@param point Vector
-    ---@return number
+    ---@return number   # nearest distance to the bounding box of the painting.
     DistanceToBoundingBox = function(self, point)
         return self:DistanceToBoundingBoxXYZ(point[1], point[2], point[3])
     end,
 
-    --- Computes a precise distance to the painting. This scales over the number of samples. It's better to first compute the distance to the bounding box.
+    --- Computes a precise distance to the painting. It considers all successive
+    --- pairs of samples to be a line segment. It computes the shortest distance
+    --- over all line segments. This scales over the number of samples. 
+    ---
+    --- It's better to first compute the distance to the bounding box to determine
+    --- whether this precision is necessary.
     ---@param self UIPainting
     ---@param px number
     ---@param py number
     ---@param pz number
-    ---@return number
+    ---@return number   # nearest distance to the painting
     DistanceToXYZ = function(self, px, py, pz)
         local distance = 8192
 
@@ -300,13 +308,20 @@ Painting = Class(DebugComponent) {
         return distance
     end,
 
-    --- Computes the distance to the nearest sample point.
+    --- Computes a precise distance to the painting. It considers all successive
+    --- pairs of samples to be a line segment. It computes the shortest distance
+    --- over all line segments. This scales over the number of samples. 
+    ---
+    --- It's better to first compute the distance to the bounding box to determine
+    --- whether this precision is necessary.
     ---@param self UIPainting
     ---@param point Vector
-    ---@return number
+    ---@return number   # nearest distance to the painting
     DistanceTo = function(self, point)
         return self:DistanceToXYZ(point[1], point[2], point[3])
     end,
+
+    --#endregion
 
     ---------------------------------------------------------------------------
     --#region Debug functionality
