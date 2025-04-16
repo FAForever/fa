@@ -26,6 +26,8 @@ local DefaultSharedColor = 'ffffffff'
 --- Keeps track of all active canvas adapter instances
 local CanvasAdapterInstances = TrashBag()
 
+---@alias UIPaintingCanvasAdapterType 'Abstract' | 'Observer' | 'Player'
+
 --- Keeps track of all muted peers.
 ---@type table<string, boolean>
 local MutedPeers = {}
@@ -36,8 +38,7 @@ local MutedPeers = {}
 ---@field Samples UIPaintingSamples
 ---@field PeerId? number
 ---@field PeerName? string
-
----@alias UIPaintingCanvasAdapterType 'Abstract' | 'Observer' | 'Player'
+---@field ShareId number
 
 --- Generic container to use when sharing paintings
 ---@class UIShareablePaintingMessage
@@ -103,6 +104,55 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
         return "PaintingCanvasAdapter of " .. tostring(self.PaintingCanvas)
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Activity across world views
+
+    --- Mutes a peer. A peer remains muted for the remainder of the session.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param author string
+    MutePainter = function(self, author)
+        -- do not mute ourselves
+        local localPeer = self:GetLocalPeerName()
+        if author == localPeer then
+            return
+        end
+
+        local isMuted = MutedPeers[author]
+        if not isMuted then
+            MutedPeers[author] = true
+            print(LOCF("<LOC painting_mute_message>Muted %s for this session", author))
+        end
+
+        -- delete all paintings across all worldviews
+        for k, adapter in CanvasAdapterInstances do
+            local paintingCanvas = adapter.PaintingCanvas
+            paintingCanvas:DeletePaintingsOfAuthor(author)
+        end
+    end,
+
+    --- Checks if a peer is muted.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param peer string
+    ---@return boolean
+    IsPeerMuted = function(self, peer)
+        return MutedPeers[peer] == true
+    end,
+
+    --- Deletes the painting across all world views.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param painting UIPainting
+    DeletePainting = function(self, painting)
+        for k, adapter in CanvasAdapterInstances do
+            local paintingCanvas = adapter.PaintingCanvas
+            paintingCanvas:DeletePainting(painting)
+        end
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Interactivity across network
 
     --- Prepares the painting to be send to all other worldviews and peers.
     ---@param self UIPaintingCanvasAdapter
@@ -212,7 +262,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(samples, color)
         painting.Author = sharedPainting.PeerName
-
+        painting.ShareId = sharedPainting.ShareId
         return painting
     end,
 
@@ -226,39 +276,13 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         ---@type UISharedPainting
         local sharedPainting = {
             PaintingAdapterIdentifier = tostring(self),
-            Samples = painting.Samples
+            Samples = painting.Samples,
+            ShareId = 1,
         }
 
         return sharedPainting
     end,
 
-    --- Mutes a peer. A peer remains muted for the remainder of the session.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param peer string
-    MutePeer = function(self, peer)
-        -- do not mute ourselves
-        local localPeer = self:GetLocalPeerName()
-        if peer == localPeer then
-            return
-        end
-
-        local isMuted = MutedPeers[peer]
-        if not isMuted then
-            MutedPeers[peer] = true
-            print(LOCF("<LOC painting_mute_message>Muted %s for this session", peer))
-        end
-    end,
-
-    --- Checks if a peer is muted.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param peer string
-    ---@return boolean
-    IsPeerMuted = function(self, peer)
-        return MutedPeers[peer] == true
-    end,
-
-    ---------------------------------------------------------------------------
-    --#region Publisher/Subscriber across network
 
     --- A rough check to see if a shared painting originates from the local peer.
     ---@param self UIPaintingCanvasAdapter
@@ -278,7 +302,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     AddSharedPainting = function(self, sharedPainting)
         -- feature: do not add the same painting twice
         if self:SharedPaintingIsKnown(sharedPainting) then
-            WARN("PAINTING IS KNOWN!")
             return
         end
 

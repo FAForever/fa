@@ -28,7 +28,7 @@ local Painting = import('/lua/ui/game/painting/Painting.lua').Painting
 ---@field LastSample Vector
 ActivePainting = ClassUI(Painting) {
 
-    DebounceTimeThreshold = 0.016,  -- About 60 fps
+    DebounceTimeThreshold = 0.016, -- About 60 fps
 
     ---@param self UIActivePainting
     ---@param color Color
@@ -38,6 +38,9 @@ ActivePainting = ClassUI(Painting) {
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = { -10, -10, -10 }
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Creation of samples interface
 
     --- Computes the debounce distance based on the current zoom level.
     ---@param self UIActivePainting
@@ -92,12 +95,12 @@ ActivePainting = ClassUI(Painting) {
 
         local samples = self.Samples
 
-        -- limitation: chat messages have a limited amount of space per 
-        -- message. It is difficult to overcome this limit. 
-        -- 
+        -- limitation: chat messages have a limited amount of space per
+        -- message. It is difficult to overcome this limit.
+        --
         -- By naturally limiting the size of a painting we not only overcome the
-        -- issue with chat messages but we also prevent players from creating 
-        -- gigantic paintings that have relatively high... entropy :). 
+        -- issue with chat messages but we also prevent players from creating
+        -- gigantic paintings that have relatively high... entropy :).
         --
         -- The value is intentionally hard coded!
 
@@ -112,6 +115,8 @@ ActivePainting = ClassUI(Painting) {
         table.insert(samples.CoordinatesY, coordinates[2])
         table.insert(samples.CoordinatesZ, coordinates[3])
     end,
+
+    --#endregion
 }
 
 ---@param color Color

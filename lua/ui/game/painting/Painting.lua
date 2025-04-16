@@ -45,10 +45,10 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 --- Responsible for drawing the painting to a world view.
 ---@class UIPainting : Renderable, DebugComponent
 ---@field Color Color
----@field Thickness number
 ---@field Decay? UIPaintingDecay
 ---@field Samples UIPaintingSamples
----@field Author? string     # peer that made the painting.
+---@field Author? string        # peer that made the painting.
+---@field ShareId? number
 Painting = Class(DebugComponent) {
 
     ---@param self UIPainting

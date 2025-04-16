@@ -172,6 +172,27 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
     end,
 
+    --- Returns the first painting that is within the given radius at the given coordinates.
+    ---@param self UIPaintingCanvas
+    ---@param coordinates Vector
+    ---@param radius number
+    ---@return UIPainting[]
+    GetPaintingsAtCoordinates = function(self, coordinates, radius, cache)
+        local paintings = cache or {}
+
+        for k, painting in self.Paintings do
+            local distanceBoundingBox = painting:DistanceToBoundingBox(coordinates)
+            if distanceBoundingBox < radius then
+                local distanceToSamples = painting:DistanceTo(coordinates)
+                if distanceToSamples < radius then
+                    table.insert(paintings, painting)
+                end
+            end
+        end
+
+        return paintings
+    end,
+
     --- Cancels the brush, destroying any active painting in the process.
     ---@param self UIPaintingCanvas
     CancelBrush = function(self)
@@ -212,35 +233,28 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
     end,
 
-    --- Shares a painting across worldviews and peers.
+    --- Deletes a single painting by comparing their identifiers.
     ---@param self UIPaintingCanvas
     ---@param painting UIPainting
-    SharePainting = function(self, painting)
-        -- share the painting across worldviews and peers. 
-        self.Adapter:SharePainting(painting)
-
-        -- clear the painting brush
-        self.PaintingBrush:Destroy()
-        self.PaintingBrush = nil
-    end,
-
-    --- Deletes a painting across worldviews.
-    ---@param self UIPaintingCanvas
     DeletePainting = function(self, painting)
-        -- TODO: propagate across world views
-        for k, other in self.Paintings do
-            if other == painting then
+        for k, painting in self.Paintings do
+            if painting.ShareId == painting.ShareId then
+                self.Paintings[k]:Destroy()
                 self.Paintings[k] = nil
-                break
             end
         end
     end,
 
-    --- Mutes a painter across worldviews.
+    --- Deletes all paintings of a given author.
     ---@param self UIPaintingCanvas
     ---@param author string
-    MutePainter = function(self, author)
-        self.Adapter:MutePeer(author)
+    DeletePaintingsOfAuthor = function(self, author)
+        for k, painting in self.Paintings do
+            if painting.Author == author then
+                self.Paintings[k]:Destroy()
+                self.Paintings[k] = nil
+            end
+        end
     end,
 }
 

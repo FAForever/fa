@@ -95,25 +95,6 @@ PaintingBrush = Class(Dragger) {
         return radius
     end,
 
-    --- Returns the first painting that is within the given radius at the given coordinates.
-    ---@param self UIPaintingBrush
-    ---@param coordinates Vector
-    ---@param radius number
-    ---@return UIPainting?
-    GetPaintingAtCoordinates = function(self, coordinates, radius)
-        for k, painting in self.PaintingCanvas.Paintings do
-            local distanceBoundingBox = painting:DistanceToBoundingBox(coordinates)
-            if distanceBoundingBox < radius then
-                local distanceToSamples = painting:DistanceTo(coordinates)
-                if distanceToSamples < radius then
-                    return painting
-                end
-            end
-        end
-
-        return nil
-    end,
-
     --#endregion
 
     --- Computes the color of the active painting.
@@ -153,9 +134,9 @@ PaintingBrush = Class(Dragger) {
 
         -- feature: ability to delete paintings
 
-        local painting = self:GetPaintingAtCoordinates(coordinates, radius)
-        if painting then
-            self.PaintingCanvas:DeletePainting(painting)
+        local paintings = self.PaintingCanvas:GetPaintingsAtCoordinates(coordinates, radius)
+        for k, painting in paintings do
+            self.PaintingCanvas.Adapter:DeletePainting(painting)
         end
     end,
 
@@ -168,12 +149,10 @@ PaintingBrush = Class(Dragger) {
 
         -- feature: ability to mute painters
 
-        local painting = self:GetPaintingAtCoordinates(coordinates, radius)
-        if painting then
-            self.PaintingCanvas:DeletePainting(painting)
-
+        local paintings = self.PaintingCanvas:GetPaintingsAtCoordinates(coordinates, radius)
+        for k, painting in paintings do
             if painting.Author then
-                self.PaintingCanvas:MutePainter(painting.Author)
+                self.PaintingCanvas.Adapter:MutePainter(painting.Author)
             end
         end
     end,
@@ -205,7 +184,7 @@ PaintingBrush = Class(Dragger) {
     ---@param y number  # y coordinate of screen position
     OnRelease = function(self, x, y)
         if self.ActivePainting then
-            self.PaintingCanvas:SharePainting(self.ActivePainting)
+            self.PaintingCanvas.Adapter:SharePainting(self.ActivePainting)
         end
 
         self.PaintingCanvas:CancelBrush()
