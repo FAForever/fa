@@ -339,7 +339,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
                 -- share it with all other adapters as we can only subscribe with one.
                 for k, canvasAdapterInstance in CanvasAdapterInstances do
                     if not IsDestroyed(canvasAdapterInstance.PaintingCanvas) then
-                        -- we need the painting to be a unique instance, hence we create multiple
                         local painting = self:FromSharedPainting(data.ShareablePainting)
                         canvasAdapterInstance.PaintingCanvas:AddPainting(painting)
                     end

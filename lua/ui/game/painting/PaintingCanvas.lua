@@ -341,7 +341,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
     end,
 
-    --- Shares the active painting with all relevant peers.
+    --- Shares the active painting across all world views and peers.
     ---@param self UIPaintingCanvas
     ShareActivePainting = function(self)
         if not self.ActivePainting then
