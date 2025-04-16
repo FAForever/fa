@@ -38,7 +38,7 @@ local SyncIdentifier = "PaintingCanvas.lua"
 ---@class UIPaintingCanvasInput
 ---@field ActiveInteraction UIPaintingCanvasActiveInteraction
 
---- A painting canvas that is responsible for registering and painting the artistic efforts of players.
+--- Responsible for providing an interface to interact with paintings and the painting network adapter. 
 ---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
 ---@field Adapter UIPaintingCanvasAdapter
 ---@field Trash TrashBag

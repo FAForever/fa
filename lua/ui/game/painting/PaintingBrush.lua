@@ -25,6 +25,7 @@ local DraggerInit = Dragger.__init
 
 ---@alias UIPaintingBrushType 'Create' | 'Delete' | 'Mute'
 
+--- Responsible for all interactions with a painting canvas.
 ---@class UIPaintingBrush : Dragger
 ---@field PaintingCanvas UIPaintingCanvas
 ---@field ActivePainting? UIActivePainting      # The active painting of the local peer.
