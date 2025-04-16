@@ -20,19 +20,16 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local PaintingCanvasObserverAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasObserverAdapter.lua")
-local PaintingCanvasPlayerAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasPlayerAdapter.lua")
-local PaintingCanvasReplayAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasReplayAdapter.lua")
-
----@class UIPaintingCanvasAdapter
----@field SharePaintingBrushStroke fun(self:UIPaintingCanvasAdapter, painting: UIBrushStroke)
+local PainterObserverAdapter = import("/lua/ui/game/painting/ShareAdapters/PainterAdapterForObservers.lua")
+local PainterPlayerAdapter = import("/lua/ui/game/painting/ShareAdapters/PainterAdapterForPlayers.lua")
+local PainterReplayAdapter = import("/lua/ui/game/painting/ShareAdapters/PainterAdapterForReplays.lua")
 
 --- Creates the correct adapter instance based on the game state of the local peer.
----@param paintingCanvas UIPaintingCanvas
----@return UIPaintingCanvasAdapter
-GetPaintingCanvasAdapter = function(paintingCanvas)
+---@param painter UIPainter
+---@return UIPainterAdapter
+GetPainterAdapter = function(painter)
 
-    -- A factory pattern that helps manage how paintings are shared. This is complicated. To keep
+    -- A factory pattern that helps manage how brush strokes are shared. This is complicated. To keep
     -- the painting canvas simple and about painting we use this (network) adapter class to
     -- encapsulate all the logic. In general, it mimics the following rules:
     --
@@ -41,14 +38,14 @@ GetPaintingCanvasAdapter = function(paintingCanvas)
     -- - If playing multiplayer, but you're a player - painting should be shared through SimCallback.
     -- - If playing multiplayer, but you're an observer - painting should be shared through SendChatMessage.
     --
-    -- Note that all paintings shared through sim callbacks become part of a replay and can therefore
+    -- Note that all brush strokes shared through sim callbacks become part of a replay and can therefore
     -- be replayed and moderated.
 
     if SessionIsReplay() then
-        return PaintingCanvasReplayAdapter.CreatePaintingCanvasReplayAdapter(paintingCanvas)
+        return PainterReplayAdapter.CreatePainterAdapterForReplays(painter)
     elseif IsObserver() then
-        return PaintingCanvasObserverAdapter.CreatePaintingCanvasObserverAdapter(paintingCanvas)
+        return PainterObserverAdapter.CreatePainterAdapterForObservers(painter)
     else
-        return PaintingCanvasPlayerAdapter.CreatePaintingCanvasPlayerAdapter(paintingCanvas)
+        return PainterPlayerAdapter.CreatePainterAdapterForPlayers(painter)
     end
 end

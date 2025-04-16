@@ -20,26 +20,26 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapter.lua").PaintingCanvasAdapter
+local PainterAdapter = import("/lua/ui/game/painting/ShareAdapters/PainterAdapter.lua").PainterAdapter
 
---- Do not create an instance of this class directly. Instead, use 
---- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
----@class UIPaintingCanvasReplayAdapter : UIPaintingCanvasAdapter
-PaintingCanvasReplayAdapter = Class(PaintingCanvasAdapter) {
+--- Do not create an instance of this class directly. Instead, use
+--- the factory pattern in the file `PainterAdapterFactory.lua`.
+---@class UIPainterAdapterForReplays : UIPainterAdapter
+PainterAdapterForReplays = Class(PainterAdapter) {
 
     AdapterType = 'Replay',
 
-    ---@param self UIPaintingCanvasReplayAdapter
-    ---@param paintingCanvas UIPaintingCanvas
-    __init = function(self, paintingCanvas)
-        PaintingCanvasAdapter.__init(self, paintingCanvas)
+    ---@param self UIPainterAdapterForReplays
+    ---@param painter UIPainter
+    __init = function(self, painter)
+        PainterAdapter.__init(self, painter)
 
         self:SubscribeToCallback()
     end,
 }
 
----@param paintingCanvas UIPaintingCanvas
----@return UIPaintingCanvasReplayAdapter
-CreatePaintingCanvasReplayAdapter = function(paintingCanvas)
-    return PaintingCanvasReplayAdapter(paintingCanvas)
+---@param painter UIPainter
+---@return UIPainterAdapterForReplays
+CreatePainterAdapterForReplays = function(painter)
+    return PainterAdapterForReplays(painter)
 end

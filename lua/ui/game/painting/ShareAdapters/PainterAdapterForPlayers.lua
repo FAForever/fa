@@ -20,36 +20,35 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapter.lua").PaintingCanvasAdapter
+local PainterAdapter = import("/lua/ui/game/painting/ShareAdapters/PainterAdapter.lua").PainterAdapter
 
---- Do not create an instance of this class directly. Instead, use 
---- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
----@class UIPaintingCanvasObserverAdapter : UIPaintingCanvasAdapter
-PaintingCanvasObserverAdapter = Class(PaintingCanvasAdapter) {
+--- Do not create an instance of this class directly. Instead, use
+--- the factory pattern in the file `PainterAdapterFactory.lua`.
+---@class UIPainterAdapterForPlayers : UIPainterAdapter
+PainterAdapterForPlayers = Class(PainterAdapter) {
 
-    AdapterType = 'Observer',
+    AdapterType = 'Player',
 
-    ---@param self UIPaintingCanvasObserverAdapter
-    ---@param paintingCanvas UIPaintingCanvas
-    __init = function(self, paintingCanvas)
-        PaintingCanvasAdapter.__init(self, paintingCanvas)
+    ---@param self UIPainterAdapterForPlayers
+    ---@param painter UIPainter
+    __init = function(self, painter)
+        PainterAdapter.__init(self, painter)
 
         self:SubscribeToCallback()
-        self:SubscribeToChatEvents()
     end,
 
-    --- Shares the painting with all other observers through the chat message mechanic.
-    ---@param self UIPaintingCanvasObserverAdapter
+    --- Shares the brush stroke with all other peers through a sim callback. These brush strokes are stored in the replay.
+    ---@param self UIPainterAdapterForPlayers
     ---@param shareablePainting UISharedBrushStroke
     SendShareablePainting = function(self, shareablePainting)
-        PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
+        PainterAdapter.SendShareablePainting(self, shareablePainting)
 
-        self:PublishAsChatMessage(shareablePainting)
+        self:PublishAsCallback(shareablePainting)
     end,
 }
 
----@param paintingCanvas UIPaintingCanvas
----@return UIPaintingCanvasObserverAdapter
-CreatePaintingCanvasObserverAdapter = function(paintingCanvas)
-    return PaintingCanvasObserverAdapter(paintingCanvas)
+---@param painter UIPainter
+---@return UIPainterAdapterForPlayers
+CreatePainterAdapterForPlayers = function(painter)
+    return PainterAdapterForPlayers(painter)
 end

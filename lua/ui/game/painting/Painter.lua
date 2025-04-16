@@ -23,38 +23,38 @@
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
-local GetPaintingCanvasAdapter = import('/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapterFactory.lua').GetPaintingCanvasAdapter
+local GetPainterAdapter = import('/lua/ui/game/painting/ShareAdapters/PainterAdapterFactory.lua').GetPainterAdapter
 local CreatePainting = import("/lua/ui/game/painting/Painting.lua").CreatePainting
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
-local PaintingCanvasInstances = TrashBag()
+local PainterInstances = TrashBag()
 
-local SyncIdentifier = "PaintingCanvas.lua"
+local SyncIdentifier = "Painter.lua"
 
----@alias UIPaintingCanvasActiveInteraction 'Create' | 'Delete' | 'Mute'
+---@alias UIPainterActiveInteraction 'Create' | 'Delete' | 'Mute'
 
----@class UIPaintingCanvasInput
----@field ActiveInteraction UIPaintingCanvasActiveInteraction
+---@class UIPainterInput
+---@field ActiveInteraction UIPainterActiveInteraction
 
 --- Responsible for glueing together the painting, the brush stroke and the painting network adapter.
----@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
----@field Adapter UIPaintingCanvasAdapter
+---@class UIPainter : Bitmap, DebugComponent, Renderable
+---@field Adapter UIPainterAdapter
 ---@field Painting UIPainting
 ---@field Trash TrashBag
 ---@field WorldView WorldView                   # Worldview that this canvas is for
 ---@field InhibitionSet table<string, boolean>  # A set of reasons for the canvas to be disabled.
 ---@field PaintingBrush UIPaintingBrush
-PaintingCanvas = Class(Bitmap, DebugComponent) {
+Painter = Class(Bitmap, DebugComponent) {
 
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     ---@param worldview WorldView
     __init = function(self, worldview)
         Bitmap.__init(self, worldview)
 
         self.Trash = TrashBag()
         self.Painting = CreatePainting()
-        self.Adapter = self.Trash:Add(GetPaintingCanvasAdapter(self))
+        self.Adapter = self.Trash:Add(GetPainterAdapter(self))
 
         self.WorldView = worldview
 
@@ -64,7 +64,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.InhibitionSet = {}
     end,
 
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     ---@param worldview WorldView
     __post_init = function(self, worldview)
         LayoutFor(self)
@@ -76,7 +76,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             :End()
     end,
 
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     Destroy = function(self)
         Bitmap.Destroy(self)
         self.Trash:Destroy()
@@ -98,20 +98,20 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     end,
 
     --- Checks if there are any reasons to be disabled.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     IsInhibited = function(self)
         return not table.empty(self.InhibitionSet)
     end,
 
     --- Lifts a reason to be disabled. Function is idempotent. Calling it twice is the same as calling it once.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     ---@param reason string
     LiftInhibition = function(self, reason)
         self.InhibitionSet[reason] = nil
     end,
 
     --- Adds a reason to be disabled. Function is idempotent. Calling it twice is the same as calling it once. All active paintings are destroyed.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     ---@param reason string
     AddInhibition = function(self, reason)
         self.InhibitionSet[reason] = true
@@ -122,7 +122,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     --#region User interactions with the painting canvas
 
     --- Responsible for the creation of paintings.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
@@ -151,7 +151,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     --#endregion
 
     --- Responsible for rendering all the paintings that are part of this canvas.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     ---@param delta any
     OnRender = function(self, delta)
         -- feature: global toggle to enable/disable painting
@@ -174,7 +174,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     end,
 
     --- Cancels the brush, destroying any active painting in the process.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     CancelBrush = function(self)
         if self.PaintingBrush then
             self.PaintingBrush:Destroy()
@@ -186,9 +186,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 --- Aborts all active paintings. As an example, this can be used to stop
 --- all active drawing when you enter cinematic mode.
 AbortAllActivePaintings = function()
-    for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
-        if not IsDestroyed(paintingCanvasInstance) then
-            paintingCanvasInstance:CancelBrush()
+    for k, painterInstance in pairs(PainterInstances) do
+        if not IsDestroyed(painterInstance) then
+            painterInstance:CancelBrush()
         end
     end
 end
@@ -196,9 +196,9 @@ end
 --- Lifts a reason for all paintings to be disabled. Function is idempotent. Calling it twice is the same as calling it once.
 ---@param reason string     # for example: 'selection'
 LiftInhibitionOfAllPaintings = function(reason)
-    for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
-        if not IsDestroyed(paintingCanvasInstance) then
-            paintingCanvasInstance:LiftInhibition(reason)
+    for k, painterInstance in pairs(PainterInstances) do
+        if not IsDestroyed(painterInstance) then
+            painterInstance:LiftInhibition(reason)
         end
     end
 end
@@ -206,19 +206,19 @@ end
 --- Adds a reason for all paintings to be disabled. Function is idempotent. Calling it twice is the same as calling it once.
 ---@param reason string     # for example: 'selection'
 InhibitAllPaintings = function(reason)
-    for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
-        if not IsDestroyed(paintingCanvasInstance) then
-            paintingCanvasInstance:AddInhibition(reason)
+    for k, painterInstance in pairs(PainterInstances) do
+        if not IsDestroyed(painterInstance) then
+            painterInstance:AddInhibition(reason)
         end
     end
 end
 
 ---@param worldview WorldView
----@return UIPaintingCanvas
-CreatePaintingCanvas = function(worldview)
+---@return UIPainter
+CreatePainter = function(worldview)
     -- create a new instance
-    local instance = PaintingCanvas(worldview) --[[@as UIPaintingCanvas]]
-    PaintingCanvasInstances:Add(instance)
+    local instance = Painter(worldview) --[[@as UIPainter]]
+    PainterInstances:Add(instance)
 
     -- feature: abort all active paintings when we enter cinematic mode
     AddOnSyncHashedCallback(
@@ -245,14 +245,14 @@ end
 function __moduleinfo.OnReload(newModule)
     print("Reloading painting canvas instances...")
 
-    for k, v in PaintingCanvasInstances do
+    for k, v in PainterInstances do
         local worldview = v.WorldView
 
         -- clean up old instances
         v:Destroy()
 
         -- create new instances
-        worldview.PaintingCanvas = newModule.CreatePaintingCanvas(worldview)
+        worldview.Painter = newModule.CreatePainter(worldview)
     end
 end
 
@@ -263,7 +263,7 @@ function __moduleinfo.OnDirty()
     -- force a reload
     ForkThread(
         function()
-            import("/lua/ui/game/painting/PaintingCanvas.lua")
+            import("/lua/ui/game/painting/Painter.lua")
         end
     )
 end

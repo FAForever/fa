@@ -26,13 +26,13 @@ local DefaultSharedColor = 'ffffffff'
 --- Keeps track of all active canvas adapter instances
 local CanvasAdapterInstances = TrashBag()
 
----@alias UIPaintingCanvasAdapterType 'Abstract' | 'Observer' | 'Player'
+---@alias UIPainterAdapterType 'Abstract' | 'Observer' | 'Player'
 
 --- Keeps track of all muted peers.
 ---@type table<string, boolean>
 local MutedPeers = {}
 
---- Represents a shared painting that is send across the network. The data structure is slightly different to reduce network bandwidth.
+--- Represents a shared brush stroke that is send across the network. The data structure is slightly different to reduce network bandwidth.
 ---@class UISharedBrushStroke
 ---@field PaintingAdapterIdentifier string
 ---@field Samples UIBrushStrokeSamples
@@ -59,28 +59,28 @@ GetUniquePaintingId = function()
     return UniquePaintingId
 end
 
---- The painting canvas adapter is responsible for sharing interactions 
+--- The painter adapter is responsible for sharing interactions
 --- across worldviews and across the network.
---- 
+---
 --- Do not create an instance of this class directly. Instead, use
---- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
----@class UIPaintingCanvasAdapter : DebugComponent
----@field AdapterType UIPaintingCanvasAdapterType
----@field PaintingCanvas UIPaintingCanvas
-PaintingCanvasAdapter = Class(DebugComponent) {
+--- the factory pattern in the file `PainterAdapterFactory.lua`.
+---@class UIPainterAdapter : DebugComponent
+---@field AdapterType UIPainterAdapterType
+---@field Painter UIPainter
+PainterAdapter = Class(DebugComponent) {
 
     AdapterType = 'Abstract',
     SyncCategory = 'SharePaintingBrushStroke',
 
-    ---@param self UIPaintingCanvasAdapter
-    ---@param paintingCanvas UIPaintingCanvas
-    __init = function(self, paintingCanvas)
-        self.PaintingCanvas = paintingCanvas
+    ---@param self UIPainterAdapter
+    ---@param painter UIPainter
+    __init = function(self, painter)
+        self.Painter = painter
 
         CanvasAdapterInstances:Add(self)
     end,
 
-    ---@param self UIPaintingCanvasAdapter
+    ---@param self UIPainterAdapter
     Destroy = function(self)
         local identifier = self:GetIdentifier()
         local syncCategory = self.SyncCategory
@@ -90,7 +90,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Retrieves the nickname of the local peer.
-    ---@param self UIPaintingCanvasAdapter
+    ---@param self UIPainterAdapter
     ---@return string
     GetLocalPeerName = function(self)
         local clients = GetSessionClients()
@@ -104,23 +104,23 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Computes a unique identifier for this adapter.
-    ---@param self UIPaintingCanvasAdapter
+    ---@param self UIPainterAdapter
     GetIdentifier = function(self)
         -- sanity check
-        if not self.PaintingCanvas then
+        if not self.Painter then
             if self.EnabledWarnings then
-                WARN("Painting canvas or world view is nil!")
+                WARN("Painter or world view is nil!")
             end
         end
 
-        return "PaintingCanvasAdapter of " .. tostring(self.PaintingCanvas)
+        return "PainterAdapter of " .. tostring(self.Painter)
     end,
 
     ---------------------------------------------------------------------------
     --#region Activity across world views
 
     --- Mutes a peer. A peer remains muted for the remainder of the session.
-    ---@param self UIPaintingCanvasAdapter
+    ---@param self UIPainterAdapter
     ---@param author string
     MutePainter = function(self, author)
         -- do not mute ourselves
@@ -137,13 +137,13 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
         -- delete all brush strokes across all worldviews
         for k, adapter in CanvasAdapterInstances do
-            local paintingCanvas = adapter.PaintingCanvas --[[@as UIPaintingCanvas]]
-            paintingCanvas.Painting:DeleteBrushStrokesOfAuthor(author)
+            local painter = adapter.Painter --[[@as UIPainter]]
+            painter.Painting:DeleteBrushStrokesOfAuthor(author)
         end
     end,
 
     --- Checks if a peer is muted.
-    ---@param self UIPaintingCanvasAdapter
+    ---@param self UIPainterAdapter
     ---@param peer string
     ---@return boolean
     IsPeerMuted = function(self, peer)
@@ -151,12 +151,12 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Deletes the brush stroke across all world views.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIBrushStroke
-    DeleteBrushStroke = function(self, painting)
+    ---@param self UIPainterAdapter
+    ---@param brushStroke UIBrushStroke
+    DeleteBrushStroke = function(self, brushStroke)
         for k, adapter in CanvasAdapterInstances do
-            local paintingCanvas = adapter.PaintingCanvas --[[@as UIPaintingCanvas]]
-            paintingCanvas.Painting:DeleteBrushStroke(painting)
+            local painter = adapter.Painter --[[@as UIPainter]]
+            painter.Painting:DeleteBrushStroke(brushStroke)
         end
     end,
 
@@ -165,41 +165,41 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---------------------------------------------------------------------------
     --#region Activity across network and world views
 
-    --- Prepares the painting to be send to all other worldviews and peers.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIBrushStroke
-    SharePaintingBrushStroke = function(self, painting)
+    --- Prepares the brush stroke to be send to all other worldviews and peers.
+    ---@param self UIPainterAdapter
+    ---@param brushStroke UIBrushStroke
+    SharePaintingBrushStroke = function(self, brushStroke)
         -- check if we have something to share
-        if table.empty(painting.Samples.CoordinatesX) then
+        if table.empty(brushStroke.Samples.CoordinatesX) then
             return
         end
 
-        local sharedPainting = self:ToSharedPainting(painting)
-        sharedPainting.PeerName = self:GetLocalPeerName()
+        local sharedBrushStroke = self:ToSharedBrushStroke(brushStroke)
+        sharedBrushStroke.PeerName = self:GetLocalPeerName()
 
-        self:SendShareablePainting(sharedPainting)
+        self:SendShareablePainting(sharedBrushStroke)
     end,
 
-    --- Sends a shareable painting to all other worldviews and peers.
+    --- Sends a shareable brush stroke to all other worldviews and peers.
     ---
     --- Do not call this class directly. Use `SharePaintingBrushStroke` instead.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param sharedPainting UISharedBrushStroke
-    SendShareablePainting = function(self, sharedPainting)
+    ---@param self UIPainterAdapter
+    ---@param sharedBrushStroke UISharedBrushStroke
+    SendShareablePainting = function(self, sharedBrushStroke)
         -- send it locally to all adapters
         for k, adapter in CanvasAdapterInstances do
-            local paintingCanvas = adapter.PaintingCanvas
-            if not IsDestroyed(paintingCanvas) then
-                local painting = adapter:FromSharedPainting(sharedPainting)
-                paintingCanvas.Painting:AddBrushStroke(painting)
+            local painter = adapter.Painter
+            if not IsDestroyed(painter) then
+                local brushStroke = adapter:FromSharedBrushStroke(sharedBrushStroke)
+                painter.Painting:AddBrushStroke(brushStroke)
             end
         end
 
         -- to be extended by subclasses to send across the network by calling `PublishAsChatMessage` or `PublishAsSimCallback`.
     end,
 
-    --- Computes the color of a shared painting.
-    ---@param self UIPaintingCanvas
+    --- Computes the color of a shared brush stroke.
+    ---@param self UIPainter
     ---@param peerName string
     ---@return Color?
     ComputeColorOfPeerName = function(self, peerName)
@@ -212,19 +212,19 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         end
     end,
 
-    --- Converts a shared painting to something that is easier to draw.
+    --- Converts a shared brush stroke to something that is easier to draw.
     ---
-    --- See also `ToSharedPainting` for the publisher side.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param sharedPainting UISharedBrushStroke
+    --- See also `ToSharedBrushStroke` for the publisher side.
+    ---@param self UIPainterAdapter
+    ---@param sharedBrushStroke UISharedBrushStroke
     ---@return UIBrushStroke
-    FromSharedPainting = function(self, sharedPainting)
+    FromSharedBrushStroke = function(self, sharedBrushStroke)
         local coordinatesX = {}
         local coordinatesY = {}
         local coordinatesZ = {}
-        local samplesX = sharedPainting.Samples.CoordinatesX
-        local samplesY = sharedPainting.Samples.CoordinatesY
-        local samplesZ = sharedPainting.Samples.CoordinatesZ
+        local samplesX = sharedBrushStroke.Samples.CoordinatesX
+        local samplesY = sharedBrushStroke.Samples.CoordinatesY
+        local samplesZ = sharedBrushStroke.Samples.CoordinatesZ
 
         for k = 1, table.getn(samplesX) do
             local sx = samplesX[k]
@@ -246,43 +246,43 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             CoordinatesZ = coordinatesZ
         }
 
-        -- color depends on the peer that sent the painting
+        -- color depends on the peer that sent the brush stroke
         local color = DefaultSharedColor
-        if sharedPainting.PeerName then
-            color = self:ComputeColorOfPeerName(sharedPainting.PeerName) or color
+        if sharedBrushStroke.PeerName then
+            color = self:ComputeColorOfPeerName(sharedBrushStroke.PeerName) or color
         end
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
-        local painting = import('/lua/ui/game/painting/BrushStroke.lua').CreateBrushStroke(samples, color)
-        painting.Author = sharedPainting.PeerName
-        painting.ShareId = sharedPainting.ShareId
-        return painting
+        local brushStroke = import('/lua/ui/game/brushStroke/BrushStroke.lua').CreateBrushStroke(samples, color)
+        brushStroke.Author = sharedBrushStroke.PeerName
+        brushStroke.ShareId = sharedBrushStroke.ShareId
+        return brushStroke
     end,
 
-    --- Converts a painting to a something that is easier to share across a network.
+    --- Converts a brush stroke to a something that is easier to share across a network.
     ---
-    --- See also `FromSharedPainting` for the subscriber side.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIBrushStroke
+    --- See also `FromSharedBrushStroke` for the subscriber side.
+    ---@param self UIPainterAdapter
+    ---@param brushStroke UIBrushStroke
     ---@return UISharedBrushStroke
-    ToSharedPainting = function(self, painting)
+    ToSharedBrushStroke = function(self, brushStroke)
         ---@type UISharedBrushStroke
-        local sharedPainting = {
+        local sharedBrushStroke = {
             PaintingAdapterIdentifier = tostring(self),
-            Samples = painting.Samples,
+            Samples = brushStroke.Samples,
             ShareId = GetUniquePaintingId(),
         }
 
-        return sharedPainting
+        return sharedBrushStroke
     end,
 
 
-    --- A rough check to see if a shared painting originates from the local peer.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param sharedPainting UISharedBrushStroke
-    SharedPaintingIsKnown = function(self, sharedPainting)
+    --- A rough check to see if a shared brushStroke originates from the local peer.
+    ---@param self UIPainterAdapter
+    ---@param sharedBrushStroke UISharedBrushStroke
+    SharedPaintingIsKnown = function(self, sharedBrushStroke)
         for k, canvasAdapterInstance in CanvasAdapterInstances do
-            if tostring(canvasAdapterInstance) == sharedPainting.PaintingAdapterIdentifier then
+            if tostring(canvasAdapterInstance) == sharedBrushStroke.PaintingAdapterIdentifier then
                 return true
             end
         end
@@ -290,34 +290,34 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return false
     end,
 
-    ---@param self UIPaintingCanvasAdapter
-    ---@param sharedPainting UISharedBrushStroke
-    AddSharedPainting = function(self, sharedPainting)
-        -- feature: do not add the same painting twice
-        if self:SharedPaintingIsKnown(sharedPainting) then
+    ---@param self UIPainterAdapter
+    ---@param sharedBrushStroke UISharedBrushStroke
+    AddSharedPainting = function(self, sharedBrushStroke)
+        -- feature: do not add the same brush stroke twice
+        if self:SharedPaintingIsKnown(sharedBrushStroke) then
             return
         end
 
-        -- feature: do not add a painting from a muted peer
-        if self:IsPeerMuted(sharedPainting.PeerName) then
+        -- feature: do not add a brush stroke from a muted peer
+        if self:IsPeerMuted(sharedBrushStroke.PeerName) then
             return
         end
 
         -- do not share paintings to a canvas that is destroyed, it appears this only happens during development.
-        if IsDestroyed(self.PaintingCanvas) then
+        if IsDestroyed(self.Painter) then
             return
         end
 
-        local painting = self:FromSharedPainting(sharedPainting)
-        self.PaintingCanvas.Painting:AddBrushStroke(painting)
+        local brushStroke = self:FromSharedBrushStroke(sharedBrushStroke)
+        self.Painter.Painting:AddBrushStroke(brushStroke)
     end,
 
-    --- Publishes a painting as a callback. Paintings that are published as a callback
+    --- Publishes a brush stroke as a callback. Paintings that are published as a callback
     --- are stored in the replay. They're visible when replaying the game. Only players
     --- with an army are able to send sim callbacks.
     ---
     --- See also `SubscribeToCallback` for the subscriber side.
-    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param self UIPainterAdapter
     ---@param shareablePainting UISharedBrushStroke
     PublishAsCallback = function(self, shareablePainting)
         ---@type UIShareableBrushStrokeCallbackMessage
@@ -334,22 +334,22 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- Subscribe and callback/sync events that are related to paintings.
     ---
     --- See also `PublishAsCallback` for the publisher side.
-    ---@param self UIPaintingCanvasAdapter
+    ---@param self UIPainterAdapter
     SubscribeToCallback = function(self)
         local identifier = self:GetIdentifier()
-        local paintingCanvas = self.PaintingCanvas
+        local painter = self.Painter
         local syncCategory = self.SyncCategory
 
-        -- feature: share the active painting with all relevant peers
+        -- feature: share the active brush stroke with all relevant peers
         AddOnSyncHashedCallback(
         ---@param sharedPaintings UIShareableBrushStrokeCallbackMessage[]
             function(sharedPaintings)
-                if paintingCanvas.EnabledSpewing then
-                    SPEW(string.format("Received %d painting(s) for %s", table.getsize(sharedPaintings), identifier))
+                if painter.EnabledSpewing then
+                    SPEW(string.format("Received %d brush stroke(s) for %s", table.getsize(sharedPaintings), identifier))
                 end
 
                 -- process event
-                if not IsDestroyed(paintingCanvas) then
+                if not IsDestroyed(painter) then
                     for k = 1, table.getn(sharedPaintings) do
                         local data = sharedPaintings[k]
                         self:AddSharedPainting(data.ShareablePainting)
@@ -359,26 +359,26 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         )
     end,
 
-    --- Publishes a painting as a chat message. Paintings that are published as a chat message are not stored in the replay. And they're also limited in size.
+    --- Publishes a brush stroke as a chat message. Paintings that are published as a chat message are not stored in the replay. And they're also limited in size.
     ---
     --- See also `SubscribeToChatEvents` for the subscriber side.
-    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param self UIPainterAdapter
     ---@param shareablePainting UISharedBrushStroke
     PublishAsChatMessage = function(self, shareablePainting)
 
-        -- limitation: chat messages have a limited amount of space per 
-        -- message. Messages send to peers with `SessionSendChatMessage` are 
-        -- limited in size. The limit appears to be around 4kb. If we exceed 
-        -- that then `SessionSendChatMessage` will just error out. 
-        -- 
+        -- limitation: chat messages have a limited amount of space per
+        -- message. Messages send to peers with `SessionSendChatMessage` are
+        -- limited in size. The limit appears to be around 4kb. If we exceed
+        -- that then `SessionSendChatMessage` will just error out.
+        --
         -- There are two options:
         --
-        -- - 1) We implement the ability to chop a painting into several messages.
-        -- - 2) We limit the size of a painting.
-        -- 
-        -- At the moment we take option 2. An active painting will stop adding
+        -- - 1) We implement the ability to chop a brush stroke into several messages.
+        -- - 2) We limit the size of a brush stroke.
+        --
+        -- At the moment we take option 2. An active brush stroke will stop adding
         -- samples once it's reached a certain threshold. With normal use,
-        -- this guarantees that the painting does not exceed the limit.
+        -- this guarantees that the brush stroke does not exceed the limit.
 
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
         local clients = FindClients()
@@ -408,13 +408,13 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             function(sender, data)
                 data.ShareablePainting.PeerName = sender
 
-                if self.PaintingCanvas.EnabledSpewing then
-                    SPEW(string.format("Received a painting from %s", tostring(data.ShareablePainting.PeerName)))
+                if self.Painter.EnabledSpewing then
+                    SPEW(string.format("Received a brush stroke from %s", tostring(data.ShareablePainting.PeerName)))
                 end
 
                 -- share it with all other adapters as we can only subscribe with one.
                 for k, canvasAdapterInstance in CanvasAdapterInstances do
-                    if not IsDestroyed(canvasAdapterInstance.PaintingCanvas) then
+                    if not IsDestroyed(canvasAdapterInstance.Painter) then
                         self:AddSharedPainting(data.ShareablePainting)
                     end
                 end

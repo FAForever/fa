@@ -27,17 +27,17 @@ local DraggerInit = Dragger.__init
 
 --- Responsible for all interactions with a painting.
 ---@class UIPaintingBrush : Dragger
----@field PaintingCanvas UIPaintingCanvas
+---@field Painter UIPainter
 ---@field ActiveBrushStroke? UIActiveBrushStroke      # The active brush stroke of the local peer.
 ---@field WorldCoordinates Vector
 PaintingBrush = Class(Dragger) {
 
     ---@param self UIPaintingBrush
-    ---@param canvas UIPaintingCanvas
+    ---@param canvas UIPainter
     __init = function(self, canvas)
         DraggerInit(self)
 
-        self.PaintingCanvas = canvas
+        self.Painter = canvas
         self.Trash = TrashBag()
         self.Trash:Add(ForkThread(self.CancelBrushThread, self))
 
@@ -98,7 +98,7 @@ PaintingBrush = Class(Dragger) {
     --#endregion
 
     --- Computes the color of the active brush stroke.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPainter
     GetColorOfActiveBrushStroke = function(self)
 
         -- in this case we just want to use the color of the
@@ -134,9 +134,9 @@ PaintingBrush = Class(Dragger) {
 
         -- feature: ability to delete paintings
 
-        local paintings = self.PaintingCanvas.Painting:GetBrushStrokesAtCoordinates(coordinates, radius)
+        local paintings = self.Painter.Painting:GetBrushStrokesAtCoordinates(coordinates, radius)
         for k, painting in paintings do
-            self.PaintingCanvas.Adapter:DeleteBrushStroke(painting)
+            self.Painter.Adapter:DeleteBrushStroke(painting)
         end
     end,
 
@@ -149,10 +149,10 @@ PaintingBrush = Class(Dragger) {
 
         -- feature: ability to mute painters
 
-        local paintings = self.PaintingCanvas.Painting:GetBrushStrokesAtCoordinates(coordinates, radius)
+        local paintings = self.Painter.Painting:GetBrushStrokesAtCoordinates(coordinates, radius)
         for k, painting in paintings do
             if painting.Author then
-                self.PaintingCanvas.Adapter:MutePainter(painting.Author)
+                self.Painter.Adapter:MutePainter(painting.Author)
             end
         end
     end,
@@ -165,7 +165,7 @@ PaintingBrush = Class(Dragger) {
         -- gather all info
         local brushType = self:GetBrushType()
         local brushRadius = self:GetBrushRadius()
-        local brushCoordinates = UnProject(self.PaintingCanvas.WorldView, {x, y})
+        local brushCoordinates = UnProject(self.Painter.WorldView, {x, y})
         self.WorldCoordinates = brushCoordinates
 
         -- do the work
@@ -186,10 +186,10 @@ PaintingBrush = Class(Dragger) {
         if self.ActiveBrushStroke then
             -- simplify the brush stroke
             self.ActiveBrushStroke:Simplify()
-            self.PaintingCanvas.Adapter:SharePaintingBrushStroke(self.ActiveBrushStroke)
+            self.Painter.Adapter:SharePaintingBrushStroke(self.ActiveBrushStroke)
         end
 
-        self.PaintingCanvas:CancelBrush()
+        self.Painter:CancelBrush()
         self:Destroy()
     end,
 
@@ -205,7 +205,7 @@ PaintingBrush = Class(Dragger) {
             print(LOC(message))
         end
 
-        self.PaintingCanvas:CancelBrush()
+        self.Painter:CancelBrush()
         self:Destroy()
     end,
 
@@ -259,7 +259,7 @@ PaintingBrush = Class(Dragger) {
     end,
 }
 
----@param canvas UIPaintingCanvas
+---@param canvas UIPainter
 CreatePaintingBrush = function(canvas)
     local brush = PaintingBrush(canvas) --[[@as UIPaintingBrush]]
     PostDragger(canvas:GetRootFrame(), 'RBUTTON', brush)
