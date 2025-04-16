@@ -24,12 +24,11 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
 local GetPaintingCanvasAdapter = import('/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapterFactory.lua').GetPaintingCanvasAdapter
+local CreatePainting = import("/lua/ui/game/painting/Painting.lua").CreatePainting
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 local PaintingCanvasInstances = TrashBag()
-
-local DefaultPaintingDuration = 25
 
 local SyncIdentifier = "PaintingCanvas.lua"
 
@@ -38,12 +37,12 @@ local SyncIdentifier = "PaintingCanvas.lua"
 ---@class UIPaintingCanvasInput
 ---@field ActiveInteraction UIPaintingCanvasActiveInteraction
 
---- Responsible for providing an interface to interact with paintings and the painting network adapter.
+--- Responsible for glueing together the painting, the brush stroke and the painting network adapter.
 ---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
 ---@field Adapter UIPaintingCanvasAdapter
+---@field Painting UIPainting
 ---@field Trash TrashBag
----@field WorldView WorldView                   # Worldview that this canvas is for.
----@field Paintings TrashBag                    # All paintings, including those shared by peers.
+---@field WorldView WorldView                   # Worldview that this canvas is for
 ---@field InhibitionSet table<string, boolean>  # A set of reasons for the canvas to be disabled.
 ---@field PaintingBrush UIPaintingBrush
 PaintingCanvas = Class(Bitmap, DebugComponent) {
@@ -54,7 +53,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         Bitmap.__init(self, worldview)
 
         self.Trash = TrashBag()
-        self.Paintings = self.Trash:Add(TrashBag())
+        self.Painting = CreatePainting()
         self.Adapter = self.Trash:Add(GetPaintingCanvasAdapter(self))
 
         self.WorldView = worldview
@@ -132,6 +131,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return false
         end
 
+        -- feature: be able to interact with the canvas
         if event.Modifiers.Right then
             if event.Type == 'ButtonPress' then
                 self.PaintingBrush = import("/lua/ui/game/painting/PaintingBrush.lua").CreatePaintingBrush(self)
@@ -153,7 +153,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return false
         end
 
-        -- render the brush
+        -- feature: render the brush
         if self.PaintingBrush then
             local ok, msg = pcall(self.PaintingBrush.OnRender, self.PaintingBrush, delta)
             if not ok and self.EnabledErrors then
@@ -162,35 +162,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             end
         end
 
-        -- render all other paintings
-        for k, painting in self.Paintings do
-            local ok, msg = pcall(painting.OnRender, painting, delta)
-            if not ok and self.EnabledErrors then
-                WARN(msg)
-                self.Paintings[k] = nil
-            end
-        end
-    end,
-
-    --- Returns the first painting that is within the given radius at the given coordinates.
-    ---@param self UIPaintingCanvas
-    ---@param coordinates Vector
-    ---@param radius number
-    ---@return UIPainting[]
-    GetPaintingsAtCoordinates = function(self, coordinates, radius, cache)
-        local paintings = cache or {}
-
-        for k, painting in self.Paintings do
-            local distanceBoundingBox = painting:DistanceToBoundingBox(coordinates)
-            if distanceBoundingBox < radius then
-                local distanceToSamples = painting:DistanceTo(coordinates)
-                if distanceToSamples < radius then
-                    table.insert(paintings, painting)
-                end
-            end
-        end
-
-        return paintings
+        -- feature: render the painting
+        self.Painting:OnRender(delta)
     end,
 
     --- Cancels the brush, destroying any active painting in the process.
@@ -199,63 +172,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         if self.PaintingBrush then
             self.PaintingBrush:Destroy()
             self.PaintingBrush = nil
-        end
-    end,
-
-    --- Adds a painting to the canvas.
-    ---
-    --- At this stage we need to guarantee that the painting is legitimate.
-    ---@param self UIPaintingCanvas
-    ---@param painting UIPainting
-    AddPainting = function(self, painting)
-        -- feature: enable/disable the painting feature
-        if self:IsDisabledByGameOptions() then
-            return
-        end
-
-        self.Paintings:Add(painting)
-
-        -- feature: paintings decay over time
-        painting:StartDecay(
-            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
-        )
-
-        if self.EnabledSpewing then
-            SPEW("Active paintings:")
-            for k, v in self.Paintings do
-                SPEW(string.format(
-                    " - %s: %d samples (%d bytes)",
-                    self.WorldView._cameraName,
-                    table.getn(v.Samples.CoordinatesX),
-                    v:ComputeAllocatedBytes()
-                ))
-            end
-        end
-    end,
-
-    --- Deletes a single painting by comparing their identifiers.
-    ---@param self UIPaintingCanvas
-    ---@param painting UIPainting
-    DeletePainting = function(self, painting)
-        for k, otherPainting in self.Paintings do
-            if otherPainting.ShareId == painting.ShareId and
-                otherPainting.Author == painting.Author
-            then
-                self.Paintings[k]:Destroy()
-                self.Paintings[k] = nil
-            end
-        end
-    end,
-
-    --- Deletes all paintings of a given author.
-    ---@param self UIPaintingCanvas
-    ---@param author string
-    DeletePaintingsOfAuthor = function(self, author)
-        for k, painting in self.Paintings do
-            if painting.Author == author then
-                self.Paintings[k]:Destroy()
-                self.Paintings[k] = nil
-            end
         end
     end,
 }

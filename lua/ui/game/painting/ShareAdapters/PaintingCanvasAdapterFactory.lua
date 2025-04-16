@@ -25,7 +25,7 @@ local PaintingCanvasPlayerAdapter = import("/lua/ui/game/painting/ShareAdapters/
 local PaintingCanvasReplayAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasReplayAdapter.lua")
 
 ---@class UIPaintingCanvasAdapter
----@field SharePainting fun(self:UIPaintingCanvasAdapter, painting: UIPainting)
+---@field SharePainting fun(self:UIPaintingCanvasAdapter, painting: UIBrushStroke)
 
 --- Creates the correct adapter instance based on the game state of the local peer.
 ---@param paintingCanvas UIPaintingCanvas

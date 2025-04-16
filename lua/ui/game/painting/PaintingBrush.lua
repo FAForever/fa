@@ -25,10 +25,10 @@ local DraggerInit = Dragger.__init
 
 ---@alias UIPaintingBrushType 'Create' | 'Delete' | 'Mute'
 
---- Responsible for all interactions with a painting canvas.
+--- Responsible for all interactions with a painting.
 ---@class UIPaintingBrush : Dragger
 ---@field PaintingCanvas UIPaintingCanvas
----@field ActivePainting? UIActivePainting      # The active painting of the local peer.
+---@field ActiveBrushStroke? UIActiveBrushStroke      # The active painting of the local peer.
 ---@field WorldCoordinates Vector
 PaintingBrush = Class(Dragger) {
 
@@ -50,7 +50,7 @@ PaintingBrush = Class(Dragger) {
         Dragger.Destroy(self)
 
         self.Trash:Destroy()
-        self:CancelActivePainting()
+        self:CancelActiveBrushStroke()
     end,
 
     ---------------------------------------------------------------------------
@@ -73,7 +73,7 @@ PaintingBrush = Class(Dragger) {
         return 'Create'
     end,
 
-    --- Computes the radius to interact with existing paintings, to for example delete them.
+    --- Computes the radius to interact with existing brush strokes, to for example delete them.
     ---@param self UIPaintingBrush
     ---@return number
     GetBrushRadius = function(self)
@@ -97,9 +97,9 @@ PaintingBrush = Class(Dragger) {
 
     --#endregion
 
-    --- Computes the color of the active painting.
+    --- Computes the color of the active brush stroke.
     ---@param self UIPaintingCanvas
-    GetColorOfActivePainting = function(self)
+    GetColorOfActiveBrushStroke = function(self)
 
         -- in this case we just want to use the color of the
         -- current focus army. This may not always match the
@@ -111,45 +111,45 @@ PaintingBrush = Class(Dragger) {
         return armiesTable[GetFocusArmy()].color or 'ffffffff'
     end,
 
-    --- Creates and adds samples to an active painting.
+    --- Creates and adds samples to an active brush stroke.
     ---@param self UIPaintingBrush
     ---@param coordinates Vector
     CreatePaintingAtBrush = function(self, coordinates)
-        if not self.ActivePainting then
+        if not self.ActiveBrushStroke then
             -- we use import directly for developer convenience: it enables you to reload the file without restarting
-            self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
-                self:GetColorOfActivePainting()
+            self.ActiveBrushStroke = import('/lua/ui/game/painting/ActiveBrushStroke.lua').CreateActiveBrushStroke(
+                self:GetColorOfActiveBrushStroke()
             )
         end
 
-        self.ActivePainting:AddSample(coordinates)
+        self.ActiveBrushStroke:AddSample(coordinates)
     end,
 
-    --- Deletes all paintings that the brush is on top of.
+    --- Deletes all brush strokes that the brush is on top of.
     ---@param self UIPaintingBrush
     ---@param coordinates Vector
     ---@param radius number
     DeletePaintingAtBrush = function(self, coordinates, radius)
-        self:CancelActivePainting()
+        self:CancelActiveBrushStroke()
 
         -- feature: ability to delete paintings
 
-        local paintings = self.PaintingCanvas:GetPaintingsAtCoordinates(coordinates, radius)
+        local paintings = self.PaintingCanvas.Painting:GetBrushStrokesAtCoordinates(coordinates, radius)
         for k, painting in paintings do
-            self.PaintingCanvas.Adapter:DeletePainting(painting)
+            self.PaintingCanvas.Adapter:DeleteBrushStroke(painting)
         end
     end,
 
-    --- Deletes and mutes all paintings that the brush is on top of.
+    --- Deletes and mutes the author of all brush stroke that the brush is on top of.
     ---@param self UIPaintingBrush
     ---@param coordinates Vector
     ---@param radius number
     MutePaintersOfPaintingAtBrush = function(self, coordinates, radius)
-        self:CancelActivePainting()
+        self:CancelActiveBrushStroke()
 
         -- feature: ability to mute painters
 
-        local paintings = self.PaintingCanvas:GetPaintingsAtCoordinates(coordinates, radius)
+        local paintings = self.PaintingCanvas.Painting:GetBrushStrokesAtCoordinates(coordinates, radius)
         for k, painting in paintings do
             if painting.Author then
                 self.PaintingCanvas.Adapter:MutePainter(painting.Author)
@@ -183,8 +183,8 @@ PaintingBrush = Class(Dragger) {
     ---@param x number  # x coordinate of screen position
     ---@param y number  # y coordinate of screen position
     OnRelease = function(self, x, y)
-        if self.ActivePainting then
-            self.PaintingCanvas.Adapter:SharePainting(self.ActivePainting)
+        if self.ActiveBrushStroke then
+            self.PaintingCanvas.Adapter:SharePainting(self.ActiveBrushStroke)
         end
 
         self.PaintingCanvas:CancelBrush()
@@ -194,9 +194,9 @@ PaintingBrush = Class(Dragger) {
     --- Called by the engine when the dragger is cancelled.
     ---@param self UIPaintingBrush
     OnCancel = function(self)
-        if self.ActivePainting then
+        if self.ActiveBrushStroke then
             -- user feedback
-            local message = "<LOC painting_cancel_message>Cancelled a painting"
+            local message = "<LOC painting_cancel_message>Cancelled a brush stroke"
             if Random() < 0.01 then
                 message = "<LOC painting_cancel_message_rare>Cancelled that work of art"
             end
@@ -210,8 +210,8 @@ PaintingBrush = Class(Dragger) {
     ---@param self UIPaintingBrush
     ---@param delta number
     OnRender = function(self, delta)
-        if self.ActivePainting then
-            self.ActivePainting:OnRender(delta)
+        if self.ActiveBrushStroke then
+            self.ActiveBrushStroke:OnRender(delta)
         end
 
         -- feature: visualize interactions with the canvas
@@ -219,7 +219,7 @@ PaintingBrush = Class(Dragger) {
         local brushCoordinates = self.WorldCoordinates
         local brushType = self:GetBrushType()
         if brushType == 'Create' then
-            UI_DrawCircle(brushCoordinates, 0, self:GetColorOfActivePainting(), 0)
+            UI_DrawCircle(brushCoordinates, 0, self:GetColorOfActiveBrushStroke(), 0)
         elseif brushType == 'Delete' then
             UI_DrawCircle(brushCoordinates, brushRadius, 'FF9D00', 0)
         elseif brushType == 'Mute' then
@@ -234,7 +234,7 @@ PaintingBrush = Class(Dragger) {
         return IsKeyDown('ESCAPE')
     end,
 
-    --- A thread that checks if the brush should be cancelled.
+    --- A thread that checks if the active brush stroke should be cancelled.
     ---@param self UIPaintingBrush
     CancelBrushThread = function(self)
         -- feature: be able to cancel the active painting
@@ -247,12 +247,12 @@ PaintingBrush = Class(Dragger) {
         end
     end,
 
-    --- Cancels the active painting.
+    --- Cancels the active brush stroke.
     ---@param self UIPaintingBrush
-    CancelActivePainting = function(self)
-        if self.ActivePainting then
-            self.ActivePainting:Destroy()
-            self.ActivePainting = nil
+    CancelActiveBrushStroke = function(self)
+        if self.ActiveBrushStroke then
+            self.ActiveBrushStroke:Destroy()
+            self.ActiveBrushStroke = nil
         end
     end,
 }

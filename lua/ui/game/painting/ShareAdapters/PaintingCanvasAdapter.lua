@@ -35,7 +35,7 @@ local MutedPeers = {}
 --- Represents a shared painting that is send across the network. The data structure is slightly different to reduce network bandwidth.
 ---@class UISharedPainting
 ---@field PaintingAdapterIdentifier string
----@field Samples UIPaintingSamples
+---@field Samples UIBrushStrokeSamples
 ---@field PeerId? number
 ---@field PeerName? string
 ---@field ShareId number
@@ -136,10 +136,10 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             print(LOCF("<LOC painting_mute_message>Muted %s for this session", author))
         end
 
-        -- delete all paintings across all worldviews
+        -- delete all brush strokes across all worldviews
         for k, adapter in CanvasAdapterInstances do
             local paintingCanvas = adapter.PaintingCanvas --[[@as UIPaintingCanvas]]
-            paintingCanvas:DeletePaintingsOfAuthor(author)
+            paintingCanvas.Painting:DeleteBrushStrokesOfAuthor(author)
         end
     end,
 
@@ -151,13 +151,13 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return MutedPeers[peer] == true
     end,
 
-    --- Deletes the painting across all world views.
+    --- Deletes the brush stroke across all world views.
     ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIPainting
-    DeletePainting = function(self, painting)
+    ---@param painting UIBrushStroke
+    DeleteBrushStroke = function(self, painting)
         for k, adapter in CanvasAdapterInstances do
             local paintingCanvas = adapter.PaintingCanvas --[[@as UIPaintingCanvas]]
-            paintingCanvas:DeletePainting(painting)
+            paintingCanvas.Painting:DeleteBrushStroke(painting)
         end
     end,
 
@@ -168,7 +168,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     --- Prepares the painting to be send to all other worldviews and peers.
     ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIPainting
+    ---@param painting UIBrushStroke
     SharePainting = function(self, painting)
         -- check if we have something to share
         if table.empty(painting.Samples.CoordinatesX) then
@@ -192,7 +192,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             local paintingCanvas = adapter.PaintingCanvas
             if not IsDestroyed(paintingCanvas) then
                 local painting = adapter:FromSharedPainting(sharedPainting)
-                paintingCanvas:AddPainting(painting)
+                paintingCanvas.Painting:AddBrushStroke(painting)
             end
         end
 
@@ -234,7 +234,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- See also `ToSharedPainting` for the publisher side.
     ---@param self UIPaintingCanvasAdapter
     ---@param sharedPainting UISharedPainting
-    ---@return UIPainting
+    ---@return UIBrushStroke
     FromSharedPainting = function(self, sharedPainting)
         local coordinatesX = {}
         local coordinatesY = {}
@@ -256,7 +256,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             end
         end
 
-        ---@type UIPaintingSamples
+        ---@type UIBrushStrokeSamples
         local samples = {
             CoordinatesX = coordinatesX,
             CoordinatesY = coordinatesY,
@@ -272,7 +272,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         end
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
-        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(samples, color)
+        local painting = import('/lua/ui/game/painting/BrushStroke.lua').CreateBrushStroke(samples, color)
         painting.Author = sharedPainting.PeerName
         painting.ShareId = sharedPainting.ShareId
         return painting
@@ -282,7 +282,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---
     --- See also `FromSharedPainting` for the subscriber side.
     ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIPainting
+    ---@param painting UIBrushStroke
     ---@return UISharedPainting
     ToSharedPainting = function(self, painting)
         ---@type UISharedPainting
@@ -328,7 +328,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         end
 
         local painting = self:FromSharedPainting(sharedPainting)
-        self.PaintingCanvas:AddPainting(painting)
+        self.PaintingCanvas.Painting:AddBrushStroke(painting)
     end,
 
     --- Publishes a painting as a callback. Paintings that are published as a callback

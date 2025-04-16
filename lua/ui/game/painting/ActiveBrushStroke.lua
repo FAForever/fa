@@ -20,30 +20,30 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Painting = import('/lua/ui/game/painting/Painting.lua').Painting
+local BrushStroke = import('/lua/ui/game/painting/BrushStroke.lua').BrushStroke
 
 --- Responsible for managing a painting that is actively being worked on.
----@class UIActivePainting : UIPainting
+---@class UIActiveBrushStroke : UIBrushStroke
 ---@field LastEdited number
 ---@field LastSample Vector
-ActivePainting = ClassUI(Painting) {
+ActiveBrushStroke = ClassUI(BrushStroke) {
 
     DebounceTimeThreshold = 0.016, -- About 60 fps
 
-    ---@param self UIActivePainting
+    ---@param self UIActiveBrushStroke
     ---@param color Color
     __init = function(self, color)
-        Painting.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
+        BrushStroke.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
 
         self.LastEdited = GetGameTimeSeconds()
-        self.LastSample = { -10, -10, -10 }
+        self.LastSample = { 0, 0, 0 }
     end,
 
     ---------------------------------------------------------------------------
     --#region Creation of samples interface
 
     --- Computes the debounce distance based on the current zoom level.
-    ---@param self UIActivePainting
+    ---@param self UIActiveBrushStroke
     ---@return number
     GetDebounceDistance = function(self)
         local worldViewManager = import("/lua/ui/game/worldview.lua")
@@ -65,8 +65,8 @@ ActivePainting = ClassUI(Painting) {
     end,
 
     --- Responsible for debouncing samples. This is to reduce the
-    --- bandwidth it requires to share the art once it is finished.
-    ---@param self UIActivePainting
+    --- bandwidth it requires to share the brush stroke once it is finished.
+    ---@param self UIActiveBrushStroke
     ---@return boolean
     DebounceSample = function(self, sample)
         -- feature: debounce samples that are in too quick succession
@@ -84,8 +84,8 @@ ActivePainting = ClassUI(Painting) {
         return false
     end,
 
-    --- Adds a sample to the painting.
-    ---@param self UIActivePainting
+    --- Adds a sample to the brush stroke.
+    ---@param self UIActiveBrushStroke
     ---@param coordinates Vector
     AddSample = function(self, coordinates)
         -- basic debouncing to reduce bandwidth requirements
@@ -98,9 +98,9 @@ ActivePainting = ClassUI(Painting) {
         -- limitation: chat messages have a limited amount of space per
         -- message. It is difficult to overcome this limit.
         --
-        -- By naturally limiting the size of a painting we not only overcome the
-        -- issue with chat messages but we also prevent players from creating
-        -- gigantic paintings that have relatively high... entropy :).
+        -- By naturally limiting the size of a brush stroke we not only overcome
+        -- the issue with chat messages but we also prevent players from creating
+        -- gigantic brush strokes that have relatively high... entropy :).
         --
         -- The value is intentionally hard coded!
 
@@ -120,9 +120,8 @@ ActivePainting = ClassUI(Painting) {
 }
 
 ---@param color Color
----@return UIActivePainting
-CreateActivePainting = function(color)
-    local instance = ActivePainting(color) --[[@as UIActivePainting]]
-
+---@return UIActiveBrushStroke
+CreateActiveBrushStroke = function(color)
+    local instance = ActiveBrushStroke(color) --[[@as UIActiveBrushStroke]]
     return instance
 end
