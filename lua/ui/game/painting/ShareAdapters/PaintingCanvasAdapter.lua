@@ -155,7 +155,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --#endregion
 
     ---------------------------------------------------------------------------
-    --#region Interactivity across network
+    --#region Activity across network and world views
 
     --- Prepares the painting to be send to all other worldviews and peers.
     ---@param self UIPaintingCanvasAdapter

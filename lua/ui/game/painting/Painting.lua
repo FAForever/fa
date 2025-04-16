@@ -47,6 +47,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field Color Color
 ---@field Decay? UIPaintingDecay
 ---@field Samples UIPaintingSamples
+---@field Trash TrashBag
 ---@field Author? string        # peer that made the painting.
 ---@field ShareId? number
 Painting = Class(DebugComponent) {
@@ -58,13 +59,12 @@ Painting = Class(DebugComponent) {
         -- store parameters
         self.Samples = samples
         self.Color = color
+        self.Trash = TrashBag()
     end,
 
     ---@param self UIPainting
     Destroy = function(self)
-        -- do nothing
-
-        -- this function exists to allow a painting to become part of a trashbag.
+        self.Trash:Destroy()
     end,
 
     --- Renders the painting to the world view.
@@ -139,7 +139,7 @@ Painting = Class(DebugComponent) {
         self.Decay = {
             Duration = duration,
             StartTime = GetGameTimeSeconds(),
-            ThreadInstance = ForkThread(self.DecayThread, self, duration)
+            ThreadInstance = self.Trash:Add(ForkThread(self.DecayThread, self, duration))
         }
     end,
 
