@@ -51,6 +51,15 @@ local MutedPeers = {}
 ---@class UIShareablePaintingChatMessage : UIShareablePaintingMessage
 ---@field Painting true
 
+---@type number
+local UniquePaintingId = 0
+
+---@return number
+GetUniquePaintingId = function()
+    UniquePaintingId = UniquePaintingId + 1
+    return UniquePaintingId
+end
+
 --- The painting canvas adapter is responsible for sharing interactions 
 --- across worldviews and across the network.
 --- 
@@ -129,7 +138,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
         -- delete all paintings across all worldviews
         for k, adapter in CanvasAdapterInstances do
-            local paintingCanvas = adapter.PaintingCanvas
+            local paintingCanvas = adapter.PaintingCanvas --[[@as UIPaintingCanvas]]
             paintingCanvas:DeletePaintingsOfAuthor(author)
         end
     end,
@@ -147,7 +156,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param painting UIPainting
     DeletePainting = function(self, painting)
         for k, adapter in CanvasAdapterInstances do
-            local paintingCanvas = adapter.PaintingCanvas
+            local paintingCanvas = adapter.PaintingCanvas --[[@as UIPaintingCanvas]]
             paintingCanvas:DeletePainting(painting)
         end
     end,
@@ -280,7 +289,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         local sharedPainting = {
             PaintingAdapterIdentifier = tostring(self),
             Samples = painting.Samples,
-            ShareId = 1,
+            ShareId = GetUniquePaintingId(),
         }
 
         return sharedPainting

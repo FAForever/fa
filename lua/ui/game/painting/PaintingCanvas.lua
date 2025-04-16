@@ -38,7 +38,7 @@ local SyncIdentifier = "PaintingCanvas.lua"
 ---@class UIPaintingCanvasInput
 ---@field ActiveInteraction UIPaintingCanvasActiveInteraction
 
---- Responsible for providing an interface to interact with paintings and the painting network adapter. 
+--- Responsible for providing an interface to interact with paintings and the painting network adapter.
 ---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
 ---@field Adapter UIPaintingCanvasAdapter
 ---@field Trash TrashBag
@@ -133,7 +133,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
 
         if event.Modifiers.Right then
-            if event.Type == 'ButtonPress'  then
+            if event.Type == 'ButtonPress' then
                 self.PaintingBrush = import("/lua/ui/game/painting/PaintingBrush.lua").CreatePaintingBrush(self)
             end
         end
@@ -202,8 +202,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
     end,
 
-    --- Adds a painting to the canvas. 
-    --- 
+    --- Adds a painting to the canvas.
+    ---
     --- At this stage we need to guarantee that the painting is legitimate.
     ---@param self UIPaintingCanvas
     ---@param painting UIPainting
@@ -237,8 +237,10 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param self UIPaintingCanvas
     ---@param painting UIPainting
     DeletePainting = function(self, painting)
-        for k, painting in self.Paintings do
-            if painting.ShareId == painting.ShareId then
+        for k, otherPainting in self.Paintings do
+            if otherPainting.ShareId == painting.ShareId and
+                otherPainting.Author == painting.Author
+            then
                 self.Paintings[k]:Destroy()
                 self.Paintings[k] = nil
             end
