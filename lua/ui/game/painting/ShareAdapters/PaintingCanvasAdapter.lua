@@ -36,7 +36,6 @@ local MutedPeers = {}
 ---@class UISharedBrushStroke
 ---@field PaintingAdapterIdentifier string
 ---@field Samples UIBrushStrokeSamples
----@field PeerId? number
 ---@field PeerName? string
 ---@field ShareId number
 
@@ -201,22 +200,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     --- Computes the color of a shared painting.
     ---@param self UIPaintingCanvas
-    ---@param peerId number
-    ---@return Color?
-    ComputeColorOfPeerId = function(self, peerId)
-        local armiesTable = GetArmiesTable().armiesTable
-        if peerId then
-            for k = 1, table.getn(armiesTable) do
-                local armyInfo = armiesTable[k]
-                if table.find(armyInfo.authorizedCommandSources, peerId) then
-                    return armyInfo.color
-                end
-            end
-        end
-    end,
-
-    --- Computes the color of a shared painting.
-    ---@param self UIPaintingCanvas
     ---@param peerName string
     ---@return Color?
     ComputeColorOfPeerName = function(self, peerName)
@@ -267,8 +250,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         local color = DefaultSharedColor
         if sharedPainting.PeerName then
             color = self:ComputeColorOfPeerName(sharedPainting.PeerName) or color
-        elseif sharedPainting.PeerId then
-            color = self:ComputeColorOfPeerId(sharedPainting.PeerId) or color
         end
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting

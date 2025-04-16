@@ -819,8 +819,7 @@ do
     ---@param data UIShareableBrushStrokeCallbackMessage
     local SyncPainting = function(data)
         -- used to determine the color of the painting
-        data.ShareablePainting.PeerId = GetCurrentCommandSource()
-        data.ShareablePainting.PeerName = GetArmyBrain(data.ShareablePainting.PeerId).Nickname
+        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSource()).Nickname
 
         Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
         table.insert(Sync.SharePaintingBrushStroke, data)
