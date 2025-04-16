@@ -51,6 +51,9 @@ local MutedPeers = {}
 ---@class UIShareablePaintingChatMessage : UIShareablePaintingMessage
 ---@field Painting true
 
+--- The painting canvas adapter is responsible for sharing interactions 
+--- across worldviews and across the network.
+--- 
 --- Do not create an instance of this class directly. Instead, use
 --- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
 ---@class UIPaintingCanvasAdapter : DebugComponent
