@@ -49,7 +49,8 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field Samples UIBrushStrokeSamples  # Samples of the brush stroke. All samples are in world coordinates.
 ---@field Trash TrashBag
 ---@field Author? string                        # peer that made the brush stroke.
----@field ShareId? number       
+---@field ShareId? number
+---@field BoundingBox? UIBrushStrokeBoundingBox # Do not access directly, use `GetBoundingBox`
 BrushStroke = Class(DebugComponent) {
 
     ---@param self UIBrushStroke
@@ -319,6 +320,88 @@ BrushStroke = Class(DebugComponent) {
     ---@return number   # nearest distance to the brush stroke
     DistanceTo = function(self, point)
         return self:DistanceToXYZ(point[1], point[2], point[3])
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Simplification
+
+    --- Simplifies the brush stroke.
+    ---@param self UIBrushStroke
+    Simplify = function(self)
+
+        local samples = self.Samples
+        local coordinatesX = samples.CoordinatesX
+        local coordinatesY = samples.CoordinatesY
+        local coordinatesZ = samples.CoordinatesZ
+
+        local count = table.getn(coordinatesX)
+        if count < 3 then
+            return
+        end
+
+        -- Tune between 0.98 (looser) and 0.9999 (stricter)
+        local DotThreshold = 0.99
+
+        -- Always keep the first sample
+        local newIndex = 2
+
+        for i = 2, count - 1 do
+            -- use the most recent sample in the new list
+            local x0 = coordinatesX[newIndex - 1]
+            local y0 = coordinatesY[newIndex - 1]
+            local z0 = coordinatesZ[newIndex - 1]
+
+            -- use the samples in the old list
+            local x1 = coordinatesX[i]
+            local y1 = coordinatesY[i]
+            local z1 = coordinatesZ[i]
+
+            local x2 = coordinatesX[i + 1]
+            local y2 = coordinatesY[i + 1]
+            local z2 = coordinatesZ[i + 1]
+
+            local dx1 = x1 - x0
+            local dy1 = y1 - y0
+            local dz1 = z1 - z0
+
+            local dx2 = x2 - x1
+            local dy2 = y2 - y1
+            local dz2 = z2 - z1
+
+            local len1Sq = dx1 * dx1 + dy1 * dy1 + dz1 * dz1
+            local len2Sq = dx2 * dx2 + dy2 * dy2 + dz2 * dz2
+
+            local keep = true
+            if len1Sq > 0.0 and len2Sq > 0.0 then
+                local len1Inv = 1.0 / math.sqrt(len1Sq)
+                local len2Inv = 1.0 / math.sqrt(len2Sq)
+                local dot = (dx1 * dx2 + dy1 * dy2 + dz1 * dz2) * len1Inv * len2Inv
+                if dot > DotThreshold then
+                    keep = false
+                end
+            end
+
+            if keep then
+                coordinatesX[newIndex] = x1
+                coordinatesY[newIndex] = y1
+                coordinatesZ[newIndex] = z1
+                newIndex = newIndex + 1
+            end
+        end
+
+        -- Always keep the last sample
+        coordinatesX[newIndex] = coordinatesX[count]
+        coordinatesY[newIndex] = coordinatesY[count]
+        coordinatesZ[newIndex] = coordinatesZ[count]
+
+        -- remove all other samples
+        for k = newIndex + 1, table.getn(coordinatesX) do
+            coordinatesX[k] = nil
+            coordinatesY[k] = nil
+            coordinatesZ[k] = nil
+        end
     end,
 
     --#endregion

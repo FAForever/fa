@@ -184,6 +184,8 @@ PaintingBrush = Class(Dragger) {
     ---@param y number  # y coordinate of screen position
     OnRelease = function(self, x, y)
         if self.ActiveBrushStroke then
+            -- simplify the brush stroke
+            self.ActiveBrushStroke:Simplify()
             self.PaintingCanvas.Adapter:SharePaintingBrushStroke(self.ActiveBrushStroke)
         end
 
