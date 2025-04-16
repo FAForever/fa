@@ -348,16 +348,10 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             return
         end
 
-        -- turn it into a regular painting
-        -- we use import directly for developer convenience: it enables you to reload the file without restarting
-        local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(
-            self.ActivePainting.Samples,
-            self.ActivePainting.Color
-        )
+        -- share the painting across worldviews and peers. 
+        self.Adapter:SharePainting(self.ActivePainting)
 
-        self.Adapter:SharePainting(painting)
-
-        -- remove the active painting as we replaced it with a regular painting
+        -- cleanup the active painting.
         self:DestroyActivePainting()
     end,
 
