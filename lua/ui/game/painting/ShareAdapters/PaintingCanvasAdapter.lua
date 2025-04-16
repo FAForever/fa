@@ -26,6 +26,10 @@ local DefaultSharedColor = 'ffffffff'
 --- Keeps track of all active canvas adapter instances
 local CanvasAdapterInstances = TrashBag()
 
+--- Keeps track of all muted peers.
+---@type table<string, boolean>
+local MutedPeers = {}
+
 --- Represents a shared painting that is send across the network. The data structure is slightly different to reduce network bandwidth.
 ---@class UISharedPainting
 ---@field PaintingAdapterIdentifier string
@@ -203,6 +207,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
         -- we use import directly for developer convenience: it enables you to reload the file without restarting
         local painting = import('/lua/ui/game/painting/Painting.lua').CreatePainting(samples, color)
+        painting.Author = sharedPainting.PeerName
 
         return painting
     end,
@@ -223,6 +228,30 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return sharedPainting
     end,
 
+    --- Mutes a peer. A peer remains muted for the remainder of the session.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param peer string
+    MutePeer = function(self, peer)
+        -- do not mute ourselves
+        local localPeer = self:GetLocalPeerName()
+        if peer == localPeer then
+            return
+        end
+
+        local isMuted = MutedPeers[peer]
+        if not isMuted then
+            MutedPeers[peer] = true
+            print("Muted a peer")
+        end
+    end,
+
+    --- Checks if a peer is muted.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param peer string
+    ---@return boolean
+    IsPeerMuted = function(self, peer)
+        return MutedPeers[peer] == true
+    end,
 
     ---------------------------------------------------------------------------
     --#region Publisher/Subscriber across network
@@ -240,8 +269,30 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return false
     end,
 
-    --- Publishes a painting as a callback. Paintings that are published as a callback 
-    --- are stored in the replay. They're visible when replaying the game. Only players 
+    ---@param self UIPaintingCanvasAdapter
+    ---@param sharedPainting UISharedPainting
+    AddSharedPainting = function(self, sharedPainting)
+        -- feature: do not add the same painting twice
+        if self:SharedPaintingIsKnown(sharedPainting) then
+            return
+        end
+
+        -- feature: do not add a painting from a muted peer
+        if self:IsPeerMuted(sharedPainting.PeerName) then
+            return
+        end
+
+        -- do not share paintings to a canvas that is destroyed, it appears this only happens during development.
+        if IsDestroyed(self.PaintingCanvas) then
+            return
+        end
+
+        local painting = self:FromSharedPainting(sharedPainting)
+        self.PaintingCanvas:AddPainting(painting)
+    end,
+
+    --- Publishes a painting as a callback. Paintings that are published as a callback
+    --- are stored in the replay. They're visible when replaying the game. Only players
     --- with an army are able to send sim callbacks.
     ---
     --- See also `SubscribeToCallback` for the subscriber side.
@@ -260,7 +311,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Subscribe and callback/sync events that are related to paintings.
-    --- 
+    ---
     --- See also `PublishAsCallback` for the publisher side.
     ---@param self UIPaintingCanvasAdapter
     SubscribeToCallback = function(self)
@@ -280,12 +331,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
                 if not IsDestroyed(paintingCanvas) then
                     for k = 1, table.getn(sharedPaintings) do
                         local data = sharedPaintings[k]
-
-                        -- only take into account paintings that we don't already have
-                        if not self:SharedPaintingIsKnown(data.ShareablePainting) then
-                            local painting = self:FromSharedPainting(data.ShareablePainting)
-                            paintingCanvas:AddPainting(painting)
-                        end
+                        self:AddSharedPainting(data.ShareablePainting)
                     end
                 end
             end, syncCategory, identifier
@@ -293,7 +339,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Publishes a painting as a chat message. Paintings that are published as a chat message are not stored in the replay. And they're also limited in size.
-    --- 
+    ---
     --- See also `SubscribeToChatEvents` for the subscriber side.
     ---@param self UIPaintingCanvasObserverAdapter
     ---@param shareablePainting UISharedPainting
@@ -314,7 +360,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Subscribe to chat events that are related to paintings.
-    --- 
+    ---
     --- See also `PublishAsChatMessage` for the publisher side.
     SubscribeToChatEvents = function(self)
 
@@ -331,16 +377,14 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             function(sender, data)
                 data.ShareablePainting.PeerName = sender
 
-                -- only take into account paintings that we did not share locally
-                if self:SharedPaintingIsKnown(data.ShareablePainting) then
-                    return
+                if self.PaintingCanvas.EnabledSpewing then
+                    SPEW(string.format("Received a painting from %s", tostring(data.ShareablePainting.PeerName)))
                 end
 
                 -- share it with all other adapters as we can only subscribe with one.
                 for k, canvasAdapterInstance in CanvasAdapterInstances do
                     if not IsDestroyed(canvasAdapterInstance.PaintingCanvas) then
-                        local painting = self:FromSharedPainting(data.ShareablePainting)
-                        canvasAdapterInstance.PaintingCanvas:AddPainting(painting)
+                        self:AddSharedPainting(data.ShareablePainting)
                     end
                 end
             end, "Painting"

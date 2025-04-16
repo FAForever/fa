@@ -114,6 +114,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self:DestroyActivePainting()
     end,
 
+    ---------------------------------------------------------------------------
+    --#region User interactions with the painting canvas
+
     --- Responsible for the deleting of paintings and muting of players.
     ---@param self UIPaintingCanvas
     OnFrame = function(self, delta)
@@ -196,7 +199,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         return radius
     end,
 
-    --- Responsible for the deletion of paintings.
+    --- Deletes all paintings near the mouse location. The search radius is zoom sensitive.
     ---@param self UIPaintingCanvas
     DeletePaintings = function(self)
         self.ActiveInteraction = 'Delete'
@@ -216,14 +219,28 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
     end,
 
-    --- Responsible for the muting of painters.
+    --- Deletes all paintings near the mouse location. The search radius is zoom sensitive. The authors of deleted paintings are muted.
     ---@param self UIPaintingCanvas
     MutePainters = function(self)
         self.ActiveInteraction = 'Mute'
 
         -- feature: ability to mute painters
         local radius = self:GetInteractionRadius()
-        -- TODO
+        local mouseWorldCoordinates = GetMouseWorldPos()
+        for k, painting in self.Paintings do
+            local distanceBoundingBox = painting:DistanceToBoundingBox(mouseWorldCoordinates)
+            if distanceBoundingBox < radius then
+                local distanceToSamples = painting:DistanceTo(mouseWorldCoordinates)
+                if distanceToSamples < radius then
+                    painting:Destroy()
+                    self.Paintings[k] = nil
+
+                    if painting.Author then
+                        self.Adapter:MutePeer(painting.Author)
+                    end
+                end
+            end
+        end
     end,
 
     --- Responsible for the creation of paintings.
@@ -244,6 +261,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             end
         end
     end,
+
+    --#endregion
 
     --- Responsible for rendering all the paintings that are part of this canvas.
     ---@param self UIPaintingCanvas
@@ -284,6 +303,9 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             UI_DrawCircle(mouseWorldCoordinates, interactionRadius, 'FF0000', 0)
         end
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Interactions with the active painting
 
     --- Creates a new active painting, or adds samples to the current active painting.
     ---@param self UIPaintingCanvas
@@ -368,6 +390,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         local armiesTable = GetArmiesTable().armiesTable
         return armiesTable[GetFocusArmy()].color or 'ffffffff'
     end,
+
+    --#endregion
 
     --- Adds a painting to the canvas. 
     --- 

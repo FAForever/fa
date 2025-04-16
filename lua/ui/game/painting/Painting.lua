@@ -48,6 +48,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field Thickness number
 ---@field Decay? UIPaintingDecay
 ---@field Samples UIPaintingSamples
+---@field Author? string     # peer that made the painting.
 Painting = Class(DebugComponent) {
 
     ---@param self UIPainting
