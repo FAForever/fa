@@ -33,18 +33,19 @@ local DefaultPaintingDuration = 25
 
 local SyncIdentifier = "PaintingCanvas.lua"
 
----@alias UIPaintingCanvasActiveInteraction 'Delete' | 'Mute'
+---@alias UIPaintingCanvasActiveInteraction 'Create' | 'Delete' | 'Mute'
+
+---@class UIPaintingCanvasInput
+---@field ActiveInteraction UIPaintingCanvasActiveInteraction
 
 --- A painting canvas that is responsible for registering and painting the artistic efforts of players.
 ---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
 ---@field Adapter UIPaintingCanvasAdapter
----@field Trash TrashBag                        # Contains all (active) paintings.
+---@field Trash TrashBag
 ---@field WorldView WorldView                   # Worldview that this canvas is for.
----@field ActivePainting? UIActivePainting      # The active painting of the local peer.
 ---@field Paintings TrashBag                    # All paintings, including those shared by peers.
----@field ActiveInteraction UIPaintingCanvasActiveInteraction?
----@field AbortedActivePainting boolean
 ---@field InhibitionSet table<string, boolean>  # A set of reasons for the canvas to be disabled.
+---@field PaintingBrush UIPaintingBrush
 PaintingCanvas = Class(Bitmap, DebugComponent) {
 
     ---@param self UIPaintingCanvas
@@ -55,16 +56,13 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Trash = TrashBag()
         self.Paintings = self.Trash:Add(TrashBag())
         self.Adapter = self.Trash:Add(GetPaintingCanvasAdapter(self))
-        self.Trash:Add(ForkThread(self.AbortActivePaintingThread, self))
 
         self.WorldView = worldview
-        self.AbortedActivePainting = false
 
         -- register us to render
         self.WorldView:RegisterRenderable(self, tostring(self))
 
         self.InhibitionSet = {}
-        self:SetNeedsFrameUpdate(true)
     end,
 
     ---@param self UIPaintingCanvas
@@ -111,155 +109,36 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param reason string
     AddInhibition = function(self, reason)
         self.InhibitionSet[reason] = true
-        self:DestroyActivePainting()
+        self:CancelBrush()
     end,
 
     ---------------------------------------------------------------------------
     --#region User interactions with the painting canvas
-
-    --- Responsible for the deleting of paintings and muting of players.
-    ---@param self UIPaintingCanvas
-    OnFrame = function(self, delta)
-        -- feature: global toggle to enable/disable painting
-        if self:IsDisabledByGameOptions() then
-            self:DestroyActivePainting()
-            return false
-        end
-
-        self.ActiveInteraction = nil
-
-        -- feature: do not interact if this canvas is inhibited
-        if self:IsInhibited() then
-            self:DestroyActivePainting()
-            return false
-        end
-
-        local KeyCodeAlt = 18
-        local KeyCodeCtrl = 17
-        if IsKeyDown(KeyCodeAlt) then
-            if IsKeyDown(KeyCodeCtrl) then
-                self:MutePainters()
-                return
-            end
-
-            self:DeletePaintings()
-            return
-        end
-    end,
 
     --- Responsible for the creation of paintings.
     ---@param self UIPaintingCanvas
     ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
-        -- feature: enable/disable painting
+        -- feature: enable/disable painting as a whole
         if self:IsDisabledByGameOptions() then
-            self:DestroyActivePainting()
+            self:CancelBrush()
             return false
         end
 
         -- feature: do not interact if this canvas is inhibited
         if self:IsInhibited() then
-            self:DestroyActivePainting()
+            self:CancelBrush()
             return false
         end
 
-        -- feature: do not paint if we're interacting with paintings
-        if self.ActiveInteraction ~= nil then
-            self:DestroyActivePainting()
-            return false
+        if event.Modifiers.Right then
+            if event.Type == 'ButtonPress'  then
+                self.PaintingBrush = import("/lua/ui/game/painting/PaintingBrush.lua").CreatePaintingBrush(self)
+            end
         end
-
-        self:CreatePaintings(event)
 
         return false
-    end,
-
-    --- Computes the radius to interact with existing paintings, to for example delete them.
-    ---@param self UIPaintingCanvas
-    ---@return number
-    GetInteractionRadius = function(self)
-        local worldViewManager = import("/lua/ui/game/worldview.lua")
-
-        -- feature: zoom sensitivity when interacting with existing paintings
-
-        local mouseScreenCoordinates = GetMouseScreenPos()
-        local worldView = worldViewManager.GetTopmostWorldViewAt(mouseScreenCoordinates[1], mouseScreenCoordinates[2])
-        local radius = 3
-        if worldView then
-            local camera = GetCamera(worldView._cameraName)
-            if camera then
-                local zoom = camera:GetZoom()
-                if zoom > 200 then
-                    radius = radius * zoom * 0.005
-                end
-            end
-        end
-
-        return radius
-    end,
-
-    --- Deletes all paintings near the mouse location. The search radius is zoom sensitive.
-    ---@param self UIPaintingCanvas
-    DeletePaintings = function(self)
-        self.ActiveInteraction = 'Delete'
-
-        -- feature: ability to delete paintings
-        local radius = self:GetInteractionRadius()
-        local mouseWorldCoordinates = GetMouseWorldPos()
-        for k, painting in self.Paintings do
-            local distanceBoundingBox = painting:DistanceToBoundingBox(mouseWorldCoordinates)
-            if distanceBoundingBox < radius then
-                local distanceToSamples = painting:DistanceTo(mouseWorldCoordinates)
-                if distanceToSamples < radius then
-                    painting:Destroy()
-                    self.Paintings[k] = nil
-                end
-            end
-        end
-    end,
-
-    --- Deletes all paintings near the mouse location. The search radius is zoom sensitive. The authors of deleted paintings are muted.
-    ---@param self UIPaintingCanvas
-    MutePainters = function(self)
-        self.ActiveInteraction = 'Mute'
-
-        -- feature: ability to mute painters
-        local radius = self:GetInteractionRadius()
-        local mouseWorldCoordinates = GetMouseWorldPos()
-        for k, painting in self.Paintings do
-            local distanceBoundingBox = painting:DistanceToBoundingBox(mouseWorldCoordinates)
-            if distanceBoundingBox < radius then
-                local distanceToSamples = painting:DistanceTo(mouseWorldCoordinates)
-                if distanceToSamples < radius then
-                    painting:Destroy()
-                    self.Paintings[k] = nil
-
-                    if painting.Author then
-                        self.Adapter:MutePeer(painting.Author)
-                    end
-                end
-            end
-        end
-    end,
-
-    --- Responsible for the creation of paintings.
-    ---@param self UIPaintingCanvas
-    ---@param event KeyEvent
-    CreatePaintings = function(self, event)
-        -- feature: ability to make a painting!
-        if event.Type == 'MouseMotion' and event.Modifiers.Right and not self.AbortedActivePainting then
-            self:CreateActivePainting()
-        end
-
-        -- feature: share the active painting with all relevant peers
-        if event.Type == 'ButtonRelease' then
-            self.AbortedActivePainting = false
-
-            if self.ActivePainting then
-                self:ShareActivePainting()
-            end
-        end
     end,
 
     --#endregion
@@ -270,16 +149,16 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     OnRender = function(self, delta)
         -- feature: global toggle to enable/disable painting
         if self:IsDisabledByGameOptions() then
-            self:DestroyActivePainting()
+            self:CancelBrush()
             return false
         end
 
-        -- render the active painting
-        if (self.ActivePainting) then
-            local ok, msg = pcall(self.ActivePainting.OnRender, self.ActivePainting, delta)
+        -- render the brush
+        if self.PaintingBrush then
+            local ok, msg = pcall(self.PaintingBrush.OnRender, self.PaintingBrush, delta)
             if not ok and self.EnabledErrors then
                 WARN(msg)
-                self:DestroyActivePainting()
+                self:CancelBrush()
             end
         end
 
@@ -291,107 +170,16 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
                 self.Paintings[k] = nil
             end
         end
-
-        -- feature: visualize interactions with the canvas
-        local interactionRadius = self:GetInteractionRadius()
-        local mouseWorldCoordinates = GetMouseWorldPos()
-        if self.ActiveInteraction == 'Delete' then
-            UI_DrawCircle(mouseWorldCoordinates, interactionRadius, 'FF9D00', 0)
-        end
-
-        if self.ActiveInteraction == 'Mute' then
-            UI_DrawCircle(mouseWorldCoordinates, interactionRadius, 'FF0000', 0)
-        end
     end,
 
-    ---------------------------------------------------------------------------
-    --#region Interactions with the active painting
-
-    --- Creates a new active painting, or adds samples to the current active painting.
+    --- Cancels the brush, destroying any active painting in the process.
     ---@param self UIPaintingCanvas
-    CreateActivePainting = function(self)
-        if not self.ActivePainting then
-            -- we use import directly for developer convenience: it enables you to reload the file without restarting
-            self.ActivePainting = import('/lua/ui/game/painting/ActivePainting.lua').CreateActivePainting(
-                self:ComputeColorOfActivePainting()
-            )
-        end
-
-        self.ActivePainting:AddSample(GetMouseWorldPos())
-    end,
-
-    --- Aborts the active painting and prints a message to the user that it happened.
-    ---@param self any
-    AbortActivePainting = function(self)
-        if self.ActivePainting then
-
-            -- user feedback
-            local message = "<LOC painting_cancel_message>Cancelled a painting"
-            if Random() < 0.01 then
-                message = "<LOC painting_cancel_message_rare>Cancelled that work of art"
-            end
-            print(LOC(message))
-
-            self:DestroyActivePainting()
+    CancelBrush = function(self)
+        if self.PaintingBrush then
+            self.PaintingBrush:Destroy()
+            self.PaintingBrush = nil
         end
     end,
-
-    --- Removes the active painting.
-    ---@param self UIPaintingCanvas
-    DestroyActivePainting = function(self)
-        if self.ActivePainting then
-            self.ActivePainting:Destroy()
-            self.ActivePainting = nil
-        end
-    end,
-
-    --- An active thread that checks if the user wants to abort the active painting.
-    ---@param self UIPaintingCanvas
-    AbortActivePaintingThread = function(self)
-
-        -- feature: be able to cancel the active painting
-        while not IsDestroyed(self) do
-            local escapePressed = IsKeyDown('ESCAPE')
-
-            -- feature: be able to cancel the active painting
-            if escapePressed and self.ActivePainting then
-                self.AbortedActivePainting = true
-                self:AbortActivePainting()
-            end
-
-            WaitFrames(1)
-        end
-    end,
-
-    --- Shares the active painting across all world views and peers.
-    ---@param self UIPaintingCanvas
-    ShareActivePainting = function(self)
-        if not self.ActivePainting then
-            return
-        end
-
-        -- share the painting across worldviews and peers. 
-        self.Adapter:SharePainting(self.ActivePainting)
-
-        -- cleanup the active painting.
-        self:DestroyActivePainting()
-    end,
-
-    --- Computes the color of the active painting.
-    ---@param self UIPaintingCanvas
-    ComputeColorOfActivePainting = function(self)
-
-        -- in this case we just want to use the color of the
-        -- current focus army. This may not always match the
-        -- command source, but the color is only visible to
-        -- the person drawing it and not to the rest of the
-        -- peers.
-
-        local armiesTable = GetArmiesTable().armiesTable
-        return armiesTable[GetFocusArmy()].color or 'ffffffff'
-    end,
-
-    --#endregion
 
     --- Adds a painting to the canvas. 
     --- 
@@ -423,6 +211,37 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             end
         end
     end,
+
+    --- Shares a painting across worldviews and peers.
+    ---@param self UIPaintingCanvas
+    ---@param painting UIPainting
+    SharePainting = function(self, painting)
+        -- share the painting across worldviews and peers. 
+        self.Adapter:SharePainting(painting)
+
+        -- clear the painting brush
+        self.PaintingBrush:Destroy()
+        self.PaintingBrush = nil
+    end,
+
+    --- Deletes a painting across worldviews.
+    ---@param self UIPaintingCanvas
+    DeletePainting = function(self, painting)
+        -- TODO: propagate across world views
+        for k, other in self.Paintings do
+            if other == painting then
+                self.Paintings[k] = nil
+                break
+            end
+        end
+    end,
+
+    --- Mutes a painter across worldviews.
+    ---@param self UIPaintingCanvas
+    ---@param author string
+    MutePainter = function(self, author)
+        self.Adapter:MutePeer(author)
+    end,
 }
 
 --- Aborts all active paintings. As an example, this can be used to stop
@@ -430,7 +249,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 AbortAllActivePaintings = function()
     for k, paintingCanvasInstance in pairs(PaintingCanvasInstances) do
         if not IsDestroyed(paintingCanvasInstance) then
-            paintingCanvasInstance:AbortActivePainting()
+            paintingCanvasInstance:CancelBrush()
         end
     end
 end
