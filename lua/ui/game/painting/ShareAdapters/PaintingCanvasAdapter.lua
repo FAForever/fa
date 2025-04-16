@@ -66,9 +66,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         self.PaintingCanvas = paintingCanvas
 
         CanvasAdapterInstances:Add(self)
-        if self.EnabledSpewing then
-            SPEW(string.format("Created a canvas adapter of type %s for camera %s", tostring(self.AdapterType), tostring(self.PaintingCanvas.WorldView._cameraName)))
-        end
     end,
 
     ---@param self UIPaintingCanvasAdapter
@@ -97,7 +94,14 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- Computes a unique identifier for this adapter.
     ---@param self UIPaintingCanvasAdapter
     GetIdentifier = function(self)
-        return "PaintingCanvasAdapter of " .. tostring(self.PaintingCanvas.WorldView)
+        -- sanity check
+        if not self.PaintingCanvas then
+            if self.EnabledWarnings then
+                WARN("Painting canvas or world view is nil!")
+            end
+        end
+
+        return "PaintingCanvasAdapter of " .. tostring(self.PaintingCanvas)
     end,
 
     --- Prepares the painting to be send to all other worldviews and peers.
@@ -274,6 +278,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     AddSharedPainting = function(self, sharedPainting)
         -- feature: do not add the same painting twice
         if self:SharedPaintingIsKnown(sharedPainting) then
+            WARN("PAINTING IS KNOWN!")
             return
         end
 
