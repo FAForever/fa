@@ -28,8 +28,7 @@ local Painting = import('/lua/ui/game/painting/Painting.lua').Painting
 ---@field LastSample Vector
 ActivePainting = ClassUI(Painting) {
 
-    DebounceTimeThreshold = 0.016,
-    DebounceDistanceThreshold = 1.0,
+    DebounceTimeThreshold = 0.016,  -- About 60 fps
 
     ---@param self UIActivePainting
     ---@param color Color
@@ -37,7 +36,7 @@ ActivePainting = ClassUI(Painting) {
         Painting.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
 
         self.LastEdited = GetGameTimeSeconds()
-        self.LastSample = GetMouseWorldPos()
+        self.LastSample = { -10, -10, -10 }
     end,
 
     --- Computes the debounce distance based on the current zoom level.
@@ -55,9 +54,7 @@ ActivePainting = ClassUI(Painting) {
             local camera = GetCamera(worldView._cameraName)
             if camera then
                 local zoom = camera:GetZoom()
-                if zoom > 200 then
-                    distance = distance * zoom * 0.005
-                end
+                distance = math.max(1, zoom * 0.01)
             end
         end
 
@@ -86,10 +83,10 @@ ActivePainting = ClassUI(Painting) {
 
     --- Adds a sample to the painting.
     ---@param self UIActivePainting
-    ---@param position Vector
-    AddSample = function(self, position)
+    ---@param coordinates Vector
+    AddSample = function(self, coordinates)
         -- basic debouncing to reduce bandwidth requirements
-        if self:DebounceSample(position) then
+        if self:DebounceSample(coordinates) then
             return
         end
 
@@ -109,11 +106,11 @@ ActivePainting = ClassUI(Painting) {
         end
 
         self.LastEdited = GetGameTimeSeconds()
-        self.LastSample = position
+        self.LastSample = coordinates
 
-        table.insert(samples.CoordinatesX, position[1])
-        table.insert(samples.CoordinatesY, position[2])
-        table.insert(samples.CoordinatesZ, position[3])
+        table.insert(samples.CoordinatesX, coordinates[1])
+        table.insert(samples.CoordinatesY, coordinates[2])
+        table.insert(samples.CoordinatesZ, coordinates[3])
     end,
 }
 
