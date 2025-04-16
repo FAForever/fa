@@ -641,9 +641,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     -- limitation: only enable painting when no unit is selected. This limitation enables us 
     -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
     if table.empty(newSelection) then
-        import("/lua/ui/game/painting/Painter.lua").LiftInhibitionOfAllPaintings("selection")
+        import("/lua/ui/game/painting/PaintingCanvas.lua").LiftInhibitionOfAllPaintings("selection")
     else
-        import("/lua/ui/game/painting/Painter.lua").InhibitAllPaintings("selection")
+        import("/lua/ui/game/painting/PaintingCanvas.lua").InhibitAllPaintings("selection")
     end
 
     if not hotkeyLabelsOnSelectionChanged then
