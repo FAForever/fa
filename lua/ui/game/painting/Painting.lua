@@ -103,7 +103,7 @@ Painting = Class(DebugComponent) {
     ---@param value number  # number between 0 and 1.0
     ---@return number
     ComputeDecayInterpolation = function(self, value)
-        return 1 - math.sqrt(value)
+        return math.sqrt(1 -  value)
     end,
 
     ---@param self UIPainting
