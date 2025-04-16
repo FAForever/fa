@@ -607,7 +607,7 @@ Tooltips = {
     },
 
     options_painting = {
-        title = "<LOC options_painting_title>Make and receive paintings",
+        title = "<LOC options_painting_title>Painting",
         description = "<LOC options_painting_description>When enabled, you can make and receive paintings to or from other players.",
     },
 

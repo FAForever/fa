@@ -87,7 +87,14 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
     --- Checks if the painting feature is disabled as a whole.
     IsDisabledByGameOptions = function(self)
-        return GetOptions("painting") ~= "on"
+        local gameOption = GetOptions("painting")
+        if gameOption == 'on' then
+            return true
+        elseif gameOption == 'observing' and (IsObserver() or SessionIsReplay()) then
+            return true
+        end
+
+        return false
     end,
 
     --- Checks if there are any reasons to be disabled.
@@ -120,7 +127,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@return boolean
     HandleEvent = function(self, event)
         -- feature: enable/disable painting as a whole
-        if self:IsDisabledByGameOptions() then
+        if not self:IsEnabledByGameOptions() then
             self:CancelBrush()
             return false
         end
@@ -148,7 +155,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---@param delta any
     OnRender = function(self, delta)
         -- feature: global toggle to enable/disable painting
-        if self:IsDisabledByGameOptions() then
+        if not self:IsEnabledByGameOptions() then
             self:CancelBrush()
             return false
         end

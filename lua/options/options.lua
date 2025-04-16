@@ -795,14 +795,15 @@ options = {
             },
 
             {
-                title = "<LOC options_painting_title>Make and receive paintings",
+                title = "<LOC options_painting_title>Painting",
                 key = 'painting',
                 type = 'toggle',
                 default = 'on',
                 custom = {
                     states = {
-                        { text = "<LOC _Off>Off", key = 'off' },
-                        { text = "<LOC _On>On", key = 'on' },
+                        { text = "<LOC _Enabled>Enabled", key = 'on' },
+                        { text = "<LOC _EnabledInReplays>Enabled when observing", key = 'observing' },
+                        { text = "<LOC _Disabled>Disabled", key = 'off' },
                     },
                 },
             },
