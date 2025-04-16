@@ -93,10 +93,22 @@ ActivePainting = ClassUI(Painting) {
             return
         end
 
+        local samples = self.Samples
+
+        -- limitation: chat messages have a limited amount of space per 
+        -- message. It is difficult to overcome this limit. 
+        -- 
+        -- By naturally limiting the size of a painting we not only overcome the
+        -- issue with chat messages but we also prevent players from creating 
+        -- gigantic paintings that often offer little... information.
+
+        if table.getn(samples.CoordinatesX) > 100 then
+            return
+        end
+
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = position
 
-        local samples = self.Samples
         table.insert(samples.CoordinatesX, position[1])
         table.insert(samples.CoordinatesY, position[2])
         table.insert(samples.CoordinatesZ, position[3])

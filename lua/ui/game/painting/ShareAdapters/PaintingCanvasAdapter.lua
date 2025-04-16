@@ -345,7 +345,19 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param shareablePainting UISharedPainting
     PublishAsChatMessage = function(self, shareablePainting)
 
-        -- TODO: chat messages are limited in size. We should have a way to split up a painting into multiple messages.
+        -- limitation: chat messages have a limited amount of space per 
+        -- message. Messages send to peers with `SessionSendChatMessage` are 
+        -- limited in size. The limit appears to be around 4kb. If we exceed 
+        -- that then `SessionSendChatMessage` will just error out. 
+        -- 
+        -- There are two options:
+        --
+        -- - 1) We implement the ability to chop a painting into several messages.
+        -- - 2) We limit the size of a painting.
+        -- 
+        -- At the moment we take option 2. An active painting will stop adding
+        -- samples once it's reached a certain threshold. With normal use,
+        -- this guarantees that the painting does not exceed the limit.
 
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
         local clients = FindClients()
@@ -368,8 +380,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         -- to a single identifier. As a result, we cheat a little bit here. All adapters of all world views
         -- try to subscribe with the same identifier. Since only one will end up being used we manually share
         -- that message with all other adapters.
-
-        -- TODO: chat messages are limited in size. We should have a method to receive multiple messages and combine it into one painting.
 
         import("/lua/ui/game/gamemain.lua").RegisterChatFunc(
         ---@param sender string
