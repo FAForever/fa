@@ -54,11 +54,11 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         self.Trash = TrashBag()
         self.Paintings = self.Trash:Add(TrashBag())
+        self.Adapter = self.Trash:Add(GetPaintingCanvasAdapter(self))
+        self.Trash:Add(ForkThread(self.AbortActivePaintingThread, self))
+
         self.WorldView = worldview
         self.AbortedActivePainting = false
-        self.Adapter = GetPaintingCanvasAdapter(self)
-
-        self.Trash:Add(ForkThread(self.AbortActivePaintingThread, self))
 
         -- register us to render
         self.WorldView:RegisterRenderable(self, tostring(self))
