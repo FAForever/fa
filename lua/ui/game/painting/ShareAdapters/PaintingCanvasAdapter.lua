@@ -71,7 +71,7 @@ end
 PaintingCanvasAdapter = Class(DebugComponent) {
 
     AdapterType = 'Abstract',
-    SyncCategory = 'SharePainting',
+    SyncCategory = 'SharePaintingBrushStroke',
 
     ---@param self UIPaintingCanvasAdapter
     ---@param paintingCanvas UIPaintingCanvas
@@ -169,7 +169,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- Prepares the painting to be send to all other worldviews and peers.
     ---@param self UIPaintingCanvasAdapter
     ---@param painting UIBrushStroke
-    SharePainting = function(self, painting)
+    SharePaintingBrushStroke = function(self, painting)
         -- check if we have something to share
         if table.empty(painting.Samples.CoordinatesX) then
             return
@@ -183,7 +183,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     --- Sends a shareable painting to all other worldviews and peers.
     ---
-    --- Do not call this class directly. Use `SharePainting` instead.
+    --- Do not call this class directly. Use `SharePaintingBrushStroke` instead.
     ---@param self UIPaintingCanvasAdapter
     ---@param sharedPainting UISharedPainting
     SendShareablePainting = function(self, sharedPainting)

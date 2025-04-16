@@ -822,12 +822,12 @@ do
         data.ShareablePainting.PeerId = GetCurrentCommandSource()
         data.ShareablePainting.PeerName = GetArmyBrain(data.ShareablePainting.PeerId).Nickname
 
-        Sync.SharePainting = Sync.SharePainting or {}
-        table.insert(Sync.SharePainting, data)
+        Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
+        table.insert(Sync.SharePaintingBrushStroke, data)
     end
 
     ---@param data UIShareablePaintingCallbackMessage
-    Callbacks.SharePainting = function(data)
+    Callbacks.SharePaintingBrushStroke = function(data)
         local focusArmy = GetFocusArmy()
         local currentCommandSource = GetCurrentCommandSource()
 

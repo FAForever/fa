@@ -86,7 +86,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     end,
 
     --- Checks if the painting feature is disabled as a whole.
-    IsDisabledByGameOptions = function(self)
+    IsEnabledByGameOptions = function(self)
         local gameOption = GetOptions("painting")
         if gameOption == 'on' then
             return true
