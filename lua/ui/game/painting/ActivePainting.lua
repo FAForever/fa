@@ -69,25 +69,19 @@ ActivePainting = ClassUI(Painting) {
     ---@param self UIActivePainting
     ---@return boolean
     DebounceSample = function(self, sample)
-
-        -- feature: debounce samples that are too close to each other
         -- feature: debounce samples that are in too quick succession
-
-        local shouldDebounce = false
-
-        -- debounce samples that happen too soon
         local now = GetGameTimeSeconds()
         if now - self.LastEdited < self.DebounceTimeThreshold then
-            shouldDebounce = true
+            return true
         end
 
-        -- debounce samples that are too close
+        -- feature: debounce samples that are too close to each other
         local debounceDistance = self:GetDebounceDistance()
         if VDist3(self.LastSample, sample) < debounceDistance then
-            shouldDebounce = true
+            return true
         end
 
-        return shouldDebounce
+        return false
     end,
 
     --- Adds a sample to the painting.
