@@ -245,7 +245,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         local isMuted = MutedPeers[peer]
         if not isMuted then
             MutedPeers[peer] = true
-            print("Muted a peer")
+            print(LOCF("<LOC painting_mute_message>Muted %s for this session", peer))
         end
     end,
 
