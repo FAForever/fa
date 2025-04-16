@@ -122,7 +122,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             local paintingCanvas = adapter.PaintingCanvas
             if not IsDestroyed(paintingCanvas) then
                 local painting = adapter:FromSharedPainting(sharedPainting)
-                paintingCanvas:AddSharedPainting(painting)
+                paintingCanvas:AddPainting(painting)
             end
         end
 
@@ -284,7 +284,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
                         -- only take into account paintings that we don't already have
                         if not self:SharedPaintingIsKnown(data.ShareablePainting) then
                             local painting = self:FromSharedPainting(data.ShareablePainting)
-                            paintingCanvas:AddSharedPainting(painting)
+                            paintingCanvas:AddPainting(painting)
                         end
                     end
                 end
@@ -341,7 +341,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
                     if not IsDestroyed(canvasAdapterInstance.PaintingCanvas) then
                         -- we need the painting to be a unique instance, hence we create multiple
                         local painting = self:FromSharedPainting(data.ShareablePainting)
-                        canvasAdapterInstance.PaintingCanvas:AddSharedPainting(painting)
+                        canvasAdapterInstance.PaintingCanvas:AddPainting(painting)
                     end
                 end
             end, "Painting"

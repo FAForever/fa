@@ -375,26 +375,17 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         return armiesTable[GetFocusArmy()].color or 'ffffffff'
     end,
 
-    --- Attempts to add a painting that is shared by peers.
-    ---
-    --- Since we can not trust our peers (yes, world is tough) there's some additional sanity
-    --- checks involved. These may flag a painting to be 'malicious' and therefore ignored.
+    --- Adds a painting to the canvas. 
+    --- 
+    --- At this stage we need to guarantee that the painting is legitimate.
     ---@param self UIPaintingCanvas
     ---@param painting UIPainting
-    AddSharedPainting = function(self, painting)
+    AddPainting = function(self, painting)
         -- feature: enable/disable the painting feature
         if self:IsDisabledByGameOptions() then
             return
         end
 
-        self:AddPainting(painting)
-    end,
-
-    --- Adds a painting to the canvas.
-    ---@param self UIPaintingCanvas
-    ---@param painting UIPainting
-    AddPainting = function(self, painting)
-        self.Trash:Add(painting)
         self.Paintings:Add(painting)
 
         -- feature: paintings decay over time
