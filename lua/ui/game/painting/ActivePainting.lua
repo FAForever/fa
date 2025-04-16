@@ -40,6 +40,30 @@ ActivePainting = ClassUI(Painting) {
         self.LastSample = GetMouseWorldPos()
     end,
 
+    --- Computes the debounce distance based on the current zoom level.
+    ---@param self UIActivePainting
+    ---@return number
+    GetDebounceDistance = function(self)
+        local worldViewManager = import("/lua/ui/game/worldview.lua")
+
+        local distance = 1
+
+        -- feature: zoom sensitivity for debounce distance
+        local mouseScreenCoordinates = GetMouseScreenPos()
+        local worldView = worldViewManager.GetTopmostWorldViewAt(mouseScreenCoordinates[1], mouseScreenCoordinates[2])
+        if worldView then
+            local camera = GetCamera(worldView._cameraName)
+            if camera then
+                local zoom = camera:GetZoom()
+                if zoom > 200 then
+                    distance = distance * zoom * 0.005
+                end
+            end
+        end
+
+        return distance
+    end,
+
     --- Responsible for debouncing samples. This is to reduce the
     --- bandwidth it requires to share the art once it is finished.
     ---@param self UIActivePainting
@@ -58,7 +82,8 @@ ActivePainting = ClassUI(Painting) {
         end
 
         -- debounce samples that are too close
-        if VDist3(self.LastSample, sample) < self.DebounceDistanceThreshold then
+        local debounceDistance = self:GetDebounceDistance()
+        if VDist3(self.LastSample, sample) < debounceDistance then
             shouldDebounce = true
         end
 
