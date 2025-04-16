@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2025 FAForever
+--** Copyright (c) 2025 Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@ local PaintingCanvasAdapter = import("/lua/ui/game/painting/ShareAdapters/Painti
 
 --- Do not create an instance of this class directly. Instead, use 
 --- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
----@class UIPaintingCanvasReplayAdapter : UIPaintingCanvasAdapter
-PaintingCanvasReplayAdapter = Class(PaintingCanvasAdapter) {
+---@class UIPaintingCanvasAdapterForReplays : UIPaintingCanvasAdapter
+PaintingCanvasAdapterForReplays = Class(PaintingCanvasAdapter) {
 
     AdapterType = 'Replay',
 
-    ---@param self UIPaintingCanvasReplayAdapter
+    ---@param self UIPaintingCanvasAdapterForReplays
     ---@param paintingCanvas UIPaintingCanvas
     __init = function(self, paintingCanvas)
         PaintingCanvasAdapter.__init(self, paintingCanvas)
@@ -39,7 +39,7 @@ PaintingCanvasReplayAdapter = Class(PaintingCanvasAdapter) {
 }
 
 ---@param paintingCanvas UIPaintingCanvas
----@return UIPaintingCanvasReplayAdapter
-CreatePaintingCanvasReplayAdapter = function(paintingCanvas)
-    return PaintingCanvasReplayAdapter(paintingCanvas)
+---@return UIPaintingCanvasAdapterForReplays
+CreatePaintingCanvasAdapterForReplays = function(paintingCanvas)
+    return PaintingCanvasAdapterForReplays(paintingCanvas)
 end

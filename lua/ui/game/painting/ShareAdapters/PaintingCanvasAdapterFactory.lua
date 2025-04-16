@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2025 FAForever
+--** Copyright (c) 2025 Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local PaintingCanvasObserverAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasObserverAdapter.lua")
-local PaintingCanvasPlayerAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasPlayerAdapter.lua")
-local PaintingCanvasReplayAdapter = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasReplayAdapter.lua")
-
----@class UIPaintingCanvasAdapter
----@field SharePaintingBrushStroke fun(self:UIPaintingCanvasAdapter, painting: UIBrushStroke)
+local PaintingCanvasAdapterForObservers = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapterForObservers.lua")
+local PaintingCanvasAdapterForPlayers = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapterForPlayers.lua")
+local PaintingCanvasAdapterForReplays = import("/lua/ui/game/painting/ShareAdapters/PaintingCanvasAdapterForReplays.lua")
 
 --- Creates the correct adapter instance based on the game state of the local peer.
 ---@param paintingCanvas UIPaintingCanvas
@@ -45,10 +42,10 @@ GetPaintingCanvasAdapter = function(paintingCanvas)
     -- be replayed and moderated.
 
     if SessionIsReplay() then
-        return PaintingCanvasReplayAdapter.CreatePaintingCanvasReplayAdapter(paintingCanvas)
+        return PaintingCanvasAdapterForReplays.PaintingCanvasAdapterForReplays(paintingCanvas)
     elseif IsObserver() then
-        return PaintingCanvasObserverAdapter.CreatePaintingCanvasObserverAdapter(paintingCanvas)
+        return PaintingCanvasAdapterForObservers.CreatePaintingCanvasAdapterForObservers(paintingCanvas)
     else
-        return PaintingCanvasPlayerAdapter.CreatePaintingCanvasPlayerAdapter(paintingCanvas)
+        return PaintingCanvasAdapterForPlayers.CreatePaintingCanvasAdapterForPlayers(paintingCanvas)
     end
 end
