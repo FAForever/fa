@@ -34,7 +34,7 @@ ActivePainting = ClassUI(Painting) {
     ---@param self UIActivePainting
     ---@param color Color
     __init = function(self, color)
-        Painting.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color, 0)
+        Painting.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
 
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = GetMouseWorldPos()

@@ -53,7 +53,7 @@ Painting = Class(DebugComponent) {
     ---@param self UIPainting
     ---@param samples UIPaintingSamples
     ---@param color Color
-    __init = function(self, samples, color, identifier)
+    __init = function(self, samples, color)
         -- store parameters
         self.Samples = samples
         self.Color = color
