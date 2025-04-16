@@ -342,7 +342,7 @@ BrushStroke = Class(DebugComponent) {
         end
 
         -- Tune between 0.98 (looser) and 0.9999 (stricter)
-        local DotThreshold = 0.99
+        local DotThreshold = 0.995
 
         -- Always keep the first sample
         local newIndex = 2
