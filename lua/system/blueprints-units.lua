@@ -603,7 +603,7 @@ local function PostProcessUnit(unit)
     if deathAnimationTables then
         for i, animationTable in deathAnimationTables do
             local animationPath = animationTable.Animation
-            if not DiskGetFileInfo(animationPath) then
+            if animationPath and not DiskGetFileInfo(animationPath) then
                 WARN(string.format('Unit "%s": Could not find death animation at path: "%s" \nRemoving the animation so that the unit does not get stuck dying!', tostring(unit.BlueprintId), tostring(animationPath)))
 
                 unit.Display.AnimationDeath[i] = nil
