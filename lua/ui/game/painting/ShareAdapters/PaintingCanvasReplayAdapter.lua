@@ -34,7 +34,7 @@ PaintingCanvasReplayAdapter = Class(PaintingCanvasAdapter) {
     __init = function(self, paintingCanvas)
         PaintingCanvasAdapter.__init(self, paintingCanvas)
 
-        self:SubscribeToSyncEvents()
+        self:SubscribeToCallback()
     end,
 }
 

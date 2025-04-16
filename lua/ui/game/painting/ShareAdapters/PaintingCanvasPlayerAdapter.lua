@@ -34,7 +34,7 @@ PaintingCanvasPlayerAdapter = Class(PaintingCanvasAdapter) {
     __init = function(self, paintingCanvas)
         PaintingCanvasAdapter.__init(self, paintingCanvas)
 
-        self:SubscribeToSyncEvents()
+        self:SubscribeToCallback()
     end,
 
     --- Shares the painting with all other peers through a sim callback. These paintings are stored in the replay.
@@ -43,14 +43,7 @@ PaintingCanvasPlayerAdapter = Class(PaintingCanvasAdapter) {
     SendShareablePainting = function(self, shareablePainting)
         PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
 
-        local syncCategory = self.SyncCategory
-
-        SimCallback({
-            Func = syncCategory,
-            Args = {
-                ShareablePainting = shareablePainting
-            }
-        })
+        self:PublishAsCallback(shareablePainting)
     end,
 }
 

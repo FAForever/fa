@@ -34,7 +34,7 @@ PaintingCanvasObserverAdapter = Class(PaintingCanvasAdapter) {
     __init = function(self, paintingCanvas)
         PaintingCanvasAdapter.__init(self, paintingCanvas)
 
-        self:SubscribeToSyncEvents()
+        self:SubscribeToCallback()
         self:SubscribeToChatEvents()
     end,
 
@@ -44,13 +44,7 @@ PaintingCanvasObserverAdapter = Class(PaintingCanvasAdapter) {
     SendShareablePainting = function(self, shareablePainting)
         PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
 
-        local FindClients = import('/lua/ui/game/chat.lua').FindClients
-        local clients = FindClients()
-
-        SessionSendChatMessage(clients, {
-            Painting = true,
-            ShareablePainting = shareablePainting,
-        })
+        self:PublishAsChatMessage(shareablePainting)
     end,
 }
 

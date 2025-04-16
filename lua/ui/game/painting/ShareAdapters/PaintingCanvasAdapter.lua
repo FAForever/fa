@@ -69,7 +69,11 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     ---@param self UIPaintingCanvasAdapter
     Destroy = function(self)
-        -- function exists to not break trashbags.
+        local identifier = self:GetIdentifier()
+        local syncCategory = self.SyncCategory
+
+        -- clean up the sync callback
+        RemoveOnSyncHashedCallback(syncCategory, identifier)
     end,
 
     --- Retrieves the nickname of the local peer.
@@ -89,7 +93,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- Computes a unique identifier for this adapter.
     ---@param self UIPaintingCanvasAdapter
     GetIdentifier = function(self)
-        return "PaintingCanvasAdapter" .. tostring(self.PaintingCanvas.WorldView)
+        return "PaintingCanvasAdapter of " .. tostring(self.PaintingCanvas.WorldView)
     end,
 
     --- Prepares the painting to be send to all other worldviews and peers.
@@ -122,21 +126,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             end
         end
 
-        -- to be extended by subclasses to send across the network
-    end,
-
-    --- Converts a painting to a something that is easier to share across a network.
-    ---@param self UIPaintingCanvasAdapter
-    ---@param painting UIPainting
-    ---@return UISharedPainting
-    ToSharedPainting = function(self, painting)
-        ---@type UISharedPainting
-        local sharedPainting = {
-            PaintingAdapterIdentifier = tostring(self),
-            Samples = painting.Samples
-        }
-
-        return sharedPainting
+        -- to be extended by subclasses to send across the network by calling `PublishAsChatMessage` or `PublishAsSimCallback`.
     end,
 
     --- Computes the color of a shared painting.
@@ -170,6 +160,8 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     end,
 
     --- Converts a shared painting to something that is easier to draw.
+    ---
+    --- See also `ToSharedPainting` for the publisher side.
     ---@param self UIPaintingCanvasAdapter
     ---@param sharedPainting UISharedPainting
     ---@return UIPainting
@@ -215,6 +207,26 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return painting
     end,
 
+    --- Converts a painting to a something that is easier to share across a network.
+    ---
+    --- See also `FromSharedPainting` for the subscriber side.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param painting UIPainting
+    ---@return UISharedPainting
+    ToSharedPainting = function(self, painting)
+        ---@type UISharedPainting
+        local sharedPainting = {
+            PaintingAdapterIdentifier = tostring(self),
+            Samples = painting.Samples
+        }
+
+        return sharedPainting
+    end,
+
+
+    ---------------------------------------------------------------------------
+    --#region Publisher/Subscriber across network
+
     --- A rough check to see if a shared painting originates from the local peer.
     ---@param self UIPaintingCanvasAdapter
     ---@param sharedPainting UISharedPainting
@@ -228,9 +240,30 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         return false
     end,
 
+    --- Publishes a painting as a callback. Paintings that are published as a callback 
+    --- are stored in the replay. They're visible when replaying the game. Only players 
+    --- with an army are able to send sim callbacks.
+    ---
+    --- See also `SubscribeToCallback` for the subscriber side.
+    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param shareablePainting UISharedPainting
+    PublishAsCallback = function(self, shareablePainting)
+        ---@type UIShareablePaintingCallbackMessage
+        local message = {
+            ShareablePainting = shareablePainting
+        }
+
+        SimCallback({
+            Func = self.SyncCategory,
+            Args = message
+        })
+    end,
+
     --- Subscribe and callback/sync events that are related to paintings.
+    --- 
+    --- See also `PublishAsCallback` for the publisher side.
     ---@param self UIPaintingCanvasAdapter
-    SubscribeToSyncEvents = function(self)
+    SubscribeToCallback = function(self)
         local identifier = self:GetIdentifier()
         local paintingCanvas = self.PaintingCanvas
         local syncCategory = self.SyncCategory
@@ -240,7 +273,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         ---@param sharedPaintings UIShareablePaintingCallbackMessage[]
             function(sharedPaintings)
                 if paintingCanvas.EnabledSpewing then
-                    LOG(string.format("Received %d paintings for %s", table.getsize(sharedPaintings), identifier))
+                    SPEW(string.format("Received %d painting(s) for %s", table.getsize(sharedPaintings), identifier))
                 end
 
                 -- process event
@@ -259,13 +292,38 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         )
     end,
 
+    --- Publishes a painting as a chat message. Paintings that are published as a chat message are not stored in the replay. And they're also limited in size.
+    --- 
+    --- See also `SubscribeToChatEvents` for the subscriber side.
+    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param shareablePainting UISharedPainting
+    PublishAsChatMessage = function(self, shareablePainting)
+
+        -- TODO: chat messages are limited in size. We should have a way to split up a painting into multiple messages.
+
+        local FindClients = import('/lua/ui/game/chat.lua').FindClients
+        local clients = FindClients()
+
+        ---@type UIShareablePaintingChatMessage
+        local message = {
+            Painting = true,
+            ShareablePainting = shareablePainting
+        }
+
+        SessionSendChatMessage(clients, message)
+    end,
+
     --- Subscribe to chat events that are related to paintings.
+    --- 
+    --- See also `PublishAsChatMessage` for the publisher side.
     SubscribeToChatEvents = function(self)
 
-        --- The chat function is relatively limited. It does not allow us to subscribe with multiple functions
-        --- to a single identifier. As a result, we cheat a little bit here. All adapters of all world views
-        --- try to subscribe with the same identifier. Since only one will end up being used we manually share
-        --- that message with all other adapters.
+        -- The chat function is relatively limited. It does not allow us to subscribe with multiple functions
+        -- to a single identifier. As a result, we cheat a little bit here. All adapters of all world views
+        -- try to subscribe with the same identifier. Since only one will end up being used we manually share
+        -- that message with all other adapters.
+
+        -- TODO: chat messages are limited in size. We should have a method to receive multiple messages and combine it into one painting.
 
         import("/lua/ui/game/gamemain.lua").RegisterChatFunc(
         ---@param sender string
@@ -289,4 +347,6 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             end, "Painting"
         )
     end,
+
+    --#endregion
 }
