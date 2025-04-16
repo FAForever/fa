@@ -402,6 +402,10 @@ BrushStroke = Class(DebugComponent) {
             coordinatesY[k] = nil
             coordinatesZ[k] = nil
         end
+
+        table.setn(coordinatesX, newIndex)
+        table.setn(coordinatesY, newIndex)
+        table.setn(coordinatesZ, newIndex)
     end,
 
     --#endregion
