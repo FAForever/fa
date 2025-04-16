@@ -39,7 +39,7 @@ PaintingCanvasPlayerAdapter = Class(PaintingCanvasAdapter) {
 
     --- Shares the painting with all other peers through a sim callback. These paintings are stored in the replay.
     ---@param self UIPaintingCanvasObserverAdapter
-    ---@param shareablePainting UISharedPainting
+    ---@param shareablePainting UISharedBrushStroke
     SendShareablePainting = function(self, shareablePainting)
         PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
 

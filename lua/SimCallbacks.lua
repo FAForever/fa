@@ -816,7 +816,7 @@ end
 do
     local OriginalFocusArmy = GetFocusArmy()
 
-    ---@param data UIShareablePaintingCallbackMessage
+    ---@param data UIShareableBrushStrokeCallbackMessage
     local SyncPainting = function(data)
         -- used to determine the color of the painting
         data.ShareablePainting.PeerId = GetCurrentCommandSource()
@@ -826,7 +826,7 @@ do
         table.insert(Sync.SharePaintingBrushStroke, data)
     end
 
-    ---@param data UIShareablePaintingCallbackMessage
+    ---@param data UIShareableBrushStrokeCallbackMessage
     Callbacks.SharePaintingBrushStroke = function(data)
         local focusArmy = GetFocusArmy()
         local currentCommandSource = GetCurrentCommandSource()

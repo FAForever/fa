@@ -40,7 +40,7 @@ PaintingCanvasObserverAdapter = Class(PaintingCanvasAdapter) {
 
     --- Shares the painting with all other observers through the chat message mechanic.
     ---@param self UIPaintingCanvasObserverAdapter
-    ---@param shareablePainting UISharedPainting
+    ---@param shareablePainting UISharedBrushStroke
     SendShareablePainting = function(self, shareablePainting)
         PaintingCanvasAdapter.SendShareablePainting(self, shareablePainting)
 
