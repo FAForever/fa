@@ -185,6 +185,7 @@ local function HoldThread(checkFn)
 end
 
 ---@param keyData NormalizedKeyBinding
+---@return fun():boolean
 local function GetKeyDataPressedChecker(keyData, keyCodeString)
     local IsKeyDown = IsKeyDown
     local keyCode = tonumber(keyCodeString, 16)
