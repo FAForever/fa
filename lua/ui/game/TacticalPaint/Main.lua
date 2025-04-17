@@ -133,14 +133,6 @@ function TacticalPaint()
             canvas:SetActive(not canvas:GetActive())
         end
     end
-
-    -- if canvas:GetActive() then
-    --     local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
-    --     EscapeHandler.PushEscapeHandler(function()
-    --         canvas:SetActive(false)
-    --     end)
-    -- end
-
 end
 
 function Clear()
