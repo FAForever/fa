@@ -121,7 +121,7 @@ UnitBlueprint{
     },
     Economy = {
         BuildCostEnergy = 2500,
-        BuildCostMass = 250,
+        BuildCostMass = 270,
         BuildTime = 1250,
     },
     Footprint = {
@@ -189,7 +189,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 45,
+            Damage = 50,
             DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Proton Cannon",

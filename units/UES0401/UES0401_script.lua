@@ -10,6 +10,7 @@ local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
+local TIFSmartCharge = import("/lua/terranweapons.lua").TIFSmartCharge
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 
@@ -26,6 +27,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         MissileRack02 = ClassWeapon(TSAMLauncher) {},
         MissileRack03 = ClassWeapon(TSAMLauncher) {},
         MissileRack04 = ClassWeapon(TSAMLauncher) {},
+        AntiTorpedo = ClassWeapon(TIFSmartCharge) {},
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)

@@ -180,14 +180,14 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Oblivion Cannon",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
-            FiringRandomness = 0.25,
-            FiringTolerance = 2,
+            FiringRandomness = 0.35,
+            FiringTolerance = 3,
             Label = "FrontTurret",
-            MaxRadius = 70,
+            MaxRadius = 80,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 31.5,
             ProjectileId = "/projectiles/ADFOblivionCannon01/ADFOblivionCannon01_proj.bp",
             RackBones = {
                 {
@@ -234,7 +234,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Harmonic Depth Charge",
             EffectiveRadius = 39,
-            FireTargetLayerCapsTable = { Water = "Seabed|Sub" },
+            FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringRandomness = 1,
             FiringTolerance = 2,
             Label = "DepthCharge",
@@ -259,7 +259,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/40, --10/integer interval in ticks
+            RateOfFire = 10/45, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -306,7 +306,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 10/40, --10/integer interval in ticks
+            RateOfFire = 10/30, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",
@@ -349,7 +349,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 10/76, --10/integer interval in ticks
+            RateOfFire = 10/60, --10/integer interval in ticks
             TargetCheckInterval = 1.0,
             TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",

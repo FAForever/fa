@@ -124,7 +124,7 @@ UnitBlueprint{
         BuildRate = 5,
         BuildTime = 260,
         BuildableCategory = { "BUILTBYTIER1ENGINEER AEON" },
-        MaxBuildDistance = 5,
+        MaxBuildDistance = 6,
         SacrificeEnergyMult = 0.6,
         SacrificeMassMult = 0.6,
         StorageEnergy = 0,

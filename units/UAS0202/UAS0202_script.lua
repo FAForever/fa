@@ -20,6 +20,8 @@ UAS0202 = ClassUnit(ASeaUnit) {
         FrontTurret = ClassWeapon(ADFCannonQuantumWeapon) {},
         AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
         AntiAirMissiles02 = ClassWeapon(AAAZealotMissileWeapon) {},
+		AntiAirMissiles011 = ClassWeapon(AAAZealotMissileWeapon) {},
+        AntiAirMissiles022 = ClassWeapon(AAAZealotMissileWeapon) {},
         AntiMissile = ClassWeapon(AAMWillOWisp) {},
     },
 

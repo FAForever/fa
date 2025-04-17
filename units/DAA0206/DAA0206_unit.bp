@@ -53,8 +53,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Light",
         EconomyThreatLevel = 80000,
-        Health = 90,
-        MaxHealth = 90,
+        Health = 15,
+        MaxHealth = 15,
     },
     Display = {
         Abilities = { "<LOC ability_suicideweapon>Suicide Weapon" },
@@ -164,13 +164,13 @@ UnitBlueprint{
             },
             BallicsticArc = "RULEUBA_None",
             CollideFriendly = true,
-            Damage = 50,
+            Damage = 800,
             DamageFriendly = true,
-            DamageRadius = 7.5,
+            DamageRadius = 3.5,
             DamageType = "Normal",
             DisplayName = "Kamikaze",
-            DoTPulses = 20,
-            DoTTime = 10,
+            DoTPulses = 3,
+            DoTTime = 3,
             EffectiveRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = "Land|Seabed|Water",
@@ -184,7 +184,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
             ProjectileId = "/projectiles/AIFGuidedMissile01/AIFGuidedMissile01_proj.bp",
-            ProjectileLifetime = 10,
+            ProjectileLifetime = 3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

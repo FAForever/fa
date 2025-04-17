@@ -17,6 +17,12 @@ UEA0303 = ClassUnit(TAirUnit) {
         RightBeam = ClassWeapon(TAAGinsuRapidPulseWeapon) {},
         LeftBeam = ClassWeapon(TAAGinsuRapidPulseWeapon) {},
     },
+
+    OnStopBeingBuilt = function(self,builder,layer)
+        TAirUnit.OnStopBeingBuilt(self,builder,layer)
+        --Turns Jamming off when unit is built
+        self:SetScriptBit('RULEUTC_JammingToggle', true)
+    end,
 }
 
 TypeClass = UEA0303

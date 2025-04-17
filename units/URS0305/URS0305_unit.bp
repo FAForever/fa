@@ -119,11 +119,11 @@ UnitBlueprint{
         UpgradesFrom = "urb3202",
     },
     Intel = {
-        RadarStealthFieldRadius = 40,
+        RadarStealthFieldRadius = 50,
         ReactivateTime = 6,
         ShowIntelOnSelect = true,
         SonarRadius = 448,
-        SonarStealthFieldRadius = 40,
+        SonarStealthFieldRadius = 50,
         VisionRadius = 32,
         WaterVisionRadius = 24,
     },

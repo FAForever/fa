@@ -170,7 +170,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
             Damage = 360,
-            DamageRadius = 0,
+            DamageRadius = 2,
             DamageType = "Normal",
             DisplayName = "Quantum Cannon",
             FireTargetLayerCapsTable = {
@@ -219,7 +219,7 @@ UnitBlueprint{
             TurretPitchSpeed = 45,
             TurretYaw = 0,
             TurretYawRange = 180,
-            TurretYawSpeed = 75,
+            TurretYawSpeed = 80,
             Turreted = true,
             WeaponCategory = "Direct Fire",
         },

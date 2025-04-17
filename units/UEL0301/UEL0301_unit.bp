@@ -176,7 +176,7 @@ UnitBlueprint{
         BuildCostEnergy = 25200,
         BuildCostMass = 2100,
         BuildRate = 56,
-        BuildTime = 14400,
+        BuildTime = 10080,
         BuildableCategory = { "BUILTBYTIER3ENGINEER UEF" },
         MaintenanceConsumptionPerSecondEnergy = 0,
         MaxBuildDistance = 10,

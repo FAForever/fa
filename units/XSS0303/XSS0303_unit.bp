@@ -124,7 +124,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 44000,
         BuildCostMass = 4400,
-        BuildRate = 120,
+        BuildRate = 180,
         BuildTime = 13200,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE AIR ANTINAVY",

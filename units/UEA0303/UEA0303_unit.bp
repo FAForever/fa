@@ -124,8 +124,8 @@ UnitBlueprint{
         UniformScale = 0.1,
     },
     Economy = {
-        BuildCostEnergy = 51200,
-        BuildCostMass = 450,
+        BuildCostEnergy = 48000,
+        BuildCostMass = 400,
         BuildTime = 3840,
     },
     Footprint = {
@@ -146,9 +146,23 @@ UnitBlueprint{
         },
         FactionName = "UEF",
         Icon = "air",
+        OrderOverrides = {
+            RULEUTC_JammingToggle = {
+                bitmapId = "jamming",
+                helpText = "toggle_jamming",
+            },
+        },
+        ToggleCaps = { RULEUTC_JammingToggle = true },
         UnitName = "<LOC uea0303_name>Wasp",
     },
-    Intel = { VisionRadius = 32 },
+    Intel = { 
+        JamRadius = {
+            Max = 40,
+            Min = 20,
+        },
+        JammerBlips = 4,
+        VisionRadius = 32 
+    },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.65,
     LifeBarSize = 1.25,

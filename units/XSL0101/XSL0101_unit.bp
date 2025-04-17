@@ -35,8 +35,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 35,
-        MaxHealth = 35,
+        Health = 40,
+        MaxHealth = 40,
         SurfaceThreatLevel = 1,
     },
     Display = {
@@ -146,9 +146,9 @@ UnitBlueprint{
     LifeBarSize = 0.4,
     Physics = {
         DragCoefficient = 0.2,
-        MaxAcceleration = 3.8,
-        MaxBrake = 3.8,
-        MaxSpeed = 3.8,
+        MaxAcceleration = 4,
+        MaxBrake = 4,
+        MaxSpeed = 4,
         MaxSpeedReverse = 0,
         MaxSteerForce = 7,
         MeshExtentsX = 0.45,
@@ -167,7 +167,7 @@ UnitBlueprint{
     SizeZ = 0.9,
     StrategicIconName = "icon_bot1_intel",
     StrategicIconSortPriority = 135,
-    Transport = { CanFireFromTransport = false },
+    Transport = { CanFireFromTransport = true },
     Veteran = {
         Level1 = 2,
         Level2 = 4,
@@ -187,7 +187,8 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Phasic Autogun",
             FireTargetLayerCapsTable = {
-                Land = "Land|Water|Seabed",
+                Air = "Land|Water|Seabed",
+				Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
             FiringTolerance = 2,

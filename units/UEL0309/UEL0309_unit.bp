@@ -130,7 +130,7 @@ UnitBlueprint{
         BuildRate = 32.5,
         BuildTime = 1560,
         BuildableCategory = { "BUILTBYTIER3ENGINEER UEF" },
-        MaxBuildDistance = 7,
+        MaxBuildDistance = 8,
         StorageEnergy = 0,
         StorageMass = 40,
         TeleportEnergyMod = 0.15,

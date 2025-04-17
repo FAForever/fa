@@ -40,8 +40,8 @@ UnitBlueprint{
         AnimationDeath = {
             {
                 Animation = "/units/xsb2302/xsb2302_ADeath.sca",
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
+                AnimationRateMax = 5,
+                AnimationRateMin = 5,
                 Weight = 100,
             },
         },
@@ -77,9 +77,9 @@ UnitBlueprint{
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 1327500,
-        BuildCostMass = 70800,
-        BuildTime = 110000,
+        BuildCostEnergy = 1526625,
+        BuildCostMass = 81420,
+        BuildTime = 126500,
         RebuildBonusIds = { "xsb2302" },
     },
     Footprint = {

@@ -42,8 +42,8 @@ UnitBlueprint{
         AnimationDeath = {
             {
                 Animation = "/units/xsb0101/xsb0101_ADeath.sca",
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
+                AnimationRateMax = 6,
+                AnimationRateMin = 6,
                 Weight = 100,
             },
         },

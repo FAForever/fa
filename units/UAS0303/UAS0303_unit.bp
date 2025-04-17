@@ -122,7 +122,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 40000,
         BuildCostMass = 4000,
-        BuildRate = 120,
+        BuildRate = 180,
         BuildTime = 12000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE AIR ANTINAVY",

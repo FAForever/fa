@@ -40,8 +40,8 @@ UnitBlueprint{
         AnimationDeath = {
             {
                 Animation = "/units/xsb0301/xsb0301_ADeath.sca",
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
+                AnimationRateMax = 6,
+                AnimationRateMin = 6,
                 Weight = 100,
             },
         },
@@ -93,7 +93,7 @@ UnitBlueprint{
         BuildCostEnergy = 47400,
         BuildCostMass = 5220,
         BuildRate = 90,
-        BuildTime = 12000,
+        BuildTime = 14400,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY SERAPHIM STRUCTURE LAND",

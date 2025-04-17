@@ -74,9 +74,9 @@ UnitBlueprint{
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 5994000,
-        BuildCostMass = 224775,
-        BuildTime = 300000,
+        BuildCostEnergy = 6893100,
+        BuildCostMass = 258491,
+        BuildTime = 345000,
         RebuildBonusIds = { "ueb2401" },
     },
     Footprint = {

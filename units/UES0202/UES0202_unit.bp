@@ -287,18 +287,18 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 110,
             DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Gauss Cannon",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
-            FiringRandomness = 0.5,
+            FiringRandomness = 0.2,
             FiringTolerance = 2,
             Label = "FrontTurret01",
             MaxRadius = 60,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 30,
+            MuzzleVelocity = 38,
             ProjectileId = "/projectiles/TDFGauss01/TDFGauss01_proj.bp",
             ProjectilesPerOnFire = 1,
             RackBones = {
@@ -315,7 +315,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 10/40, --10/integer interval in ticks
+            RateOfFire = 10/15, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 115,
             TargetPriorities = {

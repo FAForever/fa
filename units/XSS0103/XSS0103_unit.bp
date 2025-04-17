@@ -186,7 +186,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 25,
             DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Shie-eih Auto-Cannon",

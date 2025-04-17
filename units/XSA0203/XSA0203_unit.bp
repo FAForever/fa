@@ -54,8 +54,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Light",
-        Health = 1800,
-        MaxHealth = 1800,
+        Health = 800,
+        MaxHealth = 800,
         SurfaceThreatLevel = 10,
     },
     Display = {
@@ -103,9 +103,9 @@ UnitBlueprint{
         UniformScale = 0.066,
     },
     Economy = {
-        BuildCostEnergy = 10000,
-        BuildCostMass = 500,
-        BuildTime = 3300,
+        BuildCostEnergy = 4600,
+        BuildCostMass = 220,
+        BuildTime = 1600,
     },
     Footprint = {
         MaxSlope = 0.25,

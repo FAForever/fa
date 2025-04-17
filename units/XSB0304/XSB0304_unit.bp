@@ -39,8 +39,8 @@ UnitBlueprint{
         AnimationDeath = {
             {
                 Animation = "/units/xsb0304/xsb0304_ADeath.sca",
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
+                AnimationRateMax = 3,
+                AnimationRateMin = 3,
                 Weight = 1,
             },
         },
@@ -98,7 +98,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 30000,
         BuildCostMass = 3000,
-        BuildRate = 120,
+        BuildRate = 150,
         BuildTime = 4097,
         BuildableCategory = { "BUILTBYQUANTUMGATE SERAPHIM" },
         RebuildBonusIds = { "xsb0304" },

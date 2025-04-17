@@ -146,11 +146,11 @@ UnitBlueprint{
         UnitName = "<LOC xsa0101_name>Sele-istle",
     },
     Intel = {
-        IntelDurationOnDeath = 20,
+        IntelDurationOnDeath = 10,
         RadarRadius = 64,
         SonarRadius = 28,
         VisionRadius = 42,
-        VisionRadiusOnDeath = 28,
+        VisionRadiusOnDeath = 22,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,

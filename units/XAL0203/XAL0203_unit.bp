@@ -111,7 +111,7 @@ UnitBlueprint{
     },
     Economy = {
         BuildCostEnergy = 1080,
-        BuildCostMass = 180,
+        BuildCostMass = 190,
         BuildTime = 900,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -179,7 +179,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 15,
+            Damage = 20,
             DamageRadius = 0,
             DamageType = "Normal",
             DisplayName = "Quantum Autoguns",

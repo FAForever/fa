@@ -257,7 +257,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 71,
+            Damage = 85,
             DamageType = "Normal",
             DisplayName = "Zealot AA Missile",
             FireTargetLayerCapsTable = {
@@ -319,7 +319,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 71,
+            Damage = 85,
             DamageType = "Normal",
             DisplayName = "Zealot AA Missile",
             FireTargetLayerCapsTable = {

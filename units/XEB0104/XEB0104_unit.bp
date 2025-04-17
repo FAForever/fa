@@ -98,7 +98,7 @@ UnitBlueprint{
     },
     Economy = {
         BuildCostEnergy = 2625,
-        BuildCostMass = 525,
+        BuildCostMass = 400,
         BuildRate = 20,
         BuildTime = 1000,
         BuildableCategory = { "xeb0204" },

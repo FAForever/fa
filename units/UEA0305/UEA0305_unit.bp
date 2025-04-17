@@ -355,7 +355,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 8,
+            Damage = 12,
             DamageType = "Normal",
             DisplayName = "Linked Railgun",
             EffectiveRadius = 0,

@@ -91,8 +91,8 @@ UnitBlueprint{
     },
     Economy = {
         BuildCostEnergy = 2100,
-        BuildCostMass = 350,
-        BuildRate = 20,
+        BuildCostMass = 300,
+        BuildRate = 14,
         BuildTime = 1171,
         BuildableCategory = { "xrb0204" },
         MaxBuildDistance = 15,

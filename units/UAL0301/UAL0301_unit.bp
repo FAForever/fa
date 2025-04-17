@@ -187,7 +187,7 @@ UnitBlueprint{
         BuildCostEnergy = 27100,
         BuildCostMass = 1950,
         BuildRate = 56,
-        BuildTime = 14400,
+        BuildTime = 10080,
         BuildableCategory = { "BUILTBYTIER3ENGINEER AEON" },
         MaxBuildDistance = 10,
         NaturalProducer = true,
