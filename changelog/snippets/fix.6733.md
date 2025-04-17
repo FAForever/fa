@@ -1,0 +1,1 @@
+- (#6733) Fix Cybran ACU effects for AdvancedEngineering, CoolingUpgrade, T3Engineering to match the SLOTs that the enhancement is assigned to.
