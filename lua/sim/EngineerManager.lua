@@ -670,11 +670,15 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param finishedUnit Unit
     UnitConstructionFinished = function(self, unit, finishedUnit)
+        local dontAssignEngineerTask = true
         if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
-            self:AddUnit(finishedUnit)
+            if EntityCategoryContains(categories.ENGINEER - categories.ENGINEERSTATION, finishedUnit) then
+                dontAssignEngineerTask = false
+            end
+            self:AddUnit(finishedUnit, dontAssignEngineerTask)
         end
     end,
 
