@@ -141,26 +141,6 @@ function Clear()
     end
 end
 
-local isEnabled = false
-local lock = false
-local function UnlockThread()
-    lock = false
-    WaitSeconds(0.5)
-    while lock do
-        lock = false
-        WaitFrames(5)
-    end
-    isEnabled = false
-    local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
-    for _, view in views do
-        ---@type Canvas?
-        local canvas = view._canvas
-        if canvas then
-            canvas:SetActive(false)
-        end
-    end
-end
-
 ---@param state boolean
 local function SetCanvasesActive(state)
     local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
