@@ -236,7 +236,7 @@ UnitBlueprint{
             NewBuildRate = 42,
             NewHealth = 2000,
             NewRegenRate = 10,
-            ShowBones = { "Left_Upgrade" },
+            ShowBones = { "Right_Upgrade" },
             Slot = "LCH",
             UpgradeEffectBones = {
                 "Left_Upgrade",
@@ -249,7 +249,7 @@ UnitBlueprint{
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
-            HideBones = { "Left_Upgrade" },
+            HideBones = { "Right_Upgrade" },
             Icon = "aes",
             Name = "<LOC enhancements_0078>Remove Engineering Suite",
             Prerequisite = "AdvancedEngineering",
