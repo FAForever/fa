@@ -1361,7 +1361,7 @@ options = {
                 title = "Painting enabled",
                 key = 'tpaint_enabled',
                 type = 'toggle',
-                default = 'off',
+                default = 'on',
                 set = function(k, v)
                     if GetCurrentUIState() ~= 'game' then
                         return
