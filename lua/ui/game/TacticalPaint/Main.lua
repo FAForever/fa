@@ -184,30 +184,96 @@ local function HoldThread(checkFn)
     SetCanvasesActive(false)
 end
 
+---@param keyData NormalizedKeyBinding
+local function GetKeyDataPressedChecker(keyData, keyCodeString)
+    local IsKeyDown = IsKeyDown
+    local keyCode = tonumber(keyCodeString, 16)
+
+    if keyData.Ctrl then
+        if keyData.Shift then
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL") and
+                        IsKeyDown("SHIFT") and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL") and
+                        IsKeyDown("SHIFT")
+                end
+            end
+        else
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL") and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL")
+                end
+            end
+        end
+    else
+        if keyData.Shift then
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("SHIFT") and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("SHIFT")
+                end
+            end
+        else
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode)
+                end
+            end
+        end
+    end
+end
+
 function OnHold()
     local keymap = Prefs.GetFromCurrentProfile('UserKeyMap')
+    ---@type string?
     local key = table.find(keymap, "tpaint_hold")
-
 
     if not key then
         WARN("INVALID KEY FOR TPAINT HOLD")
         return
     end
 
-    local keyNames = import("/lua/keymap/keyNames.lua").keyNames
-    local keyCodeString = table.find(keyNames, key)
-
-    if not keyCodeString then
+    local keyData = import("/lua/keymap/keymapper.lua").NormalizeKey(key)
+    if not keyData.key then
         WARN("INVALID KEY FOR TPAINT HOLD")
-        -- Still have to parse code with ctrl, shift and alt
         return
     end
 
-    local keyCode = tonumber(keyCodeString, 16)
+    local keyNames = import("/lua/keymap/keyNames.lua").keyNames
+    ---@type string?
+    local keyCodeString = table.find(keyNames, keyData.key)
 
-    ForkThread(HoldThread, function()
-        return IsKeyDown(keyCode)
-    end)
+    if not keyCodeString then
+        WARN("INVALID KEY FOR TPAINT HOLD")
+        return
+    end
+
+    ForkThread(HoldThread, GetKeyDataPressedChecker(keyData, keyCodeString))
 end
 
 ---@param isReplay boolean

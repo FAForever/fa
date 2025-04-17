@@ -1962,7 +1962,6 @@ local keyActionsTacticalPaint = {
     ["tpaint_hold"] = {
         action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').OnHold()",
         category = 'Tactical Paint',
-        keyRepeat = true,
     },
     ["tpaint_clear"] = {
         action = "UI_Lua import('/lua/ui/game/TacticalPaint/Main.lua').Clear()",
