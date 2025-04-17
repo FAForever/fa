@@ -161,23 +161,53 @@ local function UnlockThread()
     end
 end
 
-function OnHold()
-    lock = true
-    if isEnabled then
-        return
-    end
-    isEnabled = true
-
+---@param state boolean
+local function SetCanvasesActive(state)
     local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
     for _, view in views do
         ---@type Canvas?
         local canvas = view._canvas
         if canvas then
-            canvas:SetActive(true)
+            canvas:SetActive(state)
         end
     end
+end
 
-    ForkThread(UnlockThread)
+---@param checkFn fun():boolean
+local function HoldThread(checkFn)
+    SetCanvasesActive(true)
+
+    while checkFn() do
+        WaitFrames(1)
+    end
+
+    SetCanvasesActive(false)
+end
+
+function OnHold()
+    local keymap = Prefs.GetFromCurrentProfile('UserKeyMap')
+    local key = table.find(keymap, "tpaint_hold")
+
+
+    if not key then
+        WARN("INVALID KEY FOR TPAINT HOLD")
+        return
+    end
+
+    local keyNames = import("/lua/keymap/keyNames.lua").keyNames
+    local keyCodeString = table.find(keyNames, key)
+
+    if not keyCodeString then
+        WARN("INVALID KEY FOR TPAINT HOLD")
+        -- Still have to parse code with ctrl, shift and alt
+        return
+    end
+
+    local keyCode = tonumber(keyCodeString, 16)
+
+    ForkThread(HoldThread, function()
+        return IsKeyDown(keyCode)
+    end)
 end
 
 ---@param isReplay boolean
