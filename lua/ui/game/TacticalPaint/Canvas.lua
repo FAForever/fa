@@ -289,3 +289,19 @@ Canvas = Class(Bitmap)
         return false
     end,
 }
+
+
+---@param view WorldView
+---@return Canvas
+function AttachCanvasToWorldView(view)
+    view._canvas = Canvas(view)
+    LayoutFor(view._canvas)
+        :Fill(view)
+        :ResetWidth()
+        :ResetHeight()
+        :Over(view)
+        :EnableHitTest()
+    view._canvas:SetActive(false)
+    view:RegisterRenderable(view._canvas, "TacticalPaint.Canvas")
+    return view._canvas
+end

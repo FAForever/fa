@@ -1362,6 +1362,20 @@ options = {
                 key = 'tpaint_enabled',
                 type = 'toggle',
                 default = 'off',
+                set = function(k, v)
+                    if GetCurrentUIState() ~= 'game' then
+                        return
+                    end
+
+                    local enabled = v == "on"
+                    for cameraName, view in import("/lua/ui/game/worldview.lua").GetWorldViews() do
+                        if cameraName ~= "MiniMap" then
+                            ---@type Canvas
+                            local canvas = view._canvas or import("/lua/ui/game/TacticalPaint/Canvas.lua").AttachCanvasToWorldView(view)
+                            canvas:SetHiddenLines(not enabled)
+                        end
+                    end
+                end,
                 custom = {
                     states = {
                         { text = "<LOC _On>", key = 'on' },
