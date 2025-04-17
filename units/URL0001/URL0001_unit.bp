@@ -249,7 +249,7 @@ UnitBlueprint{
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
-            HideBones = { "Right_Upgrade" },
+            HideBones = { "Left_Upgrade" },
             Icon = "aes",
             Name = "<LOC enhancements_0078>Remove Engineering Suite",
             Prerequisite = "AdvancedEngineering",
