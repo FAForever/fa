@@ -10,4 +10,4 @@
     - Can be turned off completely (it is on by default).
     - These drawings are left in replays, so mind what you draw.
     - You can adjust the duration of **your** drawings up to a maximum of 1 minute.
-    - Observers see these between each over and can draw their own.
+    - Observers see all drawings and can draw their own.
