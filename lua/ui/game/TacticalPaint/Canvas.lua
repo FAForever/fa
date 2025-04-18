@@ -14,8 +14,6 @@ local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
 local PlayerMuteList = import("PlayerMuteList.lua").PlayerMuteList
 local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 
-local minDist = 1
-
 ---@class Canvas : Bitmap, Renderable
 ---@field _text Text
 ---@field _btn Button
@@ -250,6 +248,20 @@ Canvas = Class(Bitmap)
     end,
 
     ---@param self Canvas
+    ---@param zoom number
+    ---@return number
+    GetMinimumDrawDistance = function(self, zoom)
+        return MathMax(zoom * 0.01, 0.25)
+    end,
+
+    ---@param self Canvas
+    ---@param zoom number
+    ---@return number
+    GetEraseRadius = function(self, zoom)
+        return zoom * 0.02
+    end,
+
+    ---@param self Canvas
     ---@param worldview WorldView
     ---@param event KeyEvent
     ---@return boolean
@@ -276,11 +288,9 @@ Canvas = Class(Bitmap)
                 local zoom = GetCamera(worldview._cameraName):GetZoom()
 
                 if isModLeft then
-                    local offset = zoom / 100
-                    self:OnDraw(pos, MathMax(offset, minDist))
+                    self:OnDraw(pos, self:GetMinimumDrawDistance(zoom))
                 elseif isModRight then
-                    local offset = zoom / 50
-                    self:OnErase(pos, offset)
+                    self:OnErase(pos, self:GetEraseRadius(zoom))
                 end
             end
 
