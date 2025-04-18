@@ -193,7 +193,7 @@ function GetCueBank(sound)
 end
 
 --- The current army number that the player has focused, or `-1` for none (i.e. observer)
----@return number
+---@return integer
 function GetFocusArmy()
 end
 
