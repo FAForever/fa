@@ -9,5 +9,5 @@
     - You can mute specific player if one annoys you.
     - Can be turned off completely (it is on by default).
     - These drawings are left in replays, so mind what you draw.
-    - You can adjust duration of **your** drawings with maximum of 1 minute.
+    - You can adjust the duration of **your** drawings up to a maximum of 1 minute.
     - Observers see these between each over and can draw their own.
