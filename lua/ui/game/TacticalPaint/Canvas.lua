@@ -4,6 +4,7 @@ local GetMouseWorldPos = GetMouseWorldPos
 local GetFocusArmy = GetFocusArmy
 local MathMax = math.max
 local TableInsert = table.insert
+local MathCeil = math.ceil
 
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -182,8 +183,8 @@ Canvas = Class(Bitmap)
 
         local n = table.getn(lines)
         if n > maxPerPackage then
-            local numPackages = math.ceil(n / maxPerPackage)
-            local packageSize = math.ceil(n / numPackages)
+            local numPackages = MathCeil(n / maxPerPackage)
+            local packageSize = MathCeil(n / numPackages)
 
             local lineIndex = 1
 
@@ -192,7 +193,7 @@ Canvas = Class(Bitmap)
                 for j = lineIndex, lineIndex + packageSize do
                     local pos = lines[j]
                     if pos then
-                        table.insert(package, pos)
+                        TableInsert(package, pos)
                     end
                 end
                 lineIndex = lineIndex + packageSize
