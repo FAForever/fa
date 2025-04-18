@@ -1,7 +1,7 @@
 local GetGameTimeSeconds = GetGameTimeSeconds
 local UI_DrawLine = UI_DrawLine
 
-local maxDecayTime = 60
+local maxDecayTime = import("/lua/shared/TacticalPaint.lua").maxDecayTime
 local maxLinesPerPlayer = 2000
 
 ---@class Line

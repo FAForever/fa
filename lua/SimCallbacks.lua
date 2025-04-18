@@ -178,6 +178,8 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 ---@alias SyncTacticalPaintData table<integer, TacticalPaintData>
 
+local maxDecayTime = import("/lua/shared/TacticalPaint.lua").maxDecayTime
+
 ---@param data TacticalPaintData
 Callbacks.TacticalPaint = function(data)
     local sourceId = GetCurrentCommandSource()
@@ -196,8 +198,8 @@ Callbacks.TacticalPaint = function(data)
 
     local lifeTime = data.LifeTime
     local curTime = GetGameTick() / 10
-    if not lifeTime or lifeTime > curTime + 60 then
-        lifeTime = curTime + 60
+    if not lifeTime or lifeTime > curTime + maxDecayTime then
+        lifeTime = curTime + maxDecayTime
     end
 
     Sync.TacticalPaint = Sync.TacticalPaint or {}
