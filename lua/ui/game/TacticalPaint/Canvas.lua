@@ -16,6 +16,7 @@ local PlayerMuteList = import("PlayerMuteList.lua").PlayerMuteList
 local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 
 ---@class Canvas : Bitmap, Renderable
+---@field _view WorldView
 ---@field _text Text
 ---@field _btn Button
 ---@field _muteBtn Button
@@ -27,9 +28,11 @@ local TacticalPaint = import("/lua/ui/game/TacticalPaint/Main.lua")
 Canvas = Class(Bitmap)
 {
     ---@param self Canvas
-    ---@param parent Control
+    ---@param parent WorldView
     __init = function(self, parent)
         Bitmap.__init(self, parent)
+
+        self._view = parent
 
         self._active = false
         self._collectedLines = {}
@@ -298,6 +301,19 @@ Canvas = Class(Bitmap)
             return true
         end
         return false
+    end,
+
+    ---@param self Canvas
+    OnDestroy = function(self)
+        self._active = false
+        self._collectedLines = nil
+        self._prevMousePos = nil
+        self._isHiddenLines = false
+
+        self._view:UnregisterRenderable("TacticalPaint.Canvas")
+        self._view = nil
+
+        Bitmap.OnDestroy(self)
     end,
 }
 
