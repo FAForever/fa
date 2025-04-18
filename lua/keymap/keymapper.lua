@@ -473,3 +473,82 @@ function KeyCategory(key, map, actions)
 
     return false
 end
+
+---Returns function that checks whether given keybind is pressed.
+---@param keyBind string
+---@return fun():boolean
+function GetKeyBindPressedChecker(keyBind)
+    local keyData = NormalizeKey(keyBind)
+
+    if not keyData.key then
+        error("Unexpected keybind format. It must be '[Ctrl-][Shift-][Alt-]<Key>'.")
+    end
+
+    local keyNames = import("/lua/keymap/keyNames.lua").keyNames
+    ---@type string?
+    local keyCodeString = table.find(keyNames, keyData.key)
+    if not keyCodeString then
+        error(("Unknown key code for '%s'."):format(keyData.key))
+    end
+
+    local keyCode = tonumber(keyCodeString, 16)
+
+    local IsKeyDown = IsKeyDown
+    if keyData.Ctrl then
+        if keyData.Shift then
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL") and
+                        IsKeyDown("SHIFT") and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL") and
+                        IsKeyDown("SHIFT")
+                end
+            end
+        else
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL") and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("CONTROL")
+                end
+            end
+        end
+    else
+        if keyData.Shift then
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("SHIFT") and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("SHIFT")
+                end
+            end
+        else
+            if keyData.Alt then
+                return function()
+                    return IsKeyDown(keyCode) and
+                        IsKeyDown("MENU") -- Alt
+                end
+            else
+                return function()
+                    return IsKeyDown(keyCode)
+                end
+            end
+        end
+    end
+end
