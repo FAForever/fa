@@ -389,6 +389,57 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         )
     end,
 
+    --- Splits a single brush stroke into chunks to send it across the network. 
+    --- 
+    --- There is a limited to the size of a single chat message. This can not be more than 1024 bytes.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param sharedBrushStroke UISharedBrushStroke
+    ---@return UISharedBrushStroke[]
+    SplitBrushStrokes = function(self, sharedBrushStroke)
+        -- number of samples per chunk. 
+        local samplesPerChunk = 20
+
+        -- number of coordinates per chunk. This translates directly to the size of the table that we transmit.
+        -- 
+        -- table overhead:                = 40 bytes
+        -- array size: (20 + 1) * 3 * 8   = 504 bytes   note: we add 1 because we add an additional sample to make sure there are no gaps
+        --                                 ----- +
+        -- table size:                    = 544
+        local coordinatesPerChunk = 3 * samplesPerChunk
+
+        -- number of samples, take into account that it is interleaved
+        local samples = math.ceil(table.getn(sharedBrushStroke.Samples) / 3)
+
+        -- number of chunks that we need to transmit all samples
+        local chunks = math.ceil(samples / samplesPerChunk)
+
+        local messages = {}
+        for k = 1, chunks do
+
+            -- copy over the samples into a separate buffer. Add an additional 
+            -- sample to make sure there's no gaps in the line.
+            local samples = {}
+            for j = 1, coordinatesPerChunk + 3 do
+                local coords = sharedBrushStroke.Samples[(k - 1) * coordinatesPerChunk + j]
+                if coords then
+                    table.insert(samples, coords)
+                end
+            end
+
+            ---@type UISharedBrushStroke
+            local chunkedMessage = {
+                PaintingAdapterIdentifier = sharedBrushStroke.PaintingAdapterIdentifier,
+                ShareId  = sharedBrushStroke.ShareId,
+                PeerName = sharedBrushStroke.PeerName,
+                Samples  = samples,
+            }
+
+            table.insert(messages, chunkedMessage)
+        end
+
+        return messages
+    end,
+
     --- Publishes a brushStroke as a chat message. Paintings that are published as a chat message are not stored in the replay. And they're also limited in size.
     ---
     --- See also `SubscribeToChatEvents` for the subscriber side.
@@ -413,13 +464,15 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         local FindClients = import('/lua/ui/game/chat.lua').FindClients
         local clients = FindClients()
 
-        ---@type UIShareableBrushStrokeChatMessage
-        local message = {
-            Painting = true,
-            ShareablePainting = shareablePainting
-        }
+        local messages = self:SplitBrushStrokes(shareablePainting)
+        for k = 1, table.getn(messages) do
+            local message = {
+                Painting = true,
+                ShareablePainting = messages[k]
+            }
 
-        SessionSendChatMessage(clients, message)
+            SessionSendChatMessage(clients, message)
+        end
     end,
 
     --- Subscribe to chat events that are related to paintings.
@@ -445,7 +498,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
                 -- share it with all other adapters as we can only subscribe with one.
                 for k, canvasAdapterInstance in CanvasAdapterInstances do
                     if not IsDestroyed(canvasAdapterInstance.PaintingCanvas) then
-                        self:AddSharedPainting(data.ShareablePainting)
+                        canvasAdapterInstance:AddSharedPainting(data.ShareablePainting)
                     end
                 end
             end, "Painting"
