@@ -79,44 +79,6 @@
       ```
 
     </details>
-    
-  [Map Selection](/lua/ui/dialogs/mapselect.lua):
-
-  - <details><summary>Add LOC entry auto-generation function for map scenario names and descriptions:</summary>
-
-    ```
-    -- Generate LOC entries for scenario names
-    function LOCN(str, type)
-        local name = str
-        name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-        if string.find(str, '<LOC') then
-            return LOC(str)
-        elseif type == 'campaign_coop' then
-            return LOC('<LOC FAF_Coop_'..name..'_Name>'..str)
-        elseif type == 'skirmish' then
-            return LOC('<LOC '..name..'_Name>'..str)
-        else
-            return str
-        end
-    end
-    
-    -- Generate LOC entries for scenario descriptions
-    function LOCD(str1, str2, type)
-        local name = str1
-        name = name:gsub(' %- ', '_'):gsub('%-', '_'):gsub(':', ''):gsub("'", ''):gsub('%w+ Mission %d+ ', ''):gsub(' ', '_')
-        if string.find(str2, '<LOC') or str2 == '' then
-            return LOC(str2)
-        elseif type == 'campaign_coop' then
-            return LOC('<LOC FAF_Coop_'..name..'_Description>'..str2)
-        elseif type == 'skirmish' then
-            return LOC('<LOC '..name..'_Desc>'..str2)
-        else
-            return str2
-        end
-    end
-    ```
-
-    </details>
 
   [Unit Description](lua/ui/game/unitviewDetail.lua):
 
