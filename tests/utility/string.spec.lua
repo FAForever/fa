@@ -81,9 +81,13 @@ luft.describe("Utils", function()
         luft.expect(StringComma(100)).to.equal("100")
         luft.expect(StringComma(1000)).to.equal("1,000")
         luft.expect(StringComma(10000)).to.equal("10,000")
-        -- Maybe not desired, but included for documentation purposes
-        luft.expect(StringComma(100000)).to.equal("1e+05")
-        luft.expect(StringComma(1000000)).to.equal("1e+06")
+        if luft.environment == "FA" then
+            luft.expect(StringComma(100000)).to.equal("100,000")
+            luft.expect(StringComma(1000000)).to.equal("1,000,000")
+        else
+            luft.expect(StringComma(100000)).to.equal("1e+05")
+            luft.expect(StringComma(1000000)).to.equal("1e+06")
+        end
     end)
 
     luft.test("StringPrepend", function()

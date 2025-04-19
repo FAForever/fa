@@ -826,27 +826,23 @@ end
 
 --#endregion
 
+
 -------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
---- An anti cheat check that passes when there is only 1 player or cheats are enabled
+
+--- An anti-cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
-local PassesAntiCheatCheck = function()
-    -- allow when cheats are enabled
+local function PassesAntiCheatCheck()
     return CheatsEnabled()
 end
 
---- A simplified check that also passes when the game has AIs
+--- An anti-cheat check that also passes when the game has AIs
 ---@return boolean
-local PassesAIAntiCheatCheck = function()
-    -- allow when there are AIs
-    if ScenarioInfo.GameHasAIs then
-        return true
-    end
-
-    -- allow when cheats are enabled
-    return PassesAntiCheatCheck()
+local function PassesAIAntiCheatCheck()
+    return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
+
 
 local SpawnedMeshes = {}
 
@@ -1000,29 +996,43 @@ end
 
 --- Toggles the profiler on / off
 Callbacks.ToggleProfiler = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.ForceEnable or false)
 end
 
 -- Allows searching for benchmarks
 Callbacks.FindBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+    import("/lua/sim/profiler.lua").FindBenchmarks()
+end
+Callbacks.LoadBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
 end
 
 -- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+Callbacks.RunBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+end
+Callbacks.StopBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").StopBenchmark()
 end
 
 Callbacks.ToggleDebugMarkersByType = function(data, units)

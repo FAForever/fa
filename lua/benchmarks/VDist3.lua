@@ -10,15 +10,15 @@
 -- Conclusion: Using VDist3 instead of calculating in Lua is faster due to an engine patch: https://github.com/FAForever/FA-Binary-Patches/pull/54
 -- Make sure to upvalue VDist3 for a significant performance boost
 
-local outerLoop = 1000000
+ModuleName = "VDist3"
 
 local pos1 = Vector(Random()*1000, Random()*1000, Random()*1000)
 local pos2 = Vector(Random()*1000, Random()*1000, Random()*1000)
 
-function GlobalLuaVDist3OnGlobals()
+function GlobalLuaVDist3OnGlobals(loop)
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dx, dy, dz = pos1[1] - pos2[1]
             , pos1[2] - pos2[2]
             , pos1[3] - pos2[3]
@@ -30,10 +30,10 @@ function GlobalLuaVDist3OnGlobals()
     return final - start
 end
 
-function GlobalEngineVDist3OnGlobals()
+function GlobalEngineVDist3OnGlobals(loop)
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dist = VDist3(pos1, pos2)
     end
 
@@ -42,13 +42,13 @@ function GlobalEngineVDist3OnGlobals()
     return final - start
 end
 
-function UpvaluedLuaVDist3OnGlobals()
+function UpvaluedLuaVDist3OnGlobals(loop)
     -- upvalue
     local MathSqrt = math.sqrt
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dx, dy, dz = pos1[1] - pos2[1]
             , pos1[2] - pos2[2]
             , pos1[3] - pos2[3]
@@ -60,13 +60,13 @@ function UpvaluedLuaVDist3OnGlobals()
     return final - start
 end
 
-function UpvaluedEngineVDist3OnGlobals()
+function UpvaluedEngineVDist3OnGlobals(loop)
     -- upvalue
     local VDist3 = VDist3
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dist = VDist3(pos1, pos2)
     end
 
@@ -77,7 +77,7 @@ end
 
 -- Operating on local vectors
 
-function GlobalLuaVDist3OnLocals()
+function GlobalLuaVDist3OnLocals(loop)
     local pos1 = Vector(Random()*1000, Random()*1000, Random()*1000)
     local pos2 = Vector(Random()*1000, Random()*1000, Random()*1000)
 
@@ -95,13 +95,13 @@ function GlobalLuaVDist3OnLocals()
     return final - start
 end
 
-function GlobalEngineVDist3OnLocals()
+function GlobalEngineVDist3OnLocals(loop)
     local pos1 = Vector(Random()*1000, Random()*1000, Random()*1000)
     local pos2 = Vector(Random()*1000, Random()*1000, Random()*1000)
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dist = VDist3(pos1, pos2)
     end
 
@@ -110,7 +110,7 @@ function GlobalEngineVDist3OnLocals()
     return final - start
 end
 
-function UpvaluedLuaVDist3OnLocals()
+function UpvaluedLuaVDist3OnLocals(loop)
     local pos1 = Vector(Random()*1000, Random()*1000, Random()*1000)
     local pos2 = Vector(Random()*1000, Random()*1000, Random()*1000)
 
@@ -119,7 +119,7 @@ function UpvaluedLuaVDist3OnLocals()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dx, dy, dz = pos1[1] - pos2[1]
             , pos1[2] - pos2[2]
             , pos1[3] - pos2[3]
@@ -131,7 +131,7 @@ function UpvaluedLuaVDist3OnLocals()
     return final - start
 end
 
-function UpvaluedEngineVDist3OnLocals()
+function UpvaluedEngineVDist3OnLocals(loop)
     local pos1 = Vector(Random()*1000, Random()*1000, Random()*1000)
     local pos2 = Vector(Random()*1000, Random()*1000, Random()*1000)
 
@@ -140,7 +140,7 @@ function UpvaluedEngineVDist3OnLocals()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for i=1, outerLoop do
+    for i=1, loop do
         local dist = VDist3(pos1, pos2)
     end
 

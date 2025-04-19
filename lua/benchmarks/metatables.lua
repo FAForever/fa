@@ -23,26 +23,40 @@
 -- only be done for values that are accessed often as caching involves cycles too. As an example: values that are only used once
 -- are not worth caching. Instead, you may want to reduce the hierarchy.
 
-local loops = 2000 * 2000
+ModuleName = "Metatables"
+BenchmarkData = {
+    Depth1 = "Depth 1",
+    Depth2 = "Depth 2",
+    Depth3 = "Depth 3",
+    Depth4 = "Depth 4",
+    Depth5 = "Depth 5",
+    Depth6 = "Depth 6",
+    Depth6Functions = "Depth 6 Functions",
+    PracticalTestArmyMeta = "Army from Meta",
+    PracticalTestArmyCached = "Army from Field",
+    PracticalTestWeaponsMeta = "ForkThread from Meta",
+    PracticalTestWeaponsCached = "ForkThread from Field",
+}
 
-local n1 = { }
-local n2 = { }
+local n1 = {}
+local n2 = {}
 
-function Depth1()
+function Depth1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t1 = { key = "value" }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local data
+    local a = 1
+    local start = timer()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
     local final = GetSystemTimeSecondsOnlyForProfileUse()
@@ -51,299 +65,274 @@ function Depth1()
 end
 
 function Depth2()
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     t2 = { key = "value", }
     t2.__index = t2
-
     t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local data
+    local a = 1
+    local start = timer()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Depth3()
+function Depth3(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t3 = { key = "value" }
     t3.__index = t3
-
-    local t2 = { chalsea= "noise" }
+    local t2 = { chalsea = "noise" }
     t2.__index = t2
-
     setmetatable(t2, t3)
     local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local data
+    local a = 1
+    local start = timer()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Depth4()
+function Depth4(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t4 = { key = "value" }
     t4.__index = t4
-
     local t3 = { roger = "rage" }
     t3.__index = t3
     setmetatable(t3, t4)
-
-    local t2 = { chalsea= "noise" }
+    local t2 = { chalsea = "noise" }
     t2.__index = t2
     setmetatable(t2, t3)
-
     local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local data
+    local a = 1
+    local start = timer()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Depth5()
+function Depth5(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t5 = { key = "value" }
     t5.__index = t5
-
     local t4 = { BLUEPRINTSHERE = "FORSALE" }
     t4.__index = t4
     setmetatable(t4, t5)
-
     local t3 = { roger = "rage" }
     t3.__index = t3
     setmetatable(t3, t4)
-
-    local t2 = { chalsea= "noise" }
+    local t2 = { chalsea = "noise" }
     t2.__index = t2
     setmetatable(t2, t3)
-
     local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
+    local data
+    local a = 1
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Depth6()
+function Depth6(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t6 = { key = "value" }
     t6.__index = t6
-
     local t5 = { fkey = "fvalue" }
     t5.__index = t5
     setmetatable(t5, t6)
-
     local t4 = { pbr = "shaders" }
     t4.__index = t4
     setmetatable(t4, t5)
-
     local t3 = { whatAmIDoing = "withMyLife" }
     t3.__index = t3
     setmetatable(t3, t4)
-
-    local t2 = { chalsea= "noise" }
+    local t2 = { chalsea = "noise" }
     t2.__index = t2
     setmetatable(t2, t3)
-
     local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local data
+    local a = 1
+    local start = timer()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function PracticalTestArmyMeta()
-
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local data = false
-    for y = 1, loops do 
-        data = unit.Army
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    unit:Destroy()
-
-    return final - start
-end
-
-function PracticalTestArmyCached()
-
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-    unit.Army = unit.Army
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local data = false
-    for y = 1, loops do 
-        data = unit.Army
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    unit:Destroy()
-
-    return final - start
-end
-
-function PracticalTestWeaponsMeta()
-
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local data = false
-    for y = 1, loops do 
-        data = unit.ForkThread
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    unit:Destroy()
-
-    return final - start
-end
-
-function PracticalTestWeaponsCached()
-
-    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-    unit.ForkThread = unit.ForkThread
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local data = false
-    for y = 1, loops do 
-        data = unit.ForkThread
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    unit:Destroy()
-
-    return final - start
-end
-
-
-
-function Depth6Functions()
+function Depth6Functions(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local t6 = { key = "value" }
-    t6.__index = function (child, key)
+    t6.__index = function(child, key)
         return t6[key]
-    end 
+    end
 
     local t5 = { fkey = "fvalue" }
-    t5.__index = function (child, key)
+    t5.__index = function(child, key)
         return t5[key]
-    end 
+    end
     setmetatable(t5, t6)
 
     local t4 = { pbr = "shaders" }
-    t4.__index = function (child, key)
+    t4.__index = function(child, key)
         return t4[key]
-    end 
+    end
     setmetatable(t4, t5)
 
     local t3 = { whatAmIDoing = "withMyLife" }
-    t3.__index = function (child, key)
+    t3.__index = function(child, key)
         return t3[key]
-    end 
+    end
     setmetatable(t3, t4)
 
-    local t2 = { chalsea= "noise" }
-    t2.__index = function (child, key)
+    local t2 = { chalsea = "noise" }
+    t2.__index = function(child, key)
         return t2[key]
-    end 
+    end
     setmetatable(t2, t3)
 
     local t1 = { bob = "noise" }
     setmetatable(t1, t2)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local data
+    local a = 1
+    local start = timer()
 
-    local data = false
-    for y = 1, loops do 
+    for _ = 1, loop do
         data = t1.key
-
         -- add some random table operations
-        data = n1.fake 
+        data = n1.fake
         data = n2.fake
-        n1.y = y - 1
-        n2.y = y
+        n1.y = a - 1
+        n2.y = a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
+    local final = timer()
+    return final - start
+end
 
+function PracticalTestArmyMeta(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local data
+    local start = timer()
+
+    for _ = 1, loop do
+        data = unit.Army
+    end
+
+    local final = timer()
+    unit:Destroy()
+    return final - start
+end
+
+function PracticalTestArmyCached(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+
+    unit.Army = unit.Army
+
+    local data
+    local start = timer()
+
+    for _ = 1, loop do
+        data = unit.Army
+    end
+
+    local final = timer()
+    unit:Destroy()
+    return final - start
+end
+
+function PracticalTestWeaponsMeta(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local data
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
+    for _ = 1, loop do
+        data = unit.ForkThread
+    end
+
+    local final = timer()
+    unit:Destroy()
+    return final - start
+end
+
+function PracticalTestWeaponsCached(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+
+    unit.ForkThread = unit.ForkThread
+
+    local data
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
+    for _ = 1, loop do
+        data = unit.ForkThread
+    end
+
+    local final = timer()
+    unit:Destroy()
     return final - start
 end

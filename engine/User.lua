@@ -589,7 +589,7 @@ function GetSystemTimeSeconds()
 end
 
 ---
----@param filename string
+---@param filename FileName
 ---@param border number? defaults to 1
 ---@return number width
 ---@return number height

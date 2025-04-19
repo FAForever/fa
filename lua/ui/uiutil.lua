@@ -630,10 +630,11 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
         if charcode == VK_TAB then
             return true
         end
-        local charLim = self:GetMaxChars()
-        if STR_Utf8Len(self:GetText()) >= charLim then
-            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
-            PlaySound(sound)
+        if STR_Utf8Len(self:GetText()) >= self:GetMaxChars() then
+            PlaySound(Sound {
+                Cue = 'UI_Menu_Error_01',
+                Bank = 'Interface',
+            })
         end
     end
 end
