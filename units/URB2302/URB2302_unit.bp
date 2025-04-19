@@ -60,9 +60,9 @@ UnitBlueprint{
         UniformScale = 0.09,
     },
     Economy = {
-        BuildCostEnergy = 1305000,
-        BuildCostMass = 69600,
-        BuildTime = 105000,
+        BuildCostEnergy = 1313000,
+        BuildCostMass = 70000,
+        BuildTime = 105600,
         RebuildBonusIds = { "urb2302" },
     },
     Footprint = {
@@ -126,7 +126,7 @@ UnitBlueprint{
             CameraShakeMin = 0,
             CameraShakeRadius = 50,
             CollideFriendly = false,
-            Damage = 3700,
+            Damage = 3800,
             DamageFriendly = true,
             DamageRadius = 9,
             DamageType = "Normal",
@@ -164,7 +164,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/77, --10/integer interval in ticks
+            RateOfFire = 10/72, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "EXPERIMENTAL MASSFABRICATION",
