@@ -33,7 +33,7 @@
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
 ---@field UnRanked 'false' | 'true
----@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox'
+---@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
 ---
 ---@field BuildMult AIMultiplierOptionValue
 ---@field CheatMult AIMultiplierOptionValue
@@ -330,6 +330,11 @@ globalOpts = {
                 text = "<LOC lobui_0122>Assassination",
                 help = "<LOC lobui_0123>Game ends when commander is destroyed",
                 key = 'demoralization',
+            },
+            {
+                text = "<LOC lobui_0130>Decapitation",
+                help = "<LOC lobui_0131>Game ends when all commanders for a team are destroyed",
+                key = 'decapitation',
             },
             {
                 text = "<LOC lobui_0124>Supremacy",
