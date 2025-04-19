@@ -670,7 +670,7 @@ EngineerManager = Class(BuilderManager) {
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
-            local dontAssign = not EntityContainsCategory(finishedUnit, categories.ENGINEER - categories.ENGINEERSTATION)
+            local dontAssign = not EntityCategoryContains(finishedUnit, categories.ENGINEER - categories.ENGINEERSTATION)
             self:AddUnit(finishedUnit, dontAssign)
         end
     end,
