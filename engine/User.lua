@@ -1096,10 +1096,10 @@ end
 function SessionResume()
 end
 
---- Sends a message to one, more or all other connected clients. This message is sent separately from the simulation. But it is sent in order.
+--- Sends a message to one, more or all other connected clients. This message is sent separately from the simulation. The message is not recorded in the replay. The message is transmit and received in order.
 ---@overload fun(message: table | number | string)
 ---@param client? number | number[]         # client or clients
----@param message table | number | string   # 
+---@param message table | number | string   # Can not be larger than 1024 bytes
 function SessionSendChatMessage(client, message)
 end
 
