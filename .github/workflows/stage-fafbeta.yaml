@@ -23,7 +23,7 @@ name: Stage changes for FAF Beta Balance
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 20 1 * *"
+    - cron: "0 22 1 * *"
 
 jobs:
   test:
