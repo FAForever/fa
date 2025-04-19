@@ -32,10 +32,12 @@ local CanvasAdapterInstances = TrashBag()
 ---@type table<string, boolean>
 local MutedPeers = {}
 
+---@alias UIInterleavedBrushStrokeSamples number[]
+
 --- Represents a shared brushStroke that is send across the network. The data structure is slightly different to reduce network bandwidth.
 ---@class UISharedBrushStroke
 ---@field PaintingAdapterIdentifier string
----@field Samples UIBrushStrokeSamples
+---@field Samples UIInterleavedBrushStrokeSamples
 ---@field PeerName? string
 ---@field ShareId number
 
@@ -212,27 +214,39 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         end
     end,
 
-    --- Converts a shared brushStroke to something that is easier to draw.
-    ---
-    --- See also `ToSharedPainting` for the publisher side.
+    --- Converts the samples to a format to minimize bandwidth.
     ---@param self UIPaintingCanvasAdapter
-    ---@param sharedBrushStroke UISharedBrushStroke
-    ---@return UIBrushStroke
-    FromSharedPainting = function(self, sharedBrushStroke)
-        local coordinatesX = {}
-        local coordinatesY = {}
-        local coordinatesZ = {}
-        local samplesX = sharedBrushStroke.Samples.CoordinatesX
-        local samplesY = sharedBrushStroke.Samples.CoordinatesY
-        local samplesZ = sharedBrushStroke.Samples.CoordinatesZ
+    ---@param samples UIBrushStrokeSamples
+    ---@return UIInterleavedBrushStrokeSamples
+    ToInterleavedBrushStrokeSamples = function(self, samples)
+        local interleavedCoordinates = {}
+        local coordinatesX = samples.CoordinatesX
+        local coordinatesY = samples.CoordinatesY
+        local coordinatesZ = samples.CoordinatesZ
+        for k = 1, table.getn(samples.CoordinatesX) do
+            local sx = coordinatesX[k]
+            local sy = coordinatesY[k]
+            local sz = coordinatesZ[k]
+            if tonumber(sx) and tonumber(sy) and tonumber(sz) then
+                table.insert(interleavedCoordinates, sx)
+                table.insert(interleavedCoordinates, sy)
+                table.insert(interleavedCoordinates, sz)
+            end
+        end
 
-        -- to prevent bogus input, we only accept the first 100 samples
-        for k = 1, math.min(100, table.getn(samplesX)) do
-            local sx = samplesX[k]
-            local sy = samplesY[k]
-            local sz = samplesZ[k]
+        return interleavedCoordinates
+    end,
 
-            -- only keep the valid samples
+    --- Converts the samples back into a format that is more accessible.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param coordinates UIInterleavedBrushStrokeSamples
+    ---@return UIBrushStrokeSamples
+    FromInterleavedBrushStrokeSamples = function(self, coordinates)
+        local coordinatesX, coordinatesY, coordinatesZ = {}, {}, {}
+        for k = 1, table.getn(coordinates), 3 do
+            local sx = coordinates[k]
+            local sy = coordinates[k + 1]
+            local sz = coordinates[k + 2]
             if tonumber(sx) and tonumber(sy) and tonumber(sz) then
                 table.insert(coordinatesX, sx)
                 table.insert(coordinatesY, sy)
@@ -246,6 +260,18 @@ PaintingCanvasAdapter = Class(DebugComponent) {
             CoordinatesY = coordinatesY,
             CoordinatesZ = coordinatesZ
         }
+
+        return samples
+    end,
+
+    --- Converts a shared brushStroke to something that is easier to draw.
+    ---
+    --- See also `ToSharedPainting` for the publisher side.
+    ---@param self UIPaintingCanvasAdapter
+    ---@param sharedBrushStroke UISharedBrushStroke
+    ---@return UIBrushStroke
+    FromSharedPainting = function(self, sharedBrushStroke)
+        local samples = self:FromInterleavedBrushStrokeSamples(sharedBrushStroke.Samples)
 
         -- color depends on the peer that sent the brushStroke
         local color = DefaultSharedColor
@@ -273,7 +299,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         ---@type UISharedBrushStroke
         local sharedBrushStroke = {
             PaintingAdapterIdentifier = tostring(self),
-            Samples = brushStroke.Samples,
+            Samples = self:ToInterleavedBrushStrokeSamples(brushStroke.Samples),
             ShareId = GetUniquePaintingId(),
         }
 
