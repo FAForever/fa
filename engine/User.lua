@@ -271,9 +271,9 @@ function EntityCategoryFilterOut(category, units)
 end
 
 --- Executes some Lua code in the sim. Requires cheats to be enabled
----@param func function
----@param value any
-function ExecLuaInSim(func, value)
+---@param func string # global sim func
+---@param arg any # arg to the func
+function ExecLuaInSim(func, arg)
 end
 
 --- Requests that the application shut down
@@ -820,7 +820,7 @@ end
 
 ---@param playerId? string  # if not provided, will return whether the local player is an observer
 ---@return boolean
-function IsObserver(playerId)
+function IsObserver()
 end
 
 --- Issue a factory build or upgrade command to your selection

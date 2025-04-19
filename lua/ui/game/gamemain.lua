@@ -256,6 +256,16 @@ function CreateUI(isReplay)
 
     controls.gameParent = UIUtil.CreateScreenGroup(GetFrame(0), "GameMain ScreenGroup")
     gameParent = controls.gameParent
+    if options.gui_draggable_queue ~= 0 then
+        -- Add gameparent handleevent for if the drag ends outside the queue window
+        local oldGameParentHandleEvent = gameParent.HandleEvent
+        gameParent.HandleEvent = function(self, event)
+            if event.Type == 'ButtonRelease' then
+                import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
+            end
+            return oldGameParentHandleEvent(self, event)
+        end
+    end
 
     controlClusterGroup, statusClusterGroup, mapGroup, windowGroup = import("/lua/ui/game/borders.lua").SetupBorderControl(gameParent)
 
