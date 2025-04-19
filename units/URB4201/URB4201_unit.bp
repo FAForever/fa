@@ -126,7 +126,7 @@ UnitBlueprint{
             FiringTolerance = 0.5,
             Label = "Turret01",
             MaxRadius = 31,
-            MaximumBeamLength = 42,
+            MaximumBeamLength = 60,
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
