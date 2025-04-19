@@ -18,12 +18,12 @@ local Group = import("/lua/maui/group.lua").Group
 Checkbox = ClassUI(Group) {
     ---@param self Checkbox
     ---@param parent Control
-    ---@param normalUnchecked Lazy<FileName>
-    ---@param normalChecked Lazy<FileName>
-    ---@param overUnchecked? Lazy<FileName> defaults to `normalUnchecked`
-    ---@param overChecked? Lazy<FileName> defaults to `normalChecked`
-    ---@param disabledUnchecked? Lazy<FileName> defaults to `normalUnchecked`
-    ---@param disabledChecked? Lazy<FileName> defaults to `normalChecked`
+    ---@param normalUnchecked LazyOrValue<FileName>
+    ---@param normalChecked LazyOrValue<FileName>
+    ---@param overUnchecked? LazyOrValue<FileName> defaults to `normalUnchecked`
+    ---@param overChecked? LazyOrValue<FileName> defaults to `normalChecked`
+    ---@param disabledUnchecked? LazyOrValue<FileName> defaults to `normalUnchecked`
+    ---@param disabledChecked? LazyOrValue<FileName> defaults to `normalChecked`
     ---@param label? UnlocalizedString
     ---@param labelRight? boolean if the label on the checkbox is to its right or left
     ---@param labelSize? number defaults to `13`
@@ -80,12 +80,12 @@ Checkbox = ClassUI(Group) {
     end,
 
     ---@param self Checkbox
-    ---@param normalUnchecked Lazy<FileName>
-    ---@param normalChecked Lazy<FileName>
-    ---@param overUnchecked? Lazy<FileName> defaults to `normalUnchecked`
-    ---@param overChecked? Lazy<FileName> defaults to `normalChecked`
-    ---@param disabledUnchecked? Lazy<FileName> defaults to `normalUnchecked`
-    ---@param disabledChecked? Lazy<FileName> defaults to `normalChecked`
+    ---@param normalUnchecked LazyOrValue<FileName>
+    ---@param normalChecked LazyOrValue<FileName>
+    ---@param overUnchecked? LazyOrValue<FileName> defaults to `normalUnchecked`
+    ---@param overChecked? LazyOrValue<FileName> defaults to `normalChecked`
+    ---@param disabledUnchecked? LazyOrValue<FileName> defaults to `normalUnchecked`
+    ---@param disabledChecked? LazyOrValue<FileName> defaults to `normalChecked`
     SetNewTextures = function(self, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked)
         self.checkedStates = {
             up = normalChecked,

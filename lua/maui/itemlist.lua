@@ -22,6 +22,9 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 ---@class ItemList : moho.item_list_methods, Control, InternalObject
 ItemList = ClassUI(moho.item_list_methods, Control) {
 
+    ---@param self ItemList
+    ---@param parent Control
+    ---@param debugname? string
     __init = function(self, parent, debugname)
         InternalCreateItemList(self, parent)
         if debugname then

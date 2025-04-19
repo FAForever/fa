@@ -13,9 +13,14 @@ local ExtendedErrorMessages = false
 local EvalContext = nil
 local WeakKeyMeta = { __mode = 'k' }
 
----@alias Lazy<T> T | LazyVar<T> | fun(): T
+---Repesents callable instance of LazyVar
+---@alias Lazy<T> LazyVar<T> | fun(): T
 
----@class LazyVar<T> : Destroyable, OnDirtyListener, function
+---Repesents Lazy instance of Lazy T or the value itself
+---@alias LazyOrValue<T> Lazy<T> | T
+
+---@class LazyVar<T> : { Set: (fun(self:LazyVar<T>, value:LazyOrValue<T>)), Destroy: fun(self:LazyVar<T>), OnDirty: fun(var:LazyVar<T>), SetValue: fun(self:LazyVar<T>, value:T), SetFunction: fun(self:LazyVar<T>, f: Lazy<T>) }
+---@class LazyVar: Destroyable, OnDirtyListener
 ---@field OnDirty? function
 ---@field [1] any                           # Cached result of what we represent
 ---@field [2] boolean                       # Flag whether the lazy var is busy
@@ -281,7 +286,7 @@ LazyVarMetaTable.__index = LazyVarMetaTable
 
 ---@generic T
 ---@param initial? T defaults to `0`
----@return LazyVar<T>
+---@return Lazy<T>
 function Create(initial)
     local setmetatable = setmetatable
     local WeakKeyMeta = WeakKeyMeta
