@@ -606,6 +606,16 @@ Tooltips = {
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
+    options_painting = {
+        title = "<LOC options_painting_title>Painting",
+        description = "<LOC options_painting_description>When enabled, you can make and receive paintings to or from other players.",
+    },
+
+    options_painting_duration = {
+        title = "<LOC options_painting_duration_title>Duration of paintings",
+        description = "<LOC options_painting_duration_description>The higher the value, the longer it takes for a painting to decay and be removed.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -1073,10 +1083,6 @@ Tooltips = {
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
         description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
-    },
-    options_casting_painting = {
-        title = '<LOC OPTIONS_0307>Painting for Observers',
-        description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
     },
     -- **********************
     -- ** Lobby Strings

@@ -168,7 +168,6 @@ function CreateUI(isReplay)
     -- casting tools
 
     import("/lua/ui/game/casting/mouse.lua")
-    import("/lua/ui/game/casting/painting.lua")
 
     -- overwrite some globals for performance / safety
 
@@ -648,6 +647,14 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     cachedSelection.added = added
     cachedSelection.removed = removed
     ObserveSelection:Set(cachedSelection)
+
+    -- limitation: only enable painting when no unit is selected. This limitation enables us 
+    -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
+    if table.empty(newSelection) then
+        import("/lua/ui/game/painting/PaintingCanvas.lua").LiftInhibitionOfAllPaintings("selection")
+    else
+        import("/lua/ui/game/painting/PaintingCanvas.lua").InhibitAllPaintings("selection")
+    end
 
     if not hotkeyLabelsOnSelectionChanged then
         hotkeyLabelsOnSelectionChanged = import("/lua/keymap/hotkeylabels.lua").onSelectionChanged
