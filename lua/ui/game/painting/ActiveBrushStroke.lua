@@ -33,7 +33,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     ---@param self UIActiveBrushStroke
     ---@param color Color
     __init = function(self, color)
-        BrushStroke.__init(self, { }, color)
+        BrushStroke.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
 
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = { 0, 0, 0 }
@@ -93,6 +93,8 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
             return
         end
 
+        local samples = self.Samples
+
         -- limitation: chat messages have a limited amount of space per
         -- message. It is difficult to overcome this limit.
         --
@@ -102,18 +104,16 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         --
         -- The value is intentionally hard coded!
 
-        local samples = self.Samples
-        if table.getn(samples) > 300 then
+        if table.getn(samples.CoordinatesX) > 100 then
             return
         end
 
         self.LastEdited = GetGameTimeSeconds()
         self.LastSample = coordinates
 
-
-        table.insert(samples, coordinates[1])
-        table.insert(samples, coordinates[2])
-        table.insert(samples, coordinates[3])
+        table.insert(samples.CoordinatesX, coordinates[1])
+        table.insert(samples.CoordinatesY, coordinates[2])
+        table.insert(samples.CoordinatesZ, coordinates[3])
     end,
 
     --#endregion

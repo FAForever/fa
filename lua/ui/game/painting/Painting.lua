@@ -98,7 +98,7 @@ Painting = Class(DebugComponent) {
             for k, v in self.BrushStrokes do
                 SPEW(string.format(
                     " - %d samples (%d bytes)",
-                    table.getn(v.Samples) / 3,
+                    table.getn(v.Samples.CoordinatesX),
                     v:ComputeAllocatedBytes()
                 ))
             end

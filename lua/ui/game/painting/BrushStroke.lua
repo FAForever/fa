@@ -31,8 +31,11 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field [5] number # max y
 ---@field [6] number # max z
 
---- Interleaved coordinates { x0, y0, z0, x1, y1, z1, x2, y2, z2, ... } 
----@alias UIBrushStrokeSamples number[]
+--- A structure of arrays that stores samples.
+---@class UIBrushStrokeSamples
+---@field CoordinatesX number[]
+---@field CoordinatesY number[]
+---@field CoordinatesZ number[]
 
 ---@class UIBrushStrokeDecay
 ---@field Duration number       # in seconds
@@ -78,15 +81,18 @@ BrushStroke = Class(DebugComponent) {
         local position1 = {}
         local position2 = {}
 
-        local coordinates = self.Samples
-        for k = 4, table.getn(coordinates), 3 do
-            position1[1] = coordinates[k - 3]
-            position1[2] = coordinates[k - 2]
-            position1[3] = coordinates[k - 1]
+        local coordinatesX = self.Samples.CoordinatesX
+        local coordinatesY = self.Samples.CoordinatesY
+        local coordinatesZ = self.Samples.CoordinatesZ
 
-            position2[1] = coordinates[k + 0]
-            position2[2] = coordinates[k + 1]
-            position2[3] = coordinates[k + 2]
+        for k = 2, table.getn(coordinatesX) do
+            position1[1] = coordinatesX[k - 1]
+            position1[2] = coordinatesY[k - 1]
+            position1[3] = coordinatesZ[k - 1]
+
+            position2[1] = coordinatesX[k]
+            position2[2] = coordinatesY[k]
+            position2[3] = coordinatesZ[k]
 
             UI_DrawLine(position1, position2, decayedColor, 0)
         end
@@ -164,11 +170,14 @@ BrushStroke = Class(DebugComponent) {
         local maxY = -8192
         local maxZ = -8192
 
-        local coordinates = self.Samples
-        for k = 1, table.getn(coordinates), 3 do
-            local sx = coordinates[k]
-            local sy = coordinates[k + 1]
-            local sz = coordinates[k + 2]
+        local coordinatesX = self.Samples.CoordinatesX
+        local coordinatesY = self.Samples.CoordinatesY
+        local coordinatesZ = self.Samples.CoordinatesZ
+
+        for k = 1, table.getn(coordinatesX) do
+            local sx = coordinatesX[k]
+            local sy = coordinatesY[k]
+            local sz = coordinatesZ[k]
 
             minX = math.min(minX, sx)
             minY = math.min(minY, sy)
@@ -249,15 +258,18 @@ BrushStroke = Class(DebugComponent) {
     DistanceToXYZ = function(self, px, py, pz)
         local distance = 8192
 
-        local coordinates = self.Samples
-        for k = 4, table.getn(coordinates), 3 do
-            local x1 = coordinates[k - 3]
-            local y1 = coordinates[k - 2]
-            local z1 = coordinates[k - 1]
+        local coordinatesX = self.Samples.CoordinatesX
+        local coordinatesY = self.Samples.CoordinatesY
+        local coordinatesZ = self.Samples.CoordinatesZ
 
-            local x2 = coordinates[k + 0]
-            local y2 = coordinates[k + 1]
-            local z2 = coordinates[k + 2]
+        for k = 2, table.getn(coordinatesX) do
+            local x1 = coordinatesX[k - 1]
+            local y1 = coordinatesY[k - 1]
+            local z1 = coordinatesZ[k - 1]
+
+            local x2 = coordinatesX[k]
+            local y2 = coordinatesY[k]
+            local z2 = coordinatesZ[k]
 
             local dx = x2 - x1
             local dy = y2 - y1
@@ -319,9 +331,13 @@ BrushStroke = Class(DebugComponent) {
     ---@param self UIBrushStroke
     Simplify = function(self)
 
-        local coordinates = self.Samples
-        local count = table.getn(coordinates)
-        if count < 3 * 3 then
+        local samples = self.Samples
+        local coordinatesX = samples.CoordinatesX
+        local coordinatesY = samples.CoordinatesY
+        local coordinatesZ = samples.CoordinatesZ
+
+        local count = table.getn(coordinatesX)
+        if count < 3 then
             return
         end
 
@@ -329,22 +345,22 @@ BrushStroke = Class(DebugComponent) {
         local DotThreshold = 0.995
 
         -- Always keep the first sample
-        local newIndex = 4
+        local newIndex = 2
 
-        for i = 4, count - 4, 3 do
+        for i = 2, count - 1 do
             -- use the most recent sample in the new list
-            local x0 = coordinates[newIndex - 3]
-            local y0 = coordinates[newIndex - 2]
-            local z0 = coordinates[newIndex - 1]
+            local x0 = coordinatesX[newIndex - 1]
+            local y0 = coordinatesY[newIndex - 1]
+            local z0 = coordinatesZ[newIndex - 1]
 
             -- use the samples in the old list
-            local x1 = coordinates[i + 0]
-            local y1 = coordinates[i + 1]
-            local z1 = coordinates[i + 2]
+            local x1 = coordinatesX[i]
+            local y1 = coordinatesY[i]
+            local z1 = coordinatesZ[i]
 
-            local x2 = coordinates[i + 3]
-            local y2 = coordinates[i + 4]
-            local z2 = coordinates[i + 5]
+            local x2 = coordinatesX[i + 1]
+            local y2 = coordinatesY[i + 1]
+            local z2 = coordinatesZ[i + 1]
 
             local dx1 = x1 - x0
             local dy1 = y1 - y0
@@ -368,24 +384,28 @@ BrushStroke = Class(DebugComponent) {
             end
 
             if keep then
-                coordinates[newIndex + 0] = x1
-                coordinates[newIndex + 1] = y1
-                coordinates[newIndex + 2] = z1
-                newIndex = newIndex + 3
+                coordinatesX[newIndex] = x1
+                coordinatesY[newIndex] = y1
+                coordinatesZ[newIndex] = z1
+                newIndex = newIndex + 1
             end
         end
 
         -- Always keep the last sample
-        coordinates[newIndex + 0] = coordinates[count - 2]
-        coordinates[newIndex + 1] = coordinates[count - 1]
-        coordinates[newIndex + 2] = coordinates[count - 0]
+        coordinatesX[newIndex] = coordinatesX[count]
+        coordinatesY[newIndex] = coordinatesY[count]
+        coordinatesZ[newIndex] = coordinatesZ[count]
 
         -- remove all other samples
-        for k = newIndex + 4, table.getn(coordinates) do
-            coordinates[k] = nil
+        for k = newIndex + 1, table.getn(coordinatesX) do
+            coordinatesX[k] = nil
+            coordinatesY[k] = nil
+            coordinatesZ[k] = nil
         end
 
-        table.setn(coordinates, newIndex)
+        table.setn(coordinatesX, newIndex)
+        table.setn(coordinatesY, newIndex)
+        table.setn(coordinatesZ, newIndex)
     end,
 
     --#endregion
@@ -397,7 +417,10 @@ BrushStroke = Class(DebugComponent) {
     ---@param self UIBrushStroke
     ---@return number
     ComputeAllocatedBytes = function(self)
-        local allocatedBytesForSamples = debug.allocatedsize(self.Samples)
+        local allocatedBytesForSamples = debug.allocatedsize(self.Samples) +
+            debug.allocatedsize(self.Samples.CoordinatesX) +
+            debug.allocatedsize(self.Samples.CoordinatesY) +
+            debug.allocatedsize(self.Samples.CoordinatesZ)
 
         local allocatedBytesForDecay = 0
         if self.Decay then

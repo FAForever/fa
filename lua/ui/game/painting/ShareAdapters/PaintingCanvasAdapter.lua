@@ -170,7 +170,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param brushStroke UIBrushStroke
     SharePaintingBrushStroke = function(self, brushStroke)
         -- check if we have something to share
-        if table.empty(brushStroke.Samples) then
+        if table.empty(brushStroke.Samples.CoordinatesX) then
             return
         end
 
@@ -219,22 +219,33 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     ---@param sharedBrushStroke UISharedBrushStroke
     ---@return UIBrushStroke
     FromSharedPainting = function(self, sharedBrushStroke)
-        local samples = {}
-        local sharedSamples = sharedBrushStroke.Samples
+        local coordinatesX = {}
+        local coordinatesY = {}
+        local coordinatesZ = {}
+        local samplesX = sharedBrushStroke.Samples.CoordinatesX
+        local samplesY = sharedBrushStroke.Samples.CoordinatesY
+        local samplesZ = sharedBrushStroke.Samples.CoordinatesZ
 
         -- to prevent bogus input, we only accept the first 100 samples
-        for k = 1, math.min(300, table.getn(sharedSamples)), 3 do
-            local sx = sharedSamples[k]
-            local sy = sharedSamples[k + 1]
-            local sz = sharedSamples[k + 2]
+        for k = 1, math.min(100, table.getn(samplesX)) do
+            local sx = samplesX[k]
+            local sy = samplesY[k]
+            local sz = samplesZ[k]
 
             -- only keep the valid samples
             if tonumber(sx) and tonumber(sy) and tonumber(sz) then
-                table.insert(samples, sx)
-                table.insert(samples, sy)
-                table.insert(samples, sz)
+                table.insert(coordinatesX, sx)
+                table.insert(coordinatesY, sy)
+                table.insert(coordinatesZ, sz)
             end
         end
+
+        ---@type UIBrushStrokeSamples
+        local samples = {
+            CoordinatesX = coordinatesX,
+            CoordinatesY = coordinatesY,
+            CoordinatesZ = coordinatesZ
+        }
 
         -- color depends on the peer that sent the brushStroke
         local color = DefaultSharedColor
