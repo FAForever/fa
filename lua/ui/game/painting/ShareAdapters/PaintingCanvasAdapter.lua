@@ -321,7 +321,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- with an army are able to send sim callbacks.
     ---
     --- See also `SubscribeToCallback` for the subscriber side.
-    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param self UIPaintingCanvasAdapter
     ---@param shareablePainting UISharedBrushStroke
     PublishAsCallback = function(self, shareablePainting)
         ---@type UIShareableBrushStrokeCallbackMessage
@@ -366,7 +366,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
     --- Publishes a brushStroke as a chat message. Paintings that are published as a chat message are not stored in the replay. And they're also limited in size.
     ---
     --- See also `SubscribeToChatEvents` for the subscriber side.
-    ---@param self UIPaintingCanvasObserverAdapter
+    ---@param self UIPaintingCanvasAdapter
     ---@param shareablePainting UISharedBrushStroke
     PublishAsChatMessage = function(self, shareablePainting)
 
