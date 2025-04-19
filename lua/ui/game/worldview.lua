@@ -25,13 +25,13 @@ MapControls = {}
 ---@type Group | false
 view = false
 
---- Primary view, and if in split screen this is the left view. The left view is always visible. 
---- 
+--- Primary view, and if in split screen this is the left view. The left view is always visible.
+---
 --- Most features are tightly coupled with the left worldview. This is an implementation detail, usually for performance reasons. One example is the reclaim overlay.
 ---@type WorldView | false
 viewLeft = false
 
---- Secondary view used in split screen. This is the right view. 
+--- Secondary view used in split screen. This is the right view.
 ---@type WorldView | false
 viewRight = false
 
@@ -215,6 +215,14 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         local newWorldCamera = GetCamera('WorldCamera')
         if newWorldCamera then
             newWorldCamera:RestoreSettings(worldCameraSettings)
+        end
+    end
+
+    local enabled = import('/lua/user/prefs.lua').GetFromCurrentProfile('options.tpaint_enabled') == "on"
+    for _, view in { viewLeft, viewRight } do
+        if view then
+            local canvas = import("/lua/ui/game/TacticalPaint/Canvas.lua").AttachCanvasToWorldView(view)
+            canvas:SetHiddenLines(not enabled)
         end
     end
 
