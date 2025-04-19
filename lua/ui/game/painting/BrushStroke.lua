@@ -327,6 +327,38 @@ BrushStroke = Class(DebugComponent) {
     ---------------------------------------------------------------------------
     --#region Simplification
 
+    --- Computes the angle in radians of the bend of a line with two consecutive segments.
+    ---@param self UIBrushStroke
+    ---@param x0 number
+    ---@param y0 number
+    ---@param z0 number
+    ---@param x1 number
+    ---@param y1 number
+    ---@param z1 number
+    ---@param x2 number
+    ---@param y2 number
+    ---@param z2 number
+    ---@return number?
+    CurvatureOfSegments = function(self, x0, y0, z0, x1, y1, z1, x2, y2, z2) 
+        local dx1 = x1 - x0
+        local dy1 = y1 - y0
+        local dz1 = z1 - z0
+
+        local dx2 = x2 - x1
+        local dy2 = y2 - y1
+        local dz2 = z2 - z1
+
+        local len1Sq = dx1 * dx1 + dy1 * dy1 + dz1 * dz1
+        local len2Sq = dx2 * dx2 + dy2 * dy2 + dz2 * dz2
+
+        if len1Sq > 0.0 and len2Sq > 0.0 then
+            local len1Inv = 1.0 / math.sqrt(len1Sq)
+            local len2Inv = 1.0 / math.sqrt(len2Sq)
+            local dot = (dx1 * dx2 + dy1 * dy2 + dz1 * dz2) * len1Inv * len2Inv
+            return dot
+        end
+    end,
+
     --- Simplifies the brush stroke.
     ---@param self UIBrushStroke
     Simplify = function(self)
@@ -362,26 +394,8 @@ BrushStroke = Class(DebugComponent) {
             local y2 = coordinatesY[i + 1]
             local z2 = coordinatesZ[i + 1]
 
-            local dx1 = x1 - x0
-            local dy1 = y1 - y0
-            local dz1 = z1 - z0
-
-            local dx2 = x2 - x1
-            local dy2 = y2 - y1
-            local dz2 = z2 - z1
-
-            local len1Sq = dx1 * dx1 + dy1 * dy1 + dz1 * dz1
-            local len2Sq = dx2 * dx2 + dy2 * dy2 + dz2 * dz2
-
-            local keep = true
-            if len1Sq > 0.0 and len2Sq > 0.0 then
-                local len1Inv = 1.0 / math.sqrt(len1Sq)
-                local len2Inv = 1.0 / math.sqrt(len2Sq)
-                local dot = (dx1 * dx2 + dy1 * dy2 + dz1 * dz2) * len1Inv * len2Inv
-                if dot > DotThreshold then
-                    keep = false
-                end
-            end
+            local dot = self:CurvatureOfSegments(x0, y0, z0, x1, y1, z1, x2, y2, z2)
+            local keep = dot and dot < DotThreshold
 
             if keep then
                 coordinatesX[newIndex] = x1
