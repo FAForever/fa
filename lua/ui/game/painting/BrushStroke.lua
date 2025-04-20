@@ -108,7 +108,7 @@ BrushStroke = Class(DebugComponent) {
             return 0
         end
 
-        return math.clamp((GetGameTimeSeconds() - self.Decay.StartTime) / self.Decay.Duration, 0, 1)
+        return math.clamp((CurrentTime() - self.Decay.StartTime) / self.Decay.Duration, 0, 1)
     end,
 
     --- Computes the alpha value based on the decay progress of the brush stroke. Defaults to a square root curve.
@@ -151,7 +151,7 @@ BrushStroke = Class(DebugComponent) {
 
         self.Decay = {
             Duration = duration,
-            StartTime = GetGameTimeSeconds(),
+            StartTime = CurrentTime(),
             ThreadInstance = self.Trash:Add(ForkThread(self.DecayThread, self, duration))
         }
     end,
