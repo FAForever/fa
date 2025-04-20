@@ -20,66 +20,66 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class UIRenderableSquare : Renderable
----@field Position Vector
----@field Size number
----@field Color Color
----@field Thickness number
+--- The abstract class of a shape that can be rendered to a world view. Do not create an instance of this class, it won't do anything.
+---@class UIShape : Destroyable
 ---@field WorldView WorldView
-UIRenderableSquare = ClassSimple {
+---@field Hidden boolean
+Shape = ClassSimple {
 
-    ---@param self UIRenderableSquare
+    ---@param self UIShape
     ---@param worldview WorldView
-    ---@param ox number     # in world coordinates
-    ---@param oy number     # in world coordinates
-    ---@param oz number     # in world coordinates
-    ---@param size number
-    ---@param color Color
-    ---@param thickness number
-    __init = function(self, worldview, ox, oy, oz, size, color, thickness)
-        self.Position = { ox, oy, oz }
-        self.Size = size
-        self.Color = color
-        self.Thickness = thickness
+    __init = function(self, worldview, id)
         self.WorldView = worldview
+        self.Hidden = false
 
-        worldview:AddShape(self)
+        -- register the shape to the world view to be rendered
+        self.WorldView:AddShape(self, tostring(self))
     end,
 
-    ---@param self UIRenderableSquare
+    ---@param self UIShape
     Destroy = function(self)
-        self:OnDestroy()
+
+        -- remove the shape from the world view, it will no longer be rendered
+        self.WorldView:RemoveShape(tostring(self))
     end,
 
-    ---@param self UIRenderableSquare
-    OnDestroy = function(self)
-        self.WorldView:RemoveShape(self)
+    --- Renders the shape if it is not hidden.
+    ---@param self UIShape
+    ---@param delta number
+    Render = function(self, delta)
+        if self.Hidden then
+            return
+        end
+
+        self:OnRender(delta)
     end,
 
-    ---@param self UIRenderableSquare
+    --- The logic to render the shape.
+    ---@param self UIShape
     ---@param delta number
     OnRender = function(self, delta)
-        UI_DrawRect(self.Position, self.Size, self.Color, self.Thickness)
+        -- to be defined by the subclass
     end,
 
-    --#region Properties
-
-    ---@param self UIRenderableSquare
-    ---@param px number     # in world coordinates
-    ---@param py number     # in world coordinates
-    ---@param pz number     # in world coordinates
-    SetPosition = function(self, px, py, pz)
-        local position = self.Position
-        position[1] = px
-        position[2] = py
-        position[3] = pz
+    --- Hides the shape, it will no longer be rendered until unhidden.
+    ---@param self UICircleShape
+    Hide = function(self)
+        self.Hidden = true
     end,
 
-    ---@param self UIRenderableSquare
-    GetPosition = function(self)
-        return unpack(self.Position)
-    end
+    --- Shows the shape. It will be rendered again.
+    ---@param self UICircleShape
+    Show = function(self)
+        self.Hidden = false
+    end,
 
-    --#endregion
+    ---@param self UICircleShape
+    SetHidden = function(self, hide)
+        self.Hidden = hide
+    end,
 
+    ---@param self UICircleShape
+    IsHidden = function(self)
+        return self.Hidden
+    end,
 }

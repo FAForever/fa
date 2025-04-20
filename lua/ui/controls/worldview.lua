@@ -36,9 +36,6 @@ local KeyCodeShift = 16
 
 local unitsToWeaponsCached = { }
 
----@class Renderable : Destroyable
----@field OnRender fun(self:Renderable, worldView:WorldView)
-
 ---@class WorldViewDecalData
 ---@field texture string
 ---@field scale number
