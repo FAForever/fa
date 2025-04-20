@@ -30,6 +30,8 @@ local DefaultPaintingDuration = 25
 ---@field WorldView WorldView
 Painting = Class(DebugComponent) {
 
+    DefaultPaintingDuration = 25,
+
     ---@param self UIPainting
     __init = function(self)
         self.BrushStrokes = TrashBag()
@@ -55,6 +57,18 @@ Painting = Class(DebugComponent) {
 
     ---------------------------------------------------------------------------
     --#region Utility functions
+
+    --- Returns the decay duration.
+    ---@param self UIPainting
+    ---@return number
+    GetDecayDuration = function(self)
+        local defaultDuration = self.DefaultPaintingDuration
+        if IsObserver() then
+            return GetOptions('painting_duration_observing') or defaultDuration
+        else
+            return GetOptions('painting_duration') or defaultDuration
+        end
+    end,
 
     --- Returns all brush strokes that are within the given radius at the given coordinates.
     ---@param self UIPainting
@@ -89,9 +103,7 @@ Painting = Class(DebugComponent) {
         self.BrushStrokes:Add(brushStroke)
 
         -- feature: brush strokes decay over time
-        brushStroke:StartDecay(
-            tonumber(GetOptions('painting_duration')) or DefaultPaintingDuration
-        )
+        brushStroke:StartDecay(self:GetDecayDuration())
 
         if self.EnabledSpewing then
             SPEW(string.format("Brush strokes:"))

@@ -820,6 +820,19 @@ options = {
                 },
             },
 
+
+            {
+                title = "<LOC options_painting_duration_title>Duration of when observing",
+                key = 'painting_duration_observing',
+                type = 'slider',
+                default = 15,
+                custom = {
+                    min = 10,
+                    max = 40,
+                    inc = 1,
+                },
+            },
+
             {
                 title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
