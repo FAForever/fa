@@ -22,7 +22,7 @@
 
 --- A component to encapsulate the logic used to render shapes in the world.
 ---@class UIRenderShapesComponent
----@field Renderables table<string, Renderable>
+---@field Shapes table<string, Renderable>
 RenderShapesComponent = ClassSimple {
 
     -- Related binary patches that make this possible:
@@ -32,29 +32,32 @@ RenderShapesComponent = ClassSimple {
 
     ---@param self UIRenderShapesComponent | WorldView
     __post_init = function(self)
-        self.Renderables = {}
+        self.Shapes = TrashBag()
     end,
 
-    --- Register a renderable to render each frame
+    --- Adds a shape that we should render to the world view.
+    --- 
+    --- The shape is stored in a weak table. If there's no other active  
+    --- reference to the shape then the garbage collector will clean it up.
     ---@param self UIRenderShapesComponent | WorldView
-    ---@param renderable Renderable
+    ---@param shape Renderable
     ---@param id string
-    RegisterRenderable = function(self, renderable, id)
-        self.Trash:Add(renderable)
-        self.Renderables[id] = renderable
+    AddShape = function(self, shape, id)
+        self.Trash:Add(shape)
+        self.Shapes[id] = shape
 
-        if not table.empty(self.Renderables) then
+        if not table.empty(self.Shapes) then
             self:SetCustomRender(true)
         end
     end,
 
-    --- Unregister a renderable
+    --- Removes a shape. It will no longer be rendered to the world view.
     ---@param self UIRenderShapesComponent | WorldView
     ---@param id string
-    UnregisterRenderable = function(self, id)
-        self.Renderables[id] = nil
+    RemoveShape = function(self, id)
+        self.Shapes[id] = nil
 
-        if table.empty(self.Renderables) then
+        if table.empty(self.Shapes) then
             self:SetCustomRender(false)
         end
     end,
@@ -63,8 +66,8 @@ RenderShapesComponent = ClassSimple {
     ---@param self UIRenderShapesComponent | WorldView
     ---@param delta number
     OnRenderWorld = function (self, delta)
-        for id, renderable in self.Renderables do
-            renderable:OnRender(delta, delta)
+        for id, shape in self.Shapes do
+            shape:OnRender(delta, delta)
         end
     end,
 

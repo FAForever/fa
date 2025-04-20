@@ -43,7 +43,7 @@ UIRenderableSquare = ClassSimple {
         self.Thickness = thickness
         self.WorldView = worldview
 
-        worldview:RegisterRenderable(self)
+        worldview:AddShape(self)
     end,
 
     ---@param self UIRenderableSquare
@@ -53,7 +53,7 @@ UIRenderableSquare = ClassSimple {
 
     ---@param self UIRenderableSquare
     OnDestroy = function(self)
-        self.WorldView:UnregisterRenderable(self)
+        self.WorldView:RemoveShape(self)
     end,
 
     ---@param self UIRenderableSquare

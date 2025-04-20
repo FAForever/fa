@@ -232,7 +232,6 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
----@field Renderables table<string, Renderable>
 WorldView = ClassUI(moho.UIWorldView, Control, RenderShapesComponent) {
 
     PingThreads = {},

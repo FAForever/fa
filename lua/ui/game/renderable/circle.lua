@@ -47,7 +47,7 @@ UIRenderableCircle = ClassSimple {
         self.Color = color
         self.Thickness = thickness
 
-        worldview:RegisterRenderable(self, id)
+        worldview:AddShape(self, id)
     end,
 
     ---@param self UIRenderableCircle
@@ -57,7 +57,7 @@ UIRenderableCircle = ClassSimple {
 
     ---@param self UIRenderableCircle
     OnDestroy = function(self)
-        self.WorldView:UnregisterRenderable(self.Identifier)
+        self.WorldView:RemoveShape(self.Identifier)
     end,
 
     ---@param self UIRenderableCircle
