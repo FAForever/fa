@@ -160,7 +160,10 @@ BrushStroke = Class(DebugComponent) {
     ---@param self UIBrushStroke
     ---@param duration number
     DecayThread = function(self, duration)
-        WaitSeconds(duration)
+        while (not IsDestroyed(self)) and(self:GetDecayProgress() < 1.0) do
+            WaitFrames(10)
+        end
+
         self:Destroy()
     end,
 
@@ -352,7 +355,7 @@ BrushStroke = Class(DebugComponent) {
     ---@param y2 number
     ---@param z2 number
     ---@return number?
-    CurvatureOfSegments = function(self, x0, y0, z0, x1, y1, z1, x2, y2, z2) 
+    CurvatureOfSegments = function(self, x0, y0, z0, x1, y1, z1, x2, y2, z2)
         local dx1 = x1 - x0
         local dy1 = y1 - y0
         local dz1 = z1 - z0
