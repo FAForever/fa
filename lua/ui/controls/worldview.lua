@@ -230,6 +230,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
+---@field PaintingCanvas UIPaintingCanvas
 ---@field Renderables table<string, Renderable>
 WorldView = ClassUI(moho.UIWorldView, Control) {
 
@@ -917,9 +918,18 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
     --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
     ---@param self WorldView
-    ---@param event any
+    ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
+
+        -- pass down the event to the canvas manually. This way we skip the 
+        -- hierarchy of the engine. For more information, see the comment in 
+        -- the function. 
+        if self.PaintingCanvas then
+            self.PaintingCanvas:HandleWorldViewEvent(event)
+        end
+
+
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
             self.CursorOverWorld = true
             if not table.empty(self.Cursor) then
@@ -1030,6 +1040,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param self WorldView
     ---@param pingData table
     DisplayPing = function(self, pingData)
+
+        reprsl(pingData)
+
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
             self:FlashScoreboardIcon(pingData.Owner + 1) -- zero-based to one-based
@@ -1110,6 +1123,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 LayoutHelpers.AtCenterIn(PingGroup.Marker.TeamColor, PingGroup.Marker)
 
                 PingGroup.Marker.HandleEvent = function(marker, event)
+                    LOG("HANDLE EVENT OF MARKER")
                     if event.Type == 'ButtonPress' then
                         if event.Modifiers.Right and event.Modifiers.Ctrl then
                             local data = {Action = 'delete', ID = PingGroup.data.ID, Owner = PingGroup.data.Owner}

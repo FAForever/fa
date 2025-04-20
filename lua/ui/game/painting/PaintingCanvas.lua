@@ -62,8 +62,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.WorldView:RegisterRenderable(self, tostring(self))
 
         self.InhibitionSet = {}
-
-        self:SetNeedsFrameUpdate(true)
     end,
 
     ---@param self UIPaintingCanvas
@@ -74,7 +72,10 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             :ResetWidth()
             :ResetHeight()
             :Over(worldview)
-            :EnableHitTest()
+            :NeedsFrameUpdate(true)
+
+            -- for details about this, see also `HandleWorldViewEvent`
+            :DisableHitTest(true)
             :End()
     end,
 
@@ -133,21 +134,64 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         end
     end,
 
-    --- Responsible for the creation of paintings. The function is called when a event occurs for this control.
+    --- Responsible for the creation of paintings. 
     ---@param self UIPaintingCanvas
     ---@param event KeyEvent
-    ---@return boolean  # if false, engine calls HandleEvent of parent.
-    HandleEvent = function(self, event)
+    HandleWorldViewEvent = function(self, event)
+
+        -- We intentionally do not use the `HandleEvent` callback of the engine 
+        -- here. Instead, we re-use the event of the world view. This is because
+        -- the `HandleEvent` function is hierarchically called, but the world view 
+        -- may have more children than just the canvas. As an example, this could
+        -- bt the hierarchy starting at the a frame:
+        -- 
+        -- Frame        <-- Responsible for selecting units, input for orders, etc.
+        --  |
+        --  +-- WorldView               <-- Responsible for various other things.
+        --      |
+        --      +-- UIPaintingCanvas    <-- Responsible for painting.
+        --      +-- Marker              <-- Responsible for moving, editing or deleting a marker.
+        --      +-- Marker              <-- ^^^
+        --      +-- Marker              <-- ^^^
+        --
+        -- Because the painting canvas covers the world view from top to bottom, the
+        -- painting canvas will ALWAYS be the first to handle all events. Now, we can 
+        -- control what the engine does if we don't want to handle the event by the
+        -- return value of `HandleEvent`:
+        --
+        -- - true: the event is handled, the parent is not called.
+        -- - false: the event is not handled, the parent is called.
+        -- 
+        -- If we return true, the engine will look for other handlers that are not
+        -- part of the painting canvas. If we return false, the engine won't look around
+        -- but instead call the parent. Eventually that parent is the frame which allows
+        -- us to interact with the simulation.
+        --
+        -- Now the difficult part: in order to interact with markers we need to return 
+        -- true. In order to interact with the simulation we need to return false. In an
+        -- ideal world we'd know when we should instead interact with markers. But we
+        -- don't know that here - returning true simply means we won't interact with the
+        -- engine! Therefore we have to return false, and we can not interact with anything
+        -- else that has the world view as its parent.
+        --
+        -- A different solution would be to toy with the depth of the marker and the painting
+        -- canvas so that the marker can technically be handled first. This is possible, but we
+        -- don't know what UI mods do and whether we'd just break them for the same reason 
+        -- described above.
+        --
+        -- Long story short: this canvas should in practice be part of the world view. It
+        -- should not be its own control, perhaps a separate component to keep it more 
+        -- maintainable. To fix this, we simply ignore the hit test of this control for now
+        -- and re-use the hit test with the world view.
+
         -- feature: enable/disable painting as a whole
         if not self:IsEnabledByGameOptions() then
             self:CancelBrush()
-            return false
         end
 
         -- feature: do not interact if this canvas is inhibited
         if self:IsInhibited() then
             self:CancelBrush()
-            return false
         end
 
         -- feature: be able to interact with the canvas
@@ -156,8 +200,6 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
                 self.PaintingBrush = import("/lua/ui/game/painting/PaintingBrush.lua").CreatePaintingBrush(self)
             end
         end
-
-        return false
     end,
 
     --#endregion
