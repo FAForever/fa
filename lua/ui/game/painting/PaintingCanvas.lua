@@ -34,11 +34,8 @@ local SyncIdentifier = "PaintingCanvas.lua"
 
 ---@alias UIPaintingCanvasActiveInteraction 'Create' | 'Delete' | 'Mute'
 
----@class UIPaintingCanvasInput
----@field ActiveInteraction UIPaintingCanvasActiveInteraction
-
 --- Responsible for glueing together the painting, the brush stroke and the painting network adapter.
----@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable
+---@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable, Destroyable
 ---@field Adapter UIPaintingCanvasAdapter
 ---@field Painting UIPainting
 ---@field Trash TrashBag
@@ -80,8 +77,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     end,
 
     ---@param self UIPaintingCanvas
-    Destroy = function(self)
-        Bitmap.Destroy(self)
+    OnDestroy = function(self)
+        Bitmap.OnDestroy(self)
         self.Trash:Destroy()
 
         -- deregister us to render

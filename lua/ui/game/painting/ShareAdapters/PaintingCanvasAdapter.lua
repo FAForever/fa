@@ -66,7 +66,7 @@ end
 ---
 --- Do not create an instance of this class directly. Instead, use
 --- the factory pattern in the file `PaintingCanvasAdapterFactory.lua`.
----@class UIPaintingCanvasAdapter : DebugComponent
+---@class UIPaintingCanvasAdapter : DebugComponent, Destroyable
 ---@field AdapterType UIPaintingCanvasAdapterType
 ---@field PaintingCanvas UIPaintingCanvas
 PaintingCanvasAdapter = Class(DebugComponent) {
@@ -84,6 +84,11 @@ PaintingCanvasAdapter = Class(DebugComponent) {
 
     ---@param self UIPaintingCanvasAdapter
     Destroy = function(self)
+        self:OnDestroy()
+    end,
+
+    ---@param self UIPaintingCanvasAdapter
+    OnDestroy = function(self)
         local identifier = self:GetIdentifier()
         local syncCategory = self.SyncCategory
 

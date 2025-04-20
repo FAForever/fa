@@ -43,7 +43,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 ---@field ThreadInstance thread
 
 --- A brush stroke of a painting.
----@class UIBrushStroke : DebugComponent
+---@class UIBrushStroke : DebugComponent, Destroyable
 ---@field Color Color                           # Color of the brush stroke.
 ---@field Decay? UIBrushStrokeDecay     # Decay of the brush stroke.
 ---@field Samples UIBrushStrokeSamples  # Samples of the brush stroke. All samples are in world coordinates.
@@ -64,6 +64,11 @@ BrushStroke = Class(DebugComponent) {
 
     ---@param self UIBrushStroke
     Destroy = function(self)
+        self:OnDestroy()
+    end,
+
+    ---@param self UIBrushStroke
+    OnDestroy = function(self)
         self.Trash:Destroy()
     end,
 

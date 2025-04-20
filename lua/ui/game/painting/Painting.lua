@@ -25,7 +25,7 @@ local DebugComponent = import("/lua/shared/components/DebugComponent.lua").Debug
 local DefaultPaintingDuration = 25
 
 --- Responsible for providing an interface to interact with a collection of brush strokes.
----@class UIPainting : DebugComponent
+---@class UIPainting : DebugComponent, Destroyable
 ---@field BrushStrokes TrashBag     # All brush strokes, including those shared by peers.
 ---@field WorldView WorldView
 Painting = Class(DebugComponent) {
@@ -39,6 +39,11 @@ Painting = Class(DebugComponent) {
 
     ---@param self UIPainting
     Destroy = function(self)
+        self:OnDestroy()
+    end,
+
+    ---@param self UIPainting
+    OnDestroy = function(self)
         self.BrushStrokes:Destroy()
     end,
 

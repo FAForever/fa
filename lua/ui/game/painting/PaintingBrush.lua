@@ -38,7 +38,6 @@ PaintingBrush = Class(Dragger) {
         DraggerInit(self)
 
         self.PaintingCanvas = canvas
-        self.Trash = TrashBag()
         self.Trash:Add(ForkThread(self.CancelBrushThread, self))
 
         -- initial coordinates
@@ -46,10 +45,9 @@ PaintingBrush = Class(Dragger) {
     end,
 
     ---@param self UIPaintingBrush
-    Destroy = function(self)
-        Dragger.Destroy(self)
+    OnDestroy = function(self)
+        Dragger.OnDestroy(self)
 
-        self.Trash:Destroy()
         self:CancelActiveBrushStroke()
     end,
 
