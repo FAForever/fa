@@ -62,6 +62,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.WorldView:RegisterRenderable(self, tostring(self))
 
         self.InhibitionSet = {}
+
+        self:SetNeedsFrameUpdate(true)
     end,
 
     ---@param self UIPaintingCanvas
@@ -121,10 +123,20 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
     ---------------------------------------------------------------------------
     --#region User interactions with the painting canvas
 
-    --- Responsible for the creation of paintings.
+    ---@param self UIPaintingCanvas
+    OnFrame = function(self)
+        -- feature: inhibit painting when holding shift
+        if IsKeyDown('Shift') then
+            self:AddInhibition('shift')
+        else
+            self:LiftInhibition('shift')
+        end
+    end,
+
+    --- Responsible for the creation of paintings. The function is called when a event occurs for this control.
     ---@param self UIPaintingCanvas
     ---@param event KeyEvent
-    ---@return boolean
+    ---@return boolean  # if false, engine calls HandleEvent of parent.
     HandleEvent = function(self, event)
         -- feature: enable/disable painting as a whole
         if not self:IsEnabledByGameOptions() then
