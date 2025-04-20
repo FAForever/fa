@@ -36,8 +36,8 @@ RenderShapesComponent = ClassSimple {
     end,
 
     --- Adds a shape that we should render to the world view.
-    --- 
-    --- The shape is stored in a weak table. If there's no other active  
+    ---
+    --- The shape is stored in a weak table. If there's no other active
     --- reference to the shape then the garbage collector will clean it up.
     ---@param self UIRenderShapesComponent | WorldView
     ---@param shape Renderable
@@ -62,13 +62,37 @@ RenderShapesComponent = ClassSimple {
         end
     end,
 
-    --- Is called each frame by the engine to render shapes when custom rendering is enabled.
+    --- Is called each frame by the engine to render shapes when custom rendering is enabled. All shapes that fail to render are removed.
     ---@param self UIRenderShapesComponent | WorldView
     ---@param delta number
-    OnRenderWorld = function (self, delta)
+    OnRenderWorld = function(self, delta)
         for id, shape in self.Shapes do
-            shape:OnRender(delta, delta)
+            local success = self:OnRenderShape(shape, delta)
+            if not success then
+                self.Shapes[id] = nil
+            end
         end
+    end,
+
+    --- Is called each frame for each shape to render it. 
+    ---@param self UIRenderShapesComponent | WorldView
+    ---@param shape Renderable
+    ---@param delta number
+    ---@return boolean  # if false then some error happened during rendering. 
+    OnRenderShape = function(self, shape, delta)
+        -- sanity check on the data
+        if not shape or not shape.OnRender then
+            return false
+        end
+
+        -- sanity check on the logic of the function
+        local ok, msg = pcall(shape.OnRender, shape, delta)
+        if not ok then
+            WARN(msg)
+            return false
+        end
+
+        return true
     end,
 
 }
