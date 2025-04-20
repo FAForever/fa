@@ -35,7 +35,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     __init = function(self, color)
         BrushStroke.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
 
-        self.LastEdited = GetGameTimeSeconds()
+        self.LastEdited = CurrentTime()
         self.LastSample = { 0, 0, 0 }
     end,
 
@@ -95,7 +95,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     ---@return boolean
     DebounceSample = function(self, sample)
         -- feature: debounce samples that are in too quick succession
-        local now = GetGameTimeSeconds()
+        local now = CurrentTime()
         if now - self.LastEdited < self.DebounceTimeThreshold then
             return true
         end
@@ -133,7 +133,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
             return
         end
 
-        self.LastEdited = GetGameTimeSeconds()
+        self.LastEdited = CurrentTime()
         self.LastSample = coordinates
 
         table.insert(samples.CoordinatesX, coordinates[1])
