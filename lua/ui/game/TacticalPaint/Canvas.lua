@@ -327,7 +327,7 @@ function AttachCanvasToWorldView(view)
         :ResetWidth()
         :ResetHeight()
         :Over(view)
-        :EnableHitTest()
+        :DisableHitTest()
     view._canvas:SetActive(false)
     view:RegisterRenderable(view._canvas, "TacticalPaint.Canvas")
     return view._canvas
