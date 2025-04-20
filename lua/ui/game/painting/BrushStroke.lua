@@ -76,11 +76,7 @@ BrushStroke = Class(DebugComponent) {
     ---@param self UIBrushStroke
     ---@param delta number
     OnRender = function(self, delta)
-        local decayProgress = 0
-        if self.Decay then
-            decayProgress = math.clamp((GetGameTimeSeconds() - self.Decay.StartTime) / self.Decay.Duration, 0, 1)
-        end
-
+        local decayProgress = self:GetDecayProgress()
         local decayedColor = self:ComputeDecayedColor(self.Color, decayProgress)
 
         local position1 = {}
@@ -101,6 +97,18 @@ BrushStroke = Class(DebugComponent) {
 
             UI_DrawLine(position1, position2, decayedColor, 0)
         end
+    end,
+
+    --- Computes the decay progression of the brush stroke.
+    ---@param self UIBrushStroke
+    ---@return number   # a number between 0 and 1, where 1 means the brush stroke is completely decayed.
+    GetDecayProgress = function(self)
+        local decay = self.Decay
+        if not decay then
+            return 0
+        end
+
+        return math.clamp((GetGameTimeSeconds() - self.Decay.StartTime) / self.Decay.Duration, 0, 1)
     end,
 
     --- Computes the alpha value based on the decay progress of the brush stroke. Defaults to a square root curve.
