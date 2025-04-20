@@ -160,7 +160,7 @@ BrushStroke = Class(DebugComponent) {
     ---@param self UIBrushStroke
     ---@param duration number
     DecayThread = function(self, duration)
-        while (not IsDestroyed(self)) and(self:GetDecayProgress() < 1.0) do
+        while self:GetDecayProgress() < 1.0 do
             WaitFrames(10)
         end
 
