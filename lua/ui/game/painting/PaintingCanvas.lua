@@ -187,11 +187,13 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- feature: enable/disable painting as a whole
         if not self:IsEnabledByGameOptions() then
             self:CancelBrush()
+            return
         end
 
         -- feature: do not interact if this canvas is inhibited
         if self:IsInhibited() then
             self:CancelBrush()
+            return
         end
 
         -- feature: be able to interact with the canvas
