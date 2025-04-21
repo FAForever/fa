@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 local UIUtil = import("/lua/ui/uiutil.lua")
-local Layouter = import("/lua/maui/layouthelpers.lua").Layouter
+local ReusedLayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 
 local Button = import("/lua/maui/button.lua").Button
 local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
@@ -75,7 +75,7 @@ OffScreenIndicator = Class(Button) {
     __post_init = function(self, parent)
 
         -- to be overwritten by subclass
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Fill(parent)
             :End()
     end,
@@ -103,21 +103,21 @@ OffScreenIndicator = Class(Button) {
 
     ---@param self UIOffScreenIndicator
     ---@param worldView WorldView
-    ---@param screenCoordinates Vector2
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
     ---@return UIOffScreenIndicatorDirection    # horizontal axis
     ---@return UIOffScreenIndicatorDirection    # vertical axis
-    GetDirectionToTarget = function(self, worldView, screenCoordinates)
+    GetDirectionToTarget = function(self, worldView, controlSpaceCoordinates)
         local horizontal = "OnScreen"
-        if worldView.Left() + screenCoordinates.x < worldView.Left() then
+        if controlSpaceCoordinates.x < 0 then
             horizontal = "West"
-        elseif screenCoordinates.x > worldView.Right() then
+        elseif controlSpaceCoordinates.x > worldView.Width() then
             horizontal = "East"
         end
 
         local vertical = "OnScreen"
-        if worldView.Top() + screenCoordinates.y < worldView.Top() then
+        if controlSpaceCoordinates.y < 0 then
             vertical = "North"
-        elseif screenCoordinates.y > worldView.Bottom() then
+        elseif controlSpaceCoordinates.y > worldView.Height() then
             vertical = "South"
         end
 
@@ -140,18 +140,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the top of the world view, following the target horizontally.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointNorth = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointNorth = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.North)
 
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Top(self.WorldView.Top)
-            :Left(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
+            :Left(function() return self.WorldView.Left() + controlSpaceCoordinates.x - self.Width() * 0.5 end)
             :ResetBottom()
             :ResetRight()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtHorizontalCenterIn(self)
             :AtTopIn(self, -10)
             :ResetRight()
@@ -161,18 +161,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the bottom of the world view, following the target horizontally.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointSouth = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointSouth = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.South)
 
-        Layouter(self)
-            :Left(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
+        ReusedLayoutFor(self)
+            :Left(function() return self.WorldView.Left() + controlSpaceCoordinates.x - self.Width() / 2 end)
             :Bottom(self.WorldView.Bottom)
             :ResetTop()
             :ResetRight()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtHorizontalCenterIn(self)
             :AtBottomIn(self, -10)
             :ResetTop()
@@ -182,18 +182,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the right of the world view, following the target vertically.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointEast = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointEast = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.East)
 
-        Layouter(self)
-            :Right(self.WorldView.Right)
-            :Top(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
+        ReusedLayoutFor(self)
+            :AnchorToRight(self)
+            :Top(function() return self.WorldView.Top() + controlSpaceCoordinates.y - self.Height() / 2 end)
             :ResetBottom()
             :ResetLeft()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtVerticalCenterIn(self)
             :AtRightIn(self, -10)
             :ResetLeft()
@@ -203,18 +203,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the left of the world view, following the target vertically.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointWest = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointWest = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.West)
 
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Left(self.WorldView.Left)
-            :Top(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
+            :Top(function() return self.WorldView.Top() + controlSpaceCoordinates.y - self.Height() / 2 end)
             :ResetBottom()
             :ResetRight()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, -10)
             :ResetRight()
@@ -224,18 +224,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the top left corner of the world view.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointNorthWest = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointNorthWest = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.NorthWest)
 
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Top(self.WorldView.Top)
             :Left(self.WorldView.Left)
             :ResetBottom()
             :ResetRight()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtTopIn(self, -10)
             :AtLeftIn(self, -10)
             :ResetRight()
@@ -245,18 +245,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the top right corner of the world view.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointNorthEast = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointNorthEast = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.EastNorth)
 
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Top(self.WorldView.Top)
             :Right(self.WorldView.Right)
             :ResetBottom()
             :ResetLeft()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtTopIn(self, -10)
             :AtRightIn(self, -10)
             :ResetLeft()
@@ -266,18 +266,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the bottom left corner of the world view.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointSouthWest = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointSouthWest = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.WestSouth)
 
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Bottom(self.WorldView.Bottom)
             :Left(self.WorldView.Left)
             :ResetTop()
             :ResetRight()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtBottomIn(self, -10)
             :AtLeftIn(self, -10)
             :ResetRight()
@@ -287,18 +287,18 @@ OffScreenIndicator = Class(Button) {
 
     --- Clamps the indicator to the bottom right corner of the world view.
     ---@param self UIOffScreenIndicator
-    ---@param screenCoordinatesOfTarget Vector2
-    PointSouthEast = function(self, screenCoordinatesOfTarget)
+    ---@param controlSpaceCoordinates Vector2   # control space coordinates
+    PointSouthEast = function(self, controlSpaceCoordinates)
         self:UpdateTextures(self.TextureSet.SouthEast)
 
-        Layouter(self)
+        ReusedLayoutFor(self)
             :Bottom(self.WorldView.Bottom)
             :Right(self.WorldView.Right)
             :ResetTop()
             :ResetLeft()
             :End()
 
-        Layouter(self.AnimatedGlow)
+        ReusedLayoutFor(self.AnimatedGlow)
             :AtBottomIn(self, -10)
             :AtRightIn(self, -10)
             :ResetLeft()
@@ -310,29 +310,29 @@ OffScreenIndicator = Class(Button) {
     ---@param self UIOffScreenIndicator
     UpdateDirection = function(self)
         local target = self:GetTarget()
-        local screenCoordinatesOfTarget = self.WorldView:Project(target)
-        local dirHorizontal, dirVertical = self:GetDirectionToTarget(self.WorldView, screenCoordinatesOfTarget)
+        local controlSpaceCoordinates = self.WorldView:Project(target)
+        local dirHorizontal, dirVertical = self:GetDirectionToTarget(self.WorldView, controlSpaceCoordinates)
         if dirHorizontal == 'OnScreen' and dirVertical == 'OnScreen' then
             self:OnPointingOnScreen()
         else
             self:OnPointingOffScreen()
             -- determine what textures to show
             if dirHorizontal == 'OnScreen' and dirVertical == 'North' then
-                self:PointNorth(screenCoordinatesOfTarget)
+                self:PointNorth(controlSpaceCoordinates)
             elseif dirHorizontal == 'OnScreen' and dirVertical == 'South' then
-                self:PointSouth(screenCoordinatesOfTarget)
+                self:PointSouth(controlSpaceCoordinates)
             elseif dirHorizontal == 'West' and dirVertical == 'OnScreen' then
-                self:PointWest(screenCoordinatesOfTarget)
+                self:PointWest(controlSpaceCoordinates)
             elseif dirHorizontal == 'East' and dirVertical == 'OnScreen' then
-                self:PointEast(screenCoordinatesOfTarget)
+                self:PointEast(controlSpaceCoordinates)
             elseif dirHorizontal == 'West' and dirVertical == 'North' then
-                self:PointNorthWest(screenCoordinatesOfTarget)
+                self:PointNorthWest(controlSpaceCoordinates)
             elseif dirHorizontal == 'East' and dirVertical == 'North' then
-                self:PointNorthEast(screenCoordinatesOfTarget)
+                self:PointNorthEast(controlSpaceCoordinates)
             elseif dirHorizontal == 'West' and dirVertical == 'South' then
-                self:PointSouthWest(screenCoordinatesOfTarget)
+                self:PointSouthWest(controlSpaceCoordinates)
             elseif dirHorizontal == 'East' and dirVertical == 'South' then
-                self:PointSouthEast(screenCoordinatesOfTarget)
+                self:PointSouthEast(controlSpaceCoordinates)
             end
         end
     end,
