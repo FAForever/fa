@@ -44,49 +44,7 @@ local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
 ---@field EastNorth UIOffScreenIndicatorTextureStates
 ---@field Glow FileName
 
---- A preset set of textures for UIOffScreenIndicator that match the blue ping.
----@type UIOffScreenIndicatorTextureSet
-local TexturesBlue = {
-    North = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_b_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_b_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_b_down.dds' },
-    NorthWest = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_bl_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_bl_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_bl_down.dds' },
-    West = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_l_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_l_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_l_down.dds' },
-    WestSouth = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_tl_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_tl_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_tl_down.dds' },
-    South = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_t_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_t_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_t_down.dds' },
-    SouthEast = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_tr_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_tr_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_tr_down.dds' },
-    East = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_r_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_r_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_r_down.dds' },
-    EastNorth = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_br_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_br_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_br_down.dds' },
-    Glow = '/textures/ui/common/game/ping_edge/ping_edge_blue_glow.dds'
-}
-
---- A preset set of textures for UIOffScreenIndicator that match the yellow ping.
----@type UIOffScreenIndicatorTextureSet
-local TexturesYellow = {
-    North = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_b_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_b_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_b_down.dds' },
-    NorthWest = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_bl_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_bl_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_bl_down.dds' },
-    West = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_l_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_l_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_l_down.dds' },
-    WestSouth = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_tl_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_tl_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_tl_down.dds' },
-    South = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_t_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_t_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_t_down.dds' },
-    SouthEast = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_tr_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_tr_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_tr_down.dds' },
-    East = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_r_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_r_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_r_down.dds' },
-    EastNorth = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_br_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_br_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_br_down.dds' },
-    Glow = '/textures/ui/common/game/ping_edge/ping_edge_yellow_glow.dds'
-}
-
---- A preset set of textures for UIOffScreenIndicator that match the red ping.
----@type UIOffScreenIndicatorTextureSet
-local TexturesRed = {
-    North = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_b_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_b_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_b_down.dds' },
-    NorthWest = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_bl_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_bl_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_bl_down.dds' },
-    West = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_l_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_l_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_l_down.dds' },
-    WestSouth = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_tl_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_tl_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_tl_down.dds' },
-    South = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_t_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_t_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_t_down.dds' },
-    SouthEast = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_tr_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_tr_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_tr_down.dds' },
-    East = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_r_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_r_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_r_down.dds' },
-    EastNorth = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_br_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_br_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_br_down.dds' },
-    Glow = '/textures/ui/common/game/ping_edge/ping_edge_red_glow.dds'
-}
-
---- A utility class to help you point to events that happen off screen.
+--- A utility class to help you point to events that happen off screen. This is an abstract class, it won't do anything on its own.
 ---@class UIOffScreenIndicator : Button
 ---@field TextureSet UIOffScreenIndicatorTextureSet
 ---@field Target Vector     # in world coordinates
@@ -98,7 +56,7 @@ OffScreenIndicator = Class(Button) {
     ---@param parent Control
     ---@param worldView WorldView
     ---@param textures UIOffScreenIndicatorTextureSet
-    __init = function(self, parent, worldView, textures, target)
+    __init = function(self, parent, worldView, textures)
         Button.__init(
             self, parent,
             UIUtil.UIFile(textures.North.Up),
@@ -109,17 +67,26 @@ OffScreenIndicator = Class(Button) {
 
         self.WorldView = worldView
         self.TextureSet = textures
-        self.Target = target
         self.AnimatedGlow = AnimatedGlow.CreateAnimatedGlow(self, textures.Glow)
     end,
 
     ---@param self UIOffScreenIndicator
     ---@param parent Control
     __post_init = function(self, parent)
+
+        -- to be overwritten by subclass
         Layouter(self)
-            :NeedsFrameUpdate(true)
             :Fill(parent)
             :End()
+    end,
+
+    --- Retrieves the target location of the indicator.
+    ---@param self UIOffScreenIndicator
+    ---@return Vector
+    GetTarget = function(self)
+
+        -- to be overwritten by subclass
+        return { 0, 0, 0 }
     end,
 
     --- Updates the set of textures to use for the button.
@@ -342,7 +309,8 @@ OffScreenIndicator = Class(Button) {
     --- Updates the direction of the off screen indicator. If the target is on screen, the indicator is hidden.
     ---@param self UIOffScreenIndicator
     UpdateDirection = function(self)
-        local screenCoordinatesOfTarget = self.WorldView:Project(self.Target)
+        local target = self:GetTarget()
+        local screenCoordinatesOfTarget = self.WorldView:Project(target)
         local dirHorizontal, dirVertical = self:GetDirectionToTarget(self.WorldView, screenCoordinatesOfTarget)
         if dirHorizontal == 'OnScreen' and dirVertical == 'OnScreen' then
             self:OnPointingOnScreen()
@@ -368,53 +336,4 @@ OffScreenIndicator = Class(Button) {
             end
         end
     end,
-
-    ---@param self UIOffScreenIndicator
-    OnFrame = function(self, delta)
-        self:UpdateDirection()
-    end,
-
-    ---@param self UIOffScreenIndicator
-    OnClick = function(self)
-        local currentCamSettings = GetCamera('WorldCamera'):SaveSettings()
-        currentCamSettings.Focus = self.Target
-        GetCamera(self.WorldView._cameraName):RestoreSettings(currentCamSettings)
-    end,
 }
-
----@param parent Control
----@param worldView WorldView
----@param target Vector # in world coordinates
----@return UIOffScreenIndicator
-CreateYellowOffScreenIndicator = function(parent, worldView, target)
-    local indicator = OffScreenIndicator(parent, worldView, TexturesYellow, target) --[[@as UIOffScreenIndicator]]
-    return indicator
-end
-
----@param parent Control
----@param worldView WorldView
----@param target Vector # in world coordinates
----@return UIOffScreenIndicator
-CreateBlueOffScreenIndicator = function(parent, worldView, target)
-    local indicator = OffScreenIndicator(parent, worldView, TexturesBlue, target) --[[@as UIOffScreenIndicator]]
-    return indicator
-end
-
----@param parent Control
----@param worldView WorldView
----@param target Vector # in world coordinates
----@return UIOffScreenIndicator
-CreateRedOffScreenIndicator = function(parent, worldView, target)
-    local indicator = OffScreenIndicator(parent, worldView, TexturesRed, target) --[[@as UIOffScreenIndicator]]
-    return indicator
-end
-
----@param parent Control
----@param worldView WorldView
----@param textures UIOffScreenIndicatorTextureSet
----@param target Vector # in world coordinates
----@return UIOffScreenIndicator
-CreateOffScreenIndicator = function(parent, worldView, textures, target)
-    local indicator = OffScreenIndicator(parent, worldView, textures, target) --[[@as UIOffScreenIndicator]]
-    return indicator
-end
