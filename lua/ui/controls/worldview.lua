@@ -1263,108 +1263,23 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
+    ---@param self WorldView
+    ---@param parent Control
+    ---@param location Vector   # in world coordinates
+    ---@param color Color
+    ---@param stayOnScreen? boolean
+    ---@return UIOffScreenIndicator
     CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
-        local Arrow = Button(parent, UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_up.dds'),
-                UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_down.dds'),
-                UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_over.dds'),
-                UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_up.dds'))
-        Arrow.State = 'b'
-        LayoutHelpers.AtCenterIn(Arrow, self)
-        Arrow:SetNeedsFrameUpdate(true)
-        Arrow.Depth:Set(parent:GetRootFrame():GetTopmostDepth() + 1)
-        Arrow.Glow = Bitmap(Arrow, UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_glow.dds'))
-        LayoutHelpers.AtCenterIn(Arrow.Glow, Arrow)
-        Arrow.Glow:SetNeedsFrameUpdate(true)
-        Arrow.Glow:SetAlpha(0)
-        Arrow.Glow.time = 0
-        Arrow.Glow:DisableHitTest()
-        Arrow.Glow.OnFrame = function(glow, delta)
-            if delta then
-                glow.time = glow.time + math.pi * 0.05
-                glow:SetAlpha(MATH_Lerp(math.sin(glow.time), -1.0, 1.0, 0.0, 0.5))
-            end
+        local OffScreenIndicator = import("/lua/ui/game/OffScreenIndicator.lua")
+
+        if color == 'blue' then
+            return OffScreenIndicator.CreateYellowOffScreenIndicator(parent, self, location)
+        elseif color == 'red' then
+            return OffScreenIndicator.CreateRedOffScreenIndicator(parent, self, location)
         end
-        Arrow.OnClick = function(arrow, modifiers)
-            local currentCamSettings = GetCamera('WorldCamera'):SaveSettings()
-            currentCamSettings.Focus = location
-            GetCamera(self._cameraName):RestoreSettings(currentCamSettings)
-        end
-        Arrow.OnFrame = function(arrow, deltatime)
-            local coords = self:Project(Vector(location[1], location[2], location[3]))
-            local horzStr = ''
-            local vertStr = ''
-            if self.Left() + coords.x < self.Left() then
-                horzStr = 'l'
-                arrow.Left:Set(self.Left)
-                LayoutHelpers.AtLeftIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetRight(arrow.Glow)
-                LayoutHelpers.ResetRight(arrow)
-            elseif coords.x > self.Right() then
-                horzStr = 'r'
-                arrow.Right:Set(self.Right)
-                LayoutHelpers.AtRightIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetLeft(arrow.Glow)
-                LayoutHelpers.ResetLeft(arrow)
-            else
-                arrow.Left:Set(function() return coords.x - arrow.Width() / 2 end)
-                LayoutHelpers.AtHorizontalCenterIn(arrow.Glow, arrow)
-                LayoutHelpers.ResetRight(arrow.Glow)
-                LayoutHelpers.ResetRight(arrow)
-            end
-            if self.Top() + coords.y > self.Bottom() then
-                vertStr = 't'
-                arrow.Bottom:Set(self.Bottom)
-                LayoutHelpers.AtBottomIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetTop(arrow.Glow)
-                LayoutHelpers.ResetTop(arrow)
-            elseif coords.y < self.Top() then
-                vertStr = 'b'
-                arrow.Top:Set(self.Top)
-                LayoutHelpers.AtTopIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetBottom(arrow.Glow)
-                LayoutHelpers.ResetBottom(arrow)
-            else
-                arrow.Top:Set(function() return coords.y - arrow.Height() / 2 end)
-                LayoutHelpers.AtVerticalCenterIn(arrow.Glow, arrow)
-                LayoutHelpers.ResetBottom(arrow.Glow)
-                LayoutHelpers.ResetBottom(arrow)
-            end
-            if horzStr != '' or vertStr != '' then
-                if arrow:IsHidden() then
-                    arrow:Show()
-                end
-                if arrow.State != vertStr..horzStr then
-                    arrow:SetTexture(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'))
-                    arrow:SetNewTextures(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'),
-                    UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_down.dds'),
-                    UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_over.dds'),
-                    UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'))
-                    arrow.State = vertStr..horzStr
-                end
-                if arrow:IsDisabled() then
-                    arrow:Enable()
-                end
-            else
-                if stayOnScreen then
-                    if arrow.State != 't' then
-                        arrow:SetTexture(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'))
-                        arrow:SetNewTextures(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'),
-                        UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_down.dds'),
-                        UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_over.dds'),
-                        UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'))
-                        arrow.State = 't'
-                    end
-                else
-                    if not arrow:IsHidden() then
-                        arrow:Hide()
-                    end
-                end
-                if not arrow:IsDisabled() then
-                    arrow:Disable()
-                end
-            end
-        end
-        return Arrow
+
+       -- default to yellow
+       return OffScreenIndicator.CreateYellowOffScreenIndicator(parent, self, location)
     end,
 
     Register = function(self, cameraName, disableMarkers, displayName, order)
