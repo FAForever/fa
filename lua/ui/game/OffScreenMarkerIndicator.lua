@@ -106,6 +106,7 @@ OffscreenMarkerIndicator = Class(OffScreenIndicator) {
 
     ---@param self UIOffScreenIndicator
     OnClick = function(self)
+        -- feature: click to navigate to the ping
         local currentCamSettings = GetCamera('WorldCamera'):SaveSettings()
         currentCamSettings.Focus = self:GetTarget()
         GetCamera(self.WorldView._cameraName):RestoreSettings(currentCamSettings)
