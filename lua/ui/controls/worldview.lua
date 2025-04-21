@@ -1273,13 +1273,13 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         local module = import("/lua/ui/game/OffscreenMarkerIndicator.lua")
 
         if color == 'blue' then
-            return module.CreateBlueOffScreenIndicator(parent, self, location)
+            return module.CreateBlueOffScreenMarkerIndicator(parent, self, location)
         elseif color == 'red' then
-            return module.CreateRedOffScreenIndicator(parent, self, location)
+            return module.CreateRedOffScreenMarkerIndicator(parent, self, location)
         end
 
        -- default to yellow
-       return module.CreateYellowOffScreenIndicator(parent, self, location)
+       return module.CreateYellowOffScreenMarkerIndicator(parent, self, location)
     end,
 
     Register = function(self, cameraName, disableMarkers, displayName, order)

@@ -112,29 +112,43 @@ OffscreenMarkerIndicator = Class(OffScreenIndicator) {
     end,
 }
 
+--- Creates an off screen marker for the target position. Uses a texture preset that matches with the yellow ping.
 ---@param parent Control
 ---@param worldView WorldView
 ---@param target Vector # in world coordinates
 ---@return UIOffScreenIndicator
-CreateYellowOffScreenIndicator = function(parent, worldView, target)
+CreateYellowOffScreenMarkerIndicator = function(parent, worldView, target)
     local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesYellow, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
 
+--- Creates an off screen marker for the target position. Uses a texture preset that matches with the blue ping.
 ---@param parent Control
 ---@param worldView WorldView
 ---@param target Vector # in world coordinates
 ---@return UIOffscreenMarkerIndicator
-CreateBlueOffScreenIndicator = function(parent, worldView, target)
+CreateBlueOffScreenMarkerIndicator = function(parent, worldView, target)
     local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesBlue, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
 
+--- Creates an off screen marker for the target position. Uses a texture preset that matches with the red ping.
 ---@param parent Control
 ---@param worldView WorldView
 ---@param target Vector # in world coordinates
 ---@return UIOffscreenMarkerIndicator
-CreateRedOffScreenIndicator = function(parent, worldView, target)
+CreateRedOffScreenMarkerIndicator = function(parent, worldView, target)
+    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesRed, target) --[[@as UIOffscreenMarkerIndicator]]
+    return indicator
+end
+
+--- Creates an off screen marker for the target position.
+---@param parent Control
+---@param worldView WorldView
+---@param textures UIOffScreenIndicatorTextureSet
+---@param target Vector # in world coordinates
+---@return UIOffscreenMarkerIndicator
+CreateOffScreenMarkerIndicator = function(parent, worldView, textures, target)
     local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesRed, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
