@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Layouter = import("/lua/maui/layouthelpers.lua").Layouter
 local UIUtil = import("/lua/ui/uiutil.lua")
 
 local Button = import("/lua/maui/button.lua").Button
@@ -113,7 +113,7 @@ OffScreenIndicator = Class(Button) {
     ---@param self UIOffScreenIndicator
     ---@param parent Control
     __post_init = function(self, parent)
-        LayoutHelpers.LayoutFor(self)
+        Layouter(self)
             :NeedsFrameUpdate(true)
             :Fill(parent)
             :End()
@@ -174,17 +174,19 @@ OffScreenIndicator = Class(Button) {
     PointNorth = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.North)
 
-        -- point at the target vertically
-        self.Left:Set(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
-        LayoutHelpers.AtHorizontalCenterIn(self.AnimatedGlow, self)
-        LayoutHelpers.ResetRight(self.AnimatedGlow)
-        LayoutHelpers.ResetRight(self)
+        Layouter(self)
+            :Top(self.WorldView.Top)
+            :Left(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
+            :ResetBottom()
+            :ResetRight()
+            :End()
 
-        -- position at the top of the screen
-        self.Top:Set(self.WorldView.Top)
-        LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetBottom(self.AnimatedGlow)
-        LayoutHelpers.ResetBottom(self)
+        Layouter(self.AnimatedGlow)
+            :AtHorizontalCenterIn(self)
+            :AtTopIn(self, -10)
+            :ResetRight()
+            :ResetBottom()
+            :End()
     end,
 
     --- Clamps the indicator to the bottom of the world view, following the target horizontally.
@@ -193,17 +195,19 @@ OffScreenIndicator = Class(Button) {
     PointSouth = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.South)
 
-        -- point at the target vertically
-        self.Left:Set(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
-        LayoutHelpers.AtHorizontalCenterIn(self.AnimatedGlow, self)
-        LayoutHelpers.ResetRight(self.AnimatedGlow)
-        LayoutHelpers.ResetRight(self)
+        Layouter(self)
+            :Left(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
+            :Bottom(self.WorldView.Bottom)
+            :ResetTop()
+            :ResetRight()
+            :End()
 
-        -- position at the bottom of the screen
-        self.Bottom:Set(self.WorldView.Bottom)
-        LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetTop(self.AnimatedGlow)
-        LayoutHelpers.ResetTop(self)
+        Layouter(self.AnimatedGlow)
+            :AtHorizontalCenterIn(self)
+            :AtBottomIn(self, -10)
+            :ResetTop()
+            :ResetRight()
+            :End()
     end,
 
     --- Clamps the indicator to the right of the world view, following the target vertically.
@@ -212,17 +216,19 @@ OffScreenIndicator = Class(Button) {
     PointEast = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.East)
 
-        -- position to the right of the screen
-        self.Right:Set(self.WorldView.Right)
-        LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetLeft(self.AnimatedGlow)
-        LayoutHelpers.ResetLeft(self)
+        Layouter(self)
+            :Right(self.WorldView.Right)
+            :Top(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
+            :ResetBottom()
+            :ResetLeft()
+            :End()
 
-        -- point at the target horizontally
-        self.Top:Set(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
-        LayoutHelpers.AtVerticalCenterIn(self.AnimatedGlow, self)
-        LayoutHelpers.ResetBottom(self.AnimatedGlow)
-        LayoutHelpers.ResetBottom(self)
+        Layouter(self.AnimatedGlow)
+            :AtVerticalCenterIn(self)
+            :AtRightIn(self, -10)
+            :ResetLeft()
+            :ResetBottom()
+            :End()
     end,
 
     --- Clamps the indicator to the left of the world view, following the target vertically.
@@ -231,17 +237,19 @@ OffScreenIndicator = Class(Button) {
     PointWest = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.West)
 
-        -- position to the left of the screen
-        self.Left:Set(self.WorldView.Left)
-        LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetRight(self.AnimatedGlow)
-        LayoutHelpers.ResetRight(self)
+        Layouter(self)
+            :Left(self.WorldView.Left)
+            :Top(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
+            :ResetBottom()
+            :ResetRight()
+            :End()
 
-        -- point at the target horizontally
-        self.Top:Set(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
-        LayoutHelpers.AtVerticalCenterIn(self.AnimatedGlow, self)
-        LayoutHelpers.ResetBottom(self.AnimatedGlow)
-        LayoutHelpers.ResetBottom(self)
+        Layouter(self.AnimatedGlow)
+            :AtVerticalCenterIn(self)
+            :AtLeftIn(self, -10)
+            :ResetRight()
+            :ResetBottom()
+            :End()
     end,
 
     --- Clamps the indicator to the top left corner of the world view.
@@ -250,16 +258,19 @@ OffScreenIndicator = Class(Button) {
     PointNorthWest = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.NorthWest)
 
-        -- position to the top left corner
-        self.Top:Set(self.WorldView.Top)
-        LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetBottom(self.AnimatedGlow)
-        LayoutHelpers.ResetBottom(self)
+        Layouter(self)
+            :Top(self.WorldView.Top)
+            :Left(self.WorldView.Left)
+            :ResetBottom()
+            :ResetRight()
+            :End()
 
-        self.Left:Set(self.WorldView.Left)
-        LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetRight(self.AnimatedGlow)
-        LayoutHelpers.ResetRight(self)
+        Layouter(self.AnimatedGlow)
+            :AtTopIn(self, -10)
+            :AtLeftIn(self, -10)
+            :ResetRight()
+            :ResetBottom()
+            :End()
     end,
 
     --- Clamps the indicator to the top right corner of the world view.
@@ -268,16 +279,19 @@ OffScreenIndicator = Class(Button) {
     PointNorthEast = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.EastNorth)
 
-        -- position to the top right corner
-        self.Top:Set(self.WorldView.Top)
-        LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetBottom(self.AnimatedGlow)
-        LayoutHelpers.ResetBottom(self)
+        Layouter(self)
+            :Top(self.WorldView.Top)
+            :Right(self.WorldView.Right)
+            :ResetBottom()
+            :ResetLeft()
+            :End()
 
-        self.Right:Set(self.WorldView.Right)
-        LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetLeft(self.AnimatedGlow)
-        LayoutHelpers.ResetLeft(self)
+        Layouter(self.AnimatedGlow)
+            :AtTopIn(self, -10)
+            :AtRightIn(self, -10)
+            :ResetLeft()
+            :ResetBottom()
+            :End()
     end,
 
     --- Clamps the indicator to the bottom left corner of the world view.
@@ -286,16 +300,19 @@ OffScreenIndicator = Class(Button) {
     PointSouthWest = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.WestSouth)
 
-        -- position to the bottom left corner
-        self.Bottom:Set(self.WorldView.Bottom)
-        LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetTop(self.AnimatedGlow)
-        LayoutHelpers.ResetTop(self)
+        Layouter(self)
+            :Bottom(self.WorldView.Bottom)
+            :Left(self.WorldView.Left)
+            :ResetTop()
+            :ResetRight()
+            :End()
 
-        self.Left:Set(self.WorldView.Left)
-        LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetRight(self.AnimatedGlow)
-        LayoutHelpers.ResetRight(self)
+        Layouter(self.AnimatedGlow)
+            :AtBottomIn(self, -10)
+            :AtLeftIn(self, -10)
+            :ResetRight()
+            :ResetTop()
+            :End()
     end,
 
     --- Clamps the indicator to the bottom right corner of the world view.
@@ -304,19 +321,22 @@ OffScreenIndicator = Class(Button) {
     PointSouthEast = function(self, screenCoordinatesOfTarget)
         self:UpdateTextures(self.TextureSet.SouthEast)
 
-        -- position to the bottom right corner
-        self.Bottom:Set(self.WorldView.Bottom)
-        LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetTop(self.AnimatedGlow)
-        LayoutHelpers.ResetTop(self)
+        Layouter(self)
+            :Bottom(self.WorldView.Bottom)
+            :Right(self.WorldView.Right)
+            :ResetTop()
+            :ResetLeft()
+            :End()
 
-        self.Right:Set(self.WorldView.Right)
-        LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
-        LayoutHelpers.ResetLeft(self.AnimatedGlow)
-        LayoutHelpers.ResetLeft(self)
+        Layouter(self.AnimatedGlow)
+            :AtBottomIn(self, -10)
+            :AtRightIn(self, -10)
+            :ResetLeft()
+            :ResetTop()
+            :End()
     end,
 
-    --- Updates the direction of the off screen indicator. If the target is on screen, the indicator is hidden. 
+    --- Updates the direction of the off screen indicator. If the target is on screen, the indicator is hidden.
     ---@param self UIOffScreenIndicator
     UpdateDirection = function(self)
         local screenCoordinatesOfTarget = self.WorldView:Project(self.Target)
