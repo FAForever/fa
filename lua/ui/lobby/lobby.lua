@@ -60,7 +60,7 @@ local groupDevColors = {
 }
 local roleNames = {
     ["Mod"] = "Moderator",
-    ["bal"] = "Balance Team",
+    ["bal"] = "BalanceTeam",
     ["admin"] = "Administrator",
     ["yt"] = "YouTube",
 }
@@ -7753,10 +7753,36 @@ function InitHostUtils()
         end,
 
         KickObservers = function(reason)
-            for k,observer in gameInfo.Observers:pairs() do
-                lobbyComm:EjectPeer(observer.OwnerID, reason or "KickedByHost")
-            end
-            gameInfo.Observers = WatchedValueArray(LobbyComm.maxPlayerSlots)
+    if not lobbyComm:IsHost() then
+        LOG("KickObservers: Not host, exiting.")
+        return
+    end
+
+    local localID = lobbyComm:GetLocalPlayerID()
+    local newObservers = WatchedValueArray(LobbyComm.maxPlayerSlots)
+
+    LOG("KickObservers: Starting observer kick process.")
+
+    for k, observer in gameInfo.Observers:pairs() do
+        LOG("KickObservers: Checking observer with OwnerID = " .. tostring(observer.OwnerID))
+
+        if observer.OwnerID == localID then
+            LOG("KickObservers: Found self (host), preserving in observer list.")
+            newObservers[k] = observer
+        else
+            LOG("KickObservers: Kicking observer with OwnerID = " .. tostring(observer.OwnerID))
+            lobbyComm:EjectPeer(observer.OwnerID, reason or "KickedByHost")
         end
+    end
+
+    gameInfo.Observers = newObservers
+    LOG("KickObservers: Observer list updated.")
+    LOG("KickObservers: Final observer list:")
+    for _, obs in newObservers:pairs() do
+        LOG(" - Observer ID: " .. tostring(obs.OwnerID))
+    end
+
+    refreshObserverList()
+end
     }
 end
