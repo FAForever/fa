@@ -168,6 +168,7 @@ OffScreenIndicator = Class(Button) {
         self:Enable()
     end,
 
+    --- Clamps the indicator to the top of the world view, following the target horizontally.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointNorth = function(self, screenCoordinatesOfTarget)
@@ -186,6 +187,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetBottom(self)
     end,
 
+    --- Clamps the indicator to the bottom of the world view, following the target horizontally.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointSouth = function(self, screenCoordinatesOfTarget)
@@ -204,6 +206,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetTop(self)
     end,
 
+    --- Clamps the indicator to the right of the world view, following the target vertically.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointEast = function(self, screenCoordinatesOfTarget)
@@ -222,6 +225,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetBottom(self)
     end,
 
+    --- Clamps the indicator to the left of the world view, following the target vertically.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointWest = function(self, screenCoordinatesOfTarget)
@@ -240,6 +244,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetBottom(self)
     end,
 
+    --- Clamps the indicator to the top left corner of the world view.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointNorthWest = function(self, screenCoordinatesOfTarget)
@@ -257,6 +262,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetRight(self)
     end,
 
+    --- Clamps the indicator to the top right corner of the world view.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointNorthEast = function(self, screenCoordinatesOfTarget)
@@ -274,6 +280,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetLeft(self)
     end,
 
+    --- Clamps the indicator to the bottom left corner of the world view.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointSouthWest = function(self, screenCoordinatesOfTarget)
@@ -291,6 +298,7 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetRight(self)
     end,
 
+    --- Clamps the indicator to the bottom right corner of the world view.
     ---@param self UIOffScreenIndicator
     ---@param screenCoordinatesOfTarget Vector2
     PointSouthEast = function(self, screenCoordinatesOfTarget)
@@ -308,8 +316,9 @@ OffScreenIndicator = Class(Button) {
         LayoutHelpers.ResetLeft(self)
     end,
 
+    --- Updates the direction of the off screen indicator. If the target is on screen, the indicator is hidden. 
     ---@param self UIOffScreenIndicator
-    OnFrame = function(self, delta)
+    UpdateDirection = function(self)
         local screenCoordinatesOfTarget = self.WorldView:Project(self.Target)
         local dirHorizontal, dirVertical = self:GetDirectionToTarget(self.WorldView, screenCoordinatesOfTarget)
         if dirHorizontal == 'OnScreen' and dirVertical == 'OnScreen' then
@@ -335,6 +344,11 @@ OffScreenIndicator = Class(Button) {
                 self:PointSouthEast(screenCoordinatesOfTarget)
             end
         end
+    end,
+
+    ---@param self UIOffScreenIndicator
+    OnFrame = function(self, delta)
+        self:UpdateDirection()
     end,
 
     ---@param self UIOffScreenIndicator
