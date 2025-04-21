@@ -1270,7 +1270,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param stayOnScreen? boolean
     ---@return UIOffScreenIndicator
     CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
-        local module = import("/lua/ui/game/OffScreenIndicatorForMarkers.lua")
+        local module = import("/lua/ui/game/OffscreenMarkerIndicator.lua")
 
         if color == 'blue' then
             return module.CreateYellowOffScreenIndicator(parent, self, location)

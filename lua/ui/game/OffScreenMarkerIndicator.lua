@@ -67,9 +67,9 @@ local TexturesRed = {
 }
 
 --- An off screen indicator for markers to help users be aware of them.
----@class UIOffScreenIndicatorForMarkers : UIOffScreenIndicator
+---@class UIOffscreenMarkerIndicator : UIOffScreenIndicator
 ---@field Target Vector     # in world coordinates
-OffScreenIndicatorForMarkers = Class(OffScreenIndicator) {
+OffscreenMarkerIndicator = Class(OffScreenIndicator) {
 
     ---@param self UIOffScreenIndicator
     ---@param parent Control
@@ -93,7 +93,7 @@ OffScreenIndicatorForMarkers = Class(OffScreenIndicator) {
     end,
 
     --- Returns the world position of the marker.
-    ---@param self UIOffScreenIndicatorForMarkers
+    ---@param self UIOffscreenMarkerIndicator
     ---@return Vector
     GetTarget = function(self)
         return self.Target
@@ -117,24 +117,24 @@ OffScreenIndicatorForMarkers = Class(OffScreenIndicator) {
 ---@param target Vector # in world coordinates
 ---@return UIOffScreenIndicator
 CreateYellowOffScreenIndicator = function(parent, worldView, target)
-    local indicator = OffScreenIndicatorForMarkers(parent, worldView, TexturesYellow, target) --[[@as UIOffScreenIndicatorForMarkers]]
+    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesYellow, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
 
 ---@param parent Control
 ---@param worldView WorldView
 ---@param target Vector # in world coordinates
----@return UIOffScreenIndicatorForMarkers
+---@return UIOffscreenMarkerIndicator
 CreateBlueOffScreenIndicator = function(parent, worldView, target)
-    local indicator = OffScreenIndicatorForMarkers(parent, worldView, TexturesBlue, target) --[[@as UIOffScreenIndicatorForMarkers]]
+    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesBlue, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
 
 ---@param parent Control
 ---@param worldView WorldView
 ---@param target Vector # in world coordinates
----@return UIOffScreenIndicatorForMarkers
+---@return UIOffscreenMarkerIndicator
 CreateRedOffScreenIndicator = function(parent, worldView, target)
-    local indicator = OffScreenIndicatorForMarkers(parent, worldView, TexturesRed, target) --[[@as UIOffScreenIndicatorForMarkers]]
+    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesRed, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
