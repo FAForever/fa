@@ -23,10 +23,9 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
+--- A small utility class that will 'animate' a bitmap by pulsing it on and off by manipulating its alpha channel.
 ---@class UIAnimatedGlow : Bitmap
 AnimatedGlow = Class(Bitmap) {
-
-    DebugName = "AnimatedGlow",
 
     ---@param self UIAnimatedGlow
     ---@param parent Control
@@ -39,6 +38,7 @@ AnimatedGlow = Class(Bitmap) {
             :End()
     end,
 
+    --- An 'animation' that will pulse over the current time to influence the opacity of the texture.
     ---@param self UIAnimatedGlow
     ---@param delta number
     OnFrame = function(self, delta)
