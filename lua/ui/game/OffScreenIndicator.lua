@@ -26,6 +26,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local Button = import("/lua/maui/button.lua").Button
 local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
 
+---@alias UIOffScreenIndicatorDirection 'OnScreen' | 'North' | 'West' | 'East' | 'South'
+
 ---@class UIOffScreenIndicatorTextureStates
 ---@field Up FileName
 ---@field Over FileName
@@ -117,6 +119,7 @@ OffScreenIndicator = Class(Button) {
             :End()
     end,
 
+    --- Updates the set of textures to use for the button.
     ---@param self UIOffScreenIndicator
     ---@param textureStates UIOffScreenIndicatorTextureStates
     UpdateTextures = function(self, textureStates)
@@ -129,81 +132,207 @@ OffScreenIndicator = Class(Button) {
     end,
 
     ---@param self UIOffScreenIndicator
-    OnFrame = function(self, delta)
-        local worldView = self.WorldView
-        local coords = worldView:Project(self.Target)
-
-        -- figure out horizontal positioning
-        local horizontal = "None"
-        if worldView.Left() + coords.x < worldView.Left() then
+    ---@param worldView WorldView
+    ---@param screenCoordinates Vector2
+    ---@return UIOffScreenIndicatorDirection    # horizontal axis
+    ---@return UIOffScreenIndicatorDirection    # vertical axis
+    GetDirectionToTarget = function(self, worldView, screenCoordinates)
+        local horizontal = "OnScreen"
+        if worldView.Left() + screenCoordinates.x < worldView.Left() then
             horizontal = "West"
-            self.Left:Set(worldView.Left)
-            LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
-            LayoutHelpers.ResetRight(self.AnimatedGlow)
-            LayoutHelpers.ResetRight(self)
-        elseif coords.x > worldView.Right() then
+        elseif screenCoordinates.x > worldView.Right() then
             horizontal = "East"
-            self.Right:Set(worldView.Right)
-            LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
-            LayoutHelpers.ResetLeft(self.AnimatedGlow)
-            LayoutHelpers.ResetLeft(self)
-        else
-            horizontal = "None"
-            self.Left:Set(function() return coords.x - self.Width() / 2 end)
-            LayoutHelpers.AtHorizontalCenterIn(self.AnimatedGlow, self)
-            LayoutHelpers.ResetRight(self.AnimatedGlow)
-            LayoutHelpers.ResetRight(self)
         end
 
-        -- figure out vertical positioning
-        local vertical = 'None'
-        if worldView.Top() + coords.y > worldView.Bottom() then
-            vertical = 'South'
-            self.Bottom:Set(worldView.Bottom)
-            LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
-            LayoutHelpers.ResetTop(self.AnimatedGlow)
-            LayoutHelpers.ResetTop(self)
-        elseif coords.y < worldView.Top() then
-            vertical = 'North'
-            self.Top:Set(worldView.Top)
-            LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
-            LayoutHelpers.ResetBottom(self.AnimatedGlow)
-            LayoutHelpers.ResetBottom(self)
-        else
-            vertical = 'None'
-            self.Top:Set(function() return coords.y - self.Height() / 2 end)
-            LayoutHelpers.AtVerticalCenterIn(self.AnimatedGlow, self)
-            LayoutHelpers.ResetBottom(self.AnimatedGlow)
-            LayoutHelpers.ResetBottom(self)
+        local vertical = "OnScreen"
+        if worldView.Top() + screenCoordinates.y < worldView.Top() then
+            vertical = "North"
+        elseif screenCoordinates.y > worldView.Bottom() then
+            vertical = "South"
         end
 
-        if horizontal == 'None' and vertical == 'None' then
-            -- on screen, hide it
-            self:Hide()
-            self:Disable()
+        return horizontal, vertical
+    end,
 
+    ---@param self UIOffScreenIndicator
+    OnPointingOnScreen = function(self)
+        -- on screen, hide it
+        self:Hide()
+        self:Disable()
+    end,
+
+    ---@param self UIOffScreenIndicator
+    OnPointingOffScreen = function(self)
+        -- off screen, show it
+        self:Show()
+        self:Enable()
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointNorth = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.North)
+
+        -- point at the target vertically
+        self.Left:Set(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
+        LayoutHelpers.AtHorizontalCenterIn(self.AnimatedGlow, self)
+        LayoutHelpers.ResetRight(self.AnimatedGlow)
+        LayoutHelpers.ResetRight(self)
+
+        -- position at the top of the screen
+        self.Top:Set(self.WorldView.Top)
+        LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetBottom(self.AnimatedGlow)
+        LayoutHelpers.ResetBottom(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointSouth = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.South)
+
+        -- point at the target vertically
+        self.Left:Set(function() return screenCoordinatesOfTarget.x - self.Width() / 2 end)
+        LayoutHelpers.AtHorizontalCenterIn(self.AnimatedGlow, self)
+        LayoutHelpers.ResetRight(self.AnimatedGlow)
+        LayoutHelpers.ResetRight(self)
+
+        -- position at the bottom of the screen
+        self.Bottom:Set(self.WorldView.Bottom)
+        LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetTop(self.AnimatedGlow)
+        LayoutHelpers.ResetTop(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointEast = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.East)
+
+        -- position to the right of the screen
+        self.Right:Set(self.WorldView.Right)
+        LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetLeft(self.AnimatedGlow)
+        LayoutHelpers.ResetLeft(self)
+
+        -- point at the target horizontally
+        self.Top:Set(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
+        LayoutHelpers.AtVerticalCenterIn(self.AnimatedGlow, self)
+        LayoutHelpers.ResetBottom(self.AnimatedGlow)
+        LayoutHelpers.ResetBottom(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointWest = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.West)
+
+        -- position to the left of the screen
+        self.Left:Set(self.WorldView.Left)
+        LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetRight(self.AnimatedGlow)
+        LayoutHelpers.ResetRight(self)
+
+        -- point at the target horizontally
+        self.Top:Set(function() return screenCoordinatesOfTarget.y - self.Height() / 2 end)
+        LayoutHelpers.AtVerticalCenterIn(self.AnimatedGlow, self)
+        LayoutHelpers.ResetBottom(self.AnimatedGlow)
+        LayoutHelpers.ResetBottom(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointNorthWest = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.NorthWest)
+
+        -- position to the top left corner
+        self.Top:Set(self.WorldView.Top)
+        LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetBottom(self.AnimatedGlow)
+        LayoutHelpers.ResetBottom(self)
+
+        self.Left:Set(self.WorldView.Left)
+        LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetRight(self.AnimatedGlow)
+        LayoutHelpers.ResetRight(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointNorthEast = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.EastNorth)
+
+        -- position to the top right corner
+        self.Top:Set(self.WorldView.Top)
+        LayoutHelpers.AtTopIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetBottom(self.AnimatedGlow)
+        LayoutHelpers.ResetBottom(self)
+
+        self.Right:Set(self.WorldView.Right)
+        LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetLeft(self.AnimatedGlow)
+        LayoutHelpers.ResetLeft(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointSouthWest = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.WestSouth)
+
+        -- position to the bottom left corner
+        self.Bottom:Set(self.WorldView.Bottom)
+        LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetTop(self.AnimatedGlow)
+        LayoutHelpers.ResetTop(self)
+
+        self.Left:Set(self.WorldView.Left)
+        LayoutHelpers.AtLeftIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetRight(self.AnimatedGlow)
+        LayoutHelpers.ResetRight(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    ---@param screenCoordinatesOfTarget Vector2
+    PointSouthEast = function(self, screenCoordinatesOfTarget)
+        self:UpdateTextures(self.TextureSet.SouthEast)
+
+        -- position to the bottom right corner
+        self.Bottom:Set(self.WorldView.Bottom)
+        LayoutHelpers.AtBottomIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetTop(self.AnimatedGlow)
+        LayoutHelpers.ResetTop(self)
+
+        self.Right:Set(self.WorldView.Right)
+        LayoutHelpers.AtRightIn(self.AnimatedGlow, self, -10)
+        LayoutHelpers.ResetLeft(self.AnimatedGlow)
+        LayoutHelpers.ResetLeft(self)
+    end,
+
+    ---@param self UIOffScreenIndicator
+    OnFrame = function(self, delta)
+        local screenCoordinatesOfTarget = self.WorldView:Project(self.Target)
+        local dirHorizontal, dirVertical = self:GetDirectionToTarget(self.WorldView, screenCoordinatesOfTarget)
+        if dirHorizontal == 'OnScreen' and dirVertical == 'OnScreen' then
+            self:OnPointingOnScreen()
         else
-            -- off screen, show it
-            self:Show()
-            self:Enable()
-
+            self:OnPointingOffScreen()
             -- determine what textures to show
-            if horizontal == 'None' and vertical == 'North' then
-                self:UpdateTextures(self.TextureSet.North)
-            elseif horizontal == 'None' and vertical == 'South' then
-                self:UpdateTextures(self.TextureSet.South)
-            elseif horizontal == 'West' and vertical == 'None' then
-                self:UpdateTextures(self.TextureSet.West)
-            elseif horizontal == 'East' and vertical == 'None' then
-                self:UpdateTextures(self.TextureSet.East)
-            elseif horizontal == 'West' and vertical == 'North' then
-                self:UpdateTextures(self.TextureSet.NorthWest)
-            elseif horizontal == 'East' and vertical == 'North' then
-                self:UpdateTextures(self.TextureSet.EastNorth)
-            elseif horizontal == 'West' and vertical == 'South' then
-                self:UpdateTextures(self.TextureSet.WestSouth)
-            elseif horizontal == 'East' and vertical == 'South' then
-                self:UpdateTextures(self.TextureSet.SouthEast)
+            if dirHorizontal == 'OnScreen' and dirVertical == 'North' then
+                self:PointNorth(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'OnScreen' and dirVertical == 'South' then
+                self:PointSouth(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'West' and dirVertical == 'OnScreen' then
+                self:PointWest(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'East' and dirVertical == 'OnScreen' then
+                self:PointEast(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'West' and dirVertical == 'North' then
+                self:PointNorthWest(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'East' and dirVertical == 'North' then
+                self:PointNorthEast(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'West' and dirVertical == 'South' then
+                self:PointSouthWest(screenCoordinatesOfTarget)
+            elseif dirHorizontal == 'East' and dirVertical == 'South' then
+                self:PointSouthEast(screenCoordinatesOfTarget)
             end
         end
     end,
