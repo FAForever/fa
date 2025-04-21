@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** Copyright (c) 2025  Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Layouter = import("/lua/maui/layouthelpers.lua").Layouter
 local UIUtil = import("/lua/ui/uiutil.lua")
+local Layouter = import("/lua/maui/layouthelpers.lua").Layouter
 
 local Button = import("/lua/maui/button.lua").Button
 local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
@@ -44,6 +44,7 @@ local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
 ---@field EastNorth UIOffScreenIndicatorTextureStates
 ---@field Glow FileName
 
+--- A preset set of textures for UIOffScreenIndicator that match the blue ping.
 ---@type UIOffScreenIndicatorTextureSet
 local TexturesBlue = {
     North = { Up = '/textures/ui/common/game/ping_edge/ping_edge_blue_b_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_blue_b_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_blue_b_down.dds' },
@@ -57,6 +58,7 @@ local TexturesBlue = {
     Glow = '/textures/ui/common/game/ping_edge/ping_edge_blue_glow.dds'
 }
 
+--- A preset set of textures for UIOffScreenIndicator that match the yellow ping.
 ---@type UIOffScreenIndicatorTextureSet
 local TexturesYellow = {
     North = { Up = '/textures/ui/common/game/ping_edge/ping_edge_yellow_b_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_yellow_b_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_yellow_b_down.dds' },
@@ -70,6 +72,7 @@ local TexturesYellow = {
     Glow = '/textures/ui/common/game/ping_edge/ping_edge_yellow_glow.dds'
 }
 
+--- A preset set of textures for UIOffScreenIndicator that match the red ping.
 ---@type UIOffScreenIndicatorTextureSet
 local TexturesRed = {
     North = { Up = '/textures/ui/common/game/ping_edge/ping_edge_red_b_up.dds', Over = '/textures/ui/common/game/ping_edge/ping_edge_red_b_over.dds', Down = '/textures/ui/common/game/ping_edge/ping_edge_red_b_down.dds' },
