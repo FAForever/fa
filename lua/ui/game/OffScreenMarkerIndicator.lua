@@ -66,6 +66,13 @@ local TexturesRed = {
     Glow = '/textures/ui/common/game/ping_edge/ping_edge_red_glow.dds'
 }
 
+--- All available texture presets. To register a new preset you can add an entry to this table.
+local TexturePresets = {
+    Blue = TexturesBlue,
+    Red = TexturesRed,
+    Yellow = TexturesYellow
+}
+
 --- An off screen indicator for markers to help users be aware of them.
 ---@class UIOffscreenMarkerIndicator : UIOffScreenIndicator
 ---@field Target Vector     # in world coordinates
@@ -113,33 +120,20 @@ OffscreenMarkerIndicator = Class(OffScreenIndicator) {
     end,
 }
 
---- Creates an off screen marker for the target position. Uses a texture preset that matches with the yellow ping.
+--- Creates an off screen marker for the target position. Textures originate from a preset.
 ---@param parent Control
 ---@param worldView WorldView
----@param target Vector # in world coordinates
----@return UIOffScreenIndicator
-CreateYellowOffScreenMarkerIndicator = function(parent, worldView, target)
-    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesYellow, target) --[[@as UIOffscreenMarkerIndicator]]
-    return indicator
-end
-
---- Creates an off screen marker for the target position. Uses a texture preset that matches with the blue ping.
----@param parent Control
----@param worldView WorldView
----@param target Vector # in world coordinates
+---@param preset 'Yellow' | 'Blue' | 'Red'
+---@param target Vector     # in world coordinates
 ---@return UIOffscreenMarkerIndicator
-CreateBlueOffScreenMarkerIndicator = function(parent, worldView, target)
-    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesBlue, target) --[[@as UIOffscreenMarkerIndicator]]
-    return indicator
-end
+CreateOffScreenMarkerIndicatorFromPreset = function(parent, worldView, target, preset)
+    local texturePreset = TexturePresets[preset]
+    if not texturePreset then
+        WARN(string.format("Invalid texture preset for off screen marker indicator: %s. Defaulting to the yellow preset", preset))
+        texturePreset = TexturePresets.Yellow
+    end
 
---- Creates an off screen marker for the target position. Uses a texture preset that matches with the red ping.
----@param parent Control
----@param worldView WorldView
----@param target Vector # in world coordinates
----@return UIOffscreenMarkerIndicator
-CreateRedOffScreenMarkerIndicator = function(parent, worldView, target)
-    local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesRed, target) --[[@as UIOffscreenMarkerIndicator]]
+    local indicator = OffscreenMarkerIndicator(parent, worldView, texturePreset, target) --[[@as UIOffscreenMarkerIndicator]]
     return indicator
 end
 
@@ -147,7 +141,7 @@ end
 ---@param parent Control
 ---@param worldView WorldView
 ---@param textures UIOffScreenIndicatorTextureSet
----@param target Vector # in world coordinates
+---@param target Vector     # in world coordinates
 ---@return UIOffscreenMarkerIndicator
 CreateOffScreenMarkerIndicator = function(parent, worldView, textures, target)
     local indicator = OffscreenMarkerIndicator(parent, worldView, TexturesRed, target) --[[@as UIOffscreenMarkerIndicator]]
