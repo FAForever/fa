@@ -82,6 +82,7 @@ RenderShapesComponent = ClassSimple {
     OnRenderShape = function(self, shape, delta)
         -- sanity check on the data
         if not shape or not shape.OnRender then
+            WARN("Shape is nil or does not have an 'OnRender' function")
             return false
         end
 
