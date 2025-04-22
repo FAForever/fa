@@ -25,11 +25,18 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 --- A small utility class that will 'animate' a bitmap by pulsing it on and off by manipulating its alpha channel.
 ---@class UIAnimatedGlow : Bitmap
+---@field Rate number   # factor to make the animation go faster or slower
 AnimatedGlow = Class(Bitmap) {
+
+    __init = function(self, parent, texture, rate)
+        Bitmap.__init(self, parent, texture)
+
+        self.Rate = rate
+    end,
 
     ---@param self UIAnimatedGlow
     ---@param parent Control
-    __post_init = function(self, parent, texture)
+    __post_init = function(self, parent, texture, rate)
         LayoutHelpers.LayoutFor(self)
             :Texture(texture)
             :DisableHitTest(true)
@@ -43,15 +50,17 @@ AnimatedGlow = Class(Bitmap) {
     ---@param delta number
     OnFrame = function(self, delta)
         if delta then
-            local alpha = MATH_Lerp(math.sin(10 * CurrentTime()), -1.0, 1.0, 0.0, 0.5)
+            local alpha = MATH_Lerp(math.sin(CurrentTime() * self.Rate), -1.0, 1.0, 0.0, 0.5)
             self:SetAlpha(alpha)
         end
     end,
 }
 
+--- Create an instance of the animated glow utility class.
 ---@param parent Control
 ---@param texture Lazy<FileName> | FileName | string
-CreateAnimatedGlow = function(parent, texture)
-    local animatedGlow = AnimatedGlow(parent, texture) --[[@as UIAnimatedGlow]]
+---@param rate number # factor to make the animation go faster or slower
+CreateAnimatedGlow = function(parent, texture, rate)
+    local animatedGlow = AnimatedGlow(parent, texture, rate) --[[@as UIAnimatedGlow]]
     return animatedGlow
 end

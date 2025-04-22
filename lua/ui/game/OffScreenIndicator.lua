@@ -67,7 +67,7 @@ OffScreenIndicator = Class(Button) {
 
         self.WorldView = worldView
         self.TextureSet = textures
-        self.AnimatedGlow = AnimatedGlow.CreateAnimatedGlow(self, textures.Glow)
+        self.AnimatedGlow = AnimatedGlow.CreateAnimatedGlow(self, textures.Glow, 10)
     end,
 
     ---@param self UIOffScreenIndicator
