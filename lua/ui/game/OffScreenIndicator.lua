@@ -108,16 +108,16 @@ OffScreenIndicator = Class(Button) {
     ---@return UIOffScreenIndicatorDirection    # vertical axis
     GetDirectionToTarget = function(self, worldView, controlSpaceCoordinates)
         local horizontal = "OnScreen"
-        if controlSpaceCoordinates.x < 0 then
+        if controlSpaceCoordinates.x < 0.5 * self.Width() then
             horizontal = "West"
-        elseif controlSpaceCoordinates.x > worldView.Width() then
+        elseif controlSpaceCoordinates.x > worldView.Width() - 0.5 * self.Width() then
             horizontal = "East"
         end
 
         local vertical = "OnScreen"
-        if controlSpaceCoordinates.y < 0 then
+        if controlSpaceCoordinates.y < 0.5 * self.Height() then
             vertical = "North"
-        elseif controlSpaceCoordinates.y > worldView.Height() then
+        elseif controlSpaceCoordinates.y > worldView.Height() - 0.5 * self.Height() then
             vertical = "South"
         end
 
