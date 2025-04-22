@@ -22,7 +22,7 @@ UnitBlueprint{
         KTurn = 1,
         KTurnDamping = 1.5,
         LiftFactor = 5,
-        MaxAirspeed = 16,
+        MaxAirspeed = 18,
         MinAirspeed = 11,
         StartTurnDistance = 10,
         TightTurnMultiplier = 1.02,
