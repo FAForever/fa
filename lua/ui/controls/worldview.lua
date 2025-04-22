@@ -958,10 +958,11 @@ WorldView = ClassUI(moho.UIWorldView, Control, RenderShapesComponent) {
         return false
     end,
 
+    ---@param self WorldView
     OnDestroy = function(self)
-
         -- take out the trash
         self.Trash:Destroy()
+        self.Shapes:Destroy()
 
         -- take out all ping threads
         for i, v in self.PingThreads do
