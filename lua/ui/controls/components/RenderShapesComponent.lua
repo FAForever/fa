@@ -22,7 +22,7 @@
 
 --- A component to encapsulate the logic used to render shapes in the world.
 ---@class UIRenderShapesComponent
----@field Shapes table<string, Renderable>
+---@field Shapes table<string, Renderable> | TrashBag
 RenderShapesComponent = ClassSimple {
 
     -- Related binary patches that make this possible:
