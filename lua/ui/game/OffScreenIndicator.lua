@@ -44,6 +44,47 @@ local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
 ---@field EastNorth UIOffScreenIndicatorTextureStates
 ---@field Glow FileName
 
+--- A utility function to help create a preset. It assumes that all files end with:
+---
+--- - <direction>_<state>.dds
+---
+--- Where:
+--- - <direction> is the direction of the image. It can be `b`, `bl`, `l`, `tl`, `t`, `tr`, `r` or `br`
+--- - <state> is the button state. It can be `up`, `over` or `down`
+--- 
+--- As an example of a preset:
+---
+--- ```lua
+--- GeneratePathForPreset('/textures/ui/common/game/ping_edge/ping_edge_blue_')
+--- ```
+--- 
+--- Will generate the following paths:
+---
+--- - '/textures/ui/common/game/ping_edge/ping_edge_blue_b_up.dds', 
+--- - '/textures/ui/common/game/ping_edge/ping_edge_blue_b_over.dds'
+--- - '/textures/ui/common/game/ping_edge/ping_edge_blue_b_down.dds'
+---
+--- Which it will pack up so that a screen indicator can use them.
+---@param filename FileName     # As an example, /textures/ui/common/game/ping_edge/ping_edge_blue_
+---@return UIOffScreenIndicatorTextureSet
+function GeneratePreset(filename)
+    ---@type UIOffScreenIndicatorTextureSet
+    local preset = {
+        North = { Up = filename .. 'b_up.dds', Over = filename .. 'b_over.dds', Down = filename .. 'b_down.dds' },
+        NorthWest = { Up = filename .. 'bl_up.dds', Over = filename .. 'bl_over.dds', Down = filename .. 'bl_down.dds' },
+        West = { Up = filename .. 'l_up.dds', Over = filename .. 'l_over.dds', Down = filename .. 'l_down.dds' },
+        WestSouth = { Up = filename .. 'tl_up.dds', Over = filename .. 'tl_over.dds', Down = filename .. 'tl_down.dds' },
+        South = { Up = filename .. 't_up.dds', Over = filename .. 't_over.dds', Down = filename .. 't_down.dds' },
+        SouthEast = { Up = filename .. 'tr_up.dds', Over = filename .. 'tr_over.dds', Down = filename .. 'tr_down.dds' },
+        East = { Up = filename .. 'r_up.dds', Over = filename .. 'r_over.dds', Down = filename .. 'r_down.dds' },
+        EastNorth = { Up = filename .. 'br_up.dds', Over = filename .. 'br_over.dds', Down = filename .. 'br_down.dds' },
+        Glow = filename .. 'glow.dds'
+    }
+
+    return preset
+end
+
+
 --- A utility class to help you point to events that happen off screen. This is an abstract class, it won't do anything on its own.
 ---@class UIOffScreenIndicator : Button
 ---@field TextureSet UIOffScreenIndicatorTextureSet
