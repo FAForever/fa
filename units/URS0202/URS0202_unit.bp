@@ -346,7 +346,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             Label = "RedirectMissile",
-            MaxRadius = 60,
+            MaxRadius = 44,
             MinRadius = 6,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
