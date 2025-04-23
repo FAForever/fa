@@ -375,7 +375,7 @@ UnitBlueprint{
             TurretBoneYaw = "zapper",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 70,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,
