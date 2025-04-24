@@ -156,6 +156,12 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         unit.IsBeingTransferred = true
 
+        -- For external factories, destroy the unit being built since otherwise it will be transferred as a built unit because it is attached indirectly
+        local externalUnitBeingBuilt = unit.ExternalFactory.UnitBeingBuilt
+        if externalUnitBeingBuilt then
+            externalUnitBeingBuilt:Destroy()
+        end
+
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy)
         if not newUnit then
@@ -503,7 +509,7 @@ end
 ---@param army Army
 function TryRebuildUnits(trackers, army)
     local rebuilders = {}
-    for k, tracker in ipairs(trackers) do
+    for k, tracker in trackers do
         if tracker.Success then
             continue
         end
@@ -525,7 +531,7 @@ function TryRebuildUnits(trackers, army)
 
     WaitTicks(1)
 
-    for k, rebuilder in ipairs(rebuilders) do
+    for k, rebuilder in rebuilders do
         local tracker = trackers[k]
         local newUnit = rebuilder:GetFocusUnit()
         local progressDif = rebuilder:GetWorkProgress() - tracker.UnitProgress

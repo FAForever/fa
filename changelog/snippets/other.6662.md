@@ -1,0 +1,1 @@
+- (#6662) Improve the detail of the error message when weapon turret setup fails.

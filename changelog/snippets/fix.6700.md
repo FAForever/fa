@@ -1,0 +1,1 @@
+- (#6700) Fix an edge case where mobile build orders issued to a factory and then cancelled would cause the unbuilt unit to not get destroyed and block the factory forever.

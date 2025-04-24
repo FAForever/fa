@@ -21,6 +21,7 @@ run_test() {
 
 # make sure the test files run in the tests directory
 run_test "./tests/utility/color.spec.lua"
+run_test "./tests/utility/stats.spec.lua"
 run_test "./tests/utility/string.spec.lua"
 
 if [[ $had_error != 0 ]]; then
