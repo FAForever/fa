@@ -332,8 +332,8 @@ globalOpts = {
                 key = 'demoralization',
             },
             {
-                text = "<LOC lobui_0130>Decapitation",
-                help = "<LOC lobui_0131>Game ends when all commanders for a team are destroyed",
+                text = "<LOC lobui_0152>Decapitation",
+                help = "<LOC lobui_0153>Game ends when all allied commanders are destroyed",
                 key = 'decapitation',
             },
             {
