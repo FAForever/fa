@@ -2266,4 +2266,25 @@ Tooltips = {
     minimap_mesh = {
         description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
     },
+
+    profiler_print_to_log = {
+        title = "<LOC profiler_0013>Print to log",
+        description = "<LOC profiler_0014>Print function bytecode to log",
+    },
+    profiler_benchmark_baseline_mode_none = {
+        title = "<LOC profiler_0031>No baseline data",
+        description = "<LOC profiler_0032>Ignore each samples' baseline",
+    },
+    profiler_benchmark_baseline_mode_paired = {
+        title = "<LOC profiler_0033>Paired baseline data",
+        description = "<LOC profiler_0034>Divide each samples' baseline into itself",
+    },
+    profiler_benchmark_baseline_mode_ratio = {
+        title = "<LOC profiler_0035>Baseline data ratio",
+        description = "<LOC profiler_0036>Treat the data and its baselines independently and perform a ratio test",
+    },
+    profiler_benchmark_clear_stats = {
+        title = "<LOC profiler_0041>Clear stats",
+        description = "<LOC profiler_0042>Clear all samples for this benchmark",
+    },
 }

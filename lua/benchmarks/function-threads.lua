@@ -12,53 +12,60 @@
 -- doing work should be done before we initialize the thread, instead of at the start of it. This is 
 -- commonly done in unit.lua and we can optimize that for sure.
 
-function FunctionCall()
+ModuleName = "Function Threads"
+BenchmarkData = {
+    FunctionCall = "Function Call",
+    ThreadCall = "Thread Call",
+    NoCall = "No Call",
+}
+
+function FunctionCall(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local sum = 0
     local function AddToSum()
         sum = sum + 1
     end
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local start = timer()
 
-    for k = 1, 100000 do 
+    for _ = 1, loop do
         AddToSum()
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function ThreadCall()
+function ThreadCall(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local sum = 0
     local function AddToSum()
         sum = sum + 1
     end
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local start = timer()
 
-    for k = 1, 100000 do 
+    for _ = 1, loop do
         ForkThread(AddToSum)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function NoCall()
+function NoCall(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local sum = 0
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local start = timer()
 
-    for k = 1, 100000 do 
+    for _ = 1, loop do
         sum = sum + 1
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
