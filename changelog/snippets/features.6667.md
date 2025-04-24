@@ -1,1 +1,1 @@
-- (#6667) Add a new **ranked** victory condition: Decapitation, where all commanders on a team must die for the team to be put out of the game.
+- (#6667) Add a new **ranked** victory condition: Decapitation, where all allied commanders on a team have to be destroyed for a player to be put out of the game.
