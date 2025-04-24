@@ -208,8 +208,7 @@ end
 
 function LOCStr(str)
     local id = str:lower()
-    id = id:gsub(' ', '_')
-    id = id:gsub('%-', '_')
+    id = id:gsub(' ', '_'):gsub('%-', '_')
     return LOC('<LOC ls_'..id..'>'..str)
 end
 
