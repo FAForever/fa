@@ -1351,28 +1351,49 @@ options = {
             },
 
             {
-                title = 'Casting tools',
+                title = 'Painting tools',
                 type = 'header',
-
                 -- these are expected everywhere
                 default = '',
                 key = '',
             },
-
             {
-                title = "<LOC OPTIONS_0309>Painting",
-                key = 'casting_painting',
+                title = "Painting enabled",
+                key = 'tpaint_enabled',
                 type = 'toggle',
-                default = 18,
+                default = 'on',
+                set = function(k, v)
+                    if GetCurrentUIState() ~= 'game' then
+                        return
+                    end
+
+                    local enabled = v == "on"
+                    for cameraName, view in import("/lua/ui/game/worldview.lua").GetWorldViews() do
+                        if cameraName ~= "MiniMap" then
+                            ---@type Canvas
+                            local canvas = view._canvas or import("/lua/ui/game/TacticalPaint/Canvas.lua").AttachCanvasToWorldView(view)
+                            canvas:SetHiddenLines(not enabled)
+                        end
+                    end
+                end,
                 custom = {
                     states = {
-                        { text = "<LOC _Off>", key = false },
-                        { text = "<LOC CTRL>Use CTRL ", key = 17 },
-                        { text = "<LOC ALT>Use ALT", key = 18 },
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC _Off>", key = 'off' },
                     },
                 },
             },
-
+            {
+                title = "Painting life time",
+                key = 'tpaint_lifetime',
+                type = 'slider',
+                default = 20,
+                custom = {
+                    min = 10,
+                    max = 60,
+                    inc = 5,
+                },
+            },
             {
                 title = "<LOC OPTIONS_0315>Show mouse locations of players",
                 key = 'share_mouse',

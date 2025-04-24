@@ -164,6 +164,53 @@ Callbacks.SpawnSpecialPing = SimPing.SpawnSpecialPing
 
 Callbacks.UpdateMarker = SimPing.UpdateMarker
 
+
+
+---@class TacticalPaintRemoveData
+---@field [1] number
+---@field [2] number
+---@field [3] number
+
+---@class TacticalPaintData
+---@field Data Vector[] | TacticalPaintRemoveData
+---@field Remove boolean?
+---@field LifeTime number
+
+---@alias SyncTacticalPaintData table<integer, TacticalPaintData>
+
+local maxDecayTime = import("/lua/shared/TacticalPaint.lua").maxDecayTime
+
+---@param data TacticalPaintData
+Callbacks.TacticalPaint = function(data)
+    local sourceId = GetCurrentCommandSource()
+    local focus = GetFocusArmy()
+
+    if focus ~= -1 then
+        if not IsAlly(sourceId, focus) then
+            return
+        end
+
+        local brain = GetArmyBrain(sourceId)
+        if not brain then
+            return
+        end
+    end
+
+    local lifeTime = data.LifeTime
+    local curTime = GetGameTick() / 10
+    if not lifeTime or lifeTime > curTime + maxDecayTime then
+        lifeTime = curTime + maxDecayTime
+    end
+
+    Sync.TacticalPaint = Sync.TacticalPaint or {}
+    Sync.TacticalPaint[sourceId] = Sync.TacticalPaint[sourceId] or {}
+    table.insert(Sync.TacticalPaint[sourceId], {
+        Remove = data.Remove,
+        Data = data.Data,
+        LifeTime = lifeTime,
+    })
+end
+
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
 Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
@@ -738,7 +785,7 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
+        do -- feature: area commands
             return
         end
 

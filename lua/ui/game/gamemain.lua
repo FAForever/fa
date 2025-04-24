@@ -169,6 +169,7 @@ function CreateUI(isReplay)
 
     import("/lua/ui/game/casting/mouse.lua")
     import("/lua/ui/game/casting/painting.lua")
+    import("/lua/ui/game/TacticalPaint/Main.lua").Main(isReplay)
 
     -- overwrite some globals for performance / safety
 
