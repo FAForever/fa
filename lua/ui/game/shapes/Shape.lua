@@ -59,6 +59,7 @@ Shape = ClassSimple {
     ---@param delta number
     OnRender = function(self, delta)
         -- to be defined by the subclass
+        error("OnRender must be overridden by subclass")
     end,
 
     --- Hides the shape, it will no longer be rendered until unhidden.
