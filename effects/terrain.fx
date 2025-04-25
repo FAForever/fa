@@ -134,7 +134,10 @@ struct VS_OUTPUT
     // in the pixel shader as the stratumTiles only have one float of actual data,
     // but use four and we are pretty tight on register slots in the new shaders.
     float4 nearScales           : TEXCOORD6;
-    float4 farScales            : TEXCOORD7;
+    float4 nearScales2          : TEXCOORD7;
+    // The semantics have no meaning and we just use what is available.
+    float4 farScales            : COLOR0;
+    float4 farScales2           : COLOR1;
 };
 
 struct TERRAIN_DEPTH
@@ -660,7 +663,9 @@ VS_OUTPUT TerrainVS( position_t p : POSITION0, uniform bool shadowed)
     VS_OUTPUT result;
 
     result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.nearScales2 = float4(Stratum4AlbedoTile.x, Stratum5AlbedoTile.x, Stratum6AlbedoTile.x, Stratum7AlbedoTile.x);
     result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+    result.farScales2 =  float4(Stratum4NormalTile.x, Stratum5NormalTile.x, Stratum6NormalTile.x, Stratum7NormalTile.x);
 
     float4 position = float4(p);
     position.y *= HeightScale;
@@ -697,7 +702,9 @@ VS_OUTPUT TerrainGlowVS( position_t p : POSITION0, uniform bool shadowed)
     VS_OUTPUT result;
 
     result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.nearScales2 = float4(Stratum4AlbedoTile.x, Stratum5AlbedoTile.x, Stratum6AlbedoTile.x, Stratum7AlbedoTile.x);
     result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+    result.farScales2 =  float4(Stratum4NormalTile.x, Stratum5NormalTile.x, Stratum6NormalTile.x, Stratum7NormalTile.x);
 
     float4 position = float4(p);
     position.y *= HeightScale;
@@ -741,7 +748,9 @@ VS_OUTPUT TerrainSkirtVS( position_t p : POSITION0)
     VS_OUTPUT result;
 
     result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.nearScales2 = float4(Stratum4AlbedoTile.x, Stratum5AlbedoTile.x, Stratum6AlbedoTile.x, Stratum7AlbedoTile.x);
     result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+    result.farScales2 =  float4(Stratum4NormalTile.x, Stratum5NormalTile.x, Stratum6NormalTile.x, Stratum7NormalTile.x);
 
     float4 position = float4(p);
     position.y *= HeightScale;
@@ -766,7 +775,9 @@ VS_OUTPUT TerrainFogVS( position_t p : POSITION0)
     VS_OUTPUT result;
 
     result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.nearScales2 = float4(Stratum4AlbedoTile.x, Stratum5AlbedoTile.x, Stratum6AlbedoTile.x, Stratum7AlbedoTile.x);
     result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+    result.farScales2 =  float4(Stratum4NormalTile.x, Stratum5NormalTile.x, Stratum6NormalTile.x, Stratum7NormalTile.x);
 
     float4 position = float4(p);
     position.y *= HeightScale;
@@ -1208,7 +1219,9 @@ VS_OUTPUT DecalsVS( position_t p : POSITION0, uniform bool shadowed)
     VS_OUTPUT result;
 
     result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.nearScales2 = float4(Stratum4AlbedoTile.x, Stratum5AlbedoTile.x, Stratum6AlbedoTile.x, Stratum7AlbedoTile.x);
     result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+    result.farScales2 =  float4(Stratum4NormalTile.x, Stratum5NormalTile.x, Stratum6NormalTile.x, Stratum7NormalTile.x);
 
     float4 position = float4(p);
     position.y += decalHeightOffset;
@@ -1256,7 +1269,9 @@ VS_OUTPUT DecalsVSWaterAlbedo( position_t p : POSITION0, uniform bool shadowed)
     VS_OUTPUT result;
 
     result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.nearScales2 = float4(Stratum4AlbedoTile.x, Stratum5AlbedoTile.x, Stratum6AlbedoTile.x, Stratum7AlbedoTile.x);
     result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+    result.farScales2 =  float4(Stratum4NormalTile.x, Stratum5NormalTile.x, Stratum6NormalTile.x, Stratum7NormalTile.x);
 
     float4 position = float4(p);
     position.y += decalHeightOffset;
@@ -3047,17 +3062,17 @@ float4 Terrain200AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform float
     float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position.xy, inV.nearScales.yy,     float2(0.0, 0.5), true);
     float4 stratum2Albedo = sampleAlbedo(Stratum2AlbedoSampler, rotated_pos, inV.nearScales.zz,     float2(0.5, 0.5), true);
     float4 stratum3Albedo = sampleAlbedo(Stratum3AlbedoSampler, position.xy, inV.nearScales.ww,     float2(0.0, 0.0), false);
-    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, rotated_pos, Stratum4AlbedoTile.xy, float2(0.5, 0.0), false);
-    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, Stratum5AlbedoTile.xy, float2(0.0, 0.5), false);
-    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, rotated_pos, Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, rotated_pos, inV.nearScales2.xx,    float2(0.5, 0.0), false);
+    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, inV.nearScales2.yy,    float2(0.0, 0.5), false);
+    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, rotated_pos, inV.nearScales2.zz,    float2(0.5, 0.5), false);
 
     float stratum0Height = sampleHeight(rotated_pos, inV.nearScales.xx,     inV.farScales.xx,      float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position.xy, inV.nearScales.yy,     inV.farScales.yy,      float2(0.0, 0.5), true);
     float stratum2Height = sampleHeight(rotated_pos, inV.nearScales.zz,     inV.farScales.zz,      float2(0.5, 0.5), true);
     float stratum3Height = sampleHeight(position.xy, inV.nearScales.ww,     inV.farScales.ww,      float2(0.0, 0.0), false);
-    float stratum4Height = sampleHeight(rotated_pos, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
-    float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
-    float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
+    float stratum4Height = sampleHeight(rotated_pos, inV.nearScales2.xx,    inV.farScales2.xx,     float2(0.5, 0.0), false);
+    float stratum5Height = sampleHeight(position.xy, inV.nearScales2.yy,    inV.farScales2.yy,     float2(0.0, 0.5), false);
+    float stratum6Height = sampleHeight(rotated_pos, inV.nearScales2.zz,    inV.farScales2.zz,     float2(0.5, 0.5), false);
 
     float4 albedo = lowerAlbedo;
     albedo = splatLerp(albedo, stratum0Albedo, stratum0Height, mask0.x, SpecularColor.r);
@@ -3270,15 +3285,15 @@ float4 Terrain200BAlbedoPS ( VS_OUTPUT inV, uniform bool halfRange, uniform floa
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
     float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, rotated_pos, inV.nearScales.xx,     float2(0.5, 0.0), true);
     float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position.xy, inV.nearScales.yy,     float2(0.0, 0.5), true);
-    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, rotated_pos, Stratum4AlbedoTile.xy, float2(0.5, 0.0), false);
-    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, Stratum5AlbedoTile.xy, float2(0.0, 0.5), false);
-    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, rotated_pos, Stratum6AlbedoTile.xy, float2(0.5, 0.5), false);
+    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, rotated_pos, inV.nearScales2.xx, float2(0.5, 0.0), false);
+    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position.xy, inV.nearScales2.yy, float2(0.0, 0.5), false);
+    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, rotated_pos, inV.nearScales2.zz, float2(0.5, 0.5), false);
 
     float stratum0Height = sampleHeight(rotated_pos, inV.nearScales.xx,     inV.farScales.xx,      float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position.xy, inV.nearScales.yy,     inV.farScales.yy,      float2(0.0, 0.5), true);
-    float stratum4Height = sampleHeight(rotated_pos, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, float2(0.5, 0.0), false);
-    float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), false);
-    float stratum6Height = sampleHeight(rotated_pos, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), false);
+    float stratum4Height = sampleHeight(rotated_pos, inV.nearScales2.xx,    inV.farScales2.xx,     float2(0.5, 0.0), false);
+    float stratum5Height = sampleHeight(position.xy, inV.nearScales2.yy,    inV.farScales2.yy,     float2(0.0, 0.5), false);
+    float stratum6Height = sampleHeight(rotated_pos, inV.nearScales2.zz,    inV.farScales2.zz,     float2(0.5, 0.5), false);
 
     float2 blendWeights = calculateBlendWeights(position.xy);
     float4 stratum2AlbedoXZ = sampleAlbedo(Stratum2AlbedoSampler, position.xz, inV.nearScales.zz, float2(0.5, 0.5), true);
