@@ -87,8 +87,7 @@ SquareShape = Class(Shape) {
 ---@param thickness number
 ---@return UISquareShape
 CreateSquareShapeXYZ = function(worldview, ox, oy, oz, size, color, thickness)
-    local shape = SquareShape(worldview, ox, oy, oz, size, color, thickness) --[[@as UISquareShape]]
-    return shape
+    return SquareShape(worldview, ox, oy, oz, size, color, thickness) --[[@as UISquareShape]]
 end
 
 --- Creates a square shape with the given properties.

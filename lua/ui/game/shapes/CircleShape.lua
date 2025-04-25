@@ -87,8 +87,7 @@ CircleShape = Class(Shape) {
 ---@param thickness number
 ---@return UICircleShape
 CreateCircleShapeXYZ = function(worldview, ox, oy, oz, size, color, thickness)
-    local shape = CircleShape(worldview, ox, oy, oz, size, color, thickness) --[[@as UICircleShape]]
-    return shape
+    return CircleShape(worldview, ox, oy, oz, size, color, thickness) --[[@as UICircleShape]]
 end
 
 --- Creates a circle shape with the given properties.

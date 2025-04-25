@@ -62,6 +62,5 @@ LineShape = Class(Shape) {
 ---@param thickness number
 ---@return UILineShape
 CreateLineShape = function(worldview, p1, p2, color, thickness)
-    local shape = LineShape(worldview, p1, p2, color, thickness) --[[@as UILineShape]]
-    return shape
+    return LineShape(worldview, p1, p2, color, thickness) --[[@as UILineShape]]
 end
