@@ -1612,6 +1612,24 @@ options = {
                     },
                 },
             },
+
+            {
+                title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
+                key = 'shadow_resolution',
+                type = 'slider',
+                default = 1024,
+                update = function(control, value)
+                    ConExecute(string.format("ren_ShadowSize %d", value))
+                end,
+                set = function(key, value, startup)
+                    ConExecute(string.format("ren_ShadowSize %d", value))
+                end,
+                custom = {
+                    min = 512,
+                    max = 2048,
+                    inc = 256,
+                },
+            },
             {
                 title = "<LOC OPTIONS_0015>Anti-Aliasing",
                 key = 'antialiasing',
