@@ -99,7 +99,7 @@ EnergyManagerBrainComponent = ClassSimple {
         end
     end,
 
-    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
+    --- A continuous thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
     ---@param self AIBrain
     ToggleEnergyExcessUnitsThread = function(self)
 
@@ -119,7 +119,6 @@ EnergyManagerBrainComponent = ClassSimple {
         local disableStorage = fabricatorParameters.DisableStorage
 
         local enableRatio = fabricatorParameters.EnableRatio
-        local enableTrend = fabricatorParameters.EnableTrend
         local enableStorage = fabricatorParameters.EnableStorage
 
         -- localize scope for better performance
@@ -156,20 +155,33 @@ EnergyManagerBrainComponent = ClassSimple {
 
             local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
             local energyStored = self:GetEconomyStored('ENERGY')
-            local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
+
+            local energyUsed = self:GetEconomyUsage('ENERGY')
+            local energyStorage = self:GetArmyStat('Economy_MaxStorage_Energy', 0).Value
+            -- Ally overflow leaves storage at `maxStorage - 1 tick excess resource needed`
+            -- So the minimum storage that overflow will leave us on is if all our energy comes from allies
+            -- In that case we will have `maxStorage - 1 tick energy income`, as overflow counts as income for our brain.
+            -- There is no way to see how much energy our brain gets as overflow.
+            local overflowStorageMin = energyStorage - energyUsed
+            local energyTrend = self:GetEconomyTrend('ENERGY')
 
             -- low on storage, start disabling them to fill our storages asap
-            if energyStoredRatio < disableRatio and energyStored < disableStorage then
-
+            if energyStoredRatio < disableRatio and energyStored < disableStorage and energyStored < overflowStorageMin * disableRatio
+                -- consuming more energy than our storage allows (if we're working off overflow), disable consumers
+                or overflowStorageMin < 0
+            then
                 -- while we have units to disable
                 for id, unit in EnergyExcessUnitsEnabled do
                     if not unit:BeenDestroyed() then
 
                         local ecobp = unit.Blueprint.Economy
-                        self.EnergyExcessConsumed = self.EnergyExcessConsumed -
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessRequired = self.EnergyExcessRequired +
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
+                        local energyConsumption = ecobp.MaintenanceConsumptionPerSecondEnergy
+
+                        -- if we disable this unit then the min storage will go above our current storage, which will cause flickering in the eco bar when we rely on overflow
+                        if overflowStorageMin > 0 and energyConsumption * 0.1 > overflowStorageMin then continue end
+
+                        self.EnergyExcessConsumed = self.EnergyExcessConsumed - energyConsumption
+                        self.EnergyExcessRequired = self.EnergyExcessRequired + energyConsumption
                         self.EnergyExcessConverted = self.EnergyExcessConverted - ecobp.ProductionPerSecondMass
 
                         -- update internal state
@@ -188,17 +200,23 @@ EnergyManagerBrainComponent = ClassSimple {
                     end
                 end
 
-                -- high on storage and sufficient energy income, enable units
-            elseif (energyStoredRatio >= enableRatio and energyTrend > enableTrend) or energyStored > enableStorage then
-
+                -- high on storage, enable units
+            elseif energyStoredRatio >= enableRatio or energyStored > enableStorage
+                -- When we're accumulating energy above the minimum storage from overflow, we may not be receiving overflow due to insufficient consumption
+                -- compare to -1 because of floating point errors
+                or energyStored >= overflowStorageMin and energyTrend >= -1
+            then
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
                     if not unit:BeenDestroyed() then
                         local ecobp = unit.Blueprint.Economy
-                        self.EnergyExcessConsumed = self.EnergyExcessConsumed +
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.EnergyExcessRequired = self.EnergyExcessRequired -
-                            ecobp.MaintenanceConsumptionPerSecondEnergy
+                        local energyConsumption = ecobp.MaintenanceConsumptionPerSecondEnergy
+
+                        -- if we enable this unit then the min storage will go negative, which will cause flickering in the eco bar when we rely on overflow
+                        if energyConsumption * 0.1 > overflowStorageMin then continue end
+
+                        self.EnergyExcessConsumed = self.EnergyExcessConsumed + energyConsumption
+                        self.EnergyExcessRequired = self.EnergyExcessRequired - energyConsumption
                         self.EnergyExcessConverted = self.EnergyExcessConverted + ecobp.ProductionPerSecondMass
 
                         -- update internal state

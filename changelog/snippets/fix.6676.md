@@ -1,0 +1,1 @@
+- (#6676) Fix the dual yaw controller added in #6428 rotating the unit on the pitch axis.

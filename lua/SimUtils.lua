@@ -46,22 +46,6 @@ local function TransferUnitsOwnershipComparator(a, b)
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
---- Temporarily disables the weapons of gifted units
----@param weapon Weapon
-local function TransferUnitsOwnershipDelayedWeapons(weapon)
-    if not weapon:BeenDestroyed() then
-        -- compute delay
-        local bp = weapon.Blueprint
-        local delay = 1 / bp.RateOfFire
-        WaitSeconds(delay)
-
-        -- enable the weapon again if it still exists
-        if not weapon:BeenDestroyed() then
-            weapon:SetEnabled(true)
-        end
-    end
-end
-
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
@@ -74,7 +58,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         return
     end
     local categoriesENGINEERSTATION = categories.ENGINEERSTATION
-    local shareUpgrades = ScenarioInfo.Options.Share == 'FullShare'
+    local shareUpgrades = ScenarioInfo.Options.Share ~= 'ShareUntilDeath'
 
     -- do not gift insignificant units
     units = EntityCategoryFilterDown(transferUnitsCategory, units)
@@ -171,6 +155,12 @@ function TransferUnitsOwnership(units, toArmy, captured)
         end
 
         unit.IsBeingTransferred = true
+
+        -- For external factories, destroy the unit being built since otherwise it will be transferred as a built unit because it is attached indirectly
+        local externalUnitBeingBuilt = unit.ExternalFactory.UnitBeingBuilt
+        if externalUnitBeingBuilt then
+            externalUnitBeingBuilt:Destroy()
+        end
 
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy)
@@ -294,16 +284,6 @@ function TransferUnitsOwnership(units, toArmy, captured)
         end
         if upgradeKennels[1] then
             ForkThread(UpgradeTransferredKennels, upgradeKennels)
-        end
-    end
-
-    -- add delay on turning on each weapon
-    for _, unit in newUnits do
-        -- disable all weapons, enable with a delay
-        for k = 1, unit.WeaponCount do
-            local weapon = unit:GetWeapon(k)
-            weapon:SetEnabled(false)
-            weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
         end
     end
 
@@ -529,7 +509,7 @@ end
 ---@param army Army
 function TryRebuildUnits(trackers, army)
     local rebuilders = {}
-    for k, tracker in ipairs(trackers) do
+    for k, tracker in trackers do
         if tracker.Success then
             continue
         end
@@ -551,7 +531,7 @@ function TryRebuildUnits(trackers, army)
 
     WaitTicks(1)
 
-    for k, rebuilder in ipairs(rebuilders) do
+    for k, rebuilder in rebuilders do
         local tracker = trackers[k]
         local newUnit = rebuilder:GetFocusUnit()
         local progressDif = rebuilder:GetWorkProgress() - tracker.UnitProgress

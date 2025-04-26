@@ -290,23 +290,23 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['create_build_template_02'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(2)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(2)',
         category = 'ai'
     },
     ['create_build_template_04'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(4)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(4)',
         category = 'ai'
     },
     ['create_build_template_08'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(8)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(8)',
         category = 'ai'
     },
     ['create_build_template_16'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(16)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(16)',
         category = 'ai'
     },
     ['create_build_template_32'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(32)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(32)',
         category = 'ai'
     },
 }

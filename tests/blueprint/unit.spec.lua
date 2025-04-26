@@ -67,34 +67,34 @@ local function rateOfFireTest(rateOfFire)
     return function()
         luft.expect(rateOfFire).to.be.number()
 
-        if rateOfFire > 6.6666 then
+        if rateOfFire > 6.666666666 then
             luft.expect(rateOfFire).to.be.close.to(10)
         -- the game's rounding tie-breaks towards even numbers
         elseif rateOfFire >= 4.0 then
             luft.expect(rateOfFire).to.be.close.to(5)
-        elseif rateOfFire > 2.8571 then
-            luft.expect(rateOfFire).to.be.close.to(3.333)
-        elseif rateOfFire > 2.2222 then
+        elseif rateOfFire > 2.857142857 then
+            luft.expect(rateOfFire).to.be.close.to(3.333333333)
+        elseif rateOfFire > 2.222222222 then
             luft.expect(rateOfFire).to.be.close.to(2.5)
-        elseif rateOfFire > 1.8182 then
+        elseif rateOfFire > 1.818181818 then
             luft.expect(rateOfFire).to.be.close.to(2.0)
-        elseif rateOfFire > 1.5384 then
-            luft.expect(rateOfFire).to.be.close.to(1.666)
-        elseif rateOfFire > 1.3333 then
-            luft.expect(rateOfFire).to.be.close.to(1.428)
-        elseif rateOfFire > 1.1765 then
+        elseif rateOfFire > 1.538461538 then
+            luft.expect(rateOfFire).to.be.close.to(1.666666666)
+        elseif rateOfFire > 1.333333333 then
+            luft.expect(rateOfFire).to.be.close.to(1.428571428)
+        elseif rateOfFire > 1.176470588 then
             luft.expect(rateOfFire).to.be.close.to(1.25)
-        elseif rateOfFire > 1.0526 then
-            luft.expect(rateOfFire).to.be.close.to(1.111)
-        elseif rateOfFire > 0.9524 then
+        elseif rateOfFire > 1.052631578 then
+            luft.expect(rateOfFire).to.be.close.to(1.111111111)
+        elseif rateOfFire > 0.9523809523 then
             luft.expect(rateOfFire).to.be.close.to(1.0)
-        elseif rateOfFire > 0.8696 then
-            luft.expect(rateOfFire).to.be.close.to(0.909)
+        elseif rateOfFire > 0.8695652173 then
+            luft.expect(rateOfFire).to.be.close.to(0.9090909090)
         -- the game's rounding tie-breaks towards even numbers
         elseif rateOfFire >= 0.8 then
-            luft.expect(rateOfFire).to.be.close.to(0.833)
-        elseif rateOfFire > 0.7407 then
-            luft.expect(rateOfFire).to.be.close.to(0.769)
+            luft.expect(rateOfFire).to.be.close.to(0.8333333333)
+        elseif rateOfFire > 0.7407407407 then
+            luft.expect(rateOfFire).to.be.close.to(0.7692307692)
         end
     end
 end

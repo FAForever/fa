@@ -2812,7 +2812,7 @@ function CreateSlotsUI(makeLabel)
         newSlot.HandleEvent = defaultHandler
 
         -- Slot number
-        local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        local slotNumber = UIUtil.CreateText(newSlot, tostring(i), 14, 'Arial')
         newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
@@ -6588,7 +6588,7 @@ function ShowLobbyOptionsDialog()
     if true then
         --snowflakes count
         local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
-        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0447>Snowflakes count").. currentSnowFlakesCount, 14, 'Arial', true)
         LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
 
         -- slider for changing chat font size
@@ -6601,7 +6601,7 @@ function ShowLobbyOptionsDialog()
         slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
         slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
             local sliderValue = math.floor(newValue)
-            slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+            slider_SnowFlakes_Count_TEXT:SetText(LOC("<LOC lobui_0447>Snowflakes count").. sliderValue)
             Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
             import("/lua/ui/events/SnowFlake.lua").Clear()
             import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)

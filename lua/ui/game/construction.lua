@@ -79,18 +79,6 @@ function setUpgradeAndAllowing(upgradesTo_, allowOthers_)
     allowOthers = allowOthers_
 end
 
-if options.gui_draggable_queue ~= 0 then
-    -- Add gameparent handleevent for if the drag ends outside the queue window
-    local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
-    local oldGameParentHandleEvent = gameParent.HandleEvent
-    gameParent.HandleEvent = function(self, event)
-        if event.Type == 'ButtonRelease' then
-            import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
-        end
-        oldGameParentHandleEvent(self, event)
-    end
-end
-
 local cutA = 0
 local cutB = 0
 if options.gui_visible_template_names ~= 0 then
@@ -466,6 +454,10 @@ function CreateTabs(type)
                 sortedOptions[slotName] = {}
                 for enhName, enhTable in enhancements do
                     if enhTable.Slot == slotName then
+                        ---@class EnhQueueData: UnitBlueprintEnhancement
+                        ---@field ID Enhancement
+                        ---@field UnitID UnitId
+
                         enhTable.ID = enhName
                         enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
                         table.insert(sortedOptions[slotName], enhTable)
@@ -2424,7 +2416,8 @@ function SetSecondaryDisplay(type)
                         table.insert(data, {type = 'enhancementqueue', unitID = item.id, icon = item.icon, name = item.name, enhancement = item.enhancement})
                     else
                         newStack = {type = 'queuestack', id = item.id, count = item.displayCount or item.count, position = index}
-                        if lastStack and lastStack.id == newStack.id then
+                        -- stacking the queue while dragging an item will make dragging show the wrong index
+                        if not dragging and lastStack and lastStack.id == newStack.id then
                             newStack.position = index - 1
                         else
                             index = index + 1
