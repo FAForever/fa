@@ -1775,23 +1775,6 @@ options = {
                     ConExecute("ren_BloomBlurKernelScale " .. tostring(value / 10))
                 end,
             },
-
-            {
-                title = "Extended graphics",
-                key = 'experimental_graphics',
-                type = 'toggle',
-                default = 0,
-                update = function(control, value)
-                end,
-                set = function(key, value, startup)
-                end,
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = 0 },
-                        { text = "<LOC _On>", key = 1 },
-                    },
-                },
-            },
         },
     },
     sound = {
