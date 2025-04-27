@@ -46,7 +46,7 @@ EnvironmentData = {
     author = 'Gas Powered Games',
     version = '1.6.6',
     icon = false,
-    location = 'D:/faf-development/fa/',
+    location = FADirectory,
 
     GenerateWikiPages = false,
     RebuildBlueprints = true,
@@ -56,8 +56,8 @@ EnvironmentData = {
         UnitIcons = false,
     },
 
-    Lua = 'D:/faf-development/fa/',
-    LOC = 'D:/faf-development/fa/',
+    Lua = FADirectory,
+    LOC = FADirectory,
 
     PreModBlueprints = {},
     PostModBlueprints = {
@@ -91,7 +91,7 @@ WikiOptions = {
     BuildListSaysModUnits = false,
 
     OnlineRepoUnitPageBlueprintLink = 'https://github.com/The-Balthazar/BrewLAN/tree/master/',
-    LocalRepuUnitPageBlueprintLink = 'D:/faf-development/fa/',
+    LocalRepuUnitPageBlueprintLink = FADirectory,
 }
 
 RebuildBlueprintOptions = {
