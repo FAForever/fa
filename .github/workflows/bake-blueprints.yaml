@@ -89,7 +89,7 @@ jobs:
               exit 1
             fi
 
-            sudo mv "$FILE" brew-wiki-gen/Run.lua
+            sudo cp "$FILE" brew-wiki-gen/Run.lua
 
       # Bake the properties
       - name: Execute lua run
