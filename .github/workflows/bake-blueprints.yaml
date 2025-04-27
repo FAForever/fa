@@ -64,7 +64,7 @@ jobs:
         with:
           path: ./fa
           sparse-checkout-cone-mode: |
-            .github
+            .github/*
             loc
             lua/ui/help/unitscription.lua
             lua/ui/help/tooltips.lua
@@ -83,7 +83,7 @@ jobs:
       # Prepare the run file
       - name: Replace run.lua
         run: |
-            FILE=".github/workflows/scripts/baking/bake-${{ inputs.blueprints }}.lua"
+            FILE="fa/.github/workflows/scripts/baking/bake-${{ inputs.blueprints }}.lua"
             if [ ! -f "$FILE" ]; then
               echo "Error: File $FILE does not exist."
               exit 1
