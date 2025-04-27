@@ -6,8 +6,40 @@
 --[{ ---------------------------------------------------------------------- ]]--
 --[[ Inputs -- NOTE: Mod input files must be valid lua                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-local OutputDirectory = "D:/faf-development/fa-total-mayhem.wiki/"
+local OutputDirectory = "D:/faf-development/fa.wiki/"
 local WikiGeneratorDirectory = "D:/faf-development/BrewWikiGen/"
+local FADirectory = "D:/faf-development/fa/"
+
+-- This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required
+local function parse_args(arg)
+    local args = {}
+    for i = 1, #arg do
+        local key, value = arg[i]:match("--([^=]+)=(.*)")
+        if key and value then
+            key = key:gsub("^%-+", "")  -- Remove leading '-' characters
+            args[key] = value
+        end
+    end
+    return args
+end
+
+local args = parse_args(arg)
+
+-- Overwrite default values if provided as command-line arguments
+if args["OutputDirectory"] then
+    OutputDirectory = args["OutputDirectory"]
+end
+if args["WikiGeneratorDirectory"] then
+    WikiGeneratorDirectory = args["WikiGeneratorDirectory"]
+end
+if args["FADirectory"] then
+    FADirectory = args["FADirectory"]
+end
+
+print("Directories set")
+print("Output Directory: " ..OutputDirectory)
+print("Wiki Generator Directory: " ..WikiGeneratorDirectory)
+print("FA Directory: " ..FADirectory)
 
 EnvironmentData = {
     name = 'Forged Alliance',
@@ -104,24 +136,18 @@ ModDirectories = { -- In order
 }
 
 BlueprintExclusions = {
-    '/z[^/]*_unit%.bp', --bp files that start with z
     '/op[ec][^/]*_unit%.bp', --bp files like OPE2001
     '/[ux][arse]c[^/]*_unit%.bp', --Exclude civilian units.
 }
 
 BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case insensitive)
-    'seb0105',
-    'srl0000',
-    'srl0001',
-    'srl0002',
-    'srl0003',
-    'srl0004',
-    'srl0005',
-    'srl0006',
-    'ssb2380',
-    'ura0001', --Cybran build effect
-    'uea0001', -- UEF ACU drone
-    'uea0003', -- UEF ACU drone
+    "zxa0001",      -- Dummy unit
+    "zxa0002",      -- Dummy unit for external/mobile factory units
+    "zxa0003",      -- Dummy unit 
+    "ura0001O",     -- Cybran build drone
+    "ura0002O",     -- Cybran build drone
+    "ura0003O",     -- Cybran build drone
+    "XRO4001",      -- Remains of Dostya
 }
 
 FooterCategories = { -- In order
@@ -166,7 +192,7 @@ Logging = { -- Functional logs
     FileUpdateWrites   = false,
     FileAssetCopies    = true,
 
-    ThreatCalculationWarnings = false,
+ThreatCalculationWarnings = false,
 }
 Sanity = { -- Advice logs
     BlueprintChecks         = false,
