@@ -96,10 +96,10 @@ WikiOptions = {
 
 RebuildBlueprintOptions = {
     RebuildBpFiles = {
-        Unit = true,
+        Unit = false,
         Beam = false,
         Mesh = false,
-        Prop = false,
+        Prop = true,
         Emitter = false,
         Projectile = false,
         TrailEmitter = false,
