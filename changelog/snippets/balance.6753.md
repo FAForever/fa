@@ -4,7 +4,6 @@
   
   <details><summary>Previously affected units:</summary>
 
-      ```
       Archer: T1 Mobile Anti-Air Gun (UEL0104)
       Sky Slammer: T1 Mobile Anti-Air Gun (URL0104)
       Cougar: T3 Mobile Rapid-fire AA Cannon (DELK002)
@@ -14,5 +13,5 @@
       Burst Master: T2 Anti-Air Flak Artillery (URB2204)
       Marr: T2 Anti-Air Flak Artillery (UAB2204)
       Sinnatha: T2 Anti-Air Flak Artillery (XSB2204)
-      ```
-    </details>
+
+  </details>
