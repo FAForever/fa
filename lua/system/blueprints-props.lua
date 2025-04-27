@@ -96,8 +96,8 @@ local function ProcessHealth(prop)
     local healthValue = MathMax(50, 2 * massValue)
 
     prop.Defense = prop.Defense or {}
-    prop.Defense.Health = healthValue
-    prop.Defense.MaxHealth = healthValue
+    prop.Defense.Health = healthValue + 1
+    prop.Defense.MaxHealth = healthValue + 1
 end
 
 --- Feature: LOD based on the size of the prop
