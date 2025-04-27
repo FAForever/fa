@@ -1683,13 +1683,34 @@ options = {
                     import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
                 set = function(key, value, startup)
-                    ConExecute("SC_CameraScaleLOD " .. tostring(value))
+                    ConExecute("SC_CameraScaleLOD " .. tostring(math.clamp(value, 0, 2)))
+
+                    if SessionIsActive() then
+                        -- feature: extend the rendering distance of the camera when settings are set to extreme
+                        local worldViewManager = import("/lua/ui/game/worldview.lua")
+                        if worldViewManager then
+                            for k, worldview in worldViewManager.MapControls do
+                                if value > 2 then
+                                    ConExecute(string.format("cam_SetLOD %s 0.70", worldview._cameraName))
+                                else
+                                    ConExecute(string.format("cam_SetLOD %s 1.0", worldview._cameraName))
+                                end
+                            end
+                        end
+                    end
                 end,
                 custom = {
                     states = {
                         { text = "<LOC _Low>", key = 0 },
                         { text = "<LOC _Medium>", key = 1 },
                         { text = "<LOC _High>", key = 2 },
+
+                        -- Note: we intentionally do not use a key of 3 for the "extreme" option
+                        -- because it is not a valid value for the 'cam_SetLOD' console command. To
+                        -- make sure we remain compatible with Steam, we instead set it to something 
+                        -- that is rounded down to 2 by the engine.
+
+                        { text = "<LOC _Extreme>Extreme", key = 2.1 },
                     },
                 },
             },
