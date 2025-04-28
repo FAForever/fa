@@ -25,6 +25,18 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' | 'Scout' | 'Support' | 'Unassigned'
 
+---@class PlatoonSquadTemplate
+---@field [1] UnitId
+---@field [2] number Min
+---@field [3] number Max
+---@field [4] PlatoonSquads
+---@field [5] UnitFormations
+
+---@class PlatoonTemplate
+---@field [1] string Platoon name
+---@field [2] string Plan name
+---@field ... PlatoonSquadTemplate
+
 ---@class Platoon : moho.platoon_methods
 ---@field PlatoonData table
 ---@field Trash TrashBag

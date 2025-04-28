@@ -48,20 +48,34 @@
 --   default to its old value, not to 0 or its normal default.
 --
 
+-- upvalue for performance
 local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
 local getinfo = debug.getinfo
+local TableInsert = table.insert
+local TableFind = table.find
+local TableGetn = table.getn
+local tostring = tostring
+local pcall = pcall
+local doscript = doscript
+local DiskFindFiles = DiskFindFiles
+
 local here = getinfo(1).source
 
 ---@type BlueprintsTable
 local original_blueprints
+---@type ModInfo
 local current_mod
 
--- upvalue for performance
-pcall = pcall
-doscript = doscript
-DiskFindFiles = DiskFindFiles
+--- Table that tracks load order of blueprints from different sources
+---@class BlueprintIdLoadOrderTable : table<FileName, number>, table<number, FileName>
+
+---@type table<BlueprintId, BlueprintIdLoadOrderTable>
+local loadersPerBpId = {}
+
+local trackDependencies
+local reloadingBlueprint
 
 doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
@@ -69,6 +83,39 @@ doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
 doscript("/lua/system/blueprints-props.lua")
 doscript("/lua/system/blueprints-weapons.lua")
+
+--- Special table merge function that allows setting a field to `nil`.
+---@param t1 table
+---@param t2 table # Overwrites t1
+---@param nilValue? string # Fields in t2 with this value set the field to nil in the result. Defaults to `"__nil"`.
+function BlueprintMerged(t1, t2, nilValue)
+    if not nilValue then nilValue = '__nil' end
+    if t1==t2 then
+        return t1
+    end
+
+    if type(t1)~='table' or type(t2)~='table' then
+        return t2
+    end
+
+    local copied = nil
+    for k,v in t2 do
+        if type(v)=='table' then
+            v = BlueprintMerged(t1[k], v, nilValue)
+        end
+        if t1[k] ~= v then
+            copied = copied or table.copy(t1)
+            t1 = copied
+            if v == nilValue then
+                t1[k] = nil
+            else
+                t1[k] = v
+            end
+        end
+    end
+
+    return t1
+end
 
 ---@class PreGameData
 ---@field CurrentMapDir string          ## is obsolete, set for removal
@@ -353,10 +400,11 @@ local function GetSource()
     local n = 2
     local there
     while true do
-        there = getinfo(n).source
-        if there ~= here then break end
+        there = getinfo(n, 'S').source
+        if there ~= '=[C]' and there ~= here then break end
         n = n + 1
     end
+    if not there then error('GetSource was not able to find a Lua source outside Blueprints.lua') end
     if sub(there, 1, 1) == "@" then
         there = sub(there, 2)
     end
@@ -369,12 +417,54 @@ local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
 
+    local source
+    local loadOrderTable = loadersPerBpId[id]
+    local n
+    local orderNumber
+    if trackDependencies then
+        source = GetSource()
+        if not loadOrderTable then
+            loadersPerBpId[id] = { [source] = 1, [1] = source }
+        else
+            n = TableGetn(loadOrderTable) + 1
+            loadOrderTable[source] = n
+            loadOrderTable[n] = source
+        end
+    end
+    if reloadingBlueprint then
+        source = GetSource()
+        -- prevent recursion
+        reloadingBlueprint = false
+        -- when we're reloading a single bp file, reload the precursor bps
+        orderNumber = loadOrderTable[source]
+        for i = 1, orderNumber - 1 do
+            local file = loadOrderTable[i]
+            LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file)
+            safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependency from ' .. file, doscript, file)
+        end
+        reloadingBlueprint = true
+        LOG('Blueprints Reloading: storing ' .. tostring(id) .. ' changes from ' .. source)
+    end
+
     if t[id] and bp.Merge then
         bp.Merge = nil
         bp.Source = nil
-        t[id] = table.merged(t[id], bp)
+        t[id] = BlueprintMerged(t[id], bp)
     else
         t[id] = bp
+    end
+
+    if reloadingBlueprint then
+        -- prevent recursion
+        reloadingBlueprint = false
+        -- when we're reloading a single bp file, reload the dependent bps
+        n = TableGetn(loadOrderTable)
+        for i = loadOrderTable[source] + 1, n do
+            local file = loadOrderTable[i]
+            LOG('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file)
+            safecall('Blueprints Reloading: reloading ' .. tostring(id) .. ' dependent from ' .. file, doscript, file)
+        end
+        reloadingBlueprint = true
     end
 end
 
@@ -448,6 +538,7 @@ function ExtractMeshBlueprint(bp)
 
         if type(disp.Mesh) == 'table' then
             local meshbp = disp.Mesh
+            -- the engine adds missing fields to the mesh blueprint based on the Source
             meshbp.Source = meshbp.Source or bp.Source
             meshbp.BlueprintId = disp.MeshBlueprint
             -- roates:  Commented out so the info would stay in the unit BP and I could use it to precache by unit.
@@ -836,14 +927,101 @@ function PreModBlueprints(all_bps)
             bp.Categories = table.unhash(bp.CategoriesHash)
         end
 
+        local addWeapon = bp.ModWeapon
+        if addWeapon then
+            for _, bpWeapon in addWeapon do
+                local mergeLabel = bpWeapon.MergeLabel
+                local insertPos = bpWeapon.AddIndex
+                MergeWeaponByLabel(bp, mergeLabel, insertPos, bpWeapon)
+            end
+        end
+
         BlueprintLoaderUpdateProgress()
     end
 end
+
+--#region Blueprint modding utilities
 
 -- Hook for mods to manipulate the entire blueprint table
 ---@param all_bps BlueprintsTable
 function ModBlueprints(all_bps)
 end
+
+--- Reload compatibility for modding from non-hook blueprint modding
+---@type table<FileName, fun(all_bps: BlueprintsTable)>
+local ModBlueprintsFunctions = {}
+
+--- Add a function to call after `ModBlueprints`.
+--- The function is overriden if this is called from the same file again.
+--- This allows modding blueprints from reloadable files (like bp files).
+---@param func fun(all_bps: BlueprintsTable)
+function SetModBlueprintFunction(func)
+    local file = GetSource()
+    LOG('Set ModBp function for ' .. file)
+    ModBlueprintsFunctions[GetSource()] = func
+end
+
+---@param all_bps BlueprintsTable
+local function RunModBlueprintFunctions(all_bps)
+    for file, func in ModBlueprintsFunctions do
+        LOG('Running ModBp function from ' .. file)
+        func(all_bps)
+        ModBlueprintsFunctions[file] = nil
+    end
+end
+
+--- Adds a category string to a blueprint.
+---@param bp EntityBlueprint
+---@param cat CategoryName
+function AddCategoryToBp(bp, cat)
+    local cats = bp.Categories
+    if not cats then
+        bp.Categories = { cat }
+        bp.CategoriesHash = { [cat] = true}
+        return
+    end
+    if not TableFind(cats, cat) then
+        TableInsert(cats, cat)
+        bp.CategoriesHash[cat] = true
+    end
+end
+
+--- Merges the weapon bp into the weapon bp found with the label.  
+--- If the label is not found, the weapon is inserted at the desired index or at the end of the array.  
+--- This helps with weapon merge blueprints and adding AI-controlling weapons (index 1).  
+--- It uses `BlueprintMerged`, so fields in `newBp` set to `"__nil"` will set it to nil in the result.
+---@param baseBp UnitBlueprint
+---@param label string
+---@param insertPos? integer
+---@param newBp WeaponBlueprint
+function MergeWeaponByLabel(baseBp, label, insertPos, newBp)
+    local weaponTable = baseBp.Weapon
+    if not weaponTable then
+        baseBp.Weapon = { newBp }
+        return
+    end
+
+    for i, w in weaponTable do
+        if w.Label == label then
+            weaponTable[i] = BlueprintMerged(w, newBp)
+            return
+        end
+    end
+
+    if insertPos then
+        local size = table.getn(weaponTable)
+        if insertPos > size + 1 then
+            WARN("Tried to insert a weapon bp in a position beyond the end of the Weapon array! Inserting at the end instead.")
+            TableInsert(weaponTable, newBp)
+        else
+            TableInsert(weaponTable, insertPos, newBp)
+        end
+    else
+        TableInsert(weaponTable, newBp)
+    end
+end
+
+--#endregion
 
 local NewDummies = {}
 
@@ -1014,6 +1192,8 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     end
     InitOriginalBlueprints()
 
+    trackDependencies = true
+
     if not skipGameFiles then
         for _, dir in directories do
             task = 'Blueprints Loading: original files from ' .. dir .. ' directory'
@@ -1081,6 +1261,7 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     LOG('Blueprints Modding...')
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    RunModBlueprintFunctions(original_blueprints)
     PostModBlueprints(original_blueprints)
 
     stats.UnitsTotal = table.getsize(original_blueprints.Unit)
@@ -1095,6 +1276,8 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
         LOG('Blueprints Loading... completed: ' .. stats.ProjsOrg .. ' original and '
                                                 .. stats.ProjsMod .. ' modded projectiles')
     end
+
+    trackDependencies = false
 
     if not skipRegistration then
         BlueprintLoaderUpdateProgress()
@@ -1111,11 +1294,14 @@ end
 function ReloadBlueprint(file)
     InitOriginalBlueprints()
 
+    reloadingBlueprint = true
     safecall("Blueprints Reloading... " .. file, doscript, file)
+    reloadingBlueprint = false
 
     ExtractAllMeshBlueprints()
     PreModBlueprints(original_blueprints)
     ModBlueprints(original_blueprints)
+    RunModBlueprintFunctions(original_blueprints)
     PostModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
