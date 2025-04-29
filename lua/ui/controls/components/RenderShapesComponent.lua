@@ -22,7 +22,7 @@
 
 --- A component to encapsulate the logic used to render shapes in the world.
 ---@class UIRenderShapesComponent
----@field Shapes table<string, Renderable> | TrashBag
+---@field Shapes table<string, UIShape> | TrashBag
 RenderShapesComponent = ClassSimple {
 
     -- Related binary patches that make this possible:
@@ -40,7 +40,7 @@ RenderShapesComponent = ClassSimple {
     --- The shape is stored in a weak table. If there's no other active
     --- reference to the shape then the garbage collector will clean it up.
     ---@param self UIRenderShapesComponent | WorldView
-    ---@param shape Renderable
+    ---@param shape UIShape
     ---@param id string
     AddShape = function(self, shape, id)
         self.Trash:Add(shape)
@@ -76,18 +76,18 @@ RenderShapesComponent = ClassSimple {
 
     --- Is called each frame for each shape to render it. 
     ---@param self UIRenderShapesComponent | WorldView
-    ---@param shape Renderable
+    ---@param shape UIShape
     ---@param delta number
     ---@return boolean  # if false then some error happened during rendering. 
     OnRenderShape = function(self, shape, delta)
         -- sanity check on the data
-        if not shape or not shape.OnRender then
+        if not (shape and shape.OnRender) then
             WARN("Shape is nil or does not have an 'OnRender' function")
             return false
         end
 
         -- sanity check on the logic of the function
-        local ok, msg = pcall(shape.OnRender, shape, delta)
+        local ok, msg = pcall(shape.Render, shape, delta)
         if not ok then
             WARN(msg)
             return false
