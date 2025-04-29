@@ -10,7 +10,8 @@ local OutputDirectory = "D:/faf-development/fa.wiki/"
 local WikiGeneratorDirectory = "D:/faf-development/BrewWikiGen/"
 local FADirectory = "D:/faf-development/fa/"
 
--- This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required
+--#region This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required by command-line arguments
+
 local function parse_args(arg)
     local args = {}
     for i = 1, table.getn(arg) do
