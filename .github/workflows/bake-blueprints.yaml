@@ -66,17 +66,7 @@ jobs:
           path: ./fa
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            # necessary for the workflow to work
-
-            .github
-
-            # necessary for the wiki gen to work
-
-            loc/*.lua
-            lua/*.lua
-
-            # include all blueprint files
-
+            *.lua
             *.bp
 
       # Install the correct version of Lua
