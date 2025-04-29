@@ -14,7 +14,7 @@ local FADirectory = "D:/faf-development/fa/"
 
 local function parse_args(arg)
     local args = {}
-    for i = 1, table.getn(arg) do
+    for i = 1, #arg do
         local key, value = arg[i]:match("--([^=]+)=(.*)")
         if key and value then
             key = key:gsub("^%-+", "")  -- Remove leading '-' characters

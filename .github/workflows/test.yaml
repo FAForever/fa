@@ -27,6 +27,9 @@ jobs:
             *.sh
             *.lua
             *.bp
+
+            # Exclude Lua that is not supposed to be shipped
+            !.github/*.lua
       - name: Check Lua syntax
         run: "bash ./tests/run-syntax-test.sh"
   testUtils:
