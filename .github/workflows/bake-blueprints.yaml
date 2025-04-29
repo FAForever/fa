@@ -62,7 +62,7 @@ jobs:
       - name: Checkout FAF Repository
         uses: actions/checkout@v4
         with:
-          ref: reference
+          ref: ${{ inputs.reference }}
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           path: ./fa
           sparse-checkout-cone-mode: false
