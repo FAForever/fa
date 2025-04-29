@@ -114,7 +114,7 @@ jobs:
 
           git checkout -b bake/${{ inputs.blueprints }}-${{ github.run_id }}
 
-          git add .
+          git stage .
           git commit -m "Bake properties of ${{ inputs.blueprints }}"
           git push origin bake/${{ inputs.blueprints }}-${{ github.run_id }}
 

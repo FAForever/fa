@@ -66,11 +66,11 @@ EnvironmentData = {
     },
 
     LoadExtraBlueprints = {
-        Beam = true,
-        Mesh = true,
+        Beam = false,
+        Mesh = false,
         Prop = true,
-        Emitter = true,
-        TrailEmitter = true,
+        Emitter = false,
+        TrailEmitter = false,
     },
 }
 
