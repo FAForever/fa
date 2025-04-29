@@ -41,6 +41,7 @@ print("Directories set")
 print("Output Directory: " ..OutputDirectory)
 print("Wiki Generator Directory: " ..WikiGeneratorDirectory)
 print("FA Directory: " ..FADirectory)
+--#endregion
 
 EnvironmentData = {
     name = 'Forged Alliance',
