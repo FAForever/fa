@@ -64,16 +64,23 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           path: ./fa
-          sparse-checkout-cone-mode: |
-            .github/*
+          sparse-checkout-cone-mode: true 
+          sparse-checkout: |
+            # necessary for the workflow to work
+
+            .github
+
+            # necessary for the wiki gen to work
+
             loc
             lua/ui/help/unitscription.lua
             lua/ui/help/tooltips.lua
             lua/sim/AdjacencyBuffs.lua
             lua/system/Blueprints.lua
-            units/*_unit.bp
-            units/*_LOD0.scm
-            projectiles
+
+            # include all blueprint files
+
+            *.bp
 
       # Install the correct version of Lua
       - name: Install Lua 5.4
