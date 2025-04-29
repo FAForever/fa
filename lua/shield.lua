@@ -595,17 +595,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 local guards = UnitGetGuards(owner)
                 if not TableEmpty(guards) then
                     -- filter out guards with something queued after the shield assist order, as to not delete clear their queue
-                    -- keep track if we have guards left over to issue orders to
-                    local hasValidGuards = false
                     for i, guard in guards do
                         if TableGetn(UnitGetCommandQueue(guard)) >= 2 then
                             guards[i] = nil
-                        elseif not hasValidGuards then
-                            hasValidGuards = true
                         end
                     end
 
-                    if hasValidGuards then
+                    if not TableEmpty(guards) then
                         -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
                         IssueClearCommands(guards)
                         IssueRepair(guards, owner)
