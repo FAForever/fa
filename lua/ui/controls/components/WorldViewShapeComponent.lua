@@ -21,16 +21,16 @@
 --******************************************************************************************************
 
 --- A component to encapsulate the logic used to render shapes in the world.
----@class UIRenderShapesComponent
+---@class UIWorldViewShapeComponent
 ---@field Shapes table<string, UIShape> | TrashBag
-RenderShapesComponent = ClassSimple {
+WorldViewShapeComponent = ClassSimple {
 
     -- Related binary patches that make this possible:
     -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
     -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
     -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
 
-    ---@param self UIRenderShapesComponent | WorldView
+    ---@param self UIWorldViewShapeComponent | WorldView
     __post_init = function(self)
         self.Shapes = TrashBag()
     end,
@@ -39,7 +39,7 @@ RenderShapesComponent = ClassSimple {
     ---
     --- The shape is stored in a weak table. If there's no other active
     --- reference to the shape then the garbage collector will clean it up.
-    ---@param self UIRenderShapesComponent | WorldView
+    ---@param self UIWorldViewShapeComponent | WorldView
     ---@param shape UIShape
     ---@param id string
     AddShape = function(self, shape, id)
@@ -52,7 +52,7 @@ RenderShapesComponent = ClassSimple {
     end,
 
     --- Removes a shape. It will no longer be rendered to the world view.
-    ---@param self UIRenderShapesComponent | WorldView
+    ---@param self UIWorldViewShapeComponent | WorldView
     ---@param id string
     RemoveShape = function(self, id)
         self.Shapes[id] = nil
@@ -63,7 +63,7 @@ RenderShapesComponent = ClassSimple {
     end,
 
     --- Is called each frame by the engine to render shapes when custom rendering is enabled. All shapes that fail to render are removed.
-    ---@param self UIRenderShapesComponent | WorldView
+    ---@param self UIWorldViewShapeComponent | WorldView
     ---@param delta number
     OnRenderWorld = function(self, delta)
         for id, shape in self.Shapes do
@@ -75,7 +75,7 @@ RenderShapesComponent = ClassSimple {
     end,
 
     --- Is called each frame for each shape to render it. 
-    ---@param self UIRenderShapesComponent | WorldView
+    ---@param self UIWorldViewShapeComponent | WorldView
     ---@param shape UIShape
     ---@param delta number
     ---@return boolean  # if false then some error happened during rendering. 

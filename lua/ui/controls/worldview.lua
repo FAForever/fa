@@ -20,7 +20,7 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
 local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
-local RenderShapesComponent = import("/lua/ui/controls/components/RenderShapesComponent.lua").RenderShapesComponent
+local WorldViewShapeComponent = import("/lua/ui/controls/components/WorldViewShapeComponent.lua").WorldViewShapeComponent
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -214,7 +214,7 @@ local orderToCursorCallback = {
     RULEUCC_RetaliateToggle = nil,
 }
 
----@class WorldView : moho.UIWorldView, Control, UIRenderShapesComponent
+---@class WorldView : moho.UIWorldView, Control, UIWorldViewShapeComponent
 ---@field _cameraName string        # Name of the camera this world view is attached to.
 ---@field _disableMarkers boolean   # If true then markers won't show.
 ---@field _displayName string       # Used in the interface
@@ -229,14 +229,14 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
-WorldView = ClassUI(moho.UIWorldView, Control, RenderShapesComponent) {
+WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent) {
 
     PingThreads = {},
 
     ---@param self WorldView
     ---@param spec any
     __post_init = function(self, spec)
-        RenderShapesComponent.__post_init(self)
+        WorldViewShapeComponent.__post_init(self)
 
         --- Contains cursor textures
         self.Cursor = { }
