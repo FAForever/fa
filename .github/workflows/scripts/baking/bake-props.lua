@@ -13,7 +13,7 @@ local FADirectory = "D:/faf-development/fa/"
 -- This section deals with overriding the OutputDirectory and WikiGeneratorDirectory if required
 local function parse_args(arg)
     local args = {}
-    for i = 1, #arg do
+    for i = 1, table.getn(arg) do
         local key, value = arg[i]:match("--([^=]+)=(.*)")
         if key and value then
             key = key:gsub("^%-+", "")  -- Remove leading '-' characters
