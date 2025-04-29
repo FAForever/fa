@@ -22,7 +22,7 @@
 
 --- A component to encapsulate the logic used to render shapes in the world.
 ---@class UIRenderShapesComponent
----@field Shapes table<string, UIShape>
+---@field Shapes table<string, UIShape> | TrashBag
 RenderShapesComponent = ClassSimple {
 
     -- Related binary patches that make this possible:
@@ -81,7 +81,8 @@ RenderShapesComponent = ClassSimple {
     ---@return boolean  # if false then some error happened during rendering. 
     OnRenderShape = function(self, shape, delta)
         -- sanity check on the data
-        if not shape or not shape.Render then
+        if not (shape and shape.OnRender) then
+            WARN("Shape is nil or does not have an 'OnRender' function")
             return false
         end
 
