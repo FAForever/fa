@@ -104,8 +104,37 @@ jobs:
         run: |
           lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/" --FADirectory="fa/"
 
+      # Create a branch, commit and pull request
+      - name: Create a pull request
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: fa
+        run: |
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git checkout -b bake/${{ inputs.blueprints }}-${{ github.run_id }}
+
+          git add .
+          git commit -m "Bake properties of ${{ inputs.blueprints }}"
+          git push origin bake/${{ inputs.blueprints }}-${{ github.run_id }}
+
+          # Install GitHub CLI (gh)
+          sudo apt update
+          sudo apt install gh -y
+
+          # Authenticate gh (use GITHUB_TOKEN)
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+          # Create a PR
+          gh pr create \
+            --title "Bake properties of ${{ inputs.blueprints }}" \
+            --body "This PR was automatically generated." \
+            --base ${{ github.ref_name }} \
+            --head bake/${{ inputs.blueprints }}-${{ github.run_id }}
+
       # Create a commit and push it
-      - name: Create commit
+      - name: Create a commit
+        if: github.event_name != 'workflow_dispatch'
         working-directory: fa
         run: |
           git config user.email "github@faforever.com"
