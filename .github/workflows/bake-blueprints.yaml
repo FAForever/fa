@@ -72,11 +72,8 @@ jobs:
 
             # necessary for the wiki gen to work
 
-            loc
-            lua/ui/help/unitscription.lua
-            lua/ui/help/tooltips.lua
-            lua/sim/AdjacencyBuffs.lua
-            lua/system/Blueprints.lua
+            loc/*.lua
+            lua/*.lua
 
             # include all blueprint files
 
