@@ -63,7 +63,7 @@ EnvironmentData = {
 
     PreModBlueprints = {},
     PostModBlueprints = {
-        "BatchProcessProps"
+        "BakePropBlueprints"
     },
 
     LoadExtraBlueprints = {
