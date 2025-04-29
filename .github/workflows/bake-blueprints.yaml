@@ -64,6 +64,7 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           path: ./fa
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
             # necessary for the workflow to work
 
