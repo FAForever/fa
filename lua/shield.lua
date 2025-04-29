@@ -601,10 +601,12 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                         end
                     end
 
-                    -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
-                    IssueClearCommands(guards)
-                    IssueRepair(guards, owner)
-                    IssueGuard(guards, owner)
+                    if not TableEmpty(guards) then
+                        -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
+                        IssueClearCommands(guards)
+                        IssueRepair(guards, owner)
+                        IssueGuard(guards, owner)
+                    end
                 end
             end
 
