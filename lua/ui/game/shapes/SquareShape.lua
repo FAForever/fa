@@ -20,15 +20,17 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class UIRenderableSquare : Renderable
+local Shape = import("/lua/ui/game/shapes/Shape.lua").Shape
+
+---@class UISquareShape : UIShape
 ---@field Position Vector
 ---@field Size number
 ---@field Color Color
 ---@field Thickness number
 ---@field WorldView WorldView
-UIRenderableSquare = ClassSimple {
+SquareShape = Class(Shape) {
 
-    ---@param self UIRenderableSquare
+    ---@param self UISquareShape
     ---@param worldview WorldView
     ---@param ox number     # in world coordinates
     ---@param oy number     # in world coordinates
@@ -37,26 +39,15 @@ UIRenderableSquare = ClassSimple {
     ---@param color Color
     ---@param thickness number
     __init = function(self, worldview, ox, oy, oz, size, color, thickness)
-        self.Position = { ox, oy, oz }
+        Shape.__init(self, worldview)
+
         self.Size = size
         self.Color = color
         self.Thickness = thickness
-        self.WorldView = worldview
-
-        worldview:RegisterRenderable(self)
+        self.Position = { ox, oy, oz }
     end,
 
-    ---@param self UIRenderableSquare
-    Destroy = function(self)
-        self:OnDestroy()
-    end,
-
-    ---@param self UIRenderableSquare
-    OnDestroy = function(self)
-        self.WorldView:UnregisterRenderable(self)
-    end,
-
-    ---@param self UIRenderableSquare
+    ---@param self UISquareShape
     ---@param delta number
     OnRender = function(self, delta)
         UI_DrawRect(self.Position, self.Size, self.Color, self.Thickness)
@@ -64,7 +55,7 @@ UIRenderableSquare = ClassSimple {
 
     --#region Properties
 
-    ---@param self UIRenderableSquare
+    ---@param self UISquareShape
     ---@param px number     # in world coordinates
     ---@param py number     # in world coordinates
     ---@param pz number     # in world coordinates
@@ -75,11 +66,37 @@ UIRenderableSquare = ClassSimple {
         position[3] = pz
     end,
 
-    ---@param self UIRenderableSquare
+    ---@param self UISquareShape
+    ---@return number   # in world coordinates
+    ---@return number   # in world coordinates
+    ---@return number   # in world coordinates
     GetPosition = function(self)
         return unpack(self.Position)
     end
 
     --#endregion
-
 }
+
+--- Creates a square shape with the given properties.
+---@param worldview WorldView
+---@param ox number # in world coordinates
+---@param oy number # in world coordinates
+---@param oz number # in world coordinates
+---@param size number
+---@param color Color
+---@param thickness number
+---@return UISquareShape
+CreateSquareShapeXYZ = function(worldview, ox, oy, oz, size, color, thickness)
+    return SquareShape(worldview, ox, oy, oz, size, color, thickness) --[[@as UISquareShape]]
+end
+
+--- Creates a square shape with the given properties.
+---@param worldview WorldView
+---@param position Vector   # in world coordinates
+---@param size number
+---@param color Color
+---@param thickness number
+---@return UISquareShape
+CreateSquareShape = function(worldview, position, size, color, thickness)
+    return CreateSquareShapeXYZ(worldview, position[1], position[2], position[3], size, color, thickness)
+end

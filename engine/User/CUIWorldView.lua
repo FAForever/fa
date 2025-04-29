@@ -16,11 +16,7 @@ end
 function CUIWorldView:CameraReset()
 end
 
---- If true, enables the rendering of custom world shapes. 
---- 
---- See also:
---- - lua\ui\game\renderable\circle.lua
---- - lua\ui\game\renderable\square.lua
+--- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes.
 --- 
 --- This is introduced via an assembly patch. For more information: https://github.com/FAForever/FA-Binary-Patches/pull/47
 ---@param bool boolean
