@@ -26,4 +26,4 @@
     - SelectionSizeX: 0.36 --> 0.4
     - SelectionSizeZ: 1.3 --> 1.4
 
-      The unit is made slightly larger to prevent it from becoming too effective against Exodus in the early Tech 2 naval stage. The SelectionSizeX
+      The unit is made slightly larger to prevent it from becoming too effective against Exodus in the early Tech 2 naval stage.
