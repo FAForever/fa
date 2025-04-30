@@ -1612,7 +1612,6 @@ options = {
                     },
                 },
             },
-
             {
                 title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
                 key = 'shadow_resolution',
