@@ -3132,12 +3132,12 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.logo, GUI, 1, 1)
 
     local version, gametype, commit = import("/lua/version.lua").GetVersionData()
-    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, "Game version " .. version, 9, UIUtil.bodyFont)
+    GUI.gameVersionText = UIUtil.CreateText(GUI.panel, LOC('<LOC lobui_0466>Game version ') .. version, 9, UIUtil.bodyFont)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
 
-    Tooltip.AddControlTooltipManual(GUI.gameVersionText, 'Version control', string.format(
-        'Game version: %s\nGame type: %s\nCommit hash: %s', version, gametype, commit:sub(1, 8)
+    Tooltip.AddControlTooltipManual(GUI.gameVersionText, '<LOC lobui_0467>Version control', string.format(
+        LOC('<LOC lobui_0468>Game version: %s\nGame type: %s\nCommit hash: %s'), version, gametype, commit:sub(1, 8)
     ))
 
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
@@ -3323,7 +3323,7 @@ function CreateUI(maxPlayers)
     end
 
     -- Create mission briefing button
-    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "<LOC _Briefing>Briefing")
     GUI.briefingButton = briefingButton
     LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
@@ -6319,7 +6319,7 @@ function SetGameTitleText(title)
 end
 
 function ShowTitleDialog()
-    CreateInputDialog(GUI, "Game Title",
+    CreateInputDialog(GUI, "<LOC lobui_0465>Game Title",
         function(self, text)
             -- remove new lines from the text
             text = text:gsub("\r", "")
@@ -6348,7 +6348,7 @@ end
 
 -- Show the rule change dialog.
 function ShowRuleDialog()
-    CreateInputDialog(GUI, "Game Rules",
+    CreateInputDialog(GUI, "<LOC lobui_0464>Game Rules",
         function(self, text)
             SetGameOption("GameRules", text, true)
             SetRuleTitleText(text)
