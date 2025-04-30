@@ -62,7 +62,7 @@ function ExecutePlan(aiBrain)
                 mainManagers.FactoryManager:AddFactory(v)
             end
         end
-        aiBrain:ForkThread(UnitCapWatchThread)
+        aiBrain:ForkThread(UnitCapWatchThread, 0.9, 30)
     end
     if aiBrain.PBM then
         aiBrain:PBMSetEnabled(false)
@@ -84,62 +84,60 @@ function SetupMainBase(aiBrain)
     aiBrain:ForceManagerSort()
 end
 
+---@class UnitCapCullEntry
+---@field categories any  -- Typically a category expression used by the AI
+---@field compare boolean -- Whether this entry compares with another category
+---@field compareTo any?  -- The category to compare against, if compare is true
+---@field cullRatio number -- The ratio (0.0 to 1.0) of units to cull under pressure
+---@field checkAttached boolean -- Whether attached units should be considered
+
+---@type table<string, UnitCapCullEntry>
+local UnitCapCullTable = {
+    Walls = {
+        categories = categories.WALL * categories.STRUCTURE * categories.DEFENSE - categories.CIVILIAN,
+        cullRatio = 0.4,
+        checkAttached = false
+    },
+    T1DefensiveUnits = {
+        categories = categories.TECH1 * categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE),
+        cullRatio = 0.3,
+        checkAttached = true
+    },
+    T1AirUnits = {
+        categories = categories.MOBILE * categories.TECH1 * categories.AIR - categories.TRANSPORTFOCUS - categories.ENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true
+    },
+    T1NavalUnits = {
+        categories = categories.MOBILE * categories.TECH1 * categories.NAVAL - categories.ENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true
+    },
+    T1LandUnits = {
+        categories = categories.MOBILE * categories.TECH1 * categories.LAND - categories.ENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true
+    },
+    T1LandEngineer = {
+        categories = categories.MOBILE * categories.TECH1 * categories.LAND * categories.ENGINEER - categories.COMMAND,
+        compareTo = categories.MOBILE * categories.LAND * categories.ENGINEER * (categories.TECH2 + categories.TECH3)- categories.COMMAND - categories.SUBCOMMANDER - categories.POD - categories.FIELDENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true,
+    },
+}
+
 --- Runs the whole game and kills off units when the AI hits get close to unit cap.
 ---@param aiBrain AIBrain
-function UnitCapWatchThread(aiBrain)
-    -- The cull table describes the types of units we want to cull if we get close to our unit cap
-    -- Options :
-    -- categories - The category of the units we want to cull
-    -- compare - If we want to validate if another type of unit already exist before we cull them
-    -- compareTo - The categories we want to compare against
-    -- checkAttached - If we want to make sure they are not attached to a transport or air staging before culling them
+---@param unitCapDesiredRatio number
+---@param maxCullNumber number
+function UnitCapWatchThread(aiBrain, unitCapDesiredRatio, maxCullNumber)
     -- Remember that this table will run in order, so we want the most deisred to cull first
     -- There is also two configurable settings
     -- cullPressure - Indicates how many units we want to cull per pass. The closer we are to the unit cap the more units we will cull.
     -- dynamicRatioThreshold - What sort of ratio we want when performing compares. So that we dont instantly cull lots of units just because 
     -- one of the next tier is available
 
-    local cullTable = {
-        Walls = {
-            categories = categories.WALL * categories.STRUCTURE * categories.DEFENSE - categories.CIVILIAN,
-            compare = false,
-            cullRatio = 0.4,
-            checkAttached = false
-        },
-        T1DefensiveUnits = {
-            categories = categories.TECH1 * categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE),
-            compare = false,
-            cullRatio = 0.3,
-            checkAttached = true
-        },
-        T1AirUnits = {
-            categories = categories.MOBILE * categories.TECH1 * categories.AIR - categories.TRANSPORTFOCUS - categories.ENGINEER,
-            compare = false,
-            cullRatio = 0.2,
-            checkAttached = true
-        },
-        T1NavalUnits = {
-            categories = categories.MOBILE * categories.TECH1 * categories.NAVAL - categories.ENGINEER,
-            compare = false,
-            cullRatio = 0.2,
-            checkAttached = true
-        },
-        T1LandUnits = {
-            categories = categories.MOBILE * categories.TECH1 * categories.LAND - categories.ENGINEER,
-            compare = false,
-            cullRatio = 0.2,
-            checkAttached = true
-        },
-        T1LandEngineer = {
-            categories = categories.MOBILE * categories.TECH1 * categories.LAND * categories.ENGINEER - categories.COMMAND,
-            compare = true,
-            compareTo = categories.MOBILE * categories.LAND * categories.ENGINEER * (categories.TECH2 + categories.TECH3)- categories.COMMAND - categories.SUBCOMMANDER - categories.POD - categories.FIELDENGINEER,
-            cullRatio = 0.2,
-            checkAttached = true,
-        },
-    }
-    local unitCapDesiredRatio = 0.9
-    local maxCullNumber = 30
+
     while true do
         WaitSeconds(30)
         local brainIndex = aiBrain:GetArmyIndex()
@@ -150,8 +148,8 @@ function UnitCapWatchThread(aiBrain)
             local cullPressure = math.min((capRatio - 0.80) / 0.2, 1)
             local dynamicRatioThreshold = 2.0 - (capRatio - 0.80) * 9
             local culledUnitCount = 0
-            for k, cullType in cullTable do
-                if cullType.compare then
+            for k, cullType in UnitCapCullTable do
+                if cullType.compareTo then
                     local compareFrom = aiBrain:GetCurrentUnits(cullType.categories)
                     local compareTo = aiBrain:GetCurrentUnits(cullType.compareTo)
                     if compareTo > 0 and compareFrom > 0 then
