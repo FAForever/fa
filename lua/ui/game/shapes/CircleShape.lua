@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024 FAForever
+--** Copyright (c) 2025 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,77 +20,42 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@class UIRenderableCircle : Renderable
----@field Identifier string
----@field Hidden boolean
+local Shape = import("/lua/ui/game/shapes/Shape.lua").Shape
+
+---@class UICircleShape : UIShape
 ---@field Position Vector
 ---@field Size number
 ---@field Color Color
 ---@field Thickness number
 ---@field WorldView WorldView
-UIRenderableCircle = ClassSimple {
+CircleShape = Class(Shape) {
 
-    ---@param self UIRenderableCircle
+    ---@param self UICircleShape
     ---@param worldview WorldView
-    ---@param id string
     ---@param ox number     # in world coordinates
     ---@param oy number     # in world coordinates
     ---@param oz number     # in world coordinates
     ---@param size number
     ---@param color Color
     ---@param thickness number
-    __init = function(self, worldview, id, ox, oy, oz, size, color, thickness)
-        self.WorldView = worldview
-        self.Identifier = id
-        self.Position = { ox, oy, oz }
+    __init = function(self, worldview, ox, oy, oz, size, color, thickness)
+        Shape.__init(self, worldview)
+
         self.Size = size
         self.Color = color
         self.Thickness = thickness
-
-        worldview:RegisterRenderable(self, id)
+        self.Position = { ox, oy, oz }
     end,
 
-    ---@param self UIRenderableCircle
-    Destroy = function(self)
-        self:OnDestroy()
-    end,
-
-    ---@param self UIRenderableCircle
-    OnDestroy = function(self)
-        self.WorldView:UnregisterRenderable(self.Identifier)
-    end,
-
-    ---@param self UIRenderableCircle
+    ---@param self UICircleShape
     ---@param delta number
     OnRender = function(self, delta)
-        if not self.Hidden then
-            UI_DrawCircle(self.Position, self.Size, self.Color, self.Thickness)
-        end
-    end,
-
-    ---@param self UIRenderableCircle
-    Hide = function(self)
-        self.Hidden = true
-    end,
-
-    ---@param self UIRenderableCircle
-    Show = function(self)
-        self.Hidden = false
-    end,
-
-    ---@param self UIRenderableCircle
-    SetHidden = function(self, hide)
-        self.Hidden = hide
-    end,
-
-    ---@param self UIRenderableCircle
-    IsHidden = function(self)
-        return self.Hidden
+        UI_DrawCircle(self.Position, self.Size, self.Color, self.Thickness)
     end,
 
     --#region Properties
 
-    ---@param self UIRenderableCircle
+    ---@param self UICircleShape
     ---@param px number     # in world coordinates
     ---@param py number     # in world coordinates
     ---@param pz number     # in world coordinates
@@ -101,14 +66,37 @@ UIRenderableCircle = ClassSimple {
         position[3] = pz
     end,
 
-    ---@param self UIRenderableCircle
-    ---@return number
-    ---@return number
-    ---@return number
+    ---@param self UICircleShape
+    ---@return number   # in world coordinates
+    ---@return number   # in world coordinates
+    ---@return number   # in world coordinates
     GetPosition = function(self)
         return unpack(self.Position)
     end
 
     --#endregion
-
 }
+
+--- Creates a circle shape with the given properties.
+---@param worldview WorldView
+---@param ox number # in world coordinates
+---@param oy number # in world coordinates
+---@param oz number # in world coordinates
+---@param size number
+---@param color Color
+---@param thickness number
+---@return UICircleShape
+CreateCircleShapeXYZ = function(worldview, ox, oy, oz, size, color, thickness)
+    return CircleShape(worldview, ox, oy, oz, size, color, thickness) --[[@as UICircleShape]]
+end
+
+--- Creates a circle shape with the given properties.
+---@param worldview WorldView
+---@param position Vector   # in world coordinates
+---@param size number
+---@param color Color
+---@param thickness number
+---@return UICircleShape
+CreateCircleShape = function(worldview, position, size, color, thickness)
+    return CreateCircleShapeXYZ(worldview, position[1], position[2], position[3], size, color, thickness)
+end
