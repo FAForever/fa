@@ -609,12 +609,12 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
             // This is the length that the light travels underwater back to the camera.
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
             // Light gets absorbed exponentially with distance.
-            float outAbsorption = 1 - exp(-scaledDepth * oneOverCosV);
+            float outAbsorption = 1 - saturate(exp(-scaledDepth * oneOverCosV));
             // Omnidirectional ambient light has an average underwater travel distance of 2 * depth.
             // This is also the same value as directional light under 60 degrees. (30 degrees above
             // the horizon.) This is a sufficient approximation of a typical sun angle on a map, so
             // we don't need to bother with separating the ambient and sun light.
-            float inAbsorption = 1 - exp(-scaledDepth * 2);
+            float inAbsorption = 1 - saturate(exp(-scaledDepth * 2));
             // Darken the color first to simulate the light absorption on the way in.
             color *= 1 - inAbsorption;
             color += emission;
