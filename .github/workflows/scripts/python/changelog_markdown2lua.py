@@ -13,7 +13,7 @@ from pathlib import Path
 
 SCRIPT_NAME = Path(__file__).name
 
-MAX_LINE_LENGTH = 150
+MAX_LINE_LENGTH = 140
 
 LUA_DESC_LINE = '        "{line}"'
 LUA_FILE = """Changelog = {{
