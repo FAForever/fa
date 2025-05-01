@@ -79,6 +79,7 @@ jobs:
           cat lua/version.lua
 
       - name: Create a commit
+        continue-on-error: true
         run: |
           git add .
           git commit -m "Embed version information"
@@ -94,6 +95,7 @@ jobs:
           cat lua/shared/components/DebugComponent.lua
 
       - name: Create a commit
+        continue-on-error: true
         run: |
           git add .
           git commit -m "Update debug references"
@@ -103,6 +105,7 @@ jobs:
           rm -f lua/ui/lobby/changelog/generated/*
 
       - name: Create a commit
+        continue-on-error: true
         run: |
           git add .
           git commit -m "Clear dummy logs"
@@ -122,6 +125,7 @@ jobs:
             lua/ui/lobby
 
       - name: Create a commit
+        continue-on-error: true
         run: |
           git add .
           git commit -m "Add changelogs"
