@@ -59,8 +59,8 @@ jobs:
             effects/**/*.bp
       - name: Check Lua syntax
         run: | 
-          ls -R
           bash ./tests/run-syntax-test.sh
+
   testUtils:
     name: Utility tests
     needs: [syntax]
