@@ -1,5 +1,6 @@
 import yaml
 import logging
+from datetime import date
 from pathlib import Path
 
 MAX_LINE_LENGTH = 150
@@ -27,18 +28,21 @@ def extract_yaml_front_matter(content: str) -> (str, str):
             return yaml_content, rest_of_content
     return '', content
 
-
 def process_markdown_file(markdown_file: Path) -> str | None:
     """Processes a single markdown file and returns the corresponding Lua entry as a string."""
     logging.info(f"Processing file: {markdown_file.name}")
 
+    # Try and extract the date from the file name
     file_name_parts = markdown_file.stem.split('-')
-    if len(file_name_parts) != 4:
-        logging.warning(f"Skipping file with unexpected name format: {markdown_file.name}")
-        return None
-
-    date = '-'.join(file_name_parts[:3])
-    version = file_name_parts[3]
+    if len(file_name_parts) == 4:
+        extracted_date = '-'.join(file_name_parts[:3])
+        version = file_name_parts[3]
+    else:
+        # We assume that the file is generated, such as the changelog of the 
+        # development branches. We default back to the date of today.
+        logging.info(f"Using date of today for file: {markdown_file.name}")
+        extracted_date = date.today().isoformat()
+        version = markdown_file.stem 
 
     try:
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
@@ -47,12 +51,12 @@ def process_markdown_file(markdown_file: Path) -> str | None:
         name = yaml_data.get('title', 'Unknown')
         patch = yaml_data.get('patch', 'Unknown')
 
-        logging.info(f"Extracted metadata - Version: {version}, Title: {name}, Date: {date}")
+        logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {extracted_date}")
 
         entry = f"""        {{
             Version = {version},
             Name = "{name}",
-            Date = "{date}",
+            Date = "{extracted_date}",
             URL = "http://faforever.github.io/fa/changelog/{version}",
             Path = "/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
         }},"""
@@ -61,7 +65,6 @@ def process_markdown_file(markdown_file: Path) -> str | None:
     except Exception as e:
         logging.error(f"Failed to process {markdown_file.name}: {e}")
         return None
-
 
 def create_overview_file(input_dir: Path, output_file: Path):
     """Creates an overview Lua file listing all changelogs with metadata."""
