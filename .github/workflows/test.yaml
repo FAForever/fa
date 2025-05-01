@@ -25,14 +25,35 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            .github/        # negative pattern can only exclude what has been included by a previous positive pattern
+            # include all shell scripts used for testing
             *.sh
-            *.lua
-            *.bp
 
-            # Exclude Lua that is not supposed to be shipped
+            # include all Lua files that we ship
+            env/*.lua
+            meshes/*.lua
+            projectiles/*.lua
+            schook/*.lua
+            effects/*.lua
+            units/*.lua
+            lua/*.lua
+            loc/*.lua
 
-            !.github/*.lua
+            # include all init files
+            init_faf.lua
+            init_fafdevelop.lua
+            init_fafbeta.lua
+            init_shared.lua
+            init.lua
+            init_local_development.lua
+            mod_info.lua
+
+            # Include all blueprint files that we ship
+            env/*.bp
+            meshes/*.bp
+            projectiles/*.bp
+            schook/*.bp
+            units/*.bp
+            effects/*.bp
       - name: Check Lua syntax
         run: "bash ./tests/run-syntax-test.sh"
   testUtils:
