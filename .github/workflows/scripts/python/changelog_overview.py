@@ -2,7 +2,7 @@ import yaml
 import logging
 from datetime import date
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 MAX_LINE_LENGTH = 150
 
@@ -29,21 +29,23 @@ def extract_yaml_front_matter(content: str) -> (str, str):
             return yaml_content, rest_of_content
     return '', content
 
-def process_markdown_file(markdown_file: Path) -> Optional[str]:
-    """Processes a single markdown file and returns the corresponding Lua entry as a string."""
+def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
     logging.info(f"Processing file: {markdown_file.name}")
 
-    # Try and extract the date from the file name
     file_name_parts = markdown_file.stem.split('-')
     if len(file_name_parts) == 4:
-        extracted_date = '-'.join(file_name_parts[:3])
+        date_str = '-'.join(file_name_parts[:3])
         version = file_name_parts[3]
+        try:
+            parsed_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            logging.warning(f"Invalid date format in filename: {date_str}, using today's date.")
+            parsed_date = date.today()
     else:
-        # We assume that the file is generated, such as the changelog of the 
-        # development branches. We default back to the date of today.
-        logging.info(f"Using date of today for file: {markdown_file.name}")
-        extracted_date = date.today().isoformat()
-        version = markdown_file.stem 
+        logging.warning(f"Unexpected filename format: {markdown_file.name}")
+        parsed_date = date.today()
+        date_str = parsed_date.isoformat()
+        version = markdown_file.stem
 
     try:
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
@@ -52,16 +54,16 @@ def process_markdown_file(markdown_file: Path) -> Optional[str]:
         name = yaml_data.get('title', 'Unknown')
         patch = yaml_data.get('patch', 'Unknown')
 
-        logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {extracted_date}")
+        logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {date_str}")
 
         entry = f"""        {{
-            Version = "{version}",
+            Version = {version},
             Name = "{name}",
-            Date = "{extracted_date}",
+            Date = "{date_str}",
             URL = "http://faforever.github.io/fa/changelog/{version}",
             Path = "/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
         }},"""
-        return entry
+        return entry, parsed_date
 
     except Exception as e:
         logging.error(f"Failed to process {markdown_file.name}: {e}")
@@ -69,7 +71,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[str]:
 
 def create_overview_file(input_dir: Path, output_file: Path):
     """Creates an overview Lua file listing all changelogs with metadata."""
-    entries = []
+    entries: list[Tuple[str, date]] = []
 
     logging.info(f"Scanning directory: {input_dir}")
     for markdown_file in input_dir.glob("*.md"):
@@ -80,6 +82,8 @@ def create_overview_file(input_dir: Path, output_file: Path):
     if not entries:
         logging.warning("No valid changelog entries found.")
         return
+
+    entries.sort(key=lambda pair: pair[1], reverse=True)
 
     logging.info("Generating overview Lua content...")
     overview_content = OVERVIEW_HEADER + """
