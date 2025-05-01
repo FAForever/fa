@@ -91,7 +91,7 @@ def create_overview_file(input_dir: Path, output_file: Path):
 Overview = {
     Changelogs = {
 """
-    overview_content += "\n".join(entries)
+    overview_content += "\n".join(entry for entry, _ in entries)
     overview_content += "\n    }\n}\n"
 
     output_file.write_text(overview_content)
