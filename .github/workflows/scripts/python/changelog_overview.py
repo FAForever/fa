@@ -54,7 +54,7 @@ def process_markdown_file(markdown_file: Path) -> str | None:
         logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {extracted_date}")
 
         entry = f"""        {{
-            Version = {version},
+            Version = "{version}",
             Name = "{name}",
             Date = "{extracted_date}",
             URL = "http://faforever.github.io/fa/changelog/{version}",
