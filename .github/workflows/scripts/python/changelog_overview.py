@@ -57,7 +57,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {date_str}")
 
         entry = f"""        {{
-            Version = {version},
+            Version = "{version}",
             Name = "{name}",
             Date = "{date_str}",
             URL = "http://faforever.github.io/fa/changelog/{version}",
