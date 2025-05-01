@@ -1,3 +1,0 @@
-# Prevent staging of (generated) changelog files
-
-*.lua
