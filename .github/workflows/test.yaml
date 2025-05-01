@@ -23,13 +23,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
+            .github/        # negative pattern can only exclude what has been included by a previous positive pattern
             *.sh
             *.lua
             *.bp
 
             # Exclude Lua that is not supposed to be shipped
-            .github/        # negative pattern can only exclude what has been included by a previous positive pattern
+
             !.github/*.lua
       - name: Check Lua syntax
         run: "bash ./tests/run-syntax-test.sh"
