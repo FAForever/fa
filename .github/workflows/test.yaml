@@ -37,7 +37,7 @@ jobs:
             units/**/*.lua
             loc/**/*.lua
             etc/**/*.lua
-            lua   # just everything that's in there
+            lua/**/.lua
 
             # include all init files
             init_faf.lua
@@ -57,7 +57,9 @@ jobs:
             units/**/*.bp
             effects/**/*.bp
       - name: Check Lua syntax
-        run: "bash ./tests/run-syntax-test.sh"
+        run: | 
+          ls -R
+          bash ./tests/run-syntax-test.sh
   testUtils:
     name: Utility tests
     needs: [syntax]
