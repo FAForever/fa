@@ -70,7 +70,7 @@ jobs:
             *.lua
             *.bp
 
-      # Install the correct version of Lua
+      # Install the correct version of Lua for the wiki generator
       - name: Install Lua 5.4
         uses: leafo/gh-actions-lua@v10
         with:
@@ -87,7 +87,7 @@ jobs:
 
             sudo cp "$FILE" brew-wiki-gen/Run.lua
 
-      # Bake the properties
+      # Use the wiki generator to bake the properties
       - name: Execute lua run
         run: |
           lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/" --FADirectory="fa/"
@@ -123,7 +123,6 @@ jobs:
       # Create a commit and push it
       - name: Create a commit
         if: github.event_name != 'workflow_dispatch'
-        continue-on-error: true
         working-directory: fa
         run: |
           git config user.email "github@faforever.com"
