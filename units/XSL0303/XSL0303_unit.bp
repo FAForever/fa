@@ -216,7 +216,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 52,
+            Damage = 57,
             DamageType = "Normal",
             DisplayName = "Aire-au Bolter",
             FireTargetLayerCapsTable = {
@@ -279,7 +279,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 52,
+            Damage = 57,
             DamageType = "Normal",
             DisplayName = "Aire-au Bolter",
             FireTargetLayerCapsTable = {
@@ -355,7 +355,7 @@ UnitBlueprint{
             },
             FiringTolerance = 1,
             Label = "MainTurret",
-            MaxRadius = 28,
+            MaxRadius = 29,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 36,
@@ -377,7 +377,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/30, --10/integer interval in ticks
+            RateOfFire = 10/34, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 175,
             TargetPriorities = {
