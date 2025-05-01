@@ -2,6 +2,7 @@ import yaml
 import logging
 from datetime import date
 from pathlib import Path
+from typing import Optional
 
 MAX_LINE_LENGTH = 150
 
@@ -28,7 +29,7 @@ def extract_yaml_front_matter(content: str) -> (str, str):
             return yaml_content, rest_of_content
     return '', content
 
-def process_markdown_file(markdown_file: Path) -> str | None:
+def process_markdown_file(markdown_file: Path) -> Optional[str]:
     """Processes a single markdown file and returns the corresponding Lua entry as a string."""
     logging.info(f"Processing file: {markdown_file.name}")
 
