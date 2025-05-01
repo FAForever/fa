@@ -51,7 +51,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
         yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
-        name = yaml_data.get('title', 'Unknown')
+        name = yaml_data.get('title', 'Open changes')
         patch = yaml_data.get('patch', 'Unknown')
 
         logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {date_str}")
