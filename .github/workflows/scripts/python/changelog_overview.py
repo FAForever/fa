@@ -28,50 +28,54 @@ def extract_yaml_front_matter(content: str) -> (str, str):
     return '', content
 
 
+def process_markdown_file(markdown_file: Path) -> str | None:
+    """Processes a single markdown file and returns the corresponding Lua entry as a string."""
+    logging.info(f"Processing file: {markdown_file.name}")
+
+    file_name_parts = markdown_file.stem.split('-')
+    if len(file_name_parts) != 4:
+        logging.warning(f"Skipping file with unexpected name format: {markdown_file.name}")
+        return None
+
+    date = '-'.join(file_name_parts[:3])
+    version = file_name_parts[3]
+
+    try:
+        yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
+        yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
+
+        name = yaml_data.get('title', 'Unknown')
+        patch = yaml_data.get('patch', 'Unknown')
+
+        logging.info(f"Extracted metadata - Version: {version}, Title: {name}, Date: {date}")
+
+        entry = f"""        {{
+            Version = {version},
+            Name = "{name}",
+            Date = "{date}",
+            URL = "http://faforever.github.io/fa/changelog/{version}",
+            Path = "/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
+        }},"""
+        return entry
+
+    except Exception as e:
+        logging.error(f"Failed to process {markdown_file.name}: {e}")
+        return None
+
+
 def create_overview_file(input_dir: Path, output_file: Path):
     """Creates an overview Lua file listing all changelogs with metadata."""
-    overview_entries = []
+    entries = []
 
     logging.info(f"Scanning directory: {input_dir}")
     for markdown_file in input_dir.glob("*.md"):
-        logging.info(f"Processing file: {markdown_file.name}")
+        result = process_markdown_file(markdown_file)
+        if result:
+            entries.append(result)
 
-        file_name_parts = markdown_file.stem.split('-')
-        if len(file_name_parts) != 4:
-            logging.warning(f"Skipping file with unexpected name format: {markdown_file.name}")
-            continue
-
-        date = '-'.join(file_name_parts[:3])
-        version = file_name_parts[3]
-
-        try:
-            yaml_content, _ = extract_yaml_front_matter(markdown_file.read_text())
-            yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
-
-            name = yaml_data.get('title', 'Unknown')
-            patch = yaml_data.get('patch', 'Unknown')
-
-            logging.info(f"Extracted metadata - Version: {version}, Title: {name}, Date: {date}")
-
-            entry = {
-                'Version': version,
-                'Name': name,
-                'Patch': patch,
-                'Date': date,
-                'URL': f"http://faforever.github.io/fa/changelog/{version}",
-                'Path': f"/lua/ui/lobby/changelog/generated/{markdown_file.stem}.lua"
-            }
-            overview_entries.append(entry)
-
-        except Exception as e:
-            logging.error(f"Failed to process {markdown_file.name}: {e}")
-
-    if not overview_entries:
+    if not entries:
         logging.warning("No valid changelog entries found.")
         return
-
-    # Sort the entries by version in reverse order
-    overview_entries.sort(key=lambda entry: entry['Version'], reverse=True)
 
     logging.info("Generating overview Lua content...")
     overview_content = OVERVIEW_HEADER + """
@@ -79,8 +83,23 @@ def create_overview_file(input_dir: Path, output_file: Path):
 Overview = {
     Changelogs = {
 """
-    for entry in overview_entries:
-        overview_content += "        {\n"
-        overview_content += f"            Version = {entry['Version']},\n"
-        overview_content += f"            Name = \"{entry['Name']}\",\n"
-        overview_content += f"            Date = \"{entry['Date']}\",\n"
+    overview_content += "\n".join(entries)
+    overview_content += "\n    }\n}\n"
+
+    output_file.write_text(overview_content)
+    logging.info(f"Overview Lua file written to: {output_file}")
+
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate an overview Lua file for changelogs.")
+    parser.add_argument("input_dir", type=Path, help="Directory containing markdown files")
+    parser.add_argument("output_file", type=Path, help="Output Lua file path")
+    args = parser.parse_args()
+
+    create_overview_file(args.input_dir, args.output_file)
+
+
+if __name__ == "__main__":
+    main()
