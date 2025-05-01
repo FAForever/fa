@@ -109,6 +109,7 @@ jobs:
       - name: Commit the new changelogs
         continue-on-error: true
         run: |
+          git status
           git stage .
           git commit -m "Add changelogs"
 
