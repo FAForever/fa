@@ -80,7 +80,7 @@ jobs:
       - name: Create a commit
         continue-on-error: true
         run: |
-          git add .
+          git stage .
           git commit -m "Embed version information"
 
       # Disable debugging statements
@@ -96,7 +96,7 @@ jobs:
       - name: Create a commit
         continue-on-error: true
         run: |
-          git add .
+          git stage .
           git commit -m "Update debug references"
 
       - name: Clear dummy logs
@@ -106,7 +106,7 @@ jobs:
       - name: Create a commit
         continue-on-error: true
         run: |
-          git add .
+          git stage .
           git commit -m "Clear dummy logs"
 
       # Retrieve the generated changelogs
@@ -126,7 +126,7 @@ jobs:
       - name: Create a commit
         continue-on-error: true
         run: |
-          git add .
+          git stage .
           git commit -m "Add changelogs"
 
       # Update the deploy/fafdevelop branch, we force push here because
