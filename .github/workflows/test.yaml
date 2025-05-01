@@ -37,7 +37,7 @@ jobs:
             units/**/*.lua
             loc/**/*.lua
             etc/**/*.lua
-            lua/**/.lua
+            lua/**/*.lua
 
             # include all init files
             init_faf.lua
