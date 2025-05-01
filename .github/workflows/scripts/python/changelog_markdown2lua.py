@@ -78,7 +78,7 @@ def markdown2lua(version: str, content: str) -> str:
     yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
     return LUA_FILE.format(
-        name = yaml_data.get('title', 'Unknown'),
+        name = yaml_data.get('title', 'Open changes'),
         patch = yaml_data.get('patch', 'Unknown'),
         version=version,
         description=lua_description,
