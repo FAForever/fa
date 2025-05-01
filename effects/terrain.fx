@@ -419,8 +419,8 @@ float3 ApplyWaterColor(float3 viewDirection, float terrainHeight, float waterDep
         // but we prevent that terrain tesselation swallows too much of the water when zoomed out
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
         if (MapUsesAdvancedWater()) {
-            // We need to multiply by 4 to be able to reach 98% absorption as the waterDepth can't go over 1.
-            waterDepth *= 4;
+            // We need to multiply by 1.5 to be able to reach 95% absorption as the waterDepth can't go over 1.
+            waterDepth *= 1.5;
             float3 up = float3(0,1,0);
             // This is the length that the light travels underwater back to the camera.
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
