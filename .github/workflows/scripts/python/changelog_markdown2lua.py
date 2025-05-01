@@ -17,7 +17,7 @@ MAX_LINE_LENGTH = 150
 
 LUA_DESC_LINE = '        "{line}"'
 LUA_FILE = """Changelog = {{
-    version = {version},
+    version = "{version}",
     description = {{
 {description}
     }}

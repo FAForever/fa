@@ -39,13 +39,13 @@ local PreferenceKeys = {
 ---@field Changelogs UIChangelogMetadata[]
 
 ---@class UIChangelogMetadata
----@field Version number
+---@field Version string
 ---@field Path string
 ---@field URL string
 ---@field Name string
 
 ---@class UIChangelogData
----@field Version number
+---@field Version string
 ---@field Name string
 ---@field Description string[]
 
