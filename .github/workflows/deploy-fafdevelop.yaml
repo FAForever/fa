@@ -77,7 +77,7 @@ jobs:
           # debugging
           cat lua/version.lua
 
-      - name: Create a commit
+      - name: Commit embedding version information
         continue-on-error: true
         run: |
           git stage .
@@ -93,21 +93,11 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      - name: Create a commit
+      - name: Commit the update to debug references
         continue-on-error: true
         run: |
           git stage .
           git commit -m "Update debug references"
-
-      - name: Clear dummy logs
-        run: |
-          rm -f lua/ui/lobby/changelog/generated/*
-
-      - name: Create a commit
-        continue-on-error: true
-        run: |
-          git stage .
-          git commit -m "Clear dummy logs"
 
       # Retrieve the generated changelogs
       - name: Download lua changelogs
@@ -116,19 +106,19 @@ jobs:
           name: lua_changelog
           path: lua/ui/lobby/changelog/generated
 
+      - name: Commit the new changelogs
+        continue-on-error: true
+        run: |
+          git stage .
+          git commit -m "Add changelogs"
+
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
           name: lua
           path: |
             lua/ui/lobby
-
-      - name: Create a commit
-        continue-on-error: true
-        run: |
-          git stage .
-          git commit -m "Add changelogs"
-
+    
       # Update the deploy/fafdevelop branch, we force push here because
       # we're not interested in fixing conflicts
       - name: Update deploy/fafdevelop
