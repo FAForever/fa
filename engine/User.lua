@@ -589,7 +589,7 @@ function GetSystemTimeSeconds()
 end
 
 ---
----@param filename string
+---@param filename FileName
 ---@param border number? defaults to 1
 ---@return number width
 ---@return number height
@@ -1287,20 +1287,46 @@ end
 function UIZoomTo(units, seconds)
 end
 
----Draws circle in world. Must be called within `WorldView:OnRenderWorld`
----@param pos Vector
+--- Draws a circle in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
+---@param pos Vector  # in world coordinates
 ---@param size number
 ---@param color Color
 ---@param thickness? number
 function UI_DrawCircle(pos, size, color, thickness)
+
+  -- Introduced by an assembly function, see also:
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
+
 end
 
----Draws rectangle in world. Must be called within `WorldView:OnRenderWorld`
----@param pos Vector
+--- Draws a rectangle in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
+---@param pos Vector  # in world coordinates
 ---@param size number
 ---@param color Color
 ---@param thickness? number
 function UI_DrawRect(pos, size, color, thickness)
+
+  -- Introduced by an assembly function, see also:
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
+
+end
+
+--- Draws a line in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
+---@param position1 Vector  # in world coordinates
+---@param position2 Vector  # in world coordinates
+---@param color Color
+---@param thickness? number
+function UI_DrawLine(position1, position2, color, thickness)
+
+  -- Introduced by an assembly function, see also:
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
+
 end
 
 ---
