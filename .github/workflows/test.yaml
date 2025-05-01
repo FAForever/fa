@@ -37,6 +37,7 @@ jobs:
             units/**/*.lua
             lua/**/*.lua
             loc/**/*.lua
+            etc/**/*.lua
 
             # include all init files
             init_faf.lua
@@ -46,6 +47,7 @@ jobs:
             init.lua
             init_local_development.lua
             mod_info.lua
+            SupComDataPath.lua
 
             # Include all blueprint files that we ship
             env/**/*.bp
