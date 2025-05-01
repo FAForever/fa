@@ -29,14 +29,14 @@ jobs:
             *.sh
 
             # include all Lua files that we ship
-            env/*.lua
-            meshes/*.lua
-            projectiles/*.lua
-            schook/*.lua
-            effects/*.lua
-            units/*.lua
-            lua/*.lua
-            loc/*.lua
+            env/**/*.lua
+            meshes/**/*.lua
+            projectiles/**/*.lua
+            schook/**/*.lua
+            effects/**/*.lua
+            units/**/*.lua
+            lua/**/*.lua
+            loc/**/*.lua
 
             # include all init files
             init_faf.lua
@@ -48,12 +48,12 @@ jobs:
             mod_info.lua
 
             # Include all blueprint files that we ship
-            env/*.bp
-            meshes/*.bp
-            projectiles/*.bp
-            schook/*.bp
-            units/*.bp
-            effects/*.bp
+            env/**/*.bp
+            meshes/**/*.bp
+            projectiles/**/*.bp
+            schook/**/*.bp
+            units/**/*.bp
+            effects/**/*.bp
       - name: Check Lua syntax
         run: "bash ./tests/run-syntax-test.sh"
   testUtils:
