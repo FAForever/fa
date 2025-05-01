@@ -41,7 +41,7 @@ jobs:
     name: Create changelog of FAF Develop
     uses: ./.github/workflows/docs-changelog.yaml
     with:
-      reference: deploy/fafdevelop
+      reference: staging/fafdevelop
 
   changelog-lua:
     name: Convert changelogs to Lua
