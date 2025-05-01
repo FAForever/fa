@@ -14,6 +14,11 @@
 
     The muzzle velocity is slightly reduced to encourage occassional dodging.
 
+    - Uall Cavitation Torpedo Launcher:
+      - Range: 28 -> 29
+
+    The range is increased to avoid cluttering the screen with range rings.
+
     - Collision Size Z: 2.3 -> 2.0
     - Collision offset Z: 0 -> 0.2
 
