@@ -17,9 +17,9 @@ MAX_LINE_LENGTH = 150
 
 LUA_DESC_LINE = '        "{line}"'
 LUA_FILE = """Changelog = {{
-    version = {Version},
+    version = {version},
     description = {{
-{Description}
+{description}
     }}
 }}
 """
@@ -78,10 +78,10 @@ def markdown2lua(version: str, content: str) -> str:
     yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
     return LUA_FILE.format(
-        Name = yaml_data.get('title', 'Unknown'),
-        Patch = yaml_data.get('patch', 'Unknown'),
-        Version=version,
-        Description=lua_description,
+        name = yaml_data.get('title', 'Unknown'),
+        patch = yaml_data.get('patch', 'Unknown'),
+        version=version,
+        description=lua_description,
     )
 
 

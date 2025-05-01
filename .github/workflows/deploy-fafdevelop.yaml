@@ -63,6 +63,12 @@ jobs:
           repository: FAForever/fa
           ref: staging/fafdevelop
 
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
         run: |
@@ -72,6 +78,11 @@ jobs:
 
           # debugging
           cat lua/version.lua
+
+      - name: Create a commit
+        run: |
+          git add .
+          git commit -m "Embed version information"
 
       # Disable debugging statements
       #
@@ -83,9 +94,19 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
+      - name: Create a commit
+        run: |
+          git add .
+          git commit -m "Update debug references"
+
       - name: Clear dummy logs
         run: |
           rm -f lua/ui/lobby/changelog/generated/*
+
+      - name: Create a commit
+        run: |
+          git add .
+          git commit -m "Clear dummy logs"
 
       # Retrieve the generated changelogs
       - name: Download lua changelogs
@@ -101,18 +122,13 @@ jobs:
           path: |
             lua/ui/lobby
 
-      # # Create a commit with the changes of the workflow in it
-      # - name: Create a commit
-      #   run: |
-      #     # Configure git
-      #     git config user.email "github@faforever.com"
-      #     git config user.name "FAForever Machine User"
+      - name: Create a commit
+        run: |
+          git add .
+          git commit -m "Add changelogs"
 
-      #     git add .
-      #     git commit -m "Post-process deployment"
-
-      # # Update the deploy/fafdevelop branch, we force push here because
-      # # we're not interested in fixing conflicts
-      # - name: Update deploy/fafdevelop
-      #   run: |
-      #     git push origin HEAD:deploy/fafdevelop --force
+      # Update the deploy/fafdevelop branch, we force push here because
+      # we're not interested in fixing conflicts
+      - name: Update deploy/fafdevelop
+        run: |
+          git push origin HEAD:deploy/fafdevelop --force
