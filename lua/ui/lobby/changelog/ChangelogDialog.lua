@@ -176,7 +176,16 @@ local ChangelogDialog = ClassUI(Group) {
             OpenURL('http://github.com/FAForever/fa/releases')
         end
 
-        self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report a bug")
+        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0005>Patchnotes")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
+        LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
+        self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
+        self.FooterPatchNotesButton:Disable()
+        self.FooterPatchNotesButton.OnClick = function()
+            OpenURL('http://patchnotes.faforever.com')
+        end
+
+        self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0006>Report a bug")
         LayoutHelpers.AtVerticalCenterIn(self.FooterDiscordButton, self.Footer)
         LayoutHelpers.DepthOverParent(self.FooterDiscordButton, self.Footer, 5)
         self.FooterDiscordButton.Left:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(170) end)

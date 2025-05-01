@@ -1,6 +1,13 @@
 UnitBlueprint{
     Description = "<LOC xes0102_desc>Torpedo Boat",
-    AI = { GuardReturnRadius = 30 },
+    AI = {
+        GuardReturnRadius = 30,
+        TargetBones = {
+            "Anti_Torpedo_Left",
+            "Anti_Torpedo_Right",
+            "XES0102",
+        },
+    },
     Audio = {
         AmbientMove = Sound { Bank = 'XES',         Cue = 'XES0102_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
         Killed      = Sound { Bank = 'XES_Destroy', Cue = 'XES0102_Destroy',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -92,12 +99,12 @@ UnitBlueprint{
                 },
             },
         },
-        UniformScale = 0.065,
+        UniformScale = 0.7,
     },
     Economy = {
-        BuildCostEnergy = 6480,
-        BuildCostMass = 810,
-        BuildTime = 3240,
+        BuildCostEnergy = 6000,
+        BuildCostMass = 750,
+        BuildTime = 3000,
     },
     Footprint = {
         SizeX = 3,
@@ -117,13 +124,13 @@ UnitBlueprint{
         UnitName = "<LOC xes0102_name>Cooper",
     },
     Intel = {
-        SonarRadius = 36,
+        SonarRadius = 72,
         VisionRadius = 32,
         WaterVisionRadius = 56,
     },
     LifeBarHeight = 0.075,
-    LifeBarOffset = 0.7,
-    LifeBarSize = 0.5,
+    LifeBarOffset = 0.8,
+    LifeBarSize = 0.7,
     Physics = {
         BackUpDistance = 5,
         CatchUpAcc = 10,
@@ -140,13 +147,13 @@ UnitBlueprint{
         TurnRadius = 5,
         TurnRate = 100,
     },
-    SelectionSizeX = 0.36,
-    SelectionSizeZ = 1.3,
+    SelectionSizeX = 0.4,
+    SelectionSizeZ = 1.4,
     SelectionThickness = 0.31,
-    CollisionOffsetY = -0.375,
-    SizeX = 0.6,
-    SizeY = 0.925,
-    SizeZ = 2,
+    CollisionOffsetY = -0.4,
+    SizeX = 0.8,
+    SizeY = 1.0,
+    SizeZ = 2.2,
     StrategicIconName = "icon_ship2_antinavy",
     StrategicIconSortPriority = 165,
     Veteran = {
@@ -189,7 +196,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 10/33, --10/integer interval in ticks
+            RateOfFire = 10/32, --10/integer interval in ticks
             TargetPriorities = {
                 "SUBMERSIBLE",
                 "MOBILE",

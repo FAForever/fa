@@ -8,6 +8,7 @@ local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLand
 ---@field UnitBeingBuilt? Unit
 ---@field UnitBuildOrder? string
 ---@field rightGunLabel string
+---@field BuildEffectBones? Bone[] -- cached table from blueprint
 CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
@@ -150,7 +151,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
     end,
 
     ---@param self CommandUnit
-    ---@param bones string
+    ---@param bones? Bone[]
     PlayCommanderWarpInEffect = function(self, bones)
         self:HideBone(0, true)
         self:SetUnSelectable(true)
@@ -159,7 +160,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
     end,
 
     ---@param self CommandUnit
-    ---@param bones Bone[]
+    ---@param bones? Bone[]
     WarpInEffectThread = function(self, bones)
         self:PlayUnitSound('CommanderArrival')
         self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):

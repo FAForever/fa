@@ -103,14 +103,15 @@ end
 function CoordinateAttacks()
 end
 
---- Creates a bone manipulator for a weapon, allowing it to aim at a target
+--- Creates a bone manipulator for a weapon, allowing it to aim at a target  
+--- At least one bone must be defined.
 ---@param weapon Weapon
 ---@param label string
----@param turretBone Bone
----@param barrelBone? Bone
+---@param yawBone? Bone # turret bone
+---@param pitchBone? Bone # barrel bone
 ---@param muzzleBone? Bone
 ---@return moho.AimManipulator
-function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
+function CreateAimController(weapon, label, yawBone, pitchBone, muzzleBone)
 end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
@@ -218,13 +219,13 @@ function CreateDecal(position, heading, textureName1, textureName2, type, sizeX,
 end
 
 --- Creates an economy event for the unit that consumes resources over given time.
---- The unit shows the orange build bar for this event.
 ---@param unit Unit
 ---@param totalEnergy number
 ---@param totalMass number
 ---@param timeInSeconds number
+---@param callback? fun(unit: Unit, economyEventProgress: number) # progress is (0,1]. Typically used with `Unit.SetWorkProgress` to show the orange build bar.
 ---@return EconomyEvent
-function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds)
+function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds, callback)
 end
 
 --- creates an emitter at an entity's bone, but does not attach the emitter to it
@@ -727,11 +728,11 @@ end
 function IsUnit(object)
 end
 
---- Orders a group of units to attack-move to a position
+--- Orders a group of units to attack-move to a target
 ---@param units Unit[]
----@param position Vector
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
-function IssueAggressiveMove(units, position)
+function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target

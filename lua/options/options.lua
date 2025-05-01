@@ -467,7 +467,7 @@ options = {
             },
 
             {
-                title = "<LOC selectionsets0001>Double tap control group decay (in ms)",
+                title = "<LOC selectionsets0002>Double tap control group decay (in ms)",
                 key = 'selection_sets_double_tap_decay',
                 type = 'slider',
                 default = 1000,
@@ -501,7 +501,7 @@ options = {
             -- },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade mass extractors",
+                title = "<LOC ASSIST_TO_UPGRADE_MASS>Assist to upgrade mass extractors",
                 key = 'assist_to_upgrade',
                 type = 'toggle',
                 default = 'Off',
@@ -516,7 +516,7 @@ options = {
             },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade radars",
+                title = "<LOC ASSIST_TO_UPGRADE_RADAR>Assist to upgrade radars",
                 key = 'assist_to_upgrade_radar',
                 type = 'toggle',
                 default = 'Off',
@@ -636,7 +636,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_artillery_title>Assist to cap end game artillery with power",
+                title = "<LOC structure_ringing_end_artillery_title>Assist to cap end game artillery with power",
                 key = 'structure_ringing_artillery_end_game',
                 type = 'toggle',
                 default = "on",
@@ -1005,8 +1005,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 1.0 },
-                        { text = "<LOC strat_icon_scale-150>150% (may cause distortions)", key = 1.5 },
-                        { text = "<LOC strat_icon_scale-200>200%", key = 2.0 },
+                        { text = "<LOC strat_icon_scale_150>150% (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale_200>200%", key = 2.0 },
                     },
                 },
             },
@@ -1049,7 +1049,7 @@ options = {
             },
 
             {
-                title = 'Building',
+                title = "<LOC OPTIONS_0327>Building",
                 type = 'header',
 
                 -- these are expected everywhere
@@ -1272,7 +1272,7 @@ options = {
             },
 
             {
-                title = 'Misc',
+                title = "<LOC OPTIONS_0328>Misc",
                 type = 'header',
 
                 -- these are expected everywhere
@@ -1351,7 +1351,7 @@ options = {
             },
 
             {
-                title = 'Casting tools',
+                title = "<LOC OPTIONS_0329>Casting tools",
                 type = 'header',
 
                 -- these are expected everywhere
@@ -1690,7 +1690,7 @@ options = {
                     end
                 end,
                 custom = {
-                    min = 4,
+                    min = 2,
                     max = 16,
                     inc = 1,
                 },
@@ -1700,10 +1700,6 @@ options = {
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
-                update = function(control, value)
-                    logic = import("/lua/options/optionslogic.lua")
-                    logic.SetValue('frametime', 16)
-                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))
@@ -1763,7 +1759,7 @@ options = {
             },
 
             {
-                title = "Extended graphics",
+                title = "<LOC OPTIONS_EXTENDED_GRAPHICS>Extended graphics",
                 key = 'experimental_graphics',
                 type = 'toggle',
                 default = 0,
