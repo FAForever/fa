@@ -192,7 +192,7 @@ UnitBlueprint{
     SelectionSizeZ = 1.4,
     SelectionThickness = 0.3,
     CollisionOffsetZ = 0.2,
-    SizeX = 0.9,
+    SizeX = 0.8,
     SizeY = 0.6,
     SizeZ = 2.0,
     StrategicIconName = "icon_land3_directfire",
