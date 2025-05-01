@@ -38,6 +38,7 @@ jobs:
             loc/**/*.lua
             etc/**/*.lua
             lua/**/*.lua
+            textures/**/*.lua
 
             # include all init files
             init_faf.lua
