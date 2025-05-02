@@ -1,1 +1,0 @@
-- (#6757) Fix the assist shield when an upgrade occurs.
