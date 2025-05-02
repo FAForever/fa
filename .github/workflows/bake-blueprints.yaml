@@ -45,7 +45,7 @@ on:
 
 env:
   COMMIT_MESSAGE: "Bake properties of ${{ inputs.blueprints }}\r\n\r\nThis commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
-  PULL_REQUEST_BODY: "This commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
+  PULL_REQUEST_BODY: "This pull request originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. It involves the baking of properties into blueprints of ${{ inputs.blueprints }}. By baking in the properties we make it easier to understand the behavior of the blueprints." 
            
 jobs:
   bake-blueprints:
