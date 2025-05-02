@@ -1,0 +1,1 @@
+- (#6075) Fixing sera t1 transport platoes landing issues. Sightly improving t2 transport too because it was made worse by one of previous minor fixes.
