@@ -117,17 +117,10 @@ jobs:
           # Authenticate gh (use GITHUB_TOKEN)
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-          # Get some meta data about the changes
-          added=$(git diff --cached --name-status | grep -c '^A' || true)
-          modified=$(git diff --cached --name-status | grep -c '^M' || true)
-          deleted=$(git diff --cached --name-status | grep -c '^D' || true)
-          total=$(git diff --cached --name-status | wc -l)
-          summary="### Changes Summary \n- Added: $added\n- Modified: $modified\n- Deleted: $deleted\n- Files changed: $total\n\n"
-
           # Create a pull request
           gh pr create \
             --title "Bake properties of ${{ inputs.blueprints }}" \
-            --body "$summary${{ env.PULL_REQUEST_BODY }}" \ 
+            --body "${{ env.PULL_REQUEST_BODY }}" \ 
             --base ${{ github.ref_name }} \
             --head bake/${{ inputs.blueprints }}-${{ github.run_id }}
 
