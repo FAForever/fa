@@ -1,1 +1,0 @@
-- (#6075) Fixing seraphim t1 and t2 transports issue of dropping on narrow platoes.
