@@ -45,7 +45,8 @@ on:
 
 env:
   COMMIT_MESSAGE: "Bake properties of ${{ inputs.blueprints }}\r\n\r\nThis commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
-          
+  PULL_REQUEST_BODY: "This commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
+           
 jobs:
   generate-blueprints:
     runs-on: ubuntu-latest
@@ -116,10 +117,17 @@ jobs:
           # Authenticate gh (use GITHUB_TOKEN)
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-          # Create a PR
+          # Get some meta data about the changes
+          added=$(git diff --cached --name-status | grep -c '^A' || true)
+          modified=$(git diff --cached --name-status | grep -c '^M' || true)
+          deleted=$(git diff --cached --name-status | grep -c '^D' || true)
+          total=$(git diff --cached --name-status | wc -l)
+          summary = "### Changes Summary \nAdded: $added\nModified: $modified\nDeleted: $deleted\nTotal: $total\n\n"
+
+          # Create a pull request
           gh pr create \
             --title "Bake properties of ${{ inputs.blueprints }}" \
-            --body "${{ env.COMMIT_MESSAGE }}" \
+            --body "$summary${{ env.PULL_REQUEST_BODY }}" \ 
             --base ${{ github.ref_name }} \
             --head bake/${{ inputs.blueprints }}-${{ github.run_id }}
 
