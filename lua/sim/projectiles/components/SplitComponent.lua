@@ -53,7 +53,9 @@ SplitComponent = ClassSimple {
                 childProjectile:TrackTarget(false)
             end
 
-            childProjectile.Trash:Add(ForkThread(self.ZigZagThread, self, childProjectile))
+            if not childProjectile.MovementThread then
+                childProjectile.Trash:Add(ForkThread(self.ZigZagThread, self, childProjectile))
+            end
         end
     end,
 
