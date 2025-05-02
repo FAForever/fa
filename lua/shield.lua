@@ -590,7 +590,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             EntityAdjustHealth(self, instigator, -absorbed)
 
             -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
-            if tick > owner.tickIssuedShieldRepair then
+            if tick > owner.tickIssuedShieldRepair and not owner:IsUnitState("Upgrading") then
                 owner.tickIssuedShieldRepair = tick
                 local guards = UnitGetGuards(owner)
                 if not TableEmpty(guards) then
