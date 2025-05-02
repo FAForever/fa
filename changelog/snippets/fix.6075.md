@@ -1,1 +1,1 @@
-- (#6075) Fixing sera t1 transport platoes landing issues. Sightly improving t2 transport too because it was made worse by one of previous minor fixes.
+- (#6075) Fixing seraphim t1 and t2 transports issue of dropping on narrow platoes.
