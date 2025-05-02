@@ -2,6 +2,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local SelectionUtils = import("/lua/ui/game/selection.lua")
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 
 local lockZoomEnable = false
 function lockZoom()
@@ -200,9 +201,9 @@ function ACUSelectCG()
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastACUSelectionTime
     if diffTime > 1.0 then
-        ConExecute('UI_SelectByCategory +nearest COMMAND')
+        SelectCommander(false)
     else
-        ConExecute('UI_SelectByCategory +nearest +goto COMMAND')
+        SelectCommander(true)
     end
 
     lastACUSelectionTime = curTime
@@ -379,9 +380,9 @@ function CreateTemplateFactory()
 end
 
 --- Creates a sim callback to set the priorities of the selected units
----@param prioritiesString string A string of categories
----@param name string Name of the priority set, used when printing on screen
----@param exclusive boolean ??
+---@param prioritiesString string | any unparsed category expressions split by commas in order of decreasing priority. Non-string values reset priorities to bluperint spec.
+---@param name string Name of the priority set, used when printing on screen, and synced in unit data `WepPriority` field
+---@param exclusive? boolean If exclusively the given priorities are used, or the default priorities are added underneath
 function SetWeaponPriorities(prioritiesString, name, exclusive)
     local priotable
     if type(prioritiesString) == 'string' then
@@ -394,8 +395,11 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
         table.insert(unitIds, unit:GetEntityId())
     end
 
-    SimCallback({ Func = 'WeaponPriorities',
-        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false } })
+    SimCallback({
+        Func = 'WeaponPriorities',
+        ---@type UIWeaponPriorityData
+        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }
+    })
 end
 
 --- Sets selected units to target the unit (and similar units) that is hovered over
@@ -661,4 +665,31 @@ SelectAllResourceConsumers = function(onscreen)
     end
 
     SelectUnits(units)
+end
+
+--- Select the commander with an option to zoom to. Will search for commanders in transports if none are found otherwise.
+---@param zoomTo boolean
+SelectCommander = function(zoomTo)
+    UISelectionByCategory("COMMAND", false, false, true, false)
+    local selectedUnits = GetSelectedUnits()
+    if not selectedUnits then
+        SetIgnoreSelection(true)
+        UISelectionByCategory("CANTRANSPORTCOMMANDER", false, false, false, false)
+        local transports = GetSelectedUnits()
+        SelectUnits(nil)
+        SetIgnoreSelection(false)
+        for _, transport in transports do
+            local attachedCommanders = EntityCategoryFilterDown(categories.COMMAND, GetAttachedUnitsList({transport}))
+            if attachedCommanders and table.getn(attachedCommanders) > 0 then
+                if zoomTo then
+                    UISelectAndZoomTo(transport, 0)
+                else
+                    SelectUnits({transport})
+                end
+                break
+            end
+        end
+    elseif zoomTo then
+        UIZoomTo(selectedUnits, 0)
+    end
 end

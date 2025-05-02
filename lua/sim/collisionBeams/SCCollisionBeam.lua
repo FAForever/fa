@@ -11,6 +11,6 @@ SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = EffectTemplate.DefaultProjectileAirUnitImpact,
     FxImpactProp = { },
-    FxImpactShield = { },    
+    FxImpactShield = { },
     FxImpactNone = { },
 }
