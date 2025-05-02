@@ -120,9 +120,9 @@ jobs:
           # Create a pull request
           gh pr create \
             --title "Bake properties of ${{ inputs.blueprints }}" \
-            --body "${{ env.PULL_REQUEST_BODY }}" \ 
-            --base ${{ github.ref_name }} \
-            --head bake/${{ inputs.blueprints }}-${{ github.run_id }}
+            --body "${{ env.PULL_REQUEST_BODY }}" \
+            --base "${{ github.ref_name }}" \
+            --head "bake/${{ inputs.blueprints }}-${{ github.run_id }}"
 
       # Create a commit and push it
       - name: Create a commit
