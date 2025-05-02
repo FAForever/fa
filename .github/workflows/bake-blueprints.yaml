@@ -43,6 +43,9 @@ on:
           - staging/fafbeta
           - staging/fafdevelop
 
+env:
+  COMMIT_MESSAGE: "Bake properties of ${{ inputs.blueprints }}\r\n\r\nThis commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
+          
 jobs:
   generate-blueprints:
     runs-on: ubuntu-latest
@@ -103,7 +106,7 @@ jobs:
           git checkout -b bake/${{ inputs.blueprints }}-${{ github.run_id }}
 
           git stage .
-          git commit -m "Bake properties of ${{ inputs.blueprints }}"
+          git commit -m "${{ env.COMMIT_MESSAGE }}"
           git push origin bake/${{ inputs.blueprints }}-${{ github.run_id }}
 
           # Install GitHub CLI (gh)
@@ -116,7 +119,7 @@ jobs:
           # Create a PR
           gh pr create \
             --title "Bake properties of ${{ inputs.blueprints }}" \
-            --body "This PR was automatically generated." \
+            --body "${{ env.COMMIT_MESSAGE }}" \
             --base ${{ github.ref_name }} \
             --head bake/${{ inputs.blueprints }}-${{ github.run_id }}
 
@@ -129,5 +132,5 @@ jobs:
           git config user.name "FAForever Machine User"
 
           git add .
-          git commit -m "Bake properties of ${{ inputs.blueprints }}"
+          git commit -m "${{ env.COMMIT_MESSAGE }}"
           git push
