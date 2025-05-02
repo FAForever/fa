@@ -340,8 +340,14 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
     local unbuiltUnits = {}
     local unbuiltUnitCount = 0
     for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
-        -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
-        if unit:IsBeingBuilt() and not unit.IsUpgrade then
+        if unit:IsBeingBuilt()
+            -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
+            and not unit.IsUpgrade
+            -- Make sure units are parents of themselves to avoid units being built in factories,
+            -- since they are awkward to finish building and they can even block factories.
+            -- TODO: Create a rebuilder for factories.
+            and unit == unit:GetParent()
+        then
             unbuiltUnitCount = unbuiltUnitCount + 1
             unbuiltUnits[unbuiltUnitCount] = unit
         end
