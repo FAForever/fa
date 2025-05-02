@@ -48,7 +48,7 @@ env:
   PULL_REQUEST_BODY: "This commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
            
 jobs:
-  generate-blueprints:
+  bake-blueprints:
     runs-on: ubuntu-latest
     defaults:
       run:
