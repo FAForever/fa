@@ -122,7 +122,7 @@ jobs:
           modified=$(git diff --cached --name-status | grep -c '^M' || true)
           deleted=$(git diff --cached --name-status | grep -c '^D' || true)
           total=$(git diff --cached --name-status | wc -l)
-          summary = "### Changes Summary \nAdded: $added\nModified: $modified\nDeleted: $deleted\nTotal: $total\n\n"
+          summary="### Changes Summary \n- Added: $added\n- Modified: $modified\n- Deleted: $deleted\n- Files changed: $total\n\n"
 
           # Create a pull request
           gh pr create \
