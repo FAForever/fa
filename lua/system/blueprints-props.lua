@@ -113,9 +113,10 @@ local function ProcessLOD(prop)
     local sz = prop.SizeZ or 1
 
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
+    local isTreeLike = prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup'
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
-    if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
-        weighted = 3.4
+    if isTreeLike then
+        weighted = 2.6
     end
 
     -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
@@ -132,6 +133,11 @@ local function ProcessLOD(prop)
 
             -- sanitize the value
             data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+
+            if isTreeLike then
+                -- log the values to screen
+                LOG(prop.Interface.HelpText, k, data.LODCutoff)
+            end
         end
     end
 end
