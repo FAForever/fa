@@ -727,6 +727,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0024>Shadow Fidelity",
         description = "<LOC OPTIONS_0056>Sets Rendering Fidelity for Shadows (off = fastest)",
     },
+    options_shadow_resolution = {
+        title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
+        description = "<LOC OPTIONS_SHADOW_RESOLUTION_DESCRIPTION>Sets resolution of shadows (lower = faster).",
+    },
     options_antialiasing = {
         title = "<LOC OPTIONS_0015>Anti-Aliasing",
         description = "<LOC OPTIONS_0050>Toggles Full Scene Anti-Aliasing (off = fastest)",

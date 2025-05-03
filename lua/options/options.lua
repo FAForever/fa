@@ -1613,6 +1613,23 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
+                key = 'shadow_resolution',
+                type = 'slider',
+                default = 1024,
+                update = function(control, value)
+                    ConExecute(string.format("ren_ShadowSize %d", value))
+                end,
+                set = function(key, value, startup)
+                    ConExecute(string.format("ren_ShadowSize %d", value))
+                end,
+                custom = {
+                    min = 512,
+                    max = 2048,
+                    inc = 256,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0015>Anti-Aliasing",
                 key = 'antialiasing',
                 type = 'toggle',
@@ -1665,13 +1682,34 @@ options = {
                     import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
                 set = function(key, value, startup)
-                    ConExecute("SC_CameraScaleLOD " .. tostring(value))
+                    ConExecute("SC_CameraScaleLOD " .. tostring(math.clamp(value, 0, 2)))
+
+                    if SessionIsActive() then
+                        -- feature: extend the rendering distance of the camera when settings are set to extreme
+                        local worldViewManager = import("/lua/ui/game/worldview.lua")
+                        if worldViewManager then
+                            for k, worldview in worldViewManager.MapControls do
+                                if value > 2 then
+                                    ConExecute(string.format("cam_SetLOD %s 0.70", worldview._cameraName))
+                                else
+                                    ConExecute(string.format("cam_SetLOD %s 1.0", worldview._cameraName))
+                                end
+                            end
+                        end
+                    end
                 end,
                 custom = {
                     states = {
                         { text = "<LOC _Low>", key = 0 },
                         { text = "<LOC _Medium>", key = 1 },
                         { text = "<LOC _High>", key = 2 },
+
+                        -- Note: we intentionally do not use a key of 3 for the "extreme" option
+                        -- because it is not a valid value for the 'cam_SetLOD' console command. To
+                        -- make sure we remain compatible with Steam, we instead set it to something 
+                        -- that is rounded down to 2 by the engine.
+
+                        { text = "<LOC _Extreme>Extreme", key = 2.1 },
                     },
                 },
             },
@@ -1756,23 +1794,6 @@ options = {
                 set = function(key, value, startup)
                     ConExecute("ren_BloomBlurKernelScale " .. tostring(value / 10))
                 end,
-            },
-
-            {
-                title = "<LOC OPTIONS_EXTENDED_GRAPHICS>Extended graphics",
-                key = 'experimental_graphics',
-                type = 'toggle',
-                default = 0,
-                update = function(control, value)
-                end,
-                set = function(key, value, startup)
-                end,
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = 0 },
-                        { text = "<LOC _On>", key = 1 },
-                    },
-                },
             },
         },
     },
