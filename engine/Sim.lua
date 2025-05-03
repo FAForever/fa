@@ -746,7 +746,8 @@ end
 function IssueAttack(units, target)
 end
 
---- Orders a group of units to build a unit
+--- Orders a group of units to build a unit.
+--- Takes 1 tick to apply.
 ---@param units Unit[]
 ---@param blueprintID string
 ---@param count number
