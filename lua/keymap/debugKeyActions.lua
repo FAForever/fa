@@ -315,15 +315,19 @@ local keyActionsDebugAI = {
         category = 'debug'
     },
     ['test_camera_angle_02'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(430)',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(470)',
         category = 'debug'
     },
     ['test_camera_angle_03'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(490)',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(570)',
         category = 'debug'
     },
     ['test_camera_angle_04'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(550)',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(670)',
+        category = 'debug'
+    },
+    ['test_camera_angle_05'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(770)',
         category = 'debug'
     },
 }
