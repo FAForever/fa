@@ -11,6 +11,50 @@ local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
 
+---@class FactoryRebuildData
+---@field UnitBlueprintID UnitId # bp.BlueprintId
+---@field UnitProgress number # progress -- save current progress for some later checks
+---@field TargetBuildTime number # progress * bp.Economy.BuildTime
+---@field UnitHealth number # unitBeingBuilt:GetHealth()
+
+--- Rebuilds a unit inside a factory according to the given data
+---@param factory FactoryUnit
+---@param factoryRebuildData FactoryRebuildData
+function FactoryRebuildUnit(factory, factoryRebuildData)
+    IssueBuildFactory({factory}, factoryRebuildData.UnitBlueprintID, 1)
+    -- wait for build order to start and then rebuild the unit for free
+    WaitTicks(1)
+    if factory.Dead then return end
+    local oldBuildRate = factory:GetBuildRate()
+    factory:SetBuildRate(factoryRebuildData.TargetBuildTime * 10)
+    factory:SetConsumptionPerSecondEnergy(0)
+    factory:SetConsumptionPerSecondMass(0)
+    -- wait for buildpower to apply then return the factory to normal and pause it
+    WaitTicks(1)
+    if factory.Dead then return end
+    factory:SetBuildRate(oldBuildRate)
+    -- consumption values will update back to normal through `Unit:OnPaused`
+    factory:SetPaused(true)
+
+    -- First make sure rebuilding went correctly
+    local rebuiltUnit = factory.UnitBeingBuilt
+    if not rebuiltUnit or math.abs(rebuiltUnit:GetFractionComplete() - factoryRebuildData.UnitProgress) > 0.001 then
+        if rebuiltUnit then rebuiltUnit:Destroy() end
+        IssueClearCommands({ factory })
+        factory:SetPaused(false)
+        WARN(string.format("FactoryRebuildUnit failed to rebuild correctly for factory %s (entity ID %d).\nRebuild data: %s\n%s"
+            , factory.UnitId
+            , factory:GetEntityId()
+            , repr(factoryRebuildData)
+            , debug.traceback()
+        ))
+        return
+    end
+
+    -- Set correct health for the rebuilt unit in case it was damaged in the factory
+    rebuiltUnit:SetHealth(nil, factoryRebuildData.UnitHealth)
+end
+
 -- used to make more expensive units transfer first, in case there's a unit cap issue
 local function TransferUnitsOwnershipComparator(a, b)
     a = a.Blueprint or a.Blueprint
@@ -88,6 +132,8 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local defaultBuildRate
         local upgradeBuildTimeComplete
         local exclude
+        ---@type FactoryRebuildData
+        local factoryRebuildData
 
         local shield = unit.MyShield
         if shield then
@@ -138,6 +184,22 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local externalUnitBeingBuilt = unit--[[@as ExternalFactoryComponent]].ExternalFactory.UnitBeingBuilt
         if externalUnitBeingBuilt then
             externalUnitBeingBuilt:Destroy()
+        end
+
+        -- If this unit is a factory building a unit (parent of the unit being built is our unit)
+        -- then store data to rebuild the factory progress after transfer
+        local unitBeingBuilt = unit.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
+            if unitBeingBuilt:GetParent() == unit then
+                local progress = unitBeingBuilt:GetFractionComplete()
+                local bpBeingBuilt = unitBeingBuilt.Blueprint
+                factoryRebuildData = {
+                    UnitBlueprintID = bpBeingBuilt.BlueprintId,
+                    UnitProgress = progress,
+                    TargetBuildTime = progress * bpBeingBuilt.Economy.BuildTime,
+                    UnitHealth = unitBeingBuilt:GetHealth(),
+                }
+            end
         end
 
         -- changing owner
@@ -251,6 +313,10 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             upgradeUnits[upgradeUnitCount] = newUnit
         end
 
+        if factoryRebuildData then
+            ForkThread(FactoryRebuildUnit, factoryRebuildData)
+        end
+
         unit.IsBeingTransferred = nil
 
         if unit.OnGiven then
@@ -345,7 +411,7 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
             and not unit.IsUpgrade
             -- Make sure units are parents of themselves to avoid units being built in factories,
             -- since they are awkward to finish building and they can even block factories.
-            -- TODO: Create a rebuilder for factories.
+            -- `FactoryRebuildUnit` handles units inside factories correctly.
             and unit == unit:GetParent()
         then
             unbuiltUnitCount = unbuiltUnitCount + 1
