@@ -1,0 +1,1 @@
+- (#6752) Fix (proper) use of sparse checkout cone mode to speed up CI/CD

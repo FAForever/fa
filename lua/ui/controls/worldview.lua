@@ -21,6 +21,7 @@ local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").Telepor
 local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
 local WorldViewCameraComponent = import("/lua/ui/controls/components/WorldViewCameraComponent.lua").WorldViewCameraComponent
+local WorldViewShapeComponent = import("/lua/ui/controls/components/WorldViewShapeComponent.lua").WorldViewShapeComponent
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -35,9 +36,6 @@ local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
 local unitsToWeaponsCached = { }
-
----@class Renderable : Destroyable
----@field OnRender fun(self:Renderable, worldView:WorldView)
 
 ---@class WorldViewDecalData
 ---@field texture string
@@ -217,7 +215,7 @@ local orderToCursorCallback = {
     RULEUCC_RetaliateToggle = nil,
 }
 
----@class WorldView : moho.UIWorldView, Control, UIWorldViewCameraComponent
+---@class WorldView : moho.UIWorldView, Control, UIWorldViewShapeComponent, UIWorldViewCameraComponent
 ---@field _cameraName string        # Name of the camera this world view is attached to.
 ---@field _disableMarkers boolean   # If true then markers won't show.
 ---@field _displayName string       # Used in the interface
@@ -232,14 +230,14 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
----@field Renderables table<string, Renderable>
-WorldView = ClassUI(moho.UIWorldView, Control, WorldViewCameraComponent) {
+WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldViewCameraComponent) {
 
     PingThreads = {},
 
     ---@param self WorldView
     ---@param spec any
     __post_init = function(self, spec)
+        WorldViewShapeComponent.__post_init(self)
 
         --- Contains cursor textures
         self.Cursor = { }
@@ -262,9 +260,6 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewCameraComponent) {
         self.CursorOverride = false
 
         self.Trash = TrashBag()
-
-        self.Renderables = {}
-
     end,
 
     ---@param self WorldView
@@ -961,10 +956,11 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewCameraComponent) {
         return false
     end,
 
+    ---@param self WorldView
     OnDestroy = function(self)
-
         -- take out the trash
         self.Trash:Destroy()
+        self.Shapes:Destroy()
 
         -- take out all ping threads
         for i, v in self.PingThreads do
@@ -1307,54 +1303,4 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewCameraComponent) {
     OnIconsVisible = function(self, areIconsVisible)
         -- called when strat icons are turned on/off
     end,
-
-    ---Add a shape to the draw table, pass an id with no data to remove it
-    ---@param self WorldView
-    ---@param id string -- id for tracking individual shapes
-    ---@param data? table -- data table for shape, pass nil to remove the given id
-    DrawShapeRegistry = function(self, id, data)
-        if data then
-            self:SetCustomRender(true)
-            self.DrawShapesTable[id] = data
-        else
-            self.DrawShapesTable[id] = nil
-        end
-    end,
-
-    --#region Custom Rendering
-
-    --- Register a renderable to render each frame
-    ---@param self WorldView
-    ---@param renderable Renderable
-    ---@param id string
-    RegisterRenderable = function(self, renderable, id)
-        self.Trash:Add(renderable)
-        self.Renderables[id] = renderable
-
-        if not table.empty(self.Renderables) then
-            self:SetCustomRender(true)
-        end
-    end,
-
-    --- Unregister a renderable
-    ---@param self WorldView
-    ---@param id string
-    UnregisterRenderable = function(self, id)
-        self.Renderables[id] = nil
-
-        if table.empty(self.Renderables) then
-            self:SetCustomRender(false)
-        end
-    end,
-
-    --- Is called each frame to render shapes when custom rendering is enabled
-    ---@param self WorldView
-    ---@param delta number
-    OnRenderWorld = function (self, delta)
-        for id, renderable in self.Renderables do
-            renderable:OnRender(delta, delta)
-        end
-    end,
-
-    --#endregion
 }
