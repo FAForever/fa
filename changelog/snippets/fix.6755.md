@@ -1,1 +1,1 @@
-- (#6755) Fix seraphim t1 and t2 transports being unable to drop units on small platoes
+- (#6755) Fix seraphim t1 and t2 transports being unable to drop units on small plateaus.
