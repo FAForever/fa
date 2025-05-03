@@ -268,12 +268,29 @@ Tree = Class(Prop) {
     end,
 }
 
+local id = 0
+
 ---@class TreeGroup : Prop
 TreeGroup = Class(Prop) {
 
     IsTree = true,
     IsTreeGroup = true,
-    
+
+    OnCreate = function(self)
+        Prop.OnCreate(self)
+
+        -- break half of all trees for testing
+        ForkThread(
+            function()
+                WaitTicks(1)
+                id = id + 1
+                if math.mod(id, 2) == 0 then
+                    self:Breakup()
+                end
+            end
+        )
+    end,
+
     --- Break when colliding with a projectile of some sort
     ---@param self TreeGroup
     ---@param other string
