@@ -35,7 +35,7 @@ local SyncIdentifier = "PaintingCanvas.lua"
 ---@alias UIPaintingCanvasActiveInteraction 'Create' | 'Delete' | 'Mute'
 
 --- Responsible for glueing together the painting, the brush stroke and the painting network adapter.
----@class UIPaintingCanvas : Bitmap, DebugComponent, Renderable, Destroyable
+---@class UIPaintingCanvas : Bitmap, DebugComponent, Destroyable
 ---@field Adapter UIPaintingCanvasAdapter
 ---@field Painting UIPainting
 ---@field Trash TrashBag
@@ -214,13 +214,20 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
     --- Responsible for rendering all the paintings that are part of this canvas.
     ---@param self UIPaintingCanvas
-    ---@param delta any
-    OnRender = function(self, delta)
+    Render = function(self, delta)
         -- feature: global toggle to enable/disable painting
         if not self:IsEnabledByGameOptions() then
             self:CancelBrush()
             return false
         end
+
+        self:OnRender(delta)
+    end,
+
+    --- Responsible for rendering all the paintings that are part of this canvas.
+    ---@param self UIPaintingCanvas
+    ---@param delta any
+    OnRender = function(self, delta)
 
         -- feature: render the brush
         if self.PaintingBrush then
