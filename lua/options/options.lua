@@ -822,7 +822,7 @@ options = {
 
 
             {
-                title = "<LOC options_painting_duration_title>Duration of when observing",
+                title = "<LOC options_painting_duration_title>Duration of paintings when observing",
                 key = 'painting_duration_observing',
                 type = 'slider',
                 default = 15,
