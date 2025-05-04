@@ -56,7 +56,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.WorldView = worldview
 
         -- register us to render
-        self.WorldView:RegisterRenderable(self, tostring(self))
+        self.WorldView:AddShape(self, tostring(self))
 
         self.InhibitionSet = {}
     end,
