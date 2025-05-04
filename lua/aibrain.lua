@@ -55,6 +55,10 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
+---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
+---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
+---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
+---@field Army Army # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
     EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
@@ -535,6 +539,23 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                 if units and not table.empty(units) then
                     if victoryOption == 'demoralization' then
                         KillerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
+                        TransferUnitsOwnership(units, KillerIndex)
+                    elseif victoryOption == 'decapitation' then
+                        -- transfer to the killer who defeated the last acu on our team
+                        local lastCommanderKilledTick = self.CommanderKilledTick
+                        local lastKilledAllyIndex = selfIndex
+                        ---@param brain AIBrain
+                        for _, brain in ArmyBrains do
+                            local brainIndex = brain.Army
+                            if brainIndex ~= selfIndex and IsAlly(brainIndex, selfIndex) then
+                                local brainCommanderKilledTick = brain.CommanderKilledTick
+                                if lastCommanderKilledTick < brainCommanderKilledTick then
+                                    lastKilledAllyIndex = brainIndex
+                                    lastCommanderKilledTick = brainCommanderKilledTick
+                                end
+                            end
+                        end
+                        KillerIndex = ArmyBrains[lastKilledAllyIndex].CommanderKilledBy or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
                     else
                         KillerIndex = ArmyBrains[selfIndex].LastUnitKilledBy or selfIndex
