@@ -107,7 +107,7 @@ Wreckage = Class(Prop) {
 }
 
 --- Create a wreckage prop.
----@param bp PropBlueprint
+---@param bp UnitBlueprint
 ---@param position Vector
 ---@param orientation Quaternion
 ---@param mass number

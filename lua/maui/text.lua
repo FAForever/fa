@@ -10,6 +10,7 @@
 
 local Control = import("/lua/maui/control.lua").Control
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class Text : moho.text_methods, Control, InternalObject
 Text = ClassUI(moho.text_methods, Control) {
@@ -20,16 +21,15 @@ Text = ClassUI(moho.text_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
-        self._font = { _family = LazyVar.Create(), _pointsize = LazyVar.Create() }
+        self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
         local onFontChanged = function(var)
             self:_internalSetFont()
         end
         self._font._family.OnDirty = onFontChanged
         self._font._pointsize.OnDirty = onFontChanged
 
-        self._color = LazyVar.Create()
+        self._color = LazyVarCreate()
         self._color.OnDirty = function(var)
             self:SetNewColor(var())
         end
@@ -267,4 +267,32 @@ function WrapText(text, lineWidth, advanceFunction)
         end
     end
     return result
+end
+
+--- Returns text aligned proportionally along a line width.
+---@param text string
+---@param lineWidth number
+---@param advanceFunction function
+---@param alignmentProportion number How far towards the right of the line the text should be aligned. 0.5 for middle alignment, 1.0 for right alignment.
+---@return string
+---@overload fun(text: string[], lineWidth: number, advanceFunction: function, alignmentProportion: number): string[]
+function AlignText(text, lineWidth, advanceFunction, alignmentProportion)
+    local spaceWidth = advanceFunction(" ")
+
+    if type(text) == "string" then
+        local textWidth = advanceFunction(text)
+        local spacesToAdd = math.floor((lineWidth - textWidth) / spaceWidth * alignmentProportion)
+        if spacesToAdd > 0 then
+            return string.rep(" ", spacesToAdd) .. text
+        else
+            return text
+        end
+    else
+        -- text is a table of strings
+        local alignedText = {}
+        for i, line in text do
+            alignedText[i] = AlignText(line, lineWidth, advanceFunction, alignmentProportion)
+        end
+        return alignedText
+    end
 end
