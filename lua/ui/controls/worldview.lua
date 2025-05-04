@@ -1283,7 +1283,6 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
     Register = function(self, cameraName, disableMarkers, displayName, order)
         WorldViewCameraComponent.Register(self, cameraName, disableMarkers, displayName, order)
         
-        self._cameraName = cameraName
         self._disableMarkers = disableMarkers
         self._displayName = displayName
         self._order = order or 5

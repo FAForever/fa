@@ -30,6 +30,8 @@ WorldViewCameraComponent = ClassSimple {
     ---@param order number
     Register = function(self, cameraName, disableMarkers, displayName, order)
 
+        self._cameraName = cameraName
+
         -- feature: extend the rendering distance of the camera when settings are set to extreme
 
         local lodOption = GetOptions('level_of_detail')
