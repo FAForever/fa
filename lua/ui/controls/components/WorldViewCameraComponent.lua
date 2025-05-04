@@ -37,4 +37,11 @@ WorldViewCameraComponent = ClassSimple {
             ConExecute(string.format("cam_SetLOD %s 0.70", tostring(cameraName)))
         end
     end,
+
+    --- Retrieves the world camera of this worldview.
+    ---@param self UIWorldViewCameraComponent | WorldView
+    ---@return Camera
+    GetCamera = function(self)
+        return GetCamera(self._cameraName)
+    end
 }
