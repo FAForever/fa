@@ -196,7 +196,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
                 newUnit:CreateEnhancement(enh)
             end
         end
-    
+
         local maxHealth = newUnit:GetMaxHealth()
         if unitHealth > maxHealth then
             unitHealth = maxHealth
@@ -206,7 +206,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         if hasFuel then
             newUnit:SetFuelRatio(fuelRatio)
         end
-        
+
         if tarmacs then
             newUnit.TarmacBag = tarmacs
         end
@@ -563,7 +563,7 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
             local orientation = tracker.UnitOrientation
             -- Refund exactly how much mass was put into the unit
             local completionFactor = tracker.TargetBuildTime / bp.Economy.BuildTime
-            local mass = bp.Economy.BuildCostMass * completionFactor 
+            local mass = bp.Economy.BuildCostMass * completionFactor
             -- Don't refund energy because it would be counterintuitive for wreckage
             local energy = 0
             -- global 2x time multiplier for unit wrecks, see `Unit:CreateWreckageProp`
@@ -603,8 +603,7 @@ function GiveUnitsToPlayer(data, units)
 
                 if unitsAfter ~= unitsBefore then
                     -- Maybe spawn an UI dialog instead?
-                    print((unitsBefore - unitsAfter) ..
-                        " engineers/factories could not be transferred due to manual share rules")
+                    print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
                 end
             end
 
@@ -684,7 +683,7 @@ end
 --- Transfer a brain's units to other brains.
 ---@param self AIBrain
 ---@param brains AIBrain[]
----@param transferUnfinishedUnits boolean 
+---@param transferUnfinishedUnits boolean
 ---@param categoriesToTransfer? EntityCategory      # Defaults to ALLUNITS - WALL - COMMAND
 ---@param reason? string # Defaults to "FullShare"
 ---@return Unit[]?
@@ -716,9 +715,9 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
                     table.destructiveCat(totalNewUnits, newUnits)
 
                     Sync.ArmyTransfer = { {
-                        from = self.Army, 
-                        to = brain.Army, 
-                        reason = reason or "FullShare" 
+                        from = self.Army,
+                        to = brain.Army,
+                        reason = reason or "FullShare"
                     } }
                 end
 
@@ -953,7 +952,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
             -- The shared ACUs don't count as keeping the army in the game since they will eventually be removed from the game.
             -- see MatchState.lua CollectDefeatedBrains
             com.RecallingAfterDefeat = true
-            StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
+            StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick()) / 10))
         end
 
         local oneComAlive = true
