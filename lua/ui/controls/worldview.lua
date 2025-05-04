@@ -1037,9 +1037,6 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent) {
     ---@param self WorldView
     ---@param pingData table
     DisplayPing = function(self, pingData)
-
-        reprsl(pingData)
-
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
             self:FlashScoreboardIcon(pingData.Owner + 1) -- zero-based to one-based
