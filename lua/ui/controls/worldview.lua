@@ -1261,25 +1261,6 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
         end
     end,
 
-    ---@param self WorldView
-    ---@param parent Control
-    ---@param location Vector   # in world coordinates
-    ---@param color Color
-    ---@param stayOnScreen? boolean
-    ---@return UIOffScreenIndicator
-    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
-        local module = import("/lua/ui/game/OffscreenMarkerIndicator.lua")
-
-        if color == 'blue' then
-            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Blue')
-        elseif color == 'red' then
-            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Red')
-        end
-
-       -- default to yellow
-       return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Yellow')
-    end,
-
     Register = function(self, cameraName, disableMarkers, displayName, order)
         WorldViewCameraComponent.Register(self, cameraName, disableMarkers, displayName, order)
         

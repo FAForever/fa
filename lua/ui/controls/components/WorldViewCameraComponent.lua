@@ -45,5 +45,25 @@ WorldViewCameraComponent = ClassSimple {
     ---@return Camera
     GetCamera = function(self)
         return GetCamera(self._cameraName)
-    end
+    end,
+
+    --- Creates an indicator that points to a location in the world.
+    ---@param self WorldView
+    ---@param parent Control
+    ---@param location Vector   # in world coordinates
+    ---@param color Color
+    ---@param stayOnScreen? boolean
+    ---@return UIOffScreenIndicator
+    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
+        local module = import("/lua/ui/game/OffscreenMarkerIndicator.lua")
+
+        if color == 'blue' then
+            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Blue')
+        elseif color == 'red' then
+            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Red')
+        end
+
+       -- default to yellow
+       return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Yellow')
+    end,
 }
