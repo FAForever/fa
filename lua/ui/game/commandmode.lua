@@ -383,12 +383,14 @@ local function UpgradeUnit(unit)
     -- inform the user
     print("Upgrade unit")
 
-    -- pause it
-    WaitTicks(5)
+    -- wait one tick for the upgrade to start
+    WaitTicks(1)
+
     if IsDestroyed(unit) then
         return
     end
 
+    -- pause the unit (again)
     SetPaused(units, true)
 end
 

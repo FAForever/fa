@@ -194,13 +194,6 @@ function CreateUI(isReplay)
     -- always try and render shadows
     ConExecute("ren_ShadowLOD 20000")
 
-    -- enable experimental graphics
-    if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
-        Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
-    then
-        ForkThread(ExperimentalGraphicsSettingsThread)
-    end
-
     local focusArmy = GetFocusArmy()
 
     -- keep track of the original focus army
@@ -353,18 +346,6 @@ function CreateUI(isReplay)
     import("/lua/keymap/hotkeylabels.lua").init()
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
-end
-
-function ExperimentalGraphicsSettingsThread()
-    WaitSeconds(1.0)
-
-    if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-        ConExecute("cam_SetLOD WorldCamera 0.70")
-    end
-
-    if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-        ConExecute("ren_ShadowSize 2048")
-    end
 end
 
 --- Find out the max Hz capability of the adapter so we don't render unnecessary frames, reducing the load on the render thread.

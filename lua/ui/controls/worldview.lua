@@ -20,6 +20,7 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
 local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
+local WorldViewCameraComponent = import("/lua/ui/controls/components/WorldViewCameraComponent.lua").WorldViewCameraComponent
 local WorldViewShapeComponent = import("/lua/ui/controls/components/WorldViewShapeComponent.lua").WorldViewShapeComponent
 
 WorldViewParams = {
@@ -214,7 +215,7 @@ local orderToCursorCallback = {
     RULEUCC_RetaliateToggle = nil,
 }
 
----@class WorldView : moho.UIWorldView, Control, UIWorldViewShapeComponent
+---@class WorldView : moho.UIWorldView, Control, UIWorldViewShapeComponent, UIWorldViewCameraComponent
 ---@field _cameraName string        # Name of the camera this world view is attached to.
 ---@field _disableMarkers boolean   # If true then markers won't show.
 ---@field _displayName string       # Used in the interface
@@ -230,7 +231,7 @@ local orderToCursorCallback = {
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
 ---@field PaintingCanvas UIPaintingCanvas
-WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent) {
+WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldViewCameraComponent) {
 
     PingThreads = {},
 
@@ -1294,6 +1295,8 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent) {
     end,
 
     Register = function(self, cameraName, disableMarkers, displayName, order)
+        WorldViewCameraComponent.Register(self, cameraName, disableMarkers, displayName, order)
+        
         self._cameraName = cameraName
         self._disableMarkers = disableMarkers
         self._displayName = displayName
