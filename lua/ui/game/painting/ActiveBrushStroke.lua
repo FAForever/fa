@@ -71,6 +71,16 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         end
     end,
 
+    ---@param self UIBrushStroke
+    ---@param color Color
+    ---@param progress number   # number between 0 and 1.0
+    ---@return Color
+    ComputeDecayedColor = function(self, color, progress)
+        -- The active brush stroke does not decay.
+
+        return color
+    end,
+
     ---------------------------------------------------------------------------
     --#region Creation of samples interface
 
