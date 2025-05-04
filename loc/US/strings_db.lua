@@ -6750,10 +6750,17 @@ urs0304_name="Plan B"
 urs0305_desc="Sonar Platform"
 urs0305_help="Sonar Platform"
 urs0305_name="Flood XR"
+
 usersync_0001="%s wins!"
 usersync_0002="%s has been defeated!"
 usersync_0003="%s receives a draw."
 usersync_0004="Game Over."
+usersync_0005="Disconnect Temporary Share"
+usersync_0006="Disconnect Share"
+usersync_0007="%s\'s units and ACU transferred to you until ACU dies/recalls"
+usersync_0008="%s\'s units and ACU transferred to you until ACU dies"
+usersync_0009="\nShare Condition after: %s"
+
 uvd_0000="Build Cost (Rate)"
 uvd_0002="Yield"
 uvd_0003="Description"
@@ -7737,6 +7744,7 @@ lobui_0781="Teams will be balanced with up to 5%% tolerance of best setup to mak
 lobui_0782="Optimal balance (Mirrored)"
 lobui_0783="Teams will be optimally balanced, mirrored start locations"
 
+-- Share Options
 lobui_0790="Manual Unit Sharing"
 lobui_0791="Are players allowed to manually give units?"
 lobui_0792="Manual unit sharing are allowed"
@@ -7745,6 +7753,31 @@ lobui_0794="No manual sharing of builder/factory"
 lobui_0795="No manual sharing of units"
 lobui_0796="Partial Share"
 lobui_0797="Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy."
+
+lobui_0798="DC Share Conditions"
+lobui_0799="Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU has not been damaged in the last 2 minutes."
+lobui_0800="Same as Share Condition"
+lobui_0801="Treat disconnecting players the same as defeated players."
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
+
+-- More share options
+lobui_0808="DC ACU Share Conditions"
+lobui_0809="Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes."
+lobui_0810="Explode"
+lobui_0811="ACUs explode when their player disconnects."
+lobui_0812="Recall"
+lobui_0813="ACUs not damaged in the last 2 minutes are recalled when their player disconnects."
+lobui_0814="Delayed Recall"
+lobui_0815="Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls."
+lobui_0816="Permanent"
+lobui_0817="Disconnected ACUs are permanently shared to allies."
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
@@ -8196,16 +8229,9 @@ aireplace_0004="A disconnected player will cause the destruction of their units 
 chat_send_type_title="Default recipient: allies"
 chat_send_type_description="When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed."
 
--- unranked lobby option
-lobui_0802="Unrate"
-lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
-lobui_0804="No"
-lobui_0805="This game will be rated if all the criteria for a rated game are met."
-lobui_0806="Yes"
-lobui_0807="This game will not be rated."
-
 replay_id="Replay id"
 map_version="Map version"
+fullshare_announcement="%s\'s units have been transferred to you"
 
 ChangelogDescriptionIdentifier="description"
 

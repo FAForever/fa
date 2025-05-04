@@ -5,6 +5,7 @@
 -- ScrollBar:ScrollPages(float pages)
 
 local Control = import("/lua/maui/control.lua").Control
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@alias ScrollAxis "Horz" | "Vert"
 
@@ -31,11 +32,11 @@ Scrollbar = ClassUI(moho.scrollbar_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua").Create
-        self._bg = LazyVar()
-        self._tm = LazyVar()
-        self._tt = LazyVar()
-        self._tb = LazyVar()
+        
+        self._bg = LazyVarCreate()
+        self._tm = LazyVarCreate()
+        self._tt = LazyVarCreate()
+        self._tb = LazyVarCreate()
 
         self._bg.OnDirty = function(var)
             self:SetNewTextures(var(), nil, nil, nil)
