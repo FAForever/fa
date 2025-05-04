@@ -855,10 +855,29 @@ local function TransferUnitsToKiller(self)
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
 
     if units and not table.empty(units) then
+        local victoryOption = ScenarioInfo.Options.Victory
         local killerIndex
 
-        if ScenarioInfo.Options.Victory == 'demoralization' then
+        if victoryOption == 'demoralization' then
             killerIndex = self.CommanderKilledBy
+        elseif victoryOption == 'decapitation' then
+            local selfIndex = self.Army
+            -- transfer to the killer who defeated the last acu on our team
+            local lastCommanderKilledTick = self.CommanderKilledTick
+            local lastKilledAllyIndex = selfIndex
+            ---@param brain AIBrain
+            for _, brain in ArmyBrains do
+                local brainIndex = brain.Army
+                if brainIndex ~= selfIndex and IsAlly(brainIndex, selfIndex) then
+                    local brainCommanderKilledTick = brain.CommanderKilledTick
+                    if lastCommanderKilledTick < brainCommanderKilledTick then
+                        lastKilledAllyIndex = brainIndex
+                        lastCommanderKilledTick = brainCommanderKilledTick
+                    end
+                end
+            end
+            KillerIndex = ArmyBrains[lastKilledAllyIndex].CommanderKilledBy or selfIndex
+            TransferUnitsOwnership(units, KillerIndex)
         else
             killerIndex = self.LastUnitKilledBy
         end
