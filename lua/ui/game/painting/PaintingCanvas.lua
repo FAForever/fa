@@ -132,7 +132,8 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         -- limitation: only enable painting when no unit is selected. This limitation enables us 
         -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
-        if table.getn(GetSelectedUnits()) == 0 then
+        local selection = GetSelectedUnits()
+        if not selection or table.getn(GetSelectedUnits()) == 0 then
             self:LiftInhibition('selection')
         else
             self:AddInhibition('selection')
