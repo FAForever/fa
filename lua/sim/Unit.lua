@@ -110,10 +110,16 @@ SyncMeta = {
 ---@field UnitBeingBuiltBehavior? thread
 ---@field Combat? boolean
 
+---@class CampaignAIUnitProperties
+---@field BaseName string Name of the BaseManager the unit belongs to
+---@field UnitName string Name of the unit from the map editor (_save.lua)
+---@field SetToUpgrade boolean|nil Unit marked by the BaseManager for upgrade
+---@field CDRData table|nil Copy of the platoon data when the BaseManager upgrades the commander
+
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields, DebugUnitComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -147,6 +153,12 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field CaptureTimeMultiplier? number
 ---@field PlatoonHandle? Platoon
 ---@field tickIssuedShieldRepair number? # Used by shields to keep track of when this unit's guards were ordered to start shield repair instantly
+---@field Sync { id: string, army: Army } # Sync table replicated to the global sync table as to be copied to the user layer at sync time.
+---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
+---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
+---@field Weapons table<string, Weapon> # string is weapon Label
+---@field WeaponInstances Weapon[]
+---@field WeaponCount number
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
@@ -157,7 +169,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     FxDamage2 = {EffectTemplate.DamageFireSmoke01, EffectTemplate.DamageSparks01},
     FxDamage3 = {EffectTemplate.DamageFire01, EffectTemplate.DamageSparks01},
 
-    -- Disables all collisions. This will be true for all units being constructed as upgrades
+    -- Disables all collisions. This will be true for all units being constructed as upgrades and dead units
     DisallowCollisions = false,
 
     -- Destruction parameters
@@ -242,20 +254,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             -- OnStartTransportLoading = {}
             -- OnStopTransportLoading = {}
         }
-    end,
-
-    ---@param self Unit
-    OnCreate = function(self)
-        local bp = self:GetBlueprint()
-
-        -- cache often accessed values into inner table
-        self.Blueprint = bp
 
         -- cache engine calls
+        -- weapons call OnCreate before the unit and they may use these values, so it should in PreCreate
+        self.Blueprint = self:GetBlueprint()
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
+    end,
+
+    ---@param self Unit
+    OnCreate = function(self)
+        local bp = self.Blueprint
 
         -- used for rebuilding mechanic
         self.Repairers = {}
@@ -302,7 +313,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self:UpdateStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
-        if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
+        if bp.General.CommandCapsHash['RULEUCC_Reclaim'] then
             self.ReclaimedMass = 0
             self.ReclaimedEnergy = 0
             self:UpdateStat("ReclaimedMass", 0)
@@ -310,7 +321,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         -- add support for automated jamming reset
-        if self.Blueprint.Intel.JammerBlips > 0 then
+        if bp.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
@@ -324,6 +335,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
 
         VeterancyComponent.OnCreate(self)
+
+        -- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
+        self:AddOnGivenCallback(self.OnGivenDisableWeapons)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -995,6 +1009,38 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Enables weapon after waiting its fire rate interval
+    ---@param weapon Weapon
+    OnGivenDisableWeaponsThread = function(weapon)
+        if not weapon:BeenDestroyed() then
+            -- compute delay
+            local bp = weapon.Blueprint
+            local delay = 1 / bp.RateOfFire
+            WaitSeconds(delay)
+
+            -- enable the weapon again if it still exists
+            if not weapon:BeenDestroyed() then
+                weapon:SetEnabled(true)
+            end
+        end
+    end,
+
+    --- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
+    ---@param newUnit Unit
+    OnGivenDisableWeapons = function(newUnit)
+        -- disable all weapons and enable after a delay
+        local disableWeaponsThread = newUnit.OnGivenDisableWeaponsThread
+        for i = 1, newUnit.WeaponCount do
+            local weapon = newUnit.WeaponInstances[i]
+            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
+            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
+            if not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement) then
+                weapon:SetEnabled(false)
+                weapon:ForkThread(disableWeaponsThread)
+            end
+        end
+    end,
+
     ---@param self Unit
     ---@param newUnit Unit
     OnGiven = function(self, newUnit)
@@ -1477,6 +1523,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         -- this flag is used to skip the need of `IsDestroyed`
         self.Dead = true
 
+        -- don't allow projectiles/beams to collide since we are dead
+        self.DisallowCollisions = true
+
         local layer = self.Layer
         local bp = self.Blueprint
         local army = self.Army
@@ -1499,11 +1548,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 self:PlayUnitSound('Killed')
             end
 
-            -- apply death animation on half built units (do not apply for ML and mega)
+            -- apply death animation on half built units (do not apply for half-built units that may animate underground like Monkeylord and Megalith)
             local FractionThreshold = bp.General.FractionThreshold or 0.5
             if self.PlayDeathAnimation and self:GetFractionComplete() > FractionThreshold then
                 self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
-                self.DisallowCollisions = true
             end
 
             self:DoUnitCallbacks('OnKilled')
@@ -1575,7 +1623,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param firingWeapon Weapon The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
-        -- bail out immediately
+       -- dead unit or unit that is an upgrade
         if self.DisallowCollisions then
             return false
         end
@@ -1596,8 +1644,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
-
-       -- bail out immediately
+       -- dead unit or unit that is an upgrade
         if self.DisallowCollisions then
             return false
         end
@@ -1945,8 +1992,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
 
         if shallSink then
-            self.DisallowCollisions = true
-
             -- Bubbles and stuff coming off the sinking wreck.
             self:ForkThread(self.SinkDestructionEffects)
 
@@ -2261,8 +2306,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param self Unit
     ---@param tpos Vector
     RotateTowards = function(self, tpos)
-        local pos = self:GetPosition()
-        local dx, dz = tpos[1] - pos[1], tpos[3] - pos[3]
+        local pX, _, pZ = self:GetPositionXYZ()
+        local dx, dz = tpos[1] - pX, tpos[3] - pZ
         self:SetOrientation(utilities.QuatFromXZDirection(dx, dz), true)
     end,
 
@@ -2762,7 +2807,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param built Unit
-    ---@param order string
+    ---@param order BuildOrderType
     ---@return boolean
     OnStartBuild = function(self, built, order)
         self.BuildEffectsBag = self.BuildEffectsBag or TrashBag()
@@ -2771,12 +2816,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local id = built.UnitId
         local bp = built:GetBlueprint()
         local bpSelf = self.Blueprint
-        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, self.Army) then
+        -- allow repairing restricted units that may be gifted or captured in campaign
+        if order ~= 'Repair' and Game.IsRestricted(id, self.Army) then
             WARN('Unit.OnStartBuild() Army ' ..self.Army.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})
             IssueToUnitClearCommands(self)
             return false -- Report failure of OnStartBuild
+        end
+
+        -- If desired, prevent engineer stations from building their upgrades as a separate unit
+        -- We need a separate table for this just in case a unit is intended to be able to build its own upgrade as a separate unit too
+        -- Its type is `UnparsedCategory[]` to make it behave identically to `Blueprint.Economy.BuildableCategory`
+        local upgradeOnlyCategory = self.Blueprint.Economy.UpgradeOnlyCategory
+        if upgradeOnlyCategory and order == "MobileBuild" then
+            for _, unparsedCat in upgradeOnlyCategory do
+                if EntityCategoryContains(ParseEntityCategory(unparsedCat), built) then
+                    -- Destroying the built unit will clear the command too, so we don't need to clear the entire queue (in case this exploit was done on accident).
+                    built:Destroy()
+                    return false
+                end
+            end
         end
 
         -- We just started a construction (and haven't just been tasked to work on a half-done
@@ -3204,7 +3264,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end;
 
     ---@param self Unit
-    ---@param enh string
+    ---@param enh Enhancement
     ---@return boolean
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
@@ -3240,7 +3300,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param enhancement string
+    ---@param enhancement Enhancement
     CreateEnhancementEffects = function(self, enhancement)
         local bp = self.Blueprint.Enhancements[enhancement]
         local effects = TrashBag()
@@ -3276,7 +3336,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param enh string
+    ---@param enh Enhancement
     ---@return boolean
     HasEnhancement = function(self, enh)
         local unitEnh = SimUnitEnhancements[self.EntityId]
@@ -4011,13 +4071,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param bone Bone
+    ---@param bone? Bone
     ---@return boolean
     ValidateBone = function(self, bone)
-        if self:IsValidBone(bone) then
+        if bone and self:IsValidBone(bone) then
             return true
         end
-        error('*ERROR: Trying to use the bone, ' .. bone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.', 2)
+        WARN('Trying to use the bone, `' .. tostring(bone) .. '` on unit ' .. (self.UnitId or self:GetUnitId()) .. ' and it does not exist in the model.', 2)
 
         return false
     end,
@@ -4330,8 +4390,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     ---@param buffTable BlueprintBuff[]
-    ---@param PosEntity Vector
-    AddBuff = function(self, buffTable, PosEntity)
+    ---@param stunOrigin? Vector # Defaults to position of `self`
+    AddBuff = function(self, buffTable, stunOrigin)
         local bt = buffTable.BuffType
         if not bt then
             error('*ERROR: Tried to add a unit buff in unit.lua but got no buff table.  Wierd.', 1)
@@ -4348,7 +4408,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local targets
             if buffTable.Radius and buffTable.Radius > 0 then
                 -- If the radius is bigger than 0 then we will use the unit as the center of the stun blast
-                targets = utilities.GetTrueEnemyUnitsInSphere(self, PosEntity or self:GetPosition(), buffTable.Radius, category)
+                targets = utilities.GetTrueEnemyUnitsInSphere(self, stunOrigin or self:GetPosition(), buffTable.Radius, category)
             else
                 -- The buff will be applied to the unit only
                 if EntityCategoryContains(category, self) then
@@ -5083,7 +5143,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param target Vector
     ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
-    OnMissileIntercepted = function(self, target, defense, position)
+    ---@param self Unit
+    OnMissileIntercepted = function(self, target, defense, position, projectile)
         -- try and run callbacks
         if self.EventCallbacks['OnMissileIntercepted'] then
             for k, callback in self.EventCallbacks['OnMissileIntercepted'] do
@@ -5400,7 +5461,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@deprecated
     ---@param self Unit
-    ---@param val number
+    ---@param val boolean
     SetCanTakeDamage = function(self, val)
         self.CanTakeDamage = val
     end,
@@ -5422,14 +5483,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@deprecated
     ---@param self Unit
-    ---@param val number
+    ---@param val boolean
     SetCanBeKilled = function(self, val)
         self.CanBeKilled = val
     end,
 
     ---@deprecated
     ---@param self Unit
-    ---@return boolean
+    ---@return Unit
     GetUnitBeingBuilt = function(self)
         return self.UnitBeingBuilt
     end,

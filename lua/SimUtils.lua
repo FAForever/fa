@@ -34,8 +34,6 @@ local function TransferUnitsOwnershipDelayedWeapons(weapon)
     end
 end
 
-local sharedUnits = {}
-
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
@@ -49,7 +47,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         return
     end
     local categoriesENGINEERSTATION = categories.ENGINEERSTATION
-    local shareUpgrades = ScenarioInfo.Options.Share == 'FullShare'
+    local shareUpgrades = ScenarioInfo.Options.Share ~= 'ShareUntilDeath'
 
     -- do not gift insignificant units
     units = EntityCategoryFilterDown(transferUnitsCategory, units)
@@ -147,6 +145,12 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         unit.IsBeingTransferred = true
+
+        -- For external factories, destroy the unit being built since otherwise it will be transferred as a built unit because it is attached indirectly
+        local externalUnitBeingBuilt = unit.ExternalFactory.UnitBeingBuilt
+        if externalUnitBeingBuilt then
+            externalUnitBeingBuilt:Destroy()
+        end
 
         -- changing owner
         local newUnit = ChangeUnitArmy(unit, toArmy, noRestrictions or false)
@@ -511,7 +515,7 @@ end
 ---@param army Army
 function TryRebuildUnits(trackers, army)
     local rebuilders = {}
-    for k, tracker in ipairs(trackers) do
+    for k, tracker in trackers do
         if tracker.Success then
             continue
         end
@@ -533,7 +537,7 @@ function TryRebuildUnits(trackers, army)
 
     WaitTicks(1)
 
-    for k, rebuilder in ipairs(rebuilders) do
+    for k, rebuilder in rebuilders do
         local tracker = trackers[k]
         local newUnit = rebuilder:GetFocusUnit()
         local progressDif = rebuilder:GetWorkProgress() - tracker.UnitProgress

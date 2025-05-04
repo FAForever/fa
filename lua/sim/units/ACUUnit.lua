@@ -137,7 +137,8 @@ ACUUnit = ClassUnit(CommandUnit) {
             })
 
         end
-        ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
+        self.Brain.CommanderKilledBy = (instigator or self).Army
+        self.Brain.CommanderKilledTick = GetGameTick()
     end,
 
     ---@param self ACUUnit

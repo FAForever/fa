@@ -34,7 +34,11 @@
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
+<<<<<<< HEAD
 ---@type table<Army, AIBrain>
+=======
+---@type AIBrain[]
+>>>>>>> develop
 ArmyBrains = {}
 
 --- restricts the army from building the unit category
@@ -107,14 +111,15 @@ end
 function CoordinateAttacks()
 end
 
---- Creates a bone manipulator for a weapon, allowing it to aim at a target
+--- Creates a bone manipulator for a weapon, allowing it to aim at a target  
+--- At least one bone must be defined.
 ---@param weapon Weapon
 ---@param label string
----@param turretBone Bone
----@param barrelBone? Bone
+---@param yawBone? Bone # turret bone
+---@param pitchBone? Bone # barrel bone
 ---@param muzzleBone? Bone
 ---@return moho.AimManipulator
-function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
+function CreateAimController(weapon, label, yawBone, pitchBone, muzzleBone)
 end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
@@ -731,11 +736,11 @@ end
 function IsUnit(object)
 end
 
---- Orders a group of units to attack-move to a position
+--- Orders a group of units to attack-move to a target
 ---@param units Unit[]
----@param position Vector
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
-function IssueAggressiveMove(units, position)
+function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target

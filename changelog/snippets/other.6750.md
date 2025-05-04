@@ -1,0 +1,1 @@
+- (#6750) Remove duplicated code that post processes LOD values of props

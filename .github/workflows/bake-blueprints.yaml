@@ -1,0 +1,137 @@
+# Copyright (c) 2025 Willem 'Jip' Wijnia
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Bake blueprints
+
+on:
+  workflow_dispatch:
+    inputs:
+      blueprints:
+        required: true
+        type: choice
+        description: The type of blueprints to bake properties into
+        options:
+          - props
+          - units
+          - projectiles
+          - emitters
+
+      reference:
+        required: true
+        type: choice
+        description: The reference (branch or tag) to use as a basis for baking.
+        options:
+          - develop
+          - staging/faf
+          - staging/fafbeta
+          - staging/fafdevelop
+
+env:
+  COMMIT_MESSAGE: "Bake properties of ${{ inputs.blueprints }}\r\n\r\nThis commit originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}." 
+  PULL_REQUEST_BODY: "This pull request originates from automation through GitHub Actions. The run was initiated by ${{ github.actor }}.\r\n\r\nThe run can be found at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. It involves the baking of properties into blueprints of ${{ inputs.blueprints }}. By baking in the properties we make it easier to understand the behavior of the blueprints." 
+           
+jobs:
+  bake-blueprints:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        
+    steps:
+      # Checkout the wiki generator that we use to bake blueprints
+      - name: Checkout Brewlan Wikigen Repository
+        uses: actions/checkout@v4
+        with:
+              repository: The-Balthazar/BrewWikiGen
+              path: ./brew-wiki-gen
+
+      # Checkout the FA repository
+      - name: Checkout FAF Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.reference }}
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          path: ./fa
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            *.lua
+            *.bp
+
+      # Install the correct version of Lua for the wiki generator
+      - name: Install Lua 5.4
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.4"
+
+      # Prepare the run file
+      - name: Replace run.lua
+        run: |
+            FILE="fa/.github/workflows/scripts/baking/bake-${{ inputs.blueprints }}.lua"
+            if [ ! -f "$FILE" ]; then
+              echo "Error: File $FILE does not exist."
+              exit 1
+            fi
+
+            sudo cp "$FILE" brew-wiki-gen/Run.lua
+
+      # Use the wiki generator to bake the properties
+      - name: Execute lua run
+        run: |
+          lua brew-wiki-gen/Run.lua --OutputDirectory="fa.wiki/" --WikiGeneratorDirectory="brew-wiki-gen/" --FADirectory="fa/"
+
+      # Create a branch, commit and pull request
+      - name: Create a pull request
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: fa
+        run: |
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git checkout -b bake/${{ inputs.blueprints }}-${{ github.run_id }}
+
+          git stage .
+          git commit -m "${{ env.COMMIT_MESSAGE }}"
+          git push origin bake/${{ inputs.blueprints }}-${{ github.run_id }}
+
+          # Install GitHub CLI (gh)
+          sudo apt update
+          sudo apt install gh -y
+
+          # Authenticate gh (use GITHUB_TOKEN)
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+          # Create a pull request
+          gh pr create \
+            --title "Bake properties of ${{ inputs.blueprints }}" \
+            --body "${{ env.PULL_REQUEST_BODY }}" \
+            --base "${{ github.ref_name }}" \
+            --head "bake/${{ inputs.blueprints }}-${{ github.run_id }}"
+
+      # Create a commit and push it
+      - name: Create a commit
+        if: github.event_name != 'workflow_dispatch'
+        working-directory: fa
+        run: |
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git add .
+          git commit -m "${{ env.COMMIT_MESSAGE }}"
+          git push

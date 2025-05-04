@@ -11,6 +11,7 @@ PreviousSync = {}
 
 -- Unit specific data that's been sync'd. Data changes are accumulated by merging
 -- the Sync.UnitData table into this table each sync (if there's new data)
+---@type table<EntityId, UnitSyncData>
 UnitData = {}
 
 local UIUtil = import("/lua/ui/uiutil.lua")
@@ -189,15 +190,19 @@ function OnSync()
         end
     end
 
-    if Sync.ProfilerData then 
+    if Sync.ProfilerData then
         import("/lua/ui/game/profiler.lua").ReceiveData(Sync.ProfilerData)
     end
 
-    if Sync.Benchmarks then 
-        import("/lua/ui/game/profiler.lua").ReceiveBenchmarks(Sync.Benchmarks)
+    if Sync.BenchmarkModules then
+        import("/lua/ui/game/profiler.lua").ReceiveBenchmarkModules(Sync.BenchmarkModules)
     end
 
-    if Sync.BenchmarkOutput then 
+    if Sync.BenchmarkInfo then
+        import("/lua/ui/game/profiler.lua").ReceiveBenchmarkInfo(Sync.BenchmarkInfo)
+    end
+
+    if Sync.BenchmarkOutput then
         import("/lua/ui/game/profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
     end
 

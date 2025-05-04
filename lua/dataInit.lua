@@ -1,3 +1,4 @@
+---@declare-global
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 
 ---@param b boolean

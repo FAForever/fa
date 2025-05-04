@@ -145,7 +145,8 @@ function CreateDialog()
                 conFuncsList.Height:Set(function()
                     return math.min(consoleOutput.Height(), conFuncsList:GetRowHeight() * numMatches)
                 end)
-                for i,v in matches do
+                -- guarantee order so it is sorted alphabetically (case-insensitive)
+                for i,v in ipairs(matches) do
                     conFuncsList:AddItem(v)
                 end
 
@@ -155,6 +156,12 @@ function CreateDialog()
 
                 conFuncsList:SetSelection(conFuncsList:GetItemCount() - 1)
                 conFuncsList:ScrollToBottom()
+
+                local oldOnClick = conFuncsList.OnClick
+                conFuncsList.OnClick = function(self, row, event)
+                    oldOnClick(conFuncsList, row, event)
+                    edit:AcquireFocus()
+                end
 
                 conFuncsList.OnDoubleClick = function(self, row)
                     edit:SetText(conFuncsList:GetItem(row))
@@ -175,8 +182,14 @@ function CreateDialog()
 
     edit.OnNonTextKeyPressed = function(self, keycode)
         local function ChangeConFuncSelection(direction)
-            local selection = math.max(math.min(conFuncsList:GetSelection() + direction, conFuncsList:GetItemCount() - 1), 0)
+            local selection = conFuncsList:GetSelection() + direction
+            if selection < 0 then
+                selection = conFuncsList:GetItemCount() - 1
+            elseif selection == conFuncsList:GetItemCount() then
+                selection = 0
+            end
             conFuncsList:SetSelection(selection)
+            conFuncsList:ShowItem(selection)
             raiseConFuncList = false
             edit:SetText(conFuncsList:GetItem(selection))
             raiseConFuncList = true

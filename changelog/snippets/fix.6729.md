@@ -1,0 +1,1 @@
+- (#6729) Fix 2nd formation (hold RMB + left click) for strategic bombers. The formation itself is more wider than default one, so it's easier to attack a target protected by SAMs and other AoE AAs.

@@ -67,6 +67,10 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
+---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
+---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
+---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
+---@field Army Army # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
     EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
@@ -665,7 +669,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param category EntityCategory The categories the units should fit.
     ---@param position Vector The center point to start looking for units.
     ---@param radius number The radius of the circle we look for units in.
-    ---@param alliance AllianceStatus
+    ---@param alliance? AllianceStatus
     ---@return Unit[]
     GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then

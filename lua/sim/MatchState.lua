@@ -6,8 +6,12 @@ local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
 
 local Conditions = {
     demoralization = categories.COMMAND,
+    decapitation = categories.COMMAND,
     domination = categories.STRUCTURE + categories.ENGINEER - categories.WALL,
     eradication = categories.ALLUNITS - categories.WALL,
+}
+local AllianceDefeatConditions = {
+    decapitation = true,
 }
 
 --- Ends the game, processing all events including sending score and statistics to the UI
@@ -29,11 +33,12 @@ end
 
 
 --- Finds and collectors the brains that are defeated
----@param aliveBrains AIBrain[]         # Table of brains that are relevant to check for defeat
----@param condition EntityCategory      # Categories to check for units that are required to remain in the game
----@param delay number                  # Delay between each brain to spread the load over various ticks
----@return AIBrain[]                    # Table of brains that are considered defeated, can be empty
-local function CollectDefeatedBrains(aliveBrains, condition, delay)
+---@param aliveBrains table<Army, AIBrain>  # Table of brains that are relevant to check for defeat
+---@param condition EntityCategory          # Categories to check for units that are required to remain in the game
+---@param delay number                      # Delay between each brain to spread the load over various ticks
+---@param allianceDefeat? boolean           # If all allies must be defeated for a brain to be defeated
+---@return table<Army, AIBrain>             # Table of brains that are considered defeated, can be empty
+local function CollectDefeatedBrains(aliveBrains, condition, delay, allianceDefeat)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
         local criticalUnits = brain:GetListOfUnits(condition)
@@ -58,6 +63,18 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
         end
 
         WaitTicks(delay)
+    end
+
+    if allianceDefeat then
+        -- filter out defeated brains that have living allies
+        for defeatedArmy, _ in defeatedBrains do
+            for aliveArmy, _ in aliveBrains do
+                if not defeatedBrains[aliveArmy] and IsAlly(aliveArmy, defeatedArmy) then
+                    defeatedBrains[defeatedArmy] = nil
+                    break
+                end
+            end
+        end
     end
 
     return defeatedBrains
@@ -88,15 +105,17 @@ function ObserverAfterDeath(armyIndex)
     end
 end
 
---- Continiously scans the game for brains being defeated or changes in alliances that can cause the game to end
+--- Continuously scans the game for brains being defeated or changes in alliances that can cause the game to end
 local function MatchStateThread()
 
     -- determine game conditions
-    local condition = Conditions[ScenarioInfo.Options.Victory]
+    local victoryCondition = ScenarioInfo.Options.Victory
+    local condition = Conditions[victoryCondition]
+    local allianceDefeat = AllianceDefeatConditions[victoryCondition]
 
     if not condition then
-        if ScenarioInfo.Options.Victory ~= 'sandbox' then
-            SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+        if victoryCondition ~= 'sandbox' then
+            SPEW("Unknown victory condition supplied: " .. tostring(victoryCondition) .. ", victory condition defaults to sandbox.")
         end
 
         return
@@ -114,7 +133,7 @@ local function MatchStateThread()
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
         -- check for defeat
-        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1)
+        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1, allianceDefeat)
         local defeatedBrainsCount = table.getsize(defeatedBrains)
         if defeatedBrainsCount > 0 then
 
@@ -124,7 +143,7 @@ local function MatchStateThread()
                 lastDefeatedBrainsCount = defeatedBrainsCount
 
                 -- re-compute the defeated brains until it no longer increases
-                defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1)
+                defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1, allianceDefeat)
                 defeatedBrainsCount = table.getsize(defeatedBrains)
             until defeatedBrainsCount == lastDefeatedBrainsCount
 

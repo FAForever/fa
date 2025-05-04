@@ -280,7 +280,7 @@ end
 function Entity:IsValidBone(bone, allowNil)
 end
 
----@overload fun(): 
+---@overload fun()
 ---@param instigator Unit
 ---@param damageType DamageType
 ---@param excessDamageRatio number
@@ -314,6 +314,7 @@ end
 function Entity:RemoveShooter(shooter)
 end
 
+--- Calls OnSelectionChanged if the unit is currently selected.
 function Entity:RequestRefreshUI()
 end
 

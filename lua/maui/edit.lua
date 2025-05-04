@@ -46,12 +46,11 @@ Edit = ClassUI(moho.edit_methods, Control) {
 
         self._lockFontChanges = false
         self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
-        self._font._family.OnDirty = function(var)
+        local onFontChanged = function(var)
             self:_internalSetFont()
         end
-        self._font._pointsize.OnDirty = function(var)
-            self:_internalSetFont()
-        end
+        self._font._family.OnDirty = onFontChanged
+        self._font._pointsize.OnDirty = onFontChanged
 
         self._fg = LazyVarCreate()
         self._fg.OnDirty = function(var)
