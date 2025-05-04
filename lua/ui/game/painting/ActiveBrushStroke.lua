@@ -91,7 +91,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     GetDebounceDistance = function(self, sample)
         local worldViewManager = import("/lua/ui/game/worldview.lua")
 
-        local zoomDebounceDistance = 1
+        local minimumDistance = 1
 
         -- feature: increase debounce distance as we zoom out
         local mouseScreenCoordinates = GetMouseScreenPos()
@@ -100,7 +100,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
             local camera = GetCamera(worldView._cameraName)
             if camera then
                 local zoom = camera:GetZoom()
-                zoomDebounceDistance = math.max(1, 0.020 * zoom)
+                minimumDistance = math.max(1, 0.020 * zoom)
             end
         end
 
@@ -124,7 +124,7 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
             -- triple square root curve allows us to quickly adjust 
             -- the debounce distance when we try and make curves
             local factor = 1 - math.sqrt(math.sqrt(math.sqrt(1 - radians)))
-            return factor * zoomDebounceDistance
+            return factor * minimumDistance
         else
             -- quickly get us two samples to help determine accurate debounce distance
             return 1
@@ -145,8 +145,8 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         -- feature: debounce samples that are too close to each other
         local lastSample = self.LastSample
         if lastSample then
-            local debounceDistance = self:GetDebounceDistance(sample)
-            if VDist3(lastSample, sample) < debounceDistance then
+            local minimumDistance = self:GetDebounceDistance(sample)
+            if VDist3(lastSample, sample) < minimumDistance then
                 return true
             end
         end
