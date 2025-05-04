@@ -82,7 +82,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         self.Trash:Destroy()
 
         -- deregister us to render
-        self.WorldView:UnregisterRenderable(tostring(self))
+        self.WorldView:RemoveShape(tostring(self))
     end,
 
     --- Checks if the painting feature is disabled as a whole.
