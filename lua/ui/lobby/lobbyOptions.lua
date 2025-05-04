@@ -244,36 +244,38 @@ globalOpts = {
                 help = "<LOC lobui_0801>Treat disconnecting players the same as defeated players.",
                 key = 'SameAsShare',
             },
-            {
-                text = "<LOC lobui_0742>Full Share",
-                help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
-                key = 'FullShare',
-            },
-            {
-                text = "<LOC lobui_0744>Share Until Death",
-                help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
-                key = 'ShareUntilDeath',
-            },
-            {
-                text = "<LOC lobui_0796>Partial Share",
-                help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die. Your other units will be destroyed when you die, except those captured by the enemy.",
-                key = 'PartialShare',
-            },
-            {
-                text = "<LOC lobui_0762>Traitors",
-                help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
-                key = 'TransferToKiller',
-            },
-            {
-                text = "<LOC lobui_0766>Defectors",
-                help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
-                key = 'Defectors',
-            },
-            {
-                text = "<LOC lobui_0764>Civilian Desertion",
-                help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
-                key = 'CivilianDeserter',
-            },
+            -- Commented out until further discussion on how the feature should behave and what options should be available.
+            -- The single choice option above is sent to the sim but does not show in the lobby UI, so everything will work as before.
+            -- {
+            --     text = "<LOC lobui_0742>Full Share",
+            --     help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
+            --     key = 'FullShare',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0744>Share Until Death",
+            --     help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
+            --     key = 'ShareUntilDeath',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0796>Partial Share",
+            --     help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die. Your other units will be destroyed when you die, except those captured by the enemy.",
+            --     key = 'PartialShare',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0762>Traitors",
+            --     help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
+            --     key = 'TransferToKiller',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0766>Defectors",
+            --     help = "<LOC lobui_0767>Your units will be transferred to the enemy with the highest score when you die.",
+            --     key = 'Defectors',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0764>Civilian Desertion",
+            --     help = "<LOC lobui_0765>Your units will be transferred to the Civilian AI, if there is one, when you die.",
+            --     key = 'CivilianDeserter',
+            -- },
         },
     },
     {
@@ -287,21 +289,23 @@ globalOpts = {
                 help = "<LOC lobui_0811>ACUs explode when their player disconnects.",
                 key = 'Explode',
             },
-            {
-                text = "<LOC lobui_0812>Recall",
-                help = "<LOC lobui_0813>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
-                key = 'Recall',
-            },
-            {
-                text = "<LOC lobui_0814>Delayed Recall",
-                help = "<LOC lobui_0815>Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls.",
-                key = 'RecallDelayed',
-            },
-            {
-                text = "<LOC lobui_0816>Permanent",
-                help = "<LOC lobui_0817>Disconnected ACUs are permanently shared to allies.",
-                key = 'Permanent',
-            },
+            -- Commented out until further discussion on how the feature should behave and what options should be available.
+            -- The single choice option above is sent to the sim but does not show in the lobby UI, so everything will work as before.
+            -- {
+            --     text = "<LOC lobui_0812>Recall",
+            --     help = "<LOC lobui_0813>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
+            --     key = 'Recall',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0814>Delayed Recall",
+            --     help = "<LOC lobui_0815>Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls.",
+            --     key = 'RecallDelayed',
+            -- },
+            -- {
+            --     text = "<LOC lobui_0816>Permanent",
+            --     help = "<LOC lobui_0817>Disconnected ACUs are permanently shared to allies.",
+            --     key = 'Permanent',
+            -- },
         },
     },
     {
