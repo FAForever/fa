@@ -34,6 +34,9 @@
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
+---@type AIBrain[]
+ArmyBrains = {}
+
 --- restricts the army from building the unit category
 ---@param army Army
 ---@param category EntityCategory
