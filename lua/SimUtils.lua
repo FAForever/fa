@@ -34,6 +34,8 @@ local function TransferUnitsOwnershipDelayedWeapons(weapon)
     end
 end
 
+local sharedUnits = {}
+
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
