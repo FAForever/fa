@@ -889,6 +889,7 @@ local function TransferUnitsToKiller(self)
         end
         -- if not transferred, units will simply be killed
     end
+    -- give some time to transfer before units are killed
     WaitSeconds(1)
 end
 
