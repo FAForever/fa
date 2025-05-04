@@ -1120,7 +1120,6 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent) {
                 LayoutHelpers.AtCenterIn(PingGroup.Marker.TeamColor, PingGroup.Marker)
 
                 PingGroup.Marker.HandleEvent = function(marker, event)
-                    LOG("HANDLE EVENT OF MARKER")
                     if event.Type == 'ButtonPress' then
                         if event.Modifiers.Right and event.Modifiers.Ctrl then
                             local data = {Action = 'delete', ID = PingGroup.data.ID, Owner = PingGroup.data.Owner}
