@@ -159,6 +159,13 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Weapons table<string, Weapon> # string is weapon Label
 ---@field WeaponInstances Weapon[]
 ---@field WeaponCount number
+---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
+---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
+---@field TransferUpgradeProgress? boolean # Keeps track of upgrades for unit transfer
+---@field UpgradeBuildTime? number # Keeps track of upgrades for unit transfer
+---@field UpgradesTo? UnitId # Keeps track of upgrades for unit transfer
+---@field TargetUpgradeBuildTime? number # Keeps track of upgrades *during* unit transfer
+---@field TargetFractionComplete? number # When an unbuilt unit is rebuilt during unit transfer, this overrides what fraction it is rebuilt to.
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
