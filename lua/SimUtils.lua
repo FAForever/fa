@@ -39,7 +39,7 @@ local sharedUnits = {}
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
----@param toArmy number
+---@param toArmy integer
 ---@param captured? boolean
 ---@param noRestrictions? boolean
 ---@return Unit[]?
@@ -90,14 +90,14 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
         local unitHealth = unit:GetHealth()
-        local tarmacs = unit.TarmacBag
+        local tarmacs = unit--[[@as StructureUnit]].TarmacBag
         local shieldIsOn = false
         local shieldHealth = 0
         local hasFuel = false
         local fuelRatio = 0
         local activeEnhancements
         local oldowner = unit.oldowner
-        local LastTickDamaged = unit.LastTickDamaged
+        local LastTickDamaged = unit--[[@as ACUUnit]].LastTickDamaged
         local upgradesTo = unit.UpgradesTo
         local defaultBuildRate
         local upgradeBuildTimeComplete
@@ -127,7 +127,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             end
         end
 
-        if categoriesHash.ENGINEERSTATION and categoriesHash.UEF then
+        if categoriesHash['ENGINEERSTATION'] and categoriesHash['UEF'] then
             -- We have to kill drones which are idling inside Kennel at the moment of transfer
             -- otherwise additional dummy drone will appear after transfer
             for _, drone in unit:GetCargo() do
@@ -149,7 +149,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         unit.IsBeingTransferred = true
 
         -- For external factories, destroy the unit being built since otherwise it will be transferred as a built unit because it is attached indirectly
-        local externalUnitBeingBuilt = unit.ExternalFactory.UnitBeingBuilt
+        local externalUnitBeingBuilt = unit--[[@as ExternalFactoryComponent]].ExternalFactory.UnitBeingBuilt
         if externalUnitBeingBuilt then
             externalUnitBeingBuilt:Destroy()
         end
@@ -236,7 +236,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
 
         if EntityCategoryContains(categoriesENGINEERSTATION, newUnit) then
             if not upgradeBuildTimeComplete or not shareUpgrades then
-                if categoriesHash.UEF then
+                if categoriesHash['UEF'] then
                     -- use special thread for UEF Kennels
                     -- Give them 1 tick to spawn their drones and then pause both station and drone
                     pauseKennelCount = pauseKennelCount + 1
@@ -244,7 +244,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
                 else -- pause cybran hives immediately
                     newUnit:SetPaused(true)
                 end
-            elseif categoriesHash.UEF then
+            elseif categoriesHash['UEF'] then
                 newUnit.UpgradesTo = upgradesTo
                 newUnit.DefaultBuildRate = defaultBuildRate
                 newUnit.TargetUpgradeBuildTime = upgradeBuildTimeComplete
@@ -299,7 +299,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
 end
 
 --- Pauses all drones in `kennels`
----@param kennels Unit[]
+---@param kennels TPodTowerUnit[]
 function PauseTransferredKennels(kennels)
     -- wait for drones to spawn
     WaitTicks(1)
@@ -319,7 +319,7 @@ function PauseTransferredKennels(kennels)
 end
 
 --- Upgrades `kennels` to their `TargetUpgradeBuildTime` value, allowing for drones to spawn and get paused
----@param kennels any
+---@param kennels TPodTowerUnit[]
 function UpgradeTransferredKennels(kennels)
     WaitTicks(1) -- spawn drones
 
@@ -471,7 +471,7 @@ function CreateRebuildTracker(unit, blockingEntities)
     }
 
     -- wrecks can prevent drone from starting construction
-    local wrecks = GetReclaimablesInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
+    local wrecks = GetReclaimablesInRect(unit:GetSkirtRect()) --[[@as ReclaimObject[] | Wreckage[] ]]
     if wrecks then
         for _, reclaim in wrecks do
             if reclaim.IsWreckage then
@@ -584,7 +584,7 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     end
 end
 
----@param data {To: number}
+---@param data {To: integer}
 ---@param units Unit[]
 function GiveUnitsToPlayer(data, units)
     local manualShare = ScenarioInfo.Options.ManualUnitShare
@@ -649,7 +649,7 @@ function KillSharedUnits(owner, categoriesToKill)
 end
 
 --- Given that `deadArmy` just died, redistributes their unit cap based on the scenario options
----@param deadArmy number
+---@param deadArmy integer
 function UpdateUnitCap(deadArmy)
     -- If we are asked to share out unit cap for the defeated army, do the following...
     local options = ScenarioInfo.Options
@@ -732,7 +732,7 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
 end
 
 --- Returns a table of the allies and enemies of a brain, and civilians.
----@param armyIndex number
+---@param armyIndex integer
 ---@return { Civilians: AIBrain[], Enemies: AIBrain[], Allies: AIBrain[] } BrainCategories
 function GetAllegianceCategories(armyIndex)
     local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
@@ -831,7 +831,7 @@ local function ReturnBorrowedUnits(self)
 end
 
 --- Take back units I gave away. Mainly needed to stop mods that auto-give after death from bypassing share conditions.
----@param selfIndex number
+---@param selfIndex integer
 ---@param brains AIBrain[]
 local function GetBackUnits(selfIndex, brains)
     local given = {}
@@ -938,6 +938,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
     -- Share units including ACUs and walls and keep track of ACUs
     local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.ALLUNITS, "DisconnectShareTemporary")
+    ---@type (ACUUnit|Unit)[]
     local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits or {})
 
     -- non-assassination games could have an army abandon without having any commanders
@@ -1030,7 +1031,7 @@ end
 local SorianUtils = import("/lua/ai/sorianutilities.lua")
 
 --- Disables the AI for non-player armies.
----@param self AIBrain
+---@param self BaseAIBrain
 function DisableAI(self)
     local army = self.Army
     -- print AI "ilost" text to chat
@@ -1100,7 +1101,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --#region Non-Unit Transfer Diplomacy
 
----@param data {Army: number, Value: boolean}
+---@param data {Army: integer, Value: boolean}
 function SetResourceSharing(data)
     local army = data.Army
     if not OkayToMessWithArmy(army) then
@@ -1110,7 +1111,7 @@ function SetResourceSharing(data)
     brain:SetResourceSharing(data.Value)
 end
 
----@param data {Army: number, Value: boolean}
+---@param data {Army: integer, Value: boolean}
 function RequestAlliedVictory(data)
     -- You cannot change this in a team game
     if ScenarioInfo.TeamGame then
@@ -1124,7 +1125,7 @@ function RequestAlliedVictory(data)
     brain.RequestingAlliedVictory = data.Value
 end
 
----@param data {Army: number, Value: boolean}
+---@param data {Army: Army, Value: boolean}
 function SetOfferDraw(data)
     local army = data.Army
     if not OkayToMessWithArmy(army) then
@@ -1134,7 +1135,7 @@ function SetOfferDraw(data)
     brain.OfferingDraw = data.Value
 end
 
----@param data {Sender: number, Msg: string}
+---@param data {Sender: integer, Msg: string}
 function SendChatToReplay(data)
     if data.Sender and data.Msg then
         if not Sync.UnitData.Chat then
@@ -1144,7 +1145,7 @@ function SendChatToReplay(data)
     end
 end
 
----@param data {From: number, To: number, Mass: number, Energy: number}
+---@param data {From: Army, To: Army, Mass: number, Energy: number}
 function GiveResourcesToPlayer(data)
     SendChatToReplay(data)
     -- Ignore observers and players trying to send resources to themselves or to enemies
@@ -1158,15 +1159,15 @@ function GiveResourcesToPlayer(data)
         if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
             return
         end
-        local massTaken = fromBrain:TakeResource('Mass', data.Mass * fromBrain:GetEconomyStored('Mass'))
-        local energyTaken = fromBrain:TakeResource('Energy', data.Energy * fromBrain:GetEconomyStored('Energy'))
+        local massTaken = fromBrain:TakeResource('MASS', data.Mass * fromBrain:GetEconomyStored('MASS'))
+        local energyTaken = fromBrain:TakeResource('ENERGY', data.Energy * fromBrain:GetEconomyStored('ENERGY'))
 
-        toBrain:GiveResource('Mass', massTaken)
-        toBrain:GiveResource('Energy', energyTaken)
+        toBrain:GiveResource('MASS', massTaken)
+        toBrain:GiveResource('ENERGY', energyTaken)
     end
 end
 
----@param data {From: number, To: number}
+---@param data {From: Army, To: Army}
 function BreakAlliance(data)
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then
@@ -1185,7 +1186,7 @@ function BreakAlliance(data)
     import("/lua/sim/recall.lua").OnAllianceChange(data)
 end
 
----@param resultData {From: number, To: number, ResultValue: DiplomacyActionType}
+---@param resultData {From: Army, To: Army, ResultValue: DiplomacyActionType}
 function OnAllianceResult(resultData)
     -- You cannot change alliances in a team game
     if ScenarioInfo.TeamGame then

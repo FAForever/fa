@@ -18,7 +18,7 @@ local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
 local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
-local RecallOnArmyDefeat = import("/lua/sim/Recall.lua").OnArmyDefeat
+local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 
 local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
@@ -56,7 +56,6 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 
 ---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
 ---@field AI boolean
----@field Army Army             # self:GetArmyIndex()
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
 ---@field Status BrainState
@@ -461,7 +460,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- AI
         if self.BrainType == 'AI' then
-            DisableAI(self)
+            DisableAI(self--[[@as BaseAIBrain]])
         end
 
         ForkThread(KillArmy, self, ScenarioInfo.Options.Share)
