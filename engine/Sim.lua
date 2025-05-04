@@ -34,11 +34,7 @@
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
-<<<<<<< HEAD
----@type table<Army, AIBrain>
-=======
 ---@type AIBrain[]
->>>>>>> develop
 ArmyBrains = {}
 
 --- restricts the army from building the unit category
