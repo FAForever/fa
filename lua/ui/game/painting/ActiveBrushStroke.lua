@@ -20,12 +20,14 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local ColorUtils = import("/lua/shared/color.lua")
 local BrushStroke = import('/lua/ui/game/painting/BrushStroke.lua').BrushStroke
 
 --- Responsible for managing a painting that is actively being worked on.
 ---@class UIActiveBrushStroke : UIBrushStroke
 ---@field LastEdited number
----@field LastSample Vector
+---@field LastSample? Vector
+---@field CurrentSample? Vector
 ActiveBrushStroke = ClassUI(BrushStroke) {
 
     DebounceTimeThreshold = 0.016, -- About 60 fps
@@ -36,7 +38,37 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         BrushStroke.__init(self, { CoordinatesX = {}, CoordinatesY = {}, CoordinatesZ = {} }, color)
 
         self.LastEdited = CurrentTime()
-        self.LastSample = { 0, 0, 0 }
+    end,
+
+    ---@param self UIBrushStroke
+    ---@param color Color
+    ---@return Color
+    ComputePreviewColor = function(self, color)
+        -- get color channel values, default to white
+        local r, g, b, a = ColorUtils.ParseColor(color)
+        if not (r and g and b) then
+            r = 1.0
+            g = 1.0
+            b = 1.0
+        end
+
+        -- compute transparency
+        a = 0.4
+
+        return ColorUtils.ColorRGB(r, g, b, a)
+    end,
+
+    --- Renders the brush stroke.
+    ---@param self UIActiveBrushStroke
+    ---@param delta number
+    OnRender = function (self, delta)
+        BrushStroke.OnRender(self, delta)
+
+        -- feature: draw a line between the last sample and the current sample
+        if self.LastSample and self.CurrentSample then
+            local previewColor = self:ComputePreviewColor(self.Color)
+            UI_DrawLine(self.LastSample, self.CurrentSample, previewColor)
+        end
     end,
 
     ---------------------------------------------------------------------------
@@ -101,9 +133,12 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         end
 
         -- feature: debounce samples that are too close to each other
-        local debounceDistance = self:GetDebounceDistance(sample)
-        if VDist3(self.LastSample, sample) < debounceDistance then
-            return true
+        local lastSample = self.LastSample
+        if lastSample then
+            local debounceDistance = self:GetDebounceDistance(sample)
+            if VDist3(lastSample, sample) < debounceDistance then
+                return true
+            end
         end
 
         return false
@@ -113,6 +148,9 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     ---@param self UIActiveBrushStroke
     ---@param coordinates Vector
     AddSample = function(self, coordinates)
+        -- enables us to visualize it
+        self.CurrentSample = coordinates
+
         -- basic debouncing to reduce bandwidth requirements
         if self:DebounceSample(coordinates) then
             return
