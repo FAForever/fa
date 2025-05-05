@@ -22,6 +22,10 @@
 
 local AbstractVictoryCondition = import("/lua/sim/Matchstate/AbstractVictoryCondition.lua").AbstractVictoryCondition
 
+-- upvalue for performance
+local TableGetn = table.getn
+local TableInsert = table.insert
+
 ---@class DecapitationCondition : AbstractVictoryCondition
 ---@field UnitCategories EntityCategory
 DecapitationCondition = Class(AbstractVictoryCondition) {
@@ -34,41 +38,41 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
         local aliveBrains = {}
         local defeatedBrains = {}
         local aiBrains = self:GetArmyBrains()
-        for k = 1, table.getn(aiBrains) do
+        for k = 1, TableGetn(aiBrains) do
             local aiBrain = aiBrains[k]
 
             if not self:BrainHasFinishedUnitsOfCategory(aiBrain, self.UnitCategories) then
-                table.insert(defeatedBrains, aiBrain)
+                TableInsert(defeatedBrains, aiBrain)
             else
-                table.insert(aliveBrains, aiBrain)
+                TableInsert(aliveBrains, aiBrain)
             end
         end
 
         -- check if defeated brains still have allies with ACUs
         local decapitatedBrains = {}
-        for k = 1, table.getn(defeatedBrains) do
+        for k = 1, TableGetn(defeatedBrains) do
             local defeatedBrain = defeatedBrains[k]
 
             -- check if the defeated brain is allied with an army that is not defeated (yet!), if
             -- so then the brain is not 'defeated' yet and should not be removed from the game
-            for l = 1, table.getn(aliveBrains) do
+            for l = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[l]
                 if IsAlly(defeatedBrain:GetArmyIndex(), aliveBrain:GetArmyIndex()) then
-                    table.insert(aliveBrains, defeatedBrain)
+                    TableInsert(aliveBrains, defeatedBrain)
                     break
                 end
             end
         end
 
         -- process all defeated brains. At this stage, it is an entire team that is defeated at once.
-        for k = 1, table.getn(decapitatedBrains) do
+        for k = 1, TableGetn(decapitatedBrains) do
             local defeatedBrain = decapitatedBrains[k]
             self:DefeatForArmy(defeatedBrain)
         end
 
         -- check if all remaining players want to forfeit
         if self:RemainingBrainsForfeit(aliveBrains) then
-            for k = 1, table.getn(aliveBrains) do
+            for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:DrawForArmy(aliveBrain)
             end
@@ -79,7 +83,7 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
         -- check if all remaining players are allied
         if self:RemainingBrainsAreAllied(aliveBrains) then
-            for k = 1, table.getn(aliveBrains) do
+            for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:VictoryForArmy(aliveBrain)
             end
