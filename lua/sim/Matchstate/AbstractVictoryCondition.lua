@@ -23,6 +23,10 @@
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
 
+-- upvalue for performance
+local TableGetn = table.getn
+local TableInsert = table.insert
+
 ---@class AbstractVictoryCondition : DebugComponent, Destroyable
 ---@field Trash TrashBag
 AbstractVictoryCondition = Class(DebugComponent) {
@@ -80,7 +84,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     BrainHasEligibleUnits = function(self, aiBrain, categories)
         local units = aiBrain:GetListOfUnits(categories, false)
         if (units) then
-            for k = 1, table.getn(units) do
+            for k = 1, TableGetn(units) do
                 local unit = units[k]
                 if self:UnitIsEligible(unit) then
                     return true
@@ -98,7 +102,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         local participatingArmyBrains = {}
         for k, aiBrain in ArmyBrains do
             if not (ArmyIsOutOfGame(aiBrain:GetArmyIndex() or aiBrain:IsDefeated())) then
-                table.insert(participatingArmyBrains, aiBrain)
+                TableInsert(participatingArmyBrains, aiBrain)
             end
         end
 
@@ -111,11 +115,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@return boolean
     RemainingBrainsAreAllied = function(self, aiBrains)
         local victorious = true
-        for a = 1, table.getn(aiBrains) do
+        for a = 1, TableGetn(aiBrains) do
             local aBrain = aiBrains[a]
             local aIndex = aBrain:GetArmyIndex()
 
-            for b = 1, table.getn(aiBrains) do
+            for b = 1, TableGetn(aiBrains) do
                 local bBrain = aiBrains[b]
                 local bIndex = bBrain:GetArmyIndex()
 
@@ -133,7 +137,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param aiBrains AIBrain[]
     ---@return boolean
     RemainingBrainsForfeit = function(self, aiBrains)
-        for k = 1, table.getn(aiBrains) do
+        for k = 1, TableGetn(aiBrains) do
             local brain = aiBrains[k]
             if not brain.OfferingDraw then
                 return false
@@ -162,7 +166,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         error("Missing implementation of ProcessGameState")
     end,
 
-    --- Ends the game.
+    --- Ends the game by starting a thread that ends the game 3 seconds later.
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
         self.Trash:Add(ForkThread(self.EndGameThread, self))
