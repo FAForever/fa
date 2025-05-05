@@ -41,7 +41,7 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
         for k = 1, TableGetn(aiBrains) do
             local aiBrain = aiBrains[k]
 
-            if not self:BrainHasFinishedUnitsOfCategory(aiBrain, self.UnitCategories) then
+            if not self:BrainHasEligibleUnits(aiBrain, self.UnitCategories) then
                 TableInsert(defeatedBrains, aiBrain)
             else
                 TableInsert(aliveBrains, aiBrain)
