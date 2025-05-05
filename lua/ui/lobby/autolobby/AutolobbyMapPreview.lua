@@ -114,10 +114,8 @@ local AutolobbyMapPreview = ClassUI(Group) {
         local x = xOffset + (px / scenarioWidth) * (size - 2) * xFactor
         local z = yOffset + (pz / scenarioHeight) * (size - 2) * yFactor
 
-        -- position it
-        LayoutHelpers.ReusedLayoutFor(icon)
-            :AtLeftTopIn(self.Preview, x - 0.5 * icon.Width(), z - 0.5 * icon.Height())
-            :End()
+        icon.Left:Set(function() return self.Preview.Left() + x - 0.5 * icon.Width() end)
+        icon.Top:Set(function() return self.Preview.Top() + z - 0.5 * icon.Height() end)
 
         return icon
     end,
