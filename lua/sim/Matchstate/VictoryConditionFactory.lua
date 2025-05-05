@@ -28,11 +28,11 @@ GetVictoryConditionInstance = function(victoryConditionType)
     if victoryConditionType == 'demoralization' then
         return import('/lua/sim/Matchstate/DecapitationCondition.lua').CreateDecapitationCondition()
     elseif victoryConditionType == 'demoralization' then
-        return import('/lua/sim/Matchstate/DemoralizationCondition.lua').CreateDemoralizationCondition()
+        return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.COMMAND)
     elseif victoryConditionType == 'domination' then
-        return import('/lua/sim/Matchstate/DominationCondition.lua').CreateDominationCondition()
+        return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.STRUCTURE + categories.ENGINEER - categories.WALL)
     elseif victoryConditionType == 'eradication' then
-        return import('/lua/sim/Matchstate/EradicationCondition.lua').CreateEradicationCondition()
+        return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.ALLUNITS - categories.WALL)
     elseif victoryConditionType == 'sandbox' then
         return import('/lua/sim/Matchstate/SandboxCondition.lua').CreateSandBoxCondition()
     end
