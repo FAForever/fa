@@ -42,20 +42,47 @@ AbstractVictoryCondition = Class(DebugComponent) {
         self.Trash:Destroy()
     end,
 
-    --- A utility function that returns whether a unit of the given categories is finished and alive for the given brain. 
+    --- A utility function that returns whether a unit is eligible to be considered in the game for the victory condition.
+    ---@param self AbstractVictoryCondition
+    ---@param unit Unit
+    ---@return boolean
+    UnitIsEligible = function(self, unit)
+
+        -- this can happen occasionally, note that we explicitly do **not** use the `.Dead` property! The
+        -- use of that property depends on the execution order in Lua. It is deterministic, but it will
+        -- generate strange results when for example two ACUs die in the same tick. Using `.Dead` will
+        -- re-introduce the 'draw bug' that bugged the community for years.
+
+        if IsDestroyed(unit) then
+            return false
+        end
+
+        -- only units that are finished are taken into account.
+
+        if unit:GetFractionComplete() <= 1.0 then
+            return false
+        end
+
+        -- only units that are not recalling are taken into account.
+
+        if unit.RecallingAfterDefeat then
+            return false
+        end
+
+        return true
+    end,
+
+    --- A utility function that returns whether the given brain has any eligible units of the given category.
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     ---@param categories EntityCategory
     ---@return boolean
-    BrainHasFinishedUnitsOfCategory = function(self, aiBrain, categories)
+    BrainHasEligibleUnits = function(self, aiBrain, categories)
         local units = aiBrain:GetListOfUnits(categories, false)
         if (units) then
             for k = 1, table.getn(units) do
                 local unit = units[k]
-                if  (not IsDestroyed(unit)) and
-                    (unit:GetFractionComplete() == 1) and
-                    not unit.RecallingAfterDefeat
-                then
+                if self:UnitIsEligible(unit) then
                     return true
                 end
             end
