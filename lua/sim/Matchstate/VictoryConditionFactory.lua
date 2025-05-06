@@ -38,6 +38,6 @@ GetVictoryConditionInstance = function(victoryConditionType)
     end
 
     -- default to sandbox
-    WARN("Unknown victory condition type: " .. victoryConditionType)
+    WARN("Unknown victory condition type: " .. tostring(victoryConditionType))
     return import('/lua/sim/Matchstate/SandboxCondition.lua').CreateSandBoxCondition()
 end
