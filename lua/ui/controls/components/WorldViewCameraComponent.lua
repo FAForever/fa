@@ -30,11 +30,40 @@ WorldViewCameraComponent = ClassSimple {
     ---@param order number
     Register = function(self, cameraName, disableMarkers, displayName, order)
 
+        self._cameraName = cameraName
+
         -- feature: extend the rendering distance of the camera when settings are set to extreme
 
         local lodOption = GetOptions('level_of_detail')
         if lodOption > 2 then
             ConExecute(string.format("cam_SetLOD %s 0.70", tostring(cameraName)))
         end
+    end,
+
+    --- Retrieves the world camera of this worldview.
+    ---@param self UIWorldViewCameraComponent | WorldView
+    ---@return Camera
+    GetCamera = function(self)
+        return GetCamera(self._cameraName)
+    end,
+
+    --- Creates an indicator that points to a location in the world.
+    ---@param self WorldView
+    ---@param parent Control
+    ---@param location Vector   # in world coordinates
+    ---@param color Color
+    ---@param stayOnScreen? boolean
+    ---@return UIOffScreenIndicator
+    CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
+        local module = import("/lua/ui/game/OffscreenMarkerIndicator.lua")
+
+        if color == 'blue' then
+            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Blue')
+        elseif color == 'red' then
+            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Red')
+        end
+
+       -- default to yellow
+       return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Yellow')
     end,
 }
