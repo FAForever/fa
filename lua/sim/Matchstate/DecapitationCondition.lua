@@ -26,6 +26,7 @@ local AbstractVictoryCondition = import("/lua/sim/Matchstate/AbstractVictoryCond
 local TableGetn = table.getn
 local TableInsert = table.insert
 
+--- Victory condition where brains are considered defeated if they have no allied ACUs alive.
 ---@class DecapitationCondition : AbstractVictoryCondition
 ---@field UnitCategories EntityCategory
 DecapitationCondition = Class(AbstractVictoryCondition) {
