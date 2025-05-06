@@ -101,7 +101,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     GetArmyBrains = function(self)
         local participatingArmyBrains = {}
         for k, aiBrain in ArmyBrains do
-            if not (ArmyIsOutOfGame(aiBrain:GetArmyIndex() or aiBrain:IsDefeated())) then
+            if not aiBrain:IsDefeated() then
                 TableInsert(participatingArmyBrains, aiBrain)
             end
         end
