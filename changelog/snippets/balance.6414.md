@@ -20,7 +20,7 @@
     - SizeX: 0.75 --> 0.8
     - SizeY: 0.925 --> 1.0
     - SizeZ: 2.0 --> 2.2
-    - UniformScale: 0.65 --> 0.7
+    - UniformScale: 0.065 --> 0.07
     - LifeBarOffset: 0.7 --> 0.8
     - LifeBarSize: 0.5 --> 0.7
     - SelectionSizeX: 0.36 --> 0.4
