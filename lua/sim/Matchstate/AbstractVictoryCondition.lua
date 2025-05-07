@@ -29,6 +29,7 @@ local TableInsert = table.insert
 
 ---@class AbstractVictoryCondition : DebugComponent, Destroyable
 ---@field Trash TrashBag
+---@field ProcessGameStateThreadInstance? thread
 AbstractVictoryCondition = Class(DebugComponent) {
 
     ---@param self AbstractVictoryCondition
@@ -129,7 +130,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
                 local bIndex = bBrain:GetArmyIndex()
 
                 if aIndex ~= bIndex then
-                    victorious = victorious and IsAlly(aIndex, bIndex) and aBrain.RequestingAlliedVictory and bBrain.RequestingAlliedVictory
+                    victorious = victorious and (IsAlly(aIndex, bIndex) and aBrain.RequestingAlliedVictory and bBrain.RequestingAlliedVictory)
                 end
             end
         end
@@ -159,7 +160,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
 
     ---@param self AbstractVictoryCondition
     Setup = function(self)
-        self.Trash:Add(ForkThread(self.ProcessGameStateThread, self))
+        self.ProcessGameStateThreadInstance = self.Trash:Add(ForkThread(self.ProcessGameStateThread, self))
     end,
 
     ---@param self AbstractVictoryCondition
@@ -179,6 +180,12 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- Ends the game by starting a thread that ends the game 3 seconds later.
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
+        -- stop checking the game state
+        if (self.ProcessGameStateThreadInstance) then
+            KillThread(self.ProcessGameStateThreadInstance)
+            self.ProcessGameStateThreadInstance = nil
+        end
+
         self.Trash:Add(ForkThread(self.EndGameThread, self))
     end,
 
