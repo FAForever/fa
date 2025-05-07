@@ -5150,7 +5150,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param target Vector
     ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
-    ---@param self Unit
     OnMissileIntercepted = function(self, target, defense, position, projectile)
         -- try and run callbacks
         if self.EventCallbacks['OnMissileIntercepted'] then
