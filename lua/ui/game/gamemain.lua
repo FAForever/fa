@@ -932,7 +932,6 @@ local NISControls = {
 local rangePrefs = {
     range_RenderHighlighted = false,
     range_RenderSelected = false,
-    range_RenderHighlighted = false
 }
 
 local preNISSettings = {}

@@ -42,7 +42,7 @@ local unitsToWeaponsCached = { }
 ---@field scale number
 
 --- Returns all unique weapon blueprints that match the predicate, and are from units with the `SHOWATTACKRETICLE` category set
----@param predicate function<WeaponBlueprint>
+---@param predicate fun(WeaponBlueprint: WeaponBlueprint): boolean
 ---@return table<UnitId, WeaponBlueprint[] | false> unitsToWeapons
 local function GetSelectedWeaponsWithReticules(predicate)
     local selectedUnits = GetSelectedUnits()
@@ -76,7 +76,7 @@ local function GetSelectedWeaponsWithReticules(predicate)
 end
 
 --- A generic decal texture / size computation function that uses the damage or spread radius
----@param predicate function<WeaponBlueprint>
+---@param predicate fun(WeaponBlueprint: WeaponBlueprint): boolean
 ---@return WorldViewDecalData[]
 local function RadiusDecalFunction(predicate)
     local unitsToWeapons = GetSelectedWeaponsWithReticules(predicate)
