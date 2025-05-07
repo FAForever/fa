@@ -296,8 +296,6 @@ end
 function BeginSession()
 
     -- imported for side effects
-    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
-    victoryCondition:Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 
     BeginSessionAI()
@@ -312,6 +310,9 @@ function BeginSession()
     import("/lua/sim/Recall.lua").init()
 
     -- other logic at the start of the game --
+
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    victoryCondition:StartMonitoring()
 
     Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
     Sync.Restrictions = import("/lua/game.lua").GetRestrictions()

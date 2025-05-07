@@ -26,7 +26,7 @@ local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVicto
 SandboxCondition = Class(AbstractVictoryCondition) {
 
     ---@param self SandboxCondition
-    ProcessGameState = function(self)
+    EvaluateVictoryCondition = function(self)
         -- do nothing, it is a sandbox!
     end,
 }

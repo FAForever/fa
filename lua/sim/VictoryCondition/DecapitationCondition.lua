@@ -34,7 +34,7 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
     UnitCategories = categories.COMMAND,
 
     ---@param self DecapitationCondition
-    ProcessGameState = function(self)
+    EvaluateVictoryCondition = function(self)
         -- see if there are defeated brains
         local aliveBrains = {}
         local defeatedBrains = {}

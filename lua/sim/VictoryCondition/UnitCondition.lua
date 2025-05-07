@@ -39,7 +39,7 @@ UnitCondition = Class(AbstractVictoryCondition) {
     end,
 
     ---@param self UnitCondition
-    ProcessGameState = function(self)
+    EvaluateVictoryCondition = function(self)
         -- see if there are defeated brains
         local aliveBrains = {}
         local defeatedBrains = {}

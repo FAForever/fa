@@ -158,22 +158,28 @@ AbstractVictoryCondition = Class(DebugComponent) {
         return true
     end,
 
+    --- Starts the monitoring of the victory condition.
     ---@param self AbstractVictoryCondition
-    Setup = function(self)
-        self.ProcessGameStateThreadInstance = self.Trash:Add(ForkThread(self.ProcessGameStateThread, self))
+    StartMonitoring = function(self)
+        if self.ProcessGameStateThreadInstance then
+            KillThread(self.ProcessGameStateThreadInstance)
+        end
+
+        self.ProcessGameStateThreadInstance = self.Trash:Add(ForkThread(self.MonitoringThread, self))
     end,
 
+    --- Monitors the victory condition.
     ---@param self AbstractVictoryCondition
-    ProcessGameStateThread = function(self)
+    MonitoringThread = function(self)
         while not IsGameOver() do
-            self:ProcessGameState(ArmyBrains)
+            self:EvaluateVictoryCondition()
             WaitTicks(4)
         end
     end,
 
+    --- Evaluates the victory condition of individual players.
     ---@param self AbstractVictoryCondition
-    ---@param aiBrains AIBrain[]
-    ProcessGameState = function(self, aiBrains)
+    EvaluateVictoryCondition = function(self)
         error("Missing implementation of ProcessGameState")
     end,
 
