@@ -53,7 +53,7 @@ ExperimentalPhasonLaserCollisionBeam = import("/lua/sim/collisionBeams/Experimen
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 local Util = import("/lua/utilities.lua")
 
 

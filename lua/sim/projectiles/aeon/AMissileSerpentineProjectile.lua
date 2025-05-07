@@ -27,7 +27,7 @@ local SingleCompositeEmitterProjectileOnKilled = SingleCompositeEmitterProjectil
 local SingleCompositeEmitterProjectileOnImpact = SingleCompositeEmitterProjectile.OnImpact
 local SingleCompositeEmitterProjectileOnExitwater = SingleCompositeEmitterProjectile.OnExitWater
 
-local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
+local DebrisComponent = import('/lua/sim/projectiles/components/debriscomponent.lua').DebrisComponent
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
 --- AEON SERPENTINE MISSILE PROJECTILES

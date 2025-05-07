@@ -24,7 +24,7 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local SLaanseTacticalMissileOnCreate = SLaanseTacticalMissile.OnCreate
 local SLaanseTacticalMissileOnImpact = SLaanseTacticalMissile.OnImpact
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
 --- used by XSB2108
 ---@class SIFLaanseTacticalMissile04 : SLaanseTacticalMissile, TacticalMissileComponent

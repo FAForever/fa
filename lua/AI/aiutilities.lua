@@ -3254,7 +3254,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
     if bool then
         IssueToUnitClearCommands(eng)
         local factionIndex = aiBrain:GetFactionIndex()
-        local buildingTmplFile = import('/lua/BuildingTemplates.lua')
+        local buildingTmplFile = import('/lua/buildingtemplates.lua')
         local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
         local whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
         for _,massMarker in markers do

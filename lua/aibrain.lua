@@ -304,7 +304,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         self.VOTable[key] = true
 
-        import("/lua/SimSyncUtils.lua").SyncVoice(data)
+        import("/lua/simsyncutils.lua").SyncVoice(data)
         WaitSeconds(sound.timeout)
 
         self.VOTable[key] = nil

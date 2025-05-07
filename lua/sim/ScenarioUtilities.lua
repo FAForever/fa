@@ -584,7 +584,7 @@ local function RevealCivilians()
         end
     end
 
-    local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
+    local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
     -- find civilian units
     for k, index in civilians do

@@ -15,7 +15,7 @@
 ---@field Type string
 ---@field Exec string
 
-local SyncCameraRequest = import("/lua/SimSyncUtils.lua").SyncCameraRequest
+local SyncCameraRequest = import("/lua/simsyncutils.lua").SyncCameraRequest
 
 SingleEvent = import("/lua/system/singleevent.lua").SingleEvent
 -- Name / Object table for cameras

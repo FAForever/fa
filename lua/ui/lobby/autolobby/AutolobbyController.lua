@@ -22,7 +22,7 @@
 
 local Utils = import("/lua/system/utils.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
-local GameColors = import("/lua/GameColors.lua")
+local GameColors = import("/lua/gamecolors.lua")
 
 local MohoLobbyMethods = moho.lobby_methods
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent

@@ -1,5 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
-local Entity = import("/lua/sim/Entity.lua").Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
