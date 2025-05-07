@@ -105,7 +105,12 @@ BrushStroke = Class(DebugComponent) {
     ---@return number
     GetBrushWidth = function(self)
         local pixelScaleFactor = LayoutHelper.GetPixelScaleFactor()
-        return 0.5 * (1 + pixelScaleFactor) - 1
+
+        -- we want the multiplier to start at 0, hence the -1
+        local multiplier = 0.5 * (1 + pixelScaleFactor) - 1
+
+        -- clamp it to make sure we don't get anything crazy
+        return math.clamp(multiplier, 0, 1)
     end,
 
     --- Computes the decay progression of the brush stroke.
