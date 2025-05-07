@@ -56,16 +56,34 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
             -- check if the defeated brain is allied with an army that is not defeated (yet!), if
             -- so then the brain is not 'defeated' yet and should not be removed from the game
+
+            local isDecapitated = true
             for l = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[l]
                 if IsAlly(defeatedBrain:GetArmyIndex(), aliveBrain:GetArmyIndex()) then
+                    isDecapitated = false
                     TableInsert(aliveBrains, defeatedBrain)
                     break
                 end
             end
+
+            -- defeated brain has no allies that are not considered defeated
+            if isDecapitated then
+                TableInsert(decapitatedBrains, defeatedBrain)
+            end
         end
 
-        -- process all defeated brains. At this stage, it is an entire team that is defeated at once.
+        -- no remaining players, just end the game
+        if table.empty(aliveBrains) then
+            if self.EnabledSpewing then
+                LOG("All players are defeated, game will end")
+            end
+
+            self:EndGame()
+            return
+        end
+
+        -- process all defeated brains. At this stage, it is an entire team that is defeated at once
         for k = 1, TableGetn(decapitatedBrains) do
             local defeatedBrain = decapitatedBrains[k]
             self:DefeatForArmy(defeatedBrain)
@@ -73,6 +91,11 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
         -- check if all remaining players want to forfeit
         if self:RemainingBrainsForfeit(aliveBrains) then
+
+            if self.EnabledSpewing then
+                LOG("All remaining players want to forfeit, game will end")
+            end
+
             for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:DrawForArmy(aliveBrain)
@@ -84,6 +107,11 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
         -- check if all remaining players are allied
         if self:RemainingBrainsAreAllied(aliveBrains) then
+
+            if self.EnabledSpewing then
+                LOG("All remaining players are allied, game will end")
+            end
+
             for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:VictoryForArmy(aliveBrain)
