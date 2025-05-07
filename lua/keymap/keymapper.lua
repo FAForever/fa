@@ -98,19 +98,7 @@ end
 function GetCurrentKeyBinding(action)
     local TableFind = table.find -- luckily, this handles nil tables
 
-    local binding = TableFind(Prefs.GetFromCurrentProfile("UserKeyMap"), action)
-    if binding then return binding end
-    binding = TableFind(Prefs.GetFromCurrentProfile("UserDebugKeyMap"), action)
-    if binding then return binding end
-
-    local defaultKeyMap = import(GetDefaultKeyMapName())
-
-    binding = TableFind(defaultKeyMap.defaultKeyMap, action)
-    if binding then return binding end
-    binding = TableFind(defaultKeyMap.debugKeyMap, action)
-    if binding then return binding end
-
-    return false
+    return TableFind(GetCurrentKeyMap(), action) or false
 end
 
 function ClearUserKeyMapping(key)
