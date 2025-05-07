@@ -10,6 +10,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local KeyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
+local TableFind = table.find
 
 function GetActionName(action)
     local name = ''
@@ -96,7 +97,6 @@ end
 ---@param action string
 ---@return string | false
 function GetCurrentKeyBinding(action)
-    local TableFind = table.find -- luckily, this handles nil tables
 
     return TableFind(GetCurrentKeyMap(), action) or false
 end
