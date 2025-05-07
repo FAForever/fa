@@ -17,8 +17,8 @@ local NullShell = DefaultProjectileFile.NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
-local SplitComponent = import('/lua/sim/projectiles/components/SplitComponent.lua').SplitComponent
-local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
+local SplitComponent = import('/lua/sim/projectiles/components/splitcomponent.lua').SplitComponent
+local DebrisComponent = import('/lua/sim/projectiles/components/debriscomponent.lua').DebrisComponent
 
 ---  CYBRAN BRACKMAN "HACK PEG-POD" PROJECTILE
 ---@class CDFBrackmanHackPegProjectile01 : MultiPolyTrailProjectile

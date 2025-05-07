@@ -47,12 +47,12 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
 
     -- create the interface, needs to be done before the lobby is
     local playerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 8
-    local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").SetupSingleton(playerCount)
+    local interface = import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").SetupSingleton(playerCount)
 
     -- create the lobby
     local maxConnections = 16
     AutolobbyCommunicationsInstance = InternalCreateLobby(
-        import("/lua/ui/lobby/autolobby/AutolobbyController.lua").AutolobbyCommunications,
+        import("/lua/ui/lobby/autolobby/autolobbycontroller.lua").AutolobbyCommunications,
         protocol, localPort, maxConnections, desiredPlayerName,
         localPlayerUID, natTraversalProvider
     )

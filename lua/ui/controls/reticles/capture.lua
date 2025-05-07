@@ -28,7 +28,7 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
-local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
+local GetBlueprintCaptureCost = import('/lua/shared/capturecost.lua').GetBlueprintCaptureCost
 
 local ObserveSelection = import("/lua/ui/game/gamemain.lua").ObserveSelection
  

@@ -4427,7 +4427,7 @@ function CreateUI(maxPlayers)
         end
     end)
     if false then
-        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
+        import("/lua/ui/events/snowflake.lua"). CreateSnowFlakes(GUI)
     end
 end
 
@@ -6583,8 +6583,8 @@ function ShowLobbyOptionsDialog()
             local sliderValue = math.floor(newValue)
             slider_SnowFlakes_Count_TEXT:SetText(LOC("<LOC lobui_0447>Snowflakes count").. sliderValue)
             Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
-            import("/lua/ui/events/SnowFlake.lua").Clear()
-            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+            import("/lua/ui/events/snowflake.lua").Clear()
+            import("/lua/ui/events/snowflake.lua").CreateSnowFlakes(GUI, sliderValue)
         end
     end
 

@@ -94,13 +94,13 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
-        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
+        self.GridPresence = import("/lua/ai/gridpresence.lua").Setup(self)
     end,
 
     ---@param self EasyAIBrain

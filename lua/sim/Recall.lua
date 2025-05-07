@@ -3,7 +3,7 @@
 --**************************************************************************************************
 
 -- collect recall parameters (note it is not imported)
-doscript "/lua/shared/RecallParams.lua"
+doscript "/lua/shared/recallparams.lua"
 
 -- TODO: generalize to abstract voting system, decoupled from recall
 

@@ -4,7 +4,7 @@
 --- A library dedicated to investigating the bytecode of functions.
 --- At a minimum, it can be used like
 ---
----   import("/lua/shared/DebugFunction.lua").PrintOut(<your fn>)
+---   import("/lua/shared/debugfunction.lua").PrintOut(<your fn>)
 ---
 --- The majority of the code is to pretty-up the output of the default
 --- `debug.listcode` function.

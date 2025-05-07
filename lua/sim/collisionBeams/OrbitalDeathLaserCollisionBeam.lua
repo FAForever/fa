@@ -2,7 +2,7 @@ local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
-local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionbeams/sccollisionbeam.lua").SCCollisionBeam
 
 -- Used by Novax Defense Satellite XEA0002's TOrbitalDeathLaserBeamWeapon
 ---@class OrbitalDeathLaserCollisionBeam : SCCollisionBeam

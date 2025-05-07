@@ -31,7 +31,7 @@ local Entity = import("/lua/sim/entity.lua").Entity
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
-local shieldAbsorptionValues = import("/lua/ShieldAbsorptionValues.lua").shieldAbsorptionValues
+local shieldAbsorptionValues = import("/lua/shieldabsorptionvalues.lua").shieldAbsorptionValues
 
 local DeprecatedWarnings = {}
 

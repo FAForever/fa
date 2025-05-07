@@ -949,8 +949,8 @@ options = {
                 default = 'on',
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
-                        import("/lua/ui/override/ArmiesTable.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/sessionclients.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/armiestable.lua").OptionShowPlayerNames = value
                     end
                 end,
                 custom = {

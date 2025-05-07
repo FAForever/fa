@@ -22,16 +22,16 @@
 
 local Utils = import("/lua/system/utils.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
-local GameColors = import("/lua/GameColors.lua")
+local GameColors = import("/lua/gamecolors.lua")
 
 local MohoLobbyMethods = moho.lobby_methods
-local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
-local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyServerCommunicationsComponent.lua")
+local DebugComponent = import("/lua/shared/components/debugcomponent.lua").DebugComponent
+local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/autolobbyservercommunicationscomponent.lua")
     .AutolobbyServerCommunicationsComponent
 
-local AutolobbyArgumentsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyArguments.lua").AutolobbyArgumentsComponent
+local AutolobbyArgumentsComponent = import("/lua/ui/lobby/autolobby/components/autolobbyarguments.lua").AutolobbyArgumentsComponent
 
-local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
+local AutolobbyMessages = import("/lua/ui/lobby/autolobby/autolobbymessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
     --  General info strings
@@ -541,7 +541,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             self:SendLaunchStatusToServer(launchStatus)
 
             -- update UI for launch statuses
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
             WaitSeconds(2.0)
@@ -620,13 +620,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = self.PlayerOptions })
 
         -- update UI for player options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
 
         local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
         if localIndex then
             local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateOwnership(ownershipMatrix)
         end
     end,
@@ -637,14 +637,14 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.PlayerOptions = data.PlayerOptions
 
         -- update UI for player options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
 
         local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
         if localIndex then
             local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
             -- update UI for player options
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateOwnership(ownershipMatrix)
         end
     end,
@@ -657,7 +657,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:Prefetch(self.GameOptions, self.GameMods)
 
         -- update UI for game options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
     end,
 
@@ -673,7 +673,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.LaunchStatutes[data.SenderID] = data.LaunchStatus
 
         -- update UI for launch statuses
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
     end,
 
@@ -905,7 +905,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:SendLaunchStatusToServer('Hosting')
 
         -- update UI for game options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
     end,
 
@@ -955,13 +955,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
         -- update UI for launch statuses
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
         -- update the matrix and the UI
         self.ConnectionMatrix[peerId] = peerConnectedTo
         local connections = self:CreateConnectionsMatrix(self.PlayerOptions, self.ConnectionMatrix)
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateConnections(connections)
     end,
 
@@ -996,7 +996,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- signal UI that we received something
         local peerIndex = self:PeerIdToIndex(self.PlayerOptions, data.SenderID)
         if peerIndex then
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateIsAliveStamp(peerIndex)
         end
 
@@ -1044,7 +1044,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:DebugSpew("GameLaunched")
 
         -- clear out the interface
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton():Destroy()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton():Destroy()
 
         -- destroy ourselves, the game takes over the management of peers
         self:Destroy()

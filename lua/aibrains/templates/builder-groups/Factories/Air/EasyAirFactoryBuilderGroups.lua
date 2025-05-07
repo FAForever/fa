@@ -5,16 +5,16 @@ DefaultAirFactory = AIBuilderGroupTemplate {
     BuilderGroupManager = 'FactoryManager',
     BuilderGroupType = 'AIR',
     BuilderTemplates = {
-        import('/lua/aibrains/templates/builders/Factories/Shared/EasySharedFactoryBuilders.lua').DefaultEngineersTech1,
-        import('/lua/aibrains/templates/builders/Factories/Shared/EasySharedFactoryBuilders.lua').DefaultEngineersTech2,
-        import('/lua/aibrains/templates/builders/Factories/Shared/EasySharedFactoryBuilders.lua').DefaultEngineersTech3,
+        import('/lua/aibrains/templates/builders/factories/shared/easysharedfactorybuilders.lua').DefaultEngineersTech1,
+        import('/lua/aibrains/templates/builders/factories/shared/easysharedfactorybuilders.lua').DefaultEngineersTech2,
+        import('/lua/aibrains/templates/builders/factories/shared/easysharedfactorybuilders.lua').DefaultEngineersTech3,
 
-        import('/lua/aibrains/templates/builders/Factories/Air/EasyAirFactoryBuilders.lua').DefaultAntiAirTech1,
-        import('/lua/aibrains/templates/builders/Factories/Air/EasyAirFactoryBuilders.lua').DefaultAntiAirTech2,
-        import('/lua/aibrains/templates/builders/Factories/Air/EasyAirFactoryBuilders.lua').DefaultAntiAirTech3,
-        import('/lua/aibrains/templates/builders/Factories/Air/EasyAirFactoryBuilders.lua').DefaultGroundAttackTech1,
-        import('/lua/aibrains/templates/builders/Factories/Air/EasyAirFactoryBuilders.lua').DefaultGroundAttackTech2,
-        import('/lua/aibrains/templates/builders/Factories/Air/EasyAirFactoryBuilders.lua').DefaultGroundAttackTech3,
+        import('/lua/aibrains/templates/builders/factories/air/easyairfactorybuilders.lua').DefaultAntiAirTech1,
+        import('/lua/aibrains/templates/builders/factories/air/easyairfactorybuilders.lua').DefaultAntiAirTech2,
+        import('/lua/aibrains/templates/builders/factories/air/easyairfactorybuilders.lua').DefaultAntiAirTech3,
+        import('/lua/aibrains/templates/builders/factories/air/easyairfactorybuilders.lua').DefaultGroundAttackTech1,
+        import('/lua/aibrains/templates/builders/factories/air/easyairfactorybuilders.lua').DefaultGroundAttackTech2,
+        import('/lua/aibrains/templates/builders/factories/air/easyairfactorybuilders.lua').DefaultGroundAttackTech3,
     }
 }
 

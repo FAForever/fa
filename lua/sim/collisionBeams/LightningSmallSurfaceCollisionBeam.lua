@@ -2,7 +2,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
-local LightningSmallCollisionBeam = import("/lua/sim/collisionBeams/LightningSmallCollisionBeam.lua").LightningSmallCollisionBeam
+local LightningSmallCollisionBeam = import("/lua/sim/collisionbeams/lightningsmallcollisionbeam.lua").LightningSmallCollisionBeam
 
 LightningSmallSurfaceCollisionBeam = Class(LightningSmallCollisionBeam) {
     TerrainImpactScale = 0.1,

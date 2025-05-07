@@ -11,7 +11,7 @@ local UnitStopBeingBuiltEffects = Unit.StopBeingBuiltEffects
 local UnitDoTakeDamage = Unit.DoTakeDamage
 local UnitCreateWreckage = Unit.CreateWreckage
 
-local BlinkingLightsUnitComponent = import("/lua/sim/units/components/BlinkingLightsUnitComponent.lua").BlinkingLightsUnitComponent
+local BlinkingLightsUnitComponent = import("/lua/sim/units/components/blinkinglightsunitcomponent.lua").BlinkingLightsUnitComponent
 
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")

@@ -851,7 +851,7 @@ local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
     local bpD = bp.Display
     if __blueprints[bpD.MeshBlueprint] then
         SPEW("Spawning mesh of " .. id)
-        local entity = import('/lua/sim/Entity.lua').Entity()
+        local entity = import('/lua/sim/entity.lua').Entity()
         if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
             y = y - bp.CollisionOffsetY
         end
@@ -899,7 +899,7 @@ local function ShowRaisedPlatforms(self)
     for i = 1, (table.getn(plats) / 12) do
         entities[i] = {}
         for b = 1, 4 do
-            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
+            entities[i][b] = import('/lua/sim/entity.lua').Entity { Owner = self }
             self.Trash:Add(entities[i][b])
             entities[i][b]:SetPosition(Vector(
                 pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
