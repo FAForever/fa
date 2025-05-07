@@ -64,10 +64,12 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     OnRender = function (self, delta)
         BrushStroke.OnRender(self, delta)
 
+        local brushWidth = self:GetBrushWidth()
+
         -- feature: draw a line between the last sample and the current sample
         if self.LastSample and self.CurrentSample then
             local previewColor = self:ComputePreviewColor(self.Color)
-            UI_DrawLine(self.LastSample, self.CurrentSample, previewColor)
+            UI_DrawLine(self.LastSample, self.CurrentSample, previewColor, brushWidth)
         end
     end,
 
@@ -154,10 +156,10 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         return false
     end,
 
-    --- Adds a sample to the brush stroke.
+    --- Attempts to add a sample to the brush stroke.
     ---@param self UIActiveBrushStroke
     ---@param coordinates Vector
-    AddSample = function(self, coordinates)
+    ProcessSample = function(self, coordinates)
         -- enables us to visualize it
         self.CurrentSample = coordinates
 
@@ -165,8 +167,6 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         if self:DebounceSample(coordinates) then
             return
         end
-
-        local samples = self.Samples
 
         -- limitation: chat messages have a limited amount of space per
         -- message. It is difficult to overcome this limit.
@@ -177,16 +177,36 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         --
         -- The value is intentionally hard coded!
 
-        if table.getn(samples.CoordinatesX) > 127 then
+        if self:GetSampleCount() > 127 then
             return
         end
 
+        self:AddSample(coordinates)
+    end,
+
+    --- Adds a sample to the brush stroke.
+    ---@param self UIActiveBrushStroke
+    ---@param coordinates Vector
+    AddSample = function(self, coordinates)
         self.LastEdited = CurrentTime()
         self.LastSample = coordinates
 
+        local samples = self.Samples
         table.insert(samples.CoordinatesX, coordinates[1])
         table.insert(samples.CoordinatesY, coordinates[2])
         table.insert(samples.CoordinatesZ, coordinates[3])
+    end,
+
+    --- Adds the last known sample to the brush stroke.
+    ---@param self UIActiveBrushStroke
+    AddLastSample = function(self)
+        local currentSample = self.CurrentSample
+        if currentSample then
+            local samples = self.Samples
+            table.insert(samples.CoordinatesX, currentSample[1])
+            table.insert(samples.CoordinatesY, currentSample[2])
+            table.insert(samples.CoordinatesZ, currentSample[3])
+        end
     end,
 
     --#endregion

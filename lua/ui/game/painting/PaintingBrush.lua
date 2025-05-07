@@ -96,7 +96,7 @@ PaintingBrush = Class(Dragger) {
     --#endregion
 
     --- Computes the color of the active brush stroke.
-    ---@param self UIPaintingCanvas
+    ---@param self UIPaintingBrush
     GetColorOfActiveBrushStroke = function(self)
 
         -- in this case we just want to use the color of the
@@ -120,7 +120,7 @@ PaintingBrush = Class(Dragger) {
             )
         end
 
-        self.ActiveBrushStroke:AddSample(coordinates)
+        self.ActiveBrushStroke:ProcessSample(coordinates)
     end,
 
     --- Deletes all brush strokes that the brush is on top of.
@@ -182,9 +182,15 @@ PaintingBrush = Class(Dragger) {
     ---@param y number  # y coordinate of screen position
     OnRelease = function(self, x, y)
         if self.ActiveBrushStroke then
-            -- simplify the brush stroke
-            self.ActiveBrushStroke:Simplify()
-            self.PaintingCanvas.Adapter:SharePaintingBrushStroke(self.ActiveBrushStroke)
+
+            -- only process brushes with at least two samples in there
+            if self.ActiveBrushStroke:GetSampleCount() > 1 then
+                self.ActiveBrushStroke:AddLastSample()
+
+                -- simplify the brush stroke and share it
+                self.ActiveBrushStroke:Simplify()
+                self.PaintingCanvas.Adapter:SharePaintingBrushStroke(self.ActiveBrushStroke)
+            end
         end
 
         self.PaintingCanvas:CancelBrush()

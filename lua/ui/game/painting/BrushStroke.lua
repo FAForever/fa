@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local ColorUtils = import("/lua/shared/color.lua")
+local LayoutHelper = import('/lua/maui/layouthelpers.lua')
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 
 ---@class UIBrushStrokeBoundingBox : number[]
@@ -76,6 +77,7 @@ BrushStroke = Class(DebugComponent) {
     ---@param self UIBrushStroke
     ---@param delta number
     OnRender = function(self, delta)
+        local brushWidth = self:GetBrushWidth()
         local decayProgress = self:GetDecayProgress()
         local decayedColor = self:ComputeDecayedColor(self.Color, decayProgress)
 
@@ -95,8 +97,15 @@ BrushStroke = Class(DebugComponent) {
             position2[2] = coordinatesY[k]
             position2[3] = coordinatesZ[k]
 
-            UI_DrawLine(position1, position2, decayedColor, 0)
+            UI_DrawLine(position1, position2, decayedColor, brushWidth)
         end
+    end,
+
+    ---@param self UIBrushStroke
+    ---@return number
+    GetBrushWidth = function(self)
+        local pixelScaleFactor = LayoutHelper.GetPixelScaleFactor()
+        return 0.5 * (1 + pixelScaleFactor) - 1
     end,
 
     --- Computes the decay progression of the brush stroke.
