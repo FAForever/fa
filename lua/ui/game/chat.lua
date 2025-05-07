@@ -1441,7 +1441,7 @@ function CreateConfigWindow()
         end
     end
 
-    local filterTitle = UIUtil.CreateText(optionGroup, '<LOC chat_0012>Message Filters', 14, "Arial Bold")
+    local filterTitle = UIUtil.CreateText(optionGroup, '<LOC chat_0012>Message/Painting Filters', 14, "Arial Bold")
     LayoutHelpers.AtLeftTopIn(filterTitle, optionGroup, 5, 5)
     Tooltip.AddControlTooltip(filterTitle, 'chat_filter')
     local index = 1
