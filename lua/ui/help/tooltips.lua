@@ -1318,10 +1318,12 @@ Tooltips = {
     options_Pause = {
         title = "<LOC tooltipui0066>Pause",
         description = "",
+        keyID = 'pause'
     },
     options_Play = {
         title = "<LOC tooltipui0098>Play",
         description = "",
+        keyID = 'pause'
     },
 
     -- **********************
