@@ -82,7 +82,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param categories EntityCategory
     ---@return boolean
     BrainHasEligibleUnits = function(self, aiBrain, categories)
-        local units = aiBrain:GetListOfUnits(categories, false)
+        local units = aiBrain:GetListOfUnits(categories)
         if (units) then
             for k = 1, TableGetn(units) do
                 local unit = units[k]
