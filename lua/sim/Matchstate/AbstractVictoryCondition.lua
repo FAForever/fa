@@ -63,7 +63,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
 
         -- only units that are finished are taken into account.
 
-        if unit:GetFractionComplete() <= 1.0 then
+        if unit:GetFractionComplete() < 1.0 then
             return false
         end
 
