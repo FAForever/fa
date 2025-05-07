@@ -4,7 +4,8 @@
 
     - The hitboxes of all tactical missiles are increased slightly, to prevent TMDs from missing them by overshooting.
     - Seraphim and UEF TMLs fly lower.
-    - The speed of the Seraphim TML is nerfed because the difference between its speed and that of other TMLs became too large after previous changes. At longer ranges, it was able to reach its target up to (and sometimes over) 10 seconds faster than other TMLs. With these changes, it is still excellent (and the fastest), but its lower terminal speed should now serve as a legitimate balancing factor.
+    - The max speed of the Seraphim TML is reduced because it was too fast compared to other TMLs; for example, it was able to reach its target over 10s faster at longer ranges. Additionally, the terminal speed of the missile as it nears its target is also reduced, so that it serves as a more legitimate balancing factor.
+
     - Nerf the Seraphim ACU TML's really oppressive close range combat potential by reducing its speed.
 
 
