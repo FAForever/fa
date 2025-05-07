@@ -325,7 +325,7 @@ function EnumerateSkirmishScenarios(nameFilter, sortFunc)
         end
     end
     
-    for id, mod in import("/lua/MODS.LUA").AllSelectableMods() do
+    for id, mod in import("/lua/mods.lua").AllSelectableMods() do
         scenFiles = DiskFindFiles(mod.location .. '/maps', nameFilter .. '_scenario.lua')
         for index, fileName in scenFiles do
             local scen = LoadScenario(fileName)

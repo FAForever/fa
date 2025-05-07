@@ -25,7 +25,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 
-local AutolobbyConnectionMatrixDot = import("/lua/ui/lobby/autolobby/AutolobbyConnectionMatrixDot.lua")
+local AutolobbyConnectionMatrixDot = import("/lua/ui/lobby/autolobby/autolobbyconnectionmatrixdot.lua")
 
 ---@class UIAutolobbyConnectionMatrix : Group
 ---@field PlayerCount number

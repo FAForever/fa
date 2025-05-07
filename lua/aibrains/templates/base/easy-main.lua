@@ -13,9 +13,9 @@ BaseTemplateMain = AIBaseTemplate {
     },
     FactoryManager = {
         BuilderGroupTemplates = {
-            import('/lua/aibrains/templates/builder-groups/Factories/Air/EasyAirFactoryBuilderGroups.lua').DefaultAirFactory,
-            import('/lua/aibrains/templates/builder-groups/Factories/Land/EasyLandFactoryBuilderGroups.lua').DefaultLandFactory,
-            import('/lua/aibrains/templates/builder-groups/Factories/Naval/EasyNavalFactoryBuilderGroups.lua').DefaultNavalFactory,
+            import('/lua/aibrains/templates/builder-groups/factories/air/easyairfactorybuildergroups.lua').DefaultAirFactory,
+            import('/lua/aibrains/templates/builder-groups/factories/land/easylandfactorybuildergroups.lua').DefaultLandFactory,
+            import('/lua/aibrains/templates/builder-groups/factories/naval/easynavalfactorybuildergroups.lua').DefaultNavalFactory,
         },
         BuilderGroupTemplatesNonCheating = {},
     }

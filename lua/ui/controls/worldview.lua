@@ -20,8 +20,8 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
 local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
-local WorldViewCameraComponent = import("/lua/ui/controls/components/WorldViewCameraComponent.lua").WorldViewCameraComponent
-local WorldViewShapeComponent = import("/lua/ui/controls/components/WorldViewShapeComponent.lua").WorldViewShapeComponent
+local WorldViewCameraComponent = import("/lua/ui/controls/components/worldviewcameracomponent.lua").WorldViewCameraComponent
+local WorldViewShapeComponent = import("/lua/ui/controls/components/worldviewshapecomponent.lua").WorldViewShapeComponent
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -1268,7 +1268,7 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
     ---@param stayOnScreen? boolean
     ---@return UIOffScreenIndicator
     CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
-        local module = import("/lua/ui/game/OffscreenMarkerIndicator.lua")
+        local module = import("/lua/ui/game/offscreenmarkerindicator.lua")
 
         if color == 'blue' then
             return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Blue')

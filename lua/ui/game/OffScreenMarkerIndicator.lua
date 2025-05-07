@@ -22,8 +22,8 @@
 
 local Layouter = import("/lua/maui/layouthelpers.lua").Layouter
 
-local OffScreenIndicatorModule = import("/lua/ui/game/OffScreenIndicator.lua")
-local OffScreenIndicator = import("/lua/ui/game/OffScreenIndicator.lua").OffScreenIndicator
+local OffScreenIndicatorModule = import("/lua/ui/game/offscreenindicator.lua")
+local OffScreenIndicator = import("/lua/ui/game/offscreenindicator.lua").OffScreenIndicator
 
 --- A preset set of textures for UIOffScreenIndicator that match the blue ping.
 ---@type UIOffScreenIndicatorTextureSet

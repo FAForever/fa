@@ -329,7 +329,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local brain = self:GetBrain()
             IssueClearCommands({ eng })
             local factionIndex = brain:GetFactionIndex()
-            local buildingTmplFile = import('/lua/BuildingTemplates.lua')
+            local buildingTmplFile = import('/lua/buildingtemplates.lua')
             local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
             local whatToBuild = brain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             for _, massMarker in self.MassPointTable do

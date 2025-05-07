@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local CDFMissileRedirectWeapon01 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon01.lua").CDFMissileRedirectWeapon01
+local CDFMissileRedirectWeapon01 = import("/lua/sim/weapons/cybran/cdfmissileredirectweapon01.lua").CDFMissileRedirectWeapon01
 local CDFMissileRedirectWeapon01OnCreate = CDFMissileRedirectWeapon01.OnCreate
 local CDFMissileRedirectWeapon01OnLostTarget = CDFMissileRedirectWeapon01.OnLostTarget
 
