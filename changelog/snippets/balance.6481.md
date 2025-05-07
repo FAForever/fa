@@ -26,6 +26,24 @@
     - Mass cost: 69600 -> 70000 (+0.6%)
     - Energy cost: 1305000 -> 1313000 (+0.6%)
     - Build time: 105000 -> 105600 (+0.6%)
-    - DPS with 4 T3 pgens: 804 -> 884 (+9.87%)
+
+    - DPS with 4 T3 pgens: 804 -> 844 (+5.0%)
       - Damage: 3700 -> 3800
-      - Base Reload: 7.7s -> 7.2s
+      - Base Reload: 7.7s -> 7.5s
+      - As it has a lot of splash radius and there is a significant accuracy buff for the Disruptor in this patch, the DPS isn't increased as much as calculated vs T3 shields.
+
+- (#6482) Balance accuracy of T3 static artillery:
+  The accuracy is balanced for DPS dealt to multiple Seraphim T3 shields (accounts for splash damage), a scenario similar to how a high value target would be protected late-game where T3 artillery plays a role.
+  - Aeon Emissary:
+    - Firing Randomness: 0.35
+  - UEF Duke:
+    - Firing Randomness: 0.525 -> 0.467
+  - Seraphim Hovatham:
+    - Firing Randomness: 0.675 -> 0.560
+  - Cybran Disruptor:
+    - Firing Randomness: 0.75 -> 0.646
+
+    
+   
+    
+
