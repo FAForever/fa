@@ -3,14 +3,11 @@
   **Othuum: T3 Siege Tank (XSL0303):**
     - Thau Cannon:
       - Reload time: 4.0 -> 3.4 seconds (DPS 156 -> 184)
-      - Range: 28 -> 29
       - Muzzle velocity: 40 -> 36
     - Aire-au Bolters:
       - Damage: 64 -> 57 (DPS 256 -> 228)
       
     Some DPS is shifted to the long range weapon to help in low unit scenarios such as raids or early T3 fights, in which Othuums were losing without even dealing much damage.
-    
-    The range helps larger formations of Othuums be more effective by making it harder for Harbingers to stay out of range of the second line of Othuums in the formation.
 
     The muzzle velocity is slightly reduced to encourage occassional dodging.
 
