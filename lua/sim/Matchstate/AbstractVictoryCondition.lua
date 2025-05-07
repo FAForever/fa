@@ -114,6 +114,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param aiBrains AIBrain[]
     ---@return boolean
     RemainingBrainsAreAllied = function(self, aiBrains)
+        -- defaults to false when no brains are provided
+        if table.empty(aiBrains) then
+            return false
+        end
+
         local victorious = true
         for a = 1, TableGetn(aiBrains) do
             local aBrain = aiBrains[a]
@@ -137,6 +142,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param aiBrains AIBrain[]
     ---@return boolean
     RemainingBrainsForfeit = function(self, aiBrains)
+        -- defaults to false when no brains are provided
+        if table.empty(aiBrains) then
+            return false
+        end
+
         for k = 1, TableGetn(aiBrains) do
             local brain = aiBrains[k]
             if not brain.OfferingDraw then
