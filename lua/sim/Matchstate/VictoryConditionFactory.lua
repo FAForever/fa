@@ -25,7 +25,7 @@
 GetVictoryConditionInstance = function(victoryConditionType)
 
     -- we load the modules in-line so that they are only loaded when used
-    if victoryConditionType == 'demoralization' then
+    if victoryConditionType == 'decapitation' then
         return import('/lua/sim/Matchstate/DecapitationCondition.lua').CreateDecapitationCondition()
     elseif victoryConditionType == 'demoralization' then
         return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.COMMAND)
