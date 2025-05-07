@@ -54,6 +54,17 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             end
         end
 
+        -- no remaining players, just end the game
+        if table.empty(aliveBrains) then
+            if self.EnabledSpewing then
+                SPEW("All players are defeated, game will end")
+            end
+
+            self:EndGame()
+            return
+        end
+
+
         -- process all defeated brains
         for k = 1, TableGetn(defeatedBrains) do
             local defeatedBrain = defeatedBrains[k]
@@ -62,6 +73,10 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
         -- check if all remaining players want to forfeit
         if self:RemainingBrainsForfeit(aliveBrains) then
+            if self.EnabledSpewing then
+                SPEW("All remaining players want to forfeit, game will end")
+            end
+
             for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:DrawForArmy(aliveBrain)
@@ -73,6 +88,10 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
         -- check if all remaining players are allied
         if self:RemainingBrainsAreAllied(aliveBrains) then
+            if self.EnabledSpewing then
+                SPEW("All remaining players are allied, game will end")
+            end
+
             for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:VictoryForArmy(aliveBrain)
