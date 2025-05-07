@@ -5150,7 +5150,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param target Vector
     ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
-    ---@param self Unit
     OnMissileIntercepted = function(self, target, defense, position, projectile)
         -- try and run callbacks
         if self.EventCallbacks['OnMissileIntercepted'] then
@@ -5209,7 +5208,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Add a callback when a missile launched by this unit is intercepted
     ---@param self Unit
-    ---@param callback function<Vector, Unit, Vector>
+    ---@param callback fun(target: Vector, defense: Unit, position: Vector)
     AddMissileInterceptedCallback = function(self, callback)
         self.EventCallbacks['OnMissileIntercepted'] = self.EventCallbacks['OnMissileIntercepted'] or { }
         table.insert(self.EventCallbacks['OnMissileIntercepted'], callback)
@@ -5217,7 +5216,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Add a callback when a missile launched by this unit hits a shield
     ---@param self Unit
-    ---@param callback function<Vector, Unit, Vector>
+    ---@param callback fun(target: Vector, shield: Unit, position: Vector)
     AddMissileImpactShieldCallback = function(self, callback)
         self.EventCallbacks['OnMissileImpactShield'] = self.EventCallbacks['OnMissileImpactShield'] or { }
         table.insert(self.EventCallbacks['OnMissileImpactShield'], callback)
@@ -5225,7 +5224,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
-    ---@param callback function<Vector, Vector>
+    ---@param callback fun(self: Unit, target: Unit, position: Vector)
     AddMissileImpactTerrainCallback = function(self, callback)
         self.EventCallbacks['OnMissileImpactTerrain'] = self.EventCallbacks['OnMissileImpactTerrain'] or { }
         table.insert(self.EventCallbacks['OnMissileImpactTerrain'], callback)

@@ -1,0 +1,1 @@
+- (#6774) Fix minor annotation issues related to incorrectly defined function prototypes and warnings about duplicate parameters/indices.
