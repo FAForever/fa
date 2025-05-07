@@ -22,17 +22,17 @@
 
 local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVictoryCondition.lua").AbstractVictoryCondition
 
----@class SandBoxCondition : AbstractVictoryCondition
-SandBoxCondition = Class(AbstractVictoryCondition) {
+---@class SandboxCondition : AbstractVictoryCondition
+SandboxCondition = Class(AbstractVictoryCondition) {
 
-    ---@param self SandBoxCondition
+    ---@param self SandboxCondition
     ProcessGameState = function(self)
         -- do nothing, it is a sandbox!
     end,
 }
 
----@return SandBoxCondition
-CreateSandBoxCondition = function()
-    return SandBoxCondition()
+---@return SandboxCondition
+CreateSandboxCondition = function()
+    return SandboxCondition()
 end
 

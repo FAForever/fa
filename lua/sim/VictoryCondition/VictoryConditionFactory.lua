@@ -34,10 +34,10 @@ GetVictoryConditionInstance = function(victoryConditionType)
     elseif victoryConditionType == 'eradication' then
         return import('/lua/sim/victorycondition/UnitCondition.lua').CreateUnitCondition(categories.ALLUNITS - categories.WALL)
     elseif victoryConditionType == 'sandbox' then
-        return import('/lua/sim/victorycondition/SandboxCondition.lua').CreateSandBoxCondition()
+        return import('/lua/sim/victorycondition/SandboxCondition.lua').CreateSandboxCondition()
     end
 
     -- default to sandbox
-    WARN("Unknown victory condition type: " .. tostring(victoryConditionType))
-    return import('/lua/sim/victorycondition/SandboxCondition.lua').CreateSandBoxCondition()
+    WARN("Unknown victory condition option: " .. tostring(victoryConditionType))
+    return import('/lua/sim/victorycondition/SandboxCondition.lua').CreateSandboxCondition()
 end
