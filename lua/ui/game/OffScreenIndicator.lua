@@ -24,7 +24,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local ReusedLayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 
 local Button = import("/lua/maui/button.lua").Button
-local AnimatedGlow = import("/lua/ui/game/common/AnimatedGlow.lua")
+local AnimatedGlow = import("/lua/ui/game/common/animatedglow.lua")
 
 ---@alias UIOffScreenIndicatorDirection 'OnScreen' | 'North' | 'West' | 'East' | 'South'
 

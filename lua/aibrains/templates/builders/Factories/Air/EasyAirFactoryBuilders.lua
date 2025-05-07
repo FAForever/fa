@@ -1,6 +1,6 @@
 
-local GenericConditions = import("/lua/aibrains/conditions/GenericConditions.lua")
-local FactoryManagerConditions = import("/lua/aibrains/conditions/FactoryManagerConditions.lua")
+local GenericConditions = import("/lua/aibrains/conditions/genericconditions.lua")
+local FactoryManagerConditions = import("/lua/aibrains/conditions/factorymanagerconditions.lua")
 
 DefaultGroundAttackTech3 = AIBuilderTemplate {
     BuilderManager = 'FactoryManager',

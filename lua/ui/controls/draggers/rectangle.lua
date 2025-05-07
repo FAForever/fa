@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local CircleShape = import('/lua/ui/game/shapes/CircleShape.lua')
+local CircleShape = import('/lua/ui/game/shapes/circleshape.lua')
 
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local DraggerInit = Dragger.__init

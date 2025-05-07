@@ -15,7 +15,7 @@ local ParseEntityCategoryProperly = import("/lua/sim/categoryutils.lua").ParseEn
 local cachedPriorities = false
 local RecycledPriTable = {}
 
-local DebugWeaponComponent = import("/lua/sim/weapons/components/DebugWeaponComponent.lua").DebugWeaponComponent
+local DebugWeaponComponent = import("/lua/sim/weapons/components/debugweaponcomponent.lua").DebugWeaponComponent
 
 --- Table of damage information passed from the weapon to the projectile
 --- Can be assigned as a meta table to the projectile's damage table to reduce memory usage for unchanged values

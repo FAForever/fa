@@ -3,7 +3,7 @@ local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 local Util = import("/lua/utilities.lua")
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
-local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionbeams/sccollisionbeam.lua").SCCollisionBeam
 
 -- Used by Seraphim Othuy (Ythotha's lightning storm) XSL0402's SDFUnstablePhasonBeam
 ---@class UnstablePhasonLaserCollisionBeam : SCCollisionBeam

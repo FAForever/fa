@@ -26,7 +26,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local MapPreview = import("/lua/ui/controls/mappreview.lua").MapPreview
-local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/AutolobbyMapPreviewSpawn.lua")
+local AutolobbyMapPreviewSpawn = import("/lua/ui/lobby/autolobby/autolobbymappreviewspawn.lua")
 
 ---@class UIAutolobbyMapPreview : Group
 ---@field Preview MapPreview
