@@ -111,6 +111,12 @@ BrushStroke = Class(DebugComponent) {
         return math.clamp((CurrentTime() - self.Decay.StartTime) / self.Decay.Duration, 0, 1)
     end,
 
+    --- Computes the number of samples in this brush stroke.
+    ---@param self UIBrushStroke
+    GetSampleCount = function(self)
+        return table.getn(self.Samples.CoordinatesX)
+    end,
+
     --- Computes the alpha value based on the decay progress of the brush stroke. Defaults to a square root curve.
     ---@param self UIBrushStroke
     ---@param value number  # number between 0 and 1.0
