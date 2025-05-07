@@ -7,6 +7,12 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+---@class TooltipInfo
+---@field title UnlocalizedString # Title text of the tooltip.
+---@field description UnlocalizedString # Body text of the tooltip.
+---@field keyID string # Which key action to display the current keybind for in the title text of the tooltip. 
+
+---@type table<string, TooltipInfo>
 Tooltips = {
     -- *******************
     -- ** Orders Strings
