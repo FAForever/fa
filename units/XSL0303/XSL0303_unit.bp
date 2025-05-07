@@ -413,7 +413,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = { Seabed = "Seabed|Sub|Water" },
             FiringTolerance = 2,
             Label = "Torpedo01",
-            MaxRadius = 29,
+            MaxRadius = 28,
             MuzzleSalvoDelay = 0.8,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
