@@ -1650,7 +1650,7 @@ Tooltips = {
     },
     mfd_defense = {
         title = "<LOC tooltipui0078>Player Colors",
-        description = "<LOC tooltipui0636>Toggle unit coloring between player and allegiance colors:\nYour Units\nAllied Units\nNeutral Units\nEnemy Units",
+        description = "<LOC tooltipui0636>Toggle unit coloring between player and allegiance colors (Right click to customize team colors and options):\nYour Units\nAllied Units\nNeutral Units\nEnemy Units",
         keyID = "tog_defense",
     },
     mfd_economy = {
