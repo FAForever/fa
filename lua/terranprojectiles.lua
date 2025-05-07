@@ -339,7 +339,7 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     OnCreate = function(self)
         SingleBeamProjectile.OnCreate(self)
         local blueprintPhysics = self.Blueprint.Physics
-        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        local radius = 0.11 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
 
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
