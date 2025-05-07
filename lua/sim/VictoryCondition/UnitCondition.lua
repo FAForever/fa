@@ -20,18 +20,23 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local AbstractVictoryCondition = import("/lua/sim/Matchstate/AbstractVictoryCondition.lua").AbstractVictoryCondition
+local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVictoryCondition.lua").AbstractVictoryCondition
 
 -- upvalue for performance
 local TableGetn = table.getn
 local TableInsert = table.insert
 
---- Victory condition where brains are considered defeated if they have no allied ACUs alive.
 ---@class DecapitationCondition : AbstractVictoryCondition
 ---@field UnitCategories EntityCategory
 DecapitationCondition = Class(AbstractVictoryCondition) {
 
-    UnitCategories = categories.COMMAND,
+    ---@param self DecapitationCondition
+    ---@param unitCategories EntityCategory
+    __init = function(self, unitCategories)
+        AbstractVictoryCondition.__init(self)
+
+        self.UnitCategories = unitCategories
+    end,
 
     ---@param self DecapitationCondition
     ProcessGameState = function(self)
@@ -49,30 +54,6 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             end
         end
 
-        -- check if defeated brains still have allies with ACUs
-        local decapitatedBrains = {}
-        for k = 1, TableGetn(defeatedBrains) do
-            local defeatedBrain = defeatedBrains[k]
-
-            -- check if the defeated brain is allied with an army that is not defeated (yet!), if
-            -- so then the brain is not 'defeated' yet and should not be removed from the game
-
-            local isDecapitated = true
-            for l = 1, TableGetn(aliveBrains) do
-                local aliveBrain = aliveBrains[l]
-                if IsAlly(defeatedBrain:GetArmyIndex(), aliveBrain:GetArmyIndex()) then
-                    isDecapitated = false
-                    TableInsert(aliveBrains, defeatedBrain)
-                    break
-                end
-            end
-
-            -- defeated brain has no allies that are not considered defeated
-            if isDecapitated then
-                TableInsert(decapitatedBrains, defeatedBrain)
-            end
-        end
-
         -- no remaining players, just end the game
         if table.empty(aliveBrains) then
             if self.EnabledSpewing then
@@ -83,9 +64,10 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             return
         end
 
-        -- process all defeated brains. At this stage, it is an entire team that is defeated at once
-        for k = 1, TableGetn(decapitatedBrains) do
-            local defeatedBrain = decapitatedBrains[k]
+
+        -- process all defeated brains
+        for k = 1, TableGetn(defeatedBrains) do
+            local defeatedBrain = defeatedBrains[k]
             self:DefeatForArmy(defeatedBrain)
         end
 
@@ -121,7 +103,8 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
     end,
 }
 
+---@param entityCategories EntityCategory
 ---@return DecapitationCondition
-CreateDecapitationCondition = function()
-    return DecapitationCondition()
+CreateUnitCondition = function(entityCategories)
+    return DecapitationCondition(entityCategories)
 end

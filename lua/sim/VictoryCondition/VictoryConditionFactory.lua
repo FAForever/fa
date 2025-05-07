@@ -26,18 +26,18 @@ GetVictoryConditionInstance = function(victoryConditionType)
 
     -- we load the modules in-line so that they are only loaded when used
     if victoryConditionType == 'decapitation' then
-        return import('/lua/sim/Matchstate/DecapitationCondition.lua').CreateDecapitationCondition()
+        return import('/lua/sim/victorycondition/DecapitationCondition.lua').CreateDecapitationCondition()
     elseif victoryConditionType == 'demoralization' then
-        return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.COMMAND)
+        return import('/lua/sim/victorycondition/UnitCondition.lua').CreateUnitCondition(categories.COMMAND)
     elseif victoryConditionType == 'domination' then
-        return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.STRUCTURE + categories.ENGINEER - categories.WALL)
+        return import('/lua/sim/victorycondition/UnitCondition.lua').CreateUnitCondition(categories.STRUCTURE + categories.ENGINEER - categories.WALL)
     elseif victoryConditionType == 'eradication' then
-        return import('/lua/sim/Matchstate/UnitCondition.lua').CreateUnitCondition(categories.ALLUNITS - categories.WALL)
+        return import('/lua/sim/victorycondition/UnitCondition.lua').CreateUnitCondition(categories.ALLUNITS - categories.WALL)
     elseif victoryConditionType == 'sandbox' then
-        return import('/lua/sim/Matchstate/SandboxCondition.lua').CreateSandBoxCondition()
+        return import('/lua/sim/victorycondition/SandboxCondition.lua').CreateSandBoxCondition()
     end
 
     -- default to sandbox
     WARN("Unknown victory condition type: " .. tostring(victoryConditionType))
-    return import('/lua/sim/Matchstate/SandboxCondition.lua').CreateSandBoxCondition()
+    return import('/lua/sim/victorycondition/SandboxCondition.lua').CreateSandBoxCondition()
 end

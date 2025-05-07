@@ -296,7 +296,7 @@ end
 function BeginSession()
 
     -- imported for side effects
-    local victoryCondition = import("/lua/sim/Matchstate/VictoryConditionSingleton.lua").GetSingleton()
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
     victoryCondition:Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 

@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local AbstractVictoryCondition = import("/lua/sim/Matchstate/AbstractVictoryCondition.lua").AbstractVictoryCondition
+local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVictoryCondition.lua").AbstractVictoryCondition
 
 ---@class SandBoxCondition : AbstractVictoryCondition
 SandBoxCondition = Class(AbstractVictoryCondition) {

@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local VictoryConditionFactory = import("/lua/sim/Matchstate/VictoryConditionFactory.lua")
+local VictoryConditionFactory = import("/lua/sim/victorycondition/VictoryConditionFactory.lua")
 
 ---@type AbstractVictoryCondition
 local VictoryConditionInstance = nil
