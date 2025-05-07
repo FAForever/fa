@@ -26,11 +26,11 @@ local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVicto
 local TableGetn = table.getn
 local TableInsert = table.insert
 
----@class DecapitationCondition : AbstractVictoryCondition
+---@class UnitCondition : AbstractVictoryCondition
 ---@field UnitCategories EntityCategory
-DecapitationCondition = Class(AbstractVictoryCondition) {
+UnitCondition = Class(AbstractVictoryCondition) {
 
-    ---@param self DecapitationCondition
+    ---@param self UnitCondition
     ---@param unitCategories EntityCategory
     __init = function(self, unitCategories)
         AbstractVictoryCondition.__init(self)
@@ -38,7 +38,7 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
         self.UnitCategories = unitCategories
     end,
 
-    ---@param self DecapitationCondition
+    ---@param self UnitCondition
     ProcessGameState = function(self)
         -- see if there are defeated brains
         local aliveBrains = {}
@@ -104,7 +104,7 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 }
 
 ---@param entityCategories EntityCategory
----@return DecapitationCondition
+---@return UnitCondition
 CreateUnitCondition = function(entityCategories)
-    return DecapitationCondition(entityCategories)
+    return UnitCondition(entityCategories)
 end
