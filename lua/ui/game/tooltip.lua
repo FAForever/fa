@@ -122,13 +122,14 @@ function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padd
         end
     end
 
-    -- some hack
+    -- A hack to color the text in the team colors tooltip. TODO: don't do this hack
     if ID == "mfd_defense" then
+        -- start from the end of the table since the beginning can be wrapped lines of text
         local size = table.getn(mouseoverDisplay.desc)
-        mouseoverDisplay.desc[size]:SetColor('ffff0000')
-        mouseoverDisplay.desc[size-1]:SetColor('ffffff00')
-        mouseoverDisplay.desc[size-2]:SetColor('ff00ff00')
-        mouseoverDisplay.desc[size-3]:SetColor('ff4f77f4')
+        mouseoverDisplay.desc[size]:SetColor('ffff0000') -- Enemy Units
+        mouseoverDisplay.desc[size-1]:SetColor('ffffff00') -- Neutral Units
+        mouseoverDisplay.desc[size-2]:SetColor('ff00ff00') -- Allied Units
+        mouseoverDisplay.desc[size-3]:SetColor('ff4f77f4') -- Your Units
     end
 
     -- adding smooth popup animation to the tooltip 
