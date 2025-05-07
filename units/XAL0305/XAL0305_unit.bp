@@ -194,7 +194,7 @@ UnitBlueprint{
             FiringTolerance = 0,
             Label = "MainGun",
             MaxRadius = 60,
-            MuzzleChargeDelay = 0,
+            MuzzleChargeDelay = 1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 90,
@@ -215,7 +215,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 10/1, --10/integer interval in ticks
+            RateOfFire = 10/67, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "SNIPER",
