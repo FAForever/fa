@@ -1410,10 +1410,12 @@ Tooltips = {
     construction_infinite = {
         title = "<LOC tooltipui0443>Infinite Build",
         description = "<LOC tooltipui0444>Toggle the infinite construction of the current queue",
+        keyID = "toggle_repeat_build",
     },
     construction_pause = {
         title = "<LOC tooltipui0445>Pause Construction",
         description = "<LOC tooltipui0446>[Pause/Unpause] the current construction order",
+        keyID = "pause_unit",
     },
 
 
