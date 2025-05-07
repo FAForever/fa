@@ -1,3 +1,2 @@
-- (#6768) Fix icons of the map preview of auto being miss placed
+- (#6768) Fix icons in the map preview of the autolobby being misplaced when using UI scaling.
 
-This was the case for all users that use the in-game UI scaling.
