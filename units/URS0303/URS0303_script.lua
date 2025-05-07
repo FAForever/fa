@@ -13,7 +13,7 @@ local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
-local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon02.lua").CDFMissileRedirectWeapon02
+local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/cdfmissileredirectweapon02.lua").CDFMissileRedirectWeapon02
 
 
 ---@class URS0303 : AircraftCarrier, ExternalFactoryComponent

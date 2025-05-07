@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local BareBonesWeapon = import("/lua/sim/weapons/BareBonesWeapon.lua").BareBonesWeapon
+local BareBonesWeapon = import("/lua/sim/weapons/barebonesweapon.lua").BareBonesWeapon
 
 --- Creates effects similar to DeathNukeWeapon, but its damage does not bypass shields.
 ---@class ACUDeathWeapon : BareBonesWeapon

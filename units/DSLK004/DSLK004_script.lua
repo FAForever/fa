@@ -7,7 +7,7 @@
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
 
 local SAALightningWeapon = import("/lua/seraphimweapons.lua").SAALightningWeapon
-local LightningSmallSurfaceCollisionBeam = import("/lua/sim/collisionBeams/LightningSmallSurfaceCollisionBeam.lua").LightningSmallSurfaceCollisionBeam
+local LightningSmallSurfaceCollisionBeam = import("/lua/sim/collisionbeams/lightningsmallsurfacecollisionbeam.lua").LightningSmallSurfaceCollisionBeam
 
 ---@class DSLK004 : SLandUnit
 DSLK004 = ClassUnit(SLandUnit) {

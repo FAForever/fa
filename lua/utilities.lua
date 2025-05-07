@@ -391,7 +391,7 @@ end
 ---@param v2 Vector
 ---@return number
 function DotP(v1, v2)
-    return v1[1] * v2[1] + v1[2] * v[2] + v[3] * v[3]
+    return v1[1] * v2[1] + v1[2] * v2[2] + v1[3] * v2[3]
 end
 
 --- Returns the conjugate of a quaternion
@@ -406,12 +406,11 @@ end
 ---@param v2 Vector
 ---@return number
 function GetAngleInBetween(v1, v2)
-    local x1, y1, z2 = v1[1], v1[2], v1[3]
+    local x1, y1, z1 = v1[1], v1[2], v1[3]
     local x2, y2, z2 = v2[1], v2[2], v2[3]
     -- arccos((v1 . v2) / (|v1| |v2|))
-    local z2Sq = z2 * z2
-    local dot = x1*x2 + y1*y2 + z2Sq
-    local len2 = MathSqrt((x1*x1 + y1*y1 + z2Sq) * (x2*x2 + y2*y2 + z2Sq))
+    local dot = x1 * x2 + y1 * y2 + z1 * z2
+    local len2 = MathSqrt((x1 * x1 + y1 * y1 + z1 * z1) * (x2 * x2 + y2 * y2 + z2 * z2))
     return MathACos(dot / len2) * 180 / math.pi
 end
 
@@ -488,13 +487,32 @@ end
 ---@param dz number
 ---@return Quaternion
 function QuatFromXZDirection(dx, dz)
-    -- ang = atan2(dx, dz) -- `dz` is adjacent
-    -- {0, sin(ang/2), 0, cos(ang/2)}
+    -- division by zero case
+    if dx == 0 and dz == 0 then
+        return UnsafeQuaternion(0, 0, 0, 1)
+    end
+
+    -- q = (0, sin(ang/2), 0, cos(ang/2))       -- definition of our y-axis rotation quaternion we want to get for angle `ang`
+
+    -- sin(ang/2) = +/-sqrt((1-cos(ang))/2)     -- half angle formula for sin. +/- is sign of sin(ang/2)
+    --            = +/-sqrt( 0.5 - cos(ang)/2 )
+    --            = +/-sqrt( 0.5 - a/2h )       -- cos(ang) = adjacent/hypotenuse
+    -- similar is repeated for cos(ang/2)
+
     local hypot = MathSqrt(dx*dx + dz*dz)
-    -- use the half-angle formulas
     local halfCosA = dz / (2 * hypot)
     local sinHalfA = MathSqrt(0.5 - halfCosA)
     local cosHalfA = MathSqrt(0.5 + halfCosA)
+
+    -- Resolve the +/- part of our result:
+    -- sign of sin(ang/2) is + for ang in (0, 2pi)
+    -- sign of cos(ang/2) is + for ang in (0, pi) and - for ang in (pi, 2pi)
+    -- ang in (pi, 2pi) is when dx is negative, so negate cosHalfA in that case
+
+    if dx < 0 then
+        return UnsafeQuaternion(0, sinHalfA, 0, -cosHalfA)
+    end
+
     return UnsafeQuaternion(0, sinHalfA, 0, cosHalfA)
 end
 

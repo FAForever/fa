@@ -17,6 +17,7 @@ local SimPing = import("/lua/simping.lua")
 local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -26,6 +27,7 @@ local TableMerged = table.merged
 
 -- upvalue scope for performance
 local type = type
+local TableGetn = table.getn
 local Vector = Vector
 local IsEntity = IsEntity
 local GetEntityById = GetEntityById
@@ -264,14 +266,27 @@ Callbacks.ValidateAssist = function(data, units)
     end
 end
 
+--- Attack move doesn't exist as a command mode, so this callback substitutes that.
+---@param data { Clear: boolean }
+---@param units Unit[]
 Callbacks.AttackMove = function(data, units)
-    -- exclude structures as it makes no sense to apply a move command to them
+    -- exclude structures as they can't move and there is no sim command to issue attack move rally points for factories
     local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
+    -- Verify that the user manually clicked to issue the command, and use that position.
+    -- assume all units in the selection were given the same order, so we only need to check one unit
+    local commandQueue = allNonStructures[1]:GetCommandQueue()
+    local lastcommand = commandQueue[TableGetn(commandQueue)]
+    -- dummy script task should be used, although we can't check the script task's type
+    if UnitQueueDataToCommand[lastcommand.commandType].Type ~= "Script" then return end
+    -- script tasks issued without a target have x,y,z = 0
+    local x, y, z = lastcommand.x, lastcommand.y, lastcommand.z
+    if x == 0 and y == 0 and z == 0 then return end
 
     if data.Clear then
         IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(allNonStructures, data.Target)
+    IssueAggressiveMove(allNonStructures, { x, y, z })
 end
 
 --tells a unit to toggle its pointer
@@ -811,27 +826,23 @@ end
 
 --#endregion
 
+
 -------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
---- An anti cheat check that passes when there is only 1 player or cheats are enabled
+
+--- An anti-cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
-local PassesAntiCheatCheck = function()
-    -- allow when cheats are enabled
+local function PassesAntiCheatCheck()
     return CheatsEnabled()
 end
 
---- A simplified check that also passes when the game has AIs
+--- An anti-cheat check that also passes when the game has AIs
 ---@return boolean
-local PassesAIAntiCheatCheck = function()
-    -- allow when there are AIs
-    if ScenarioInfo.GameHasAIs then
-        return true
-    end
-
-    -- allow when cheats are enabled
-    return PassesAntiCheatCheck()
+local function PassesAIAntiCheatCheck()
+    return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
+
 
 local SpawnedMeshes = {}
 
@@ -840,7 +851,7 @@ local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
     local bpD = bp.Display
     if __blueprints[bpD.MeshBlueprint] then
         SPEW("Spawning mesh of " .. id)
-        local entity = import('/lua/sim/Entity.lua').Entity()
+        local entity = import('/lua/sim/entity.lua').Entity()
         if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
             y = y - bp.CollisionOffsetY
         end
@@ -888,7 +899,7 @@ local function ShowRaisedPlatforms(self)
     for i = 1, (table.getn(plats) / 12) do
         entities[i] = {}
         for b = 1, 4 do
-            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
+            entities[i][b] = import('/lua/sim/entity.lua').Entity { Owner = self }
             self.Trash:Add(entities[i][b])
             entities[i][b]:SetPosition(Vector(
                 pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
@@ -985,29 +996,43 @@ end
 
 --- Toggles the profiler on / off
 Callbacks.ToggleProfiler = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.ForceEnable or false)
 end
 
 -- Allows searching for benchmarks
 Callbacks.FindBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+    import("/lua/sim/profiler.lua").FindBenchmarks()
+end
+Callbacks.LoadBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
 end
 
 -- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+Callbacks.RunBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+end
+Callbacks.StopBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").StopBenchmark()
 end
 
 Callbacks.ToggleDebugMarkersByType = function(data, units)

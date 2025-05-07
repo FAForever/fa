@@ -25,6 +25,7 @@
 ---@field SimStartTime number           # Set when the objective starts
 ---@field AddProgressCallback function  # Adds a progression callback
 ---@field AddResultCallback function    # Adds a completion callback
+---@field ManualResult fun(obj: Objective, result: boolean)|nil # Ends the objective with given result
 
 -- SUPPORTED OBJECTIVE TYPES:
 -- Kill
@@ -1117,7 +1118,8 @@ function MakeListFromTarget(Target)
         for _, armyName in Target.Armies do
             if armyName == "HumanPlayers" then
                 for iArmy, strArmy in pairs(tblArmy) do
-                    if ScenarioInfo.ArmySetup[strArmy].Human then
+                    --In campaign, if an AI mod is being used to provide an AI 'player', then this should also be included otherwise it can render some missions impossible to complete
+                    if ScenarioInfo.ArmySetup[strArmy].Human or (ScenarioInfo.type == 'campaign_coop' and string.sub(strArmy, 1, 6)  == 'Player') then
                         resultList[GetArmyBrain(iArmy)] = true
                     end
                 end
@@ -1428,7 +1430,7 @@ end
 ---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
 ---@param Title string              # Title of the objective, supports strings with LOC
 ---@param Description string        # Description of the objective, supports strings with LOC
----@param Target table              # Objective data, see the description
+---@param Target? table             # Objective data, see the description
 ---@return Objective
 function Basic(Type, Complete, Title, Description, Image, Target)
     local objective = AddObjective(Type, Complete, Title, Description, Image, Target)

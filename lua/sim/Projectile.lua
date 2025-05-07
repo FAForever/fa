@@ -26,7 +26,7 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local EntityCategoryContains = EntityCategoryContains
 
-local DebugProjectileComponent = import("/lua/sim/projectiles/components/DebugProjectileComponent.lua").DebugProjectileComponent
+local DebugProjectileComponent = import("/lua/sim/projectiles/components/debugprojectilecomponent.lua").DebugProjectileComponent
 
 local ProjectileMethods = moho.projectile_methods
 local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
@@ -89,11 +89,15 @@ local VectorCached = Vector(0, 0, 0)
 
 ---@class Projectile : moho.projectile_methods, InternalObject, DebugProjectileComponent
 ---@field Blueprint ProjectileBlueprint
----@field Army number
+---@field Army Army
 ---@field Trash TrashBag
 ---@field Launcher Unit
----@field OriginalTarget? Unit
+---@field OriginalTarget? Unit | Blip
 ---@field DamageData WeaponDamageTable
+---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
+---@field MyFlare? Flare            # If weapon blueprint has a (valid) `Flare` field
+---@field MyUpperFlare? Flare       # If weapon blueprint has a (valid) `Flare` field that wants to be stacked
+---@field MyLowerFlare? Flare       # If weapon blueprint has a (valid) `Flare` field that wants to be stacked
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
 ---@field InnerRing? NukeAOE
@@ -305,7 +309,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- callbacks for launcher to have an idea what is going on for AIs
         local launcher = self.Launcher
         if not IsDestroyed(launcher) then
-            launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
+            launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition(), self)
 
             -- keep track of the number of intercepted missiles
             if not IsDestroyed(instigator) and instigator.GetStat then
@@ -319,9 +323,15 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by the engine when the projectile impacts something
     ---@param self Projectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
+        -- Since collision is checked before impacts are run, collision changes caused by impacts need to be checked by impacts
+        -- For example, a shield will first tell every projectile that it can collide with it, and then only afterwards will
+        -- HP be drained from the shield, and collisions turned off due to the shield being down. The same applies for units.
+        if targetEntity.DisallowCollisions then
+            return
+        end
 
         -- localize information for performance
         local position = self:GetPosition()
@@ -612,16 +622,11 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     end,
 
     --- Called by Lua to process the damage logic of a projectile
-    -- @param self The projectile itself
-    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
-    -- @param DamageData The damage data passed by the weapon
-    -- @param targetEntity The entity we hit, is nil if we hit terrain
-    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self Projectile
-    ---@param instigator Unit
+    ---@param instigator Unit # The launcher, and if it doesn't exist, the projectile itself
     ---@param DamageData WeaponDamageTable # passed by the weapon
-    ---@param targetEntity Unit | Prop | nil
-    ---@param cachedPosition Vector
+    ---@param targetEntity Unit | Prop | nil # nil if hitting terrain
+    ---@param cachedPosition Vector # A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
         -- this may be a cached vector, we can not send this to threads or use after waiting statements!
@@ -637,66 +642,57 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 local damageFriendly =  DamageData.DamageFriendly
                 local damageSelf = DamageData.DamageSelf or false
 
-                -- check for damage-over-time
-                local DoTTime = DamageData.DoTTime
-                if DoTTime <= 0 then
-                    -- no damage over time, do radius-based damage
+                -- do initial damage in a radius
+                -- anti-shield damage first so that the remaining damage can overkill under the shield
+                local damageToShields = DamageData.DamageToShields
+                if damageToShields then
                     DamageArea(
                         instigator,
                         cachedPosition,
                         radius,
-                        damage,
-                        damageType,
+                        damageToShields,
+                        "FAF_AntiShield",
                         damageFriendly,
                         damageSelf
                     )
+                end
 
-                    local damageToShields = DamageData.DamageToShields
-                    if damageToShields then
-                        DamageArea(
+                DamageArea(
+                    instigator,
+                    cachedPosition,
+                    radius,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType,
+                    damageFriendly,
+                    damageSelf
+                )
+
+                -- check for and deal damage over time
+                local DoTTime = DamageData.DoTTime
+                if DoTTime > 0 then
+                    -- initial damage pulse was already dealt so subtract 1
+                    local DoTPulses = DamageData.DoTPulses - 1
+                    if DoTPulses >= 1 then
+                        ForkThread(
+                            AreaDoTThread,
                             instigator,
-                            cachedPosition,
+                            self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                            DoTPulses,
+                            (DoTTime / (DoTPulses)),
                             radius,
-                            damageToShields,
-                            "FAF_AntiShield",
-                            damageFriendly,
-                            damageSelf
-                        )
-                    end
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount
-                    if initialDmg > 0 then
-                        DamageArea(
-                            instigator,
-                            cachedPosition,
-                            radius,
-                            initialDmg,
+                            damage,
                             damageType,
-                            damageFriendly,
-                            damageSelf
+                            damageFriendly
                         )
                     end
-
-                    -- apply damage over time
-                    local DoTPulses = DamageData.DoTPulses or 1
-                    ForkThread(
-                        AreaDoTThread,
-                        instigator,
-                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                        DoTPulses,
-                        (DoTTime / (DoTPulses)),
-                        radius,
-                        damage,
-                        damageType,
-                        damageFriendly
-                    )
                 end
 
             -- damage a single entity
             elseif targetEntity then
                 local damageType = DamageData.DamageType
 
+                -- do initial damage
+                -- anti-shield damage first so remainder can overkill under the shield
                 local damageToShields = DamageData.DamageToShields
                 if damageToShields then
                     Damage(
@@ -708,43 +704,30 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     )
                 end
 
-                -- check for damage-over-time
-                local DoTTime = DamageData.DoTTime
-                if DoTTime <= 0 then
+                Damage(
+                    instigator,
+                    cachedPosition,
+                    targetEntity,
+                    damage + (DamageData.InitialDamageAmount or 0),
+                    damageType
+                )
 
-                    -- no damage over time, do single target damage
-                    Damage(
-                        instigator,
-                        cachedPosition,
-                        targetEntity,
-                        damage,
-                        damageType
-                    )
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        Damage(
+                -- check for and apply damage over time
+                local DoTTime = DamageData.DoTTime
+                if DoTTime > 0 then
+                    -- initial damage pulse was already dealt so subtract 1
+                    local DoTPulses = DamageData.DoTPulses - 1
+                    if DoTPulses >= 1 then
+                        ForkThread(
+                            UnitDoTThread,
                             instigator,
-                            cachedPosition,
                             targetEntity,
-                            initialDmg,
+                            DoTPulses,
+                            (DoTTime / (DoTPulses)),
+                            damage,
                             damageType
                         )
                     end
-
-                    -- apply damage over time
-                    local DoTPulses = DamageData.DoTPulses or 1
-                    ForkThread(
-                        UnitDoTThread,
-                        instigator,
-                        targetEntity,
-                        DoTPulses,
-                        (DoTTime / (DoTPulses)),
-                        damage,
-                        damageType,
-                        DamageData.DamageFriendly
-                    )
                 end
             end
         end
@@ -850,12 +833,15 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     AddDepthCharge = function(self, blueprint)
         if not blueprint then return end
         if not blueprint.Radius then return end
-        self.MyDepthCharge = DepthCharge {
+
+        ---@type DepthChargeSpec
+        local depthChargeSpec = {
             Owner = self,
             Radius = blueprint.Radius or 10,
-            DepthCharge = blueprint.ProjectilesToDeflect
+            ProjectilesToDeflect = blueprint.ProjectilesToDeflect
         }
-        self.Trash:Add(self.MyDepthCharge)
+
+        self.MyDepthCharge = self.Trash:Add(DepthCharge(depthChargeSpec))
     end,
 
     --- Called by Lua to create the impact effects

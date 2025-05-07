@@ -1,0 +1,1 @@
+- (#6666) Remove duplicated closures in controls.

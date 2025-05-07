@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local AArtilleryFragmentationSensorShellProjectile = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile.lua")
+local AArtilleryFragmentationSensorShellProjectile = import("/lua/sim/projectiles/aeon/aartilleryfragmentationsensorshellprojectile.lua")
     .AArtilleryFragmentationSensorShellProjectile
 
     --- AEON ARTILLERY FRAGMENTATION SENSOR SHELL 02 (split 1)

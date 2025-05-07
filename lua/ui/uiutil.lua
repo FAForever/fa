@@ -630,10 +630,11 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
         if charcode == VK_TAB then
             return true
         end
-        local charLim = self:GetMaxChars()
-        if STR_Utf8Len(self:GetText()) >= charLim then
-            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
-            PlaySound(sound)
+        if STR_Utf8Len(self:GetText()) >= self:GetMaxChars() then
+            PlaySound(Sound {
+                Cue = 'UI_Menu_Error_01',
+                Bank = 'Interface',
+            })
         end
     end
 end
@@ -1421,7 +1422,7 @@ end
 
 ---@param primary UnlocalizedString
 ---@param secondary UnlocalizedString
----@param control? Control defaults to duumy control at center of screen 
+---@param control? Control defaults to dummy control at center of screen 
 function CreateAnnouncementStd(primary, secondary, control)
     -- make it originate from the top
     if not control then

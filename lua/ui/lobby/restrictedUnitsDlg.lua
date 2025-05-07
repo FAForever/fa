@@ -14,7 +14,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 
-local restrictedUnits = import("/lua/ui/lobby/restrictedUnitsData.lua").restrictedUnits
+local restrictedUnits = import("/lua/ui/lobby/restrictedunitsdata.lua").restrictedUnits
 
 function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
      
@@ -184,7 +184,7 @@ function CreateDialog(parent, initialRestrictions, OnOk, OnCancel, isHost)
         return bg
     end
 
-    local sortOrder = import("/lua/ui/lobby/restrictedUnitsData.lua").sortOrder
+    local sortOrder = import("/lua/ui/lobby/restrictedunitsdata.lua").sortOrder
     for index, key in sortOrder do
         if restrictedUnits[key] then
             table.insert(scrollGroup.controlList, CreateListElement(scrollGroup, key))

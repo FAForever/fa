@@ -208,7 +208,7 @@ end
 
 function LOCStr(str)
     local id = str:lower()
-    id = id:gsub(' ', '_')
+    id = id:gsub(' ', '_'):gsub('%-', '_')
     return LOC('<LOC ls_'..id..'>'..str)
 end
 
@@ -433,6 +433,10 @@ GetAbilityDesc = {
     end
 }
 
+---@param bp UnitBlueprint
+---@param builder UserUnit
+---@param descID string
+---@param control Control
 function WrapAndPlaceText(bp, builder, descID, control)
     local lines = {}
     local blocks = {}
@@ -510,17 +514,17 @@ function WrapAndPlaceText(bp, builder, descID, control)
             local armorType = bp.Defense.ArmorType
             if armorType and armorType ~= '' then
                 local spaceWidth = control.Value[1]:GetStringAdvance(' ')
-                local str = LOC('<LOC uvd_ArmorType>')..LOC('<LOC at_'..armorType..'>')
-                local spaceCount = (195 - control.Value[1]:GetStringAdvance(str)) / spaceWidth
-                str = str..string.rep(' ', spaceCount)..LOC('<LOC uvd_DamageTaken>')
-                table.insert(lines, str)
+                local headerString = LOC('<LOC uvd_ArmorType>')..LOC('<LOC at_'..armorType..'>')
+                local spaceCount = (195 - control.Value[1]:GetStringAdvance(headerString)) / spaceWidth
+                local takesAdjustedDamage = false
                 for _, armor in armorDefinition do
                     if armor[1] == armorType then
                         local row = 0
                         local armorDetails = ''
                         local elemCount = table.getsize(armor)
                         for i = 2, elemCount do
-                            --if string.find(armor[i], '1.0') > 0 then continue end
+                            if string.find(armor[i], '1.0') > 0 then continue end
+                            takesAdjustedDamage = true
                             local armorName = armor[i]
                             armorName = string.sub(armorName, 1, string.find(armorName, ' ') - 1)
                             armorName = LOC('<LOC an_'..armorName..'>')..' - '..string.format('%0.1f', tonumber(armor[i]:sub(armorName:len() + 2, armor[i]:len())) * 100)
@@ -541,6 +545,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                     end
                 end
                 table.insert(lines, '')
+
+                if takesAdjustedDamage then
+                    headerString = headerString..string.rep(' ', spaceCount)..LOC('<LOC uvd_DamageTaken>')
+                end
+                table.insert(lines, 1, headerString)
+
                 table.insert(blocks, {color = 'FF7FCFCF', lines = lines})
             end
             --Weapons
@@ -717,13 +727,13 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
 
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
-                            local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
+                            local weaponDetails3 = string.format(LOC('<LOC uvd_cost>Charge Cost: -%d E (-%d E/s)'), info.EnergyRequired, info.EnergyDrainPerSecond)
                             table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails3}})
                         end
 
                         local ProjectileEco = __blueprints[info.ProjectileId].Economy
                         if ProjectileEco and (ProjectileEco.BuildCostMass > 0 or ProjectileEco.BuildCostEnergy > 0) and ProjectileEco.BuildTime > 0 then
-                            local weaponDetails4 = string.format('Missile Cost: %d M, %d E, %d BT', ProjectileEco.BuildCostMass, ProjectileEco.BuildCostEnergy, ProjectileEco.BuildTime)
+                            local weaponDetails4 = string.format(LOC('<LOC uvd_missile>Missile Cost: %d M, %d E, %d BT'), ProjectileEco.BuildCostMass, ProjectileEco.BuildCostEnergy, ProjectileEco.BuildTime)
                             table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails4}})
                         end
                     end

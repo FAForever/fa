@@ -444,10 +444,10 @@ end
 ---@param markerType string
 ---@param pos Vector
 ---@param radius number
----@param threatMin number
----@param threatMax number
----@param threatRings number
----@param threatType string
+---@param threatMin? number
+---@param threatMax? number
+---@param threatRings? number
+---@param threatType? string
 ---@return table
 function AIGetMarkerPositionsAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local markers = AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
@@ -463,10 +463,10 @@ end
 ---@param markerType string
 ---@param pos Vector
 ---@param radius number
----@param threatMin number
----@param threatMax number
----@param threatRings number
----@param threatType string
+---@param threatMin? number
+---@param threatMax? number
+---@param threatRings? number
+---@param threatType? string
 ---@return table
 function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
@@ -1309,9 +1309,9 @@ end
 ---@param category EntityCategory
 ---@param location Vector
 ---@param radius number
----@param min number
----@param max number
----@param rings number
+---@param min? number
+---@param max? number
+---@param rings? number
 ---@param tType? string
 ---@return table
 function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, rings, tType)
@@ -1339,10 +1339,10 @@ function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, r
 end
 
 ---@param aiBrain AIBrain
----@param category string
+---@param category EntityCategory
 ---@param location Vector
 ---@param radius number
----@param tBrain string
+---@param tBrain AIBrain
 ---@return table
 function GetBrainUnitsAroundPoint(aiBrain, category, location, radius, tBrain)
     local units = aiBrain:GetUnitsAroundPoint(category, location, radius)
@@ -3254,7 +3254,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
     if bool then
         IssueToUnitClearCommands(eng)
         local factionIndex = aiBrain:GetFactionIndex()
-        local buildingTmplFile = import('/lua/BuildingTemplates.lua')
+        local buildingTmplFile = import('/lua/buildingtemplates.lua')
         local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
         local whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
         for _,massMarker in markers do

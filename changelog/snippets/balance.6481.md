@@ -26,6 +26,7 @@
     - Mass cost: 69600 -> 70000 (+0.6%)
     - Energy cost: 1305000 -> 1313000 (+0.6%)
     - Build time: 105000 -> 105600 (+0.6%)
+
     - DPS with 4 T3 pgens: 804 -> 844 (+5.0%)
       - Damage: 3700 -> 3800
       - Base Reload: 7.7s -> 7.5s
@@ -41,3 +42,8 @@
     - Firing Randomness: 0.675 -> 0.560
   - Cybran Disruptor:
     - Firing Randomness: 0.75 -> 0.646
+
+    
+   
+    
+

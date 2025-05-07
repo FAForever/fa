@@ -1,0 +1,1 @@
+- (#6758) Disable instant shield assist for upgrading shields since the repair order drains resources without repairing the shield when the shield is upgrading.
