@@ -160,13 +160,6 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
     ---@param self UIActiveBrushStroke
     ---@param coordinates Vector
     ProcessSample = function(self, coordinates)
-        -- enables us to visualize it
-        self.CurrentSample = coordinates
-
-        -- basic debouncing to reduce bandwidth requirements
-        if self:DebounceSample(coordinates) then
-            return
-        end
 
         -- limitation: chat messages have a limited amount of space per
         -- message. It is difficult to overcome this limit.
@@ -178,6 +171,15 @@ ActiveBrushStroke = ClassUI(BrushStroke) {
         -- The value is intentionally hard coded!
 
         if self:GetSampleCount() > 127 then
+            self.CurrentSample = nil
+            return
+        end
+
+        -- enables us to visualize it
+        self.CurrentSample = coordinates
+
+        -- basic debouncing to reduce bandwidth requirements
+        if self:DebounceSample(coordinates) then
             return
         end
 
