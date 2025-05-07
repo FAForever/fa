@@ -181,15 +181,16 @@ PaintingBrush = Class(Dragger) {
     ---@param x number  # x coordinate of screen position
     ---@param y number  # y coordinate of screen position
     OnRelease = function(self, x, y)
-        if self.ActiveBrushStroke then
+        local activeBrushStroke = self.ActiveBrushStroke
+        if activeBrushStroke then
 
             -- only process brushes with at least two samples in there
-            if self.ActiveBrushStroke:GetSampleCount() > 1 then
-                self.ActiveBrushStroke:AddLastSample()
+            if activeBrushStroke:GetSampleCount() > 1 then
+                activeBrushStroke:AddLastSample()
 
                 -- simplify the brush stroke and share it
-                self.ActiveBrushStroke:Simplify()
-                self.PaintingCanvas.Adapter:SharePaintingBrushStroke(self.ActiveBrushStroke)
+                activeBrushStroke:Simplify()
+                self.PaintingCanvas.Adapter:SharePaintingBrushStroke(activeBrushStroke)
             end
         end
 
