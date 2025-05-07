@@ -52,6 +52,9 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
 
     -- reduce height due to distance
     FinalBoostAngle = 30,
+    HeightDistanceFactor = 11,
+    LaunchTicks = 10,
+    LaunchTurnRate = 30,
 
     --- Called by the engine when the projectile impacts something
     ---@param self TIFMissileCruise01

@@ -34,14 +34,14 @@ SIFLaanseTacticalMissile04 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     LaunchTicksRange = 1,
     LaunchTurnRate = 20,
     LaunchTurnRateRange = 1,
-    HeightDistanceFactor = 8,
+    HeightDistanceFactor = 11,
     HeightDistanceFactorRange = 0,
     MinHeight = 5,
     MinHeightRange = 0,
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
-    TerminalSpeed = 13,
+    TerminalSpeed = 12,
     TerminalDistance = 30,
 
     ---@param self SIFLaanseTacticalMissile04
