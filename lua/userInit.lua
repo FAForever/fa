@@ -274,9 +274,11 @@ do
         -- inform allies about self-destructed units
         if callback.Func == 'ToggleSelfDestruct' then
             local selectedUnits = GetSelectedUnits()
+            if selectedUnits then
+                -- try to inform moderators
+                ForkThread(SendModeratorEventThread, string.format('Self-destructed %d units', TableGetn(selectedUnits)))
+            end
 
-            -- try to inform moderators
-            ForkThread(SendModeratorEventThread, string.format('Self-destructed %d units', TableGetn(selectedUnits)))
         end
 
         -- inform moderators about pings
