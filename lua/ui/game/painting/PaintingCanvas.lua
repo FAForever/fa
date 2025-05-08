@@ -126,17 +126,30 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
         -- feature: inhibit painting when holding shift
         if IsKeyDown('Shift') then
             self:AddInhibition('shift')
+            return
         else
             self:LiftInhibition('shift')
         end
 
+        -- limitation: only enable painting when we're not in command mode. This usually 
+        -- only applies when cheating in units. In all other cases you also have a selection.
+        local commandMode = import("/lua/ui/game/commandmode.lua")
+        if commandMode.InCommandMode() then
+            self:AddInhibition('commandmode')
+            return
+        else
+            self:LiftInhibition('commandmode')
+        end
+
         -- limitation: only enable painting when no unit is selected. This limitation enables us 
         -- to use a wide range of (mouse) buttons that would otherwise be used by engine functions
+        -- note: this is expensive, but sadly necessary to be backwards compatible!
         local selection = GetSelectedUnits()
-        if not selection or table.getn(GetSelectedUnits()) == 0 then
-            self:LiftInhibition('selection')
-        else
+        if selection and table.getn(selection) > 0 then
             self:AddInhibition('selection')
+            return
+        else
+            self:LiftInhibition('selection')
         end
     end,
 
