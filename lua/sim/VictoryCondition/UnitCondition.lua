@@ -26,7 +26,9 @@ local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVicto
 local TableGetn = table.getn
 local TableInsert = table.insert
 
+
 ---@class UnitCondition : AbstractVictoryCondition
+---@operator call(EntityCategory): UnitCondition
 ---@field UnitCategories EntityCategory
 UnitCondition = Class(AbstractVictoryCondition) {
 

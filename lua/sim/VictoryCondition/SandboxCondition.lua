@@ -23,6 +23,7 @@
 local AbstractVictoryCondition = import("/lua/sim/victorycondition/AbstractVictoryCondition.lua").AbstractVictoryCondition
 
 ---@class SandboxCondition : AbstractVictoryCondition
+---@operator call: SandboxCondition
 SandboxCondition = Class(AbstractVictoryCondition) {
 
     ---@param self SandboxCondition
