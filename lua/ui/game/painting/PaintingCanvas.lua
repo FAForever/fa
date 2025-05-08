@@ -67,7 +67,7 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
             local blockedAuthorsTable = self.Painting.BlockedAuthors
             for armyIndex = 1, numArmies do
                 -- the chat option marks the checkbox status, true = view chat, false = hide chat
-                blockedAuthorsTable[armiesTable[armyIndex].nickname] = not chatOptions[armyIndex]
+                blockedAuthorsTable[armiesTable[armyIndex].nickname] = chatOptions[armyIndex] == false
             end
         end)
 
