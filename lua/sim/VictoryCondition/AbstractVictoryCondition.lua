@@ -198,14 +198,14 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- Ends the game.
     ---@param self AbstractVictoryCondition
     EndGameThread = function(self)
-        WaitTicks(30)
+        WaitSeconds(3)
 
         for _, v in GameOverListeners do
             pcall(v)
         end
 
         Sync.GameEnded = true
-        WaitTicks(1)
+        WaitTicks(2)
         EndGame()
     end,
 
