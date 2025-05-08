@@ -9,6 +9,8 @@
 ---@alias AIExpansionOptionValue '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
 ---| '99999' unlimited expansions allowed
 
+---@alias VictoryCondition 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
+
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
@@ -35,7 +37,7 @@
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
 ---@field Unranked 'No' | 'Yes'
----@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
+---@field Victory VictoryCondition
 ---
 ---@field BuildMult AIMultiplierOptionValue
 ---@field CheatMult AIMultiplierOptionValue
