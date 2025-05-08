@@ -45,7 +45,7 @@ UnitCondition = Class(AbstractVictoryCondition) {
         -- see if there are defeated brains
         local aliveBrains = {}
         local defeatedBrains = {}
-        local aiBrains = self:GetArmyBrains()
+        local aiBrains = self:GetEligibleArmyBrains()
         for k = 1, TableGetn(aiBrains) do
             local aiBrain = aiBrains[k]
 
