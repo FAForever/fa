@@ -28,6 +28,7 @@ local DefaultPaintingDuration = 25
 ---@class UIPainting : DebugComponent, Destroyable
 ---@field BrushStrokes TrashBag     # All brush strokes, including those shared by peers.
 ---@field WorldView WorldView
+---@field BlockedAuthors table<string, boolean>
 Painting = Class(DebugComponent) {
 
     DefaultPaintingDuration = 25,
@@ -35,6 +36,7 @@ Painting = Class(DebugComponent) {
     ---@param self UIPainting
     __init = function(self)
         self.BrushStrokes = TrashBag()
+        self.BlockedAuthors = {}
     end,
 
     ---@param self UIPainting
@@ -50,8 +52,12 @@ Painting = Class(DebugComponent) {
     ---@param self UIPainting
     ---@param delta number
     OnRender = function(self, delta)
-        -- render all brush strokes
+        -- render allowed brush strokes
+        local blockedAuthors = self.BlockedAuthors
+        ---@param brushStroke UIBrushStroke
         for k, brushStroke in self.BrushStrokes do
+            if blockedAuthors[brushStroke.Author] then continue end
+
             local ok, msg = pcall(brushStroke.OnRender, brushStroke, delta)
             if not ok and self.EnabledErrors then
                 WARN(msg)

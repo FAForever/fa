@@ -375,7 +375,7 @@ Tooltips = {
     },
     chat_filter = {
         title = "<LOC tooltipui0401>Chat Filters",
-        description = "<LOC tooltipui0402>Show or hide messages from players",
+        description = "<LOC tooltipui0402>Show or hide messages and paintings from players",
     },
     chat_color = {
         title = "<LOC tooltipui0403>Chat Color",

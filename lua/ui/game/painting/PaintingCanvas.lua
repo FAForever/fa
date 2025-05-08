@@ -32,6 +32,10 @@ local PaintingCanvasInstances = TrashBag()
 
 local SyncIdentifier = "PaintingCanvas.lua"
 
+local armyTable = GetArmiesTable()
+local numArmies = armyTable.numArmies
+local armiesTable = armyTable.armiesTable
+
 ---@alias UIPaintingCanvasActiveInteraction 'Create' | 'Delete' | 'Mute'
 
 --- Responsible for glueing together the painting, the brush stroke and the painting network adapter.
@@ -57,6 +61,15 @@ PaintingCanvas = Class(Bitmap, DebugComponent) {
 
         -- register us to render
         self.WorldView:AddShape(self, tostring(self))
+
+        -- register us to read chat options
+        import('/lua/ui/game/chat.lua').AddChatOptionSetCallback(function(chatOptions)
+            local blockedAuthorsTable = self.Painting.BlockedAuthors
+            for armyIndex = 1, numArmies do
+                -- the chat option marks the checkbox status, true = view chat, false = hide chat
+                blockedAuthorsTable[armiesTable[armyIndex].nickname] = chatOptions[armyIndex] == false
+            end
+        end)
 
         self.InhibitionSet = {}
     end,
