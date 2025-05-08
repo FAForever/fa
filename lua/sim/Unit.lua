@@ -956,6 +956,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     OnDecayed = function(self)
+        if self.Dead then return end
         self:Destroy()
     end,
 
@@ -2524,6 +2525,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnFailedToBeBuilt = function(self)
         self:ForkThread(function()
             WaitTicks(1)
+            if self.Dead then return end
             self:Destroy()
         end)
 
