@@ -608,7 +608,7 @@ Tooltips = {
 
     options_painting = {
         title = "<LOC options_painting_title>Painting",
-        description = "<LOC options_painting_description>When enabled, you can make and receive paintings to or from other players.",
+        description = "<LOC options_painting_description>When enabled, you can send and receive brush strokes to or from other players.\r\nYou can create a brush stroke using the right mouse button. Painting is disabled when you have a unit selection or when you hold shift. You can delete a brush stroke by holding ALT while drawing. You can mute a player by holding CTRL and ALT while drawing.",
     },
 
     options_painting_duration = {
