@@ -99,6 +99,11 @@ PaintingBrush = Class(Dragger) {
     ---@param self UIPaintingBrush
     GetColorOfActiveBrushStroke = function(self)
 
+        -- observers are always white
+        if IsObserver() then
+            return 'ffffffff'
+        end
+
         -- in this case we just want to use the color of the
         -- current focus army. This may not always match the
         -- command source, but the color is only visible to

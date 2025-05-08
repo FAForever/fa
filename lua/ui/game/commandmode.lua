@@ -190,9 +190,6 @@ function StartCommandMode(newCommandMode, data)
     for i, v in startBehaviors do
         v(commandMode, modeData)
     end
-
-    -- limitation: only enable painting when we're not in command mode. This usually only applies when cheating in units.
-    import("/lua/ui/game/painting/PaintingCanvas.lua").InhibitAllPaintings("commandmode")
 end
 
 --- Called when the command mode ends and deconstructs all the data.
@@ -227,9 +224,6 @@ function EndCommandMode(isCancel)
     commandMode = false
     modeData = false
     issuedOneCommand = false
-
-    -- limitation: only enable painting when we're not in command mode. This usually only applies when cheating in units.
-    import("/lua/ui/game/painting/PaintingCanvas.lua").LiftInhibitionOfAllPaintings("commandmode")
 end
 
 --- Caches the command mode, allows us to restore it
