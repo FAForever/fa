@@ -75,10 +75,19 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
                 end
                 IssueClearCommands({ factory })
                 factory:SetPaused(false)
-                WARN(string.format("FactoryRebuildUnits failed to rebuild correctly for factory %s (entity ID %d).\nRebuild data: %s\n%s"
+                WARN(string.format(
+                    [[FactoryRebuildUnits failed to rebuild correctly for factory %s (entity ID %d).
+Rebuild data:
+Progress: %f
+BuildTime: %f
+Health: %f
+%s]]
                     , factory.UnitId
                     , factory:GetEntityId()
-                    , repr(factory, {depth = 1})
+                    , factory.FacRebuild_Progress
+                    , factory.FacRebuild_BuildTime
+                    , factory.FacRebuild_Health
+                    , factory.FacRebuild_OldBuildRate
                     , debug.traceback()
                 ))
             end
