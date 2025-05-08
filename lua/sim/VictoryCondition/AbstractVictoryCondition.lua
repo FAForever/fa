@@ -96,13 +96,29 @@ AbstractVictoryCondition = Class(DebugComponent) {
         return false
     end,
 
+    --- A utility function that returns whether a brain is eligible to be considered for victory conditions.
+    ---@param self AbstractVictoryCondition
+    ---@param aiBrain AIBrain
+    ---@return boolean
+    BrainIsEligible = function(self, aiBrain)
+        if aiBrain:IsDefeated() then
+            return false
+        end
+
+        if ArmyIsCivilian(aiBrain.Army) then
+            return false
+        end
+
+        return true
+    end,
+
     --- A utility function that retrieves all brains that are still participating in the match.
     ---@param self AbstractVictoryCondition
     ---@return AIBrain[]
-    GetArmyBrains = function(self)
+    GetEligibleArmyBrains = function(self)
         local participatingArmyBrains = {}
         for k, aiBrain in ArmyBrains do
-            if not (aiBrain:IsDefeated() or ArmyIsCivilian(aiBrain.Army)) then
+            if self:BrainIsEligible(aiBrain) then
                 TableInsert(participatingArmyBrains, aiBrain)
             end
         end
