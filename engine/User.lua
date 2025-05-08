@@ -529,8 +529,8 @@ end
 function GetScriptBit(unit, bit)
 end
 
---- Returns a table of the currently selected units
----@return UserUnit[]
+--- Returns a table of the currently selected units. Returns `nil` for an empty selection.
+---@return UserUnit[]?
 function GetSelectedUnits()
 end
 
