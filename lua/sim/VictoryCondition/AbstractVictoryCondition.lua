@@ -215,6 +215,39 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ToObserver = function(self, aiBrain)
         local brainIndex = aiBrain.Army
         SetArmyOutOfGame(brainIndex)
+
+        if not ScenarioInfo.Options.AllowObservers then return end
+
+        -- we need to map the brains to the command source index. Since we don't have access to `GetClients` 
+        -- in the sim, we try and decipher it manually by checking if a brain is a human. We only want
+        -- the command sources of allied humans.
+
+        local commandSourceIndex = 0
+        local commandSourceIndices = {}
+
+        for i, data in ArmyBrains do
+            if data.BrainType == 'Human' then
+                if IsAlly(aiBrain.Army, data.Army) then
+                    if not ArmyIsOutOfGame(data.Army) then
+                        LOG("We have an allied source still going strong, can't remove")
+                        return
+                    end
+
+                    table.insert(commandSourceIndices, commandSourceIndex)
+                end
+
+                -- brain is a human, always increment the command source index
+                commandSourceIndex = commandSourceIndex + 1
+            end
+        end
+
+        -- since this command source is defeated, we remove it from all existing armies.
+
+        for _, commandSource in commandSourceIndices do
+            for _, data in ArmyBrains do
+                SetCommandSource(data.Army - 1, commandSource, false)
+            end
+        end
     end,
 
     --- Processes the army as if it forfeit/drew.
@@ -225,7 +258,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         aiBrain:OnDraw()
 
         local brainIndex = aiBrain.Army
-        SyncGameResult({ brainIndex, "victory 10" })
+        SyncGameResult({ brainIndex, "draw 0" })
     end,
 
     --- Processes the army as if it was victorious.
@@ -247,7 +280,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         aiBrain:OnDefeat()
 
         local brainIndex = aiBrain.Army
-        SyncGameResult({ brainIndex, "victory 10" })
+        SyncGameResult({ brainIndex, "defeat -10" })
     end,
 
 }
