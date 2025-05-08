@@ -5,7 +5,7 @@
 local DraggerMethods = moho.dragger_methods
 local DraggerMethodsDestroy = DraggerMethods.Destroy
 
----@class Dragger : moho.dragger_methods, InternalObject
+---@class Dragger : moho.dragger_methods, InternalObject, Destroyable
 ---@field Trash TrashBag
 Dragger = ClassUI(DraggerMethods) {
 
