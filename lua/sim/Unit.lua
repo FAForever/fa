@@ -166,6 +166,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field UpgradesTo? UnitId # Keeps track of upgrades for unit transfer
 ---@field TargetUpgradeBuildTime? number # Keeps track of upgrades *during* unit transfer
 ---@field TargetFractionComplete? number # When an unbuilt unit is rebuilt during unit transfer, this overrides what fraction it is rebuilt to.
+---@field isFinishedUnit? boolean # set to true in `OnStopBeingBuilt`
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
