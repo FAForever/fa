@@ -64,7 +64,9 @@ function EndOperation(success, allPrimary, allSecondary, allBonus)
         opData = import(opFile)
     end
 
-    import("/lua/sim/matchstate.lua").CallEndGame() -- We need this here to populate the score screen
+    -- we need to end the game 'properly' to populate the score screen
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    victoryCondition:EndGame()
 
     ForkThread(EndOperationThread, {
         success = success,
