@@ -104,9 +104,3 @@ UnitCondition = Class(AbstractVictoryCondition) {
         end
     end,
 }
-
----@param entityCategories EntityCategory
----@return UnitCondition
-CreateUnitCondition = function(entityCategories)
-    return UnitCondition(entityCategories)
-end

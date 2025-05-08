@@ -121,8 +121,3 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
         end
     end,
 }
-
----@return DecapitationCondition
-CreateDecapitationCondition = function()
-    return DecapitationCondition()
-end

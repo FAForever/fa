@@ -31,9 +31,3 @@ SandboxCondition = Class(AbstractVictoryCondition) {
         -- do nothing, it is a sandbox!
     end,
 }
-
----@return SandboxCondition
-CreateSandboxCondition = function()
-    return SandboxCondition()
-end
-
