@@ -24,15 +24,20 @@ local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
 local ATorpedoClusterOnCreate = ATorpedoCluster.OnCreate
 local ATorpedoClusterOnEnterWater = ATorpedoCluster.OnEnterWater
 
+local SplitComponent = import('/lua/sim/projectiles/components/splitcomponent.lua').SplitComponent
+
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 -- upvalue scope for performance
 local CreateTrail = CreateTrail
 
 --- Aeon Torpedo Cluster Projectile script, XAA0306
----@class AANTorpedoCluster01 : ATorpedoCluster
-AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
+---@class AANTorpedoCluster01 : ATorpedoCluster, SplitComponent
+AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster, SplitComponent) {
     FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
+
+    ChildCount = 2,
+    ChildProjectileBlueprint = "/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp",
 
     ---@param self AANTorpedoCluster01
     OnCreate = function(self)
@@ -44,13 +49,11 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
     OnEnterWater = function(self)
         ATorpedoClusterOnEnterWater(self)
 
+        -- split damage over each child
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount / self.ChildCount
+
         -- create child projectiles
-        local bp = self.Blueprint.Physics
-        local numProjectiles = bp.Fragments
-        for i = 0, numProjectiles do
-            proj = self:CreateChildProjectile(bp.FragmentId)
-            proj.DamageData = self.DamageData
-        end
+        self:OnSplit(false)
 
         -- create vision
         local px, _, pz = self:GetPositionXYZ()
@@ -59,7 +62,6 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
         marker:UpdateDuration(10)
         marker:UpdateIntel(self.Army, 5, 'Vision', true)
 
-        -- let the children live on
         self:Destroy()
     end,
 }
