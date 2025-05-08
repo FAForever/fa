@@ -123,11 +123,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
         local victorious = true
         for a = 1, TableGetn(aiBrains) do
             local aBrain = aiBrains[a]
-            local aIndex = aBrain:GetArmyIndex()
+            local aIndex = aBrain.Army
 
             for b = 1, TableGetn(aiBrains) do
                 local bBrain = aiBrains[b]
-                local bIndex = bBrain:GetArmyIndex()
+                local bIndex = bBrain.Army
 
                 if aIndex ~= bIndex then
                     victorious = victorious and (IsAlly(aIndex, bIndex) and aBrain.RequestingAlliedVictory and bBrain.RequestingAlliedVictory)
@@ -213,7 +213,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     ToObserver = function(self, aiBrain)
-        local brainIndex = aiBrain:GetArmyIndex()
+        local brainIndex = aiBrain.Army
         SetArmyOutOfGame(brainIndex)
     end,
 
@@ -224,7 +224,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         self:ToObserver(aiBrain)
         aiBrain:OnDraw()
 
-        local brainIndex = aiBrain:GetArmyIndex()
+        local brainIndex = aiBrain.Army
         SyncGameResult({ brainIndex, "victory 10" })
     end,
 
@@ -235,7 +235,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         self:ToObserver(aiBrain)
         aiBrain:OnVictory()
 
-        local brainIndex = aiBrain:GetArmyIndex()
+        local brainIndex = aiBrain.Army
         SyncGameResult({ brainIndex, "victory 10" })
     end,
 
@@ -246,7 +246,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         self:ToObserver(aiBrain)
         aiBrain:OnDefeat()
 
-        local brainIndex = aiBrain:GetArmyIndex()
+        local brainIndex = aiBrain.Army
         SyncGameResult({ brainIndex, "victory 10" })
     end,
 
