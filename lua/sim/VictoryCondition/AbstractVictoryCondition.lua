@@ -102,7 +102,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     GetArmyBrains = function(self)
         local participatingArmyBrains = {}
         for k, aiBrain in ArmyBrains do
-            if not aiBrain:IsDefeated() then
+            if not (aiBrain:IsDefeated() or ArmyIsCivilian(aiBrain.Army)) then
                 TableInsert(participatingArmyBrains, aiBrain)
             end
         end
