@@ -47,7 +47,7 @@ end
 function Hidden(callback)
     local CM = import("/lua/ui/game/commandmode.lua")
 
-    local old_selection = GetSelectedUnits() or {}
+    local old_selection = GetSelectedUnits() or EmptyTable
     hidden_select = true
     CM.SetIgnoreSelection(true)
 
