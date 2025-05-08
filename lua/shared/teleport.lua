@@ -66,8 +66,8 @@ TeleportCostFunction = function(unit, location)
     local energyCost, time
 
     if bpEco.UseVariableTeleportCosts then
-        energyCost = math.min(teleportFlatEnergyCost + dist * dist, teleportMaximumEnergyCost)
-        time = math.min(teleDelay + (0.005 * dist) * (0.005 * dist), teleportMaximumDuration)
+        energyCost = math.min(teleportFlatEnergyCost + (0.5 * math.pow(dist, 2.1)), teleportMaximumEnergyCost)
+        time = math.min(teleDelay + (0.00001 * math.pow(dist, 2.1)), teleportMaximumDuration)
 
         -- make sure the teleport destination effects appear on time
         teleDelay = time * 0.4
