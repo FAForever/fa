@@ -195,7 +195,7 @@ function StartCommandMode(newCommandMode, data)
     import("/lua/ui/game/painting/PaintingCanvas.lua").InhibitAllPaintings("commandmode")
 end
 
---- Called when the command mode ends and deconstructs all the data.
+--- Called when the command mode ends and deconstructs all the data or by the engine when the selection changes.
 ---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
     if ignoreSelection then
