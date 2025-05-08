@@ -72,6 +72,29 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         end
     end,
 
+    --- Modified version of `FactoryUnit.KillUnitBeingBuilt` so that vet is dispersed from the exfac's parent.  
+    --- Kills the unit being built, with veterancy dispersal and credit to the instigator.
+    ---@param self ExternalFactoryUnit
+    ---@param instigator Unit | Projectile
+    ---@param type DamageType
+    ---@param overkillRatio number
+    KillUnitBeingBuilt = function(self, instigator, type, overkillRatio)
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
+            -- Detach the unit to allow things like sinking
+            unitBeingBuilt:DetachFrom(true)
+            -- Disperse the unit's veterancy to our killers
+            -- only take remaining HP so we don't double count
+            -- Identical logic is used for cargo of transports, so this vet behavior is consistent.
+            self.Parent:VeterancyDispersal(unitBeingBuilt:GetTotalMassCost() * unitBeingBuilt:GetHealth() / unitBeingBuilt:GetMaxHealth())
+            if instigator then
+                unitBeingBuilt:Kill(instigator, type, 0)
+            else
+                unitBeingBuilt:Kill()
+            end
+        end
+    end,
+
     ---@param self ExternalFactoryUnit
     ---@param parent Unit
     SetParent = function(self, parent)
