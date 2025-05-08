@@ -232,6 +232,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             and not unitBeingBuilt.Dead
             and not unitBeingBuilt.isFinishedUnit
             and unitBeingBuilt:GetParent() == unit
+            and not unit.ExternalFactory
         then
             local bpBeingBuilt = unitBeingBuilt.Blueprint
 
