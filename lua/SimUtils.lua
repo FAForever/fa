@@ -236,6 +236,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             and not unitBeingBuilt.Dead
             and not unitBeingBuilt.isFinishedUnit
             -- In external factories, the units are parented to the base unit instead of the exfac.
+            -- Checking the parent also excludes upgrading factories (the upgrade's parent is the upgrade itself)
             and unitBeingBuilt:GetParent() == unit
         then
             local bpBeingBuilt = unitBeingBuilt.Blueprint
