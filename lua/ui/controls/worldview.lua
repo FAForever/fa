@@ -230,6 +230,7 @@ local orderToCursorCallback = {
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
+---@field PaintingCanvas UIPaintingCanvas
 WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldViewCameraComponent) {
 
     PingThreads = {},
@@ -260,6 +261,10 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
         self.CursorOverride = false
 
         self.Trash = TrashBag()
+
+        -- we do not want the module to reload if we reload this
+        local CreatePaintingCanvas = import("/lua/ui/game/painting/PaintingCanvas.lua").CreatePaintingCanvas
+        self.PaintingCanvas = self.Trash:Add(CreatePaintingCanvas(self))
     end,
 
     ---@param self WorldView
@@ -910,9 +915,18 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
 
     --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
     ---@param self WorldView
-    ---@param event any
+    ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
+
+        -- pass down the event to the canvas manually. This way we skip the 
+        -- hierarchy of the engine. For more information, see the comment in 
+        -- the function. 
+        if self.PaintingCanvas then
+            self.PaintingCanvas:HandleWorldViewEvent(event)
+        end
+
+
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
             self.CursorOverWorld = true
             if not table.empty(self.Cursor) then

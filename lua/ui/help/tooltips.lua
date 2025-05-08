@@ -375,7 +375,7 @@ Tooltips = {
     },
     chat_filter = {
         title = "<LOC tooltipui0401>Chat Filters",
-        description = "<LOC tooltipui0402>Show or hide messages from players",
+        description = "<LOC tooltipui0402>Show or hide messages and paintings from players",
     },
     chat_color = {
         title = "<LOC tooltipui0403>Chat Color",
@@ -604,6 +604,16 @@ Tooltips = {
     options_selection_threshold_replay = {
         title = "<LOC OPTIONS_0314>Replay Selection Threshold",
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
+    },
+
+    options_painting = {
+        title = "<LOC options_painting_title>Painting",
+        description = "<LOC options_painting_description>When enabled, you can send and receive brush strokes to or from other players.\r\nYou can create a brush stroke using the right mouse button. Painting is disabled when you have a unit selection or when you hold shift. You can delete a brush stroke by holding ALT while drawing. You can mute a player by holding CTRL and ALT while drawing.",
+    },
+
+    options_painting_duration = {
+        title = "<LOC options_painting_duration_title>Duration of paintings",
+        description = "<LOC options_painting_duration_description>The higher the value, the longer it takes for a painting to decay and be removed.",
     },
 
     options_wheel_sensitivity = {
@@ -1077,10 +1087,6 @@ Tooltips = {
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
         description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
-    },
-    options_casting_painting = {
-        title = '<LOC OPTIONS_0307>Painting for Observers',
-        description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
     },
     -- **********************
     -- ** Lobby Strings
