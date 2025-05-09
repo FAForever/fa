@@ -199,6 +199,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         self:CreateBlinkingLights()
     end,
 
+    --- Called by the engine when the current *build* order (not repair order) is cancelled.
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
         -- When a factory has a queue and you cancel the currently building unit, this unit

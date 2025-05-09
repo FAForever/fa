@@ -2913,6 +2913,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.Brain:OnUnitStopBuild(self, built, order)
     end,
 
+    --- Called by the engine when the current *build* order (not repair order) is cancelled.
     ---@param self Unit
     OnFailedToBuild = function(self)
         self:DoOnFailedToBuildCallbacks()
