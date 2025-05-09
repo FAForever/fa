@@ -320,7 +320,7 @@ Callbacks.SelfDestruct = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+    import("/lua/sim/commands/self-destruct.lua").SelfDestruct(selection, true)
 end
 
 --#endregion
