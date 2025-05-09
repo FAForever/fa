@@ -201,8 +201,13 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
-        -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
-        self.UnitBeingBuilt:SetCollisionShape('None')
+        -- When a factory has a queue and you cancel the currently building unit, this unit
+        -- needs to have its collision removed so that the next unit can start building immediately,
+        -- since destroying the unit doesn't immediately clear the build area.
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
+            unitBeingBuilt:SetCollisionShape('None')
+        end
         StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
