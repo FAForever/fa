@@ -1,1 +1,1 @@
-- (#6692) Fix factories not immediately starting to build queued units after the factory finishes upgrading, or when a currently building land or navy unit is cancelled.
+- (#6692, #6789) Fix factories not immediately starting to build queued units after the factory finishes upgrading, or when a currently building land or navy unit is cancelled.
