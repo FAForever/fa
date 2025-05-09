@@ -14,10 +14,10 @@ function CMauiScrollbar:DoScrollLines(lines)
 end
 
 ---
----@param background string
----@param thumbMiddle string
----@param thumbTop string
----@param thumbBottom string
+---@param background string?
+---@param thumbMiddle string?
+---@param thumbTop string?
+---@param thumbBottom string?
 function CMauiScrollbar:SetNewTextures(background, thumbMiddle, thumbTop, thumbBottom)
 end
 

@@ -6,7 +6,7 @@ local MathFloor = math.floor
 ---@field _rangeMin number
 ---@field _rangeMax number
 ---@field _minSlidePercent number
----@field _value LazyVar<number>
+---@field _value Lazy<number>
 ---@field _vertical boolean
 ---@field _negative boolean
 ---@field _stretch boolean
@@ -19,7 +19,7 @@ StatusBar = ClassUI(Bitmap) {
     ---@param rangeMax number
     ---@param vertical boolean # When true, the bar grows vertically instead of horizontally
     ---@param negative boolean # When true, the bar grows in the other direction
-    ---@param background Lazy<FileName>
+    ---@param background LazyOrValue<FileName>
     ---@param bar FileName
     ---@param stretchTextures boolean
     ---@param debugname string
@@ -38,8 +38,8 @@ StatusBar = ClassUI(Bitmap) {
 
         if vertical then
             if negative then
-                self._bar.Top:SetFunction(self.Top)
-                self._bar.Bottom:SetFunction(
+                self._bar.Top:Set(self.Top)
+                self._bar.Bottom:Set(
                     function()
                         local rangePercent = self:_CalcRangePercent()
                         if not self._stretch then
@@ -49,8 +49,8 @@ StatusBar = ClassUI(Bitmap) {
                     end
                 )
             else
-                self._bar.Bottom:SetFunction(self.Bottom)
-                self._bar.Top:SetFunction(
+                self._bar.Bottom:Set(self.Bottom)
+                self._bar.Top:Set(
                     function()
                         local rangePercent = self:_CalcRangePercent()
                         if not self._stretch then
@@ -60,12 +60,12 @@ StatusBar = ClassUI(Bitmap) {
                     end
                 )
             end
-            self._bar.Left:SetFunction(self.Left)
-            self._bar.Width:SetFunction(self.Width)
+            self._bar.Left:Set(self.Left)
+            self._bar.Width:Set(self.Width)
         else
             if negative then
-                self._bar.Right:SetFunction(self.Right)
-                self._bar.Left:SetFunction(
+                self._bar.Right:Set(self.Right)
+                self._bar.Left:Set(
                     function()
                         local rangePercent = self:_CalcRangePercent()
                         if not self._stretch then
@@ -75,8 +75,8 @@ StatusBar = ClassUI(Bitmap) {
                     end
                 )
             else
-                self._bar.Left:SetFunction(self.Left)
-                self._bar.Right:SetFunction(
+                self._bar.Left:Set(self.Left)
+                self._bar.Right:Set(
                     function()
                         local rangePercent = self:_CalcRangePercent()
                         if not self._stretch then
@@ -86,8 +86,8 @@ StatusBar = ClassUI(Bitmap) {
                     end
                 )
             end
-            self._bar.Top:SetFunction(self.Top)
-            self._bar.Height:SetFunction(self.Height)
+            self._bar.Top:Set(self.Top)
+            self._bar.Height:Set(self.Height)
         end
     end,
 
@@ -103,7 +103,7 @@ StatusBar = ClassUI(Bitmap) {
             value = max
         end
 
-        self._value:SetValue(value)
+        self._value:Set(value)
     end,
 
     ---@param self StatusBar
