@@ -1,0 +1,1 @@
+- (#6788) Fix errors when self destruct is used with no selection.

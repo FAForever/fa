@@ -306,8 +306,10 @@ end
 -------------------------------------------------------------------------------
 --#region General orders
 
+--- Instant self destruct that only works on the selection.
+--- Alternative, simplified implementation that is unused.
 ---@param data { }
----@param selection Unit[]
+---@param selection? Unit[]
 Callbacks.SelfDestruct = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
@@ -320,7 +322,7 @@ Callbacks.SelfDestruct = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+    import("/lua/sim/commands/self-destruct.lua").SelfDestruct(selection, true)
 end
 
 --#endregion
