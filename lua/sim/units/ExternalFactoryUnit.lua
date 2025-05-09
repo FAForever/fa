@@ -66,9 +66,9 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         end
 
         -- Similar to SeaFactoryUnit
-        local UnitBeingBuilt = self.UnitBeingBuilt
-        if UnitBeingBuilt and not UnitBeingBuilt.Dead and UnitBeingBuilt:GetFractionComplete() < 1 then
-            UnitBeingBuilt:Destroy()
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
         end
     end,
 
