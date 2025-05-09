@@ -1,0 +1,1 @@
+- (#6790) The tempest can now be retargeted while it is charging without triggering a full 12.5 second reload.
