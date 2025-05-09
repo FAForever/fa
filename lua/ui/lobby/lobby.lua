@@ -41,7 +41,7 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local CountryTooltips = import("/lua/ui/help/tooltips-country.lua").tooltip
 local SetUtils = import("/lua/system/setutils.lua")
 local JSON = import("/lua/system/dkson.lua").json
-local Changelog = import("/lua/ui/lobby/changelog.lua")
+local UnitsAnalyzer = import("/lua/ui/lobby/unitsanalyzer.lua")
 local UTF =  import("/lua/utf.lua")
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
@@ -1034,9 +1034,10 @@ function SetSlotInfo(slotNum, playerInfo)
         GUI.connectdialog:Close()
         GUI.connectdialog = nil
 
-        -- Changelog, if necessary.
-        if Changelog.OpenChangelog() then
-            Changelog.Changelog(GetFrame(0))
+        -- ChangelogDialog, if necessary.
+        local changelogDialogManager = import("/lua/ui/lobby/changelog/changelogdialog.lua")
+        if changelogDialogManager.ShouldOpenChangelog() then
+            changelogDialogManager.CreateChangelogDialog(GetFrame(0))
         end
     end
 
@@ -3319,7 +3320,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
-        Changelog.Changelog(GUI)
+        import("/lua/ui/lobby/changelog/changelogdialog.lua").CreateChangelogDialog(GUI)
     end
 
     -- Create mission briefing button
@@ -4489,11 +4490,15 @@ function setupChatEdit(chatPanel)
     end
 
     GUI.chatEdit.OnEscPressed = function(self, text)
+
+        local changelogDialogManager = import("/lua/ui/lobby/changelog/changelogdialog.lua")
+        local changelogDialogIsOpen = changelogDialogManager.IsOpen()
+
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") or Changelog.isOpen then
+        if HasCommandLineArg("/gpgnet") or changelogDialogIsOpen then
             -- Quit to desktop
-            EscapeHandler.HandleEsc(not Changelog.isOpen)
+            EscapeHandler.HandleEsc(not changelogDialogIsOpen)
         else
             -- Back to main menu
             GUI.exitButton.OnClick()
