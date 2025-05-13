@@ -4,7 +4,7 @@ MeshBlueprint{
         {
             LODCutoff = 195,
             LookupName = "/effects/entities/PhaseShield/PhaseShieldLookup.dds",
-            ShaderName = "PhaseShield",
+            ShaderName = "AeonPhaseShield",
             MeshName = "ual0001_lod0.scm",
             AlbedoName = "ual0001_albedo.dds",
             NormalsName = "ual0001_normals.dds",
