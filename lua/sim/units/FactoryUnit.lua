@@ -141,7 +141,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
-        if not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
+        if not IsDestroyed(unitBeingBuilt) and not unitBeingBuilt.isFinishedUnit then
             unitBeingBuilt:Destroy()
         end
 
@@ -206,7 +206,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
         -- needs to have its collision removed so that the next unit can start building immediately,
         -- since destroying the unit doesn't immediately clear the build area.
         local unitBeingBuilt = self.UnitBeingBuilt
-        if unitBeingBuilt and not unitBeingBuilt.Dead then
+        if not IsDestroyed(unitBeingBuilt) then
+            ---@diagnostic disable-next-line: need-check-nil
             unitBeingBuilt:SetCollisionShape('None')
         end
         StructureUnitOnFailedToBuild(self)
