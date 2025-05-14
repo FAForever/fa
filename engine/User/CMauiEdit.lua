@@ -162,6 +162,7 @@ end
 ---@field Left? true
 ---@field Right? true
 ---@field Shift? true
+---@field Middle? true
 
 ---@class KeyEvent
 ---@field Control Control

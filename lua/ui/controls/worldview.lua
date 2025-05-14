@@ -1108,7 +1108,7 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                     end
                 end
                 table.insert(self.PingThreads, ForkThread(function()
-                    local Arrow = false
+                    local Arrow
                     if not self._disableMarkers then
                         Arrow = self:CreateCameraIndicator(self, pingData.Location, pingData.ArrowColor)
                     end
