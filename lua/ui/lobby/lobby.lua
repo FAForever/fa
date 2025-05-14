@@ -5635,6 +5635,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
     end
 
+    --- Called by the engine when we receive data from other players. There is no checking to see if the data is legitimate, these need to be done in Lua.
+    ---
+    --- Data can be sent via `BroadcastData` and/or `SendData`.
+    ---@param self UILobbyCommunication
+    ---@param data UILobbyReceivedMessage
     lobbyComm.DataReceived = function(self, data)
 
         
