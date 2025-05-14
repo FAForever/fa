@@ -31,7 +31,7 @@ local Entity = import("/lua/sim/entity.lua").Entity
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
-local shieldAbsorptionValues = import("/lua/ShieldAbsorptionValues.lua").shieldAbsorptionValues
+local shieldAbsorptionValues = import("/lua/shieldabsorptionvalues.lua").shieldAbsorptionValues
 
 local DeprecatedWarnings = {}
 
@@ -157,6 +157,7 @@ end
 ---@field ImpactMeshBp string
 ---@field SkipAttachmentCheck boolean
 ---@field AbsorptionTypeDamageTypeToMulti table<DamageType, number>
+---@field DisallowCollisions boolean
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
@@ -194,6 +195,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+        self.DisallowCollisions = false
 
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
@@ -347,6 +349,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- change state if we're enabled
         if self.Enabled then
+            self.DisallowCollisions = true
             ChangeState(self, self.EnergyDrainedState)
         end
     end,
@@ -357,6 +360,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- change state if we're enabled
         if self.Enabled then
+            self.DisallowCollisions = false
             ChangeState(self, self.OnState)
         end
     end,
@@ -586,7 +590,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             EntityAdjustHealth(self, instigator, -absorbed)
 
             -- force guards to start repairing in 1 tick instead of waiting for them to react 7-11 ticks
-            if tick > owner.tickIssuedShieldRepair then
+            if tick > owner.tickIssuedShieldRepair and not owner:IsUnitState("Upgrading") then
                 owner.tickIssuedShieldRepair = tick
                 local guards = UnitGetGuards(owner)
                 if not TableEmpty(guards) then
@@ -597,10 +601,12 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                         end
                     end
 
-                    -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
-                    IssueClearCommands(guards)
-                    IssueRepair(guards, owner)
-                    IssueGuard(guards, owner)
+                    if not TableEmpty(guards) then
+                        -- For the filtered guards, clear their assist order, order repair, then re-add the assist order after
+                        IssueClearCommands(guards)
+                        IssueRepair(guards, owner)
+                        IssueGuard(guards, owner)
+                    end
                 end
             end
 
@@ -615,6 +621,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- if we have no health, collapse
             if EntityGetHealth(self) <= 0 then
+                self.DisallowCollisions = true
                 ChangeState(self, self.DamageDrainedState)
                 -- otherwise, attempt to regenerate
             else
@@ -721,6 +728,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param other Projectile The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
+        if self.DisallowCollisions then
+            return false
+        end
+
         -- special logic when it is a projectile to simulate air crashes
         if other.CrashingAirplaneShieldCollisionLogic then
             if other.ShieldImpacted then
@@ -761,6 +772,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     -- @param self The shield we're checking the collision for
     -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
+
+        if self.DisallowCollisions then
+            return false
+        end
 
         -- if we're allied, check if we allow that type of collision
         if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
@@ -956,6 +971,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.RegenThreadStartTick = GetGameTick() + 10 * self.RegenStartTime
 
             -- back to the regular onstate
+            self.DisallowCollisions = false
             ChangeState(self, self.OnState)
         end,
 

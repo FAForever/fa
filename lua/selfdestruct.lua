@@ -21,11 +21,14 @@ end
 
 --- Toggles the destruction of the units
 ---@param data { owner: number, noDelay: boolean }
----@param units Unit[]
+---@param units? Unit[]
 function ToggleSelfDestruct(data, units)
 
     -- suppress self destruct in tutorial missions as they screw up the mission end
-    if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
+    if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true
+        -- handle call with empty selection
+        or not units
+    then
         return
     end
 

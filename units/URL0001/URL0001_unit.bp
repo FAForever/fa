@@ -241,7 +241,7 @@ UnitBlueprint{
             UpgradeEffectBones = {
                 "Right_Upgrade",
                 "Right_Turret",
-                "Right_Muzzle_02",
+                "Turret_Muzzle_02",
             },
             UpgradeUnitAmbientBones = { "URL0001" },
         },
@@ -299,7 +299,7 @@ UnitBlueprint{
             UpgradeEffectBones = {
                 "Right_Upgrade",
                 "Right_Turret",
-                "Right_Muzzle_02",
+                "Turret_Muzzle_02",
             },
             UpgradeUnitAmbientBones = { "URL0001" },
         },
@@ -508,7 +508,7 @@ UnitBlueprint{
             UpgradeEffectBones = {
                 "Right_Upgrade",
                 "Right_Turret",
-                "Right_Muzzle_02",
+                "Turret_Muzzle_02",
             },
             UpgradeUnitAmbientBones = { "URL0001" },
         },
@@ -587,8 +587,8 @@ UnitBlueprint{
         },
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 15,
-        TeleportFlatEnergyCost = 75000,
+        TeleportDelay = 20,
+        TeleportFlatEnergyCost = 100000,
     },
     Intel = {
         ActiveIntel = { Omni = true },

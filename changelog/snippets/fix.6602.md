@@ -1,1 +1,0 @@
-- (#6602) Removed unused personalty function calls in default AI factory manager and platoon former manager.

@@ -888,9 +888,6 @@ function ReceiveChatFromSim(sender, msg)
             GUI.chatContainer:ScrollToBottom()
         end
     end
-    if SessionIsReplay() then
-        PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Diplomacy_Close'}))
-    end
 end
 
 function ToggleChat()
@@ -1071,6 +1068,39 @@ function SetupChatLayout(mapGroup)
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(ReceiveChat, 'Chat')
 end
 
+---@type table<string|integer, fun(chatOptions: table)>
+local OnChatOptionsChangedCallbacks = {}
+
+--- Adds a callback and calls it with the current chat options.
+---@param callback fun(chatOptions: table)
+---@param id? string
+function AddChatOptionSetCallback(callback, id)
+    local ok, msg = pcall(callback, ChatOptions)
+    if not ok then
+        WARN(string.format('Error with initial run of `ChatOptionSet` callback%s: %s'
+            , id and string.format(' (id "%s")', tostring(id)) or ''
+            , msg)
+        )
+        return
+    end
+    if id then
+        OnChatOptionsChangedCallbacks[id] = callback
+    else
+        table.insert(OnChatOptionsChangedCallbacks, callback)
+    end
+end
+
+--- Runs all callbacks using the current chat options.
+local function DoChatOptionSetCallbacks()
+    for id, callback in OnChatOptionsChangedCallbacks do
+        local ok, msg = pcall(callback, ChatOptions)
+        if not ok then
+            WARN(string.format('Error running `ChatOptionSet` callback (id "%s"): %s', tostring(id), msg))
+            OnChatOptionsChangedCallbacks[id] = nil
+        end
+    end
+end
+
 function CreateChat()
     if GUI.bg then
         GUI.bg.OnClose()
@@ -1127,6 +1157,7 @@ function CreateChat()
             GUI.bg.curTime = 0
             GUI.bg:SetNeedsFrameUpdate(true)
         end
+        DoChatOptionSetCallbacks()
     end
     GUI.bg.OnHideWindow = function(self, hidden)
         if not hidden then
@@ -1410,7 +1441,7 @@ function CreateConfigWindow()
         end
     end
 
-    local filterTitle = UIUtil.CreateText(optionGroup, '<LOC chat_0012>Message Filters', 14, "Arial Bold")
+    local filterTitle = UIUtil.CreateText(optionGroup, '<LOC chat_0012>Message/Painting Filters', 14, "Arial Bold")
     LayoutHelpers.AtLeftTopIn(filterTitle, optionGroup, 5, 5)
     Tooltip.AddControlTooltip(filterTitle, 'chat_filter')
     local index = 1

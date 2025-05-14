@@ -271,9 +271,9 @@ function EntityCategoryFilterOut(category, units)
 end
 
 --- Executes some Lua code in the sim. Requires cheats to be enabled
----@param func function
----@param value any
-function ExecLuaInSim(func, value)
+---@param func string # global sim func
+---@param arg any # arg to the func
+function ExecLuaInSim(func, arg)
 end
 
 --- Requests that the application shut down
@@ -493,9 +493,9 @@ end
 function GetNumRootFrames()
 end
 
----
+--- Retrieves the value of a game option from the preference file. The value is retrieved from the 'option' table in the preference file.
 ---@param key string
----@return string[]
+---@return any
 function GetOptions(key)
 end
 
@@ -589,7 +589,7 @@ function GetSystemTimeSeconds()
 end
 
 ---
----@param filename string
+---@param filename FileName
 ---@param border number? defaults to 1
 ---@return number width
 ---@return number height
@@ -818,10 +818,9 @@ end
 function IsKeyDown(keyCode)
 end
 
----
----@param playerId string
+---@param playerId? string  # if not provided, will return whether the local player is an observer
 ---@return boolean
-function IsObserver(playerId)
+function IsObserver()
 end
 
 --- Issue a factory build or upgrade command to your selection
@@ -1096,10 +1095,11 @@ end
 --- Resume the world simulation
 function SessionResume()
 end
- 
----
----@param client? number | number[] client or clients
----@param message table | number | string
+
+--- Sends a message to one, more or all other connected clients. This message is sent separately from the simulation. The message is not recorded in the replay. The message is transmit and received in order.
+---@overload fun(message: table | number | string)
+---@param client? number | number[]         # client or clients
+---@param message table | number | string   # Can not be larger than 1024 bytes
 function SessionSendChatMessage(client, message)
 end
 
@@ -1287,20 +1287,54 @@ end
 function UIZoomTo(units, seconds)
 end
 
----Draws circle in world. Must be called within `WorldView:OnRenderWorld`
----@param pos Vector
+--- Draws a circle in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
+---@param pos Vector  # in world coordinates
 ---@param size number
 ---@param color Color
 ---@param thickness? number
 function UI_DrawCircle(pos, size, color, thickness)
+
+  -- Introduced by an assembly function, see also:
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
+
 end
 
----Draws rectangle in world. Must be called within `WorldView:OnRenderWorld`
----@param pos Vector
+--- Draws a rectangle in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
+---@param pos Vector  # in world coordinates
 ---@param size number
 ---@param color Color
 ---@param thickness? number
 function UI_DrawRect(pos, size, color, thickness)
+
+  -- Introduced by an assembly function, see also:
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
+
+end
+
+--- Draws a line in world. Must be called from `WorldView:OnRenderWorld` or it won't draw anything.
+---@param position1 Vector  # in world coordinates
+---@param position2 Vector  # in world coordinates
+---@param color Color
+---@param thickness? number
+function UI_DrawLine(position1, position2, color, thickness)
+
+  -- Introduced by an assembly function, see also:
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/47
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
+  -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
+
+end
+
+--- Draws a line in world. Must be called within `WorldView:OnRenderWorld`
+---@param position1 Vector
+---@param position2 Vector
+---@param color Color
+---@param thickness? number
+function UI_DrawLine(position1, position2, color, thickness)
 end
 
 ---

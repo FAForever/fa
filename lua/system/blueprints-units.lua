@@ -597,6 +597,22 @@ local function PostProcessUnit(unit)
     if unit.Economy and not unit.Economy.BuildRate then
         unit.Economy.BuildRate = 0
     end
+
+    -- Verify existence of death animations as units will get stuck in the default `DeathThread` otherwise
+    local deathAnimationTables = unit.Display.AnimationDeath
+    if deathAnimationTables then
+        for i, animationTable in deathAnimationTables do
+            local animationPath = animationTable.Animation
+            if animationPath and not DiskGetFileInfo(animationPath) then
+                WARN(string.format('Unit "%s": Could not find death animation at path: "%s" \nRemoving the animation so that the unit does not get stuck dying!', tostring(unit.BlueprintId), tostring(animationPath)))
+
+                unit.Display.AnimationDeath[i] = nil
+            end
+        end
+        if table.empty(deathAnimationTables) then
+            unit.Display.AnimationDeath = nil
+        end
+    end
 end
 
 --- Feature: re-apply the ability to land on water

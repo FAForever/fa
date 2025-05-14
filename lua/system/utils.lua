@@ -63,7 +63,7 @@ if not rawget(table, 'empty') then
     -- - https://github.com/FAForever/FA-Binary-Patches/pull/98
 
     --- table.empty(t) returns true iff t has no keys/values.
-    ---@param t table
+    ---@param t? table
     ---@return boolean
     function table.empty(t)
         if type(t) ~= 'table' then return true end

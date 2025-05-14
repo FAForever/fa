@@ -1,1 +1,0 @@
-- (#6578) Fix Megalith's `GetCommandQueue` returning a hidden factory rally point queue instead of the Megalith's command queue.

@@ -155,7 +155,7 @@ Control = ClassUI(moho.control_methods) {
     ScrollSetTop = function(self, axis, top)
     end,
 
-    --- Called to determine if the control is scrollable on a particular access. Must return true or false.
+    --- Called to determine if the control is scrollable on a particular axis. Must return true or false.
     ---@param self Control
     ---@param axis ScrollAxis
     ---@return boolean

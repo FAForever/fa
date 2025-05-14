@@ -23,12 +23,44 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
+            # include all shell scripts used for testing
             *.sh
-            *.lua
-            *.bp
+
+            # include all Lua files that we ship
+            env/**/*.lua
+            meshes/**/*.lua
+            projectiles/**/*.lua
+            schook/**/*.lua
+            effects/**/*.lua
+            units/**/*.lua
+            loc/**/*.lua
+            etc/**/*.lua
+            lua/**/*.lua
+            textures/**/*.lua
+
+            # include all init files
+            init_faf.lua
+            init_fafdevelop.lua
+            init_fafbeta.lua
+            init_shared.lua
+            init.lua
+            init_local_development.lua
+            mod_info.lua
+            SupComDataPath.lua
+
+            # Include all blueprint files that we ship
+            env/**/*.bp
+            meshes/**/*.bp
+            projectiles/**/*.bp
+            schook/**/*.bp
+            units/**/*.bp
+            effects/**/*.bp
       - name: Check Lua syntax
-        run: "bash ./tests/run-syntax-test.sh"
+        run: | 
+          bash ./tests/run-syntax-test.sh
+
   testUtils:
     name: Utility tests
     needs: [syntax]

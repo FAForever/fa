@@ -39,8 +39,6 @@ ProjectileBlueprint{
     Physics = {
         Acceleration = 0,
         DestroyOnWater = false,
-        FragmentId = "/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp",
-        Fragments = 2,
         Lifetime = 30,
         MaxSpeed = 20,
         RealisticOrdinance = false,

@@ -18,4 +18,5 @@
 
 ## Checklist
 - [ ] Changes are annotated, including comments where useful
-- [ ] Changes are documented in the changelog for the next game version
+- [ ] Changes are documented in a changelog snippet according to the [guidelines](https://faforever.github.io/fa/development/changelog#format-of-a-snippet).
+- [ ] Request 2-3 reviewers from the [list of reviewers and their areas of knowledge](https://github.com/FAForever/fa/blob/deploy/fafdevelop/CONTRIBUTING.md#reviewers).

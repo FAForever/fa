@@ -324,6 +324,17 @@ function EnumerateSkirmishScenarios(nameFilter, sortFunc)
             table.insert(scenarios, scen)
         end
     end
+    
+    for id, mod in import("/lua/mods.lua").AllSelectableMods() do
+        scenFiles = DiskFindFiles(mod.location .. '/maps', nameFilter .. '_scenario.lua')
+        for index, fileName in scenFiles do
+            local scen = LoadScenario(fileName)
+            if IsScenarioPlayable(scen) and scen.type == "skirmish" then
+                table.insert(scenarios, scen)
+            end
+        end
+    end
+
 
     -- sort based on name
     table.sort(scenarios, function(a, b) return sortFunc(a.name, b.name) end)

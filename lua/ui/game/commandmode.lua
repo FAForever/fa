@@ -14,7 +14,6 @@ local watchForQueueChange = import("/lua/ui/game/construction.lua").watchForQueu
 local checkBadClean = import("/lua/ui/game/construction.lua").checkBadClean
 local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
-local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
 local RadialDragger = import("/lua/ui/controls/draggers/radial.lua").RadialDragger
 
@@ -93,7 +92,12 @@ local MathAtan = math.atan
 -- during command mode (e.g., when you do a move order it turns your cursor into
 -- the blue move marker). This is fixed by reloading the game.
 
----@alias CommandMode 'order' | 'build' | 'buildanchored' | false
+---@alias CommandMode
+---| 'order' 
+---| 'build' 
+---| 'buildanchored' 
+---| 'ping' # Does not issue commands or get canceled by right click. Basically passes data from `StartCommandMode` to `EndCommandMode`.
+---| false
 
 ---@class CommandModeDataBase
 ---@field cursor? CommandCap        # Similar to the field 'name'
@@ -106,7 +110,12 @@ local MathAtan = math.atan
 ---@class CommandModeDataBuild : CommandModeDataBase
 ---@field name string # blueprint id of the unit being built
 
+--- Like 'build' mode but can only place structures within `MaxBuildDistance` of all selected units.
+--- Shows the distance as a range ring which jitters while the unit moves due to not using interpolated position.
+--- This distance does not represent the actual maximum build range (which adds builder footprint and target skirt).
+--- Not recommended for use.
 ---@class CommandModeDataBuildAnchored : CommandModeDataBase
+---@field name string # blueprint id of the unit being built
 
 ---@class CommandModeDataOrderScript : CommandModeDataOrder
 ---@field TaskName string
@@ -184,7 +193,7 @@ function StartCommandMode(newCommandMode, data)
 end
 
 --- Called when the command mode ends and deconstructs all the data.
----@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
+---@param isCancel boolean # set when we're at the end of (a sequence of) order(s), is usually always true. False when the mode is ended with right click, except for "ping" mode.
 function EndCommandMode(isCancel)
     if ignoreSelection then
         return
@@ -351,22 +360,31 @@ local function UpgradeUnit(unit)
         return
     end
 
+    -- verify build restrictions ui-side so sim doesn't log a warning
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandDataOfUnit(unit)
+    local unitUpgrade = unit:GetBlueprint().General.UpgradesTo
+    if not unitUpgrade or not EntityCategoryContains(buildableCategories, unitUpgrade) then
+        return
+    end
+
     -- issue the upgrade
     IssueBlueprintCommandToUnit(
         unit, "UNITCOMMAND_Upgrade",
-        unit:GetBlueprint().General.UpgradesTo,
+        unitUpgrade,
         1, true
     )
 
     -- inform the user
     print("Upgrade unit")
 
-    -- pause it
-    WaitTicks(5)
+    -- wait one tick for the upgrade to start
+    WaitTicks(1)
+
     if IsDestroyed(unit) then
         return
     end
 
+    -- pause the unit (again)
     SetPaused(units, true)
 end
 
@@ -383,6 +401,7 @@ local function OnGuardUpgrade(guardees, unit)
         EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH1, unit)
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 
     if upgradeRadarTech2 and
@@ -390,6 +409,7 @@ local function OnGuardUpgrade(guardees, unit)
         unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 
     -- check for mass extractors
@@ -400,6 +420,7 @@ local function OnGuardUpgrade(guardees, unit)
         EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * categories.TECH1, unit)
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 
     if upgradeExtractorTech2 and
@@ -407,6 +428,7 @@ local function OnGuardUpgrade(guardees, unit)
         unitBlueprint.Economy.ProductionPerSecondMass < unit:GetEconData().massProduced -- check for any adjacency
     then
         ForkThread(UpgradeUnit, unit)
+        return
     end
 end
 
@@ -603,24 +625,8 @@ end
 local function OnScriptIssued(command)
     if command.LuaParams then
         if command.LuaParams.TaskName == 'AttackMove' then
-            local avgPoint = { 0, 0 }
-            for _, unit in command.Units do
-                avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
-                avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
-            end
-            avgPoint[1] = avgPoint[1] / TableGetN(command.Units)
-            avgPoint[2] = avgPoint[2] / TableGetN(command.Units)
-
-            avgPoint[1] = command.Target.Position[1] - avgPoint[1]
-            avgPoint[2] = command.Target.Position[3] - avgPoint[2]
-
-            local rotation = MathAtan(avgPoint[1] / avgPoint[2])
-            rotation = rotation * 180 / MathPi
-            if avgPoint[2] < 0 then
-                rotation = rotation + 180
-            end
-            local cb = { Func = "AttackMove", Args = { Target = command.Target.Position, Rotation = rotation,
-                Clear = command.Clear } }
+            ---@type SimCallback
+            local cb = { Func = "AttackMove", Args = { Clear = command.Clear } }
             SimCallback(cb, true)
         elseif command.LuaParams.Enhancement then
             EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
