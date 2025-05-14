@@ -5,7 +5,7 @@ UnitBlueprint{
         GuardReturnRadius = 30,
         RefuelingMultiplier = 50,
         RefuelingRepairAmount = 500,
-        RepairConsumeEnergy = 30,
+        RepairConsumeEnergy = 0,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
