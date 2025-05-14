@@ -1031,7 +1031,7 @@ end
 ---@param button3Text? UnlocalizedString text for the first button
 ---@param button3Callback fun() | nil callback function for the first button
 ---@param destroyOnCallback? boolean if true, the popup is closed when a button with a callback is pressed (if false, you must destroy); defaults to `true` when all three callback functions are supplied and `false` otherwise
----@param modalInfo ModalityInfo Sets up modality info for dialog
+---@param modalInfo? ModalityInfo Sets up modality info for dialog
 ---@return Popup
 function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, button3Text, button3Callback, destroyOnCallback, modalInfo)
     -- if there is a callback and destroy not specified, assume destroy
