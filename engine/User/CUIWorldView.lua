@@ -50,9 +50,6 @@ end
 function CUIWorldView:GetRightMouseButtonOrder()
 end
 
-local wv = import('/lua/ui/game/worldview.lua').GetTopmostWorldViewAt(unpack(GetMouseScreenPos()))
-LOG(wv:GetRightMouseButtonOrder())
-
 --- Translates the world position of the unit to screen space.
 ---@param unit Unit
 ---@return Vector2 | nil
