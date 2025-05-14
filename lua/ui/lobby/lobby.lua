@@ -2392,7 +2392,7 @@ local function UpdateGame()
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed
                     else
-                        WARN("Unable to load icons from mod '" .. tostring(mod.name) .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN("Unable to load icons from mod '" .. tostring(mod.name) .. "' with uid '" .. tostring(uid) .. "'. Please inform the author: " .. tostring(mod.author))
                         WARN(msg)
                     end
                 end
