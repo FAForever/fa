@@ -229,7 +229,7 @@ local orderToCursorCallback = {
 ---@field _registered boolean       # Flag that indicates if this world view is registered with the world view manager.
 ---@field Cursor table
 ---@field CursorTrash TrashBag
----@field CursorLastEvent any
+---@field CursorLastEvent CommandCap | 'MESSAGE' # Corresponds to keys in `orderToCursorCallback`
 ---@field CursorLastIdentifier CommandCap
 ---@field CursorOverride CommandCap
 ---@field CursorDecalTrash TrashBag | UserDecal[]
