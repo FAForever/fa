@@ -1,20 +1,19 @@
 ---@class UIBuildTemplateBuilding
----@field [1] string unit id
----@field [2] number build order
----@field [3] number position x
----@field [4] number position z
+---@field [1] UnitId
+---@field [2] integer # build order
+---@field [3] integer # position x
+---@field [4] integer # position z
 
 ---@class UIBuildTemplate
----@field [1] number        # width that is used when drag building the template
----@field [2] number        # height that is used when drag building the template
+---@field [1] integer        # width that is used when drag building the template
+---@field [2] integer        # height that is used when drag building the template
 ---@field [3] UIBuildTemplateBuilding
 --@field [...] UIBuildTemplateBuilding
 
 ---@class UIBuildTemplateData
----@field templateData table
+---@field templateData UIBuildTemplate
 ---@field name string
----@field icon string unit id
-
+---@field icon UnitId
 
 local Prefs = import("/lua/user/prefs.lua")
 
