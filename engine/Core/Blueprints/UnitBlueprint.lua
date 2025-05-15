@@ -1081,7 +1081,7 @@
 ---@field SpoofRadius { Max: number, Min: number }
 --- used by XSL0101 (Selen) to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
---- how far the unit can see above water and land
+--- how far the unit can see above water and land. Defaults to 10.
 ---@field VisionRadius number
 --- used by XSA0101 (Seraphim T1 air scout) to set its vision radius when it crashes
 ---@field VisionRadiusOnDeath? number
