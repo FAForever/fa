@@ -603,16 +603,16 @@ end
 
 --- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet UserUnit[]
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
 --- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unit UserUnit
----@return string[] orders
----@return CommandCap[] availableToggles
+---@return EngineCommandCap[] orders
+---@return EngineToggleCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandDataOfUnit(unit)
 end
