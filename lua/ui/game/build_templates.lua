@@ -6,11 +6,71 @@
 ----------------------------------------------------------------------------
 
 local Prefs = import("/lua/user/prefs.lua")
-local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
 local UIUtil = import("/lua/ui/uiutil.lua")
 
-local function TemplateAxisOffset(unitbp, axe)
-    return (math.mod(math.ceil(unitbp.Footprint and unitbp.Footprint[axe] or unitbp[axe] or 1), 2) == 1 and 0 or 0.5)
+---@type UIBuildTemplateData
+local templates = Prefs.GetFromCurrentProfile('build_templates') or {}
+
+---@param template UIBuildTemplate
+---@return string
+function GetInitialName(template)
+    for _, entry in template do
+        if type(entry) ~= 'table' then continue end
+        return (string.gsub(__blueprints[entry[1]].Description, '^<[^>]*>', '')) -- removes <LOC xyz_desc> from name
+    end
+end
+
+---@param template UIBuildTemplate
+---@return 'default' | UnitId
+function GetInitialIcon(template)
+    for _, entry in template do
+        if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds' --[[@as FileName]], true) then
+            return entry[1] -- Original or modded unit found
+        end
+    end
+    return 'default' -- If we don't find a valid IconName; return string 'default'
+end
+
+---@param newTemplate UIBuildTemplate
+function AddTemplate(newTemplate)
+    table.insert(templates, {templateData = newTemplate, name = GetInitialName(newTemplate), icon = GetInitialIcon(newTemplate)})
+    Prefs.SetToCurrentProfile('build_templates', templates)
+end
+
+--- Gets an offset to add to template positions to center templates with units
+--- that have odd-numbered footprint sizes, such as walls and SMD.
+---@param unitbp UnitBlueprint
+---@param axis 'SizeX' | 'SizeZ'
+---@return number # 0 or 0.5
+local function TemplateAxisOffset(unitbp, axis)
+    return (math.mod(
+        math.ceil(
+            unitbp.Footprint and unitbp.Footprint[axis]
+            or unitbp[axis]
+            or 1
+        )
+        , 2
+        ) == 1 and 0
+        or 0.5
+    )
+end
+
+--- Centers the given template
+---@param template UIBuildTemplate
+---@return UIBuildTemplate centeredTemplate
+function CenterTemplate(template)
+    local centeredTemplate = { template[1], template[2] }
+    local bp1 = __blueprints[ template[3][1] ] --[[@as UnitBlueprint]]
+    local bp1Xoffset = TemplateAxisOffset(bp1, 'SizeX')
+    local bp1Yoffset = TemplateAxisOffset(bp1, 'SizeZ')
+    if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
+        for i = 3, table.getn(template) do
+            local nextbp = template[i]
+            nextbp[3] = nextbp[3] + bp1Xoffset
+            nextbp[4] = nextbp[4] + bp1Yoffset
+        end
+    end
+    return centeredTemplate
 end
 
 function CreateBuildTemplate()
@@ -18,14 +78,14 @@ function CreateBuildTemplate()
     local template = GetActiveBuildTemplate()
     ClearBuildTemplates()
     if next(template) then
-        local str1bp = __blueprints[ template[3][1] ]
-        local s1Xoffset = TemplateAxisOffset(str1bp, 'SizeX')
-        local s1Yoffset = TemplateAxisOffset(str1bp, 'SizeZ')
-        if s1Xoffset ~= 0 or s1Yoffset ~= 0 then
-            for i=3, table.getn(template) do
-                local str = template[i]
-                str[3] = str[3] + s1Xoffset
-                str[4] = str[4] + s1Yoffset
+        local bp1 = __blueprints[ template[3][1] ] --[[@as UnitBlueprint]]
+        local bp1Xoffset = TemplateAxisOffset(bp1, 'SizeX')
+        local bp1Yoffset = TemplateAxisOffset(bp1, 'SizeZ')
+        if bp1Xoffset ~= 0 or bp1Yoffset ~= 0 then
+            for i = 3, table.getn(template) do
+                local nextbp = template[i]
+                nextbp[3] = nextbp[3] + bp1Xoffset
+                nextbp[4] = nextbp[4] + bp1Yoffset
             end
         end
         AddTemplate(template)
@@ -43,27 +103,6 @@ function ReceiveTemplate(sender, msg)
         import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC template_0000>Build Template Received'), tab, LOCF('<LOC template_0001>From %s', sender))
     end
     AddTemplate(msg.data)
-end
-
-function GetInitialName(template)
-    for _, entry in template do
-        if type(entry) ~= 'table' then continue end
-        return (string.gsub(__blueprints[entry[1]].Description, '^<[^>]*>', '')) -- removes <LOC xyz_desc> from name
-    end
-end
-
-function GetInitialIcon(template)
-    for _, entry in template do
-        if type(entry) == 'table' and UIUtil.UIFile('/icons/units/' .. entry[1] .. '_icon.dds', true) then
-            return entry[1] -- Original or modded unit found
-        end
-    end
-    return 'default' -- If we don't find a valid IconName; return string 'default'
-end
-
-function AddTemplate(newTemplate)
-    table.insert(templates, {templateData = newTemplate, name = GetInitialName(newTemplate), icon = GetInitialIcon(newTemplate)})
-    Prefs.SetToCurrentProfile('build_templates', templates)
 end
 
 function GetTemplates()

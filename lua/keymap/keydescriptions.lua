@@ -580,4 +580,5 @@ keyDescriptions = {
     ['create_build_template_16'] = '<LOC key_desc_create_build_template_02>Create a 16x16 chunk template',
     ['create_build_template_32'] = '<LOC key_desc_create_build_template_02>Create a 32x32 chunk template',
 
+    ['temporary_template_use_or_create'] = 'Save a temporary template from the current selection or use the saved temporary template.',
 }
