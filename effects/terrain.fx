@@ -2116,7 +2116,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 //  ----            ---             ---             ---              ---              ---         ---              ---         ---
 // | U  | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | 
 //  ----            ---             ---             ---              ---              ---         ---              ---         ---
-// | S7 | amb. occl.    shadow          shadow (copy)  water depth     | normal.z (copy)  normal.z    normal.z (copy)  normal.x  |
+// | S7 | water depth   AO              AO (copy)      shadow          | normal.z (copy)  normal.z    normal.z (copy)  normal.x  |
 // | S6 | R             G               B              unused          | X                Y           Z                unused    |
 // | S5 | R             G               B              unused          | X                Y           Z                unused    |
 // | S4 | R             G               B              unused          | X                Y           Z                unused    |
@@ -2233,15 +2233,6 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
         mask1 = saturate(mask1 * 2 - 1);
     }
 
-    float4 terrainInfo = tex2D(Stratum7AlbedoSampler, coordinates.xy);
-    float terrainShadow = terrainInfo.g;
-    float waterDepth = terrainInfo.a;
-
-    // disable shadows when game settings tell us to
-    if (ShadowsEnabled == 0) {
-        terrainShadow = 1.0f;
-    }
-
     float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    coordinates * LowerAlbedoTile);
     float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, coordinates * Stratum0AlbedoTile);
     float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, coordinates * Stratum1AlbedoTile);
@@ -2262,9 +2253,17 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
-    // compute the shadows, combining the baked and dynamic shadows
-    float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * terrainShadow;
+
+    float shadow = 1;
+    float ambientOcclusion = 1;
+    if (ShadowsEnabled == 1) {
+        shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+    }
+    if (ShaderUsesTerrainInfoTexture()) {
+        float4 terrainInfo = tex2D(Stratum7AlbedoSampler, coordinates.xy);
+        shadow *= terrainInfo.a;
+        ambientOcclusion = terrainInfo.g;
+    }
 
     // normalize the pre-computed normal
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
@@ -2275,10 +2274,11 @@ float4 Terrain000AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 
     float dotSunNormal = dot(SunDirection, normal);
 
-    float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
+    float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience * ambientOcclusion;
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
+    float waterDepth = tex2D(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
     albedo.rgb = ApplyWaterColor(-inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
@@ -2960,10 +2960,11 @@ technique Terrain152B <
 // Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
 // Consequently the normal map scales are controlled by the albedo scales except on the lower layer.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
-// SpecularColor.r is used to control the blurriness of the texture splatting
-// Every second stratum is rotated by 30 degrees to help break up texture repetion by loading the same texture into two adjacent slots.
-// The better texture splatting allows this, traditional lerping would just produce mushed results if attempting this. That's why the
-// previous shaders don't use this.
+// SpecularColor.r is used to control the blurriness of the texture splatting.
+// SpecularColor.g is used to increase the contrast of the height texture that controls the splatting.
+// Every second stratum can be rotated to help break up texture repetion by loading the same texture into two adjacent slots.
+// The better texture splatting allows this, traditional lerping would just produce mushed results if attempting this. That's
+// why the previous shaders don't use this.
 
 float4 Terrain200NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
