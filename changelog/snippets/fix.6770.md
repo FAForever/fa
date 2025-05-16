@@ -1,0 +1,1 @@
+- (#6770) Fix the TTerrainXPExt shader (and Terrain000 and Terrain050) that were using the terrain info texture incorrectly.
