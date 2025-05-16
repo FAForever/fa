@@ -23,7 +23,7 @@ The deployment procedure can be a lengthy process because it involves various st
 
 The deployment of engine patches to the release branch is a manual process. This is intentional from a security perspective - it provides a second pair of eyes from a server administrator who is usually not directly related to the game team.
 
-- (1) Make sure that any open changes that you want to include are merged to the `staging/faf` branch of the [Binary patches](https://github.com/FAForever/FA-Binary-Patches) repository.
+- (1) Make sure that any open changes that you want to include are merged to the `master` branch of the [Binary patches](https://github.com/FAForever/FA-Binary-Patches) repository.
 - (2) Update the executable of the `FAF Develop` and `FAF Beta Balance` game types using the [Upload workflow](https://github.com/FAForever/FA-Binary-Patches/actions).
 
 The workflow requires an approval of another maintainer. Once approved, wait for the workflow to finish.
