@@ -1,0 +1,1 @@
+Small hot fix for Traditional Chinese script.
