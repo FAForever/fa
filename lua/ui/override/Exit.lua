@@ -6,9 +6,14 @@ local GlobalRestartSession = _G.RestartSession
 
 local OnExitCallbacks = { }
 
+---@alias ExitType
+---| 'ExitGame'
+---| 'ExitApplication'
+---| 'RestartSession'
+
 --- Add a callback to be run when the game exits gracefully
 ---@param identifier string
----@param callback function
+---@param callback fun(exitType: ExitType)
 function AddOnExitCallback(identifier, callback)
     OnExitCallbacks[identifier] = callback
 end
@@ -20,6 +25,7 @@ function RemoveOnExitCallback(identifier)
 end
 
 --- Run all on exit callbacks
+---@param type ExitType
 local function RunOnExitCallbacks(type)
     for k, callback in OnExitCallbacks do
         local ok, msg = pcall(callback, type)
