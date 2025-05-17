@@ -141,7 +141,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
-        if unitBeingBuilt:GetFractionComplete() < 1 then
+        if not IsDestroyed(unitBeingBuilt) and not unitBeingBuilt.isFinishedUnit then
             unitBeingBuilt:Destroy()
         end
 
@@ -199,10 +199,17 @@ FactoryUnit = ClassUnit(StructureUnit) {
         self:CreateBlinkingLights()
     end,
 
+    --- Called by the engine when the current *build* order (not repair order) is cancelled.
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
-        -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
-        self.UnitBeingBuilt:SetCollisionShape('None')
+        -- When a factory has a queue and you cancel the currently building unit, this unit
+        -- needs to have its collision removed so that the next unit can start building immediately,
+        -- since destroying the unit doesn't immediately clear the build area.
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if not IsDestroyed(unitBeingBuilt) then
+            ---@diagnostic disable-next-line: need-check-nil
+            unitBeingBuilt:SetCollisionShape('None')
+        end
         StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
