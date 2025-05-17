@@ -21,22 +21,12 @@
 name: Convert Markdown changelog to Lua
 
 on:
+  push:
   workflow_dispatch:
-    inputs:
-      reference:
-        required: true
-        type: choice
-        description: The reference (branch or tag) to use to compile the changelog snippets from
-        options:
-          - develop
-          - deploy/fafbeta
-          - deploy/fafdevelop
-
   workflow_call:
     inputs:
-      reference:
-        required: true
-        type: string
+      artifact:
+        type: string # fafdevelop or fafbeta
         description: The reference (branch or tag) to use to compile the changelog snippets from
 
 jobs:
@@ -54,6 +44,23 @@ jobs:
           sparse-checkout: |
             ${{ env.SCRIPTS }}
             changelog
+            docs
+
+      - name: Download develop artifact
+        if: inputs.artifact == 'fafdevelop'
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: docs/_posts
+          merge-multiple: true
+
+      - name: Download balance artifact
+        if: inputs.artifact == 'fafbeta'
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: docs/_posts
+          merge-multiple: true
 
       - name: Setup python
         uses: actions/setup-python@v5
@@ -68,11 +75,14 @@ jobs:
       - name: Convert changelog to Lua
         run: |
           out_dir=lua_changelog
-          mkdir $out_dir
-          for file in changelog/*.md; do
-            out_file=$(basename ${file%.md}.lua)
-            python3 $SCRIPTS/changelog_markdown2lua.py "${file}" "${out_dir}/${out_file}"
-          done
+          mkdir -p $out_dir
+          python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
+
+      - name: Create changelog overview in Lua
+        run: |
+          out_dir=lua_changelog
+          mkdir -p $out_dir
+          python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
 
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
