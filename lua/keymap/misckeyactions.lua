@@ -693,3 +693,18 @@ SelectCommander = function(zoomTo)
         UIZoomTo(selectedUnits, 0)
     end
 end
+
+function TestCameraAngle1(zoom)
+
+    -- camera in bottom right corner of Seton's Clutch
+
+    ConExecute("sc_VerticalSync 0")
+    ConExecute("cam_free 0")
+    ConExecute("sc_FrameTimeClamp 1")
+
+    local camera = GetCamera("WorldCamera")
+    local settings = camera:SaveSettings()
+    settings.Focus = Vector(230, 26, 860)
+    settings.Zoom = zoom
+    camera:RestoreSettings(settings)
+end

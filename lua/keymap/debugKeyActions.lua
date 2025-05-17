@@ -309,6 +309,27 @@ local keyActionsDebugAI = {
         action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(32)',
         category = 'ai'
     },
+
+    ['test_camera_angle_01'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(370)',
+        category = 'debug'
+    },
+    ['test_camera_angle_02'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(470)',
+        category = 'debug'
+    },
+    ['test_camera_angle_03'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(570)',
+        category = 'debug'
+    },
+    ['test_camera_angle_04'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(670)',
+        category = 'debug'
+    },
+    ['test_camera_angle_05'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TestCameraAngle1(770)',
+        category = 'debug'
+    },
 }
 
 ---@type table<string, UIKeyAction>
