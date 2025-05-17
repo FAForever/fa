@@ -576,7 +576,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         local selfIndex = self:GetArmyIndex()
         UpdateUnitCap(selfIndex)
-        OnArmyDefeat(selfIndex)
+        SimPingOnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == "AI" then
