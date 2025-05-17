@@ -23,7 +23,7 @@ ProjectileBlueprint{
         Acceleration = -1.25,
         DestroyOnWater = true,
         LifeTime = 3,
-        MaxSpeed = 15,
+        MaxSpeed = false,
         MaxZigZag = 10,
         TrackTarget = false,
         TurnRate = 0,
