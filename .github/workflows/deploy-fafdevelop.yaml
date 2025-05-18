@@ -35,9 +35,23 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
+
+  changelog:
+    name: Create changelog of FAF Develop
+    uses: ./.github/workflows/docs-changelog.yaml
+    with:
+      reference: staging/fafdevelop
+
+  changelog-lua:
+    name: Convert changelogs to Lua
+    needs: [changelog]
+    uses: ./.github/workflows/docs-convert-changelog.yaml
+    with:
+      artifact: fafdevelop
+
   update:
     name: Update FAF Develop
-    needs: [test]
+    needs: [test, changelog-lua]
     runs-on: ubuntu-latest
     steps:
       # https://github.com/actions/checkout/tree/v4/
@@ -45,8 +59,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-          repository: FAForever/fa
           ref: staging/fafdevelop
+
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
@@ -58,6 +77,12 @@ jobs:
           # debugging
           cat lua/version.lua
 
+      - name: Commit embedding version information
+        continue-on-error: true
+        run: |
+          git stage .
+          git commit -m "Embed version information"
+
       # Disable debugging statements
       #
       # You can overwrite these adjustments by setting up a `Debug` folder
@@ -68,16 +93,33 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      # Create a commit with the changes of the workflow in it
-      - name: Create a commit
+      - name: Commit the update to debug references
+        continue-on-error: true
         run: |
-          # Configure git
-          git config user.email "github@faforever.com"
-          git config user.name "FAForever Machine User"
+          git stage .
+          git commit -m "Update debug references"
 
-          git add .
-          git commit -m "Post-process deployment"
+      # Retrieve the generated changelogs
+      - name: Download lua changelogs
+        uses: actions/download-artifact@v4
+        with:
+          name: lua_changelog
+          path: lua/ui/lobby/changelog/generated
 
+      - name: Commit the new changelogs
+        continue-on-error: true
+        run: |
+          git status
+          git stage .
+          git commit -m "Add changelogs"
+
+      - name: Add the changelog as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lua
+          path: |
+            lua/ui/lobby
+    
       # Update the deploy/fafdevelop branch, we force push here because
       # we're not interested in fixing conflicts
       - name: Update deploy/fafdevelop

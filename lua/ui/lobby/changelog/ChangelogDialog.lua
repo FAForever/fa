@@ -1,3 +1,25 @@
+--******************************************************************************************************
+--** Copyright (c) 2024 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
@@ -7,35 +29,38 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-local data = import("/lua/ui/lobby/changelogdata.lua")
+local ChangelogOverview = import("/lua/ui/lobby/changelog/generated/overview.lua")
 
---- Test if we should display the changelog of the new game version.
----@return boolean
-function OpenChangelog()
-    local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-    return LastChangelogVersion < data.last_version
-end
+local PreferenceKeys = {
+    GameVersion = "ChangelogGameVersion",
+}
+
+---@class UIChangelogOverview
+---@field Changelogs UIChangelogMetadata[]
+
+---@class UIChangelogMetadata
+---@field Version string
+---@field Path string
+---@field URL string
+---@field Name string
+
+---@class UIChangelogData
+---@field Version string
+---@field Name string
+---@field Description string[]
+
+--- A set of preference keys that are used.
+PreferenceKeys = {
+    GameVersion = "ChangelogGameVersion",
+}
 
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false
 
---- A bit of a hack, but allows us to keep track of whether the changelog is open or not. The lobby
--- is (almost aggressively) trying to keep control of the keyboard on the chat box to prevent hotkeys
--- from working :sad:
-isOpen = false
+---@type TrashBag
+local ModuleTrash = TrashBag()
 
----@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
-
----@class PatchNotes
----@field version number | string       # Patch version
----@field hasPrettyGithubRelease boolean  # URL to the release on Github
----@field name PatchNotesType           # Patch type
----@field hasPrettyPatchnotes boolean   # Refers to patchnotes.faforever.com, defaults to false
----@field descriptionFR string[]        # French translation
----@field descriptionRU string[]        # Russian translation
----@field description string[]          # Default changelog in English
-
----@class UIChangelog : Group
+---@class UIChangelogDialog : Group
 ---@field Debug Group
 ---@field CommonUI Group
 ---@field Border Border
@@ -48,8 +73,7 @@ isOpen = false
 ---@field HeaderSubtitle Text
 ---@field Footer Group
 ---@field FooterDebug Bitmap
----@field FooterGithubButton Button
----@field FooterPatchNotesButton Button
+---@field FooterOnlineButton Button
 ---@field FooterDiscordButton Button
 ---@field Content Group
 ---@field ContentDebug Bitmap
@@ -59,9 +83,9 @@ isOpen = false
 ---@field ContentPatchesDebug Bitmap
 ---@field ContentDivider Bitmap
 ---@field ContentPatchesList ItemList
-Changelog = ClassUI(Group) {
+local ChangelogDialog = ClassUI(Group) {
 
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -73,7 +97,6 @@ Changelog = ClassUI(Group) {
 
         -- allow us to use escape to quickly get out
 
-        isOpen = true
         EscapeHandler.PushEscapeHandler(
             function()
                 self:Close()
@@ -145,11 +168,11 @@ Changelog = ClassUI(Group) {
         self.FooterDebug:SetSolidColor("ff00ff00")
         LayoutHelpers.FillParent(self.FooterDebug, self.Footer)
 
-        self.FooterGithubButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0004>Github")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterGithubButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterGithubButton, self.Footer, 5)
-        self.FooterGithubButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
-        self.FooterGithubButton.OnClick = function()
+        self.FooterOnlineButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Online")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterOnlineButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterOnlineButton, self.Footer, 5)
+        self.FooterOnlineButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
+        self.FooterOnlineButton.OnClick = function()
             OpenURL('http://github.com/FAForever/fa/releases')
         end
 
@@ -245,65 +268,129 @@ Changelog = ClassUI(Group) {
     end,
 
     --- Populates the dialog with the given patch
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     ---@param index number
     PopulateWithPatch = function(self, index)
-        local patch = data.gamePatches[index + 1]
+        ---@type UIChangelogMetadata
+        local changelog = ChangelogOverview.Overview.Changelogs[index + 1]
+
+        ---@type UIChangelogData
+        local patch = import(changelog.Path).Changelog
 
         if patch then
 
-            if patch.hasPrettyGithubRelease then
-                self.FooterGithubButton:Enable()
-                self.FooterGithubButton.OnClick = function()
-                    OpenURL(string.format('http://github.com/FAForever/fa/releases/tag/%d', patch.version))
+            if changelog.URL then
+                self.FooterOnlineButton:Enable()
+                self.FooterOnlineButton.OnClick = function()
+                    OpenURL(changelog.URL)
                 end
             else
-                self.FooterGithubButton:Disable()
-            end
-
-            if patch.hasPrettyPatchnotes then
-                self.FooterPatchNotesButton:Enable()
-                self.FooterPatchNotesButton.OnClick = function()
-                    OpenURL('http://patchnotes.faforever.com')
-                end
-            else
-                self.FooterPatchNotesButton:Disable()
+                self.FooterOnlineButton:Disable()
             end
 
             self.ContentPatchesList:SetSelection(index)
-            self.HeaderSubtitle:SetText(patch.name)
+            self.HeaderSubtitle:SetText(patch.Name or "Unknown name")
             self.ContentNotesList:DeleteAllItems()
 
             local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
-            for k, line in patch[altDescription] or patch.description do
+            for k, line in patch[altDescription] or patch.Description do
                 self.ContentNotesList:AddItem(line)
             end
         else
-            self.FooterGithubButton:Disable()
-            self.FooterPatchNotesButton:Disable()
+            self.FooterOnlineButton:Disable()
         end
     end,
 
     --- Populates the list of patches
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
-        for k, patch in data.gamePatches do
-            self.ContentPatchesList:AddItem(patch.version .. " - " .. patch.name)
+        for _, patch in pairs(ChangelogOverview.Overview.Changelogs) do
+            self.ContentPatchesList:AddItem(patch.Name)
         end
     end,
 
     --- Destroys the dialog
-    ---@param self UIChangelog
+    ---@param self UIChangelogDialog
     Close = function(self)
 
-        -- prevent the dialog from popping up again
-        Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
+        local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
-        isOpen = false
+        -- prevent the dialog from popping up again
+        Prefs.SetToCurrentProfile(PreferenceKeys.GameVersion, version)
+
         EscapeHandler.PopEscapeHandler()
 
         -- go into oblivion
-        self:Destroy()
+        CloseChangelogDialog()
     end,
 }
+
+---@type UIChangelogDialog | false
+ChangelogInstance = false
+
+--- Closes the dialog. Function is idempotent.
+CloseChangelogDialog = function()
+    ModuleTrash:Destroy()
+    ChangelogInstance = false
+end
+
+--- Opens the changelog dialog. Function is idempotent.
+---@param parent Control
+---@return UIChangelogDialog
+CreateChangelogDialog = function(parent)
+    CloseChangelogDialog()
+
+    ---@type UIChangelogDialog
+    ChangelogInstance = ChangelogDialog(parent)
+    ModuleTrash:Add(ChangelogInstance)
+    return ChangelogInstance
+end
+
+--- Returns iff the changelog is open.
+---@return boolean
+IsOpen = function()
+    if not ChangelogInstance then
+        return false
+    end
+
+    if IsDestroyed(ChangelogInstance) then
+        return false
+    end
+
+    return true
+end
+
+--- Returns true iff we should open the changelog.
+---@return boolean
+function ShouldOpenChangelog()
+    local version, gametype, commit = import("/lua/version.lua").GetVersionData()
+
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.GameVersion) or 0
+    return LastChangelogVersion < version
+end
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Called by the module manager when this module becomes dirty
+function __moduleinfo.OnDirty()
+    -- keep track of whether the changelog was open
+    local openAgain = IsOpen()
+
+    -- clear all trash related to the dialog, including the dialog itself
+    CloseChangelogDialog()
+
+    -- if the dialog was open, wait a second and then automatically re-open it
+    if openAgain then
+        ForkThread(
+            function()
+                WaitSeconds(1.0)
+                local module = import(__moduleinfo.name)
+                module.CreateChangelogDialog(GetFrame(0))
+            end
+        )
+    end
+end
+
+--#endregion

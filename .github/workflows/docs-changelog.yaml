@@ -113,11 +113,11 @@ jobs:
         run: |
           echo "${{ github.workspace }}/scripts/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
-      # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
+      # We need to do this to remove the `/` and anything in front of it from the reference. Specifically the `/` is problematic
       - name: Update reference
         run: |
           REFERENCE="${{ inputs.reference }}"
-          NAME="${REFERENCE#deploy/}"
+          NAME="${REFERENCE#*/}"
           echo "NAME=$NAME" >> $GITHUB_ENV
 
       - name: Create the changelog
