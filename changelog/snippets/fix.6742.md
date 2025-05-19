@@ -1,1 +1,0 @@
-- (#6742) Fix an error when shields get damaged and they are assisted only by engineers with other commands queued after the assist order.

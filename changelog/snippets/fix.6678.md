@@ -1,1 +1,0 @@
-- (#6678) Fix being able to bypass unit restrictions in campaign (most commonly through the mex upgrading features).

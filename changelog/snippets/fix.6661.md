@@ -1,1 +1,0 @@
-- (#6661) Fix mass fabricators not updating the mass fab panel's numbers when they are destroyed.
