@@ -1,1 +1,0 @@
-- (#6773) Change all imports to lowercase for performance, and fix intellisense warnings about import names for the same file not matching.

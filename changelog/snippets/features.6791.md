@@ -1,1 +1,0 @@
-- (#6791) Prevent weapons that fire after charging (using `RackSalvoChargeTime` and `RackSalvoFiresAfterCharge`) from charging while not aimed, as they would miss if the charging finished before the weapon finished aiming due to a slow turret turn speed.

@@ -1,1 +1,0 @@
-- (#6794) Change Aeon ACU's personal shield from UEF's blue shield to Aeon's green shield effect.

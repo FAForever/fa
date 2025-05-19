@@ -1,1 +1,0 @@
-- (#6735) Add filter to AI Engineer Manager to stop non engineers being assigned engineer task loop functions. Added filter to stop engineering stations being included in engineer tables of the AI Engineer Manager.

@@ -1,1 +1,0 @@
-- (#6682) Fix pre-allocated table declaration causing syntax errors in intellisense.
