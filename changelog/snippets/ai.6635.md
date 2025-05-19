@@ -1,1 +1,0 @@
-- (#6635) Enable counterintel by default for units created by AIs. This includes Cybran aircraft stealth, Cybran land scout's cloak, and UEF strategic bomber's jamming.
