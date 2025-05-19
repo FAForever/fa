@@ -74,11 +74,7 @@ At this point you need to wait until the `changelog branch` is merged.
 - (2) Use the [Deploy to FAF Workflow](https://github.com/FAForever/fa/actions/workflows/deploy-faf.yaml) to perform the deployment.
 
 The workflow requires an approval of another maintainer. Once approved, wait for the workflow to finish.
-
-- (3) Use the [Update SpookyDB](https://github.com/FAForever/fa/actions/workflows/spookydb-update.yaml) workflow to update [SpookyDB](https://github.com/FAForever/spooky-db)
-- (4) Use the [Update UnitDB](https://github.com/FAForever/fa/actions/workflows/unitdb-update.yaml) workflow to update [UnitDB](https://github.com/FAForever/UnitDB)
-
-Once all this is run you can review the status of the deployment by the server in the [production environment](https://github.com/FAForever/fa/deployments/production). Once that returns green the deployment succeeded and you can inform the community of the deployment. Congratulations!
+You can then review the status of the deployment by the server in the [production environment](https://github.com/FAForever/fa/deployments/production). Once that returns green the deployment succeeded and you can inform the community of the deployment. Congratulations!
 
 ## Deployment procedures for the development game types
 
@@ -108,7 +104,7 @@ Relevant branches for the respective game types:
 
 Staging branches make it easier to:
 
-- **Test individual changes or commits**: Force push the `master` branch to a staging branch, proceed to cherry-pick the desired changes and then trigger the deployment workflow.
+- **Test individual changes or commits**: Force push the `develop` branch to a staging branch, proceed to cherry-pick the desired changes and then trigger the deployment workflow.
 - **Test experimental changes from a pull request**: Force push the branch to a staging branch, then trigger the deployment workflow.
 
 Staging branches are periodically updated automatically to keep them aligned with ongoing development. You can review the schedule by evaluating the [cron expression](https://crontab.cronhub.io/) in the workflow files.
