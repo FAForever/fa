@@ -1039,9 +1039,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             local bp = weapon.Blueprint
             local enablingEnhancement = bp.EnabledByEnhancement
             local rateOfFire = bp.RateOfFire
-            -- Dummy weapons can have 0 fire rate so that the engine never fires them
+            -- Dummy weapons with 0 fire rate shouldn't be disabled
             if rateOfFire > 0
-                -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
+                -- Weapons disabled by enhancement shouldn't be disabled unless the enhancement is built
                 and (not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement))
             then
                 weapon:SetEnabled(false)
