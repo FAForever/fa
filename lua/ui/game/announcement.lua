@@ -13,6 +13,8 @@ local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
+local SmallAnnouncement = import("/lua/ui/game/announcement/SmallAnnouncement.lua").SmallAnnouncement
+
 local MATH_Lerp = MATH_Lerp
 
 local bg = false
@@ -25,13 +27,28 @@ local bg = false
 function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     local frame = GetFrame(0)
 
+    do
+        -- just do nothing
+        LOG(text, goalControl, secondaryText, onFinished)
+
+        ForkThread(
+            function()
+                local announcement = SmallAnnouncement(frame, goalControl, onFinished, text)
+                WaitSeconds(3)
+                announcement:Destroy()
+            end
+        )
+
+        return
+    end
+
     if not goalControl then
         -- make it originate from the top
         goalControl = Group(frame)
         goalControl.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)
         goalControl.Right:Set(function() return frame.Left() + 0.51 * frame.Right() end)
-        goalControl.Top = frame.Top
-        goalControl.Bottom = frame.Top
+        goalControl.Top:Set(function() return frame.Top() end);
+        goalControl.Height:Set(0)
     end
 
     local scoreDlg = import("/lua/ui/dialogs/score.lua")
