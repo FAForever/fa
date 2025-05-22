@@ -309,6 +309,10 @@ local keyActionsDebugAI = {
         action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(32)',
         category = 'ai'
     },
+    ['create_dummy_announcement'] = {
+        action = 'UI_Lua import("/lua/ui/game/announcement.lua").CreateAnnouncement("Test announcement", nil, nil, function() end)',
+        category = 'debug'
+    },
 }
 
 ---@type table<string, UIKeyAction>
