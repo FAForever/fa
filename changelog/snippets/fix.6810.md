@@ -1,0 +1,1 @@
+- (#6810) Fix fullshare not working when a player disconnects in matchmaker games.
