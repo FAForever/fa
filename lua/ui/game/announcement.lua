@@ -35,7 +35,7 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
             function()
                 local announcement = SmallAnnouncement(frame, goalControl, onFinished, text)
                 WaitSeconds(3)
-                announcement:Destroy()
+                announcement:FadeOut(3)
             end
         )
 

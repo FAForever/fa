@@ -15,11 +15,10 @@ SmallAnnouncement = ClassUI(AbstractAnnouncement) {
 
     ---@param self UISmallAnnouncement
     ---@param parent Control
-    ---@param goalControl Control
     ---@param onFinishedCallback fun()
     ---@param text string
-    __init = function(self, parent, goalControl, onFinishedCallback, text)
-        AbstractAnnouncement.__init(self, parent, goalControl, onFinishedCallback)
+    __init = function(self, parent, onFinishedCallback, text)
+        AbstractAnnouncement.__init(self, parent, onFinishedCallback)
 
         self.Title = UIUtil.CreateText(self, text, 22, UIUtil.titleFont)
     end,
