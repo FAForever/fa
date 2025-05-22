@@ -210,6 +210,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             Share = 'FullShare',
             ShareUnitCap = 'allies',
             DisconnectionDelay02 = '90',
+            DisconnectShare = 'SameAsShare',
+            DisconnectShareCommanders = 'Explode',
 
             -- yep, great
             Ranked = true,
