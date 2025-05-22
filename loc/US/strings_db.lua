@@ -7762,6 +7762,15 @@ lobui_0805="This game will be rated if all the criteria for a rated game are met
 lobui_0806="Yes"
 lobui_0807="This game will not be rated."
 
+lobui_0808="Disconnection delay"
+lobui_0809="Sets the disconnect delay when a player has trouble connecting."
+lobui_0810="Tournament"
+lobui_0811="The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically."
+lobui_0812="Quick"
+lobui_0813="The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically."
+lobui_0814="Regular"
+lobui_0815="The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically."
+
 -- On-disconnect share options
 lobui_dc_share_01="DC Share Conditions"
 lobui_dc_share_02="Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU has not been damaged in the last 2 minutes."
