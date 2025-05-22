@@ -343,7 +343,7 @@ AbstractAnnouncement = ClassUI(Group) {
             WaitFrames(1)
         end
 
-        -- make sure animation ends properly even when there are frame drops
+        -- make sure animation completes properly even when there are frame drops
         if state == 'Expand' then
             progress:Set(1)
         else
@@ -356,6 +356,7 @@ AbstractAnnouncement = ClassUI(Group) {
     ---------------------------------------------------------------------------
     --#region Interface to abort 
 
+    --- Aborts the announcement. All animations are stopped. The announcement is turned transparent and then destroyed.
     ---@param self UIAbstractAnnouncement
     AbortAnnouncement = function(self)
         -- make the function idempotent
@@ -369,6 +370,7 @@ AbstractAnnouncement = ClassUI(Group) {
         self.AbortAnimationThreadInstance = self.Trash:Add(ForkThread(self.AbortAnimationThread, self))
     end,
 
+    --- Aborts the announcement by turning it completely transparent. The announcement is destroyed at the end of it.
     ---@param self UIAbstractAnnouncement
     AbortAnimationThread = function(self)
         local alphaContent = self.ContentArea:GetAlpha()
@@ -391,6 +393,7 @@ AbstractAnnouncement = ClassUI(Group) {
         self:Destroy()
     end,
 
+    --- Cancels the animation thread.
     ---@param self UIAbstractAnnouncement
     CancelAnimation = function(self)
         if self.AnimateThreadInstance then
@@ -398,6 +401,7 @@ AbstractAnnouncement = ClassUI(Group) {
         end
     end,
 
+    --- Cancels the animation of the background, stopping it in its tracks.
     ---@param self UIAbstractAnnouncement
     CancelBackgroundAnimation = function(self)
         if self.AnimateBackgroundThreadInstance then
@@ -405,6 +409,7 @@ AbstractAnnouncement = ClassUI(Group) {
         end
     end,
 
+    --- Cancels the animation of the content, stopping it in its tracks. 
     ---@param self UIAbstractAnnouncement
     CancelContentAnimation = function(self)
         if self.AnimateContentThreadInstance then
