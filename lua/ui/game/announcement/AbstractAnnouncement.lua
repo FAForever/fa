@@ -8,182 +8,251 @@ local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local CreateLazyVar = import("/lua/lazyvar.lua").Create
 
----@class UIAbstractAnnouncement : Bitmap, Destroyable
+
+
+---@class UIAbstractAnnouncement : Destroyable, Group
 ---@field Trash TrashBag
----@field GoalControl Control
----@field OnFinishedCallback? fun()
+---@field AnimateThreadInstance? thread
 ---@field FadeThreadInstance? thread
-AbstractAnnouncement = ClassUI(Bitmap) {
+---@field Background Bitmap
+---@field BackgroundBorderTopLeft Bitmap
+---@field BackgroundBorderTop Bitmap
+---@field BackgroundBorderTopRight Bitmap
+---@field BackgroundBorderLeft Bitmap
+---@field BackgroundBorderRight Bitmap
+---@field BackgroundBorderBottomLeft Bitmap
+---@field BackgroundBorderBottom Bitmap
+---@field BackgroundBorderBottomRight Bitmap
+---@field ContentArea Group
+AbstractAnnouncement = ClassUI(Group) {
+
+    -- Announcements works by morphing the background to/from a control. By doing so you give the player an idea
+    -- what the announcement is connected to. The content of the announcement is never moved, only the background
+    -- is. The alpha of the content is adjusted when the announcement arrives and leaves again.
+
+    -- To make it more concrete:
+    -- - The announcement class itself is the content.
+    -- - The background is what we animate.
 
     ---@param self UIAbstractAnnouncement
     ---@param parent Control
-    ---@param onFinishedCallback? fun()
-    __init = function(self, parent, onFinishedCallback)
-        Bitmap.__init(self, parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
+    __init = function(self, parent)
+        Group.__init(self, parent, "Announcement")
 
         self.Trash = TrashBag();
-        self.OnFinishedCallback = onFinishedCallback
 
+        self.ContentArea = Group(self)
+
+        -- background that we animate
+        self.Background = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
+        self.BackgroundBorderTopLeft = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
+        self.BackgroundBorderTop = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
+        self.BackgroundBorderTopRight = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
+        self.BackgroundBorderLeft = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
+        self.BackgroundBorderRight = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
+        self.BackgroundBorderBottomLeft = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
+        self.BackgroundBorderBottom = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
+        self.BackgroundBorderBottomRight = Bitmap(self.Background, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
     end,
 
     ---@param self UIAbstractAnnouncement
     ---@param parent Control
-    ---@param goalControl Control
-    ---@param onFinishedCallback fun()
-    __post_init = function(self, parent, goalControl, onFinishedCallback)
-        -- initial layout
+    __post_init = function(self, parent)
+        local frame = GetFrame(0)
+
+        -- where we expect announcements to be
         LayoutHelpers.LayoutFor(self)
             :Height(0)
             :Width(0)
+            :AtCenterIn(frame, -250)
             :Over(parent, 1)
-            :NeedsFrameUpdate(true)
             :End()
 
-        self:CreateBorder()
+        -- by default, fill the parent
+        LayoutHelpers.LayoutFor(self.ContentArea)
+            :Fill(self)
+            :End()
+
+        -- by default, just fill the parent
+        LayoutHelpers.LayoutFor(self.Background)
+            :Fill(self)
+            :End()
+
+        -- put border around the background
+        LayoutHelpers.Layouter(self.BackgroundBorderTopLeft)
+            :TopLeftOf(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderTop)
+            :CenteredAbove(self.Background)
+            :FillHorizontally(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderTopRight)
+            :TopRightOf(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderLeft)
+            :CenteredLeftOf(self.Background)
+            :FillVertically(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderRight)
+            :CenteredRightOf(self.Background)
+            :FillVertically(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderBottomLeft)
+            :BottomLeftOf(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderBottom)
+            :CenteredBelow(self.Background)
+            :FillHorizontally(self.Background)
+            :End()
+
+        LayoutHelpers.Layouter(self.BackgroundBorderBottomRight)
+            :BottomRightOf(self.Background)
+            :End()
     end,
 
     ---@param self UIAbstractAnnouncement
     OnDestroy = function(self)
         Bitmap.OnDestroy(self)
 
-        if self.OnFinishedCallback then
-            self.OnFinishedCallback()
-        end
+        self.Trash:Destroy()
     end,
 
-    --- Fades out the announcement. Starts the fade out at the current alpha value, scaling the duration accordingly.
     ---@param self UIAbstractAnnouncement
-    ---@param duration number       # in seconds
-    FadeOut = function(self, duration)
-        if self.FadeThreadInstance then
-            self.FadeThreadInstance:Destroy()
-        end
-
-        local from = self:GetAlpha()
-        local scaledDuration = duration * from
-        self.FadeThreadInstance = self.Trash:Add(ForkThread(self.FadeThread, self, scaledDuration, from, 0))
+    ---@param duration number
+    ---@param targetTransparency number
+    AnimateContent = function(self, duration, targetTransparency)
+        local from = self.ContentArea:GetAlpha()
+        self.Trash:Add(ForkThread(self.AnimateContentThread, self, duration, from, targetTransparency))
     end,
 
-    --- Fades in the announcement. Starts the fade out at the current alpha value, scaling the duration accordingly.
     ---@param self UIAbstractAnnouncement
-    ---@param duration number       # in seconds
-    FadeIn = function(self, duration)
-        if self.FadeThreadInstance then
-            self.FadeThreadInstance:Destroy()
-        end
-
-        local from = self:GetAlpha()
-        local scaledDuration = duration * (1 - from)
-        self.FadeThreadInstance = self.Trash:Add(ForkThread(self.FadeThread, self, scaledDuration, from, 1))
-    end,
-
-    --- The thread for fading the announcement.
-    ---@param self UIAbstractAnnouncement
-    ---@param duration number       # in seconds
-    FadeThread = function(self, duration, from, to)
+    ---@param duration number
+    ---@param target number
+    AnimateContentThread = function(self, duration, from, target)
+        -- animate it
         local startTime = GetSystemTimeSeconds()
         local endTime = startTime + duration
         while not IsDestroyed(self) do
-            -- fade over time
             local currentTime = GetSystemTimeSeconds()
-            local progress = (currentTime - startTime) / (endTime - startTime)
-            local alpha = MATH_Lerp(progress, from, to)
-            self:SetAlpha(alpha, true)
-
             if currentTime > endTime then
                 break
             end
+
+            local progress = (currentTime - startTime) / duration
+            local alpha = math.clamp(MATH_Lerp(progress, from, target), 0, 1)
+            self.ContentArea:SetAlpha(alpha, true)
 
             WaitFrames(1)
         end
     end,
 
+    --- Expands the background of the announcement, starting at the provided control towards the center of the screen.
+    ---@param self UIAbstractAnnouncement
+    ---@param control Control
+    ---@param duration number
+    ExpandBackground = function(self, control, duration)
+        self:AnimateBackground(control, duration, 'Expand')
+        PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Open'}))
+    end,
+
+    --- Contracts the background of the announcement, the provided control is the destination to contract to.
+    ---@param self UIAbstractAnnouncement
+    ---@param control Control
+    ---@param duration number
+    ContractBackground = function(self, control, duration)
+        self:AnimateBackground(control, duration, 'Contract')
+        PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Close'}))
+    end,
 
     ---@param self UIAbstractAnnouncement
+    ---@param control Control
     ---@param duration number
-    ---@param originControl Control
-    ---@param targetControl Control
-    ExpandAnimation = function(self, duration, originControl, targetControl)
-        -- animate alpha
-        self:SetAlpha(0)
-        self:FadeIn(duration)
+    ---@param state 'Expand' | 'Contract'
+    AnimateBackground = function(self, control, duration, state)
+        -- do not allow other animations
+        if self.AnimateThreadInstance then
+            self.AnimateThreadInstance:Destroy()
+        end
 
         -- animate position and scale
-        self.Trash:Add(self.ExpandAnimationThread, self, originControl, duration)
+        self.AnimateThreadInstance = self.Trash:Add(ForkThread(self.BackgroundAnimationThread, self, control, duration, state))
     end,
 
-
-
+    --- Expands the background of the announcement, starting at the provided control towards the center of the screen.
     ---@param self UIAbstractAnnouncement
-    ---@param originControl Control
-    ExpandAnimationThread = function(self, originControl, duration)
+    ---@param control Control
+    ---@param duration number
+    ---@param state 'Expand' | 'Contract'
+    BackgroundAnimationThread = function(self, control, duration, state)
+        -- local scope for performance
+        local background = self.Background
+        local content = self.ContentArea
 
-    end,
+        ---@type LazyVar
+        local progress = CreateLazyVar(0)
 
-    -- ContractAnimation = function(self, duration, destinationControl)
-    --     PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Close'}))
-    --     self.Trash:Add(self.ContractAnimationThread, self, destinationControl, duration)
-    -- end,
+        background.Top:Set(
+            function() 
+                local percentage = progress()
+                return percentage * content.Top() + (1 - percentage) * control.Top()
+            end
+        )
 
-    -- ---@param self UIAbstractAnnouncement
-    -- ---@param destinationControl Control
-    -- ContractAnimationThread = function(self, destinationControl, duration)
+        background.Bottom:Set(
+            function() 
+                local percentage = progress()
+                return percentage * content.Bottom() + (1 - percentage) * control.Bottom()
+            end
+        )
 
-    -- end,
+        background.Left:Set(
+            function() 
+                local percentage = progress()
+                return percentage * content.Left() + (1 - percentage) * control.Left()
+            end
+        )
 
-    ---@param self UIAbstractAnnouncement
-    ---@param control Control       # the control where the announcement 'expands' from and 'contracts' to
-    ---@param onFinishedCallback? fun()
-    Animate = function(self, control, onFinishedCallback)
-        local thread = ForkThread(self.AnimateThread, self, control, onFinishedCallback)
-        self.Trash:Add(thread)
-    end,
+        background.Right:Set(
+            function() 
+                local percentage = progress()
+                return percentage * content.Right() + (1 - percentage) * control.Right()
+            end
+        )
 
-    ---@param self UIAbstractAnnouncement
-    ---@param goalControl Control
-    ---@param onFinishedCallback? fun()
-    AnimateThread = function(self, goalControl, onFinishedCallback)
+        -- define width and height by top/bottom and left/right values
+        LayoutHelpers.LayoutFor(background)
+            :ResetWidth()
+            :ResetHeight()
+            :End()
 
-        local expandDuration = 2
-        local contractDuration = 1.5
-        local stationaryDuration = 3
+        -- animate it
+        local startTime = GetSystemTimeSeconds()
+        local endTime = startTime + duration
+        while not IsDestroyed(self) do
+            local currentTime = GetSystemTimeSeconds()
+            if currentTime > endTime then
+                break
+            end
 
-        -- expand animation
-        self:SetAlpha(0, true)
-        self:FadeIn(expandDuration)
-        self:ExpandAnimation(expandDuration, goalControl)
+            -- compute where we are in the animation
+            local percentage = math.clamp((currentTime - startTime) / (endTime - startTime), 0, 1)
+            if state == 'Contract' then
+                percentage = 1 - percentage
+            end
 
-        -- wait for the expand animation to finish
-        WaitSeconds(expandDuration)
+            -- triggers the translation and scaling changes
+            progress:Set(percentage)
 
+            -- update alpha separately
+            background:SetAlpha(percentage, true)
 
-        -- keep the message stationary for a while before contracting
-        WaitSeconds(stationaryDuration)
-
-        self:FadeOut(contractDuration)
-        self:ContractAnimation(contractDuration, goalControl)
-    end,
-
-    --- Creates the border for the announcement control.
-    ---@param self UIAbstractAnnouncement
-    CreateBorder = function(self)
-        local tl = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
-        local tm = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
-        local tr = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
-        local ml = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
-        local mr = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
-        local bl = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
-        local bm = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
-        local br = Bitmap(self, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
-
-        Layouter(tl):TopLeftOf(self):End()
-        Layouter(tm):CenteredAbove(self):FillHorizontally(self):End()
-        Layouter(tr):TopRightOf(self):End()
-        Layouter(ml):CenteredLeftOf(self):FillVertically(self):End()
-        Layouter(mr):CenteredRightOf(self):FillVertically(self):End()
-        Layouter(bl):BottomLeftOf(self):End()
-        Layouter(bm):CenteredBelow(self):FillHorizontally(self):End()
-        Layouter(br):BottomRightOf(self):End()
-    end,
+            WaitFrames(1)
+        end
+    end
 }
-

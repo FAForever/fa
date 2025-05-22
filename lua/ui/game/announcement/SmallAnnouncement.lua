@@ -15,29 +15,33 @@ SmallAnnouncement = ClassUI(AbstractAnnouncement) {
 
     ---@param self UISmallAnnouncement
     ---@param parent Control
-    ---@param onFinishedCallback fun()
     ---@param text string
-    __init = function(self, parent, onFinishedCallback, text)
-        AbstractAnnouncement.__init(self, parent, onFinishedCallback)
+    __init = function(self, parent, text)
+        AbstractAnnouncement.__init(self, parent)
 
-        self.Title = UIUtil.CreateText(self, text, 22, UIUtil.titleFont)
+        self.Title = UIUtil.CreateText(self.ContentArea, text, 22, UIUtil.titleFont)
     end,
 
     ---@param self UISmallAnnouncement
     ---@param parent Control
-    ---@param goalControl Control
-    ---@param onFinishedCallback fun()
     ---@param text string
-    __post_init = function(self, parent, goalControl, onFinishedCallback, text)
-        AbstractAnnouncement.__post_init(self, parent, goalControl, onFinishedCallback)
+    __post_init = function(self, parent, text)
+        AbstractAnnouncement.__post_init(self, parent)
 
-        LayoutHelpers.LayoutFor(self.Title)
-            :AtCenterIn(GetFrame(0), -250)
-            :DropShadow(true)
-            :Color(UIUtil.fontColor)
+        Layouter(self.Title)
+            :AtCenterIn(parent, -250)
             :End()
 
-        LayoutHelpers.LayoutFor(self)
-            :Fill(self.Title)
+        -- match the content area with the title
+        Layouter(self.ContentArea)
+            :Left(self.Title.Left)
+            :Right(self.Title.Right)
+            :AtTopIn(self.Title, 10)
+            :Bottom(self.Title.Bottom)
+            :ResetWidth()
+            :ResetHeight()
+            :Alpha(0, true)
+            :End()
+
     end,
 }

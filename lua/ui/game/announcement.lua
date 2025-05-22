@@ -27,29 +27,43 @@ local bg = false
 function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
     local frame = GetFrame(0)
 
-    do
-        -- just do nothing
-        LOG(text, goalControl, secondaryText, onFinished)
-
-        ForkThread(
-            function()
-                local announcement = SmallAnnouncement(frame, goalControl, onFinished, text)
-                WaitSeconds(3)
-                announcement:FadeOut(3)
-            end
-        )
-
-        return
-    end
-
     if not goalControl then
-        -- make it originate from the top
+        -- make it originate from the top of the screen
         goalControl = Group(frame)
         goalControl.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)
         goalControl.Right:Set(function() return frame.Left() + 0.51 * frame.Right() end)
         goalControl.Top:Set(function() return frame.Top() end);
         goalControl.Height:Set(0)
     end
+
+    do
+        -- just do nothing
+        LOG(text, goalControl, secondaryText, onFinished)
+
+        ForkThread(
+            function()
+                ---@type UIAbstractAnnouncement
+                local announcement = SmallAnnouncement(frame, text)
+                announcement:ExpandBackground(goalControl, 0.4)
+                WaitSeconds(0.4)
+
+                announcement:AnimateContent(0.6, 1.0)
+                WaitSeconds(2.0)
+
+                announcement:AnimateContent(0.4, 0.0)
+                WaitSeconds(0.4)
+
+                announcement:ContractBackground(goalControl, 0.4)
+                WaitSeconds(0.4)
+
+                announcement:Destroy()
+            end
+        )
+
+        return
+    end
+
+
 
     local scoreDlg = import("/lua/ui/dialogs/score.lua")
     if scoreDlg.dialog then
