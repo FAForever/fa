@@ -1,38 +1,61 @@
+--******************************************************************************************************
+--** Copyright (c) 2025  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local CreateLazyVar = import("/lua/lazyvar.lua").Create
 
-
-
+--- An abstract announcement that has all the functionality that you would expect from an announcement. Do not create an instance of this class.
 ---@class UIAbstractAnnouncement : Destroyable, Group
 ---@field Trash TrashBag
+---@field AnimateBackgroundThreadInstance? thread
 ---@field AnimateThreadInstance? thread
----@field FadeThreadInstance? thread
----@field Background Bitmap
----@field BackgroundBorderTopLeft Bitmap
----@field BackgroundBorderTop Bitmap
----@field BackgroundBorderTopRight Bitmap
----@field BackgroundBorderLeft Bitmap
----@field BackgroundBorderRight Bitmap
----@field BackgroundBorderBottomLeft Bitmap
----@field BackgroundBorderBottom Bitmap
----@field BackgroundBorderBottomRight Bitmap
----@field ContentArea Group
+---@field AnimateContentThreadInstance? thread
+---@field AbortAnimationThreadInstance? thread
+---@field Background Bitmap                     # Background that we animate
+---@field BackgroundBorderTopLeft Bitmap        # Border element of the background
+---@field BackgroundBorderTop Bitmap            # Border element of the background
+---@field BackgroundBorderTopRight Bitmap       # Border element of the background
+---@field BackgroundBorderLeft Bitmap           # Border element of the background
+---@field BackgroundBorderRight Bitmap          # Border element of the background
+---@field BackgroundBorderBottomLeft Bitmap     # Border element of the background
+---@field BackgroundBorderBottom Bitmap         # Border element of the background
+---@field BackgroundBorderBottomRight Bitmap    # Border element of the background
+---@field ContentArea Group                     # Content area that we animate to/from
 AbstractAnnouncement = ClassUI(Group) {
 
-    -- Announcements works by morphing the background to/from a control. By doing so you give the player an idea
-    -- what the announcement is connected to. The content of the announcement is never moved, only the background
-    -- is. The alpha of the content is adjusted when the announcement arrives and leaves again.
+    -- Announcements works by morphing the background from a control, to the content are and back. By doing so,
+    -- we give the player an idea what the announcement is connected to. The content of the announcement is never 
+    -- moved, only the background is. The alpha of the content is adjusted when the announcement arrives and 
+    -- leaves again.
 
     -- To make it more concrete:
-    -- - The announcement class itself is the content.
-    -- - The background is what we animate.
+    -- - The 'ContentArea' is the area that we animate to/from
+    -- - The 'Background' is the background that we animate
 
     ---@param self UIAbstractAnnouncement
     ---@param parent Control
@@ -61,7 +84,7 @@ AbstractAnnouncement = ClassUI(Group) {
         local frame = GetFrame(0)
 
         -- where we expect announcements to be
-        LayoutHelpers.LayoutFor(self)
+        Layouter(self)
             :Height(0)
             :Width(0)
             :AtCenterIn(frame, -250)
@@ -69,49 +92,50 @@ AbstractAnnouncement = ClassUI(Group) {
             :End()
 
         -- by default, fill the parent
-        LayoutHelpers.LayoutFor(self.ContentArea)
+        Layouter(self.ContentArea)
             :Fill(self)
             :End()
 
         -- by default, just fill the parent
-        LayoutHelpers.LayoutFor(self.Background)
+        Layouter(self.Background)
             :Fill(self)
+            :Alpha(0, true)
             :End()
 
         -- put border around the background
-        LayoutHelpers.Layouter(self.BackgroundBorderTopLeft)
+        Layouter(self.BackgroundBorderTopLeft)
             :TopLeftOf(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderTop)
+        Layouter(self.BackgroundBorderTop)
             :CenteredAbove(self.Background)
             :FillHorizontally(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderTopRight)
+        Layouter(self.BackgroundBorderTopRight)
             :TopRightOf(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderLeft)
+        Layouter(self.BackgroundBorderLeft)
             :CenteredLeftOf(self.Background)
             :FillVertically(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderRight)
+        Layouter(self.BackgroundBorderRight)
             :CenteredRightOf(self.Background)
             :FillVertically(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderBottomLeft)
+        Layouter(self.BackgroundBorderBottomLeft)
             :BottomLeftOf(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderBottom)
+        Layouter(self.BackgroundBorderBottom)
             :CenteredBelow(self.Background)
             :FillHorizontally(self.Background)
             :End()
 
-        LayoutHelpers.Layouter(self.BackgroundBorderBottomRight)
+        Layouter(self.BackgroundBorderBottomRight)
             :BottomRightOf(self.Background)
             :End()
     end,
@@ -123,14 +147,77 @@ AbstractAnnouncement = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 
+    ---------------------------------------------------------------------------
+    --#region Interface to animate
+
+    --- The default animation sequence for an announcement. The announcement is destroyed at the end of the animation.
+    ---@param self UIAbstractAnnouncement
+    ---@param control Control
+    Animate = function(self, control)
+        -- do not allow other animations
+        if self.AnimateThreadInstance then
+            self.AnimateThreadInstance:Destroy()
+        end
+
+        self.AnimateThreadInstance = self.Trash:Add(ForkThread(self.AnimateThread, self, control))
+    end,
+
+    --- The default animation sequence for an announcement. The announcement is destroyed at the end of the animation.
+    ---@param self UIAbstractAnnouncement
+    ---@param control Control
+    AnimateThread = function(self, control)
+        -- internal configuration of the animation
+        local expandDuration = 0.4
+        local contractDuration = 0.4
+        local contentDuration = 2.0
+        local contentShowDuration = 0.6
+        local contentHideDuration = 0.4
+
+        -- expand animation
+        self:ExpandBackground(control, expandDuration)
+        WaitSeconds(expandDuration)
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- show content and hide it
+        self:AnimateContent(contentShowDuration, 1.0)
+        WaitSeconds(contentShowDuration + contentDuration)
+        if IsDestroyed(self) then
+            return
+        end
+
+        self:AnimateContent(contentHideDuration, 0.0)
+        WaitSeconds(contentHideDuration)
+        if IsDestroyed(self) then
+            return
+        end
+
+        -- contract animation
+        self:ContractBackground(control, contractDuration)
+        WaitSeconds(contractDuration)
+        if IsDestroyed(self) then
+            return
+        end
+
+        self:Destroy()
+    end,
+
+    --- Animates the alpha value of the content area.
     ---@param self UIAbstractAnnouncement
     ---@param duration number
     ---@param targetTransparency number
     AnimateContent = function(self, duration, targetTransparency)
+        -- do not allow other animations
+        if self.AnimateContentThreadInstance then
+            self.AnimateContentThreadInstance:Destroy()
+        end
+
         local from = self.ContentArea:GetAlpha()
-        self.Trash:Add(ForkThread(self.AnimateContentThread, self, duration, from, targetTransparency))
+        self.AnimateContentThreadInstance = self.Trash:Add(ForkThread(self.AnimateContentThread, self, duration, from, targetTransparency))
     end,
 
+    --- Animates the alpha value of the content area.
     ---@param self UIAbstractAnnouncement
     ---@param duration number
     ---@param target number
@@ -170,18 +257,19 @@ AbstractAnnouncement = ClassUI(Group) {
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Close'}))
     end,
 
+    --- Animates the background. Use the utility functions `ExpandBackground` and `ContractBackground` to
     ---@param self UIAbstractAnnouncement
     ---@param control Control
     ---@param duration number
     ---@param state 'Expand' | 'Contract'
     AnimateBackground = function(self, control, duration, state)
         -- do not allow other animations
-        if self.AnimateThreadInstance then
-            self.AnimateThreadInstance:Destroy()
+        if self.AnimateBackgroundThreadInstance then
+            self.AnimateBackgroundThreadInstance:Destroy()
         end
 
         -- animate position and scale
-        self.AnimateThreadInstance = self.Trash:Add(ForkThread(self.BackgroundAnimationThread, self, control, duration, state))
+        self.AnimateBackgroundThreadInstance = self.Trash:Add(ForkThread(self.AnimateBackgroundThread, self, control, duration, state))
     end,
 
     --- Expands the background of the announcement, starting at the provided control towards the center of the screen.
@@ -189,7 +277,7 @@ AbstractAnnouncement = ClassUI(Group) {
     ---@param control Control
     ---@param duration number
     ---@param state 'Expand' | 'Contract'
-    BackgroundAnimationThread = function(self, control, duration, state)
+    AnimateBackgroundThread = function(self, control, duration, state)
         -- local scope for performance
         local background = self.Background
         local content = self.ContentArea
@@ -226,7 +314,7 @@ AbstractAnnouncement = ClassUI(Group) {
         )
 
         -- define width and height by top/bottom and left/right values
-        LayoutHelpers.LayoutFor(background)
+        Layouter(background)
             :ResetWidth()
             :ResetHeight()
             :End()
@@ -254,5 +342,75 @@ AbstractAnnouncement = ClassUI(Group) {
 
             WaitFrames(1)
         end
-    end
+
+        -- make sure animation ends properly even when there are frame drops
+        if state == 'Expand' then
+            progress:Set(1)
+        else
+            progress:Set(0)
+        end
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Interface to abort 
+
+    ---@param self UIAbstractAnnouncement
+    AbortAnnouncement = function(self)
+        -- make the function idempotent
+        if self.AbortAnimationThreadInstance then
+            return
+        end
+
+        self:CancelAnimation()
+        self:CancelContentAnimation()
+
+        self.AbortAnimationThreadInstance = self.Trash:Add(ForkThread(self.AbortAnimationThread, self))
+    end,
+
+    ---@param self UIAbstractAnnouncement
+    AbortAnimationThread = function(self)
+        local alphaContent = self.ContentArea:GetAlpha()
+        local alphaBackground = self.Background:GetAlpha()
+
+        while not IsDestroyed(self) do
+            alphaContent = math.clamp(alphaContent - 0.05, 0, 1)
+            alphaBackground = math.clamp(alphaBackground - 0.05, 0, 1)
+
+            self.ContentArea:SetAlpha(alphaContent, true)
+            self.Background:SetAlpha(alphaBackground, true)
+
+            if alphaContent == 0 and alphaBackground == 0 then
+                break
+            end
+
+            WaitFrames(1)
+        end
+
+        self:Destroy()
+    end,
+
+    ---@param self UIAbstractAnnouncement
+    CancelAnimation = function(self)
+        if self.AnimateThreadInstance then
+            self.AnimateThreadInstance:Destroy()
+        end
+    end,
+
+    ---@param self UIAbstractAnnouncement
+    CancelBackgroundAnimation = function(self)
+        if self.AnimateBackgroundThreadInstance then
+            self.AnimateBackgroundThreadInstance:Destroy()
+        end
+    end,
+
+    ---@param self UIAbstractAnnouncement
+    CancelContentAnimation = function(self)
+        if self.AnimateContentThreadInstance then
+            self.AnimateContentThreadInstance:Destroy()
+        end
+    end,
+
+    --#endregion
 }
