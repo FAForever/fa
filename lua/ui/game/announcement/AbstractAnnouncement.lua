@@ -54,7 +54,7 @@ AbstractAnnouncement = ClassUI(Group) {
     -- leaves again.
 
     -- To make it more concrete:
-    -- - The 'ContentArea' is the area that we animate to/from
+    -- - The 'ContentArea' is the area that we animate towards when displaying the announcement, and away from when hiding it
     -- - The 'Background' is the background that we animate
 
     ---@param self UIAbstractAnnouncement
