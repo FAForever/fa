@@ -238,7 +238,7 @@ AbstractAnnouncement = ClassUI(Group) {
         end
     end,
 
-    --- Expands the background of the announcement, starting at the provided control towards the center of the screen.
+    --- Expands the background of the announcement, starting at the provided control towards the content area.
     ---@param self UIAbstractAnnouncement
     ---@param control Control
     ---@param duration number
