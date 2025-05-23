@@ -156,7 +156,7 @@ function RemoveOutliers(t, n)
     local size = 0
     for i = 1, n do
         local result = sorted[i]
-        if math.abs(result - q2) < iqr15 then
+        if math.abs(result - q2) <= iqr15 then
             size = size + 1
             trimmed[size] = result
         end
