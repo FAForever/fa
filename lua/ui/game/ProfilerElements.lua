@@ -12,6 +12,8 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local AddressToString = import("/lua/shared/debugfunction.lua").AddressToString
 
+---@alias ProfilerElementMode "none" | "paired" | "ratio"
+
 ---@class ProfilerElementRow : Group
 ---@field name Text
 ---@field source Text
@@ -130,8 +132,17 @@ function DepopulateDefaultElement(element)
     element.growth:SetText("")
 end
 
+---@param stats { [integer]: number, n: integer }
+---@param baselines { [integer]: number, n: integer }
+---@param mode ProfilerElementMode
+---@param removeOutliers any
+---@return integer numSamples
+---@return string | number mean
+---@return string | number deviation
+---@return string | number skewness
 function DoStats(stats, baselines, mode, removeOutliers)
     local sn, bn = stats.n, baselines.n
+    ---@type number | string, number | string, number | string
     local mean, deviation, skewness = "0", "∞", "∞"
 
     local function InterestingStuff(t, n)
@@ -344,16 +355,19 @@ ProfilerScrollArea = ClassUI(Group) {
 }
 
 ---@class StatisticSummary : Group
+---@field baselines? number[]
 ---@field bg Bitmap
 ---@field clearButton Button
 ---@field deviation Text
 ---@field deviationLabel Text
 ---@field mean Text
 ---@field meanLabel Text
+---@field mode Combo
 ---@field samples Text
 ---@field samplesLabel Text
 ---@field skewness Text
 ---@field skewnessLabel Text
+---@field stats? number[]
 ---@field summary Group
 StatisticSummary = Class(Group) {
     ---@param self StatisticSummary
@@ -505,17 +519,18 @@ StatisticSummary = Class(Group) {
 
     ---@param self StatisticSummary
     OnClickClearSummary = function(self)
-        self:SetStats(nil)
+        self:SetStats()
     end,
 
+    ---@overload fun() # Clear stats
     ---@param self StatisticSummary
-    ---@param stats? number[]
-    ---@param baselines? number[]
+    ---@param stats { [integer]: number, n: integer }
+    ---@param baselines { [integer]: number, n: integer }
     SetStats = function(self, stats, baselines)
         if stats then
             self.stats = stats
             self.baselines = baselines
-            local _, mode = self.mode:GetItem()
+            local _, mode = self.mode:GetItem()--[[@as ProfilerElementMode]]
             local samples, mean, deviation, skewness = DoStats(stats, baselines, mode, true)
             self.samples:SetText(samples)
             self.mean:SetText(mean)
@@ -533,6 +548,7 @@ StatisticSummary = Class(Group) {
 ---@field bytecodeGroup Group
 ---@field details Group
 ---@field detailsBg Bitmap
+---@field groupBytecode Group
 ---@field bytecode ItemList
 ---@field parameters Text
 ---@field upvalues Text
@@ -578,6 +594,7 @@ BytecodeArea = Class(Group) {
         end
     end,
 
+    ---@param self BytecodeArea
     Layout = function(self)
         local logButton = Layouter(self.logButton)
             :AtRightTopIn(self, 6)
@@ -630,7 +647,7 @@ BytecodeArea = Class(Group) {
             :Over(self, 10)
             :AtRightIn(groupBytecode, 14)
             :Font(UIUtil.fixedFont, 14)
-            :End()
+            :End() --[[@as ItemList]]
 
         UIUtil.CreateLobbyVertScrollbar(bytecode)
 
