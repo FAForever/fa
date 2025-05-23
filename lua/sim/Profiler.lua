@@ -42,40 +42,6 @@ local benchmarkTargetTime = 0.5
 -- parameters as the index 
 local benchmarkBaselines
 
-
---- Toggles the profiler on / off
----@param army number
----@param forceEnable? boolean
-function ToggleProfiler(forceEnable)
-    if forceEnable and isProfiling then -- let the profiler be on if we are trying to force it on 
-        return
-    end
-
-    if not isProfiling then
-        -- Inform us in case of abuse
-        SPEW("Profiler has been toggled on by army: " .. tostring(GetFocusArmy()))
-        isProfiling = true
-
-        -- Thread to sync information gathered to the UI
-        if not profilingThread then
-            profilingThread = ForkThread(SyncThread)
-        end
-
-        -- Add a function to track
-        sethook(FunctionHook, "c") -- only track on function calls
-    else
-        isProfiling = false
-        if profilingThread then
-            profilingThread = KillThread(profilingThread)
-        end
-
-        -- Inform us in case of abuse
-        SPEW("Profiler has been toggled off by army: " .. tostring(GetFocusArmy()))
-
-        sethook(nil) -- remove tracking
-    end
-end
-
 ---@param event any
 function FunctionHook(event)
     -- quite expensive, returns a table
@@ -115,24 +81,36 @@ function SyncThread()
     end
 end
 
----@param army Army
-function FindBenchmarks()
-    local loader = BenchmarkModuleLoader("/lua/benchmarks")
-
-    -- add benchmarks from base game
-    loader:FindBenchmarkModules()
-
-    -- add benchmarks from mods
-    for _, mod in __active_mods do
-        loader:FindBenchmarkModules(mod.location)
+--- Toggles the profiler on / off
+---@param forceEnable? boolean
+function ToggleProfiler(forceEnable)
+    if forceEnable and isProfiling then -- let the profiler be on if we are trying to force it on
+        return
     end
 
-    loader:SortModules()
+    if not isProfiling then
+        -- Inform us in case of abuse
+        SPEW("Profiler has been toggled on by army: " .. tostring(GetFocusArmy()))
+        isProfiling = true
 
-    -- sync it over
-    Sync.BenchmarkModules = loader.modulesUser
-    benchmarkModules = loader.modulesSim
-    benchmarkBaselines = loader.loopBaseline
+        -- Thread to sync information gathered to the UI
+        if not profilingThread then
+            profilingThread = ForkThread(SyncThread)
+        end
+
+        -- Add a function to track
+        sethook(FunctionHook, "c") -- only track on function calls
+    else
+        isProfiling = false
+        if profilingThread then
+            profilingThread = KillThread(profilingThread)
+        end
+
+        -- Inform us in case of abuse
+        SPEW("Profiler has been toggled off by army: " .. tostring(GetFocusArmy()))
+
+        sethook() -- remove tracking
+    end
 end
 
 --- Sends benchmark info back to the UI
@@ -142,20 +120,6 @@ function LoadBenchmark(moduleIndex, benchmarkIndex)
     local info = benchmarkModules[moduleIndex].benchmarks[benchmarkIndex].info
     if info then
         Sync.BenchmarkInfo = info
-    end
-end
-
---- Starts the benchmark running thread
----@param moduleIndex number
----@param benchmarkIndex number
----@param parameters any[]
-function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
-    if not benchmarkThread then
-        local moduleData = benchmarkModules[moduleIndex]
-        LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
-        benchmarkThread = ForkThread(RunBenchmarkThread, moduleIndex, benchmarkIndex, parameters)
-    else
-        SPEW("Already running benchmark")
     end
 end
 
@@ -280,6 +244,20 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     benchmarkThread = false
     SPEW("Done with benchmark")
+end
+
+--- Starts the benchmark running thread
+---@param moduleIndex number
+---@param benchmarkIndex number
+---@param parameters any[]
+function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
+    if not benchmarkThread then
+        local moduleData = benchmarkModules[moduleIndex]
+        LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
+        benchmarkThread = ForkThread(RunBenchmarkThread, moduleIndex, benchmarkIndex, parameters)
+    else
+        SPEW("Already running benchmark")
+    end
 end
 
 ---@class UserBenchmarkModule
@@ -667,3 +645,22 @@ BenchmarkModuleLoader = Class() {
         table.sort(self.modulesSim, self.moduleSorter)
     end,
 }
+
+function FindBenchmarks()
+    local loader = BenchmarkModuleLoader("/lua/benchmarks")
+
+    -- add benchmarks from base game
+    loader:FindBenchmarkModules()
+
+    -- add benchmarks from mods
+    for _, mod in __active_mods do
+        loader:FindBenchmarkModules(mod.location)
+    end
+
+    loader:SortModules()
+
+    -- sync it over
+    Sync.BenchmarkModules = loader.modulesUser
+    benchmarkModules = loader.modulesSim
+    benchmarkBaselines = loader.loopBaseline
+end

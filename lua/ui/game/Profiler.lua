@@ -160,80 +160,6 @@ local function CanUseProfiler()
     return sessionInfo.Options.CheatsEnabled == "true"
 end
 
-
---- Opens up the window
-function OpenWindow()
-    if not CanUseProfiler() then
-        WARN("Unable to open Profiler window")
-        return
-    end
-
-    local State = State
-
-    -- make hotkey act as a toggle
-    if State.WindowIsOpen then
-        CloseWindow()
-        return
-    end
-    SPEW("Opening profiler window")
-
-    State.WindowIsOpen = true
-    -- populate the GUI
-    local localGUI = GUI
-    if localGUI then
-        localGUI:Show()
-        SwitchHeader(State.Header)
-    else
-        GUI = ProfilerWindow(GetFrame(0))
-        SwitchHeader(State.Header)
-        -- retrieve benchmarks
-        SimCallback({
-            Func = "FindBenchmarks",
-            Args = {},
-        })
-        -- toggle the profiler
-        SimCallback({
-            Func = "ToggleProfiler",
-            Args = {
-                ForceEnable = true,
-            },
-        })
-    end
-end
-
---- Closes the window
-function CloseWindow()
-    SPEW("Closing profiler window")
-    State.WindowIsOpen = false
-    local GUI = GUI
-    if GUI then
-        GUI:Hide()
-    end
-end
-
----@param target ProfilerTab
-function SwitchHeader(target)
-    local tabs = GUI.Tabs
-    if tabs then
-        State.Header = target
-
-        -- hide all tabs
-        for _, tab in tabs do
-            tab:Hide()
-        end
-
-        -- show the tab we're interested in
-        local tab = tabs[target]
-        if tab then
-            tab:Show()
-            local onFocus = tab.OnFocus
-            if onFocus then
-                onFocus(tab)
-            end
-        end
-    end
-end
-
 local function GetBenchmarkCacheKey(modIndex, benIndex)
     local state = State.Benchmarks
     modIndex = modIndex or state.SelectedModule
@@ -351,230 +277,38 @@ function StopBenchmark()
     })
 end
 
+---@param target ProfilerTab
+function SwitchHeader(target)
+    local tabs = GUI.Tabs
+    if tabs then
+        State.Header = target
 
-
----@class ProfilerWindow : Window
----@field Tabs {Overview: ProfilerOverview, Timers: ProfilerTimers, Stamps: ProfilerStamps, Benchmarks: ProfilerBenchmarks, Options: ProfilerOptions}
----@field Headers {[1]: "Overview", [2]: "Timers", [3]: "Stamps", [4]: "Benchmarks", [5]: "Options"}
-ProfilerWindow = ClassUI(Window) {
-    ---@param self ProfilerWindow
-    ---@param parent Control
-    __init = function(self, parent)
-        Window.__init(self, parent, LOC("<LOC profiler_0000>Profiler"),
-            false, false, false, true, false, "profiler2", {
-            Left = 10,
-            Top = 300,
-            Right = 830,
-            Bottom = 810,
-        })
-        LayoutHelpers.DepthOverParent(self, parent, 1)
-        self._border = UIUtil.SurroundWithBorder(self, "/scx_menu/lan-game-lobby/frame/")
-
-        self:InitHeaders()
-        self:InitTabs()
-
-        -- allows us to act on changes
-        BenchmarkModulesReceived:AddObserver(function(modules)
-            self:ReceiveBenchmarkModules(modules)
-        end)
-        BenchmarkInfoReceived:AddObserver(function(info)
-            self:ReceiveBenchmarkInfo(info)
-        end)
-        BenchmarkOutputReceived:AddObserver(function(output)
-            self:ReceiveBenchmarkOutput(output)
-        end)
-        BenchmarkModuleSelected:AddObserver(function(index)
-            self:ReceiveModuleSelected(index)
-        end)
-        BenchmarkSelected:AddObserver(function(index)
-            self:ReceiveBenchmarkSelected(index)
-        end)
-
-        self:Layout()
-    end,
-
-    ---@param self ProfilerWindow
-    InitHeaders = function(self)
-        local clientGroup = self.ClientGroup
-        local header = Group(clientGroup)
-        clientGroup.header = header
-
-        self.Headers = {}
-        self:InitHeaderButton(header, "Overview", "<LOC profiler_0001>Overview")
-        self:InitHeaderButton(header, "Timers", "<LOC profiler_0002>Timers")
-        self:InitHeaderButton(header, "Stamps", "<LOC profiler_0003>Stamps")
-        self:InitHeaderButton(header, "Benchmarks", "<LOC profiler_0004>Benchmarks")
-        self:InitHeaderButton(header, "Options", "<LOC profiler_0005>Options")
-    end,
-
-    ---@param self ProfilerWindow
-    InitTabs = function(self)
-        local clientGroup = self.ClientGroup
-        local tabGroup = Group(clientGroup)
-        clientGroup.tabGroup = tabGroup
-
-        self.Tabs = {}
-        self:InitOverviewTab(tabGroup)
-        --self:InitTimersTab(tabGroup)
-        --self:InitStampsTab(tabGroup)
-        self:InitBenchmarksTab(tabGroup)
-        --self:InitOptionsTab(tabGroup)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param parent Group
-    ---@param name string
-    ---@param text UnlocalizedString
-    InitHeaderButton = function(self, parent, name, text)
-        local button = UIUtil.CreateButtonStd(parent, "/widgets02/small", LOC(text), 16, 2)
-        button.Tab = name
-
-        table.insert(self.Headers, name)
-        parent[name] = button
-
-        button.OnClick = function(button_self)
-            SwitchHeader(button_self.Tab)
-        end
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param tabs Group
-    InitOverviewTab = function(self, tabs)
-        self.Tabs.Overview = ProfilerOverview(tabs)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param tabs Group
-    InitTimersTab = function(self, tabs)
-        self.Tabs.Timers = ProfilerTimers(tabs)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param tabs Group
-    InitStampsTab = function(self, tabs)
-        self.Tabs.Stamps = ProfilerStamps(tabs)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param tabs Group
-    InitBenchmarksTab = function(self, tabs)
-        self.Tabs.Benchmarks = ProfilerBenchmarks(tabs)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param tabs Group
-    InitOptionsTab = function(self, tabs)
-        self.Tabs.Options = ProfilerOptions(tabs)
-    end,
-
-    Layout = function(self)
-        local clientGroup = self.ClientGroup
-        local tabs = self.Tabs
-
-        local header = Layouter(clientGroup.header)
-            :AtLeftIn(clientGroup)
-            :AtRightIn(clientGroup)
-            :AtTopIn(clientGroup)
-            :HeightFromTexture(UIUtil.UIFile("/widgets02/small_btn_up.dds"), 8)
-            :End()
-
-        local pos = 0.010
-        for _, name in self.Headers do
-            local button = header[name]
-            Layouter(button)
-                :AtTopIn(header, 4)
-                :FromLeftIn(header, pos)
-                :Over(header, 10)
-                :End()
-            if not tabs[button.Tab] then
-                button:Disable()
-            end
-            pos = pos + 0.2
-        end
-
-        -- tabs
-
-        local tabGroup = Layouter(clientGroup.tabGroup)
-            :AtLeftIn(clientGroup)
-            :AtRightIn(clientGroup)
-            :AtBottomIn(clientGroup)
-            :AnchorToBottom(clientGroup.header)
-            :End()
-
+        -- hide all tabs
         for _, tab in tabs do
-            Layouter(tab)
-                :Fill(tabGroup)
-                :End()
+            tab:Hide()
         end
-    end,
 
-    ---@param self ProfilerWindow
-    OnClose = function(self)
-        CloseWindow()
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param index number
-    ReceiveModuleSelected = function(self, index)
-        local benchmarkState = State.Benchmarks
-        local moduleData = benchmarkState.Modules[index]
-        benchmarkState.SelectedModule = index
-        self.Tabs.Benchmarks:UpdateBenchmarkDetails(moduleData)
-        BenchmarkSelected:Set(moduleData.LastBenchmarkSelected)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param index number
-    ReceiveBenchmarkSelected = function(self, index)
-        local benchmarkState = State.Benchmarks
-        local moduleData = benchmarkState.Modules[benchmarkState.SelectedModule]
-        benchmarkState.SelectedBenchmark = index
-        moduleData.LastBenchmarkSelected = index
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param modules Module[]
-    ReceiveBenchmarkModules = function(self, modules)
-        State.Benchmarks.Modules = modules
-        self.Tabs.Benchmarks:PopulateModulePicker(modules)
-        BenchmarkModuleSelected:Set(1)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param info RawFunctionDebugInfo
-    ReceiveBenchmarkInfo = function(self, info)
-        local benchmarkState = State.Benchmarks
-        benchmarkState.ParameterCount = info.bytecode.numparams
-        self.Tabs.Benchmarks:UpdateBenchmarkInfo(info)
-    end,
-
-    ---@param self ProfilerWindow
-    ---@param output BenchmarkOutput
-    ReceiveBenchmarkOutput = function(self, output)
-        local benchmarksTab = self.Tabs.Benchmarks
-        local benchmarkState = State.Benchmarks
-
-        benchmarkState.BenchmarkRunning = output.success == nil
-        local complete = 0
-        if output.data then
-            complete = table.getn(output.data)
+        -- show the tab we're interested in
+        local tab = tabs[target]
+        if tab then
+            tab:Show()
+            local onFocus = tab.OnFocus
+            if onFocus then
+                onFocus(tab)
+            end
         end
-        if output.runs then
-            benchmarkState.BenchmarkRuns = output.runs
-            benchmarkState.BenchmarkProgress = complete
-        else
-            benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + complete
-        end
-        benchmarksTab:AddBenchmarkStats(output.data, output.baselines)
-        benchmarksTab:UpdateBenchmarkProgress()
-        benchmarksTab:UpdateRunButtonState()
-    end,
-}
+    end
+end
 
-
-----------
--- Tabs
-----------
+--- Closes the window
+function CloseWindow()
+    SPEW("Closing profiler window")
+    State.WindowIsOpen = false
+    local GUI = GUI
+    if GUI then
+        GUI:Hide()
+    end
+end
 
 ---@param parent Control
 ---@param tab string
@@ -681,6 +415,7 @@ local function CreateSortBar(parent, tab)
     return sortbar
 end
 
+--#region Tabs
 
 ---@class ProfilerOverview : Group
 ---@field searchBar Group
@@ -1159,3 +894,263 @@ ProfilerOptions = Class(Group) {
         Group.__init(self, parent)
     end
 }
+
+--#endregion
+
+---@class ProfilerWindow : Window
+---@field Tabs {Overview: ProfilerOverview, Timers: ProfilerTimers, Stamps: ProfilerStamps, Benchmarks: ProfilerBenchmarks, Options: ProfilerOptions}
+---@field Headers {[1]: "Overview", [2]: "Timers", [3]: "Stamps", [4]: "Benchmarks", [5]: "Options"}
+ProfilerWindow = ClassUI(Window) {
+    ---@param self ProfilerWindow
+    ---@param parent Control
+    __init = function(self, parent)
+        Window.__init(self, parent, LOC("<LOC profiler_0000>Profiler"),
+            false, false, false, true, false, "profiler2", {
+            Left = 10,
+            Top = 300,
+            Right = 830,
+            Bottom = 810,
+        })
+        LayoutHelpers.DepthOverParent(self, parent, 1)
+        self._border = UIUtil.SurroundWithBorder(self, "/scx_menu/lan-game-lobby/frame/")
+
+        self:InitHeaders()
+        self:InitTabs()
+
+        -- allows us to act on changes
+        BenchmarkModulesReceived:AddObserver(function(modules)
+            self:ReceiveBenchmarkModules(modules)
+        end)
+        BenchmarkInfoReceived:AddObserver(function(info)
+            self:ReceiveBenchmarkInfo(info)
+        end)
+        BenchmarkOutputReceived:AddObserver(function(output)
+            self:ReceiveBenchmarkOutput(output)
+        end)
+        BenchmarkModuleSelected:AddObserver(function(index)
+            self:ReceiveModuleSelected(index)
+        end)
+        BenchmarkSelected:AddObserver(function(index)
+            self:ReceiveBenchmarkSelected(index)
+        end)
+
+        self:Layout()
+    end,
+
+    ---@param self ProfilerWindow
+    InitHeaders = function(self)
+        local clientGroup = self.ClientGroup
+        local header = Group(clientGroup)
+        clientGroup.header = header
+
+        self.Headers = {}
+        self:InitHeaderButton(header, "Overview", "<LOC profiler_0001>Overview")
+        self:InitHeaderButton(header, "Timers", "<LOC profiler_0002>Timers")
+        self:InitHeaderButton(header, "Stamps", "<LOC profiler_0003>Stamps")
+        self:InitHeaderButton(header, "Benchmarks", "<LOC profiler_0004>Benchmarks")
+        self:InitHeaderButton(header, "Options", "<LOC profiler_0005>Options")
+    end,
+
+    ---@param self ProfilerWindow
+    InitTabs = function(self)
+        local clientGroup = self.ClientGroup
+        local tabGroup = Group(clientGroup)
+        clientGroup.tabGroup = tabGroup
+
+        self.Tabs = {}
+        self:InitOverviewTab(tabGroup)
+        --self:InitTimersTab(tabGroup)
+        --self:InitStampsTab(tabGroup)
+        self:InitBenchmarksTab(tabGroup)
+        --self:InitOptionsTab(tabGroup)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param parent Group
+    ---@param name string
+    ---@param text UnlocalizedString
+    InitHeaderButton = function(self, parent, name, text)
+        local button = UIUtil.CreateButtonStd(parent, "/widgets02/small", LOC(text), 16, 2)
+        button.Tab = name
+
+        table.insert(self.Headers, name)
+        parent[name] = button
+
+        button.OnClick = function(button_self)
+            SwitchHeader(button_self.Tab)
+        end
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitOverviewTab = function(self, tabs)
+        self.Tabs.Overview = ProfilerOverview(tabs)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitTimersTab = function(self, tabs)
+        self.Tabs.Timers = ProfilerTimers(tabs)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitStampsTab = function(self, tabs)
+        self.Tabs.Stamps = ProfilerStamps(tabs)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitBenchmarksTab = function(self, tabs)
+        self.Tabs.Benchmarks = ProfilerBenchmarks(tabs)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param tabs Group
+    InitOptionsTab = function(self, tabs)
+        self.Tabs.Options = ProfilerOptions(tabs)
+    end,
+
+    Layout = function(self)
+        local clientGroup = self.ClientGroup
+        local tabs = self.Tabs
+
+        local header = Layouter(clientGroup.header)
+            :AtLeftIn(clientGroup)
+            :AtRightIn(clientGroup)
+            :AtTopIn(clientGroup)
+            :HeightFromTexture(UIUtil.UIFile("/widgets02/small_btn_up.dds"), 8)
+            :End()
+
+        local pos = 0.010
+        for _, name in self.Headers do
+            local button = header[name]
+            Layouter(button)
+                :AtTopIn(header, 4)
+                :FromLeftIn(header, pos)
+                :Over(header, 10)
+                :End()
+            if not tabs[button.Tab] then
+                button:Disable()
+            end
+            pos = pos + 0.2
+        end
+
+        -- tabs
+
+        local tabGroup = Layouter(clientGroup.tabGroup)
+            :AtLeftIn(clientGroup)
+            :AtRightIn(clientGroup)
+            :AtBottomIn(clientGroup)
+            :AnchorToBottom(clientGroup.header)
+            :End()
+
+        for _, tab in tabs do
+            Layouter(tab)
+                :Fill(tabGroup)
+                :End()
+        end
+    end,
+
+    ---@param self ProfilerWindow
+    OnClose = function(self)
+        CloseWindow()
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param index number
+    ReceiveModuleSelected = function(self, index)
+        local benchmarkState = State.Benchmarks
+        local moduleData = benchmarkState.Modules[index]
+        benchmarkState.SelectedModule = index
+        self.Tabs.Benchmarks:UpdateBenchmarkDetails(moduleData)
+        BenchmarkSelected:Set(moduleData.LastBenchmarkSelected)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param index number
+    ReceiveBenchmarkSelected = function(self, index)
+        local benchmarkState = State.Benchmarks
+        local moduleData = benchmarkState.Modules[benchmarkState.SelectedModule]
+        benchmarkState.SelectedBenchmark = index
+        moduleData.LastBenchmarkSelected = index
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param modules Module[]
+    ReceiveBenchmarkModules = function(self, modules)
+        State.Benchmarks.Modules = modules
+        self.Tabs.Benchmarks:PopulateModulePicker(modules)
+        BenchmarkModuleSelected:Set(1)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param info RawFunctionDebugInfo
+    ReceiveBenchmarkInfo = function(self, info)
+        local benchmarkState = State.Benchmarks
+        benchmarkState.ParameterCount = info.bytecode.numparams
+        self.Tabs.Benchmarks:UpdateBenchmarkInfo(info)
+    end,
+
+    ---@param self ProfilerWindow
+    ---@param output BenchmarkOutput
+    ReceiveBenchmarkOutput = function(self, output)
+        local benchmarksTab = self.Tabs.Benchmarks
+        local benchmarkState = State.Benchmarks
+
+        benchmarkState.BenchmarkRunning = output.success == nil
+        local complete = 0
+        if output.data then
+            complete = table.getn(output.data)
+        end
+        if output.runs then
+            benchmarkState.BenchmarkRuns = output.runs
+            benchmarkState.BenchmarkProgress = complete
+        else
+            benchmarkState.BenchmarkProgress = benchmarkState.BenchmarkProgress + complete
+        end
+        benchmarksTab:AddBenchmarkStats(output.data, output.baselines)
+        benchmarksTab:UpdateBenchmarkProgress()
+        benchmarksTab:UpdateRunButtonState()
+    end,
+}
+
+--- Opens up the window
+function OpenWindow()
+    if not CanUseProfiler() then
+        WARN("Unable to open Profiler window")
+        return
+    end
+
+    local State = State
+
+    -- make hotkey act as a toggle
+    if State.WindowIsOpen then
+        CloseWindow()
+        return
+    end
+    SPEW("Opening profiler window")
+
+    State.WindowIsOpen = true
+    -- populate the GUI
+    local localGUI = GUI
+    if localGUI then
+        localGUI:Show()
+        SwitchHeader(State.Header)
+    else
+        GUI = ProfilerWindow(GetFrame(0))
+        SwitchHeader(State.Header)
+        -- retrieve benchmarks
+        SimCallback({
+            Func = "FindBenchmarks",
+            Args = {},
+        })
+        -- toggle the profiler
+        SimCallback({
+            Func = "ToggleProfiler",
+            Args = {
+                ForceEnable = true,
+            },
+        })
+    end
+end
