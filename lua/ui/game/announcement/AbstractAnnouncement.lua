@@ -375,9 +375,15 @@ AbstractAnnouncement = ClassUI(Group) {
         local alphaContent = self.ContentArea:GetAlpha()
         local alphaBackground = self.Background:GetAlpha()
 
+        local lastTime = GetSystemTimeSeconds()
         while not IsDestroyed(self) do
-            alphaContent = math.clamp(alphaContent - 0.05, 0, 1)
-            alphaBackground = math.clamp(alphaBackground - 0.05, 0, 1)
+            -- frame rate independent
+            local currentTime = GetSystemTimeSeconds()
+            local diff = 2 * (currentTime - lastTime)
+            lastTime = currentTime
+
+            alphaContent = math.clamp(alphaContent - diff, 0, 1)
+            alphaBackground = math.clamp(alphaBackground - diff, 0, 1)
 
             self.ContentArea:SetAlpha(alphaContent, true)
             self.Background:SetAlpha(alphaBackground, true)
