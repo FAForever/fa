@@ -419,9 +419,9 @@ BenchmarkModuleLoader = Class() {
         }
     end,
 
-    ---@overload fun(self: BenchmarkModuleLoader, module: Module, metadata: BenchmarkModuleMetadata, error: string)
-    ---@param self BenchmarkModuleLoader
-    ---@param module Module
+    ---@overload fun(self: BenchmarkModuleLoader?, module: Module?, metadata: BenchmarkModuleMetadata, error: string)
+    ---@param self? BenchmarkModuleLoader # unused
+    ---@param module? Module # unused
     ---@param metadata BenchmarkModuleMetadata
     ---@param benchmarksUser table
     ---@param benchmarksSim table

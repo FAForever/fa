@@ -41,6 +41,7 @@ end
 -- @field prototypes nil -- we don't have access to these!
 ---@field upvalueNames string[]
 ---@field upvalues any[]
+---@field info debuginfo
 
 ---@param f function | integer
 ---@return RawFunctionDebugInfo
