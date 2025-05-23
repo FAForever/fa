@@ -166,6 +166,11 @@ AbstractAnnouncement = ClassUI(Group) {
     ---@param self UIAbstractAnnouncement
     ---@param control Control
     AnimateThread = function(self, control)
+        -- early exist for edge case
+        if IsDestroyed(self) then
+            return
+        end
+
         -- internal configuration of the animation
         local expandDuration = 0.4
         local contractDuration = 0.4
@@ -222,6 +227,11 @@ AbstractAnnouncement = ClassUI(Group) {
     ---@param duration number
     ---@param target number
     AnimateContentThread = function(self, duration, from, target)
+        -- early exit for edge case
+        if IsDestroyed(self) then
+            return
+        end
+
         local startTime = GetSystemTimeSeconds()
         local endTime = startTime + duration
         while not IsDestroyed(self) do
@@ -277,6 +287,11 @@ AbstractAnnouncement = ClassUI(Group) {
     ---@param duration number
     ---@param state 'Expand' | 'Contract'
     AnimateBackgroundThread = function(self, control, duration, state)
+        -- early exit for edge case
+        if IsDestroyed(self) then
+            return
+        end
+
         -- local scope for performance
         local background = self.Background
         local content = self.ContentArea
@@ -372,6 +387,11 @@ AbstractAnnouncement = ClassUI(Group) {
     --- Aborts the announcement by turning it completely transparent. The announcement is destroyed at the end of it.
     ---@param self UIAbstractAnnouncement
     AbortAnimationThread = function(self)
+        -- early exit for edge case
+        if IsDestroyed(self) then
+            return
+        end
+
         local alphaContent = self.ContentArea:GetAlpha()
         local alphaBackground = self.Background:GetAlpha()
 
