@@ -75,8 +75,8 @@ function CreateAnnouncement(text, goalControl)
 end
 
 --- Create an announcement UI for sending general messages to the user
----@param titleText string
----@param bodyText string
+---@param titleText UnlocalizedString
+---@param bodyText UnlocalizedString
 ---@param goalControl? Control
 CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
     -- early exit: don't show announcements when the score dialog is open
