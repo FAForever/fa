@@ -1,0 +1,1 @@
+- (#6807) Fix an error when units with 0 fire rate are shared, for example the Seraphim Sniper Bot (XSL0305).
