@@ -40,8 +40,7 @@ end
 --- Create an announcement UI for sending general messages to the user
 ---@param text UnlocalizedString # title text
 ---@param goalControl? Control The control where the announcement appears out of.
----@param secondaryText? UnlocalizedString # body text
-function CreateAnnouncement(text, goalControl, secondaryText)
+function CreateAnnouncement(text, goalControl)
     -- early exit: don't show announcements when the score dialog is open
     local scoreModule = import("/lua/ui/dialogs/score.lua")
     if scoreModule.dialog then
@@ -75,6 +74,44 @@ function CreateAnnouncement(text, goalControl, secondaryText)
     end
 end
 
+--- Create an announcement UI for sending general messages to the user
+---@param titleText string
+---@param bodyText string
+---@param goalControl? Control
+CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
+    -- early exit: don't show announcements when the score dialog is open
+    local scoreModule = import("/lua/ui/dialogs/score.lua")
+    if scoreModule.dialog then
+        return
+    end
+
+    local frame = GetFrame(0) --[[@as Frame]]
+
+    -- create a dummy goal control if we don't have one
+    if not goalControl then
+        goalControl = CreateDefaultGoalControl(frame)
+    end
+
+    -- abort all existing announcements
+    for k, announcement in Announcements do
+        announcement:AbortAnnouncement()
+    end
+
+    -- lazy load the module
+    local TitleTextAnnouncement = import("/lua/ui/game/announcement/TitleTextAnnouncement.lua").TitleTextAnnouncement
+
+    -- create the announcement
+    ---@type UIAbstractAnnouncement
+    local announcement = TitleTextAnnouncement(frame, titleText, bodyText)
+    announcement:Animate(goalControl, 2.2)
+    Announcements:Add(announcement)
+
+    -- feature: immediately hide announcements when game UI is hidden
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
+        announcement:Hide()
+    end
+end
+
 --- Instantly hides the current announcement
 function Contract()
     for k, announcement in Announcements do
@@ -92,3 +129,18 @@ function Expand()
         end
     end
 end
+
+-------------------------------------------------------------------------------
+--#region Debug functionality
+
+--- Creates a title announcement for debugging.
+DebugTitleAnnouncement = function()
+    CreateAnnouncement("Title because X is defeated")
+end
+
+--- Creates a title text announcement for debugging.
+DebugTitleTextAnnouncement = function()
+    CreateTitleTextAnnouncement("Title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+end
+
+--#endregion

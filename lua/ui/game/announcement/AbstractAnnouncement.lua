@@ -147,6 +147,15 @@ AbstractAnnouncement = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 
+    --- A utility function to set the alpha of the content. Concrete implementations 
+    --- can hook this function to set the alpha value of UI elements that do propagate 
+    --- properly when the alpha of a parent is set (looking at you, TextArea).
+    ---@param self UIAbstractAnnouncement
+    ---@param value number
+    SetAlphaOfContent = function(self, value)
+        self.ContentArea:SetAlpha(value, true)
+    end,
+
     ---------------------------------------------------------------------------
     --#region Interface to animate
 
@@ -243,13 +252,13 @@ AbstractAnnouncement = ClassUI(Group) {
 
             local progress = (currentTime - startTime) / duration
             local alpha = math.clamp(MATH_Lerp(progress, from, target), 0, 1)
-            self.ContentArea:SetAlpha(alpha, true)
+            self:SetAlphaOfContent(alpha)
 
             WaitFrames(1)
         end
 
         -- always make sure the target is reached
-        self.ContentArea:SetAlpha(target, true)
+        self:SetAlphaOfContent(target)
     end,
 
     --- Expands the background of the announcement, starting at the provided control towards the content area.
@@ -409,7 +418,7 @@ AbstractAnnouncement = ClassUI(Group) {
             alphaContent = math.clamp(alphaContent - diff, 0, 1)
             alphaBackground = math.clamp(alphaBackground - diff, 0, 1)
 
-            self.ContentArea:SetAlpha(alphaContent, true)
+            self:SetAlphaOfContent(alphaContent)
             self.Background:SetAlpha(alphaBackground, true)
 
             if alphaContent == 0 and alphaBackground == 0 then
