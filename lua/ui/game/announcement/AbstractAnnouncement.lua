@@ -48,7 +48,7 @@ local CreateLazyVar = import("/lua/lazyvar.lua").Create
 ---@field ContentArea Group                     # Content area that we animate to/from
 AbstractAnnouncement = ClassUI(Group) {
 
-    -- Announcements works by morphing the background from a control, to the content are and back. By doing so,
+    -- Announcements works by morphing the background from a control, to the content area, and then back. By doing so,
     -- we give the player an idea what the announcement is connected to. The content of the announcement is never 
     -- moved, only the background is. The alpha of the content is adjusted when the announcement arrives and 
     -- leaves again.
