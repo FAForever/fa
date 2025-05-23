@@ -392,7 +392,7 @@ AbstractAnnouncement = ClassUI(Group) {
         self:Destroy()
     end,
 
-    --- Cancels the animation thread.
+    --- Cancels the main animation thread.
     ---@param self UIAbstractAnnouncement
     CancelAnimation = function(self)
         if self.AnimateThreadInstance then
