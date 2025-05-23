@@ -153,7 +153,7 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- baseline loop adjustment
     local baselineLoop = benchmarkBaselines[parameterCount]
-    if baselineLoop == test or parameters.rawtime then -- don't test ourself!
+    if baselineLoop == test then -- don't test ourself!
         baselineLoop = nil
     end
 
