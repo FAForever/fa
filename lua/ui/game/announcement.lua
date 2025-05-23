@@ -22,8 +22,6 @@
 
 local Group = import("/lua/maui/group.lua").Group
 
-local SmallAnnouncement = import("/lua/ui/game/announcement/SmallAnnouncement.lua").SmallAnnouncement
-
 ---@type TrashBag | UIAbstractAnnouncement[]
 local Announcements = TrashBag()
 
@@ -61,6 +59,9 @@ function CreateAnnouncement(text, goalControl, secondaryText)
     for k, announcement in Announcements do
         announcement:AbortAnnouncement()
     end
+
+    -- lazy load the module
+    local SmallAnnouncement = import("/lua/ui/game/announcement/SmallAnnouncement.lua").SmallAnnouncement
 
     -- create the announcement
     ---@type UIAbstractAnnouncement
