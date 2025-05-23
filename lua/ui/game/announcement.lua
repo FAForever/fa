@@ -66,7 +66,7 @@ function CreateAnnouncement(text, goalControl, secondaryText)
     -- create the announcement
     ---@type UIAbstractAnnouncement
     local announcement = SmallAnnouncement(frame, text)
-    announcement:Animate(goalControl)
+    announcement:Animate(goalControl, 1.4)
     Announcements:Add(announcement)
 
     -- feature: immediately hide announcements when game UI is hidden

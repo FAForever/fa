@@ -153,19 +153,21 @@ AbstractAnnouncement = ClassUI(Group) {
     --- The default animation sequence for an announcement. The announcement is destroyed at the end of the animation.
     ---@param self UIAbstractAnnouncement
     ---@param control Control
-    Animate = function(self, control)
+    ---@param durationForContent number
+    Animate = function(self, control, durationForContent)
         -- do not allow other animations
         if self.AnimateThreadInstance then
             self.AnimateThreadInstance:Destroy()
         end
 
-        self.AnimateThreadInstance = self.Trash:Add(ForkThread(self.AnimateThread, self, control))
+        self.AnimateThreadInstance = self.Trash:Add(ForkThread(self.AnimateThread, self, control, durationForContent))
     end,
 
     --- The default animation sequence for an announcement. The announcement is destroyed at the end of the animation.
     ---@param self UIAbstractAnnouncement
     ---@param control Control
-    AnimateThread = function(self, control)
+    ---@param durationForContent number
+    AnimateThread = function(self, control, durationForContent)
         -- early exist for edge case
         if IsDestroyed(self) then
             return
@@ -174,8 +176,7 @@ AbstractAnnouncement = ClassUI(Group) {
         -- internal configuration of the animation
         local expandDuration = 0.4
         local contractDuration = 0.4
-        local contentDuration = 2.0
-        local contentShowDuration = 0.6
+        local contentShowDuration = 0.5
         local contentHideDuration = 0.4
 
         -- expand animation
@@ -187,7 +188,7 @@ AbstractAnnouncement = ClassUI(Group) {
 
         -- show content and hide it
         self:AnimateContent(contentShowDuration, 1.0)
-        WaitSeconds(contentShowDuration + contentDuration)
+        WaitSeconds(contentShowDuration + durationForContent)
         if IsDestroyed(self) then
             return
         end
@@ -246,6 +247,9 @@ AbstractAnnouncement = ClassUI(Group) {
 
             WaitFrames(1)
         end
+
+        -- always make sure the target is reached
+        self.ContentArea:SetAlpha(target, true)
     end,
 
     --- Expands the background of the announcement, starting at the provided control towards the content area.
