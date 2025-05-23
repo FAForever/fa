@@ -222,7 +222,6 @@ AbstractAnnouncement = ClassUI(Group) {
     ---@param duration number
     ---@param target number
     AnimateContentThread = function(self, duration, from, target)
-        -- animate it
         local startTime = GetSystemTimeSeconds()
         local endTime = startTime + duration
         while not IsDestroyed(self) do
