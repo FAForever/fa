@@ -408,7 +408,7 @@ AbstractAnnouncement = ClassUI(Group) {
         end
     end,
 
-    --- Cancels the animation of the content, stopping it in its tracks. 
+    --- Cancels the animation of the content.
     ---@param self UIAbstractAnnouncement
     CancelContentAnimation = function(self)
         if self.AnimateContentThreadInstance then
