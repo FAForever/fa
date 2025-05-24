@@ -1642,9 +1642,9 @@ function CategorizeUnits(formationUnits)
         for type, table in categoryTables do
             for category, _ in table do
                 if EntityCategoryContains(table[category], u) then
-                    local bp = u:GetBlueprint()
-                    local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
-                    local id = bp.BlueprintId
+                    local blueprint = u:GetBlueprint()
+                    local fs = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
+                    local id = blueprint.BlueprintId
 
                     if not unitsList[type][category][fs] then
                         unitsList[type][category][fs] = {Count = 0, Categories = {}}
