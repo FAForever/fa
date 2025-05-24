@@ -185,7 +185,7 @@ AbstractAnnouncement = ClassUI(Group) {
         -- internal configuration of the animation
         local expandDuration = 0.4
         local contractDuration = 0.4
-        local contentShowDuration = 0.5
+        local contentShowDuration = 0.2
         local contentHideDuration = 0.4
 
         -- expand animation
