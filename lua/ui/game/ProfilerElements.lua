@@ -522,7 +522,7 @@ StatisticSummary = Class(Group) {
         self:SetStats()
     end,
 
-    ---@overload fun() # Clear stats
+    ---@overload fun(self: StatisticSummary, nil: nil, nil: nil) # Clear stats
     ---@param self StatisticSummary
     ---@param stats { [integer]: number, n: integer }
     ---@param baselines { [integer]: number, n: integer }
