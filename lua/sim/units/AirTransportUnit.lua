@@ -90,7 +90,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
                 totalweight = maxWeight
                 break
             end
-	    end
+        end
         self:SetSpeedMult(1 - (totalweight / transportspeed))
     end,
 
@@ -148,7 +148,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         end
         -- these need to be defined for certain behaviors (like ctrl-k) to function
         damageType = damageType or "Normal"
-        excessDamageRatio =  excessDamageRatio or 0
+        excessDamageRatio = excessDamageRatio or 0
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 
