@@ -61,7 +61,9 @@ local State = {
     Benchmarks = {
         BenchmarkProgress = 0,
         BenchmarkRunning = false,
+        ---@type number
         BenchmarkRunningMod = false,
+        ---@type number
         BenchmarkRunningBen = false,
         BenchmarkRuns = 0,
         ---@type UserBenchmarkModule[]
@@ -170,6 +172,7 @@ end
 ---@param modIndex? number
 ---@param benIndex? number
 ---@return number[] | nil
+---@return number[]?
 local function GetBenchmarkStatCache(modIndex, benIndex)
     local key = GetBenchmarkCacheKey(modIndex, benIndex)
     return State.Benchmarks.StatCache[key], State.Benchmarks.BaselineCache[key]
@@ -185,12 +188,12 @@ local function SetBenchmarkStatCache(data, baselines, modIndex, benIndex)
     State.Benchmarks.BaselineCache[key] = baselines
 end
 
----@param data number[] | nil
----@param baselines number[] | nil
+---@param data { [integer]: number, n: integer } | nil
+---@param baselines number[]
 ---@param modIndex? number
 ---@param benIndex? number
----@return number[] | nil data
----@return number[] | nil baselines
+---@return { [integer]: number, n: integer } | nil data
+---@return { [integer]: number, n: integer } | nil baselines
 local function AddBenchmarkStatCache(data, baselines, modIndex, benIndex)
     local key = GetBenchmarkCacheKey(modIndex, benIndex)
     local statCaches = State.Benchmarks.StatCache
@@ -474,7 +477,7 @@ ProfilerStamps = Class(Group) {
 
 ---@class ProfilerBenchmarks : Group
 ---@field benchmarkText Text
----@field benchmarkList ItemList
+---@field benchmarkList ItemList | { background: Bitmap }
 ---@field bytecode BytecodeArea
 ---@field fileText Text
 ---@field groupInput Group
@@ -618,7 +621,7 @@ ProfilerBenchmarks = Class(Group) {
                 UIUtil.highlightColor, "bcfffe"
             )
             :MouseoverItem(true)
-            :End()
+            :End() --[[ @as ItemList | { background: Bitmap } ]]
         UIUtil.CreateLobbyVertScrollbar(benchmarkList, 0, 0, 0)
 
         Layouter(benchmarkList.background)
@@ -802,7 +805,7 @@ ProfilerBenchmarks = Class(Group) {
         if type(info) == "table" then
             info = DebugFunction(info)
         end
-        bytecodeArea:SetFunction(info)
+        bytecodeArea:SetFunction(info --[[@as string?]])
         self:UpdateParametersLabel()
         self:UpdateBenchmarkStats()
         self:UpdateRunButtonState()
