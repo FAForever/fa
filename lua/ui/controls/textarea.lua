@@ -48,14 +48,6 @@ TextArea = ClassUI(ItemList) {
         self.Width.OnDirty = function(var)
             self:ReflowText()
         end
-
-        -- Reflow text when the text properties of this ItemList are changed (see itemlist.lua)
-        local fontOnDirty = function(var)
-            self:_internalSetFont()
-        end
-
-        self._font._family.OnDirty = fontOnDirty
-        self._font._pointsize.OnDirty = fontOnDirty
     end,
 
     ---@param self TextArea
