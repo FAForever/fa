@@ -12,6 +12,8 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
+local MathAbs = math.abs
+
 local TableGetn = table.getn
 local TableInsert = table.insert
 
@@ -1425,7 +1427,7 @@ function GetLargeAirPositions(unitsList, airBlock)
                 formationLength = formationLength + 1
                 whichCol = 1
                 local x, y = GetChevronPosition(1, currRowLen, formationLength)
-                wideRow = math.abs(x) >= radius
+                wideRow = MathAbs(x) >= radius
             else
                 whichCol = whichCol + 2
             end
@@ -1435,7 +1437,7 @@ function GetLargeAirPositions(unitsList, airBlock)
             end
 
             local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
-            if whichCol ~= 1 and math.abs(xPos) < radius then
+            if whichCol ~= 1 and MathAbs(xPos) < radius then
                 continue
             end
 
