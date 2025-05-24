@@ -1642,26 +1642,27 @@ function CategorizeUnits(formationUnits)
     for _, unit in formationUnits do
         local identified = false
         for type, table in categoryTables do
+            local categorizationForType = unitsList[type]
+
             for category, _ in table do
                 if EntityCategoryContains(table[category], unit) then
                     local blueprint = unit:GetBlueprint()
                     local footprintSize = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
                     local id = blueprint.BlueprintId
 
-                    local typeCategories = unitsList[type]
-                    local categoryFootprintSizes = typeCategories[category]
+                    local categoryFootprintSizes = categorizationForType[category]
 
                     if not categoryFootprintSizes[footprintSize] then
                         categoryFootprintSizes[footprintSize] = {Count = 0, Categories = {}}
                     end
                     categoryFootprintSizes[footprintSize].Count = categoryFootprintSizes[footprintSize].Count + 1
                     categoryFootprintSizes[footprintSize].Categories[id] = categories[id]
-                    typeCategories.FootprintCounts[footprintSize] = (typeCategories.FootprintCounts[footprintSize] or 0) + 1
+                    categorizationForType.FootprintCounts[footprintSize] = (categorizationForType.FootprintCounts[footprintSize] or 0) + 1
 
                     if category == "RemainingCategory" then
                         LOG('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
-                    typeCategories.UnitTotal = typeCategories.UnitTotal + 1
+                    categorizationForType.UnitTotal = categorizationForType.UnitTotal + 1
                     identified = true
                     break
                 end
