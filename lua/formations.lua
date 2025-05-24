@@ -1572,6 +1572,7 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function CategorizeUnits(formationUnits)
+    -- TODO: @ostrovaya @NOPUBLISH
     LOG('wtf')
     LOG('test')
     LOG('gross')
