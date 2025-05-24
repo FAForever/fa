@@ -1572,47 +1572,23 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function CategorizeUnits(formationUnits)
-    local unitsList = {
-        Land = {
-            Bot1 = {}, Bot2 = {}, Bot3 = {}, Bot4 = {},
-            Tank1 = {}, Tank2 = {}, Tank3 = {}, Tank4 = {},
-            Sniper1 = {}, Sniper2 = {}, Sniper3 = {}, Sniper4 = {},
-            Art1 = {}, Art2 = {}, Art3 = {}, Art4 = {},
-            AA1 = {}, AA2 = {}, AA3 = {},
-            Com1 = {}, Com2 = {}, Com3 = {}, Com4 = {},
-            Util1 = {}, Util2 = {}, Util3 = {}, Util4 = {},
-            Shields = {},
-            RemainingCategory = {},
-        },
+    LOG('wtf')
+    LOG('test')
+    LOG('gross')
 
-        Air = {
-            Ground1 = {}, Ground2 = {}, Ground3 = {},
-            Trans1 = {}, Trans2 = {}, Trans3 = {},
-            Bomb1 = {}, Bomb2 = {}, Bomb3 = {},
-            AA1 = {}, AA2 = {}, AA3 = {},
-            AN1 = {}, AN2 = {}, AN3 = {},
-            AIntel1 = {}, AIntel2 = {}, AIntel3 = {},
-            AExper = {},
-            AEngineer = {},
-            RemainingCategory = {},
-        },
+    local unitsList = {}
 
-        Naval = {
-            CarrierCount = {},
-            BattleshipCount = {},
-            DestroyerCount = {},
-            CruiserCount = {},
-            FrigateCount = {},
-            LightCount = {},
-            NukeSubCount = {},
-            MobileSonarCount = {},
-            RemainingCategory = {},
-        },
+    -- initialize each unit type section by its categories
+    local categoryTables = { Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
+    for unitType, typeCategories in categoryTables do
+        if not unitsList[unitType] then
+            unitsList[unitType] = {}
+        end
 
-        Subs = {
-            SubCount = {},
-        },
-    }
+        for categoryName, _ in typeCategories do
+            unitsList[unitType][categoryName] = {}
+        end
+    end
 
     -- initialize common fields for each unit type
     for _, unitType in {'Land', 'Air', 'Naval', 'Subs'} do
@@ -1627,8 +1603,6 @@ function CategorizeUnits(formationUnits)
 
     -- TODO: @ostrovaya @NOPUBLISH
     LOG('CategorizeUnits called!')
-
-    local categoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
 
     -- Loop through each unit to get its category and size
     for _, unit in formationUnits do
@@ -1692,11 +1666,11 @@ function CategorizeUnits(formationUnits)
     end
 
     -- TODO: @ostrovaya @NOPUBLISH
+    LOG(reprsl(unitsList))
     LOG("air unit total")
     LOG(reprsl(unitsList.Air.UnitTotal))
     LOG("land unit total")
     LOG(reprsl(unitsList.Land.UnitTotal))
-    -- LOG(reprsl(unitsList))
 
     CalculateSizes(unitsList)
 
