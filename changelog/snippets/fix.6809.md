@@ -1,0 +1,1 @@
+-(#6809) Fix the disconnection delay option using the title/description texts of the disconnect ACU share option.

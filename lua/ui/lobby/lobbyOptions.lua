@@ -237,13 +237,13 @@ globalOpts = {
     },
     {
         default = 1,
-        label = "<LOC lobui_0798>DC Share Conditions",
-        help = "<LOC lobui_0799>Set what happens to a player's units when they disconnect.",
+        label = "<LOC lobui_dc_share_01>DC Share Conditions",
+        help = "<LOC lobui_dc_share_02>Set what happens to a player's units when they disconnect.",
         key = 'DisconnectShare',
         values = {
             {
-                text = "<LOC lobui_0800>Same as Share Condition",
-                help = "<LOC lobui_0801>Treat disconnecting players the same as defeated players.",
+                text = "<LOC lobui_dc_share_03>Same as Share Condition",
+                help = "<LOC lobui_dc_share_04>Treat disconnecting players the same as defeated players.",
                 key = 'SameAsShare',
             },
             -- Commented out until further discussion on how the feature should behave and what options should be available.
@@ -282,30 +282,30 @@ globalOpts = {
     },
     {
         default = 1,
-        label = "<LOC lobui_0808>DC ACU Share Conditions",
-        help = "<LOC lobui_0809>Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes.",
+        label = "<LOC lobui_dc_share_05>DC ACU Share Conditions",
+        help = "<LOC lobui_dc_share_06>Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes.",
         key = 'DisconnectShareCommanders',
         values = {
             {
-                text = "<LOC lobui_0810>Explode",
-                help = "<LOC lobui_0811>ACUs explode when their player disconnects.",
+                text = "<LOC lobui_dc_share_07>Explode",
+                help = "<LOC lobui_dc_share_08>ACUs explode when their player disconnects.",
                 key = 'Explode',
             },
             -- Commented out until further discussion on how the feature should behave and what options should be available.
             -- The single choice option above is sent to the sim but does not show in the lobby UI, so everything will work as before.
             -- {
-            --     text = "<LOC lobui_0812>Recall",
-            --     help = "<LOC lobui_0813>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
+            --     text = "<LOC lobui_dc_share_09>Recall",
+            --     help = "<LOC lobui_dc_share_10>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
             --     key = 'Recall',
             -- },
             -- {
-            --     text = "<LOC lobui_0814>Delayed Recall",
-            --     help = "<LOC lobui_0815>Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls.",
+            --     text = "<LOC lobui_dc_share_11>Delayed Recall",
+            --     help = "<LOC lobui_dc_share_12>Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls.",
             --     key = 'RecallDelayed',
             -- },
             -- {
-            --     text = "<LOC lobui_0816>Permanent",
-            --     help = "<LOC lobui_0817>Disconnected ACUs are permanently shared to allies.",
+            --     text = "<LOC lobui_dc_share_13>Permanent",
+            --     help = "<LOC lobui_dc_share_14>Disconnected ACUs are permanently shared to allies.",
             --     key = 'Permanent',
             -- },
         },
