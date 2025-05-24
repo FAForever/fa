@@ -1583,9 +1583,6 @@ function CategorizeUnits(formationUnits)
             Util1 = {}, Util2 = {}, Util3 = {}, Util4 = {},
             Shields = {},
             RemainingCategory = {},
-
-            FootprintCounts = {},
-            FootprintSizes = {},
         },
 
         Air = {
@@ -1598,9 +1595,6 @@ function CategorizeUnits(formationUnits)
             AExper = {},
             AEngineer = {},
             RemainingCategory = {},
-
-            FootprintCounts = {},
-            FootprintSizes = {},
         },
 
         Naval = {
@@ -1613,16 +1607,10 @@ function CategorizeUnits(formationUnits)
             NukeSubCount = {},
             MobileSonarCount = {},
             RemainingCategory = {},
-
-            FootprintCounts = {},
-            FootprintSizes = {},
         },
 
         Subs = {
             SubCount = {},
-
-            FootprintCounts = {},
-            FootprintSizes = {},
         },
     }
 
@@ -1630,6 +1618,10 @@ function CategorizeUnits(formationUnits)
     for _, unitType in {'Land', 'Air', 'Naval', 'Subs'} do
         for _, commonNumberField in {'UnitTotal', 'AreaTotal'} do
             unitsList[unitType][commonNumberField] = 0
+        end
+
+        for _, commonTableField in {'FootprintCounts', 'FootprintSizes'} do
+            unitsList[unitType][commonTableField] = {}
         end
     end
 
