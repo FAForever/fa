@@ -56,7 +56,9 @@ CreateTitleAnnouncement = function(titleText, goalControl)
 
     -- abort all existing announcements
     for k, announcement in Announcements do
-        announcement:AbortAnnouncement()
+        if not IsDestroyed(announcement) then
+            announcement:AbortAnnouncement()
+        end
     end
 
     -- lazy load the module
@@ -94,7 +96,9 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
 
     -- abort all existing announcements
     for k, announcement in Announcements do
-        announcement:AbortAnnouncement()
+        if not IsDestroyed(announcement) then
+            announcement:AbortAnnouncement()
+        end
     end
 
     -- lazy load the module
