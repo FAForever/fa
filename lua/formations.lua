@@ -1646,11 +1646,13 @@ function CategorizeUnits(formationUnits)
                     local footprintSize = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
                     local id = blueprint.BlueprintId
 
-                    if not unitsList[type][category][footprintSize] then
-                        unitsList[type][category][footprintSize] = {Count = 0, Categories = {}}
+                    local categoryFootprintSizes = unitsList[type][category]
+
+                    if not categoryFootprintSizes[footprintSize] then
+                        categoryFootprintSizes[footprintSize] = {Count = 0, Categories = {}}
                     end
-                    unitsList[type][category][footprintSize].Count = unitsList[type][category][footprintSize].Count + 1
-                    unitsList[type][category][footprintSize].Categories[id] = categories[id]
+                    categoryFootprintSizes[footprintSize].Count = categoryFootprintSizes[footprintSize].Count + 1
+                    categoryFootprintSizes[footprintSize].Categories[id] = categories[id]
                     unitsList[type].FootprintCounts[footprintSize] = (unitsList[type].FootprintCounts[footprintSize] or 0) + 1
 
                     if category == "RemainingCategory" then
