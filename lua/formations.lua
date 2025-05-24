@@ -1634,6 +1634,8 @@ function CategorizeUnits(formationUnits)
         },
     }
 
+    LOG('CategorizeUnits called!')
+
     local categoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
 
     -- Loop through each unit to get its category and size
@@ -1646,19 +1648,20 @@ function CategorizeUnits(formationUnits)
                     local footprintSize = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
                     local id = blueprint.BlueprintId
 
-                    local categoryFootprintSizes = unitsList[type][category]
+                    local typeCategories = unitsList[type]
+                    local categoryFootprintSizes = typeCategories[category]
 
                     if not categoryFootprintSizes[footprintSize] then
                         categoryFootprintSizes[footprintSize] = {Count = 0, Categories = {}}
                     end
                     categoryFootprintSizes[footprintSize].Count = categoryFootprintSizes[footprintSize].Count + 1
                     categoryFootprintSizes[footprintSize].Categories[id] = categories[id]
-                    unitsList[type].FootprintCounts[footprintSize] = (unitsList[type].FootprintCounts[footprintSize] or 0) + 1
+                    typeCategories.FootprintCounts[footprintSize] = (typeCategories.FootprintCounts[footprintSize] or 0) + 1
 
                     if category == "RemainingCategory" then
                         LOG('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
-                    unitsList[type].UnitTotal = unitsList[type].UnitTotal + 1
+                    typeCategories.UnitTotal = typeCategories.UnitTotal + 1
                     identified = true
                     break
                 end
@@ -1676,8 +1679,9 @@ function CategorizeUnits(formationUnits)
     -- Loop through each category and combine the types within into a single filter category for each size
     for type, table in categoryTables do
         for category, _ in table do
-            if unitsList[type][category] then
-                for footprintSize, data in unitsList[type][category] do
+            local categoryFootprintSizes = unitsList[type][category]
+            if categoryFootprintSizes then
+                for footprintSize, data in categoryFootprintSizes do
                     local filter = nil
                     for _, category in data.Categories do
                         if not filter then
@@ -1686,7 +1690,7 @@ function CategorizeUnits(formationUnits)
                             filter = filter + category
                         end
                     end
-                    unitsList[type][category][footprintSize] = {Count = data.Count, Filter = filter}
+                    categoryFootprintSizes[footprintSize] = {Count = data.Count, Filter = filter}
                 end
             end
         end
