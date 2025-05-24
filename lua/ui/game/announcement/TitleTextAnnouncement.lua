@@ -43,7 +43,7 @@ TitleTextAnnouncement = ClassUI(AbstractAnnouncement) {
 
         self.Title = UIUtil.CreateText(self.ContentArea, text, 22, UIUtil.titleFont)
         self.Text = TextArea(self.ContentArea, 600, 60)
-        self.Text:SetText(bodyText)
+        self.Text:SetText(LOC(bodyText))
     end,
 
     ---@param self UITitleTextAnnouncement
