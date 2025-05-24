@@ -1634,6 +1634,7 @@ function CategorizeUnits(formationUnits)
         },
     }
 
+    -- TODO: @ostrovaya @NOPUBLISH
     LOG('CategorizeUnits called!')
 
     local categoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
