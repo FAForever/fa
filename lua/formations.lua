@@ -12,6 +12,7 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
+local TableGetn = table.getn
 
 SurfaceFormations = {
     'AttackFormation',
@@ -41,7 +42,7 @@ function GetCachedResults(formationUnits, formationType)
         return false
     end
 
-    local unitCount = table.getn(formationUnits)
+    local unitCount = TableGetn(formationUnits)
     for _, data in cache do
         if data.UnitCount == unitCount then
             local match = true
@@ -69,10 +70,10 @@ function CacheResults(results, formationUnits, formationType)
     end
 
     local cache = FormationCache[formationType]
-    if table.getn(cache) >= MaxCacheSize then
+    if TableGetn(cache) >= MaxCacheSize then
         table.remove(cache)
     end
-    table.insert(cache, 1, {Results = results, Units = formationUnits, UnitCount = table.getn(formationUnits)})
+    table.insert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
 end
 
 -- =========================================
@@ -854,7 +855,7 @@ function GuardFormation(formationUnits)
     local shieldCategory = ShieldCat
     local nonShieldCategory = categories.ALLUNITS - shieldCategory
     local footprintCounts = {}
-    local remainingUnits = table.getn(formationUnits)
+    local remainingUnits = TableGetn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
         if EntityCategoryContains(ShieldCat, u) then
@@ -941,11 +942,11 @@ end
 ---@return table
 function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     spacing = (spacing or 1) * unitsList.Scale
-    local numRows = table.getn(formationBlock)
+    local numRows = TableGetn(formationBlock)
     local rowNum = 1
     local whichRow = 1
     local whichCol = 1
-    local currRowLen = table.getn(formationBlock[whichRow])
+    local currRowLen = TableGetn(formationBlock[whichRow])
     local rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
     currRowLen = currRowLen - rowModifier
     local evenRowLen = math.mod(currRowLen, 2) == 0
@@ -965,7 +966,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             formationLength = formationLength + 1 + (formationBlock.LineBreak or 0)
             whichCol = 1
             rowType = false
-            currRowLen = table.getn(formationBlock[whichRow])
+            currRowLen = TableGetn(formationBlock[whichRow])
             if occupiedSpaces[rowNum] then
                 rowModifier = 0
             else
@@ -1177,11 +1178,11 @@ end
 ---@return table
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
-    local numRows = table.getn(airBlock)
+    local numRows = TableGetn(airBlock)
     local whichRow = 1
     local whichCol = 1
     local chevronPos = 1
-    local currRowLen = table.getn(airBlock[whichRow])
+    local currRowLen = TableGetn(airBlock[whichRow])
     local chevronSize = airBlock.ChevronSize or 5
     local chevronType = false
     local formationLength = 0
@@ -1225,11 +1226,11 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
-                        currRowLen = table.getn(airBlock[whichRow])
+                        currRowLen = TableGetn(airBlock[whichRow])
                     end
                 else
                     whichRow = whichRow + 1
-                    currRowLen = table.getn(airBlock[whichRow])
+                    currRowLen = TableGetn(airBlock[whichRow])
                 end
                 formationLength = formationLength + 1
                 whichCol = 1
@@ -1306,11 +1307,11 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
         }
     end
 
-    local numRows = table.getn(airBlock)
+    local numRows = TableGetn(airBlock)
     local whichRow = 1
     local whichCol = 1
     local chevronPos = 1
-    local currRowLen = table.getn(airBlock[whichRow])
+    local currRowLen = TableGetn(airBlock[whichRow])
     local chevronSize = 1
     local chevronType = false
     local formationLength = 0
@@ -1332,11 +1333,11 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
-                        currRowLen = table.getn(airBlock[whichRow])
+                        currRowLen = TableGetn(airBlock[whichRow])
                     end
                 else
                     whichRow = whichRow + 1
-                    currRowLen = table.getn(airBlock[whichRow])
+                    currRowLen = TableGetn(airBlock[whichRow])
                 end
                 formationLength = formationLength + 1
                 whichCol = 1
@@ -1399,7 +1400,7 @@ function GetLargeAirPositions(unitsList, airBlock)
         end
     end
 
-    local numRows = table.getn(airBlock)
+    local numRows = TableGetn(airBlock)
     local whichRow = 0
     local whichCol = 0
     local currRowLen = 0
@@ -1414,11 +1415,11 @@ function GetLargeAirPositions(unitsList, airBlock)
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
-                        currRowLen = table.getn(airBlock[whichRow])
+                        currRowLen = TableGetn(airBlock[whichRow])
                     end
                 else
                     whichRow = whichRow + 1
-                    currRowLen = table.getn(airBlock[whichRow])
+                    currRowLen = TableGetn(airBlock[whichRow])
                 end
                 formationLength = formationLength + 1
                 whichCol = 1
