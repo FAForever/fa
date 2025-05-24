@@ -37,13 +37,23 @@ local function CreateDefaultGoalControl(frame)
     return goalControl
 end
 
+--- A utility function that determines when announcements should be skipped
+---@return boolean
+local function ShouldSkipAnnouncement()
+    -- early exit: don't show announcements when the score dialog is open
+    local scoreModule = import("/lua/ui/dialogs/score.lua")
+    if scoreModule.dialog then
+        return true
+    end
+
+    return false
+end
+
 --- Create an announcement with a title.
 ---@param titleText UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
 CreateTitleAnnouncement = function(titleText, goalControl)
-    -- early exit: don't show announcements when the score dialog is open
-    local scoreModule = import("/lua/ui/dialogs/score.lua")
-    if scoreModule.dialog then
+    if ShouldSkipAnnouncement() then
         return
     end
 
@@ -81,9 +91,7 @@ end
 ---@param bodyText UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
 CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
-    -- early exit: don't show announcements when the score dialog is open
-    local scoreModule = import("/lua/ui/dialogs/score.lua")
-    if scoreModule.dialog then
+    if ShouldSkipAnnouncement() then
         return
     end
 
