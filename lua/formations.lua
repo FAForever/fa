@@ -1643,15 +1643,15 @@ function CategorizeUnits(formationUnits)
             for category, _ in table do
                 if EntityCategoryContains(table[category], u) then
                     local blueprint = u:GetBlueprint()
-                    local fs = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
+                    local footprintSize = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
                     local id = blueprint.BlueprintId
 
-                    if not unitsList[type][category][fs] then
-                        unitsList[type][category][fs] = {Count = 0, Categories = {}}
+                    if not unitsList[type][category][footprintSize] then
+                        unitsList[type][category][footprintSize] = {Count = 0, Categories = {}}
                     end
-                    unitsList[type][category][fs].Count = unitsList[type][category][fs].Count + 1
-                    unitsList[type][category][fs].Categories[id] = categories[id]
-                    unitsList[type].FootprintCounts[fs] = (unitsList[type].FootprintCounts[fs] or 0) + 1
+                    unitsList[type][category][footprintSize].Count = unitsList[type][category][footprintSize].Count + 1
+                    unitsList[type][category][footprintSize].Categories[id] = categories[id]
+                    unitsList[type].FootprintCounts[footprintSize] = (unitsList[type].FootprintCounts[footprintSize] or 0) + 1
 
                     if category == "RemainingCategory" then
                         LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
@@ -1675,7 +1675,7 @@ function CategorizeUnits(formationUnits)
     for type, table in categoryTables do
         for category, _ in table do
             if unitsList[type][category] then
-                for fs, data in unitsList[type][category] do
+                for footprintSize, data in unitsList[type][category] do
                     local filter = nil
                     for _, category in data.Categories do
                         if not filter then
@@ -1684,7 +1684,7 @@ function CategorizeUnits(formationUnits)
                             filter = filter + category
                         end
                     end
-                    unitsList[type][category][fs] = {Count = data.Count, Filter = filter}
+                    unitsList[type][category][footprintSize] = {Count = data.Count, Filter = filter}
                 end
             end
         end
