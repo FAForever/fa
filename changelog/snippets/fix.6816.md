@@ -1,0 +1,1 @@
+- (#6816) Fix `WrapText` not picking up single trailing characters after newlines.

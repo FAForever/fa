@@ -188,7 +188,7 @@ function WrapText(text, lineWidth, advanceFunction)
                 -- find the next line feed
                 lfStartIndex = string.find(packedWord, "\n", curIndex)
                 -- pick up any trailing word
-                if not lfStartIndex and curIndex < bytes then
+                if not lfStartIndex and curIndex <= bytes then
                     table.insert(words, string.sub(packedWord, curIndex, bytes))
                 end
             end
