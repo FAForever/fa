@@ -49,6 +49,16 @@ local function ShouldSkipAnnouncement()
     return false
 end
 
+--- A utility function that determines when announcements should be immediately hidden
+local function ShouldImmediatelyHideAnnouncement()
+    -- feature: immediately hide announcements when game UI is hidden
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
+        return true
+    end
+
+    return false
+end
+
 --- Create an announcement with a title.
 ---@param titleText UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
@@ -81,7 +91,7 @@ CreateTitleAnnouncement = function(titleText, goalControl)
     Announcements:Add(announcement)
 
     -- feature: immediately hide announcements when game UI is hidden
-    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
+    if ShouldImmediatelyHideAnnouncement() then
         announcement:Hide()
     end
 end
@@ -119,7 +129,7 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
     Announcements:Add(announcement)
 
     -- feature: immediately hide announcements when game UI is hidden
-    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
+    if ShouldImmediatelyHideAnnouncement() then
         announcement:Hide()
     end
 end
