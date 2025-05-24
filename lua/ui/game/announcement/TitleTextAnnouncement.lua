@@ -36,7 +36,8 @@ TitleTextAnnouncement = ClassUI(AbstractAnnouncement) {
 
     ---@param self UITitleTextAnnouncement
     ---@param parent Control
-    ---@param text string
+    ---@param text UnlocalizedString
+    ---@param bodyText UnlocalizedString
     __init = function(self, parent, text, bodyText)
         AbstractAnnouncement.__init(self, parent)
 
