@@ -1584,8 +1584,6 @@ function CategorizeUnits(formationUnits)
             Shields = {},
             RemainingCategory = {},
 
-            UnitTotal = 0,
-            AreaTotal = 0,
             FootprintCounts = {},
             FootprintSizes = {},
         },
@@ -1601,8 +1599,6 @@ function CategorizeUnits(formationUnits)
             AEngineer = {},
             RemainingCategory = {},
 
-            UnitTotal = 0,
-            AreaTotal = 0,
             FootprintCounts = {},
             FootprintSizes = {},
         },
@@ -1618,8 +1614,6 @@ function CategorizeUnits(formationUnits)
             MobileSonarCount = {},
             RemainingCategory = {},
 
-            UnitTotal = 0,
-            AreaTotal = 0,
             FootprintCounts = {},
             FootprintSizes = {},
         },
@@ -1627,12 +1621,17 @@ function CategorizeUnits(formationUnits)
         Subs = {
             SubCount = {},
 
-            UnitTotal = 0,
-            AreaTotal = 0,
             FootprintCounts = {},
             FootprintSizes = {},
         },
     }
+
+    -- initialize common fields for each unit type
+    for _, unitType in {'Land', 'Air', 'Naval', 'Subs'} do
+        for _, commonIntField in {'UnitTotal', 'AreaTotal'} do
+            unitsList[unitType][commonIntField] = 0
+        end
+    end
 
     -- TODO: @ostrovaya @NOPUBLISH
     LOG('CategorizeUnits called!')
@@ -1699,6 +1698,13 @@ function CategorizeUnits(formationUnits)
             end
         end
     end
+
+    -- TODO: @ostrovaya @NOPUBLISH
+    LOG("air unit total")
+    LOG(reprsl(unitsList.Air.UnitTotal))
+    LOG("land unit total")
+    LOG(reprsl(unitsList.Land.UnitTotal))
+    -- LOG(reprsl(unitsList))
 
     CalculateSizes(unitsList)
 
