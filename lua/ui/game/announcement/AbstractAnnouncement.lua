@@ -412,7 +412,7 @@ AbstractAnnouncement = ClassUI(Group) {
         while not IsDestroyed(self) do
             -- frame rate independent
             local currentTime = GetSystemTimeSeconds()
-            local diff = 2 * (currentTime - lastTime)
+            local diff = 2 * (currentTime - lastTime) -- 100% alpha change in 0.5 seconds
             lastTime = currentTime
 
             alphaContent = math.clamp(alphaContent - diff, 0, 1)
