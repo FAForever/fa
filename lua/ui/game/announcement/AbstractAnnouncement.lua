@@ -410,7 +410,6 @@ AbstractAnnouncement = ClassUI(Group) {
 
         local lastTime = GetSystemTimeSeconds()
         while not IsDestroyed(self) do
-            -- frame rate independent
             local currentTime = GetSystemTimeSeconds()
             local diff = 2 * (currentTime - lastTime) -- 100% alpha change in 0.5 seconds
             lastTime = currentTime
