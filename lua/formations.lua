@@ -13,6 +13,7 @@
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
 local MathAbs = math.abs
+local MathCeil = math.ceil
 local MathFloor = math.floor
 
 local TableGetn = table.getn
@@ -1026,7 +1027,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
 
                         local xPos
                         if evenRowLen then
-                            xPos = math.ceil(whichCol/2) - .5 + offsetX
+                            xPos = MathCeil(whichCol/2) - .5 + offsetX
                             if not (math.mod(whichCol, 2) == 0) then
                                 xPos = xPos * -1
                             end
@@ -1034,7 +1035,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             if whichCol == 1 then
                                 xPos = 0
                             else
-                                xPos = math.ceil(((whichCol-1) /2)) + offsetX
+                                xPos = MathCeil(((whichCol-1) /2)) + offsetX
                                 if not (math.mod(whichCol, 2) == 0) then
                                     xPos = xPos * -1
                                 end
@@ -1558,7 +1559,7 @@ function CalculateSizes(unitsList)
             unitData.Scale = gridSize / (largestFootprint + 2)
 
             for fs, count in unitData.FootprintCounts do
-                local size = math.ceil(fs * data.MinSeparationFraction / gridSize)
+                local size = MathCeil(fs * data.MinSeparationFraction / gridSize)
                 unitData.FootprintSizes[fs] = size
                 unitData.AreaTotal = unitData.AreaTotal + count * size * size
             end
