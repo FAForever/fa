@@ -36,7 +36,7 @@ TextArea = ClassUI(ItemList) {
         self._textWidth = 0
 
         -- The advance function for Text.WrapText. Delegates to the ItemList.GetStringAdvance.
-        -- Initialize before the default font below reflows the text
+        -- Initialize before setting default font.
         self.advanceFunction = function(text) return self:GetStringAdvance(text) end
 
         -- By default, inherit colour and font from UIUtil (this will update with the skin, too,
@@ -50,6 +50,7 @@ TextArea = ClassUI(ItemList) {
         end
     end,
 
+    --- Changes the font and then reflows the text.
     ---@param self TextArea
     _internalSetFont = function(self)
         if not self._lockFontChanges then
