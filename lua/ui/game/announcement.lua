@@ -37,7 +37,7 @@ local function CreateDefaultGoalControl(frame)
     return goalControl
 end
 
---- A utility function that determines when announcements should be skipped
+--- Determines when an announcement should be skipped.
 ---@return boolean
 local function ShouldSkipAnnouncement()
     -- early exit: don't show announcements when the score dialog is open
@@ -49,7 +49,7 @@ local function ShouldSkipAnnouncement()
     return false
 end
 
---- A utility function that determines when announcements should be immediately hidden
+--- Determines when an announcement should be hidden immediately.
 local function ShouldImmediatelyHideAnnouncement()
     -- feature: immediately hide announcements when game UI is hidden
     if import("/lua/ui/game/gamemain.lua").gameUIHidden then
@@ -57,6 +57,15 @@ local function ShouldImmediatelyHideAnnouncement()
     end
 
     return false
+end
+
+--- Aborts all existing announcements.
+local function AbortExistingAnnouncements()
+    for k, announcement in Announcements do
+        if not IsDestroyed(announcement) then
+            announcement:AbortAnnouncement()
+        end
+    end
 end
 
 --- Create an announcement with a title.
@@ -67,21 +76,13 @@ CreateTitleAnnouncement = function(titleText, goalControl)
         return
     end
 
-    local frame = GetFrame(0) --[[@as Frame]]
+    AbortExistingAnnouncements()
 
     -- create a dummy goal control if we don't have one
-    if not goalControl then
-        goalControl = CreateDefaultGoalControl(frame)
-    end
+    local frame = GetFrame(0) --[[@as Frame]]
+    goalControl = goalControl or CreateDefaultGoalControl(frame)
 
-    -- abort all existing announcements
-    for k, announcement in Announcements do
-        if not IsDestroyed(announcement) then
-            announcement:AbortAnnouncement()
-        end
-    end
-
-    -- lazy load the module
+    -- developers note: lazy load the module so that it remains unloaded unless used
     local SmallAnnouncement = import("/lua/ui/game/announcement/SmallAnnouncement.lua").SmallAnnouncement
 
     -- create the announcement
@@ -90,7 +91,6 @@ CreateTitleAnnouncement = function(titleText, goalControl)
     announcement:Animate(goalControl, 1.4)
     Announcements:Add(announcement)
 
-    -- feature: immediately hide announcements when game UI is hidden
     if ShouldImmediatelyHideAnnouncement() then
         announcement:Hide()
     end
@@ -105,21 +105,13 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
         return
     end
 
-    local frame = GetFrame(0) --[[@as Frame]]
+    AbortExistingAnnouncements()
 
     -- create a dummy goal control if we don't have one
-    if not goalControl then
-        goalControl = CreateDefaultGoalControl(frame)
-    end
+    local frame = GetFrame(0) --[[@as Frame]]
+    goalControl = goalControl or CreateDefaultGoalControl(frame)
 
-    -- abort all existing announcements
-    for k, announcement in Announcements do
-        if not IsDestroyed(announcement) then
-            announcement:AbortAnnouncement()
-        end
-    end
-
-    -- lazy load the module
+    -- developers note: lazy load the module so that it remains unloaded unless used
     local TitleTextAnnouncement = import("/lua/ui/game/announcement/TitleTextAnnouncement.lua").TitleTextAnnouncement
 
     -- create the announcement
@@ -128,7 +120,6 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
     announcement:Animate(goalControl, 2.2)
     Announcements:Add(announcement)
 
-    -- feature: immediately hide announcements when game UI is hidden
     if ShouldImmediatelyHideAnnouncement() then
         announcement:Hide()
     end
@@ -174,7 +165,7 @@ DebugTitleAnnouncement = function()
     CreateAnnouncement("Title because X is defeated")
 end
 
---- Creates a title text announcement for debugging.
+--- Creates a title-with-text announcement for debugging.
 DebugTitleTextAnnouncement = function()
     CreateAnnouncement("Title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
 end
