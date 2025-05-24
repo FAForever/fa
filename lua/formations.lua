@@ -1637,12 +1637,12 @@ function CategorizeUnits(formationUnits)
     local categoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
 
     -- Loop through each unit to get its category and size
-    for _, u in formationUnits do
+    for _, unit in formationUnits do
         local identified = false
         for type, table in categoryTables do
             for category, _ in table do
-                if EntityCategoryContains(table[category], u) then
-                    local blueprint = u:GetBlueprint()
+                if EntityCategoryContains(table[category], unit) then
+                    local blueprint = unit:GetBlueprint()
                     local footprintSize = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
                     local id = blueprint.BlueprintId
 
@@ -1656,7 +1656,7 @@ function CategorizeUnits(formationUnits)
                     unitsList[type].FootprintCounts[footprintSize] = (unitsList[type].FootprintCounts[footprintSize] or 0) + 1
 
                     if category == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
+                        LOG('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
                     unitsList[type].UnitTotal = unitsList[type].UnitTotal + 1
                     identified = true
@@ -1669,7 +1669,7 @@ function CategorizeUnits(formationUnits)
             end
         end
         if not identified then
-            WARN('*FORMATION DEBUG: Unit ' .. u.UnitId .. ' was excluded from the formation because its layer could not be determined.')
+            WARN('*FORMATION DEBUG: Unit ' .. unit.UnitId .. ' was excluded from the formation because its layer could not be determined.')
         end
     end
 
