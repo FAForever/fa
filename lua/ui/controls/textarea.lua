@@ -35,13 +35,14 @@ TextArea = ClassUI(ItemList) {
         self.text = ""
         self._textWidth = 0
 
+        -- The advance function for Text.WrapText. Delegates to the ItemList.GetStringAdvance.
+        -- Initialize before the default font below reflows the text
+        self.advanceFunction = function(text) return self:GetStringAdvance(text) end
+
         -- By default, inherit colour and font from UIUtil (this will update with the skin, too,
         -- because LazyVars are magical.
         self:SetColors(UIUtil.fontColor, "00000000", UIUtil.fontColor, "00000000")
         self:SetFont(UIUtil.bodyFont, 14)
-
-        -- The advance function for Text.WrapText. Delegates to the ItemList.GetStringAdvance.
-        self.advanceFunction = function(text) return self:GetStringAdvance(text) end
 
         -- Reflow text when the width is changed.
         self.Width.OnDirty = function(var)
@@ -49,12 +50,18 @@ TextArea = ClassUI(ItemList) {
         end
 
         -- Reflow text when the text properties of this ItemList are changed (see itemlist.lua)
-        self._font._family.OnDirty = function(var)
+        local fontOnDirty = function(var)
             self:_internalSetFont()
-            self:ReflowText()
         end
-        self._font._pointsize.OnDirty = function(var)
-            self:_internalSetFont()
+
+        self._font._family.OnDirty = fontOnDirty
+        self._font._pointsize.OnDirty = fontOnDirty
+    end,
+
+    ---@param self TextArea
+    _internalSetFont = function(self)
+        if not self._lockFontChanges then
+            self:SetNewFont(self._font._family(), self._font._pointsize())
             self:ReflowText()
         end
     end,
