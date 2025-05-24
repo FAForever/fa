@@ -13,6 +13,7 @@
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
 local TableGetn = table.getn
+local TableInsert = table.insert
 
 SurfaceFormations = {
     'AttackFormation',
@@ -73,7 +74,7 @@ function CacheResults(results, formationUnits, formationType)
     if TableGetn(cache) >= MaxCacheSize then
         table.remove(cache)
     end
-    table.insert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
+    TableInsert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
 end
 
 -- =========================================
@@ -921,11 +922,11 @@ function GuardFormation(formationUnits)
         offsetX = sizeMult * math.sin(ringPosition)
         offsetY = -sizeMult * math.cos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
-            table.insert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
         end
         unitCount = unitCount + 1
         remainingUnits = remainingUnits - 1
@@ -1041,7 +1042,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             rowType = type
                         end
 
-                        table.insert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, formationLength, true})
+                        TableInsert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, formationLength, true})
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
@@ -1196,7 +1197,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                     for fs, groupData in unitsList[group] do
                         size = unitsList.FootprintSizes[fs]
                         if groupData.Count > 0 and size == data.size then
-                            table.insert(FormationPos, {data.xPos * spacing, data.yPos * spacing, groupData.Filter, 0, true})
+                            TableInsert(FormationPos, {data.xPos * spacing, data.yPos * spacing, groupData.Filter, 0, true})
                             groupData.Count = groupData.Count - 1
                             if groupData.Count <= 0 then
                                 unitsList[group][fs] = nil
@@ -1261,7 +1262,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                         if airBlock.HomogenousBlocks and not chevronType then
                             chevronType = type
                         end
-                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
+                        TableInsert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
@@ -1368,7 +1369,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
                         if airBlock.HomogenousBlocks and not chevronType then
                             chevronType = type
                         end
-                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
+                        TableInsert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
@@ -1448,11 +1449,11 @@ function GetLargeAirPositions(unitsList, airBlock)
                 end
             end
             if not blocked then
-                table.insert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
+                TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
                 count = count - 1
                 numResults = numResults + 1
                 if whichCol ~= 1 then
-                    table.insert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
+                    TableInsert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
                     count = count - 1
                     numResults = numResults + 1
                 end
