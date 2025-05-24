@@ -36,20 +36,20 @@ TitleTextAnnouncement = ClassUI(AbstractAnnouncement) {
 
     ---@param self UITitleTextAnnouncement
     ---@param parent Control
-    ---@param text UnlocalizedString
+    ---@param titleText UnlocalizedString
     ---@param bodyText UnlocalizedString
-    __init = function(self, parent, text, bodyText)
+    __init = function(self, parent, titleText, bodyText)
         AbstractAnnouncement.__init(self, parent)
 
-        self.Title = UIUtil.CreateText(self.ContentArea, text, 22, UIUtil.titleFont)
+        self.Title = UIUtil.CreateText(self.ContentArea, LOC(titleText), 22, UIUtil.titleFont)
         self.Text = TextArea(self.ContentArea, 600, 60)
         self.Text:SetText(LOC(bodyText))
     end,
 
     ---@param self UITitleTextAnnouncement
     ---@param parent Control
-    ---@param text string
-    __post_init = function(self, parent, text, bodyText)
+    ---@param titleText UnlocalizedString
+    __post_init = function(self, parent, titleText, bodyText)
         AbstractAnnouncement.__post_init(self, parent)
 
         Layouter(self.Title)

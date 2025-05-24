@@ -33,17 +33,17 @@ SmallAnnouncement = ClassUI(AbstractAnnouncement) {
 
     ---@param self UISmallAnnouncement
     ---@param parent Control
-    ---@param text string
-    __init = function(self, parent, text)
+    ---@param titleText UnlocalizedString
+    __init = function(self, parent, titleText)
         AbstractAnnouncement.__init(self, parent)
 
-        self.Title = UIUtil.CreateText(self.ContentArea, text, 22, UIUtil.titleFont)
+        self.Title = UIUtil.CreateText(self.ContentArea, LOC(titleText), 22, UIUtil.titleFont)
     end,
 
     ---@param self UISmallAnnouncement
     ---@param parent Control
-    ---@param text string
-    __post_init = function(self, parent, text)
+    ---@param titleText UnlocalizedString
+    __post_init = function(self, parent, titleText)
         AbstractAnnouncement.__post_init(self, parent)
 
         Layouter(self.Title)
