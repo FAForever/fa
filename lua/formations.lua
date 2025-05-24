@@ -1592,7 +1592,7 @@ function CategorizeUnits(formationUnits)
     end
 
     -- initialize common fields for each unit type
-    for _, unitType in {'Land', 'Air', 'Naval', 'Subs'} do
+    for unitType, _ in categoryTables do
         for _, commonNumberField in {'UnitTotal', 'AreaTotal'} do
             unitsList[unitType][commonNumberField] = 0
         end
