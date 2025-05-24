@@ -60,9 +60,9 @@ TextArea = ClassUI(ItemList) {
     end,
 
     ---@param self TextArea
-    ---@param text string
+    ---@param text? string | number
     SetText = function(self, text)
-        self.text = text
+        self.text = tostring(text)
         self:ReflowText()
     end,
 
