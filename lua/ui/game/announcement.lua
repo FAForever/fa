@@ -37,10 +37,10 @@ local function CreateDefaultGoalControl(frame)
     return goalControl
 end
 
---- Create an announcement UI for sending general messages to the user
----@param text UnlocalizedString # title text
----@param goalControl? Control The control where the announcement appears out of.
-function CreateAnnouncement(text, goalControl)
+--- Create an announcement with a title.
+---@param titleText UnlocalizedString
+---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
+CreateTitleAnnouncement = function(titleText, goalControl)
     -- early exit: don't show announcements when the score dialog is open
     local scoreModule = import("/lua/ui/dialogs/score.lua")
     if scoreModule.dialog then
@@ -64,7 +64,7 @@ function CreateAnnouncement(text, goalControl)
 
     -- create the announcement
     ---@type UIAbstractAnnouncement
-    local announcement = SmallAnnouncement(frame, text)
+    local announcement = SmallAnnouncement(frame, titleText)
     announcement:Animate(goalControl, 1.4)
     Announcements:Add(announcement)
 
@@ -74,10 +74,10 @@ function CreateAnnouncement(text, goalControl)
     end
 end
 
---- Create an announcement UI for sending general messages to the user
+--- Create an announcement with a title and some text.
 ---@param titleText UnlocalizedString
 ---@param bodyText UnlocalizedString
----@param goalControl? Control
+---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
 CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
     -- early exit: don't show announcements when the score dialog is open
     local scoreModule = import("/lua/ui/dialogs/score.lua")
@@ -112,6 +112,20 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
     end
 end
 
+--- A general function to create an announcement UI for sending general messages to the user.
+---
+--- Exists for backwards compatibility.
+---@param titleText UnlocalizedString
+---@param bodyText? UnlocalizedString
+---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
+function CreateAnnouncement(titleText, bodyText, goalControl)
+    if type(bodyText) == "string" then
+        return import("/lua/ui/game/announcement.lua").CreateTitleTextAnnouncement (titleText, bodyText, goalControl)
+    else
+        return import("/lua/ui/game/announcement.lua").CreateTitleAnnouncement(titleText, goalControl)
+    end
+end
+
 --- Instantly hides the current announcement
 function Contract()
     for k, announcement in Announcements do
@@ -140,7 +154,7 @@ end
 
 --- Creates a title text announcement for debugging.
 DebugTitleTextAnnouncement = function()
-    CreateTitleTextAnnouncement("Title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+    CreateAnnouncement("Title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
 end
 
 --#endregion
