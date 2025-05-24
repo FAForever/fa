@@ -31,39 +31,90 @@ local Layouter = LayoutHelpers.LayoutFor
 
 
 --* Handy global variables to assist skinning
-buttonFont = LazyVar.Create()            -- default font used for button faces
-factionFont = LazyVar.Create()      -- default font used for dialog button faces
-dialogButtonFont = LazyVar.Create()      -- default font used for dialog button faces
-bodyFont = LazyVar.Create()              -- font used for all other text
-fixedFont = LazyVar.Create()             -- font used for fixed width characters
-titleFont = LazyVar.Create()             -- font used for titles and labels
-fontColor = LazyVar.Create()             -- common font color
-fontOverColor = LazyVar.Create()             -- common font color
-fontDownColor = LazyVar.Create()             -- common font color
-tooltipTitleColor = LazyVar.Create()             -- common font color
-tooltipBorderColor = LazyVar.Create()             -- common font color
-bodyColor = LazyVar.Create()             -- common color for dialog body text
-dialogCaptionColor = LazyVar.Create()    -- common color for dialog titles
-dialogColumnColor = LazyVar.Create()     -- common color for column headers in a dialog
-dialogButtonColor = LazyVar.Create()     -- common color for buttons in a dialog
-highlightColor = LazyVar.Create()        -- text highlight color
-disabledColor = LazyVar.Create()         -- text disabled color
-panelColor = LazyVar.Create()            -- default color when drawing a panel
-transparentPanelColor = LazyVar.Create() -- default color when drawing a transparent panel
-consoleBGColor = LazyVar.Create()        -- console background color
-consoleFGColor = LazyVar.Create()        -- console foreground color (text)
-consoleTextBGColor = LazyVar.Create()    -- console text background color
-menuFontSize = LazyVar.Create()          -- font size used on main in game escape menu
-factionTextColor = LazyVar.Create()      -- faction color for text foreground
-factionBackColor = LazyVar.Create()      -- faction color for text background
+-- default font used for button faces
+---@type Lazy<string>
+buttonFont = LazyVar.Create()
+-- default font used for dialog button faces
+---@type Lazy<string>
+factionFont = LazyVar.Create()
+-- default font used for dialog button faces
+---@type Lazy<string>
+dialogButtonFont = LazyVar.Create()
+-- font used for all other text
+---@type Lazy<string>
+bodyFont = LazyVar.Create()
+-- font used for fixed width characters
+---@type Lazy<string>
+fixedFont = LazyVar.Create()
+-- font used for titles and labels
+---@type Lazy<string>
+titleFont = LazyVar.Create()
+-- common font color
+---@type Lazy<Color>
+fontColor = LazyVar.Create()
+-- common font color
+---@type Lazy<Color>
+fontOverColor = LazyVar.Create()
+-- common font color
+---@type Lazy<Color>
+fontDownColor = LazyVar.Create()
+-- common font color
+---@type Lazy<Color>
+tooltipTitleColor = LazyVar.Create()
+-- common font color
+---@type Lazy<Color>
+tooltipBorderColor = LazyVar.Create()
+-- common color for dialog body text
+---@type Lazy<Color>
+bodyColor = LazyVar.Create()
+-- common color for dialog titles
+---@type Lazy<Color>
+dialogCaptionColor = LazyVar.Create()
+-- common color for column headers in a dialog
+---@type Lazy<Color>
+dialogColumnColor = LazyVar.Create()
+-- common color for buttons in a dialog
+---@type Lazy<Color>
+dialogButtonColor = LazyVar.Create()
+---Text highlight color
+---@type Lazy<Color>
+highlightColor = LazyVar.Create()
+-- text disabled color
+---@type Lazy<Color>
+disabledColor = LazyVar.Create()
+-- default color when drawing a panel
+---@type Lazy<Color>
+panelColor = LazyVar.Create()
+-- default color when drawing a transparent panel
+---@type Lazy<Color>
+transparentPanelColor = LazyVar.Create()
+-- console background color
+---@type Lazy<Color>
+consoleBGColor = LazyVar.Create()
+-- console foreground color (text)
+---@type Lazy<Color>
+consoleFGColor = LazyVar.Create()
+-- console text background color
+---@type Lazy<Color>
+consoleTextBGColor = LazyVar.Create()
+-- font size used on main in game escape menu
+---@type Lazy<number>
+menuFontSize = LazyVar.Create()
+-- faction color for text foreground
+---@type Lazy<Color>
+factionTextColor = LazyVar.Create()
+-- faction color for text background
+---@type Lazy<Color>
+factionBackColor = LazyVar.Create()
 
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
 layouts = nil
 
 --* other handy variables!
 consoleDepth = false  -- in order to get the console to always be on top, assign this number and never go over
-
-networkBool = LazyVar.Create()    -- boolean whether the game is local or networked
+-- boolean whether the game is local or networked
+---@type Lazy<boolean>
+networkBool = LazyVar.Create()
 
 -- Default scenario for skirmishes / MP Lobby
 defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'
@@ -91,9 +142,10 @@ VK_NEXT = 34
 VK_UP = 38
 VK_DOWN = 40
 VK_PAUSE = 310
-
+---@type Lazy<Skin>
 local currentSkin = LazyVar.Create()
-
+---@type string
+---@diagnostic disable-next-line:assign-type-mismatch
 currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
 
@@ -265,7 +317,7 @@ end
 
 --- Sets the current skin table
 ---@param skin Skin
----@param overrideTable table
+---@param overrideTable? table
 function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
     if not skinTable then
@@ -418,11 +470,12 @@ end
 --- Given a path and name relative to the skin path, returns the full path based on the current skin
 ---@param filespec FileName
 ---@param checkMods? boolean
----@return FileName
+---@return FileName?
 function UIFile(filespec, checkMods)
     if UIFileBlacklist[filespec] then return filespec end
     local skins = import("/lua/skins/skins.lua").skins
     local useSkin = currentSkin()
+    ---@type FileName
     local currentPath = skins[useSkin].texturesPath
     local origPath = currentPath
 
@@ -499,7 +552,7 @@ end
 --- placement and destruction can occur. This creates a group which fills the screen.
 ---@param root Control
 ---@param debugName? string defaults to `"screenGroup"`
----@return Group
+---@return Group?
 function CreateScreenGroup(root, debugName)
     if not root then return end
     local screenGroup = Group(root, debugName or "screenGroup")
@@ -535,7 +588,7 @@ end
 ---@param parent Control
 ---@param label? UnlocalizedString
 ---@param pointSize? number
----@param font? LazyVarString
+---@param font? LazyOrValue<string>
 ---@param dropshadow? boolean
 ---@return Text
 function CreateText(parent, label, pointSize, font, dropshadow)
@@ -571,7 +624,7 @@ function CreateBitmapStd(parent, filename, border)
 end
 
 ---@param parent Control
----@param color LazyVarColor
+---@param color LazyOrValue<Color>
 ---@return Bitmap
 function CreateBitmapColor(parent, color)
     local bitmap = Bitmap(parent)
@@ -599,11 +652,11 @@ end
 
 
 ---@param control Edit
----@param foreColor? LazyVarColor
----@param backColor? LazyVarColor
----@param highlightFore? LazyVarColor
----@param highlightBack? LazyVarColor
----@param fontFace? LazyVarString
+---@param foreColor? LazyOrValue<Color>
+---@param backColor? LazyOrValue<Color>
+---@param highlightFore? LazyOrValue<Color>
+---@param highlightBack? LazyOrValue<Color>
+---@param fontFace? LazyOrValue<string>
 ---@param fontSize? number
 ---@param charLimit? number
 function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBack, fontFace, fontSize, charLimit)
@@ -641,10 +694,10 @@ end
 
 --- Returns a button set up with a text overlay and a click sound
 ---@param parent Control
----@param up FileName
----@param down FileName
----@param over FileName
----@param disabled FileName
+---@param up LazyOrValue<FileName>
+---@param down LazyOrValue<FileName>
+---@param over LazyOrValue<FileName>
+---@param disabled LazyOrValue<FileName>
 ---@param label? UnlocalizedString
 ---@param pointSize? number
 ---@param textOffsetVert? number
@@ -667,15 +720,19 @@ function CreateButton(parent, up, down, over, disabled, label, pointSize, textOf
         rolloverCue = rolloverCue or "UI_Menu_Rollover_Sml"
     end
     if type(up) == 'string' then
+        ---@diagnostic disable-next-line:param-type-mismatch
         up = SkinnableFile(up)
     end
     if type(down) == 'string' then
+        ---@diagnostic disable-next-line:param-type-mismatch
         down = SkinnableFile(down)
     end
     if type(over) == 'string' then
+        ---@diagnostic disable-next-line:param-type-mismatch
         over = SkinnableFile(over)
     end
     if type(disabled) == 'string' then
+        ---@diagnostic disable-next-line:param-type-mismatch
         disabled = SkinnableFile(disabled)
     end
 
@@ -828,6 +885,9 @@ end
 --- benefit of code that uses "radiobtn" for its checkboxs' texture names. These are:
 --- `-d_btn_up.dds`, `-s_btn_up.dds`, `-d_btn_over.dds`, `-s_btn_over.dds`,
 --- `-d_btn_dis.dds`, and `-s_btn_dis.dds`
+---@param parent Control
+---@param texturePath FileName
+---@return Checkbox
 function CreateCheckboxStd(parent, texturePath)
     return Checkbox(parent,
         SkinnableFile(texturePath .. '-d_btn_up.dds'),
@@ -848,7 +908,7 @@ end
 ---@param labelSize any
 ---@param clickCue any
 ---@param rollCue any
----@return unknown
+---@return Checkbox
 function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, clickCue, rollCue)
     return Checkbox(parent,
         SkinnableFile(texturePath .. 'd_up.dds'),
@@ -873,6 +933,9 @@ function CreateCollapseArrow(parent, position)
     if position ~= 't' and position ~= 'r' and position ~= 'l' then
         error("Collapse arrow position must be one of: 'l', 't', 'r'", 2)
     end
+
+    ---@type FileName
+    ---@diagnostic disable-next-line:assign-type-mismatch
     local prefix = "/game/tab-" .. position .. "-btn/tab-"
     return Checkbox(parent,
         SkinnableFile(prefix .. "close_btn_up.dds"),
@@ -891,7 +954,7 @@ end
 ---@param title LocalizedString
 ---@param buttons any
 ---@param default any
----@return unknown
+---@return RadioButtons
 function CreateRadioButtonsStd(parent, texturePath, title, buttons, default)
     local radioButton = RadioButtons(parent, title, buttons, default, "Arial", 14, fontColor,
         SkinnableFile(texturePath .. 'd_up.dds'),
@@ -922,6 +985,13 @@ function CreateDialogButtonStd(parent, filename, label, pointSize, textOffsetVer
 end
 
 --* return the standard scrollbar
+---comment
+---@param attachto Control
+---@param offset_right? number
+---@param filename? FileName
+---@param offset_bottom? number
+---@param offset_top? number
+---@return Scrollbar
 function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom, offset_top)
     offset_right = offset_right or 0
     offset_bottom = offset_bottom or 0
@@ -1055,6 +1125,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
     )
 
     local textHeight = 0
+
+    ---@type Control
+    ---@diagnostic disable-next-line:assign-type-mismatch
     local prevControl = false
     for i, v in tempTable do
         if i == 1 then
@@ -1097,8 +1170,15 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
         return button
     end
 
-    ---@type Button, Button, Button
-    local button1, button2, button3 = false, false, false
+    ---@type Button
+    ---@diagnostic disable-next-line:assign-type-mismatch
+    local button1 = false
+    ---@type Button
+    ---@diagnostic disable-next-line:assign-type-mismatch
+    local button2 = false
+    ---@type Button
+    ---@diagnostic disable-next-line:assign-type-mismatch
+    local button3 = false
     if button1Text then
         button1 = MakeButton(button1Text, button1Callback)
     end
@@ -1178,7 +1258,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 end
 
 ---@param parent Control
----@param colorOverride? Color defaults to black
+---@param colorOverride? LazyOrValue<Color> defaults to black
 function CreateWorldCover(parent, colorOverride)
     colorOverride = colorOverride or "ff000000"
     local NumFrame = GetNumRootFrames() - 1
@@ -1258,10 +1338,13 @@ end
 function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottomOffset, altTextures)
     local ret = Group(parent)
 
+    ---@type FileName
     local texturePath
     if altTextures then
+        ---@type FileName
         texturePath = "/scx_menu/panel-brackets-small"
     else
+        ---@type FileName
         texturePath = "/scx_menu/panel-brackets"
     end
 
@@ -1396,10 +1479,10 @@ local windowTextures = {
 ---@param lockSize? boolean Toggle to allow the user to adjust the size of the window.
 ---@param lockPosition? boolean Toggle to allow the user to adjust the position of the window.
 ---@param preferenceID? string Identifier used in the preference file to remember where this window was located last
----@param defaultLeft? Lazy<number> The default left boundary of the window, defaults to 10
----@param defaultTop? Lazy<number> The default top boundary of the window, defaults to 300
----@param defaultBottom? Lazy<number> The default bottom boundary of the window, defaults to 600
----@param defaultRight? Lazy<number> The default right boundary of the window, defaults to 210
+---@param defaultLeft? LazyOrValue<number> The default left boundary of the window, defaults to 10
+---@param defaultTop? LazyOrValue<number> The default top boundary of the window, defaults to 300
+---@param defaultBottom? LazyOrValue<number> The default bottom boundary of the window, defaults to 600
+---@param defaultRight? LazyOrValue<number> The default right boundary of the window, defaults to 210
 ---@return Window
 function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
     parent = parent or GetFrame(0)
@@ -1426,6 +1509,8 @@ end
 function CreateAnnouncementStd(primary, secondary, control)
     -- make it originate from the top
     if not control then
+        ---@type Frame
+        ---@diagnostic disable-next-line:assign-type-mismatch
         local frame = GetFrame(0)
         control = Group(frame)
         control.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)

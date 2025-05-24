@@ -15,10 +15,10 @@ ScrollAxis = {
 }
 
 ---@class Scrollbar : moho.scrollbar_methods, Control, InternalObject
----@field _bg LazyVar<FileName>
----@field _tm LazyVar<FileName>
----@field _tt LazyVar<FileName>
----@field _tb LazyVar<FileName>
+---@field _bg Lazy<FileName>
+---@field _tm Lazy<FileName>
+---@field _tt Lazy<FileName>
+---@field _tb Lazy<FileName>
 ---@field UpButton? Button
 ---@field DownButton? Button
 Scrollbar = ClassUI(moho.scrollbar_methods, Control) {
@@ -80,10 +80,10 @@ Scrollbar = ClassUI(moho.scrollbar_methods, Control) {
     end,
 
     ---@param self Scrollbar
-    ---@param background  Lazy<FileName> | nil
-    ---@param thumbMiddle Lazy<FileName> | nil
-    ---@param thumbTop    Lazy<FileName> | nil
-    ---@param thumbBottom Lazy<FileName> | nil
+    ---@param background  LazyOrValue<FileName>?
+    ---@param thumbMiddle LazyOrValue<FileName>?
+    ---@param thumbTop    LazyOrValue<FileName>?
+    ---@param thumbBottom LazyOrValue<FileName>?
     SetTextures = function(self, background, thumbMiddle, thumbTop, thumbBottom)
         if background and self._bg then self._bg:Set(background) end
         if thumbMiddle and self._tm then self._tm:Set(thumbMiddle) end

@@ -1,10 +1,10 @@
 ---@meta
 
 ---@class moho.text_methods : moho.control_methods
----@field FontAscent LazyVar<number>
----@field FontDescent LazyVar<number>
----@field FontExternalLeading LazyVar<number>
----@field TextAdvance LazyVar<number>
+---@field FontAscent Lazy<number>
+---@field FontDescent Lazy<number>
+---@field FontExternalLeading Lazy<number>
+---@field TextAdvance Lazy<number>
 local CMauiText = {}
 
 ---
