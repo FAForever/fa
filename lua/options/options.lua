@@ -786,6 +786,54 @@ options = {
             },
 
             {
+                title = '<LOC OPTIONS_0323>Painting features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC options_painting_title>Painting",
+                key = 'painting',
+                type = 'toggle',
+                default = 'on',
+                custom = {
+                    states = {
+                        { text = "<LOC _Enabled>Enabled", key = 'on' },
+                        { text = "<LOC _EnabledInReplays>Enabled when observing", key = 'observing' },
+                        { text = "<LOC _Disabled>Disabled", key = 'off' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC options_painting_duration_title>Duration of paintings",
+                key = 'painting_duration',
+                type = 'slider',
+                default = 25,
+                custom = {
+                    min = 10,
+                    max = 40,
+                    inc = 1,
+                },
+            },
+
+
+            {
+                title = "<LOC options_painting_duration_title>Duration of paintings when observing",
+                key = 'painting_duration_observing',
+                type = 'slider',
+                default = 15,
+                custom = {
+                    min = 10,
+                    max = 40,
+                    inc = 1,
+                },
+            },
+
+            {
                 title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
 
@@ -1357,20 +1405,6 @@ options = {
                 -- these are expected everywhere
                 default = '',
                 key = '',
-            },
-
-            {
-                title = "<LOC OPTIONS_0309>Painting",
-                key = 'casting_painting',
-                type = 'toggle',
-                default = 18,
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = false },
-                        { text = "<LOC CTRL>Use CTRL ", key = 17 },
-                        { text = "<LOC ALT>Use ALT", key = 18 },
-                    },
-                },
             },
 
             {

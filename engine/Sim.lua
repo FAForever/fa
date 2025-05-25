@@ -1171,9 +1171,9 @@ function SetArmyUnitCap(army, unitCap)
 end
 
 --- Sets the command source of an army to match another army's command source.
----@param targetArmyIndex number
----@param sourceHumanIndex number
----@param enable boolean
+---@param targetArmyIndex number        # The target army that we're managing command sources for
+---@param sourceHumanIndex number       # The source index that is added or removed as a command source
+---@param enable boolean                # Whether or not the source index is a command source for the target army
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 

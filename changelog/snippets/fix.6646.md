@@ -1,1 +1,0 @@
-- (#6646) Remove the chat beeps when watching a replay

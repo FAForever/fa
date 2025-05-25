@@ -1,1 +1,0 @@
-- (#6665, #6743) Air staging now detaches aircraft when killed or ctrl-k'd (to work around an engine bug where aircraft get stuck inside air staging).

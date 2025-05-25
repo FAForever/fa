@@ -306,8 +306,10 @@ end
 -------------------------------------------------------------------------------
 --#region General orders
 
+--- Instant self destruct that only works on the selection.
+--- Alternative, simplified implementation that is unused.
 ---@param data { }
----@param selection Unit[]
+---@param selection? Unit[]
 Callbacks.SelfDestruct = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
@@ -320,7 +322,7 @@ Callbacks.SelfDestruct = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+    import("/lua/sim/commands/self-destruct.lua").SelfDestruct(selection, true)
 end
 
 --#endregion
@@ -738,7 +740,7 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
+        do -- feature: area commands
             return
         end
 
@@ -822,6 +824,43 @@ do
         SPEW("Time taken for area attack order: ", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start), "miliseconds")
     end
 
+end
+
+--#endregion
+
+
+--#region UI related functionality
+
+do
+    local OriginalFocusArmy = GetFocusArmy()
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    local SyncPainting = function(data)
+        -- used to determine the color of the painting
+        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSource()).Nickname
+
+        Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
+        table.insert(Sync.SharePaintingBrushStroke, data)
+    end
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    Callbacks.SharePaintingBrushStroke = function(data)
+        local focusArmy = GetFocusArmy()
+        local currentCommandSource = GetCurrentCommandSource()
+
+        -- spectators are able to see all paintings. We take into account
+        -- the original focus army because spectators can change focus army
+        if OriginalFocusArmy == -1 or focusArmy == -1 then
+            SyncPainting(data)
+            return
+        end
+
+        -- allies are able to see each others paintings
+        if IsAlly(focusArmy, currentCommandSource) then
+            SyncPainting(data)
+            return
+        end
+    end
 end
 
 --#endregion

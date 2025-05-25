@@ -780,7 +780,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.WeaponUnpackingState)
                 else
                     if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
-                        ChangeState(self, self.RackSalvoChargeState)
+                        -- don't charge and then possibly fire while unaimed
+                        if not bp.RackSalvoFiresAfterCharge then
+                            ChangeState(self, self.RackSalvoChargeState)
+                        end
                     else
                         ChangeState(self, self.RackSalvoFireReadyState)
                     end

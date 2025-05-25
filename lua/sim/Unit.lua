@@ -1018,13 +1018,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
-    --- Enables weapon after waiting its fire rate interval
+    --- Enables weapon after waiting a given delay (typically the fire rate interval)
     ---@param weapon Weapon
-    OnGivenDisableWeaponsThread = function(weapon)
+    ---@param delay number # Must be >= 0
+    OnGivenDisableWeaponsThread = function(weapon, delay)
         if not weapon:BeenDestroyed() then
-            -- compute delay
-            local bp = weapon.Blueprint
-            local delay = 1 / bp.RateOfFire
             WaitSeconds(delay)
 
             -- enable the weapon again if it still exists
@@ -1038,14 +1036,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param newUnit Unit
     OnGivenDisableWeapons = function(newUnit)
         -- disable all weapons and enable after a delay
-        local disableWeaponsThread = newUnit.OnGivenDisableWeaponsThread
         for i = 1, newUnit.WeaponCount do
             local weapon = newUnit.WeaponInstances[i]
-            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
-            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
-            if not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement) then
+            local bp = weapon.Blueprint
+            local enablingEnhancement = bp.EnabledByEnhancement
+            local rateOfFire = bp.RateOfFire
+            -- Dummy weapons with 0 fire rate shouldn't be disabled
+            if rateOfFire > 0
+                -- Weapons disabled by enhancement shouldn't be disabled unless the enhancement is built
+                and (not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement))
+            then
                 weapon:SetEnabled(false)
-                weapon:ForkThread(disableWeaponsThread)
+                weapon:ForkThread(newUnit.OnGivenDisableWeaponsThread, 1 / rateOfFire)
             end
         end
     end,

@@ -1088,7 +1088,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
                 continue
             end
             -- The shared ACUs don't count as keeping the army in the game since they will eventually be removed from the game.
-            -- see MatchState.lua CollectDefeatedBrains
+            -- See the victory conditions, and especially `AbstractVictoryCondition` class with the method `UnitIsEligible`
             com.RecallingAfterDefeat = true
             StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick()) / 10))
         end

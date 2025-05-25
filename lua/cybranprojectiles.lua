@@ -634,7 +634,7 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
 
 ---  CYBRAN ROCKET PROJECILES
 ---@class CLOATacticalChildMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, DebrisComponent
-CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, DebrisComponent) {
+CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_02_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_03_emit.bp',},
     FxTrailOffset = -0.5,
@@ -655,12 +655,6 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
 
     FxOnKilled = EffectTemplate.TMissileKilled01,
     FxOnKilledScale = 0.375,
-
-    LaunchTicks = 2,
-    LaunchTurnRate = 6,
-    HeightDistanceFactor = 5,
-    MinHeight = 2,
-    FinalBoostAngle = 0,
 
     DebrisBlueprints = {
         '/effects/Entities/TacticalDebris03/TacticalDebris03_proj.bp',

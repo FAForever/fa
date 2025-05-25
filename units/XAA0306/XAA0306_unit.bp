@@ -199,7 +199,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 400,
+            Damage = 1000,
             DamageType = "Normal",
             DisplayName = "Torpedo Cluster",
             FireTargetLayerCapsTable = {

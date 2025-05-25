@@ -1,1 +1,0 @@
-- (#6714) Prevent beam weapons from missing the Volcano (Aeon TMD) while it is firing. Also increase its hitbox size to match the firing animation.

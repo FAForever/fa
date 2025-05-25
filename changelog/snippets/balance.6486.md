@@ -1,1 +1,0 @@
-- (#6486) Adjust aurora handling so that it no longer stops and jitters when given a new move order. It now immediately moves towards the waypoint, and new move orders do not cause it to stop.
