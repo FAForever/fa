@@ -103,7 +103,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     OnStopBuild = function(self, unitBeingBuilt)
         TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
         -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
-        if unitBeingBuilt:GetFractionComplete() < 1 then
+        if not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
             unitBeingBuilt:Destroy()
         end
         self.BuildingUnit = false

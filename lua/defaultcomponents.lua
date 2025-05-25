@@ -917,13 +917,14 @@ ExternalFactoryComponent = ClassSimple {
     end,
 
     ---@param self Unit | ExternalFactoryComponent
-    ---@param instigator Unit unused
-    ---@param type string unused
-    ---@param overkillRatio number unused
+    ---@param instigator Unit
+    ---@param type DamageType
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
             self.ExternalFactory:SetBlockCommandQueue(true)
+            self.ExternalFactory:KillUnitBeingBuilt(instigator, type, overkillRatio)
             self.ExternalFactory:Destroy()
         end
     end,

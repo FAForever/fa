@@ -746,7 +746,8 @@ end
 function IssueAttack(units, target)
 end
 
---- Orders a group of units to build a unit
+--- Orders a group of units to build a unit.
+--- Takes 1 tick to apply.
 ---@param units Unit[]
 ---@param blueprintID string
 ---@param count number
@@ -912,9 +913,11 @@ end
 function IssuePatrol(units, position)
 end
 
---- Orders a unit to pause, this happens immediately
----@param unit Unit
-function IssuePause(unit)
+--- Orders a group of units to pause building, upgrading, and other tasks.
+--- This pause order is put into the order queue, so it may not apply immediately.
+--- Use `Unit:SetPaused` to pause a unit in the middle of a task.
+---@param units Unit[]
+function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
