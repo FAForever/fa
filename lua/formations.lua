@@ -946,7 +946,7 @@ end
 ---@param spacing? number defaults to 1
 ---@return table
 function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
-    spacing = (spacing or 1) * unitsList.Scale
+    spacing = (spacing or 1) * (unitsList.Scale or 1)
     local numRows = TableGetn(formationBlock)
     local rowNum = 1
     local whichRow = 1
@@ -994,6 +994,10 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             end
             for _, group in type do
                 if not formationBlock.HomogenousRows or (rowType == false or rowType == type) then
+                    if not unitsList[group] then
+                        continue
+                    end
+                    
                     local fs = 0
                     local size = 0
                     local evenSize = true
@@ -1073,12 +1077,21 @@ end
 ---@param currRowLen number
 ---@return number
 function GetLandRowModifer(unitsList, categoryTable, currRowLen)
-    if unitsList.UnitTotal >= currRowLen or math.mod(unitsList.UnitTotal, 2) == math.mod(currRowLen, 2) then
+    LOG('wut?')
+    if not unitsList.UnitTotal then
+        return 0
+    end
+    
+    if (unitsList.UnitTotal or 0) >= currRowLen or math.mod((unitsList.UnitTotal or 0), 2) == math.mod(currRowLen, 2) then
         return 0
     end
 
     local sizeTotal = 0
     for group, _ in categoryTable do
+        if not unitsList[group] then
+            continue
+        end
+
         for fs, data in unitsList[group] do
             sizeTotal = sizeTotal + unitsList.FootprintSizes[fs] * data.Count
         end
@@ -1182,7 +1195,7 @@ end
 ---@param spacing? number defaults to 1
 ---@return table
 function BlockBuilderAir(unitsList, airBlock, spacing)
-    spacing = (spacing or 1) * unitsList.Scale
+    spacing = (spacing or 1) * (unitsList.Scale or 1)
     local numRows = TableGetn(airBlock)
     local whichRow = 1
     local whichCol = 1
@@ -1192,12 +1205,16 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
     local chevronType = false
     local formationLength = 0
 
-    if unitsList.AreaTotal > unitsList.UnitTotal then -- If there are any units of size > 1 deal with them here
+    if unitsList.AreaTotal > (unitsList.UnitTotal or 0) then -- If there are any units of size > 1 deal with them here
         local largeUnitPositions = GetLargeAirPositions(unitsList, airBlock)
         for _, data in largeUnitPositions do
             local currSlot = airBlock[data.row][data.col]
             for _, type in currSlot do
                 for _, group in type do
+                    if not unitsList[group] then
+                        continue
+                    end
+
                     for fs, groupData in unitsList[group] do
                         size = unitsList.FootprintSizes[fs]
                         if groupData.Count > 0 and size == data.size then
@@ -1215,11 +1232,13 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
         end
     end
 
-    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+    local unitTotal = unitsList.UnitTotal or 0
+
+    if unitTotal < chevronSize and math.mod(unitTotal, 2) == 0 then
         chevronPos = 2
     end
 
-    while unitsList.UnitTotal > 0 do
+    while (unitsList.UnitTotal or 0) > 0 do
         if chevronPos > chevronSize then
             if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
                 chevronPos = 2
@@ -1254,7 +1273,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                 if not airBlock.HomogenousBlocks or chevronType == false or chevronType == type then
                     local fs = 0
                     local groupData = nil
-                    for k, v in unitsList[group] do
+                    for k, v in (unitsList[group] or {}) do
                         if v.Count > 0 then
                             fs = k
                             groupData = v
@@ -1525,8 +1544,12 @@ function CalculateSizes(unitsList)
         local numSizes = 0
         local unitTotal = 0
         for _, type in data.Types do
-            unitTotal = unitTotal + unitsList[type].UnitTotal
-            for fs, count in unitsList[type].FootprintCounts do
+            if not unitsList[type] then
+                continue
+            end
+
+            unitTotal = unitTotal + (unitsList[type].UnitTotal or 0)
+            for fs, count in (unitsList[type].FootprintCounts or {}) do
                 groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
                 largestFootprint = math.max(largestFootprint, fs)
                 largestForGroup = math.max(largestForGroup, fs)
@@ -1552,6 +1575,9 @@ function CalculateSizes(unitsList)
         local gridSize = math.max(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
         for _, type in data.Types do
             local unitData = unitsList[type]
+            if not unitData then
+                continue
+            end
 
              -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
              -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
@@ -1581,26 +1607,27 @@ function CategorizeUnits(formationUnits)
 
     -- initialize each unit type section by its categories
     local categoryTables = { Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
-    for unitType, typeCategories in categoryTables do
-        if not unitsList[unitType] then
-            unitsList[unitType] = {}
-        end
 
-        for categoryName, _ in typeCategories do
-            unitsList[unitType][categoryName] = {}
-        end
-    end
+    -- for unitType, typeCategories in categoryTables do
+    --     if not unitsList[unitType] then
+    --         unitsList[unitType] = {}
+    --     end
+
+    --     for categoryName, _ in typeCategories do
+    --         unitsList[unitType][categoryName] = {}
+    --     end
+    -- end
 
     -- initialize common fields for each unit type
-    for unitType, _ in categoryTables do
-        for _, commonNumberField in {'UnitTotal', 'AreaTotal'} do
-            unitsList[unitType][commonNumberField] = 0
-        end
+    -- for unitType, _ in categoryTables do
+    --     for _, commonNumberField in {'UnitTotal', 'AreaTotal'} do
+    --         unitsList[unitType][commonNumberField] = 0
+    --     end
 
-        for _, commonTableField in {'FootprintCounts', 'FootprintSizes'} do
-            unitsList[unitType][commonTableField] = {}
-        end
-    end
+    --     for _, commonTableField in {'FootprintCounts', 'FootprintSizes'} do
+    --         unitsList[unitType][commonTableField] = {}
+    --     end
+    -- end
 
     -- TODO: @ostrovaya @NOPUBLISH
     LOG('CategorizeUnits called!')
@@ -1609,24 +1636,39 @@ function CategorizeUnits(formationUnits)
     for _, unit in formationUnits do
         local identified = false
         for type, table in categoryTables do
-            local categorizationForType = unitsList[type]
-
             for category, _ in table do
                 if not EntityCategoryContains(table[category], unit) then
                     continue
                 end
 
+                -- initialize relevant sections of the categorization table
+                if not unitsList[type] then
+                    unitsList[type] = {}
+
+                    unitsList[type]['UnitTotal'] = 0
+                    unitsList[type]['AreaTotal'] = 0
+        
+                    unitsList[type]['FootprintCounts'] = {}
+                    unitsList[type]['FootprintSizes'] = {}
+                end
+                local categorizationForType = unitsList[type]
+
+                if not categorizationForType[category] then
+                    categorizationForType[category] = {}
+                end
+                local categoryFootprintSizes = categorizationForType[category]
+
                 local blueprint = unit:GetBlueprint()
                 local footprintSize = math.max(blueprint.Footprint.SizeX, blueprint.Footprint.SizeZ)
                 local id = blueprint.BlueprintId
 
-                local categoryFootprintSizes = categorizationForType[category]
-
                 if not categoryFootprintSizes[footprintSize] then
                     categoryFootprintSizes[footprintSize] = {Count = 0, Categories = {}}
                 end
-                categoryFootprintSizes[footprintSize].Count = categoryFootprintSizes[footprintSize].Count + 1
-                categoryFootprintSizes[footprintSize].Categories[id] = categories[id]
+                local footprintSizeSection = categoryFootprintSizes[footprintSize]
+
+                footprintSizeSection.Count = footprintSizeSection.Count + 1
+                footprintSizeSection.Categories[id] = categories[id]
                 categorizationForType.FootprintCounts[footprintSize] = (categorizationForType.FootprintCounts[footprintSize] or 0) + 1
 
                 if category == "RemainingCategory" then
@@ -1667,11 +1709,9 @@ function CategorizeUnits(formationUnits)
     end
 
     -- TODO: @ostrovaya @NOPUBLISH
-    LOG(reprsl(unitsList))
-    LOG("air unit total")
-    LOG(reprsl(unitsList.Air.UnitTotal))
-    LOG("land unit total")
-    LOG(reprsl(unitsList.Land.UnitTotal))
+    -- LOG(reprsl(unitsList))
+    LOG('categorization size:')
+    LOG(debug.allocatedrsize(unitsList))
 
     CalculateSizes(unitsList)
 
