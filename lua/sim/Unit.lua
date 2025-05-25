@@ -166,6 +166,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field UpgradesTo? UnitId # Keeps track of upgrades for unit transfer
 ---@field TargetUpgradeBuildTime? number # Keeps track of upgrades *during* unit transfer
 ---@field TargetFractionComplete? number # When an unbuilt unit is rebuilt during unit transfer, this overrides what fraction it is rebuilt to.
+---@field isFinishedUnit? boolean # set to true in `OnStopBeingBuilt`
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
@@ -955,6 +956,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     OnDecayed = function(self)
+        if self.Dead then return end
         self:Destroy()
     end,
 
@@ -2525,6 +2527,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnFailedToBeBuilt = function(self)
         self:ForkThread(function()
             WaitTicks(1)
+            if self.Dead then return end
             self:Destroy()
         end)
 
