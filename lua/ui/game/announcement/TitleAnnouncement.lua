@@ -27,11 +27,11 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local AbstractAnnouncement = import("/lua/ui/game/announcement/AbstractAnnouncement.lua").AbstractAnnouncement
 
 --- An announcement with just a title.
----@class UISmallAnnouncement : UIAbstractAnnouncement
+---@class UITitleAnnouncement : UIAbstractAnnouncement
 ---@field Title Text
-SmallAnnouncement = ClassUI(AbstractAnnouncement) {
+TitleAnnouncement = ClassUI(AbstractAnnouncement) {
 
-    ---@param self UISmallAnnouncement
+    ---@param self UITitleAnnouncement
     ---@param parent Control
     ---@param titleText UnlocalizedString
     __init = function(self, parent, titleText)
@@ -40,7 +40,7 @@ SmallAnnouncement = ClassUI(AbstractAnnouncement) {
         self.Title = UIUtil.CreateText(self.ContentArea, LOC(titleText), 22, UIUtil.titleFont)
     end,
 
-    ---@param self UISmallAnnouncement
+    ---@param self UITitleAnnouncement
     ---@param parent Control
     ---@param titleText UnlocalizedString
     __post_init = function(self, parent, titleText)

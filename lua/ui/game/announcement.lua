@@ -83,11 +83,11 @@ CreateTitleAnnouncement = function(titleText, goalControl)
     goalControl = goalControl or CreateDefaultGoalControl(frame)
 
     -- developers note: lazy load the module so that it remains unloaded unless used
-    local SmallAnnouncement = import("/lua/ui/game/announcement/SmallAnnouncement.lua").SmallAnnouncement
+    local TitleAnnouncement = import("/lua/ui/game/announcement/TitleAnnouncement.lua").TitleAnnouncement
 
     -- create the announcement
     ---@type UIAbstractAnnouncement
-    local announcement = SmallAnnouncement(frame, titleText)
+    local announcement = TitleAnnouncement(frame, titleText)
     announcement:Animate(goalControl, 1.4)
     Announcements:Add(announcement)
 
