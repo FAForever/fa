@@ -132,7 +132,8 @@ end
 ---@param bodyText? UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
 function CreateAnnouncement(titleText, bodyText, goalControl)
-    if type(bodyText) == "string" then
+    local typeOfBodyText = type(bodyText)
+    if typeOfBodyText == "string" or typeOfBodyText == "number" then
         return import("/lua/ui/game/announcement.lua").CreateTitleTextAnnouncement (titleText, bodyText, goalControl)
     else
         return import("/lua/ui/game/announcement.lua").CreateTitleAnnouncement(titleText, goalControl)
