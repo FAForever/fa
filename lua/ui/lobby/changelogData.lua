@@ -4,6 +4,21 @@ last_version = 3822
 ---@type PatchNotes[]
 gamePatches = {
     {
+        version = 3823,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3823 (25th of May 2025)",
+            "",
+            "Fixes various reported issues. In particular, campaign/coop should work again!",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
         version = 3822,
         name = "Game patch",
         hasPrettyGithubRelease = true,
