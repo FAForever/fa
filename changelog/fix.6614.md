@@ -1,1 +1,0 @@
-- (#6614) Fix an error when engineering drones spawned without an ACU/SACU are killed.
