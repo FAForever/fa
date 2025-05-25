@@ -378,7 +378,7 @@ local function UpgradeUnit(unit)
     print("Upgrade unit")
 
     -- wait one tick for the upgrade to start
-    WaitTicks(1)
+    WaitTicks(5)
 
     if IsDestroyed(unit) then
         return
