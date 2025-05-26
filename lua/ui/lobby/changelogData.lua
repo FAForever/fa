@@ -4,6 +4,21 @@ last_version = 3822
 ---@type PatchNotes[]
 gamePatches = {
     {
+        version = 3823,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3823 (25th of May 2025)",
+            "",
+            "Fixes various reported issues. In particular, campaign/coop should work again!",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
         version = 3822,
         name = "Game patch",
         hasPrettyGithubRelease = true,
@@ -11,9 +26,16 @@ gamePatches = {
         description = {
             "# Game version 3822 (19th of April 2025)",
             "",
-            "We once again have a game patch that is loaded with exciting improvements thanks to our active developers. The most notable feature of this patch is the introduction of the ability for players and observers to paint directly on the map. The brush strokes are shared with allied players. Observers can view all brush strokes, and only share with other observers. All brush strokes made by players are part of the replay.",
-            "A brush stroke is limited in length, but here's no limit on the number of brush strokes. This is a technical limitation to handle the network traffic better. You can create complicated shapes by creating multiple brush strokes.",
-            "With thanks to 4z0t for both the assembly implementation to be able to draw lines and the concurrent Lua implementation. Without his time and effort it would not be possible, and it wouldn't be as refined as it is now.",
+            "We once again have a game patch that is loaded with exciting improvements thanks to our active developers. The most notable",
+            "feature of this patch is the introduction of the ability for players and observers to paint directly on the map. The brush",
+            "strokes are shared with allied players. Observers can view all brush strokes, and only share with other observers. All brush ",
+            "strokes made by players are part of the replay.",
+            "",
+            "A brush stroke is limited in length, but here's no limit on the number of brush strokes. This is a technical limitation to ",
+            "handle the network traffic better. You can create complicated shapes by creating multiple brush strokes.",
+            "",
+            "With thanks to 4z0t for both the assembly implementation to be able to draw lines and the concurrent Lua implementation. ",
+            "Without his time and effort it would not be possible, and it wouldn't be as refined as it is now.",
             "",
             "Limitations:",
             "- You can not make a painting when you hold shift.",
