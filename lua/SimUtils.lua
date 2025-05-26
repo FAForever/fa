@@ -40,8 +40,8 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
     end
     -- wait for build order to start and then rebuild the units for free
     WaitTicks(1)
-    for k, factories in pairs(factoryRebuildDataTable) do
-        for i, factory in pairs(factories) do
+    for k, factories in factoryRebuildDataTable do
+        for i, factory in factories do
             if factory.Dead then
                 factories[i] = nil
                 if table.empty(factories) then
@@ -58,8 +58,8 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
     end
     -- wait for buildpower to apply then return the factories to normal and pause them
     WaitTicks(1)
-    for k, factories in pairs(factoryRebuildDataTable) do
-        for i, factory in pairs(factories) do
+    for k, factories in factoryRebuildDataTable do
+        for i, factory in factories do
             if factory.Dead then
                 factories[i] = nil
                 if table.empty(factories) then
