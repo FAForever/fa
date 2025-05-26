@@ -22,6 +22,19 @@ local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categor
 ---@param factoryRebuildDataTable FactoryRebuildDataTable
 function FactoryRebuildUnits(factoryRebuildDataTable)
     for buildUnitId, factories in factoryRebuildDataTable do
+        local noFactories = false
+        for i, factory in factories do
+            if not factory:CanBuild(buildUnitId) then
+                factories[i] = nil
+                if table.empty(factories) then
+                    factoryRebuildDataTable[buildUnitId] = nil
+                    noFactories = true
+                end
+                continue
+            end
+        end
+        if noFactories then continue end
+
         IssueClearCommands(factories)
         IssueBuildFactory(factories, buildUnitId, 1)
     end
