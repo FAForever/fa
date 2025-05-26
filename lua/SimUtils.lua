@@ -22,6 +22,7 @@ local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categor
 ---@param factoryRebuildDataTable FactoryRebuildDataTable
 function FactoryRebuildUnits(factoryRebuildDataTable)
     for buildUnitId, factories in factoryRebuildDataTable do
+        -- Remove support factories that can't build their unit due to lacking an HQ
         local noFactories = false
         for i, factory in factories do
             if not factory:CanBuild(buildUnitId) then
