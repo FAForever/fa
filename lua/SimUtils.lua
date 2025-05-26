@@ -19,6 +19,16 @@ local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categor
 
 ---@alias FactoryRebuildDataTable table<UnitId, (FactoryUnit | FactoryRebuildData)[]>
 
+--- Clear data for a factory so transferring it doesn't try to rebuild units again
+---@param factory FactoryUnit | FactoryRebuildData
+local function clearFactoryRebuildData(factory)
+    factory.FacRebuild_UnitId = nil
+    factory.FacRebuild_Progress = nil
+    factory.FacRebuild_BuildTime = nil
+    factory.FacRebuild_Health = nil
+    factory.FacRebuild_OldBuildRate = nil
+end
+
 ---@param factoryRebuildDataTable FactoryRebuildDataTable
 function FactoryRebuildUnits(factoryRebuildDataTable)
     for buildUnitId, factories in factoryRebuildDataTable do
@@ -26,6 +36,7 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
         local noFactories = false
         for i, factory in factories do
             if not factory:CanBuild(buildUnitId) then
+                clearFactoryRebuildData(factory)
                 factories[i] = nil
                 if table.empty(factories) then
                     factoryRebuildDataTable[buildUnitId] = nil
@@ -111,11 +122,7 @@ Health: %f
                 rebuiltUnit:SetHealth(nil, factory.FacRebuild_Health)
             end
 
-            -- clean up after the rebuilding
-            factory.FacRebuild_Progress = nil
-            factory.FacRebuild_BuildTime = nil
-            factory.FacRebuild_Health = nil
-            factory.FacRebuild_OldBuildRate = nil
+            clearFactoryRebuildData(factory)
         end
     end
 end
