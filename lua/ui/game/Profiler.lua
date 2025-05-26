@@ -171,7 +171,7 @@ end
 
 ---@param modIndex? number
 ---@param benIndex? number
----@return number[] | nil
+---@return number[]?
 ---@return number[]?
 local function GetBenchmarkStatCache(modIndex, benIndex)
     local key = GetBenchmarkCacheKey(modIndex, benIndex)
@@ -795,6 +795,7 @@ ProfilerBenchmarks = Class(Group) {
         local benchmarkState = State.Benchmarks
         local mod = benchmarkState.BenchmarkRunningMod
         local ben = benchmarkState.BenchmarkRunningBen
+        ---@diagnostic disable-next-line: param-type-mismatch
         self.summary:SetStats(AddBenchmarkStatCache(data, baselines, mod, ben))
     end,
 
@@ -827,7 +828,7 @@ ProfilerBenchmarks = Class(Group) {
             label:Hide()
             label:DeleteAllItems()
             if params > 0 then
-                local paramFormatter = LOC("<LOC profiler_0008>Parameter %d: %s")
+                local paramFormatter = LOC("<LOC profiler_0008>Parameter %d: %s") --[[@as LocalizedString]]
                 local parameters = benchmarkState.Parameters
                 for i = 1, params do
                     label:AddItem(paramFormatter:format(i, tostring(parameters[i])))
@@ -839,6 +840,7 @@ ProfilerBenchmarks = Class(Group) {
 
     ---@param self ProfilerBenchmarks
     UpdateBenchmarkStats = function(self)
+        ---@diagnostic disable-next-line: param-type-mismatch
         self.summary:SetStats(GetBenchmarkStatCache())
     end,
 

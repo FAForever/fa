@@ -672,7 +672,7 @@ BytecodeArea = Class(Group) {
     ---@param index number
     GetBytecodeTooltip = function(self, index)
         local text = self.bytecode:GetItem(index)
-        local jumpTooltipFormatter = LOC("<LOC profiler_0019>Jump from %s")
+        local jumpTooltipFormatter = LOC("<LOC profiler_0019>Jump from %s") --[[@as LocalizedString]]
         local jumpInd = text:find('>', nil, true)
         if jumpInd and jumpInd < 20 then
             -- pull the instruction address directly from the text
@@ -681,7 +681,7 @@ BytecodeArea = Class(Group) {
                 return
             end
             addr = tonumber(addr, 16)
-            local fn = self.DebugFunction
+            local fn = self.DebugFunction --[[@as DebugFunction]]
             local jumps = fn.prototype:ResolveJumps()[addr]
             -- string together all jump-from locations
             local addrFrom = AddressToString(jumps[1])
