@@ -414,14 +414,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             local healthToRemove = 0
             -- fraction of resources missing for assistance
             local totalBuildpower = 0
-            for _, builder in pairs(self.RegenAssisters) do
+            for _, builder in self.RegenAssisters do
                 if builder.ActiveConsumption and builder:GetResourceConsumed() > 0 then
                     totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
                 end
             end
 
             healthToRemove = healthToRemove + repairPerBuildrate * totalBuildpower
-            LOG('remove', healthToRemove, 'for', totalBuildpower)
             EntityAdjustHealth(self, self.Owner, -healthToRemove)
             self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
             -- wait till next tick
