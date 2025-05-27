@@ -410,22 +410,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             local health = EntityGetHealth(self)
             local maxHealth = EntityGetMaxHealth(self)
 
-            -- if we didn't suspend then check regen assist conditions
-            local healthToRemove = 0
-            -- fraction of resources missing for assistance
-            local totalBuildpower = 0
-            for _, builder in self.RegenAssisters do
-                if builder.ActiveConsumption and builder:GetResourceConsumed() > 0 then
-                    totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
-                end
-            end
-
-            healthToRemove = healthToRemove + repairPerBuildrate * totalBuildpower
-            EntityAdjustHealth(self, self.Owner, -healthToRemove)
-            self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
-            -- wait till next tick
-            CoroutineYield(1)
-
             -- check if we need to suspend ourself
             if -- we're at zero health or lower
                 health <= 0
@@ -445,6 +429,20 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 SuspendCurrentThread()
                 self.RegenAssistThreadSuspended = false
             end
+
+            local healthToRemove = 0
+            local totalBuildpower = 0
+            for _, builder in self.RegenAssisters do
+                if builder.ActiveConsumption and builder:GetResourceConsumed() > 0 then
+                    totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
+                end
+            end
+
+            healthToRemove = healthToRemove + repairPerBuildrate * totalBuildpower
+            EntityAdjustHealth(self, self.Owner, -healthToRemove)
+            self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
+            -- wait till next tick
+            CoroutineYield(1)
         end
     end,
 
