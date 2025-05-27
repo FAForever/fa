@@ -139,6 +139,13 @@ for k, bp in __blueprints do
     end
 end
 
+--- Resources consumed this tick by any army assisting shields.
+---@type table<Army, number?>
+local ArmyResourceEfficiencyCache = {}
+--- If the resource efficiency was updated this tick for an army
+---@type {NeedsClear: boolean?, [Army]: boolean? }
+local IsArmyResourceEfficiencyUpdated = {}
+
 ---@class Shield : moho.shield_methods, Entity
 ---@field Army Army
 ---@field EntityId EntityId
@@ -151,8 +158,11 @@ end
 ---@field ShieldRechargeTime number
 ---@field ShieldEnergyDrainRechargeTime number
 ---@field ShieldVerticalOffset number
----@field RegenRate number
+---@field RegenRate number # Determines HP/second regen. Also used by the engine for regen assist.
 ---@field RegenStartTime number
+---@field RegenAssistMult number # cached from shield spec
+---@field RegenAssistersPerArmy table<Army, Unit[]>
+---@field RegenAssistThreadSuspended boolean
 ---@field PassOverkillDamage boolean
 ---@field ImpactMeshBp string
 ---@field SkipAttachmentCheck boolean
@@ -192,6 +202,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.ShieldVerticalOffset = spec.ShieldVerticalOffset
         self.RegenRate = spec.ShieldRegenRate
         self.RegenStartTime = spec.ShieldRegenStartTime
+        self.RegenAssistMult = spec.RegenAssistMult or 1 -- 1 is engine default
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
@@ -263,6 +274,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.RegenThreadState = "On"
         self.RegenThread = ForkThread(self.RegenThread, self)
         TrashAdd(self.Trash, self.RegenThread)
+
+        -- manage regen assist validation thread
+        self.RegenAssistThreadSuspended = true
+        self.RegenAssistersToAdd = {}
+        self.RegenAssistersPerArmy = {}
+        self.RegenAssistThreadHandle = ForkThread(self.RegenAssistThread, self)
+        TrashAdd(self.Trash, self.RegenAssistThreadHandle)
 
         -- manage the loss of shield when energy is depleted
         self.Brain:AddEnergyDependingEntity(self)
@@ -340,6 +358,203 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- wait till next tick
             CoroutineYield(1)
+        end
+    end,
+
+    ---@param self Shield
+    ---@param builder Unit
+    OnBeingRepaired = function(self, builder)
+        -- After starting repair, it takes 1 tick for resource consumption and HP addition to start,
+        -- so we addition of assisters to the validation table has to be delayed 1 tick or else validation
+        -- will remove HP that was never added since it will think it is being repaired by 0 consumption units.
+        LOG(GetGameTick(), 'start being repaired by', builder.EntityId)
+        self.RegenAssistersToAdd[builder.EntityId] = builder
+        if not self.AddingRegenAssisters then
+            ForkThread(self.AddRegenAssistersThread, self)
+            self.AddingRegenAssisters = true
+        end
+    end,
+
+    ---@param self Shield
+    AddRegenAssistersThread = function(self)
+        WaitTicks(1)
+        if self.RegenAssistThreadSuspended then
+            ResumeThread(self.RegenAssistThreadHandle)
+        end
+        -- add queued assisters
+        local regenAssistersToAdd = self.RegenAssistersToAdd
+        if TableEmpty(regenAssistersToAdd) then 
+            LOG(GetGameTick(), 'thread but no assisters')
+        else
+            -- thread can suspend the same time tick repairing starts
+            LOG('resume thread addregen assisters')
+            self.RegenAssistThreadShouldSuspend = false
+            for id, assister in regenAssistersToAdd do
+                local regenAssistersOfArmy = self.RegenAssistersPerArmy[assister.Army]
+                if not regenAssistersOfArmy then
+                    self.RegenAssistersPerArmy[assister.Army] = { [assister.EntityId] = assister }
+                else
+                    regenAssistersOfArmy[assister.EntityId] = assister
+                end
+
+                regenAssistersToAdd[id] = nil
+            end
+        end
+
+        self.AddingRegenAssisters = false
+    end,
+
+    ---@param self Shield
+    ---@param builder Unit
+    OnStopBeingRepaired = function(self, builder)
+        -- LOG('stop being repaired', self.RegenAssistThreadSuspended)
+        if not self.RegenAssistThreadSuspended then
+            local regenAssistersPerArmy = self.RegenAssistersPerArmy
+            local id = builder.EntityId
+            regenAssistersPerArmy[builder.Army][id] = nil
+            self.RegenAssistersToAdd[id] = nil
+            local noAssisters = true
+            for _, regenAssistersOfArmy in regenAssistersPerArmy do
+                if next(regenAssistersOfArmy) then
+                    noAssisters = false
+                    break
+                end
+                LOG(GetGameTick(), 'stop being repaired by', id)
+            end
+            if noAssisters then
+                self.RegenAssistThreadShouldSuspend = true
+                LOG(GetGameTick(), 'queue suspend thread')
+            end
+        end
+    end,
+
+    --- Validates regeneration given by shield repair, since the engine gives full regen
+    --- regardless of resources consumed
+    ---@param self Shield
+    RegenAssistThread = function(self)
+        -- cache globals
+        local GetGameTick = GetGameTick
+        local CoroutineYield = CoroutineYield
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        -- cache cfunctions
+        local EntityGetHealth = EntityGetHealth
+        local EntityGetMaxHealth = EntityGetMaxHealth
+        local EntityAdjustHealth = EntityAdjustHealth
+
+        -- cache table operations
+        local regenAssistMult = self.RegenAssistMult
+        local regenAssistersPerArmy = self.RegenAssistersPerArmy
+        local owner = self.Owner
+
+        -- Tracks changes to RegenRate since the engine uses it to determine regen assist amount
+        local regenRate = self.RegenRate
+        -- HP regenerated per 1 buildpower per tick
+        local repairPerBuildrate = regenRate / regenAssistMult / 10
+
+        while not IsDestroyed(self) do
+
+            -- gather some information
+            local fromSuspension = false
+            local health = EntityGetHealth(self)
+            local maxHealth = EntityGetMaxHealth(self)
+            local tick = GetGameTick()
+
+            -- check if we need to suspend ourself
+            if -- we're at zero health or lower
+                health <= 0
+                -- we're full health
+                or health == maxHealth
+                -- we're not enabled
+                or not self.Enabled
+                -- we're not recharged
+                or not self.Recharged
+                -- we have nobody assisting
+                or self.RegenAssistThreadShouldSuspend
+                -- owner started upgrade which takes priority over assist
+                or owner:GetFocusUnit()
+            then
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+
+                LOG(string.format('tick %d - stopping regen assist - 0hp: %s, maxhp: %s, enbl: %s, rchgd: %s, nobp: %s'
+                    , tick
+                    , tostring(health <= 0)
+                    , tostring(health == maxHealth)
+                    , tostring(not self.Enabled)
+                    , tostring(not self.Recharged)
+                    , tostring(self.RegenAssistThreadShouldSuspend)
+                ))
+                -- suspend ourselves and wait
+                self.RegenAssistThreadSuspended = true
+                self.RegenAssistThreadShouldSuspend = false
+                SuspendCurrentThread()
+                LOG('resume regen assist thread', GetGameTick())
+                self.RegenAssistThreadSuspended = false
+                fromSuspension = true
+            end
+
+            -- if we didn't suspend then check regen assist conditions
+            if not fromSuspension then
+                -- make sure regen rate hasn't changed
+                local currentRegenRate = self.RegenRate
+                if regenRate ~= currentRegenRate then
+                    regenRate = currentRegenRate
+                    repairPerBuildrate = regenRate / regenAssistMult / 10
+                end
+
+                local healthToRemove = 0
+                for army, assisters in pairs(regenAssistersPerArmy) do
+                    -- fraction of resources missing for assistance
+                    local inefficiency = IsArmyResourceEfficiencyUpdated[army] and ArmyResourceEfficiencyCache[army] or nil
+                    if inefficiency == 0 then continue end
+
+                    local armyBuildpower = 0
+                    for _, builder in pairs(assisters) do
+                        -- exclude paused builders
+                        if builder.ActiveConsumption then
+                            if not inefficiency then
+                                inefficiency = 1 - builder:GetResourceConsumed()
+                                ArmyResourceEfficiencyCache[army] = inefficiency
+                                IsArmyResourceEfficiencyUpdated[army] = true
+
+                                if inefficiency == 0 then break end
+                            end
+                            -- buildrate can change on the fly so can't cache it (unless we hook `Unit.SetBuildRate`)
+                            armyBuildpower = armyBuildpower + builder:GetBuildRate()
+                        end
+                    end
+
+                    LOG(string.format('tick %s - inefficiency: %s, armyBp: %s, hpremove: %s'
+                        , tostring(tick)
+                        , tostring(inefficiency)
+                        , tostring(armyBuildpower)
+                        , tostring(repairPerBuildrate * armyBuildpower * (inefficiency or 0))
+                    ))
+
+                    if not inefficiency or inefficiency == 0 or armyBuildpower == 0 then continue end
+
+                    healthToRemove = healthToRemove + repairPerBuildrate * armyBuildpower * inefficiency
+                end
+
+                if healthToRemove ~= 0 then
+                    EntityAdjustHealth(self, self.Owner, -healthToRemove)
+                    self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
+                end
+            end
+            -- prevents multiple threads clearing the table multiple times
+            IsArmyResourceEfficiencyUpdated.NeedsClear = true
+
+            -- wait till next tick
+            CoroutineYield(1)
+
+            -- inefficiency is no longer up to date
+            if IsArmyResourceEfficiencyUpdated.NeedsClear then
+                for army, _ in IsArmyResourceEfficiencyUpdated do
+                    IsArmyResourceEfficiencyUpdated[army] = false
+                end
+                IsArmyResourceEfficiencyUpdated.NeedsClear = false
+            end
         end
     end,
 
