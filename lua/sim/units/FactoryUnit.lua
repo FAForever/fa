@@ -252,7 +252,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
     DestroyUnitBeingBuilt = function(self)
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
         -- unit is dead, so it should destroy itself
-        if not unitBeingBuilt.Dead and not IsDestroyed(unitBeingBuilt) then
+        if not unitBeingBuilt.Dead and not IsDestroyed(unitBeingBuilt)
+            and not unitBeingBuilt.isFinishedUnit
+        then
             unitBeingBuilt:Destroy()
         end
     end,
