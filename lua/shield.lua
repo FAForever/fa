@@ -366,7 +366,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     ---@param builder Unit
     OnBeingRepaired = function(self, builder)
-        LOG(GetGameTick(), 'OnBeingRepaired')
         self.RegenAssisters[builder.EntityId] = builder
         if self.RegenAssistThreadSuspended then
             ResumeThread(self.RegenAssistThread)
@@ -376,7 +375,6 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     ---@param builder Unit
     OnStopBeingRepaired = function(self, builder)
-        LOG(GetGameTick(), 'OnStopBeingRepaired')
         self.RegenAssisters[builder.EntityId] = nil
     end,
 
@@ -404,30 +402,23 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- HP regenerated per 1 buildpower per tick
         local repairPerBuildrate = regenRate / regenAssistMult / 10
 
-        local lastTickRemove = 0
-
         while not IsDestroyed(self) do
             -- gather some information
             local health = EntityGetHealth(self)
             local maxHealth = EntityGetMaxHealth(self)
 
+            -- if we didn't suspend then check regen assist conditions
+            local healthToRemove = 0
             -- fraction of resources missing for assistance
-            local totalEffectiveBp = 0
+            local totalBuildpower = 0
             for _, builder in pairs(self.RegenAssisters) do
-                local b = builder.Brain
-                local brainEff = math.min(
-                    b:GetEconomyIncome('MASS') / b:GetEconomyRequested('MASS'),
-                    b:GetEconomyIncome('ENERGY') / b:GetEconomyRequested('ENERGY'),
-                    1
-                )
-                LOG(GetGameTick(), 'braineff:', brainEff)
-                totalEffectiveBp = totalEffectiveBp + builder:GetBuildRate() * (1 - brainEff)
+                totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
             end
 
-            EntityAdjustHealth(self, self.Owner, -lastTickRemove)
-            self:UpdateShieldRatio((health - lastTickRemove) / maxHealth)
-            lastTickRemove = repairPerBuildrate * totalEffectiveBp
+            healthToRemove = healthToRemove + repairPerBuildrate * totalBuildpower
 
+            EntityAdjustHealth(self, self.Owner, -healthToRemove)
+            self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
             -- wait till next tick
             CoroutineYield(1)
 
