@@ -1,0 +1,1 @@
+- (#6824) Fix factory upgrades disappearing upon completion.
