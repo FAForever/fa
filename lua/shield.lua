@@ -406,71 +406,52 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         local lastTickRemove = 0
 
-        ---@type Unit[]
-        local lastTickAssisters
-        local lastTickBuildRate
-
         while not IsDestroyed(self) do
             -- gather some information
             local health = EntityGetHealth(self)
             local maxHealth = EntityGetMaxHealth(self)
 
-            -- -- check if we need to suspend ourself
-            -- if -- we're at zero health or lower
-            --     health <= 0
-            --     -- we're full health
-            --     or health == maxHealth
-            --     -- we're not enabled
-            --     or not self.Enabled
-            --     -- we're not recharged
-            --     or not self.Recharged
-            --     -- we have nobody assisting
-            --     or TableEmpty(self.Owner:GetGuards())
-            --     -- owner started upgrade which takes priority over assist
-            --     or owner:GetFocusUnit()
-            -- then
-            --     -- adjust shield bar one last time
-            --     self:UpdateShieldRatio(health / maxHealth)
-            --     -- suspend ourselves and wait
-            --     self.RegenAssistThreadSuspended = true
-            --     SuspendCurrentThread()
-            --     self.RegenAssistThreadSuspended = false
-            -- end
-
-            if lastTickAssisters then
-                local totalEffectiveBp = 0
-                for _, u in pairs(lastTickAssisters) do
-                    if not u.Dead and u.ActiveConsumption then
-                        totalEffectiveBp = totalEffectiveBp + u:GetBuildRate() * u:GetResourceConsumed()
-                    else
-                        totalEffectiveBp = totalEffectiveBp + u.lastTickBr
-                    end
-                end
-
-                if totalEffectiveBp ~= lastTickBuildRate then
-                    local extraBp = lastTickBuildRate - totalEffectiveBp
-                    LOG('adjusted hp by extra bp of ', extraBp)
-                    self:AdjustHealth(self.Owner, - repairPerBuildrate * extraBp)
-                end
-                lastTickAssisters = nil
-                lastTickBuildRate = nil
+            -- fraction of resources missing for assistance
+            local totalEffectiveBp = 0
+            for _, builder in pairs(self.RegenAssisters) do
+                local b = builder.Brain
+                local brainEff = math.min(
+                    b:GetEconomyIncome('MASS') / b:GetEconomyRequested('MASS'),
+                    b:GetEconomyIncome('ENERGY') / b:GetEconomyRequested('ENERGY'),
+                    1
+                )
+                LOG(GetGameTick(), 'braineff:', brainEff)
+                totalEffectiveBp = totalEffectiveBp + builder:GetBuildRate() * (1 - brainEff)
             end
 
-            local assisters = self.Owner:GetGuards()
-            if assisters[1] then
-                lastTickAssisters = {}
-                lastTickBuildRate = 0
-                for _, u in pairs(assisters) do
-                    if u:GetFocusUnit() == self.Owner and u.ActiveConsumption then
-                        table.insert(lastTickAssisters, u)
-                        lastTickBuildRate = lastTickBuildRate + u:GetBuildRate()
-                        u.lastTickBr = u:GetBuildRate()
-                    end
-                end
-            end
+            EntityAdjustHealth(self, self.Owner, -lastTickRemove)
+            self:UpdateShieldRatio((health - lastTickRemove) / maxHealth)
+            lastTickRemove = repairPerBuildrate * totalEffectiveBp
 
             -- wait till next tick
             CoroutineYield(1)
+
+            -- check if we need to suspend ourself
+            if -- we're at zero health or lower
+                health <= 0
+                -- we're full health
+                or health == maxHealth
+                -- we're not enabled
+                or not self.Enabled
+                -- we're not recharged
+                or not self.Recharged
+                -- we have nobody assisting
+                or TableEmpty(self.RegenAssisters)
+                -- owner started upgrade which takes priority over assist
+                or owner:GetFocusUnit()
+            then
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+                -- suspend ourselves and wait
+                self.RegenAssistThreadSuspended = true
+                SuspendCurrentThread()
+                self.RegenAssistThreadSuspended = false
+            end
         end
     end,
 
