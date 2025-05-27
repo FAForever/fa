@@ -366,10 +366,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     ---@param builder Unit
     OnBeingRepaired = function(self, builder)
-        self.RegenAssisters[builder.EntityId] = builder
-        if self.RegenAssistThreadSuspended then
-            ResumeThread(self.RegenAssistThread)
-        end
+        -- Must be forked for correct execution order (however that happens)
+        ForkThread(function()
+            if self.RegenAssistThreadSuspended then
+                ResumeThread(self.RegenAssistThread)
+            end
+            self.RegenAssisters[builder.EntityId] = builder
+        end)
     end,
 
     ---@param self Shield
@@ -412,11 +415,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             -- fraction of resources missing for assistance
             local totalBuildpower = 0
             for _, builder in pairs(self.RegenAssisters) do
-                totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
+                if builder.ActiveConsumption and builder:GetResourceConsumed() > 0 then
+                    totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
+                end
             end
 
             healthToRemove = healthToRemove + repairPerBuildrate * totalBuildpower
-
+            LOG('remove', healthToRemove, 'for', totalBuildpower)
             EntityAdjustHealth(self, self.Owner, -healthToRemove)
             self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
             -- wait till next tick
@@ -437,7 +442,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 or owner:GetFocusUnit()
             then
                 -- adjust shield bar one last time
-                self:UpdateShieldRatio(health / maxHealth)
+                -- self:UpdateShieldRatio(health / maxHealth)
                 -- suspend ourselves and wait
                 self.RegenAssistThreadSuspended = true
                 SuspendCurrentThread()
