@@ -2920,7 +2920,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.TransferUpgradeProgress = nil
 
         if built.Repairers[self.EntityId] then
-            self:OnStopRepair(self, built)
+            self:OnStopRepair(built)
             built.Repairers[self.EntityId] = nil
         end
 
