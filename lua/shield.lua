@@ -428,6 +428,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 self.RegenAssistThreadSuspended = true
                 SuspendCurrentThread()
                 self.RegenAssistThreadSuspended = false
+                health = EntityGetHealth(self)
+                maxHealth = EntityGetMaxHealth(self)
             end
 
             local healthToRemove = 0
