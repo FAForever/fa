@@ -428,6 +428,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- - shield is not recharged
                 -- - shield has full or 0 health
                 self.NumAssisters == 0
+                -- shield is max health but still being assisted because owner is damaged
+                or health == maxHealth
                 -- when owner started upgrade which takes priority over assist
                 -- TODO: can't use num assisters here because repair orders don't switch target once upgrade starts
                 -- TODO: fix suspending an upgrade causes 1 tick of free regen from all but the first builder
@@ -758,6 +760,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 self.RegenThreadStartTick = tick + 10 * self.RegenStartTime
                 if self.RegenThreadSuspended then
                     ResumeThread(self.RegenThread)
+                end
+
+                -- Resume regen assist thread if it was paused because we were at full HP
+                if self.RegenAssistThreadSuspended and self.NumAssisters > 0 then
+                    ResumeThread(self.RegenAssistThread)
                 end
             end
         end
