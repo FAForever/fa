@@ -277,10 +277,9 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         TrashAdd(self.Trash, self.RegenThread)
 
         -- manage regen assist validation thread
-        self.RegenAssistThreadSuspended = true
         self.RegenAssisters = {}
-        self.RegenAssistersToAdd = {}
-        self.RegenAssistersPerArmy = {}
+        self.NumAssisters = 0
+        self.RegenAssistThreadSuspended = false
         self.RegenAssistThread = ForkThread(self.RegenAssistThread, self)
         TrashAdd(self.Trash, self.RegenAssistThread)
 
@@ -367,6 +366,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param builder Unit
     OnBeingRepaired = function(self, builder)
         self.RegenAssisters[builder.EntityId] = builder
+        self.NumAssisters = self.NumAssisters + 1
+
         if self.RegenAssistThreadSuspended then
             ResumeThread(self.RegenAssistThread)
             -- set here so assisters in the same tick don't resume thread many times
@@ -378,6 +379,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param builder Unit
     OnStopBeingRepaired = function(self, builder)
         self.RegenAssisters[builder.EntityId] = nil
+        self.NumAssisters = self.NumAssisters - 1
     end,
 
     --- Validates regeneration given by shield repair, since the engine gives full regen
@@ -421,10 +423,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- - shield is not enabled
                 -- - shield is not recharged
                 -- - shield has full or 0 health
-                TableEmpty(self.RegenAssisters)
+                self.NumAssisters == 0
                 -- when owner started upgrade which takes priority over assist
-                -- TODO: fix suspending an upgrade causes 1 tick of free repair
-                or self.Owner:GetFocusUnit()
+                -- TODO: can't use num assisters here because repair orders don't switch target once upgrade starts
+                -- TODO: fix suspending an upgrade causes 1 tick of free regen from all but the first builder
+                or owner:GetFocusUnit()
             then
                 -- adjust shield bar one last time
                 self:UpdateShieldRatio(health / maxHealth)
@@ -439,15 +442,20 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 maxHealth = EntityGetMaxHealth(self)
             end
 
-            local healthToRemove = 0
-            local totalBuildpower = 0
+            local excessBuildpower = 0
             for _, builder in self.RegenAssisters do
-                if builder.ActiveConsumption and builder:GetResourceConsumed() > 0 then
-                    totalBuildpower = totalBuildpower + builder:GetBuildRate() * (1 - builder:GetResourceConsumed())
+                local resourcesConsumed = builder:GetResourceConsumed()
+                    -- *Immediately* detects paused builders. 
+                    -- Resource consumption == 0 for pausing is delayed by 1 tick, which would cause an HP loss on pause.
+                if  builder.ActiveConsumption
+                    -- 0 when builder just started building but hasn't added HP
+                    and resourcesConsumed > 0
+                then
+                    excessBuildpower = excessBuildpower + builder:GetBuildRate() * (1 - resourcesConsumed)
                 end
             end
 
-            healthToRemove = repairPerBuildrate * totalBuildpower
+            local healthToRemove = repairPerBuildrate * excessBuildpower
             EntityAdjustHealth(self, self.Owner, -healthToRemove)
             self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
 
