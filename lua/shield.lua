@@ -369,6 +369,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.RegenAssisters[builder.EntityId] = builder
         if self.RegenAssistThreadSuspended then
             ResumeThread(self.RegenAssistThread)
+            -- set here so assisters in the same tick don't resume thread many times
             self.RegenAssistThreadSuspended = false
         end
     end,
@@ -404,7 +405,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local repairPerBuildrate = regenRate / regenAssistMult / 10
 
         while not IsDestroyed(self) do
-            -- gather some information
+            -- gather information
             local health = EntityGetHealth(self)
             local maxHealth = EntityGetMaxHealth(self)
 
@@ -416,7 +417,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- - shield has full or 0 health
                 TableEmpty(self.RegenAssisters)
                 -- when owner started upgrade which takes priority over assist
-                -- not checking this causes 1 tick of unnecessary hp reduction
+                -- TODO: fix suspending an upgrade causes 1 tick of free repair
                 or self.Owner:GetFocusUnit()
             then
                 -- adjust shield bar one last time
@@ -425,6 +426,9 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- suspend ourselves and wait
                 self.RegenAssistThreadSuspended = true
                 SuspendCurrentThread()
+                -- RegenAssistThreadSuspended set to false in OnStartBeingRepaired
+
+                -- update data since time passed
                 health = EntityGetHealth(self)
                 maxHealth = EntityGetMaxHealth(self)
             end
@@ -437,9 +441,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 end
             end
 
-            healthToRemove = healthToRemove + repairPerBuildrate * totalBuildpower
+            healthToRemove = repairPerBuildrate * totalBuildpower
             EntityAdjustHealth(self, self.Owner, -healthToRemove)
             self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
+
             -- wait till next tick
             CoroutineYield(1)
         end
