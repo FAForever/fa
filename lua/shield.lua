@@ -409,18 +409,15 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             local maxHealth = EntityGetMaxHealth(self)
 
             -- check if we need to suspend ourself
-            if -- we're at zero health or lower
-                health <= 0
-                -- we're full health
-                or health == maxHealth
-                -- we're not enabled
-                or not self.Enabled
-                -- we're not recharged
-                or not self.Recharged
-                -- we have nobody assisting
-                or TableEmpty(self.RegenAssisters)
-                -- owner started upgrade which takes priority over assist
-                or owner:GetFocusUnit()
+            if  -- we have nobody assisting
+                -- also includes:
+                -- - shield is not enabled
+                -- - shield is not recharged
+                -- - shield has full or 0 health
+                TableEmpty(self.RegenAssisters)
+                -- when owner started upgrade which takes priority over assist
+                -- not checking this causes 1 tick of unnecessary hp reduction
+                or self.Owner:GetFocusUnit()
             then
                 -- adjust shield bar one last time
                 self:UpdateShieldRatio(health / maxHealth)
