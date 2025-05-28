@@ -463,6 +463,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 end
             end
 
+            -- Note: If a shield has enough buildpower this tick to restore it to full HP, 
+            -- then it will do so (for free) and the builders will automatically stop repairing,
+            -- causing the thread to break. It's a massive amount of buildpower so I won't fix it.
+
             local healthToRemove = repairPerBuildrate * excessBuildpower
             EntityAdjustHealth(self, self.Owner, -healthToRemove)
             self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
