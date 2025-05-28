@@ -366,14 +366,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@param self Shield
     ---@param builder Unit
     OnBeingRepaired = function(self, builder)
-        -- Must be forked for correct execution order (however that happens)
+        self.RegenAssisters[builder.EntityId] = builder
         if self.RegenAssistThreadSuspended then
-            ForkThread(function()
-                ResumeThread(self.RegenAssistThread)
-            end)
+            ResumeThread(self.RegenAssistThread)
             self.RegenAssistThreadSuspended = false
         end
-        self.RegenAssisters[builder.EntityId] = builder
     end,
 
     ---@param self Shield
