@@ -401,10 +401,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local regenAssistersPerArmy = self.RegenAssistersPerArmy
         local owner = self.Owner
 
+        -- variables needed across ticks
+
         -- Tracks changes to RegenRate since the engine uses it to determine regen assist amount
         local regenRate = self.RegenRate
         -- HP regenerated per 1 buildpower per tick
         local repairPerBuildrate = regenRate / regenAssistMult / 10
+        -- Owner damaged state affects repairs of next tick
+        local ownerIsDamaged = EntityGetHealth(owner) < EntityGetMaxHealth(owner)
 
         while not IsDestroyed(self) do
             -- update regen info if it changed
@@ -451,13 +455,18 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                     -- 0 when builder just started building but hasn't added HP
                     and resourcesConsumed > 0
                 then
-                    excessBuildpower = excessBuildpower + builder:GetBuildRate() * (1 - resourcesConsumed)
+                    local builderExcessBp = builder:GetBuildRate() * (1 - resourcesConsumed)
+                    -- Engine splits buildpower 50/50 when owner was damaged last tick
+                    excessBuildpower = excessBuildpower + (ownerIsDamaged and builderExcessBp * 0.5 or builderExcessBp)
                 end
             end
 
             local healthToRemove = repairPerBuildrate * excessBuildpower
             EntityAdjustHealth(self, self.Owner, -healthToRemove)
             self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
+
+            -- update for next tick
+            ownerIsDamaged = EntityGetHealth(owner) < EntityGetMaxHealth(owner)
 
             -- wait till next tick
             CoroutineYield(1)
