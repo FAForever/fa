@@ -422,6 +422,9 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- owner started upgrade which takes priority over assist
                 or owner:GetFocusUnit()
             then
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+
                 -- suspend ourselves and wait
                 self.RegenAssistThreadSuspended = true
                 SuspendCurrentThread()
