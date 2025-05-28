@@ -405,6 +405,12 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local repairPerBuildrate = regenRate / regenAssistMult / 10
 
         while not IsDestroyed(self) do
+            -- update regen info if it changed
+            if regenRate ~= self.RegenRate then
+                regenRate = self.RegenRate
+                repairPerBuildrate = regenRate / regenAssistMult / 10
+            end
+
             -- gather information
             local health = EntityGetHealth(self)
             local maxHealth = EntityGetMaxHealth(self)
