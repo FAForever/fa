@@ -1981,7 +1981,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     DeathThread = function(self, overkillRatio, instigator)
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
-        self:DebugLog('the game will desync now')
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
         if not self.BagsDestroyed then
