@@ -35,7 +35,7 @@ function CollapseDebugInfo(info)
 end
 
 
----@class RawFunctionDebugInfo : debuginfo
+---@class RawFunctionDebugInfo
 ---@field bytecode Bytecode
 ---@field constants any[]
 -- @field prototypes nil -- we don't have access to these!
