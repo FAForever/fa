@@ -59,25 +59,18 @@ AbstractVictoryCondition = Class(DebugComponent) {
         -- re-introduce the 'draw bug' that bugged the community for years.
 
         if IsDestroyed(unit) then
-            LOG(GetGameTick(), unit.Brain.Nickname, 'unit is ineligible because it is destroyed')
             return false
-        end
-
-        if unit.Dead then
-            LOG(GetGameTick(), unit.Brain.Nickname, 'unit is Dead but is not yet destroyed, so it is eligible')
         end
 
         -- only units that are finished are taken into account.
 
         if unit:GetFractionComplete() < 1.0 then
-            LOG('unit is ineligible because it is incomplete')
             return false
         end
 
         -- only units that are not recalling are taken into account.
 
         if unit.RecallingAfterDefeat then
-            LOG('unit is ineligible because it is recalling')
             return false
         end
 
@@ -100,7 +93,6 @@ AbstractVictoryCondition = Class(DebugComponent) {
             end
         end
 
-        LOG(GetGameTick(), 'brain', aiBrain.Army, aiBrain.Nickname, 'has NO eligible units')
         return false
     end,
 
@@ -197,7 +189,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     MonitoringThread = function(self)
         while not IsGameOver() do
             self:EvaluateVictoryCondition()
-            WaitTicks(1)
+            WaitTicks(4)
         end
     end,
 
