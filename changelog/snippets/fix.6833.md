@@ -1,0 +1,1 @@
+- (#6833) Fix profiler discarding all benchmark data as outliers when all data points are the same exact value.
