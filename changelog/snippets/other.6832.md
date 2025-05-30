@@ -1,0 +1,1 @@
+- (#6832) Fix most annotation warnings in the new profiler code.
