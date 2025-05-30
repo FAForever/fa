@@ -56,7 +56,13 @@ UnitCondition = Class(AbstractVictoryCondition) {
             end
         end
 
-        -- no remaining players, just end the game
+        -- defeated brains must be processed before the game (potentially) ends to sync game results to be sent to server
+        for k = 1, TableGetn(defeatedBrains) do
+            local defeatedBrain = defeatedBrains[k]
+            self:DefeatForArmy(defeatedBrain)
+        end
+
+        -- no remaining players, end the game as the conditions below require living players
         if table.empty(aliveBrains) then
             if self.EnabledSpewing then
                 SPEW("All players are defeated, game will end")
@@ -64,13 +70,6 @@ UnitCondition = Class(AbstractVictoryCondition) {
 
             self:EndGame()
             return
-        end
-
-
-        -- process all defeated brains
-        for k = 1, TableGetn(defeatedBrains) do
-            local defeatedBrain = defeatedBrains[k]
-            self:DefeatForArmy(defeatedBrain)
         end
 
         -- check if all remaining players want to forfeit

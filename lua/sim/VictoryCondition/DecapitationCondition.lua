@@ -74,6 +74,13 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             end
         end
 
+        -- process all defeated brains. At this stage, it is an entire team that is defeated at once
+        -- defeated brains must be processed before the game (potentially) ends to sync game results to be sent to server
+        for k = 1, TableGetn(defeatedBrains) do
+            local defeatedBrain = defeatedBrains[k]
+            self:DefeatForArmy(defeatedBrain)
+        end
+
         -- no remaining players, just end the game
         if table.empty(aliveBrains) then
             if self.EnabledSpewing then
@@ -82,12 +89,6 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
 
             self:EndGame()
             return
-        end
-
-        -- process all defeated brains. At this stage, it is an entire team that is defeated at once
-        for k = 1, TableGetn(decapitatedBrains) do
-            local defeatedBrain = decapitatedBrains[k]
-            self:DefeatForArmy(defeatedBrain)
         end
 
         -- check if all remaining players want to forfeit
