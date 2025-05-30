@@ -74,11 +74,17 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             end
         end
 
-        -- process all defeated brains. At this stage, it is an entire team that is defeated at once
-        -- defeated brains must be processed before the game (potentially) ends to sync game results to be sent to server
-        for k = 1, TableGetn(defeatedBrains) do
-            local defeatedBrain = defeatedBrains[k]
-            self:DefeatForArmy(defeatedBrain)
+        -- defeated brains must be processed first to sync game results to be sent to server
+        -- At this stage, it is an entire team that is defeated at once
+        local numDefeated = TableGetn(defeatedBrains)
+        if numDefeated > 0 then
+            for k = 1, numDefeated do
+                local defeatedBrain = defeatedBrains[k]
+                self:DefeatForArmy(defeatedBrain)
+            end
+            -- Give other brains some time to be defeated for a draw
+            WaitTicks(6) -- 6 ticks due to random 0-6 tick delay in Unit death thread
+            return self:EvaluateVictoryCondition()
         end
 
         -- no remaining players, just end the game

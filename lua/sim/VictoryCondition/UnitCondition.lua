@@ -56,10 +56,16 @@ UnitCondition = Class(AbstractVictoryCondition) {
             end
         end
 
-        -- defeated brains must be processed before the game (potentially) ends to sync game results to be sent to server
-        for k = 1, TableGetn(defeatedBrains) do
-            local defeatedBrain = defeatedBrains[k]
-            self:DefeatForArmy(defeatedBrain)
+        -- defeated brains must be processed first to sync game results to be sent to server
+        local numDefeated = TableGetn(defeatedBrains)
+        if numDefeated > 0 then
+            for k = 1, numDefeated do
+                local defeatedBrain = defeatedBrains[k]
+                self:DefeatForArmy(defeatedBrain)
+            end
+            -- Give other brains some time to be defeated for a draw
+            WaitTicks(6) -- 6 ticks due to random 0-6 tick delay in Unit death thread
+            return self:EvaluateVictoryCondition()
         end
 
         -- no remaining players, end the game as the conditions below require living players
