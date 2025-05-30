@@ -13,6 +13,7 @@ local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUn
 local KillArmy = import("/lua/simutils.lua").KillArmy
 local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
 local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
+local RecallArmy = import('/lua/simutils.lua').RecallArmy
 local DisableAI = import("/lua/simutils.lua").DisableAI
 local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
@@ -574,7 +575,6 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --- Called by the victory condition when we need to recall.
     ---@param self AIBrain
     OnRecalled = function(self)
-        -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
         local selfIndex = self:GetArmyIndex()
@@ -583,46 +583,10 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- AI
         if self.BrainType == "AI" then
-            DisableAI(self)
+            DisableAI(self--[[@as BaseAIBrain]] )
         end
 
-        local enemies, civilians = {}, {}
-
-        -- Sort brains out into mutually exclusive categories
-        for index, brain in ArmyBrains do
-            brain.index = index
-
-            if not brain:IsDefeated() and selfIndex ~= index then
-                if ArmyIsCivilian(index) then
-                    table.insert(civilians, brain)
-                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
-                    table.insert(enemies, brain)
-                end
-            end
-        end
-
-        -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
-        -- Recalling recalls all SACU, so they shouldn't be transferred.
-        local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
-        local shareOption = ScenarioInfo.Options.Share
-        if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(self, civilians, false, recallCat, "CivilianDeserter")
-        elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, enemies, false, recallCat, "Defectors")
-        end
-
-        -- let the average, team vs team game end first
-        WaitSeconds(10.0)
-
-        -- Kill all units left over
-        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        if tokill then
-            for _, unit in tokill do
-                if not IsDestroyed(unit) then
-                    unit:Kill()
-                end
-            end
-        end
+        ForkThread(RecallArmy, self, ScenarioInfo.Options.Share)
 
         local trash = self.Trash
         if trash then

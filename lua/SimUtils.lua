@@ -1163,6 +1163,48 @@ function KillArmyOnACUDeath(self, shareOption)
     KillArmy(self, shareOption)
 end
 
+-- Recalling recalls all SACU, so they shouldn't be transferred.
+local recallCategory = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+
+--- Recalling has different share conditions than defeat because the entire team recalls simultaneously,
+--- so there are no allies to transfer units to as needed by most share options.
+---@param self AIBrain
+---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+function RecallArmy(self, shareOption)
+    local selfIndex = self.Army
+
+    -- Sort brains out into mutually exclusive categories
+    local enemies, civilians = {}, {}
+    for index, brain in ArmyBrains do
+        brain.index = index
+
+        if not brain:IsDefeated() and selfIndex ~= index then
+            if ArmyIsCivilian(index) then
+                table.insert(civilians, brain)
+            elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
+                table.insert(enemies, brain)
+            end
+        end
+    end
+
+    if shareOption == 'CivilianDeserter' then
+        TransferUnitsToBrain(self, civilians, false, recallCategory, "CivilianDeserter")
+    elseif shareOption == 'Defectors' then
+        TransferUnitsToHighestBrain(self, enemies, false, recallCategory, "Defectors")
+    end
+
+    -- let the average 2-team game end before killing all units left over
+    WaitSeconds(10.0)
+    local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+    if tokill then
+        for _, unit in tokill do
+            if not IsDestroyed(unit) then
+                unit:Kill()
+            end
+        end
+    end
+end
+
 --#endregion
 
 local SorianUtils = import("/lua/ai/sorianutilities.lua")
