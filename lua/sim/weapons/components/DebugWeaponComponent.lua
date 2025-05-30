@@ -120,7 +120,8 @@ DebugWeaponComponent = Class(DebugComponent) {
 
         -- do not draw everything, just what the developer may be interested in
         if not (GetFocusArmy() == -1 or GetFocusArmy() == self.Army) then
-            return
+            -- not drawing anything at all will desync the game, so we draw in a transparent color
+            color = '00ffffff'
         end
 
         color = color or 'ffffff'

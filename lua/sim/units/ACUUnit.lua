@@ -108,7 +108,7 @@ ACUUnit = ClassUnit(CommandUnit) {
             local instigatorBrain = ArmyBrains[instigator.Army]
 
             Sync.EnforceRating = true
-            WARN('ACU kill detected. Rating for ranked games is now enforced.')
+            WARN(GetGameTick(), 'ACU kill detected. Rating for ranked games is now enforced.', self.Brain.Nickname, ' was killed by ', instigator.Brain.Nickname, ' using ', type)
 
             -- If we are teamkilled, filter out death explostions of allied units that were not coused by player's self destruct order
             -- Damage types:

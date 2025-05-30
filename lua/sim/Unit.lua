@@ -1577,6 +1577,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
             self:DisableShield()
             self:DisableUnitIntel('Killed')
+            self:DebugLog('tick:', GetGameTick(), 'forking death thread...')
             self:ForkThread(self.DeathThread, overkillRatio , instigator)
         end
 
@@ -1981,7 +1982,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     DeathThread = function(self, overkillRatio, instigator)
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
-        WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
+        local rand = utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax)
+        self:DebugLog('tick:', GetGameTick()
+            , string.format('death thread started, waiting random explosion delay of %f - %f seconds (result: %f s)'
+                , self.DestructionExplosionWaitDelayMin
+                , self.DestructionExplosionWaitDelayMax
+                , rand
+            )
+        )
+        WaitSeconds(rand)
+        self:DebugLog('tick:', GetGameTick(), 'explosion delay done, playing sink/death anim')
 
         if not self.BagsDestroyed then
             self:DestroyAllBuildEffects()
@@ -2031,6 +2041,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         elseif self.DeathAnimManip then -- wait for non-sinking animations
             WaitFor(self.DeathAnimManip)
         end
+        self:DebugLog('tick:', GetGameTick(), 'sinking anim or death anim manipulator done, destroying unit...')
 
         -- If we're not doing fancy sinking rubbish, just blow the damn thing up.
         self:DestroyUnit(overkillRatio)
@@ -2044,6 +2055,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- wait at least 1 tick before destroying unit
         WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
+        self:DebugLog('tick:', GetGameTick(), tostring(math.max(0.1, self.DeathThreadDestructionWaitTime)) .. ' seconds destruction wait done, destroying unit now')
 
         -- do not play sound after sinking
         if not self.Sinking then 
