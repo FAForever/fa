@@ -208,6 +208,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
             self.ProcessGameStateThreadInstance = nil
         end
 
+        self.EndingGame = true
         self.Trash:Add(ForkThread(self.EndGameThread, self))
     end,
 
@@ -307,6 +308,19 @@ AbstractVictoryCondition = Class(DebugComponent) {
         aiBrain:OnRecalled()
 
         local brainIndex = aiBrain.Army
+        SyncGameResult({ brainIndex, "defeat -10" })
+    end,
+
+    --- Processes the army as if it was abandoned (player disconnected). Called by `AIBrain.AbandonedByPlayer`.
+    ---@param self AbstractVictoryCondition
+    ---@param aiBrain AIBrain
+    AbandonmentForArmy = function(self, aiBrain)
+        self:ToObserver(aiBrain)
+        -- there is no callback to do
+
+        local brainIndex = aiBrain.Army
+        -- Generally useful, so always spew
+        SPEW(string.format("Army %d (%s) has been abandoned (player disconnected)", brainIndex, aiBrain.Nickname))
         SyncGameResult({ brainIndex, "defeat -10" })
     end,
 }

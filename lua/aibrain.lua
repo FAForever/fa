@@ -474,8 +474,15 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --- Called by the engine when a player disconnects.
     ---@param self AIBrain
     AbandonedByPlayer = function(self)
-        if not IsGameOver() then
-            self.Status = 'Defeat'
+        local victoryCondition = import("/lua/sim/victorycondition/victoryconditionsingleton.lua").GetSingleton()
+        if not IsGameOver()
+            -- make sure game is not in the process of ending
+            and victoryCondition.ProcessGameStateThreadInstance
+        then
+            -- sync our defeat result
+            victoryCondition:AbandonmentForArmy(self)
+
+            self.Status = "Defeat"
 
             import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
             import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
