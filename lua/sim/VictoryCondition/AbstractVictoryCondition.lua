@@ -307,4 +307,14 @@ AbstractVictoryCondition = Class(DebugComponent) {
         SyncGameResult({ brainIndex, "defeat -10" })
     end,
 
+    --- Processes the army as if it was recalled. Called by the AIBrain when it recalls.
+    ---@param self AbstractVictoryCondition
+    ---@param aiBrain AIBrain
+    RecallForArmy = function(self, aiBrain)
+        self:ToObserver(aiBrain)
+        aiBrain:OnRecalled()
+
+        local brainIndex = aiBrain.Army
+        SyncGameResult({ brainIndex, "defeat -10" })
+    end,
 }

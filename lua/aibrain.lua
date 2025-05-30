@@ -567,9 +567,12 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         if recallingUnits then
             FakeTeleportUnits(recallingUnits, true)
         end
-        self:OnRecalled()
+        -- will call OnRecalled after removing the army from play.
+        import("/lua/sim/victorycondition/victoryconditionsingleton.lua").GetSingleton():RecallForArmy(self)
     end,
 
+    --- Called by the victory condition when we need to recall.
+    ---@param self AIBrain
     OnRecalled = function(self)
         -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
