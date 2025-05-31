@@ -115,7 +115,7 @@ local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal
 
                 -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
                 -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return initialVal, bool end
 
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
@@ -210,7 +210,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
                 -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
                 -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return initialVal, bool end
 
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
