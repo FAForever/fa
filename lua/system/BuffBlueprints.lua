@@ -73,6 +73,7 @@ Buffs = {}
 --- if we don't want unit properties connected the affect type to also change (e.g. changing
 --- `MaxHealth` also increases `Health` unless this flag is set)
 ---@field DoNotFill? boolean
+---@field Bool? boolean
 
 --- Buff affect data stored for a unit. Includes the affect blueprint and the buff stack count,
 --- except for instant affects "Health" and "Energy".
