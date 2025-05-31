@@ -30,6 +30,7 @@ function AnimatePingMesh(entity, lifetime)
     end
 end
 
+---@param data SyncPingData
 function SpawnPing(data)
     if not PingsRemaining[data.Owner] then
         PingsRemaining[data.Owner] = PingLimit
