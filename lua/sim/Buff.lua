@@ -53,7 +53,7 @@
 ---@param buffName string
 ---@param affectType string
 ---@param initialVal integer
----@param initialBool boolean
+---@param initialBool? boolean
 ---@return number, boolean
 local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal, initialBool)
 
