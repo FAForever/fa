@@ -20,6 +20,7 @@ end
 
 ---@class UnitSyncData
 ---@field WepPriority? UnitSyncWepPriority
+---@field Buffs? BuffName[] # Buffs to display icons for
 
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.

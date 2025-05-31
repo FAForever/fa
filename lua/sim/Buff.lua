@@ -626,13 +626,13 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
         def:OnBuffRemove(unit, instigator)
     end
 
-    -- FIXME: This doesn't work because the magic sync table doesn't detect
-    -- the change. Need to give all child tables magic meta tables too.
     if def.Icon then
         -- If the user layer was displaying an icon, remove it from the sync table
-        local newTable = unit.Sync.Buffs
-        table.removeByValue(newTable, buffName)
-        unit.Sync.Buffs = table.copy(newTable)
+        local oldTable = unit.Sync.Buffs
+        if oldTable then
+            table.removeByValue(oldTable, buffName)
+            unit.Sync.Buffs = oldTable
+        end
     end
 
     BuffAffectUnit(unit, buffName, unit, true)
@@ -811,6 +811,16 @@ function ApplyBuff(unit, buffName, instigator)
 
     if def.OnApplyBuff then
         def:OnApplyBuff(unit, instigator)
+    end
+
+    if def.Icon then
+        local currentBuffs = unit.Sync.Buffs
+        if currentBuffs then
+            table.insert(currentBuffs, buffName)
+            unit.Sync.Buffs = currentBuffs
+        else
+            unit.Sync.Buffs = { buffName }
+        end
     end
 
     BuffAffectUnit(unit, buffName, instigator, false)

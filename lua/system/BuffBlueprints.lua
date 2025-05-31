@@ -113,6 +113,7 @@ Buffs = {}
 --- table of VFX (not the how the buff affects units)
 ---@field Effects? FileName[]
 ---@field EffectsScale? number
+---@field Icon? boolean # Syncs buff name to UnitData when it affects a unit for icon display
 BuffDefMeta = {}
 BuffDefMeta.__index = BuffDefMeta
 BuffDefMeta.__call = function(...)
