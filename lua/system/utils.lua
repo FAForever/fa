@@ -104,8 +104,11 @@ function table.copy(t)
     return r
 end
 
---- table.find(t,val) returns the key for val if it is in t table.
---- Otherwise, return nil
+--- Returns the key for `val` if it is in table `t`.
+--- Otherwise, returns nil.
+---@param t? table
+---@param val any
+---@return any keyOrNil
 function table.find(t,val)
     if not t then return end -- prevents looping over nil table
     for k,v in t do
