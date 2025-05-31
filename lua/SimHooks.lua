@@ -40,45 +40,6 @@ do
 end
 
 do
-
-    -- upvalue for performance
-    local Random = Random
-
-    local oldDrawCircle = _G.DrawCircle
-    _G.DrawCircle = function(position, diameter, color)
-
-        -- cause a desync when players during non-ai games try and call this function separate from other players
-        if not ScenarioInfo.GameHasAIs then
-            Random()
-        end
-
-        oldDrawCircle(position, diameter, color)
-    end
-
-    local oldDrawLine = _G.DrawLine
-    _G.DrawLine = function(a, b, color)
-
-        -- cause a desync when players during non-ai games try and call this function separate from other players
-        if not ScenarioInfo.GameHasAIs then
-            Random()
-        end
-
-        oldDrawLine(a, b, color)
-    end
-
-    local oldDrawLinePop = _G.DrawLinePop
-    _G.DrawLinePop = function(a, b, color)
-
-        -- cause a desync when players during non-ai games try and call this function separate from other players
-        if not ScenarioInfo.GameHasAIs then
-            Random()
-        end
-
-        oldDrawLinePop(a, b, color)
-    end
-end
-
-do
     -- do not allow command units to be given
     local oldChangeUnitArmy = _G.ChangeUnitArmy
     _G.ChangeUnitArmy = function(unit, army, noRestrictions)
