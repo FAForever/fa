@@ -13,6 +13,7 @@ local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUn
 local KillArmy = import("/lua/simutils.lua").KillArmy
 local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
 local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
+local RecallArmy = import('/lua/simutils.lua').RecallArmy
 local DisableAI = import("/lua/simutils.lua").DisableAI
 local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
@@ -473,8 +474,15 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --- Called by the engine when a player disconnects.
     ---@param self AIBrain
     AbandonedByPlayer = function(self)
-        if not IsGameOver() then
-            self.Status = 'Defeat'
+        local victoryCondition = import("/lua/sim/victorycondition/victoryconditionsingleton.lua").GetSingleton()
+        if not IsGameOver()
+            -- make sure game is not in the process of ending
+            and victoryCondition.ProcessGameStateThreadInstance
+        then
+            -- sync our defeat result
+            victoryCondition:AbandonmentForArmy(self)
+
+            self.Status = "Defeat"
 
             import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
             import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
@@ -567,11 +575,13 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         if recallingUnits then
             FakeTeleportUnits(recallingUnits, true)
         end
-        self:OnRecalled()
+        -- will call OnRecalled after removing the army from play.
+        import("/lua/sim/victorycondition/victoryconditionsingleton.lua").GetSingleton():RecallForArmy(self)
     end,
 
+    --- Called by the victory condition when we need to recall.
+    ---@param self AIBrain
     OnRecalled = function(self)
-        -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
         local selfIndex = self:GetArmyIndex()
@@ -580,46 +590,10 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- AI
         if self.BrainType == "AI" then
-            DisableAI(self)
+            DisableAI(self--[[@as BaseAIBrain]] )
         end
 
-        local enemies, civilians = {}, {}
-
-        -- Sort brains out into mutually exclusive categories
-        for index, brain in ArmyBrains do
-            brain.index = index
-
-            if not brain:IsDefeated() and selfIndex ~= index then
-                if ArmyIsCivilian(index) then
-                    table.insert(civilians, brain)
-                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
-                    table.insert(enemies, brain)
-                end
-            end
-        end
-
-        -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
-        -- Recalling recalls all SACU, so they shouldn't be transferred.
-        local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
-        local shareOption = ScenarioInfo.Options.Share
-        if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(self, civilians, false, recallCat, "CivilianDeserter")
-        elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, enemies, false, recallCat, "Defectors")
-        end
-
-        -- let the average, team vs team game end first
-        WaitSeconds(10.0)
-
-        -- Kill all units left over
-        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        if tokill then
-            for _, unit in tokill do
-                if not IsDestroyed(unit) then
-                    unit:Kill()
-                end
-            end
-        end
+        ForkThread(RecallArmy, self, ScenarioInfo.Options.Share)
 
         local trash = self.Trash
         if trash then

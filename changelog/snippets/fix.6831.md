@@ -1,0 +1,1 @@
+- (#6831) Fix draws, recalls, and disconnects resulting in unknown results or incorrect victories.
