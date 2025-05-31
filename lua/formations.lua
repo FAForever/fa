@@ -1591,20 +1591,17 @@ function CategorizeUnits(formationUnits)
             for k in pairs(typeDataCategory) do
                 typeDataCategory[k] = nil
             end
-            table.setn(typeDataCategory, 0)
         end
 
         local footprintCounts = typeData.FootprintCounts
         for k in pairs(footprintCounts) do
             footprintCounts[k] = nil
         end
-        table.setn(footprintCounts, 0)
 
         local footprintSizes = typeData.FootprintSizes
         for k in pairs(footprintSizes) do
             footprintSizes[k] = nil
         end
-        table.setn(footprintSizes, 0)
 
         typeData.UnitTotal = 0
         typeData.AreaTotal = 0
