@@ -1565,23 +1565,50 @@ end
 
 -- reusable table for categorizing units in a formation 
 local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
+-- map layers to categories
+local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
+-- initialize the layer tables
+for unitType, categoriesForType in CategoryTables do
+    local typeData = UnitsList[unitType]
+    for unitTypeCategory, _ in categoriesForType do
+        typeData[unitTypeCategory] = {}
+    end
+    typeData.FootprintCounts = {}
+    typeData.FootprintSizes = {}
+end
 
 -- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
 ---@param formationUnits Unit[]
 ---@return table
 function CategorizeUnits(formationUnits)
-    local categoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
+    local categoryTables = CategoryTables
 
-    -- flush and initialize the list
+    -- flush the table
     for unitType, categoriesForType in categoryTables do
         local typeData = UnitsList[unitType]
         for unitTypeCategory, _ in categoriesForType do
-            typeData[unitTypeCategory] = {}
+            local typeDataCategory = typeData[unitTypeCategory]
+            for k in pairs(typeDataCategory) do
+                typeDataCategory[k] = nil
+            end
+            table.setn(typeDataCategory, 0)
         end
+
+        local footprintCounts = typeData.FootprintCounts
+        for k in pairs(footprintCounts) do
+            footprintCounts[k] = nil
+        end
+        table.setn(footprintCounts, 0)
+
+        local footprintSizes = typeData.FootprintSizes
+        for k in pairs(footprintSizes) do
+            footprintSizes[k] = nil
+        end
+        table.setn(footprintSizes, 0)
+
         typeData.UnitTotal = 0
         typeData.AreaTotal = 0
-        typeData.FootprintCounts = {}
-        typeData.FootprintSizes = {}
+        typeData.Scale = nil -- set elsewhere in formations logic
     end
 
     -- Loop through each unit to get its category and size
