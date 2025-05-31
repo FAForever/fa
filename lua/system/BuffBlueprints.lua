@@ -74,6 +74,11 @@ Buffs = {}
 --- `MaxHealth` also increases `Health` unless this flag is set)
 ---@field DoNotFill? boolean
 
+--- Buff "affect" data stored for a unit. Includes the "affect" blueprint and the buff stack count.
+---@class BlueprintBuffAffectState : BlueprintBuffAffect
+--- Used in the buff calculation
+---@field Count? number
+
 --- The blueprint definition of a buff, as stored in `Buffs` (with the buff name as the key).
 ---
 --- Generally, adding a buff to a unit will apply a certain number of buff effects (that we call
@@ -99,7 +104,8 @@ Buffs = {}
 --- If present, this function will be called to determine if the buff should be applied for a unit.
 ---@field BuffCheckFunction? fun(self: BlueprintBuff, unit: Unit): boolean
 ---@field OnBuffAffect? fun(self: BlueprintBuff, unit: Unit, instigator: Unit)
----@field OnBuffRemove? fun(self: BlueprintBuff, unit: Unit, instigator: Unit)
+---@field OnBuffRemove? fun(self: BlueprintBuff, unit: Unit, instigator: Unit?)
+---@field OnApplyBuff? fun(self: BlueprintBuff, unit: Unit, instigator: Unit)
 --- table of how the buff will affect the units (not VFX)
 ---@field Affects? table<BuffAffectName, BlueprintBuffAffect>
 --- table of VFX (not the how the buff affects units)
