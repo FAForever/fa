@@ -27,6 +27,12 @@ local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
 local TableGetn = table.getn
 local TableInsert = table.insert
 
+--- Responsible for two features:
+--- - 1) Eliminate armies according to the victory condition. This could be by winning, being defeated (including recall) or when the game is a draw.
+--- - 2) Send and process game results when an army is eliminated.
+---
+--- This class is abstract. It provides a lot of utility functions that a concrete implementation can use. When you create a new concrete implementation,
+--- you should inherit from this class and implement the `ProcessGameState` method. Do not forgot to also add it to the factory pattern.
 ---@class AbstractVictoryCondition : DebugComponent, Destroyable
 ---@field Trash TrashBag
 ---@field ProcessGameStateThreadInstance? thread
