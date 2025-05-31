@@ -167,6 +167,9 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field TargetUpgradeBuildTime? number # Keeps track of upgrades *during* unit transfer
 ---@field TargetFractionComplete? number # When an unbuilt unit is rebuilt during unit transfer, this overrides what fraction it is rebuilt to.
 ---@field isFinishedUnit? boolean # set to true in `OnStopBeingBuilt`
+---@field ImmuneToStun? boolean
+---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
+---@field IsBeingTransferred? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,
