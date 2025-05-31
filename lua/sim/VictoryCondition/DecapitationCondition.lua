@@ -74,16 +74,6 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             end
         end
 
-        -- no remaining players, just end the game
-        if table.empty(aliveBrains) then
-            if self.EnabledSpewing then
-                SPEW("All players are defeated, game will end")
-            end
-
-            self:EndGame()
-            return
-        end
-
         -- process all defeated brains. At this stage, it is an entire team that is defeated at once
         for k = 1, TableGetn(decapitatedBrains) do
             local defeatedBrain = decapitatedBrains[k]
@@ -114,6 +104,16 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
             for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:VictoryForArmy(aliveBrain)
+            end
+
+            self:EndGame()
+            return
+        end
+
+        -- no remaining players, just end the game
+        if table.empty(aliveBrains) then
+            if self.EnabledSpewing then
+                SPEW("All players are defeated, game will end")
             end
 
             self:EndGame()
