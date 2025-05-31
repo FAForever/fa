@@ -751,6 +751,12 @@ function ApplyBuff(unit, buffName, instigator)
 
     local data = ubt[def.BuffType][buffName]
     if not data then
+        --- Container for buff state on a unit.
+        ---@class BuffData
+        ---@field Count integer
+        ---@field Trash TrashBag
+        ---@field BuffName BuffName
+
         -- This is a new buff (as opposed to an additional one being stacked)
         data = {
             Count = 1,

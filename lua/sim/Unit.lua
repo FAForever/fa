@@ -119,6 +119,10 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
+---@class UnitBuffsTable
+---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
+---@field BuffTable table<BuffType, table<BuffName, BuffData>>
+
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
@@ -135,7 +139,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
----@field Buffs { Affects: table<BuffAffectName, table<BuffName, BlueprintBuffAffectState> >, BuffTable: table<string, table> }
+---@field Buffs UnitBuffsTable
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
