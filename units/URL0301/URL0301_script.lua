@@ -101,6 +101,12 @@ URL0301 = ClassUnit(CCommandUnit) {
                         Add = bp.NewHealth,
                         Mult = 1.0,
                     },
+                    DamageRadius = {
+                        Add = 10,
+                    },
+                    Health = {
+                        Add = -10000,
+                    },
                 },
             }
         end
