@@ -48,106 +48,59 @@
 
 --#region Buff stacking calculations
 
---- Seraphim regen field buff computations
+-- A key -> function table for buffs, uses the buffName parameter
+local UniqueBuffs = {}
+
+-- Dynamic ceilings with fallback values for sera regen field
+local regenAuraDefaultCeilings = {
+    TECH1 = 10,
+    TECH2 = 15,
+    TECH3 = 25,
+    EXPERIMENTAL = 40,
+    SUBCOMMANDER = 30
+}
+
+--- Calculates regen for a unit using mults as a multiplier of the unit's HP that is then added to the final regen value.
 ---@param unit Unit
----@param buffName string
----@param affectType string
----@param initialVal integer
----@param initialBool? boolean
----@return number, boolean
-local BuffRegenFieldCalculate = function(unit, buffName, affectType, initialVal, initialBool)
-
+---@param affectBuffName BuffAffectName
+---@param affectBp BlueprintBuffAffectState
+---@return number
+---@return number
+local function regenAuraCalculate(unit, affectBuffName, affectBp)
     local adds = 0
-    local mults = 1.0
-    local multsTotal = 0 -- Used only for regen buffs
-    local bool = initialBool or false
-    local ceil = 0
-    local floor = 0
-    -- Dynamic ceilings and floors with fallback values for sera regen field
-    local ceilings = {
-        TECH1 = 10,
-        TECH2 = 15,
-        TECH3 = 25,
-        EXPERIMENTAL = 40,
-        SUBCOMMANDER = 30
-    }
-    local floors = {
-        TECH1 = 3,
-        TECH2 = 8,
-        TECH3 = 15,
-        EXPERIMENTAL = 25,
-        SUBCOMMANDER = 15
-    }
 
-    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
+    if affectBp.Add and affectBp.Add ~= 0 then
+        adds = adds + (affectBp.Add * affectBp.Count)
+    end
 
-    for k, v in unit.Buffs.Affects[affectType] do
-        if v.Add and v.Add ~= 0 then
-            adds = adds + (v.Add * v.Count)
-        end
+    -- Take regen values from bp, keys have to match techCategory options
+    local bpCeilings = affectBp.BPCeilings
 
-        -- Take regen values from bp, keys have to match techCategory options
+    local techCat = unit.Blueprint.TechCategory
+    ---@diagnostic disable-next-line: need-check-nil
+    local ceil = bpCeilings[techCat] or regenAuraDefaultCeilings[techCat]
 
-        if v.BPCeilings then
-            for k_, v_ in ceilings do
-                if v.BPCeilings[k_] then
-                    ceilings[k_] = v.BPCeilings[k_]
-                end
-            end
-        end
-
-        if v.BPFloors then
-            for k_, v_ in floors do
-                if v.BPFloors[k_] then
-                    floors[k_] = v.BPFloors[k_]
-                end
-            end
-            floor = floors[unit.Blueprint.TechCategory] or 0
-        elseif v.Floor then
-            floor = v.Floor
-        end
-
-        ceil = ceilings[unit.Blueprint.TechCategory] or 99999
-
-        if v.Mult then
-            if affectType == 'Regen' then
-                -- Regen mults use MaxHp as base, so should always be <1
-
-                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
-                -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return initialVal, bool end
-
-                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
-                if v.Mult ~= 1 then
-                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
-                    for i = 1, v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil)
-                    end
-                end
-            else
-                for i = 1, v.Count do
-                    mults = mults * v.Mult
-                end
-            end
-        end
-
-        if not v.Bool then
-            bool = false
-        else
-            bool = true
+    local mult = affectBp.Mult
+    if mult then
+        local maxHealth = unit.Blueprint.Defense.MaxHealth
+        for i = 1, affectBp.Count do
+            local multHp = mult * maxHealth
+            if ceil and multHp > ceil then multHp = ceil end
+            adds = adds + multHp
         end
     end
 
-    -- Adds are calculated first, then the mults.
-    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
-
-    return returnVal, bool
+    return adds, 1
 end
 
--- A key -> function table for buffs, uses the buffName parameter
-local UniqueBuffs = {}
-UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
-UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
+--- A function that calculates buff add and mult values for 1 "affect" instance.
+---@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffAffectName, affectBp: BlueprintBuffAffectState): add: number, mult: number
+
+---@type table<BuffName, table<BuffAffectName, AffectCalculation>>
+UniqueAffectCalculation = {
+    SeraphimACURegenAura = { Regen = regenAuraCalculate },
+    SeraphimACUAdvancedRegenAura = { Regen = regenAuraCalculate },
+}
 
 --- Calculates the buff from all the buffs of the same time the unit has.
 ---@param unit Unit
@@ -168,73 +121,44 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     local adds = 0
     local mults = 1.0
-    local multsTotal = 0 -- Used only for regen buffs
     local bool = initialBool or false
     local floor = 0
-    local ceil = 0
-
-    -- Dynamic ceilings with fallback values for sera regen field
-    local ceilings = {
-        TECH1 = 10,
-        TECH2 = 15,
-        TECH3 = 25,
-        EXPERIMENTAL = 40,
-        SUBCOMMANDER = 30
-    }
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
-    for k, v in unit.Buffs.Affects[affectType] do
-        if v.Add and v.Add ~= 0 then
-            adds = adds + (v.Add * v.Count)
+    for affectBuffName, affectBp in pairs(unit.Buffs.Affects[affectType]) do
+        if affectBp.Floor then
+            floor = affectBp.Floor
         end
 
-        if v.Floor then
-            floor = v.Floor
-        end
-
-        -- Take regen values from bp, keys have to match techCategory options
-        if v.BPCeilings then
-            for k_, v_ in ceilings do
-                if v.BPCeilings[k_] then
-                    ceilings[k_] = v.BPCeilings[k_]
-                end
-            end
-        end
-
-        ceil = ceilings[unit.Blueprint.TechCategory]
-
-        if v.Mult then
-            if affectType == 'Regen' then
-                -- Regen mults use MaxHp as base, so should always be <1
-
-                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
-                -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return initialVal, bool end
-
-                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
-                if v.Mult ~= 1 then
-                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
-                    for i = 1, v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
-                    end
-                end
-            else
-                for i = 1, v.Count do
-                    mults = mults * v.Mult
-                end
-            end
-        end
-
-        if not v.Bool then
+        if not affectBp.Bool then
             bool = false
         else
             bool = true
         end
+
+        local uniqueCalculation = UniqueAffectCalculation[affectBuffName][affectType]
+        if uniqueCalculation then
+            local add, mult = uniqueCalculation(unit, affectBuffName, affectBp)
+            adds = adds + add
+            mults = mults * mult
+        else
+            local add = affectBp.Add
+            if add and add ~= 0 then
+                adds = adds + (add * affectBp.Count)
+            end
+
+            local mult = affectBp.Mult
+            if mult then
+                for i = 1, affectBp.Count do
+                    mults = mults * mult
+                end
+            end
+        end
     end
 
     -- Adds are calculated first, then the mults.
-    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
+    local returnVal = math.max((initialVal + adds) * mults, floor)
 
     return returnVal, bool
 end
@@ -322,7 +246,7 @@ BuffEffects = {
         -- Adjusted to use a special case of adding mults and calculating the final value
         -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
         local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
-        local val = BuffCalculate(unit, nil, 'Regen', bpRegen)
+        local val = BuffCalculate(unit, buffName, 'Regen', bpRegen)
 
         unit:SetRegen(val)
     end,
