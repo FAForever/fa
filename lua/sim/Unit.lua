@@ -119,6 +119,10 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
+---@class UnitBuffsTable
+---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
+---@field BuffTable table<BuffType, table<BuffName, BuffData>>
+
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
@@ -135,7 +139,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
----@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
+---@field Buffs UnitBuffsTable
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
@@ -167,6 +171,9 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field TargetUpgradeBuildTime? number # Keeps track of upgrades *during* unit transfer
 ---@field TargetFractionComplete? number # When an unbuilt unit is rebuilt during unit transfer, this overrides what fraction it is rebuilt to.
 ---@field isFinishedUnit? boolean # set to true in `OnStopBeingBuilt`
+---@field ImmuneToStun? boolean
+---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
+---@field IsBeingTransferred? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
 
     IsUnit = true,

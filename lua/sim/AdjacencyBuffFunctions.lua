@@ -14,7 +14,7 @@ local TableGetn = table.getn
 
 ---@param buff BlueprintBuff unused
 ---@param unit StructureUnit
----@param instigator StructureUnit
+---@param instigator? StructureUnit
 DefaultBuffRemove = function(buff, unit, instigator)
     unit:DestroyAdjacentEffects(instigator)
 end
@@ -142,7 +142,7 @@ end
 
 ---@param buff BlueprintBuff
 ---@param unit StructureUnit
----@param instigator StructureUnit
+---@param instigator? StructureUnit
 EnergyWeaponBuffRemove = function(buff, unit, instigator)
     DefaultBuffRemove(buff, unit, instigator)
 end
@@ -193,7 +193,7 @@ end
 
 ---@param buff BlueprintBuff
 ---@param unit StructureUnit
----@param instigator StructureUnit
+---@param instigator? StructureUnit
 EnergyProductionBuffRemove = function(buff, unit, instigator)
     DefaultBuffRemove(buff, unit, instigator)
 end
@@ -219,7 +219,7 @@ end
 
 ---@param buff BlueprintBuff
 ---@param unit StructureUnit
----@param instigator StructureUnit
+---@param instigator? StructureUnit
 MassProductionBuffRemove = function(buff, unit, instigator)
     DefaultBuffRemove(buff, unit, instigator)
 end
