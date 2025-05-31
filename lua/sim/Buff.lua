@@ -55,7 +55,7 @@
 ---@param initialVal integer
 ---@param initialBool? boolean
 ---@return number, boolean
-local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal, initialBool)
+local BuffRegenFieldCalculate = function(unit, buffName, affectType, initialVal, initialBool)
 
     local adds = 0
     local mults = 1.0
@@ -120,12 +120,12 @@ local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
-                    for i=1,v.Count do
+                    for i = 1, v.Count do
                         multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil)
                     end
                 end
             else
-                for i=1,v.Count do
+                for i = 1, v.Count do
                     mults = mults * v.Mult
                 end
             end
@@ -145,7 +145,7 @@ local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal
 end
 
 -- A key -> function table for buffs, uses the buffName parameter
-local UniqueBuffs = { }
+local UniqueBuffs = {}
 UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
 UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
 
@@ -215,12 +215,12 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
-                    for i=1,v.Count do
+                    for i = 1, v.Count do
                         multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
                     end
                 end
             else
-                for i=1,v.Count do
+                for i = 1, v.Count do
                     mults = mults * v.Mult
                 end
             end
@@ -419,7 +419,7 @@ BuffEffects = {
     RadarRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'RadarRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
         if not unit:IsIntelEnabled('Radar') then
-            unit:InitIntel(unit.Army,'Radar', val)
+            unit:InitIntel(unit.Army, 'Radar', val)
             unit:EnableIntel('Radar')
         else
             unit:SetIntelRadius('Radar', val)
@@ -438,7 +438,7 @@ BuffEffects = {
     OmniRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
         if not unit:IsIntelEnabled('Omni') then
-            unit:InitIntel(unit.Army,'Omni', val)
+            unit:InitIntel(unit.Army, 'Omni', val)
             unit:EnableIntel('Omni')
         else
             unit:SetIntelRadius('Omni', val)
@@ -578,7 +578,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             BuffEffects[atype](buffDef, vals, unit, buffName, instigator, afterRemove)
         elseif not buffMissingWarnings[atype] then
             buffMissingWarnings[atype] = true
-            WARN('Missing buff effect function '..tostring(atype))
+            WARN('Missing buff effect function ' .. tostring(atype))
         end
     end
 end
@@ -596,7 +596,7 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
         return
     end
 
-    for atype,_ in def.Affects do
+    for atype, _ in def.Affects do
         local list = unit.Buffs.Affects[atype]
         if list and list[buffName] then
             -- If we're removing all buffs of this name, only remove as
@@ -631,7 +631,7 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     if def.Icon then
         -- If the user layer was displaying an icon, remove it from the sync table
         local newTable = unit.Sync.Buffs
-        table.removeByValue(newTable,buffName)
+        table.removeByValue(newTable, buffName)
         unit.Sync.Buffs = table.copy(newTable)
     end
 
@@ -683,7 +683,7 @@ function PlayBuffEffect(unit, buffName, trsh)
     end
 end
 
---- Function to apply a buff to a unit. This function is a fire-and-forget. 
+--- Function to apply a buff to a unit. This function is a fire-and-forget.
 --- Apply this and it'll be applied over time if there is a duration.
 ---@param unit Unit
 ---@param buffName BuffName
@@ -705,7 +705,7 @@ function ApplyBuff(unit, buffName, instigator)
     --buff = table of buff data
     local def = Buffs[buffName]
     if not def then
-        error("*ERROR: Tried to add a buff that doesn\'t exist! Name: ".. buffName, 2)
+        error("*ERROR: Tried to add a buff that doesn\'t exist! Name: " .. buffName, 2)
         return
     end
 
@@ -767,7 +767,7 @@ function ApplyBuff(unit, buffName, instigator)
 
     local uaffects = unit.Buffs.Affects
     if def.Affects then
-        for k,v in def.Affects do
+        for k, v in def.Affects do
             -- Don't save off 'instant' type affects like health and energy
             if k ~= 'Health' and k ~= 'Energy' then
                 if not uaffects[k] then
@@ -828,7 +828,7 @@ end
 --- Prints the `Buffs` table of the currently selected units
 _G.PrintBuffs = function()
     local selection = DebugGetSelection()
-    for k,unit in selection do
+    for k, unit in selection do
         if unit.Buffs then
             LOG('Buffs = ', repr(unit.Buffs))
         end
