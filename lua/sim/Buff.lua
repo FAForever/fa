@@ -46,164 +46,202 @@
 ---@alias UniqueBuffName
 ---| SelenBuffName
 
+--#region Buff stacking calculations
 
-----------
---- Total refactor upcoming
-----------
-
-
---- Function to apply a buff to a unit. This function is a fire-and-forget. 
---- Apply this and it'll be applied over time if there is a duration.
+--- Seraphim regen field buff computations
 ---@param unit Unit
----@param buffName BuffName
----@param instigator? Unit
-function ApplyBuff(unit, buffName, instigator)
+---@param buffName string
+---@param affectType string
+---@param initialVal integer
+---@param initialBool boolean
+---@return number, boolean
+local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal, initialBool)
 
-    -- do not buff dead units
-    if unit.Dead then
-        return
-    end
+    local adds = 0
+    local mults = 1.0
+    local multsTotal = 0 -- Used only for regen buffs
+    local bool = initialBool or false
+    local ceil = 0
+    local floor = 0
+    -- Dynamic ceilings and floors with fallback values for sera regen field
+    local ceilings = {
+        TECH1 = 10,
+        TECH2 = 15,
+        TECH3 = 25,
+        EXPERIMENTAL = 40,
+        SUBCOMMANDER = 30
+    }
+    local floors = {
+        TECH1 = 3,
+        TECH2 = 8,
+        TECH3 = 15,
+        EXPERIMENTAL = 25,
+        SUBCOMMANDER = 15
+    }
 
-    -- do not buff insignificant / dummy units
-    if EntityCategoryContains(categories.INSIGNIFICANTUNIT, unit) then
-        return
-    end
+    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
-    instigator = instigator or unit
-
-    --buff = table of buff data
-    local def = Buffs[buffName]
-    if not def then
-        error("*ERROR: Tried to add a buff that doesn\'t exist! Name: ".. buffName, 2)
-        return
-    end
-
-    if def.EntityCategory then
-        local cat = ParseEntityCategory(def.EntityCategory)
-        if not EntityCategoryContains(cat, unit) then
-            return
+    for k, v in unit.Buffs.Affects[affectType] do
+        if v.Add and v.Add ~= 0 then
+            adds = adds + (v.Add * v.Count)
         end
-    end
 
-    if def.BuffCheckFunction then
-        if not def:BuffCheckFunction(unit) then
-            return
-        end
-    end
+        -- Take regen values from bp, keys have to match techCategory options
 
-    local ubt = unit.Buffs.BuffTable
-
-    -- We're going to need some naughty, hard-coded stuff here for a regen aura edge case where
-    -- we need the advanced version to take precedence over the lower version, but not vice versa.
-    if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
-
-    if buffName == 'SeraphimACUAdvancedRegenAura' and ubt['COMMANDERAURA_RegenAura']['SeraphimACURegenAura'] then
-        for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
-            RemoveBuff(unit, key, true)
-        end
-    end
-
-    if def.Stacks == 'REPLACE' and ubt[def.BuffType] then
-        for key, bufftbl in ubt[def.BuffType] do
-            RemoveBuff(unit, key, true)
-        end
-    end
-
-    -- If add this buff to the list of buffs the unit has becareful of stacking buffs.
-    if not ubt[def.BuffType] then
-        ubt[def.BuffType] = {}
-    end
-
-    if def.Stacks == 'IGNORE' and ubt[def.BuffType] and not table.empty(ubt[def.BuffType]) then
-        return
-    end
-
-    local data = ubt[def.BuffType][buffName]
-    if not data then
-        -- This is a new buff (as opposed to an additional one being stacked)
-        data = {
-            Count = 1,
-            Trash = TrashBag(),
-            BuffName = buffName,
-        }
-        ubt[def.BuffType][buffName] = data
-    else
-        -- This buff is already on the unit so stack another by incrementing the
-        -- counts. data.Count is how many times the buff has been applied
-        data.Count = data.Count + 1
-
-    end
-
-    local uaffects = unit.Buffs.Affects
-    if def.Affects then
-        for k,v in def.Affects do
-            -- Don't save off 'instant' type affects like health and energy
-            if k ~= 'Health' and k ~= 'Energy' then
-                if not uaffects[k] then
-                    uaffects[k] = {}
-                end
-
-                if not uaffects[k][buffName] then
-                    -- This is a new affect.
-                    local affectdata = {
-                        BuffName = buffName,
-                        Count = 1,
-                    }
-                    for buffkey, buffval in v do
-                        affectdata[buffkey] = buffval
-                    end
-                    uaffects[k][buffName] = affectdata
-                else
-                    -- This affect is already there, increment the count
-                    uaffects[k][buffName].Count = uaffects[k][buffName].Count + 1
+        if v.BPCeilings then
+            for k_, v_ in ceilings do
+                if v.BPCeilings[k_] then
+                    ceilings[k_] = v.BPCeilings[k_]
                 end
             end
         end
-    end
 
-    -- If the buff has a duration, then
-    if def.Duration and def.Duration > 0 then
-        local thread = ForkThread(BuffWorkThread, unit, buffName, instigator)
-        unit.Trash:Add(thread)
-        data.Trash:Add(thread)
-    end
+        if v.BPFloors then
+            for k_, v_ in floors do
+                if v.BPFloors[k_] then
+                    floors[k_] = v.BPFloors[k_]
+                end
+            end
+            floor = floors[unit.Blueprint.TechCategory] or 0
+        elseif v.Floor then
+            floor = v.Floor
+        end
 
-    PlayBuffEffect(unit, buffName, data.Trash)
+        ceil = ceilings[unit.Blueprint.TechCategory] or 99999
 
-    ubt[def.BuffType][buffName] = data
+        if v.Mult then
+            if affectType == 'Regen' then
+                -- Regen mults use MaxHp as base, so should always be <1
 
-    if def.OnApplyBuff then
-        def:OnApplyBuff(unit, instigator)
-    end
+                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
+                -- they will remove this
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
 
-    BuffAffectUnit(unit, buffName, instigator, false)
-end
+                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
+                if v.Mult ~= 1 then
+                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
+                    for i=1,v.Count do
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil)
+                    end
+                end
+            else
+                for i=1,v.Count do
+                    mults = mults * v.Mult
+                end
+            end
+        end
 
---Function to do work on the buff.  Apply it over time and in pulses.
----@param unit Unit
----@param buffName string
----@param instigator Unit
-function BuffWorkThread(unit, buffName, instigator)
-    local buffDef = Buffs[buffName]
-
-    --Non-Pulsing Buff
-    local totPulses = buffDef.DurationPulse
-
-    if not totPulses then
-        WaitSeconds(buffDef.Duration)
-    else
-        local pulse = 0
-        local pulseTime = buffDef.Duration / totPulses
-
-        while pulse <= totPulses and not unit.Dead do
-            WaitSeconds(pulseTime)
-            BuffAffectUnit(unit, buffName, instigator, false)
-            pulse = pulse + 1
+        if not v.Bool then
+            bool = false
+        else
+            bool = true
         end
     end
 
-    RemoveBuff(unit, buffName)
+    -- Adds are calculated first, then the mults.
+    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
+
+    return returnVal, bool
 end
+
+-- A key -> function table for buffs, uses the buffName parameter
+local UniqueBuffs = { }
+UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
+UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
+
+--- Calculates the buff from all the buffs of the same time the unit has.
+---@param unit Unit
+---@param buffName string
+---@param affectType string
+---@param initialVal number
+---@param initialBool? boolean
+---@return number, boolean
+function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
+
+    -- Check if we have a separate buff calculation system
+    local uniqueBuff = UniqueBuffs[buffName]
+    if uniqueBuff then
+        return uniqueBuff(unit, buffName, affectType, initialVal, initialBool)
+    end
+
+    -- if not, do the typical buff computation
+
+    local adds = 0
+    local mults = 1.0
+    local multsTotal = 0 -- Used only for regen buffs
+    local bool = initialBool or false
+    local floor = 0
+    local ceil = 0
+
+    -- Dynamic ceilings with fallback values for sera regen field
+    local ceilings = {
+        TECH1 = 10,
+        TECH2 = 15,
+        TECH3 = 25,
+        EXPERIMENTAL = 40,
+        SUBCOMMANDER = 30
+    }
+
+    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
+
+    for k, v in unit.Buffs.Affects[affectType] do
+        if v.Add and v.Add ~= 0 then
+            adds = adds + (v.Add * v.Count)
+        end
+
+        if v.Floor then
+            floor = v.Floor
+        end
+
+        -- Take regen values from bp, keys have to match techCategory options
+        if v.BPCeilings then
+            for k_, v_ in ceilings do
+                if v.BPCeilings[k_] then
+                    ceilings[k_] = v.BPCeilings[k_]
+                end
+            end
+        end
+
+        ceil = ceilings[unit.Blueprint.TechCategory]
+
+        if v.Mult then
+            if affectType == 'Regen' then
+                -- Regen mults use MaxHp as base, so should always be <1
+
+                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
+                -- they will remove this
+                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
+
+                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
+                if v.Mult ~= 1 then
+                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
+                    for i=1,v.Count do
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
+                    end
+                end
+            else
+                for i=1,v.Count do
+                    mults = mults * v.Mult
+                end
+            end
+        end
+
+        if not v.Bool then
+            bool = false
+        else
+            bool = true
+        end
+    end
+
+    -- Adds are calculated first, then the mults.
+    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
+
+    return returnVal, bool
+end
+
+--#endregion
+
+--#region Buff Effect functions
 
 -- Function to affect the unit. Every time you want to affect a new part of unit, add it in here.
 -- afterRemove is a bool that defines if this buff is affecting after the removal of a buff.
@@ -430,6 +468,10 @@ BuffEffects = {
 
 local buffMissingWarnings = {}
 
+--#endregion
+
+--#region Functions for applying, removing, and checking buffs
+
 ---@param unit Unit
 ---@param buffName string
 ---@param instigator Unit
@@ -451,197 +493,6 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             WARN('Missing buff effect function '..tostring(atype))
         end
     end
-end
-
---- Seraphim regen field buff computations
----@param unit Unit
----@param buffName string
----@param affectType string
----@param initialVal integer
----@param initialBool boolean
----@return number, boolean
-local BuffRegenFieldCalculate = function (unit, buffName, affectType, initialVal, initialBool)
-
-    local adds = 0
-    local mults = 1.0
-    local multsTotal = 0 -- Used only for regen buffs
-    local bool = initialBool or false
-    local ceil = 0
-    local floor = 0
-    -- Dynamic ceilings and floors with fallback values for sera regen field
-    local ceilings = {
-        TECH1 = 10,
-        TECH2 = 15,
-        TECH3 = 25,
-        EXPERIMENTAL = 40,
-        SUBCOMMANDER = 30
-    }
-    local floors = {
-        TECH1 = 3,
-        TECH2 = 8,
-        TECH3 = 15,
-        EXPERIMENTAL = 25,
-        SUBCOMMANDER = 15
-    }
-
-    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
-
-    for k, v in unit.Buffs.Affects[affectType] do
-        if v.Add and v.Add ~= 0 then
-            adds = adds + (v.Add * v.Count)
-        end
-
-        -- Take regen values from bp, keys have to match techCategory options
-
-        if v.BPCeilings then
-            for k_, v_ in ceilings do
-                if v.BPCeilings[k_] then
-                    ceilings[k_] = v.BPCeilings[k_]
-                end
-            end
-        end
-
-        if v.BPFloors then
-            for k_, v_ in floors do
-                if v.BPFloors[k_] then
-                    floors[k_] = v.BPFloors[k_]
-                end
-            end
-            floor = floors[unit.Blueprint.TechCategory] or 0
-        elseif v.Floor then
-            floor = v.Floor
-        end
-
-        ceil = ceilings[unit.Blueprint.TechCategory] or 99999
-
-        if v.Mult then
-            if affectType == 'Regen' then
-                -- Regen mults use MaxHp as base, so should always be <1
-
-                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
-                -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
-
-                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
-                if v.Mult ~= 1 then
-                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
-                    for i=1,v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil)
-                    end
-                end
-            else
-                for i=1,v.Count do
-                    mults = mults * v.Mult
-                end
-            end
-        end
-
-        if not v.Bool then
-            bool = false
-        else
-            bool = true
-        end
-    end
-
-    -- Adds are calculated first, then the mults.
-    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
-
-    return returnVal, bool
-end
-
--- A key -> function table for buffs, uses the buffName parameter
-local UniqueBuffs = { }
-UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
-UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
-
---- Calculates the buff from all the buffs of the same time the unit has.
----@param unit Unit
----@param buffName string
----@param affectType string
----@param initialVal number
----@param initialBool? boolean
----@return number, boolean
-function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
-
-    -- Check if we have a separate buff calculation system
-    local uniqueBuff = UniqueBuffs[buffName]
-    if uniqueBuff then
-        return uniqueBuff(unit, buffName, affectType, initialVal, initialBool)
-    end
-
-    -- if not, do the typical buff computation
-
-    local adds = 0
-    local mults = 1.0
-    local multsTotal = 0 -- Used only for regen buffs
-    local bool = initialBool or false
-    local floor = 0
-    local ceil = 0
-
-    -- Dynamic ceilings with fallback values for sera regen field
-    local ceilings = {
-        TECH1 = 10,
-        TECH2 = 15,
-        TECH3 = 25,
-        EXPERIMENTAL = 40,
-        SUBCOMMANDER = 30
-    }
-
-    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
-
-    for k, v in unit.Buffs.Affects[affectType] do
-        if v.Add and v.Add ~= 0 then
-            adds = adds + (v.Add * v.Count)
-        end
-
-        if v.Floor then
-            floor = v.Floor
-        end
-
-        -- Take regen values from bp, keys have to match techCategory options
-        if v.BPCeilings then
-            for k_, v_ in ceilings do
-                if v.BPCeilings[k_] then
-                    ceilings[k_] = v.BPCeilings[k_]
-                end
-            end
-        end
-
-        ceil = ceilings[unit.Blueprint.TechCategory]
-
-        if v.Mult then
-            if affectType == 'Regen' then
-                -- Regen mults use MaxHp as base, so should always be <1
-
-                -- If >1 it's probably deliberate, but silly, so let's bail. If it's THAT deliberate
-                -- they will remove this
-                if v.Mult > 1 then WARN('Regen mult too high, should be <1, for unit ' .. unit.UnitId .. ' and buff ' .. buffName) return end
-
-                -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
-                if v.Mult ~= 1 then
-                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
-                    for i=1,v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
-                    end
-                end
-            else
-                for i=1,v.Count do
-                    mults = mults * v.Mult
-                end
-            end
-        end
-
-        if not v.Bool then
-            bool = false
-        else
-            bool = true
-        end
-    end
-
-    -- Adds are calculated first, then the mults.
-    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
-
-    return returnVal, bool
 end
 
 --Removes buffs
@@ -699,15 +550,30 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     BuffAffectUnit(unit, buffName, unit, true)
 end
 
+--Function to do work on the buff.  Apply it over time and in pulses.
 ---@param unit Unit
 ---@param buffName string
----@return boolean
-function HasBuff(unit, buffName)
-    local def = Buffs[buffName]
-    if not def then
-        return false
+---@param instigator Unit
+function BuffWorkThread(unit, buffName, instigator)
+    local buffDef = Buffs[buffName]
+
+    --Non-Pulsing Buff
+    local totPulses = buffDef.DurationPulse
+
+    if not totPulses then
+        WaitSeconds(buffDef.Duration)
+    else
+        local pulse = 0
+        local pulseTime = buffDef.Duration / totPulses
+
+        while pulse <= totPulses and not unit.Dead do
+            WaitSeconds(pulseTime)
+            BuffAffectUnit(unit, buffName, instigator, false)
+            pulse = pulse + 1
+        end
     end
-    return unit.Buffs.BuffTable[def.BuffType][buffName] ~= nil
+
+    RemoveBuff(unit, buffName)
 end
 
 ---@param unit Unit
@@ -729,9 +595,149 @@ function PlayBuffEffect(unit, buffName, trsh)
     end
 end
 
---
--- DEBUG FUNCTIONS
---
+--- Function to apply a buff to a unit. This function is a fire-and-forget. 
+--- Apply this and it'll be applied over time if there is a duration.
+---@param unit Unit
+---@param buffName BuffName
+---@param instigator? Unit
+function ApplyBuff(unit, buffName, instigator)
+
+    -- do not buff dead units
+    if unit.Dead then
+        return
+    end
+
+    -- do not buff insignificant / dummy units
+    if EntityCategoryContains(categories.INSIGNIFICANTUNIT, unit) then
+        return
+    end
+
+    instigator = instigator or unit
+
+    --buff = table of buff data
+    local def = Buffs[buffName]
+    if not def then
+        error("*ERROR: Tried to add a buff that doesn\'t exist! Name: ".. buffName, 2)
+        return
+    end
+
+    if def.EntityCategory then
+        local cat = ParseEntityCategory(def.EntityCategory)
+        if not EntityCategoryContains(cat, unit) then
+            return
+        end
+    end
+
+    if def.BuffCheckFunction then
+        if not def:BuffCheckFunction(unit) then
+            return
+        end
+    end
+
+    local ubt = unit.Buffs.BuffTable
+
+    -- We're going to need some naughty, hard-coded stuff here for a regen aura edge case where
+    -- we need the advanced version to take precedence over the lower version, but not vice versa.
+    if buffName == 'SeraphimACURegenAura' and ubt['COMMANDERAURA_AdvancedRegenAura']['SeraphimACUAdvancedRegenAura'] then return end
+
+    if buffName == 'SeraphimACUAdvancedRegenAura' and ubt['COMMANDERAURA_RegenAura']['SeraphimACURegenAura'] then
+        for key, bufftbl in ubt['COMMANDERAURA_RegenAura'] do
+            RemoveBuff(unit, key, true)
+        end
+    end
+
+    if def.Stacks == 'REPLACE' and ubt[def.BuffType] then
+        for key, bufftbl in ubt[def.BuffType] do
+            RemoveBuff(unit, key, true)
+        end
+    end
+
+    -- If add this buff to the list of buffs the unit has becareful of stacking buffs.
+    if not ubt[def.BuffType] then
+        ubt[def.BuffType] = {}
+    end
+
+    if def.Stacks == 'IGNORE' and ubt[def.BuffType] and not table.empty(ubt[def.BuffType]) then
+        return
+    end
+
+    local data = ubt[def.BuffType][buffName]
+    if not data then
+        -- This is a new buff (as opposed to an additional one being stacked)
+        data = {
+            Count = 1,
+            Trash = TrashBag(),
+            BuffName = buffName,
+        }
+        ubt[def.BuffType][buffName] = data
+    else
+        -- This buff is already on the unit so stack another by incrementing the
+        -- counts. data.Count is how many times the buff has been applied
+        data.Count = data.Count + 1
+
+    end
+
+    local uaffects = unit.Buffs.Affects
+    if def.Affects then
+        for k,v in def.Affects do
+            -- Don't save off 'instant' type affects like health and energy
+            if k ~= 'Health' and k ~= 'Energy' then
+                if not uaffects[k] then
+                    uaffects[k] = {}
+                end
+
+                if not uaffects[k][buffName] then
+                    -- This is a new affect.
+                    local affectdata = {
+                        BuffName = buffName,
+                        Count = 1,
+                    }
+                    for buffkey, buffval in v do
+                        affectdata[buffkey] = buffval
+                    end
+                    uaffects[k][buffName] = affectdata
+                else
+                    -- This affect is already there, increment the count
+                    uaffects[k][buffName].Count = uaffects[k][buffName].Count + 1
+                end
+            end
+        end
+    end
+
+    -- If the buff has a duration, then
+    if def.Duration and def.Duration > 0 then
+        local thread = ForkThread(BuffWorkThread, unit, buffName, instigator)
+        unit.Trash:Add(thread)
+        data.Trash:Add(thread)
+    end
+
+    PlayBuffEffect(unit, buffName, data.Trash)
+
+    ubt[def.BuffType][buffName] = data
+
+    if def.OnApplyBuff then
+        def:OnApplyBuff(unit, instigator)
+    end
+
+    BuffAffectUnit(unit, buffName, instigator, false)
+end
+
+---@param unit Unit
+---@param buffName string
+---@return boolean
+function HasBuff(unit, buffName)
+    local def = Buffs[buffName]
+    if not def then
+        return false
+    end
+    return unit.Buffs.BuffTable[def.BuffType][buffName] ~= nil
+end
+
+--#endregion
+
+--#region Debug functions
+
+--- Prints the `Buffs` table of the currently selected units
 _G.PrintBuffs = function()
     local selection = DebugGetSelection()
     for k,unit in selection do
@@ -740,3 +746,5 @@ _G.PrintBuffs = function()
         end
     end
 end
+
+--#endregion
