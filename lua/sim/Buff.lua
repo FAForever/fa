@@ -257,7 +257,7 @@ BuffEffects = {
     ---@param afterRemove boolean
     Stun = function(buffDefinition, buffValues, unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
         if unit.ImmuneToStun or afterRemove then return end
-        unit:SetStunned(buffDefinition.Duration or 1, instigator)
+        unit:SetStunned(buffDefinition.Duration or 1)
         if unit.Anims then
             for k, manip in unit.Anims do
                 manip:SetRate(0)
