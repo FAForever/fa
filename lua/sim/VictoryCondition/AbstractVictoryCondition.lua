@@ -189,7 +189,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     MonitoringThread = function(self)
         while not IsGameOver() do
             self:EvaluateVictoryCondition()
-            WaitTicks(4)
+            WaitTicks(11)
         end
     end,
 
