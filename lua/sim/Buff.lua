@@ -360,8 +360,8 @@ BuffEffects = {
             local wepbp = wep:GetBlueprint()
             local weprad = wepbp.DamageRadius
             local val = BuffCalculate(unit, buffName, 'DamageRadius', weprad)
-
-            wep:SetDamageRadius(val)
+            wep.DamageRadiusMod = val
+            wep.damageTableCache = false
         end
     end,
 
