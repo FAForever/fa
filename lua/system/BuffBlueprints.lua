@@ -74,6 +74,12 @@ Buffs = {}
 --- `MaxHealth` also increases `Health` unless this flag is set)
 ---@field DoNotFill? boolean
 
+--- Buff affect data stored for a unit. Includes the affect blueprint and the buff stack count,
+--- except for instant affects "Health" and "Energy".
+---@class BlueprintBuffAffectState : BlueprintBuffAffect
+--- Used in the buff calculation
+---@field Count? number
+
 --- The blueprint definition of a buff, as stored in `Buffs` (with the buff name as the key).
 ---
 --- Generally, adding a buff to a unit will apply a certain number of buff effects (that we call

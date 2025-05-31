@@ -135,7 +135,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
----@field Buffs { Affects: table<BuffAffectName, table<BuffName, BlueprintBuffAffect> >, BuffTable: table<string, table> }
+---@field Buffs { Affects: table<BuffAffectName, table<BuffName, BlueprintBuffAffectState> >, BuffTable: table<string, table> }
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
