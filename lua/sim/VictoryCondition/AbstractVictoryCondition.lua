@@ -27,14 +27,22 @@ local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
 local TableGetn = table.getn
 local TableInsert = table.insert
 
+--- Responsible for two features:
+--- - 1) Eliminate armies according to the victory condition. This could be by winning, being defeated (including recall) or when the game is a draw.
+--- - 2) Send and process game results when an army is eliminated.
+---
+--- This class is abstract. It provides a lot of utility functions that a concrete implementation can use. When you create a new concrete implementation,
+--- you should inherit from this class and implement the `ProcessGameState` method. Do not forgot to also add it to the factory pattern.
 ---@class AbstractVictoryCondition : DebugComponent, Destroyable
 ---@field Trash TrashBag
 ---@field ProcessGameStateThreadInstance? thread
+---@field ProcessedBrains table<string, boolean>    # Indicates that we already processed this brain.
 AbstractVictoryCondition = Class(DebugComponent) {
 
     ---@param self AbstractVictoryCondition
     __init = function(self)
         self.Trash = TrashBag()
+        self.ProcessedBrains = {}
     end,
 
     ---@param self AbstractVictoryCondition
@@ -101,7 +109,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param aiBrain AIBrain
     ---@return boolean
     BrainIsEligible = function(self, aiBrain)
-        if aiBrain:IsDefeated() then
+        if self.ProcessedBrains[aiBrain.Nickname] then
             return false
         end
 
@@ -189,7 +197,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     MonitoringThread = function(self)
         while not IsGameOver() do
             self:EvaluateVictoryCondition()
-            WaitTicks(4)
+            WaitTicks(11)
         end
     end,
 
@@ -266,10 +274,25 @@ AbstractVictoryCondition = Class(DebugComponent) {
         end
     end,
 
+    ---@param self AbstractVictoryCondition
+    ---@param aiBrain AIBrain
+    FlagBrainAsProcessed = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Flagging brain as processed: " .. aiBrain.Nickname)
+        end
+
+        self.ProcessedBrains[aiBrain.Nickname] = true
+    end,
+
     --- Processes the army as if it forfeit/drew.
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DrawForArmy = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Army forfeit the game: ", aiBrain.Nickname)
+        end
+
+        self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
         aiBrain:OnDraw()
 
@@ -281,6 +304,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     VictoryForArmy = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Army is victorious: ", aiBrain.Nickname)
+        end
+
+        self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
         aiBrain:OnVictory()
 
@@ -292,6 +320,11 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DefeatForArmy = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Army is defeated: ", aiBrain.Nickname)
+        end
+
+        self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
         aiBrain:OnDefeat()
 
