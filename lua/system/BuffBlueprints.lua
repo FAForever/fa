@@ -105,7 +105,7 @@ Buffs = {}
 --- If present, this function will be called to determine if the buff should be applied for a unit.
 ---@field BuffCheckFunction? fun(self: BlueprintBuff, unit: Unit): boolean
 ---@field OnBuffAffect? fun(self: BlueprintBuff, unit: Unit, instigator: Unit)
----@field OnBuffRemove? fun(self: BlueprintBuff, unit: Unit, instigator: Unit)
+---@field OnBuffRemove? fun(self: BlueprintBuff, unit: Unit, instigator: Unit?)
 ---@field OnApplyBuff? fun(self: BlueprintBuff, unit: Unit, instigator: Unit)
 --- table of how the buff will affect the units (not VFX)
 ---@field Affects? table<BuffAffectName, BlueprintBuffAffect>
