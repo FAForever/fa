@@ -249,10 +249,15 @@ end
 -- that was on the unit. However, this doesn't work for stunned units because it's a fire-and-forget
 -- type buff, not a fire-and-keep-track-of type buff.
 BuffEffects = {
-
-    Stun = function(buffDef, buffValues, unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
+    ---@param instigator Unit # can be the unit itself
+    ---@param afterRemove boolean
+    Stun = function(buffDefinition, buffValues, unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
         if unit.ImmuneToStun or afterRemove then return end
-        unit:SetStunned(buffDef.Duration or 1, instigator)
+        unit:SetStunned(buffDefinition.Duration or 1, instigator)
         if unit.Anims then
             for k, manip in unit.Anims do
                 manip:SetRate(0)
@@ -261,6 +266,11 @@ BuffEffects = {
     end,
 
     --- Quite confident that this one is broken
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
+    ---@param instigator Unit # can be the unit itself
     Health = function(buffDefinition, buffValues, unit, buffName, instigator)
         -- Note: With health we don't actually look at the unit's table because it's an instant
         -- happening. We don't want to overcalculate something as pliable as health.
@@ -282,6 +292,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     MaxHealth = function(buffDefinition, buffValues, unit, buffName)
         -- With this type of buff, the idea is to adjust the Max Health of a unit.
         -- The DoNotFill flag is set when we want to adjust the max ONLY and not have the
@@ -300,6 +314,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     Regen = function(buffDefinition, buffValues, unit, buffName)
         -- Adjusted to use a special case of adding mults and calculating the final value
         -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
@@ -309,6 +327,10 @@ BuffEffects = {
         unit:SetRegen(val)
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     Damage = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
@@ -328,6 +350,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     DamageRadius = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
@@ -339,6 +365,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     MaxRadius = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
@@ -350,6 +380,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     MoveMult = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MoveMult', 1)
         unit:SetSpeedMult(val)
@@ -357,6 +391,10 @@ BuffEffects = {
         unit:SetTurnMult(val)
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     WeaponsEnable = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
@@ -365,11 +403,19 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     VisionRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'VisionRadius', unit:GetBlueprint().Intel.VisionRadius or 0)
         unit:SetIntelRadius('Vision', val)
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     RadarRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'RadarRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
         if not unit:IsIntelEnabled('Radar') then
@@ -385,6 +431,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     OmniRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
         if not unit:IsIntelEnabled('Omni') then
@@ -400,48 +450,81 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     BuildRate = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
         unit:SetBuildRate(val)
     end,
 
-    -------- ADJACENCY BELOW --------
+    --#region Adjacency Buffs
+
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     EnergyActive = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyActive', 1)
         unit.EnergyBuildAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     MassActive = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MassActive', 1)
         unit.MassBuildAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     EnergyMaintenance = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyMaintenance', 1)
         unit.EnergyMaintAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     MassMaintenance = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MassMaintenance', 1)
         unit.MassMaintAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     EnergyProduction = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyProduction', 1)
         unit.EnergyProdAdjMod = val
         unit:UpdateProductionValues()
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     MassProduction = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MassProduction', 1)
         unit.MassProdAdjMod = val
         unit:UpdateProductionValues()
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     EnergyWeapon = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyWeapon', 1)
         for i = 1, unit:GetWeaponCount() do
@@ -452,6 +535,10 @@ BuffEffects = {
         end
     end,
 
+    ---@param buffDefinition BlueprintBuff
+    ---@param buffValues BlueprintBuffAffect
+    ---@param unit Unit
+    ---@param buffName BuffName
     RateOfFire = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
 
@@ -464,6 +551,7 @@ BuffEffects = {
         end
     end,
 
+    --#endregion
 }
 
 local buffMissingWarnings = {}
