@@ -288,6 +288,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DrawForArmy = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Army forfeit the game: ", aiBrain.Nickname)
+        end
+
         self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
         aiBrain:OnDraw()
@@ -300,6 +304,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     VictoryForArmy = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Army is victorious: ", aiBrain.Nickname)
+        end
+
         self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
         aiBrain:OnVictory()
@@ -312,6 +320,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DefeatForArmy = function(self, aiBrain)
+        if self.EnabledSpewing then
+            SPEW("Army is defeated: ", aiBrain.Nickname)
+        end
+
         self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
         aiBrain:OnDefeat()
