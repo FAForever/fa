@@ -82,6 +82,7 @@ SyncMeta = {
                 SyncUnitData[id] = unitData
             end
             unitData[key] = val
+            LOG(key, 'set new unit data', val)
         end
     end,
 }

@@ -725,6 +725,11 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     end
 
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
+
+    for _, u in newSelection do
+        local id = u:GetEntityId()
+        LOG(string.format('UnitData for %s %s: %s', u:GetUnitId(), id, repr(UnitData[id])))
+    end
 end
 
 ---@param newQueue UIBuildQueue

@@ -146,6 +146,7 @@ XSL0001 = ClassUnit(ACUUnit) {
                         },
                     },
                 },
+                Icon = true,
             }
             buff_bp.Affects.MaxHealth = {
                 Add = 0,
@@ -571,3 +572,16 @@ XSL0001 = ClassUnit(ACUUnit) {
 }
 
 TypeClass = XSL0001
+
+__moduleinfo = {
+    OnReload = function()
+        Buffs['SeraphimACUAdvancedRegenAura'] = nil
+        Buffs['SeraphimACUAdvancedRegenAuraSelfBuff'] = nil
+        Buffs['SeraphimACUDamageStabilization'] = nil
+        Buffs['SeraphimACUDamageStabilizationAdv'] = nil
+        Buffs['SeraphimACURegenAura'] = nil
+        Buffs['SeraphimACURegenAuraSelfBuff'] = nil
+        Buffs['SeraphimACUT2BuildRate'] = nil
+        Buffs['SeraphimACUT3BuildRate'] = nil
+    end,
+}
