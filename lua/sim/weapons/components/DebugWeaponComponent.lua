@@ -118,6 +118,11 @@ DebugWeaponComponent = Class(DebugComponent) {
             return
         end
 
+        -- do not draw everything, just what the developer may be interested in
+        if not (GetFocusArmy() == -1 or GetFocusArmy() == self.Army) then
+            return
+        end
+
         color = color or 'ffffff'
 
         local owner = self.unit
