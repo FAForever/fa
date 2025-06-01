@@ -249,14 +249,14 @@ function sendEnhancementMessage(messageTable)
     if trigger == 'started' then
         onStartEnhancement(id, army, category, source)
     elseif trigger == 'cancelled' then
-        onCancelledEnhancement(id, category, source)
+        onCancelledEnhancement(id, category, source, army)
     elseif trigger == 'completed' then
-        onCompletedEnhancement(id, category, source)
+        onCompletedEnhancement(id, category, source, army)
     end
 end
 
 function onStartEnhancement(id, army, category, source)
-    local msg = {to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
+    local msg = {from = army, to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
     -- Start by storing ACU IDs for future use
     if id and (focusArmy == -1 or army == focusArmy) then
@@ -276,8 +276,8 @@ function onStartEnhancement(id, army, category, source)
     sendMessage(msg)
 end
 
-function onCancelledEnhancement(id, category, source)
-    local msg = {to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
+function onCancelledEnhancement(id, category, source, army)
+    local msg = {from = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
     if id then
         local data = ACUs[id]
@@ -290,8 +290,8 @@ function onCancelledEnhancement(id, category, source)
 end
 
 -- Called from the enhancement watcher
-function onCompletedEnhancement(id, category, source)
-    local msg = {to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
+function onCompletedEnhancement(id, category, source, army)
+    local msg = {from = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
     if id then
         local data = ACUs[id]

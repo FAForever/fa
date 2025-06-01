@@ -826,8 +826,12 @@ function ReceiveChatFromSim(sender, msg)
         return
     end
 
-    if msg.to == 'notify' and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
-        return
+    if msg.to == 'notify' then
+        if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
+            return -- ignore unwanted messages
+        elseif SessionIsReplay() or GetFocusArmy() == -1 then
+            sender = GetArmyData(msg.from).nickname
+        end
     end
 
     if type(msg) == 'string' then
