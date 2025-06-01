@@ -83,6 +83,12 @@ function setupStartDisables()
 end
 
 -- This function is called from chat.lua when a player receives a message from another player flagged as Notify = true. Generated below.
+
+--- Processes an incoming message according to player preferences and message limits.
+--- Returns false if the message should not be posted in chat.
+---@param sender string # sender player name
+---@param msg { data: { category: NotifyCategory, source: NotifySource, trigger: NotifyTrigger } }
+---@return boolean PostMessage
 function processIncomingMessage(sender, msg)
     local category = msg.data.category
     local source = msg.data.source
