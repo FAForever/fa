@@ -4,6 +4,7 @@
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
+---@field UnitData? { [EntityId]: { OwnerArmy: Army, Data: UnitSyncData }, Chat: { sender: string,  msg: table }[] }
 Sync = { }
 
 local SyncDefaults = {
