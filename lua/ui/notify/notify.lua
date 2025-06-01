@@ -243,6 +243,7 @@ function sendMessage(msg)
 end
 
 -- This function processes messages sent from the sim from unit.lua and defaultunits.lua
+---@param messageTable NotifyMessageSyncData
 function sendEnhancementMessage(messageTable)
     local source = messageTable.source
     local category = messageTable.category
@@ -261,6 +262,10 @@ function sendEnhancementMessage(messageTable)
     end
 end
 
+---@param id EntityId?
+---@param army Army
+---@param category NotifyCategory
+---@param source NotifySource
 function onStartEnhancement(id, army, category, source)
     local msg = {from = army, to = 'notify', Chat = true, text = 'Starting ' .. messages()[category][source], data = {category = category, source = source, trigger = 'started'}}
 
@@ -282,6 +287,10 @@ function onStartEnhancement(id, army, category, source)
     sendMessage(msg)
 end
 
+---@param id EntityId?
+---@param army Army
+---@param category NotifyCategory
+---@param source NotifySource
 function onCancelledEnhancement(id, category, source, army)
     local msg = {from = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' cancelled', data = {category = category, source = source, trigger = 'cancelled'}}
 
@@ -296,6 +305,10 @@ function onCancelledEnhancement(id, category, source, army)
 end
 
 -- Called from the enhancement watcher
+---@param id EntityId?
+---@param army Army
+---@param category NotifyCategory
+---@param source NotifySource
 function onCompletedEnhancement(id, category, source, army)
     local msg = {from = army, to = 'notify', Chat = true, text = messages()[category][source] .. ' done!', data = {category = category, source = source, trigger = 'completed'}}
 
@@ -320,6 +333,10 @@ function killWatcher(data)
     end
 end
 
+---@param id EntityId?
+---@param text string
+---@param category NotifyCategory
+---@param source NotifySource
 function watchEnhancement(id, text, category, source)
     local overlayData = {}
     overlayData.unit = GetUnitById(id)

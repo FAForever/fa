@@ -5,6 +5,7 @@
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
 ---@field UnitData? { [EntityId]: { OwnerArmy: Army, Data: UnitSyncData }, Chat: { sender: string,  msg: table }[] }
+---@field EnhanceMessage? NotifyMessageSyncData[]
 Sync = { }
 
 local SyncDefaults = {
