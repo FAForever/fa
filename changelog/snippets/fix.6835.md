@@ -1,0 +1,1 @@
+- (#6835) Revert the change that made factories immediately start building after an upgrade or after cancelling a unit, since it seems to be causing occassional desyncs.
