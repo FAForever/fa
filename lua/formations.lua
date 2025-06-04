@@ -13,6 +13,7 @@
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
 local LandCategories = import("/lua/formationscategories.lua").LandCategories
+local AirCategories = import("/lua/formationscategories.lua").AirCategories
 
 SurfaceFormations = {
     'AttackFormation',
@@ -280,49 +281,6 @@ local EightRowAttackFormationBlock = {
 -- =========================================
 -- ================ AIR DATA ===============
 -- =========================================
-
--- === AIR CATEGORIES ===
-local GroundAttackAir = (categories.AIR * categories.GROUNDATTACK) - categories.ANTIAIR
-local TransportationAir = categories.AIR * categories.TRANSPORTATION - categories.GROUNDATTACK
-local BomberAir = categories.AIR * categories.BOMBER
-local AAAir = categories.AIR * categories.ANTIAIR
-local AntiNavyAir = categories.AIR * categories.ANTINAVY
-local IntelAir = categories.AIR * (categories.SCOUT + categories.RADAR)
-local ExperimentalAir = categories.AIR * categories.EXPERIMENTAL
-local EngineerAir = categories.AIR * categories.ENGINEER
-
--- === TECH LEVEL AIR CATEGORIES ===
-local AirCategories = {
-    Ground1 = GroundAttackAir * categories.TECH1,
-    Ground2 = GroundAttackAir * categories.TECH2,
-    Ground3 = GroundAttackAir * categories.TECH3,
-
-    Trans1 = TransportationAir * categories.TECH1,
-    Trans2 = TransportationAir * categories.TECH2,
-    Trans3 = TransportationAir* categories.TECH3,
-
-    Bomb1 = BomberAir * categories.TECH1,
-    Bomb2 = BomberAir * categories.TECH2,
-    Bomb3 = BomberAir * categories.TECH3,
-
-    AA1 = AAAir * categories.TECH1,
-    AA2 = AAAir * categories.TECH2,
-    AA3 = AAAir * categories.TECH3,
-
-    AN1 = AntiNavyAir * categories.TECH1,
-    AN2 = AntiNavyAir * categories.TECH2,
-    AN3 = AntiNavyAir * categories.TECH3,
-
-    AIntel1 = IntelAir * categories.TECH1,
-    AIntel2 = IntelAir * categories.TECH2,
-    AIntel3 = IntelAir * categories.TECH3,
-
-    AExper = ExperimentalAir,
-
-    AEngineer = EngineerAir,
-
-    RemainingCategory = categories.AIR - (GroundAttackAir + TransportationAir + BomberAir + AAAir + AntiNavyAir + IntelAir + ExperimentalAir + EngineerAir)
-}
 
 -- === SUB GROUP ORDERING ===
 local GroundAttack = { 'Ground3', 'Ground2', 'Ground1', }
