@@ -9,6 +9,7 @@ local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRE
 local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
 ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
+NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
 -- === TECH LEVEL LAND CATEGORIES ===
 LandCategories = {
