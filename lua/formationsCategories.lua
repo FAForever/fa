@@ -90,3 +90,39 @@ AirCategories = {
 
     RemainingCategory = categories.AIR - (GroundAttackAir + TransportationAir + BomberAir + AAAir + AntiNavyAir + IntelAir + ExperimentalAir + EngineerAir)
 }
+
+-- === NAVAL CATEGORIES ===
+local LightAttackNaval = categories.LIGHTBOAT
+local FrigateNaval = categories.FRIGATE
+local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.TECH3 * categories.SUBMERSIBLE * categories.ANTINAVY * categories.NAVAL - categories.NUKE)
+local DestroyerNaval = categories.DESTROYER
+local CruiserNaval = categories.CRUISER
+local BattleshipNaval = categories.BATTLESHIP
+local CarrierNaval = categories.NAVALCARRIER
+local NukeSubNaval = categories.NUKESUB - SubNaval
+local MobileSonar = categories.MOBILESONAR
+local DefensiveBoat = categories.DEFENSIVEBOAT
+local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
+                        CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
+
+
+-- === TECH LEVEL LAND CATEGORIES ===
+NavalCategories = {
+    LightCount = LightAttackNaval,
+    FrigateCount = FrigateNaval,
+
+    CruiserCount = CruiserNaval,
+    DestroyerCount = DestroyerNaval,
+
+    BattleshipCount = BattleshipNaval,
+    CarrierCount = CarrierNaval,
+
+    NukeSubCount = NukeSubNaval,
+    MobileSonarCount = MobileSonar + DefensiveBoat,
+
+    RemainingCategory = RemainingNaval,
+}
+
+SubCategories = {
+    SubCount = SubNaval,
+}
