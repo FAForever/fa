@@ -109,7 +109,6 @@ local DefensiveBoat = categories.DEFENSIVEBOAT
 local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
                         CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
 
-
 -- === TECH LEVEL LAND CATEGORIES ===
 NavalCategories = {
     LightCount = LightAttackNaval,
@@ -214,6 +213,7 @@ function CategorizeUnits(formationUnits)
                         typeData[cat][fs] = {Count = 0, Filter = categories[id]}
                     end
                     local footprintSizeData = typeData[cat][fs]
+
                     footprintSizeData.Count = footprintSizeData.Count + 1
                     footprintSizeData.Filter = footprintSizeData.Filter + categories[id]
                     typeData.FootprintCounts[fs] = (typeData.FootprintCounts[fs] or 0) + 1
