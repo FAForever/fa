@@ -211,8 +211,9 @@ function CategorizeUnits(formationUnits)
                     if not UnitsList[type][cat][fs] then
                         UnitsList[type][cat][fs] = {Count = 0, Filter = categories[id]}
                     end
-                    UnitsList[type][cat][fs].Count = UnitsList[type][cat][fs].Count + 1
-                    UnitsList[type][cat][fs].Filter = UnitsList[type][cat][fs].Filter + categories[id]
+                    local footprintSizeData = UnitsList[type][cat][fs]
+                    footprintSizeData.Count = footprintSizeData.Count + 1
+                    footprintSizeData.Filter = footprintSizeData.Filter + categories[id]
                     UnitsList[type].FootprintCounts[fs] = (UnitsList[type].FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
