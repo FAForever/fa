@@ -8,11 +8,11 @@ local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.S
 local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
 local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
-ShieldCat = categories.uel0307 + categories.ual0307 + categories.xsl0307
+ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
 
 -- === TECH LEVEL LAND CATEGORIES ===
 LandCategories = {
-    Shields = ShieldCat,
+    Shields = ShieldCategory,
 
     Bot1 = (DirectFire * categories.TECH1) * categories.BOT - categories.SCOUT,
     Bot2 = (DirectFire * categories.TECH2) * categories.BOT - categories.SCOUT,
