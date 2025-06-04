@@ -15,7 +15,7 @@
 local LandCategories = import("/lua/formationscategories.lua").LandCategories
 local NavalCategories = import("/lua/formationscategories.lua").NavalCategories
 local SubCategories = import("/lua/formationscategories.lua").SubCategories
-local ShieldCat = import("/lua/formationscategories.lua").ShieldCat
+local ShieldCategory = import("/lua/formationscategories.lua").ShieldCategory
 
 local CategorizeUnits = import("/lua/formationscategories.lua").CategorizeUnits
 
@@ -729,13 +729,13 @@ function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
 
-    local shieldCategory = ShieldCat
+    local shieldCategory = ShieldCategory
     local nonShieldCategory = categories.ALLUNITS - shieldCategory
     local footprintCounts = {}
     local remainingUnits = table.getn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
-        if EntityCategoryContains(ShieldCat, u) then
+        if EntityCategoryContains(shieldCategory, u) then
             remainingShields = remainingShields + 1
         end
 
