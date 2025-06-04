@@ -28,21 +28,23 @@ XAB3301 = ClassUnit(AStructureUnit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        AStructureUnit.OnStopBeingBuilt(self, builder, layer)
-
-        self.Trash:Add(CreateRotator(self, 'spin02', 'x', nil, 0, 15, 60 + Random(0, 20)))
-        self.Trash:Add(CreateRotator(self, 'spin02', 'y', nil, 0, 15, 60 + Random(0, 20)))
-        self.Trash:Add(CreateRotator(self, 'spin02', 'z', nil, 0, 15, 60 + Random(0, 20)))
-
+        -- Create manipulators before the main function since we can be instantly disabled
+        -- due to having no energy, and disabling requires the manipulators to exist.
         self.Animator = CreateAnimator(self)
         self.Animator:PlayAnim("/units/xab3301/XAB3301_activate.sca")
         self.Animator:SetRate(0)
         self.Trash:Add(self.Animator)
 
+        self.Trash:Add(CreateRotator(self, 'spin02', 'x', nil, 0, 15, 60 + Random(0, 20)))
+        self.Trash:Add(CreateRotator(self, 'spin02', 'y', nil, 0, 15, 60 + Random(0, 20)))
+        self.Trash:Add(CreateRotator(self, 'spin02', 'z', nil, 0, 15, 60 + Random(0, 20)))
+
         self.RotatorBot = CreateRotator(self, 'spin01', 'y', nil, 0, 3, 6)
         self.RotatorTop = CreateRotator(self, 'spin03', 'y', nil, 0, -2, -4)
 
         self.TrashAmbientEffects = TrashBag()
+
+        AStructureUnit.OnStopBeingBuilt(self, builder, layer)
     end,
 
     ---@param self XAB3301
