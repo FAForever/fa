@@ -1,3 +1,6 @@
+local MathMax = math.max
+local MathCeil = math.ceil
+
 -- === LAND CATEGORIES ===
 local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
 local Sniper = categories.SNIPER * categories.LAND
@@ -202,7 +205,7 @@ function CategorizeUnits(formationUnits)
             for cat, _ in table do
                 if EntityCategoryContains(table[cat], u) then
                     local bp = u:GetBlueprint()
-                    local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
+                    local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
                     local id = bp.BlueprintId
 
                     if not UnitsList[type][cat][fs] then
@@ -249,8 +252,8 @@ function CalculateSizes()
             unitTotal = unitTotal + UnitsList[type].UnitTotal
             for fs, count in UnitsList[type].FootprintCounts do
                 groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
-                largestFootprint = math.max(largestFootprint, fs)
-                largestForGroup = math.max(largestForGroup, fs)
+                largestFootprint = MathMax(largestFootprint, fs)
+                largestForGroup = MathMax(largestForGroup, fs)
                 numSizes = numSizes + 1
             end
         end
@@ -270,7 +273,7 @@ function CalculateSizes()
     end
 
     for group, data in TypeGroups do
-        local gridSize = math.max(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
+        local gridSize = MathMax(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
         for _, type in data.Types do
             local unitData = UnitsList[type]
 
@@ -280,7 +283,7 @@ function CalculateSizes()
             unitData.Scale = gridSize / (largestFootprint + 2)
 
             for fs, count in unitData.FootprintCounts do
-                local size = math.ceil(fs * data.MinSeparationFraction / gridSize)
+                local size = MathCeil(fs * data.MinSeparationFraction / gridSize)
                 unitData.FootprintSizes[fs] = size
                 unitData.AreaTotal = unitData.AreaTotal + count * size * size
             end
