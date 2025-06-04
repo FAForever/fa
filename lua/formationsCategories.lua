@@ -126,3 +126,186 @@ NavalCategories = {
 SubCategories = {
     SubCount = SubNaval,
 }
+
+-- reusable table for categorizing units in a formation 
+local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
+-- map layers to categories
+local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
+-- initialize the layer tables
+for unitType, categoriesForType in CategoryTables do
+    local typeData = UnitsList[unitType]
+    for unitTypeCategory, _ in categoriesForType do
+        typeData[unitTypeCategory] = {}
+    end
+    typeData.FootprintCounts = {}
+    typeData.FootprintSizes = {}
+end
+
+-- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
+---@param formationUnits Unit[]
+---@return table
+function CategorizeUnits(formationUnits)
+    local categoryTables = CategoryTables
+
+    -- flush the table
+    for unitType, categoriesForType in categoryTables do
+        local typeData = UnitsList[unitType]
+        for unitTypeCategory, _ in categoriesForType do
+            local typeDataCategory = typeData[unitTypeCategory]
+            for k in pairs(typeDataCategory) do
+                typeDataCategory[k] = nil
+            end
+        end
+
+        local footprintCounts = typeData.FootprintCounts
+        for k in pairs(footprintCounts) do
+            footprintCounts[k] = nil
+        end
+
+        local footprintSizes = typeData.FootprintSizes
+        for k in pairs(footprintSizes) do
+            footprintSizes[k] = nil
+        end
+
+        typeData.UnitTotal = 0
+        typeData.AreaTotal = 0
+        typeData.Scale = nil -- set elsewhere in formations logic
+    end
+
+    -- Loop through each unit to get its category and size
+    for _, u in formationUnits do
+        local identified = false
+        for type, table in categoryTables do
+            for cat, _ in table do
+                if EntityCategoryContains(table[cat], u) then
+                    local bp = u:GetBlueprint()
+                    local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
+                    local id = bp.BlueprintId
+
+                    if not UnitsList[type][cat][fs] then
+                        UnitsList[type][cat][fs] = {Count = 0, Categories = {}}
+                    end
+                    UnitsList[type][cat][fs].Count = UnitsList[type][cat][fs].Count + 1
+                    UnitsList[type][cat][fs].Categories[id] = categories[id]
+                    UnitsList[type].FootprintCounts[fs] = (UnitsList[type].FootprintCounts[fs] or 0) + 1
+
+                    if cat == "RemainingCategory" then
+                        LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
+                    end
+                    UnitsList[type].UnitTotal = UnitsList[type].UnitTotal + 1
+                    identified = true
+                    break
+                end
+            end
+
+            if identified then
+                break
+            end
+        end
+        if not identified then
+            WARN('*FORMATION DEBUG: Unit ' .. u.UnitId .. ' was excluded from the formation because its layer could not be determined.')
+        end
+    end
+
+    -- Loop through each category and combine the types within into a single filter category for each size
+    for type, table in categoryTables do
+        for cat, _ in table do
+            if UnitsList[type][cat] then
+                for fs, data in UnitsList[type][cat] do
+                    local filter = nil
+                    for _, category in data.Categories do
+                        if not filter then
+                            filter = category
+                        else
+                            filter = filter + category
+                        end
+                    end
+                    UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
+                end
+            end
+        end
+    end
+
+    CalculateSizes(UnitsList)
+
+    return UnitsList
+end
+
+---@param unitsList table
+---@return any
+function CalculateSizes(unitsList)
+    local largestFootprint = 1
+    local smallestFootprints = {}
+
+    local typeGroups = {
+        Land = {
+            GridSizeFraction = 2.75,
+            GridSizeAbsolute = 2,
+            MinSeparationFraction = 2.25,
+            Types = {'Land'}
+        },
+
+        Air = {
+            GridSizeFraction = 1.3,
+            GridSizeAbsolute = 2,
+            MinSeparationFraction = 1,
+            Types = {'Air'}
+        },
+
+        Sea = {
+            GridSizeFraction = 1.75,
+            GridSizeAbsolute = 4,
+            MinSeparationFraction = 1.15,
+            Types = {'Naval', 'Subs'}
+        },
+    }
+
+    for group, data in typeGroups do
+        local groupFootprintCounts = {}
+        local largestForGroup = 1
+        local numSizes = 0
+        local unitTotal = 0
+        for _, type in data.Types do
+            unitTotal = unitTotal + unitsList[type].UnitTotal
+            for fs, count in unitsList[type].FootprintCounts do
+                groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
+                largestFootprint = math.max(largestFootprint, fs)
+                largestForGroup = math.max(largestForGroup, fs)
+                numSizes = numSizes + 1
+            end
+        end
+
+        smallestFootprints[group] = largestForGroup
+        if numSizes > 0 then
+            local minCount = unitTotal / 2
+            local smallerUnitCount = 0
+            for fs, count in groupFootprintCounts do
+                smallerUnitCount = smallerUnitCount + count
+                if smallerUnitCount >= minCount then
+                    smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
+                    break
+                end
+            end
+        end
+    end
+
+    for group, data in typeGroups do
+        local gridSize = math.max(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
+        for _, type in data.Types do
+            local unitData = unitsList[type]
+
+             -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
+             -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
+             -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
+            unitData.Scale = gridSize / (largestFootprint + 2)
+
+            for fs, count in unitData.FootprintCounts do
+                local size = math.ceil(fs * data.MinSeparationFraction / gridSize)
+                unitData.FootprintSizes[fs] = size
+                unitData.AreaTotal = unitData.AreaTotal + count * size * size
+            end
+        end
+    end
+
+    return unitsList
+end
