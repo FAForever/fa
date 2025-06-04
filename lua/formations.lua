@@ -15,6 +15,7 @@
 local LandCategories = import("/lua/formationscategories.lua").LandCategories
 local NavalCategories = import("/lua/formationscategories.lua").NavalCategories
 local SubCategories = import("/lua/formationscategories.lua").SubCategories
+local ShieldCat = import("/lua/formationscategories.lua").ShieldCat
 
 local CategorizeUnits = import("/lua/formationscategories.lua").CategorizeUnits
 

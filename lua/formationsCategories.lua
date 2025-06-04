@@ -5,7 +5,7 @@ local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.S
 local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
 local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
-local ShieldCat = categories.uel0307 + categories.ual0307 + categories.xsl0307
+ShieldCat = categories.uel0307 + categories.ual0307 + categories.xsl0307
 
 -- === TECH LEVEL LAND CATEGORIES ===
 LandCategories = {
@@ -229,25 +229,6 @@ function CategorizeUnits(formationUnits)
             WARN('*FORMATION DEBUG: Unit ' .. u.UnitId .. ' was excluded from the formation because its layer could not be determined.')
         end
     end
-
-    -- Loop through each category and combine the types within into a single filter category for each size
-    -- for type, table in categoryTables do
-    --     for cat, _ in table do
-    --         if UnitsList[type][cat] then
-    --             for fs, data in UnitsList[type][cat] do
-    --                 local filter = nil
-    --                 for _, category in data.Categories do
-    --                     if not filter then
-    --                         filter = category
-    --                     else
-    --                         filter = filter + category
-    --                     end
-    --                 end
-    --                 UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
-    --             end
-    --         end
-    --     end
-    -- end
 
     CalculateSizes()
 
