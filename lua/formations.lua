@@ -16,6 +16,7 @@ local LandCategories = import("/lua/formationscategories.lua").LandCategories
 local NavalCategories = import("/lua/formationscategories.lua").NavalCategories
 local SubCategories = import("/lua/formationscategories.lua").SubCategories
 local ShieldCategory = import("/lua/formationscategories.lua").ShieldCategory
+local NonShieldCategory = import("/lua/formationscategories.lua").NonShieldCategory
 
 local CategorizeUnits = import("/lua/formationscategories.lua").CategorizeUnits
 
@@ -729,13 +730,11 @@ function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
 
-    local shieldCategory = ShieldCategory
-    local nonShieldCategory = categories.ALLUNITS - shieldCategory
     local footprintCounts = {}
     local remainingUnits = table.getn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
-        if EntityCategoryContains(shieldCategory, u) then
+        if EntityCategoryContains(ShieldCategory, u) then
             remainingShields = remainingShields + 1
         end
 
@@ -798,11 +797,11 @@ function GuardFormation(formationUnits)
         offsetX = sizeMult * math.sin(ringPosition)
         offsetY = -sizeMult * math.cos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
+            table.insert(FormationPos, { offsetX, offsetY, ShieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
-            table.insert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
+            table.insert(FormationPos, { offsetX, offsetY, NonShieldCategory, 0, rotate })
         end
         unitCount = unitCount + 1
         remainingUnits = remainingUnits - 1
