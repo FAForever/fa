@@ -206,10 +206,10 @@ function CategorizeUnits(formationUnits)
                     local id = bp.BlueprintId
 
                     if not UnitsList[type][cat][fs] then
-                        UnitsList[type][cat][fs] = {Count = 0, Categories = {}}
+                        UnitsList[type][cat][fs] = {Count = 0, Filter = categories[id]}
                     end
                     UnitsList[type][cat][fs].Count = UnitsList[type][cat][fs].Count + 1
-                    UnitsList[type][cat][fs].Categories[id] = categories[id]
+                    UnitsList[type][cat][fs].Filter = UnitsList[type][cat][fs].Filter + categories[id]
                     UnitsList[type].FootprintCounts[fs] = (UnitsList[type].FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
@@ -231,23 +231,23 @@ function CategorizeUnits(formationUnits)
     end
 
     -- Loop through each category and combine the types within into a single filter category for each size
-    for type, table in categoryTables do
-        for cat, _ in table do
-            if UnitsList[type][cat] then
-                for fs, data in UnitsList[type][cat] do
-                    local filter = nil
-                    for _, category in data.Categories do
-                        if not filter then
-                            filter = category
-                        else
-                            filter = filter + category
-                        end
-                    end
-                    UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
-                end
-            end
-        end
-    end
+    -- for type, table in categoryTables do
+    --     for cat, _ in table do
+    --         if UnitsList[type][cat] then
+    --             for fs, data in UnitsList[type][cat] do
+    --                 local filter = nil
+    --                 for _, category in data.Categories do
+    --                     if not filter then
+    --                         filter = category
+    --                     else
+    --                         filter = filter + category
+    --                     end
+    --                 end
+    --                 UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
+    --             end
+    --         end
+    --     end
+    -- end
 
     CalculateSizes()
 
