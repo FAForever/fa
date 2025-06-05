@@ -82,9 +82,6 @@ CreateTitleAnnouncement = function(titleText, goalControl, onCompleteCallback)
     -- create a dummy goal control if we don't have one
     local frame = GetFrame(0) --[[@as Frame]]
     if not goalControl or IsDestroyed(goalControl) then
-        LOG("No goal control found, creating default goal control")
-        reprsl(goalControl)
-        LOG(IsDestroyed(goalControl))
         goalControl = CreateDefaultGoalControl(frame)
     end
 

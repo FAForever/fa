@@ -170,9 +170,6 @@ AbstractAnnouncement = ClassUI(Group) {
             self.AnimateThreadInstance:Destroy()
         end
 
-        LOG(control)
-        LOG(IsDestroyed(control))
-        LOG(debug.traceback())
         local animationProgress = self:SetupBackgroundAnimation(control)
 
         self.AnimateThreadInstance = self.Trash:Add(ForkThread(self.AnimateThread, self, animationProgress, durationForContent, onCompleteCallback))
