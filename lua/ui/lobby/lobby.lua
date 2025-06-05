@@ -344,12 +344,12 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     local tooltips = {}
 
     if not GetSlotMenuData()[stateKey] then
-        WARN("Invalid slot menu state selected: " .. stateKey)
+        WARN("Invalid slot menu state selected: " .. tostring(stateKey))
         return nil
     end
 
     if not GetSlotMenuData()[stateKey][hostKey] then
-        WARN("Invalid slot menu host key selected: " .. hostKey)
+        WARN("Invalid slot menu host key selected: " .. tostring(hostKey))
         return nil
     end
 
@@ -2392,7 +2392,7 @@ local function UpdateGame()
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed
                     else
-                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN("Unable to load icons from mod '" .. tostring(mod.name) .. "' with uid '" .. tostring(uid) .. "'. Please inform the author: " .. tostring(mod.author))
                         WARN(msg)
                     end
                 end
@@ -5635,13 +5635,18 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
     end
 
+    --- Called by the engine when we receive data from other players. There is no checking to see if the data is legitimate, these need to be done in Lua.
+    ---
+    --- Data can be sent via `BroadcastData` and/or `SendData`.
+    ---@param self UILobbyCommunication
+    ---@param data UILobbyReceivedMessage
     lobbyComm.DataReceived = function(self, data)
 
-        
+
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
-            WARN("Unknown message type: " .. data.Type)
+            WARN("Unknown message type: " .. tostring(data.Type))
             return
         end
 
@@ -5651,7 +5656,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif MessageHandlers[data.Type].Reject then
             MessageHandlers[data.Type].Reject(data)
         else
-            WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
+            WARN("Rejected message of type " .. tostring(data.Type) .. " from " .. tostring(FindNameForID(data.SenderID)))
         end
     end
 
