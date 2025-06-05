@@ -2,4 +2,4 @@
 
   **Sky Slammer: T1 Mobile Anti-Air Gun (URL0104)**
     - Nanodart Launcher (Anti Air)
-      - Damage: 16 -> 14
+      - Damage: 16 -> 14 (DPS 32 -> 28)
