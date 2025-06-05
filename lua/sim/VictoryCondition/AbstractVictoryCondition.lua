@@ -104,12 +104,19 @@ AbstractVictoryCondition = Class(DebugComponent) {
         return false
     end,
 
+    --- Retrieves a unique name for the given brain.
+    ---@param self AbstractVictoryCondition
+    ---@param aiBrain AIBrain
+    GetBrainName = function(self, aiBrain)
+        return aiBrain.Name
+    end,
+
     --- A utility function that returns whether a brain is eligible to be considered for victory conditions.
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     ---@return boolean
     BrainIsEligible = function(self, aiBrain)
-        if self.ProcessedBrains[aiBrain.Nickname] then
+        if self.ProcessedBrains[self:GetBrainName(aiBrain)] then
             return false
         end
 
@@ -242,7 +249,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
 
         if not ScenarioInfo.Options.AllowObservers then return end
 
-        -- we need to map the brains to the command source index. Since we don't have access to `GetClients` 
+        -- we need to map the brains to the command source index. Since we don't have access to `GetClients`
         -- in the sim, we try and decipher it manually by checking if a brain is a human. We only want
         -- the command sources of allied humans.
 
@@ -277,19 +284,23 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     FlagBrainAsProcessed = function(self, aiBrain)
+        local aiBrainName = self:GetBrainName(aiBrain)
+
         if self.EnabledSpewing then
-            SPEW("Flagging brain as processed: " .. aiBrain.Nickname)
+            SPEW("Flagging brain as processed: " .. aiBrainName)
         end
 
-        self.ProcessedBrains[aiBrain.Nickname] = true
+        self.ProcessedBrains[aiBrainName] = true
     end,
 
     --- Processes the army as if it forfeit/drew.
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DrawForArmy = function(self, aiBrain)
+        local aiBrainName = self:GetBrainName(aiBrain)
+
         if self.EnabledSpewing then
-            SPEW("Army forfeit the game: ", aiBrain.Nickname)
+            SPEW("Army forfeit the game: ", aiBrainName)
         end
 
         self:FlagBrainAsProcessed(aiBrain)
@@ -304,8 +315,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     VictoryForArmy = function(self, aiBrain)
+        local aiBrainName = self:GetBrainName(aiBrain)
+
         if self.EnabledSpewing then
-            SPEW("Army is victorious: ", aiBrain.Nickname)
+            SPEW("Army is victorious: ", aiBrainName)
         end
 
         self:FlagBrainAsProcessed(aiBrain)
@@ -320,8 +333,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DefeatForArmy = function(self, aiBrain)
+        local aiBrainName = self:GetBrainName(aiBrain)
+
         if self.EnabledSpewing then
-            SPEW("Army is defeated: ", aiBrain.Nickname)
+            SPEW("Army is defeated: ", aiBrainName)
         end
 
         self:FlagBrainAsProcessed(aiBrain)
