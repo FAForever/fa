@@ -71,7 +71,8 @@ end
 --- Create an announcement with a title.
 ---@param titleText UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
-CreateTitleAnnouncement = function(titleText, goalControl)
+---@param onCompleteCallback? fun()
+CreateTitleAnnouncement = function(titleText, goalControl, onCompleteCallback)
     if ShouldSkipAnnouncement() then
         return
     end
@@ -80,7 +81,12 @@ CreateTitleAnnouncement = function(titleText, goalControl)
 
     -- create a dummy goal control if we don't have one
     local frame = GetFrame(0) --[[@as Frame]]
-    goalControl = goalControl or CreateDefaultGoalControl(frame)
+    if not goalControl or IsDestroyed(goalControl) then
+        LOG("No goal control found, creating default goal control")
+        reprsl(goalControl)
+        LOG(IsDestroyed(goalControl))
+        goalControl = CreateDefaultGoalControl(frame)
+    end
 
     -- developers note: lazy load the module so that it remains unloaded unless used
     local TitleAnnouncement = import("/lua/ui/game/announcement/TitleAnnouncement.lua").TitleAnnouncement
@@ -88,7 +94,7 @@ CreateTitleAnnouncement = function(titleText, goalControl)
     -- create the announcement
     ---@type UIAbstractAnnouncement
     local announcement = TitleAnnouncement(frame, titleText)
-    announcement:Animate(goalControl, 1.4)
+    announcement:Animate(goalControl, 1.4, onCompleteCallback)
     Announcements:Add(announcement)
 
     if ShouldImmediatelyHideAnnouncement() then
@@ -100,7 +106,8 @@ end
 ---@param titleText UnlocalizedString
 ---@param bodyText UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
-CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
+---@param onCompleteCallback? fun()
+CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl, onCompleteCallback)
     if ShouldSkipAnnouncement() then
         return
     end
@@ -117,7 +124,7 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl)
     -- create the announcement
     ---@type UIAbstractAnnouncement
     local announcement = TitleTextAnnouncement(frame, titleText, bodyText)
-    announcement:Animate(goalControl, 2.2)
+    announcement:Animate(goalControl, 2.2, onCompleteCallback)
     Announcements:Add(announcement)
 
     if ShouldImmediatelyHideAnnouncement() then
@@ -129,14 +136,15 @@ end
 ---
 --- Exists for backwards compatibility.
 ---@param titleText UnlocalizedString
----@param bodyText? UnlocalizedString
 ---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
-function CreateAnnouncement(titleText, bodyText, goalControl)
+---@param bodyText? UnlocalizedString
+---@param onCompleteCallback? fun()
+function CreateAnnouncement(titleText, goalControl, bodyText, onCompleteCallback)
     local typeOfBodyText = type(bodyText)
     if typeOfBodyText == "string" or typeOfBodyText == "number" then
-        return import("/lua/ui/game/announcement.lua").CreateTitleTextAnnouncement (titleText, bodyText, goalControl)
+        return CreateTitleTextAnnouncement(titleText, bodyText, goalControl, onCompleteCallback)
     else
-        return import("/lua/ui/game/announcement.lua").CreateTitleAnnouncement(titleText, goalControl)
+        return CreateTitleAnnouncement(titleText, goalControl, onCompleteCallback)
     end
 end
 
@@ -163,12 +171,14 @@ end
 
 --- Creates a title announcement for debugging.
 DebugTitleAnnouncement = function()
-    CreateAnnouncement("Title because X is defeated")
+    local control = CreateDefaultGoalControl(GetFrame(0))
+    CreateAnnouncement("Title because X is defeated", control)
+    control:Destroy()
 end
 
 --- Creates a title-with-text announcement for debugging.
 DebugTitleTextAnnouncement = function()
-    CreateAnnouncement("Title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+    CreateAnnouncement("Title", nil, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
 end
 
 --#endregion
