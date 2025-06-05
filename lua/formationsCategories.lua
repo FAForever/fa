@@ -49,7 +49,7 @@ LandCategories = {
     Util3 = UtilityCat * categories.TECH3,
     Util4 = UtilityCat * categories.EXPERIMENTAL,
 
-    RemainingCategory = categories.LAND - (DirectFire + Sniper + Construction + Artillery + AntiAir + UtilityCat + ShieldCat)
+    RemainingCategory = categories.LAND - (DirectFire + Sniper + Construction + Artillery + AntiAir + UtilityCat + ShieldCategory)
 }
 
 -- === AIR CATEGORIES ===
