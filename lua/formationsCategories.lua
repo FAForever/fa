@@ -254,8 +254,10 @@ function CalculateSizes()
         local numSizes = 0
         local unitTotal = 0
         for _, type in data.Types do
-            unitTotal = unitTotal + UnitsList[type].UnitTotal
-            for fs, count in UnitsList[type].FootprintCounts do
+            local typeData = UnitsList[type]
+            
+            unitTotal = unitTotal + typeData.UnitTotal
+            for fs, count in typeData.FootprintCounts do
                 groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
                 largestFootprint = MathMax(largestFootprint, fs)
                 largestForGroup = MathMax(largestForGroup, fs)
