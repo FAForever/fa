@@ -186,10 +186,12 @@ function CategorizeUnits(formationUnits)
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
                     local id = bp.BlueprintId
 
-                    if not typeData[cat][fs] then
-                        typeData[cat][fs] = {Count = 0, Filter = categories[id]}
+                    local categoryData = typeData[cat]
+
+                    if not categoryData[fs] then
+                        categoryData[fs] = {Count = 0, Filter = categories[id]}
                     end
-                    local footprintSizeData = typeData[cat][fs]
+                    local footprintSizeData = categoryData[fs]
 
                     footprintSizeData.Count = footprintSizeData.Count + 1
                     footprintSizeData.Filter = footprintSizeData.Filter + categories[id]
