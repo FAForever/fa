@@ -144,29 +144,6 @@ for unitType, categoriesForType in CategoryTables do
     typeData.FootprintSizes = {}
 end
 
-local TypeGroups = {
-    Land = {
-        GridSizeFraction = 2.75,
-        GridSizeAbsolute = 2,
-        MinSeparationFraction = 2.25,
-        Types = {'Land'}
-    },
-
-    Air = {
-        GridSizeFraction = 1.3,
-        GridSizeAbsolute = 2,
-        MinSeparationFraction = 1,
-        Types = {'Air'}
-    },
-
-    Sea = {
-        GridSizeFraction = 1.75,
-        GridSizeAbsolute = 4,
-        MinSeparationFraction = 1.15,
-        Types = {'Naval', 'Subs'}
-    },
-}
-
 -- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
 ---@param formationUnits Unit[]
 ---@return table
@@ -240,6 +217,29 @@ function CategorizeUnits(formationUnits)
 
     return UnitsList
 end
+
+local TypeGroups = {
+    Land = {
+        GridSizeFraction = 2.75,
+        GridSizeAbsolute = 2,
+        MinSeparationFraction = 2.25,
+        Types = {'Land'}
+    },
+
+    Air = {
+        GridSizeFraction = 1.3,
+        GridSizeAbsolute = 2,
+        MinSeparationFraction = 1,
+        Types = {'Air'}
+    },
+
+    Sea = {
+        GridSizeFraction = 1.75,
+        GridSizeAbsolute = 4,
+        MinSeparationFraction = 1.15,
+        Types = {'Naval', 'Subs'}
+    },
+}
 
 ---@return any
 function CalculateSizes()
