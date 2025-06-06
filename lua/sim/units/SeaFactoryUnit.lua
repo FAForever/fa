@@ -2,6 +2,8 @@
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
 local FactoryUnitCalculateRollOffPoint = FactoryUnit.CalculateRollOffPoint
 
+local MathSqrt = math.sqrt
+
 ---@class SeaFactoryUnit : FactoryUnit
 SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
@@ -47,7 +49,9 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
         for k, rolloffPoint in bp do
 
             local ropz = modz * rolloffPoint.Z
-            distance = VDist2(rallyPoint[1], rallyPoint[3], ropx + px, ropz + pz)
+            local distX = (ropx + px) - rallyPoint[1]
+            local distZ = (ropz + pz) - rallyPoint[3]
+            distance = MathSqrt(distX * distX + distZ * distZ)
             if not lowest or distance < lowest then
                 bpKey = k
                 lowest = distance
