@@ -349,8 +349,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- save the new predicted target position in case we lose the target
         -- so that we can drop the bomb salvo centered onto there.
         if data.target then
-            targetPos[1] = targetPos[1] + time * targetVelX
-            targetPos[3] = targetPos[3] + time * targetVelZ
+            targetPos[1] = targetPosX + time * targetVelX
+            targetPos[3] = targetPosZ + time * targetVelZ
             data.targetPos = targetPos
         end
 
