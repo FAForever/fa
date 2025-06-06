@@ -1567,3 +1567,14 @@ function CloseChatConfig()
         GUI.config = nil
     end
 end
+
+__module_info = {
+    OnReload = function(newModule)
+        for i, v in GUI do
+            if v.Destroy then v:Destroy() end
+            GUI[i] = nil
+        end
+
+        newModule.SetupChatLayout(import('/lua/ui/game/gamemain.lua').windowGroup)
+    end,
+}

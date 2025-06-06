@@ -1169,7 +1169,7 @@ SendChat = function()
                     if newChat then
                         chat.oldTime = GetGameTimeSeconds()
                         table.insert(oldData, chat)
-                        sendChat(chat.sender, chat.msg)
+                        import("/lua/ui/game/chat.lua").ReceiveChatFromSim(chat.sender, chat.msg)
                     end
                 end
                 UnitData.Chat = {}
