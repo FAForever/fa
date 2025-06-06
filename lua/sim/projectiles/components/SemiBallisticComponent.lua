@@ -79,7 +79,7 @@ SemiBallisticComponent = ClassSimple {
         local dist = MathSqrt(d1 * d1 + d2 * d2)
 
         -- we need velocity in m/s, not in m/tick
-        local ux, uy, uz = ux*10, uy*10, uz*10
+        ux, uy, uz = ux*10, uy*10, uz*10
     
         local timeToImpact = dist / MathSqrt(MathPow(ux, 2) + MathPow(uz, 2))
         local ballisticAcceleration = (2 * ((target[2] - s0[2]) - uy * timeToImpact)) / MathPow(timeToImpact, 2)
