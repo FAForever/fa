@@ -114,17 +114,17 @@ SemiBallisticComponent = ClassSimple {
     TurnRateFromDistance = function(self)
         local blueprintPhysics = self.Blueprint.Physics
 
-        local dist = self:DistanceToTarget()
-
         local targetX, targetY, targetZ = self:GetCurrentTargetPositionXYZ()
         local selfX, selfY, selfZ = self:GetPositionXYZ()
         local targetVector = Vector(targetX - selfX, targetY - selfY, targetZ - selfZ)
 
         local ux, uy, uz = self:GetVelocity()
         local velocityVector = Vector(ux, uy, uz)
-        local speed = self:GetCurrentSpeed()
 
         local dot = targetVector[1] * velocityVector[1] + targetVector[2] * velocityVector[2] + targetVector[3] * velocityVector[3]
+
+        local dist = self:DistanceToTarget()
+        local speed = self:GetCurrentSpeed()
         local theta = MathAcos(dot / (speed * dist))
         --local radius = dist/(2 * MathSin(theta))
         local arcLength = 2 * theta * dist/(2 * MathSin(theta))
