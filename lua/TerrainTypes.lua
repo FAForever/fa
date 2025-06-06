@@ -23,7 +23,7 @@
     200-219 reserved for snowy
     220-255 reserved for water
  
-- Map Style List (7)-
+- Style Key List (7)-
     Desert
     Evergreen
     Geothermal
@@ -31,7 +31,16 @@
     RedRock
     Tropical
     Tundra    
+
+    The style keys control an unused but working feature that allows swapping a unit's
+    textures and even the mesh depending on the terrain type it gets built on.
+    This could for example be used to give units built in areas marked as Tundra the
+    appearance of being covered with snow.
+    As this requires to provide additional textures for every unit and every terrain style
+    it is unlikely to ever be implemented. The memory requirements of all these textures
+    would be significant. 
  
+
 - Effect mapping key descriptions -
 
     These type mappings map to effect 'Type' names, mapped in unit display 
