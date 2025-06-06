@@ -39,7 +39,7 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
         -- find the attachpoint for the build location
         local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
-        local bx, by, bz = self:GetPositionXYZ(bone)
+        local bx, _, _ = self:GetPositionXYZ(bone)
         local modz = 1.0 + 0.1 * self.UnitBeingBuilt.Blueprint.SizeZ
 
         -- find the nearest roll off point
