@@ -247,7 +247,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if distVel == 0 then
                     return 4.9
                 end
-                local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+                local posDiffX = targetPosX - projPosX
+                local posDiffZ = targetPosZ - projPosZ
+                local distPos = MathSqrt(posDiffX * posDiffX + posDiffZ * posDiffZ)
                 do
                     local dropShort = self.DropBombShortRatio
                     if dropShort then
