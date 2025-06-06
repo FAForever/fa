@@ -221,7 +221,9 @@ CConstructionTemplate = ClassSimple {
                     local bot = bots[k]
                     if bot and not bot.Dead then
                         local bx, by, bz = EntityGetPositionXYZ(bot)
-                        local distance = VDist2Sq(tx, tz, bx, bz)
+                        local distX = bx - tx
+                        local distZ = bz - tz
+                        local distance = distX * distX + distZ * distZ
 
                         -- if close enough, just remove it
                         threshold = threshold + 0.1
