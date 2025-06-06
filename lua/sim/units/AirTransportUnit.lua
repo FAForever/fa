@@ -59,7 +59,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
             if UnloadCommands[command.commandType] then
                 local navigator = self:GetNavigator()
                 local targetPos = navigator:GetCurrentTargetPos()
-                local pos = self:GetPosition()
+                local posX, posY, posZ = self:GetPositionXYZ()
 
                 if not targetPos then
                     return
@@ -67,20 +67,20 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
                 -- Don't drop if we're too far away from the target
 
-                local commandDistX = command.x - pos[1]
-                local commandDistZ = command.z - pos[3]
+                local commandDistX = command.x - posX
+                local commandDistZ = command.z - posZ
                 local commandDist = MathSqrt(commandDistX * commandDistX + commandDistZ * commandDistZ)
 
                 if commandDist > 20 then
                     return
                 end
 
-                local targetDistX = targetPos[1] - pos[1]
-                local targetDistZ = targetPos[3] - pos[3]
+                local targetDistX = targetPos[1] - posX
+                local targetDistZ = targetPos[3] - posZ
                 local targetDist = MathSqrt(targetDistX * targetDistX + targetDistZ * targetDistZ)
 
                 if targetDist > HorzUnloadMargin
-                    or pos[2] - targetPos[2] > (self.Blueprint.Air.TransportHoverHeight or 6) * VertUnloadFactor
+                    or posY - targetPos[2] > (self.Blueprint.Air.TransportHoverHeight or 6) * VertUnloadFactor
                 then
                     return
                 end
