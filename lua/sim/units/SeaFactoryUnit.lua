@@ -50,8 +50,7 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
         local distZPartial = pz - rallyPoint[3]
 
         for k, rolloffPoint in bp do
-            local ropz = modz * rolloffPoint.Z
-            local distZ = ropz + distZPartial
+            local distZ = distZPartial + (modz * rolloffPoint.Z)
             distance = MathSqrt(distX * distX + distZ * distZ)
             if not lowest or distance < lowest then
                 bpKey = k
