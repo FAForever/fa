@@ -22,6 +22,8 @@
 
 local NullShell = import("/lua/sim/projectiles/nullprojectile.lua").NullShell
 
+local MathSqrt = math.sqrt
+
 ---@class NukeProjectile : NullShell
 NukeProjectile = ClassProjectile(NullShell) {
 
@@ -80,7 +82,9 @@ NukeProjectile = ClassProjectile(NullShell) {
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
+        local distX = tpos[1] - mpos[1]
+        local distZ = tpos[3] - mpos[3]
+        local dist = MathSqrt(distX * distX + distZ * distZ)
         return dist
     end,
 
