@@ -59,7 +59,7 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
         end
 
         -- finalize the computation
-        local fx, fy, fz, spin
+        local fy, fz, spin
         local bpP = bp[bpKey]
         local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
         if unitBP then
@@ -68,11 +68,10 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
             spin = bpP.UnitSpin
         end
 
-        fx = ropx + px
         fy = bpP.Y + py
         fz = modz * bpP.Z + pz
 
-        return spin, fx, fy, fz
+        return spin, bx, fy, fz
     end,
 
 }
