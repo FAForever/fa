@@ -21,7 +21,6 @@
 --******************************************************************************************************
 
 -- upvalue globals for performance
-local VDist2 = VDist2
 local VDist3 = VDist3
 local MathPow = math.pow
 local MathSqrt = math.sqrt
@@ -75,7 +74,9 @@ SemiBallisticComponent = ClassSimple {
         local ux, uy, uz = self:GetVelocity()
         local s0 = self:GetPosition()
         local target = self:GetCurrentTargetPosition()
-        local dist = VDist2(target[1], target[3], s0[1], s0[3])
+        local d1 = s0[1] - target[1]
+        local d2 =  s0[3] - target[3]
+        local dist = MathSqrt(d1 * d1 + d2 * d2)
 
         -- we need velocity in m/s, not in m/tick
         local ux, uy, uz = ux*10, uy*10, uz*10
@@ -184,7 +185,9 @@ SemiBallisticComponent = ClassSimple {
     HorizontalDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
-        return VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
+        local d1 = tpos[1] - mpos[1]
+        local d2 = tpos[3] - mpos[3]
+        return MathSqrt(d1 * d1 + d2 * d2)
     end,
 
     -- Angle between the given vector and the horizontal plane
@@ -198,7 +201,7 @@ SemiBallisticComponent = ClassSimple {
         else
             vx, vy, vz = self:GetVelocity()
         end
-        local vh = VDist2(vx, vz, 0, 0)
+        local vh = MathSqrt(vx * vx + vz * vz)
         if vh == 0 then
             if vy >= 0 then
                 return MathPi/2
