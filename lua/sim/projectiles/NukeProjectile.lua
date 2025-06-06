@@ -80,10 +80,10 @@ NukeProjectile = ClassProjectile(NullShell) {
     ---@param self NukeProjectile
     ---@return number
     GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local distX = tpos[1] - mpos[1]
-        local distZ = tpos[3] - mpos[3]
+        local tx, _, tz = self:GetCurrentTargetPositionXYZ()
+        local mx, _, mz = self:GetPositionXYZ()
+        local distX = tx - mx
+        local distZ = tz - mz
         local dist = MathSqrt(distX * distX + distZ * distZ)
         return dist
     end,
