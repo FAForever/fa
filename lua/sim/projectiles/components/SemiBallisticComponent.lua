@@ -115,7 +115,11 @@ SemiBallisticComponent = ClassSimple {
         local blueprintPhysics = self.Blueprint.Physics
 
         local dist = self:DistanceToTarget()
-        local targetVector = VDiff(self:GetCurrentTargetPosition(), self:GetPosition())
+
+        local targetX, targetY, targetZ = self:GetCurrentTargetPositionXYZ()
+        local selfX, selfY, selfZ = self:GetPositionXYZ()
+        local targetVector = Vector(targetX - selfX, targetY - selfY, targetZ - selfZ)
+
         local ux, uy, uz = self:GetVelocity()
         local velocityVector = Vector(ux, uy, uz)
         local speed = self:GetCurrentSpeed()
