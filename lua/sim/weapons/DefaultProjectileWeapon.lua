@@ -200,7 +200,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end
 
         local UnitGetVelocity = UnitGetVelocity
-        local VDist2 = VDist2
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
