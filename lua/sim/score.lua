@@ -325,15 +325,22 @@ local function GameOverScore()
             Score.units[categoryName]['built'] = brain:GetBlueprintStat("Units_History", category)
             Score.units[categoryName]['lost'] = brain:GetBlueprintStat("Units_Killed", category)
         end
-        
+
         Score.blueprints = {}
         local allStats = brain:GetUnitStats()
         for _, unitId in unitIdsForAchievements do
+
+            LOG(index, unitId, brain:GetBlueprintStat("Enemies_Killed", categories[unitId]), '->', allStats[unitId]['kills'])
+            LOG(index, unitId, brain:GetBlueprintStat("Units_History", categories[unitId]), '->', allStats[unitId]['built'])
+            LOG(index, unitId, brain:GetBlueprintStat("Units_History", categories[unitId]) - brain:GetBlueprintStat("Units_Active", categories[unitId]), '->', allStats[unitId]['lost'])
+
             local unitStats = allStats[unitId]
             if unitStats then
-                if not unitStats['kills'] then unitStats['kills'] = 0 end
-                if not unitStats['built'] then unitStats['built'] = 0 end
-                if not unitStats['lost'] then unitStats['lost'] = 0 end
+                -- track the statistics for these specific units
+                unitStats['kills'] = brain:GetBlueprintStat("Enemies_Killed", categories[unitId])
+                unitStats['built'] = brain:GetBlueprintStat("Units_History", categories[unitId])
+                unitStats['lost'] = brain:GetBlueprintStat("Units_History", categories[unitId]) - brain:GetBlueprintStat("Units_Active", categories[unitId])
+
                 Score.blueprints[unitId] = unitStats
             end
         end
