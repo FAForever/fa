@@ -116,10 +116,9 @@ SemiBallisticComponent = ClassSimple {
 
         local targetX, targetY, targetZ = self:GetCurrentTargetPositionXYZ()
         local selfX, selfY, selfZ = self:GetPositionXYZ()
+        local velX, velY, velZ = self:GetVelocity()
 
-        local ux, uy, uz = self:GetVelocity()
-
-        local dot = (targetX - selfX) * ux + (targetY - selfY) * uy + (targetZ - selfZ) * uz
+        local dot = (targetX - selfX) * velX + (targetY - selfY) * velY + (targetZ - selfZ) * velZ
 
         local dist = self:DistanceToTarget()
         local speed = self:GetCurrentSpeed()
