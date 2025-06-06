@@ -318,7 +318,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
-        local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+        local velDiffX = targetVelX - projVelX
+        local velDiffZ = targetVelZ - projVelZ
+        local distVel = MathSqrt(velDiffX * velDiffX + velDiffZ * velDiffZ)
         if distVel == 0 then
             data.lastAccel = 4.9
             return 4.9
