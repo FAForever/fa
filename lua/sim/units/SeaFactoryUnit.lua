@@ -46,10 +46,10 @@ SeaFactoryUnit = ClassUnit(FactoryUnit) {
         -- find the nearest roll off point
         local bpKey = 1
         local distance, lowest = nil, nil
-        for k, rolloffPoint in bp do
+        local distX = (ropx + px) - rallyPoint[1]
 
+        for k, rolloffPoint in bp do
             local ropz = modz * rolloffPoint.Z
-            local distX = (ropx + px) - rallyPoint[1]
             local distZ = (ropz + pz) - rallyPoint[3]
             distance = MathSqrt(distX * distX + distZ * distZ)
             if not lowest or distance < lowest then
