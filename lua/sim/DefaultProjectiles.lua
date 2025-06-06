@@ -52,6 +52,7 @@ local Random = Random
 local CreateTrail = CreateTrail
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
+---@diagnostic disable-next-line: deprecated
 local VDist2 = VDist2
 local TableGetn = table.getn
 

@@ -1,8 +1,12 @@
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
+--#region Backwards compatibility
+---@diagnostic disable-next-line: deprecated
+local VDist2 = VDist2
+--#endregion
+
 -- upvalue globals for performance
 local GetSurfaceHeight = GetSurfaceHeight
-local VDist2 = VDist2
 
 local EntityMethods = moho.entity_methods
 local EntityGetPosition = EntityMethods.GetPosition
