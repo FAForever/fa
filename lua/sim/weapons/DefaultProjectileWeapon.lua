@@ -1026,10 +1026,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
 
                 if bp.FixedSpreadRadius then
-                    local weaponPos = unit:GetPosition()
+                    local weaponPosX, _, weaponPosZ = unit:GetPositionXYZ()
                     local targetPos = self:GetCurrentTargetPos()
-                    local posDiffX = targetPos[1] - weaponPos[1]
-                    local posDiffZ = targetPos[3] - weaponPos[3]
+                    local posDiffX = targetPos[1] - weaponPosX
+                    local posDiffZ = targetPos[3] - weaponPosZ
                     local distance = MathSqrt(posDiffX * posDiffX + posDiffZ * posDiffZ)
 
                     -- This formula was obtained empirically and somehow it works :)
