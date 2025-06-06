@@ -241,7 +241,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     targetVelX, _, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
-                local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+                local velDiffX = targetVelX - projVelX
+                local velDiffZ = targetVelZ - projVelZ
+                local distVel = MathSqrt(velDiffX * velDiffX + velDiffZ * velDiffZ)
                 if distVel == 0 then
                     return 4.9
                 end
