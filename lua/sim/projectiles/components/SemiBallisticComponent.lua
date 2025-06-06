@@ -124,7 +124,8 @@ SemiBallisticComponent = ClassSimple {
         local velocityVector = Vector(ux, uy, uz)
         local speed = self:GetCurrentSpeed()
 
-        local theta = MathAcos(VDot(targetVector, velocityVector) / (speed * dist))
+        local dot = targetVector[1] * velocityVector[1] + targetVector[2] * velocityVector[2] + targetVector[3] * velocityVector[3]
+        local theta = MathAcos(dot / (speed * dist))
         --local radius = dist/(2 * MathSin(theta))
         local arcLength = 2 * theta * dist/(2 * MathSin(theta))
 
