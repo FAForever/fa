@@ -328,7 +328,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         -- calculate the distance for this particular bomb
-        local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+        local posDiffX = targetPosX - projPosX
+        local posDiffY = targetPosZ - projPosZ
+        local distPos = MathSqrt(posDiffX * posDiffX + posDiffY * posDiffY)
         do
             local dropShort = self.DropBombShortRatio
             if dropShort then
