@@ -105,7 +105,7 @@ if ($players -eq 1) {
     $hostTeamArgument = Get-TeamArgument -instanceNumber 0
 
     $divisionArgText = Get-DivisionArgText
-    $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /players $players /$hostFaction $hostTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
+    $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /$hostFaction $hostTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
 
     # Launch host game instance
     Launch-GameInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments $hostArguments
@@ -122,7 +122,7 @@ if ($players -eq 1) {
         $clientFaction = $factions | Get-Random
         $clientTeamArgument = Get-TeamArgument -instanceNumber $i
         $divisionArgText = Get-DivisionArgText
-        $clientArguments = "/log $clientLogFile /joingame $hostProtocol localhost:$port $clientPlayerName /startspot $($i + 1) /players $players /$clientFaction $clientTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
+        $clientArguments = "/log $clientLogFile /joingame $hostProtocol localhost:$port $clientPlayerName /startspot $($i + 1) /$clientFaction $clientTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
         
         Launch-GameInstance -instanceNumber ($i + 1) -xPos $xPos -yPos $yPos -arguments $clientArguments
     }

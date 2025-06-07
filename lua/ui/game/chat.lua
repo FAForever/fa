@@ -511,17 +511,17 @@ function FindClients(id)
     local focus = t.focusArmy
     local result = {}
     if focus == -1 then
-        for index,client in GetSessionClients() do
+        for index, client in GetSessionClients() do
             if not client.connected then
                 continue
             end
             local playerIsObserver = true
-            for id, player in GetArmiesTable().armiesTable do
-                if player.outOfGame and player.human and player.nickname == client.name then
+            for _, info in t.armiesTable do
+                if info.outOfGame and info.human and info.nickname == client.name then
                     table.insert(result, index)
                     playerIsObserver = false
                     break
-                elseif player.nickname == client.name then
+                elseif info.nickname == client.name then
                     playerIsObserver = false
                     break
                 end
@@ -532,24 +532,24 @@ function FindClients(id)
         end
     else
         local srcs = {}
-        for army,info in t.armiesTable do
+        for army, info in t.armiesTable do
             if id then
                 if army == id then
-                    for k,cmdsrc in info.authorizedCommandSources do
+                    for k, cmdsrc in info.authorizedCommandSources do
                         srcs[cmdsrc] = true
                     end
                     break
                 end
             else
                 if IsAlly(focus, army) then
-                    for k,cmdsrc in info.authorizedCommandSources do
+                    for _, cmdsrc in info.authorizedCommandSources do
                         srcs[cmdsrc] = true
                     end
                 end
             end
         end
-        for index,client in GetSessionClients() do
-            for k,cmdsrc in client.authorizedCommandSources do
+        for index, client in GetSessionClients() do
+            for _, cmdsrc in client.authorizedCommandSources do
                 if srcs[cmdsrc] then
                     table.insert(result, index)
                     break
@@ -806,13 +806,13 @@ function ChatPageDown(mod)
 end
 
 function ReceiveChat(sender, msg)
-    if not msg.ConsoleOutput then
+    local isObsNotifyMessage = msg.to == 'notify' and GetFocusArmy() == -1
+    if not msg.ConsoleOutput and not isObsNotifyMessage then
         SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Sender=sender, Msg=msg},} , true)
     end
     if not SessionIsReplay() then
         ReceiveChatFromSim(sender, msg)
     end
-
 end
 
 function ReceiveChatFromSim(sender, msg)
@@ -826,8 +826,15 @@ function ReceiveChatFromSim(sender, msg)
         return
     end
 
-    if msg.to == 'notify' and not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
-        return
+    if msg.to == 'notify' then
+        -- ignore unwanted messages
+        if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
+            return
+
+        -- if we are an observer, display the message as sent from the player making the upgrade
+        elseif GetFocusArmy() == -1 then
+            sender = GetArmyData(msg.from).nickname
+        end
     end
 
     if type(msg) == 'string' then
@@ -1563,3 +1570,14 @@ function CloseChatConfig()
         GUI.config = nil
     end
 end
+
+__module_info = {
+    OnReload = function(newModule)
+        for i, v in GUI do
+            if v.Destroy then v:Destroy() end
+            GUI[i] = nil
+        end
+
+        newModule.SetupChatLayout(import('/lua/ui/game/gamemain.lua').windowGroup)
+    end,
+}
