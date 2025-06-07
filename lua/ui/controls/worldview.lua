@@ -643,7 +643,7 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-                CommandMode.GetCommandMode()[2].reticle = TeleportReticle(self)
+                TeleportReticle(self)
             end
         end
     end,
