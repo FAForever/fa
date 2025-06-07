@@ -739,7 +739,11 @@ Tooltips = {
     },
     options_shadow_resolution = {
         title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
-        description = "<LOC OPTIONS_SHADOW_RESOLUTION_DESCRIPTION>Sets resolution of shadows (lower = faster).",
+        description = "<LOC OPTIONS_SHADOW_RESOLUTION_DESCRIPTION>Sets resolution of shadows (lower = faster). High values require more VRAM.",
+    },
+    options_shadow_render_distance = {
+        title = "<LOC OPTIONS_SHADOW_RENDER_DISTANCE_TITLE>Shadow Resolution",
+        description = "<LOC OPTIONS_SHADOW_RENDER_DISTANCE_DESCRIPTION>Sets the rendering distance (level of detail) of shadows (lower = faster). High values can have a significant impact on your framerate.",
     },
     options_antialiasing = {
         title = "<LOC OPTIONS_0015>Anti-Aliasing",
