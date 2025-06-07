@@ -113,23 +113,25 @@ function Skewness(t, n, m, d)
     end
 end
 
---- Removes items that are more than 1.5 times the interquartile range away from
---- the median into a new table
+--- Computes the quartiles of a data set (needs at least 5 elements)
 ---@param t number[]
 ---@param n? integer
----@return number[] trimmed
----@return integer newSize
-function RemoveOutliers(t, n)
+---@return number minimum
+---@return number q1
+---@return number median
+---@return number q2
+---@return number maximum
+function GetQuartiles(t, n)
     n = n or TableGetn(t)
+    if n < 5 then
+        return
+    end
 
     local sorted = {}
     for i = 1, n do
         sorted[i] = t[i]
     end
     table.sort(sorted)
-    if n < 5 then
-        return sorted, n -- no quartiles
-    end
 
     local rawHalf = n * 0.5
     local quart2 = math.ceil(rawHalf)
@@ -146,21 +148,40 @@ function RemoveOutliers(t, n)
 
     local q1 = sorted[quart1]
     local q3 = sorted[quart3]
-    if quart1 ~= rawQuart then
+    if quart1 == rawQuart then
         q1 = (q1 + sorted[quart1 + 1]) * 0.5
         q3 = (q3 + sorted[quart3 + 1]) * 0.5
     end
-    local iqr15 = (q3 - q1) * 1.5
+    return sorted[1], q1, q2, q3, sorted[n]
+end
+
+--- Removes items that are more than 1.5 times the interquartile range away from
+--- the median into a new table
+---@param t number[]
+---@param n? integer
+---@return number[] trimmed
+---@return integer newSize
+function RemoveOutliers(t, n)
+    n = n or TableGetn(t)
 
     local trimmed = {}
-    local size = 0
-    for i = 1, n do
-        local result = sorted[i]
-        if math.abs(result - q2) < iqr15 then
-            size = size + 1
-            trimmed[size] = result
+    if n < 5 then
+        for i = 1, n do
+            trimmed[i] = t[i]
         end
-    end
+        return trimmed, n
+    else
+        local _, q1, q2, q3, _ = GetQuartiles(t, n)
+        local iqr15 = (q3 - q1) * 1.5
 
-    return trimmed, size
+        local size = 0
+        for i = 1, n do
+            local result = t[i]
+            if math.abs(result - q2) <= iqr15 then
+                size = size + 1
+                trimmed[size] = result
+            end
+        end
+        return trimmed, size
+    end
 end
