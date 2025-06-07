@@ -33,6 +33,7 @@ UnitData = {}
 ---@type EnhancementSyncTable
 SimUnitEnhancements = {}
 
+--- Called by the engine every sim beat
 function ResetSyncTable()
     local sync = Sync
     for k, v in sync do
@@ -140,6 +141,9 @@ function OnPostLoad()
     Sync.IsSavedGame = true
 end
 
+--- Called by the engine when the focus army is changed
+---@param new Army
+---@param old Army
 function NoteFocusArmyChanged(new, old)
     import("/lua/simping.lua").OnArmyChange()
     import("/lua/sim/recall.lua").OnArmyChange()
