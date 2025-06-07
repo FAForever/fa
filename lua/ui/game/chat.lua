@@ -806,13 +806,13 @@ function ChatPageDown(mod)
 end
 
 function ReceiveChat(sender, msg)
-    if not msg.ConsoleOutput then
+    local isObsNotifyMessage = msg.to == 'notify' and GetFocusArmy() == -1
+    if not msg.ConsoleOutput and not isObsNotifyMessage then
         SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Sender=sender, Msg=msg},} , true)
     end
     if not SessionIsReplay() then
         ReceiveChatFromSim(sender, msg)
     end
-
 end
 
 function ReceiveChatFromSim(sender, msg)
@@ -827,9 +827,12 @@ function ReceiveChatFromSim(sender, msg)
     end
 
     if msg.to == 'notify' then
+        -- ignore unwanted messages
         if not import("/lua/ui/notify/notify.lua").processIncomingMessage(sender, msg) then
-            return -- ignore unwanted messages
-        elseif SessionIsReplay() or GetFocusArmy() == -1 then
+            return
+
+        -- if we are an observer, display the message as sent from the player making the upgrade
+        elseif GetFocusArmy() == -1 then
             sender = GetArmyData(msg.from).nickname
         end
     end
