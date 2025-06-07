@@ -594,6 +594,7 @@ end
 ---@field Samples number
 ---@field UnitCount? { Min: number, Max: number}
 
+---@param exitType ExitType
 local function StoreSamples(exitType)
 
     -- this is usually testing, no need to keep track of that
