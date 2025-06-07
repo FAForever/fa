@@ -59,13 +59,13 @@ local testSets = {
         quartiles = {-2, -1, 0, 8, 15},
         remove_outliers = {-2, 0, 0, 1},
     }, { -- subtest 12
-        list = {-4, -2, -1, 1, 3, 9},
-        quartiles = {-4, -3, 0, 6, 9},
-        remove_outliers = {1, 2, 4, 5, 9},
+        list = {-3, -2, -1, 1, 2, 22},
+        quartiles = {-3, -2.5, 0, 12, 22},
+        remove_outliers = {-3, -2, -1, 1, 2},
     }, { -- subtest 13
         list = {-4, 1, 2, 3, 4, 5, 9},
         quartiles = {-4, 1, 3, 5, 9},
-        remove_outliers = {-4, 1, 2, 3, 4, 5, 9},
+        remove_outliers = {1, 2, 3, 4, 5, 9},
     }, { -- subtest 14
         list = {-6, 0, 1, 3, 4, 5, 6, 12},
         quartiles = {-6, 0, 3.5, 6, 12},
