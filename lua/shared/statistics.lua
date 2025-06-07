@@ -92,6 +92,9 @@ function Skewness(t, n, m, d)
     m = m or Mean(t, n)
 
     if d then
+        if d == 0 then
+            return 0
+        end
         local skewness = 0
         for k = 1, n do
             local residual = t[k] - m
@@ -106,6 +109,9 @@ function Skewness(t, n, m, d)
             local residualSq = residual * residual
             stddev = stddev + residualSq
             skewness = skewness + residualSq * residual
+        end
+        if stddev == 0 then
+            return 0
         end
         stddev = math.sqrt(stddev / (n - 1))
         skewness = skewness / n

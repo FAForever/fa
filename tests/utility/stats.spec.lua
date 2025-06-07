@@ -48,7 +48,7 @@ local testSets = {
         list = {1, 2, 3, 4, 15},
         sum = 25, mean = 5, deviation = math.sqrt(65 / 2), skewness = 72 / 13 * math.sqrt(2 / 65),
         quartiles = {1, 1.5, 3, 9.5, 15},
-        remove_outliers = {1, 2, 3, 4},
+        remove_outliers = {1, 2, 3, 4, 15},
     }, { -- subtest 10
         list = {9, 9, 9, 9, 9, 9, 9},
         sum = 63, mean = 9, deviation = 0, skewness = 0,
