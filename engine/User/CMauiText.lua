@@ -50,7 +50,7 @@ function CMauiText:SetNewFont(family, pointsize)
 end
 
 ---
----@param text string
+---@param text string | number
 function CMauiText:SetText(text)
 end
 
