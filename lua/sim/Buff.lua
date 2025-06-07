@@ -93,7 +93,7 @@ local function regenAuraCalculate(unit, affectBuffName, affectBp)
     return adds, 1
 end
 
---- A function that calculates buff add and mult values for 1 "affect" instance.
+--- A function that calculates buff add and mult values for a buff contributing to an "affect".
 ---@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffAffectName, affectBp: BlueprintBuffAffectState): add: number, mult: number
 
 ---@type table<BuffName, table<BuffAffectName, AffectCalculation>>
