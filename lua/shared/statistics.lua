@@ -97,7 +97,7 @@ function Skewness(t, n, m, d)
             local residual = t[k] - m
             skewness = skewness + residual * residual * residual
         end
-        return skewness / (n * d)
+        return skewness / (n * d * d * d)
     else
         local stddev = 0
         local skewness = 0
@@ -148,7 +148,7 @@ function GetQuartiles(t, n)
 
     local q1 = sorted[quart1]
     local q3 = sorted[quart3]
-    if quart1 == rawQuart then
+    if quart1 ~= rawQuart then
         q1 = (q1 + sorted[quart1 + 1]) * 0.5
         q3 = (q3 + sorted[quart3 + 1]) * 0.5
     end
