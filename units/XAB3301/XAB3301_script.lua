@@ -46,7 +46,7 @@ XAB3301 = ClassUnit(AStructureUnit) {
         self.RotatorOrbZ = rotatorOrbZ
 
         local rotatorBot = CreateRotator(self, 'spin01', 'y', nil, 0, 3, 6)
-        local rotatorTop = CreateRotator(self, 'spin03', 'y', nil, 0, -2, -4)
+        local rotatorTop = CreateRotator(self, 'spin03', '-y', nil, 0, 2, 4)
         rotatorBot:Disable()
         rotatorTop:Disable()
         self.RotatorBot = rotatorBot
@@ -86,7 +86,7 @@ XAB3301 = ClassUnit(AStructureUnit) {
 
                 self.Animator:SetRate(1)
                 self.RotatorBot:SetTargetSpeed(12)
-                self.RotatorTop:SetTargetSpeed(-8)
+                self.RotatorTop:SetTargetSpeed(8)
 
                 for k, v in AQuantumGateAmbient do
                     self.TrashAmbientEffects:Add(CreateAttachedEmitter(self, 'spin02', self.Army, v):ScaleEmitter(0.6))
@@ -102,7 +102,7 @@ XAB3301 = ClassUnit(AStructureUnit) {
 
         self.Animator:SetRate(-1)
         self.RotatorBot:SetTargetSpeed(6)
-        self.RotatorTop:SetTargetSpeed(-4)
+        self.RotatorTop:SetTargetSpeed(4)
 
         self.TrashAmbientEffects:Destroy()
         self.ScryEnabled = false
