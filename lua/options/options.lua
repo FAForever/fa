@@ -1664,6 +1664,23 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_SHADOW_RENDER_DISTANCE_TITLE>Shadow render distance",
+                key = 'shadow_render_distance',
+                type = 'slider',
+                default = 260,
+                update = function(control, value)
+                    ConExecute(string.format("ren_ShadowLOD %d", value))
+                end,
+                set = function(key, value, startup)
+                    ConExecute(string.format("ren_ShadowLOD %d", value))
+                end,
+                custom = {
+                    min = 200,
+                    max = 440,
+                    inc = 20,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0015>Anti-Aliasing",
                 key = 'antialiasing',
                 type = 'toggle',
