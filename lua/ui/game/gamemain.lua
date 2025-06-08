@@ -191,9 +191,6 @@ function CreateUI(isReplay)
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
     ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
 
-    -- always try and render shadows
-    ConExecute("ren_ShadowLOD 20000")
-
     local focusArmy = GetFocusArmy()
 
     -- keep track of the original focus army
