@@ -1,0 +1,1 @@
+- (#6839) Fix `Health` and `DamageRadius` buff effect types. Previously they would just error if you used them.
