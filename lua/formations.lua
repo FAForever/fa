@@ -12,13 +12,13 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
-local LandCategories = import("/lua/formationscategories.lua").LandCategories
-local NavalCategories = import("/lua/formationscategories.lua").NavalCategories
-local SubCategories = import("/lua/formationscategories.lua").SubCategories
-local ShieldCategory = import("/lua/formationscategories.lua").ShieldCategory
-local NonShieldCategory = import("/lua/formationscategories.lua").NonShieldCategory
+local LandCategories = import("/lua/shared/formations/categorizeunits.lua").LandCategories
+local NavalCategories = import("/lua/shared/formations/categorizeunits.lua").NavalCategories
+local SubCategories = import("/lua/shared/formations/categorizeunits.lua").SubCategories
+local ShieldCategory = import("/lua/shared/formations/categorizeunits.lua").ShieldCategory
+local NonShieldCategory = import("/lua/shared/formations/categorizeunits.lua").NonShieldCategory
 
-local CategorizeUnits = import("/lua/formationscategories.lua").CategorizeUnits
+local CategorizeUnits = import("/lua/shared/formations/categorizeunits.lua").CategorizeUnits
 
 SurfaceFormations = {
     'AttackFormation',
