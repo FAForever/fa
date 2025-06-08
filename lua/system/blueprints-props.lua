@@ -115,7 +115,7 @@ local function ProcessLOD(prop)
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
     if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
-        weighted = 2.6
+        weighted = 10.0
     end
 
     -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
@@ -152,6 +152,9 @@ end
 --- - .github\workflows\bake-blueprints.yaml
 ---@param blueprints BlueprintsTable
 function BakePropBlueprints(blueprints)
+
+
+
     if blueprints.Prop then
         for _, prop in pairs(blueprints.Prop) do
             ProcessInvulnerability(prop)
