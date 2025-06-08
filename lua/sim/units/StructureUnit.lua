@@ -939,7 +939,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     end,
 
     ---@param self StructureUnit
-    ---@param adjacentUnit StructureUnit
+    ---@param adjacentUnit? StructureUnit
     DestroyAdjacentEffects = function(self, adjacentUnit)
         if not self.AdjacencyBeamsBag then return end
 
