@@ -7,6 +7,21 @@ local Button = import("/lua/maui/button.lua").Button
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Edit = import("/lua/maui/edit.lua").Edit
 
+---@class SyncPingData
+---@field Owner integer # Army index of who sent the ping
+---@field Location Vector # position
+---@field Type 'Alert' | 'Move' | 'Attack' | 'Marker'
+---@field Lifetime number
+---@field Ring FileName # 
+---@field ArrowColor 'yellow' | 'blue' | 'red'
+---@field Sound string # 'UI_Main_IG_Click'
+---@field Marker? true
+---@field Name? string # Text under the marker ping
+---@field Color? string # Color of marker ping, matching army color.
+---@field ID? integer # Synced to UI from SimPing. Used by UI to edit markers.
+---@field Renew? true # Synced to UI from SimPing. Used to suppress sounds/vfx when changing army and updating markers.
+---@field Action? 'delete' | 'move' | 'rename' | 'renew' # Synced to UI from SimPing.
+
 --- The dialog used to define marker-pings.
 local dialog = false
 
@@ -85,6 +100,7 @@ function DoPing(pingType)
     end
 
     -- prepare ping data
+    ---@type SyncPingData
     local data = {
         Owner = OriginalFocusArmy - 1, 
         Type = pingType, 
