@@ -2,13 +2,16 @@ local MathMax = math.max
 local MathCeil = math.ceil
 
 -- === LAND CATEGORIES ===
+---@type EntityCategory
 local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
 local Sniper = categories.SNIPER * categories.LAND
 local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.SNIPER) * categories.LAND
 local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
 local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
+---@type EntityCategory
 ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
+---@type EntityCategory
 NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
 -- === TECH LEVEL LAND CATEGORIES ===
