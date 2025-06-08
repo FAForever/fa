@@ -215,9 +215,7 @@ function CategorizeUnits(formationUnits)
         end
     end
 
-    CalculateSizes()
-
-    return UnitsList
+    return CalculateSizes(UnitsList)
 end
 
 local TypeGroups = {
@@ -243,8 +241,9 @@ local TypeGroups = {
     },
 }
 
----@return any
-function CalculateSizes()
+---@param unitsList table
+---@return table
+function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
 
@@ -254,8 +253,8 @@ function CalculateSizes()
         local numSizes = 0
         local unitTotal = 0
         for _, type in data.Types do
-            local typeData = UnitsList[type]
-            
+            local typeData = unitsList[type]
+
             unitTotal = unitTotal + typeData.UnitTotal
             for fs, count in typeData.FootprintCounts do
                 groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
@@ -282,7 +281,7 @@ function CalculateSizes()
     for group, data in TypeGroups do
         local gridSize = MathMax(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
         for _, type in data.Types do
-            local unitData = UnitsList[type]
+            local unitData = unitsList[type]
 
              -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
              -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
@@ -296,4 +295,6 @@ function CalculateSizes()
             end
         end
     end
+
+    return unitsList
 end
