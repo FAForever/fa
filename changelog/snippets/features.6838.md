@@ -1,0 +1,1 @@
+- (#6838) Implement the previously non-functional `BlueprintBuff.Icon` field which syncs the buff name to the UI when it affects a unit.
