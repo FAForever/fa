@@ -1,6 +1,7 @@
 ---@meta
 
 ---@class moho.UIWorldView : moho.control_methods
+---@overload fun(parentControl: Control, cameraName: string, depth: number, isMiniMap: boolean, trackCamera: boolean?): WorldView
 local CUIWorldView = {}
 
 ---
@@ -8,7 +9,7 @@ local CUIWorldView = {}
 ---@param cameraName string
 ---@param depth number
 ---@param isMiniMap boolean
----@param trackCamera boolean
+---@param trackCamera boolean?
 function CUIWorldView:__init(parentControl, cameraName, depth, isMiniMap, trackCamera)
 end
 
@@ -35,8 +36,17 @@ end
 function CUIWorldView:EnableResourceRendering(enable)
 end
 
---- 
----@return string
+--- Is set when our mouse is over a hostile unit, reclaim, etc. and returns nil if we're in command mode.
+---@return 
+---| 'RULEUCC_Reclaim' 
+---| 'RULEUCC_Attack' 
+---| 'RULEUCC_Move' 
+---| 'RULEUCC_Guard' 
+---| 'RULEUCC_Repair' 
+---| 'RULEUCC_Capture'
+---| 'RULEUCC_CallTransport'
+---| 'RULEUCC_Transport'
+---| nil
 function CUIWorldView:GetRightMouseButtonOrder()
 end
 
