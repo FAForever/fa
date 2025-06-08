@@ -4,6 +4,8 @@
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
+---@field UnitData? { [EntityId]: { OwnerArmy: Army, Data: UnitSyncData }, Chat: { sender: string,  msg: table }[] }
+---@field EnhanceMessage? NotifyMessageSyncData[]
 Sync = { }
 
 local SyncDefaults = {
@@ -31,6 +33,7 @@ UnitData = {}
 ---@type EnhancementSyncTable
 SimUnitEnhancements = {}
 
+--- Called by the engine every sim beat
 function ResetSyncTable()
     local sync = Sync
     for k, v in sync do
@@ -138,6 +141,9 @@ function OnPostLoad()
     Sync.IsSavedGame = true
 end
 
+--- Called by the engine when the focus army is changed
+---@param new Army
+---@param old Army
 function NoteFocusArmyChanged(new, old)
     import("/lua/simping.lua").OnArmyChange()
     import("/lua/sim/recall.lua").OnArmyChange()
