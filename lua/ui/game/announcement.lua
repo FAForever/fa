@@ -81,9 +81,11 @@ CreateTitleAnnouncement = function(titleText, goalControl, onCompleteCallback)
 
     -- create a dummy goal control if we don't have one
     local frame = GetFrame(0) --[[@as Frame]]
-    if not goalControl or IsDestroyed(goalControl) then
+    if IsDestroyed(goalControl) then
         goalControl = CreateDefaultGoalControl(frame)
     end
+
+    ---@cast goalControl -nil, -unknown
 
     -- developers note: lazy load the module so that it remains unloaded unless used
     local TitleAnnouncement = import("/lua/ui/game/announcement/TitleAnnouncement.lua").TitleAnnouncement
@@ -113,7 +115,11 @@ CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl, onCompl
 
     -- create a dummy goal control if we don't have one
     local frame = GetFrame(0) --[[@as Frame]]
-    goalControl = goalControl or CreateDefaultGoalControl(frame)
+    if IsDestroyed(goalControl) then
+        goalControl = CreateDefaultGoalControl(frame)
+    end
+
+    ---@cast goalControl -nil, -unknown
 
     -- developers note: lazy load the module so that it remains unloaded unless used
     local TitleTextAnnouncement = import("/lua/ui/game/announcement/TitleTextAnnouncement.lua").TitleTextAnnouncement
