@@ -3,7 +3,7 @@
 ---@class moho.item_list_methods : moho.control_methods
 local CMauiItemList = {}
 
----@param text LocalizedString
+---@param text LocalizedString | number
 function CMauiItemList:AddItem(text)
 end
 
@@ -23,9 +23,9 @@ end
 function CMauiItemList:Empty()
 end
 
----
+--- Get an item from the list, using 0-based indexing.
 ---@param index number
----@return number
+---@return LocalizedString | number
 function CMauiItemList:GetItem(index)
 end
 
