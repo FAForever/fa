@@ -35,12 +35,8 @@ EngineerManager = Class(BuilderManager) {
         self.LocationType = self.LocationType or lType
 
         self.ConsumptionUnits = {
-            Engineers = { Category = categories.ENGINEER, Units = {}, UnitsList = {}, Count = 0, },
-
-
-
-
-            
+            Engineers = { Category = categories.ENGINEER - categories.ENGINEERSTATION, Units = {}, UnitsList = {}, Count = 0, },
+            EngineerStations = { Category = categories.ENGINEERSTATION, Units = {}, UnitsList = {}, Count = 0, },
             Fabricators = { Category = categories.MASSFABRICATION * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             Shields = { Category = categories.SHIELD * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             MobileShields = { Category = categories.SHIELD * categories.MOBILE, Units = {}, UnitsList = {}, Count = 0, },
@@ -674,7 +670,8 @@ EngineerManager = Class(BuilderManager) {
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
-            self:AddUnit(finishedUnit)
+            local dontAssign = not EntityCategoryContains(categories.ENGINEER - categories.ENGINEERSTATION, finishedUnit)
+            self:AddUnit(finishedUnit, dontAssign)
         end
     end,
 

@@ -467,7 +467,7 @@ options = {
             },
 
             {
-                title = "<LOC selectionsets0001>Double tap control group decay (in ms)",
+                title = "<LOC selectionsets0002>Double tap control group decay (in ms)",
                 key = 'selection_sets_double_tap_decay',
                 type = 'slider',
                 default = 1000,
@@ -501,7 +501,7 @@ options = {
             -- },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade mass extractors",
+                title = "<LOC ASSIST_TO_UPGRADE_MASS>Assist to upgrade mass extractors",
                 key = 'assist_to_upgrade',
                 type = 'toggle',
                 default = 'Off',
@@ -516,7 +516,7 @@ options = {
             },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade radars",
+                title = "<LOC ASSIST_TO_UPGRADE_RADAR>Assist to upgrade radars",
                 key = 'assist_to_upgrade_radar',
                 type = 'toggle',
                 default = 'Off',
@@ -636,7 +636,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_artillery_title>Assist to cap end game artillery with power",
+                title = "<LOC structure_ringing_end_artillery_title>Assist to cap end game artillery with power",
                 key = 'structure_ringing_artillery_end_game',
                 type = 'toggle',
                 default = "on",
@@ -782,6 +782,54 @@ options = {
                     min = 8,
                     max = 80,
                     inc = 2,
+                },
+            },
+
+            {
+                title = '<LOC OPTIONS_0323>Painting features',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC options_painting_title>Painting",
+                key = 'painting',
+                type = 'toggle',
+                default = 'on',
+                custom = {
+                    states = {
+                        { text = "<LOC _Enabled>Enabled", key = 'on' },
+                        { text = "<LOC _EnabledInReplays>Enabled when observing", key = 'observing' },
+                        { text = "<LOC _Disabled>Disabled", key = 'off' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC options_painting_duration_title>Duration of paintings",
+                key = 'painting_duration',
+                type = 'slider',
+                default = 25,
+                custom = {
+                    min = 10,
+                    max = 40,
+                    inc = 1,
+                },
+            },
+
+
+            {
+                title = "<LOC options_painting_duration_title>Duration of paintings when observing",
+                key = 'painting_duration_observing',
+                type = 'slider',
+                default = 15,
+                custom = {
+                    min = 10,
+                    max = 40,
+                    inc = 1,
                 },
             },
 
@@ -949,8 +997,8 @@ options = {
                 default = 'on',
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
-                        import("/lua/ui/override/ArmiesTable.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/sessionclients.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/armiestable.lua").OptionShowPlayerNames = value
                     end
                 end,
                 custom = {
@@ -1018,8 +1066,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 1.0 },
-                        { text = "<LOC strat_icon_scale-150>150% (may cause distortions)", key = 1.5 },
-                        { text = "<LOC strat_icon_scale-200>200%", key = 2.0 },
+                        { text = "<LOC strat_icon_scale_150>150% (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale_200>200%", key = 2.0 },
                     },
                 },
             },
@@ -1062,7 +1110,7 @@ options = {
             },
 
             {
-                title = 'Building',
+                title = "<LOC OPTIONS_0327>Building",
                 type = 'header',
 
                 -- these are expected everywhere
@@ -1285,7 +1333,7 @@ options = {
             },
 
             {
-                title = 'Misc',
+                title = "<LOC OPTIONS_0328>Misc",
                 type = 'header',
 
                 -- these are expected everywhere
@@ -1364,26 +1412,12 @@ options = {
             },
 
             {
-                title = 'Casting tools',
+                title = "<LOC OPTIONS_0329>Casting tools",
                 type = 'header',
 
                 -- these are expected everywhere
                 default = '',
                 key = '',
-            },
-
-            {
-                title = "<LOC OPTIONS_0309>Painting",
-                key = 'casting_painting',
-                type = 'toggle',
-                default = 18,
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = false },
-                        { text = "<LOC CTRL>Use CTRL ", key = 17 },
-                        { text = "<LOC ALT>Use ALT", key = 18 },
-                    },
-                },
             },
 
             {
@@ -1626,6 +1660,40 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
+                key = 'shadow_resolution',
+                type = 'slider',
+                default = 1024,
+                update = function(control, value)
+                    ConExecute(string.format("ren_ShadowSize %d", value))
+                end,
+                set = function(key, value, startup)
+                    ConExecute(string.format("ren_ShadowSize %d", value))
+                end,
+                custom = {
+                    min = 512,
+                    max = 2048,
+                    inc = 256,
+                },
+            },
+            {
+                title = "<LOC OPTIONS_SHADOW_RENDER_DISTANCE_TITLE>Shadow render distance",
+                key = 'shadow_render_distance',
+                type = 'slider',
+                default = 260,
+                update = function(control, value)
+                    ConExecute(string.format("ren_ShadowLOD %d", value))
+                end,
+                set = function(key, value, startup)
+                    ConExecute(string.format("ren_ShadowLOD %d", value))
+                end,
+                custom = {
+                    min = 200,
+                    max = 440,
+                    inc = 20,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0015>Anti-Aliasing",
                 key = 'antialiasing',
                 type = 'toggle',
@@ -1678,13 +1746,34 @@ options = {
                     import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
                 set = function(key, value, startup)
-                    ConExecute("SC_CameraScaleLOD " .. tostring(value))
+                    ConExecute("SC_CameraScaleLOD " .. tostring(math.clamp(value, 0, 2)))
+
+                    if SessionIsActive() then
+                        -- feature: extend the rendering distance of the camera when settings are set to extreme
+                        local worldViewManager = import("/lua/ui/game/worldview.lua")
+                        if worldViewManager then
+                            for k, worldview in worldViewManager.MapControls do
+                                if value > 2 then
+                                    ConExecute(string.format("cam_SetLOD %s 0.70", worldview._cameraName))
+                                else
+                                    ConExecute(string.format("cam_SetLOD %s 1.0", worldview._cameraName))
+                                end
+                            end
+                        end
+                    end
                 end,
                 custom = {
                     states = {
                         { text = "<LOC _Low>", key = 0 },
                         { text = "<LOC _Medium>", key = 1 },
                         { text = "<LOC _High>", key = 2 },
+
+                        -- Note: we intentionally do not use a key of 3 for the "extreme" option
+                        -- because it is not a valid value for the 'cam_SetLOD' console command. To
+                        -- make sure we remain compatible with Steam, we instead set it to something 
+                        -- that is rounded down to 2 by the engine.
+
+                        { text = "<LOC _Extreme>Extreme", key = 2.1 },
                     },
                 },
             },
@@ -1703,7 +1792,7 @@ options = {
                     end
                 end,
                 custom = {
-                    min = 4,
+                    min = 2,
                     max = 16,
                     inc = 1,
                 },
@@ -1713,10 +1802,6 @@ options = {
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
-                update = function(control, value)
-                    logic = import("/lua/options/optionslogic.lua")
-                    logic.SetValue('frametime', 16)
-                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))
@@ -1773,23 +1858,6 @@ options = {
                 set = function(key, value, startup)
                     ConExecute("ren_BloomBlurKernelScale " .. tostring(value / 10))
                 end,
-            },
-
-            {
-                title = "Extended graphics",
-                key = 'experimental_graphics',
-                type = 'toggle',
-                default = 0,
-                update = function(control, value)
-                end,
-                set = function(key, value, startup)
-                end,
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = 0 },
-                        { text = "<LOC _On>", key = 1 },
-                    },
-                },
             },
         },
     },

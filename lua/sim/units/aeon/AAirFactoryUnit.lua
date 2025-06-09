@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
-local AFactoryUnit = import('/lua/sim/units/aeon/AFactoryUnit.lua').AFactoryUnit
+local AFactoryUnit = import('/lua/sim/units/aeon/afactoryunit.lua').AFactoryUnit
 
 ---@class AAirFactoryUnit : AirFactoryUnit
 AAirFactoryUnit = ClassUnit(AirFactoryUnit) {

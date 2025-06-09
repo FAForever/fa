@@ -13,6 +13,7 @@ local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
+local MathSqrt = math.sqrt
 
 ---@class WeaponSalvoData
 ---@field target? Unit | Prop   if absent, will use `targetPos` instead
@@ -29,6 +30,7 @@ local MathClamp = math.clamp
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 ---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
+---@field EconDrain? moho.EconomyEvent
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -60,19 +62,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Make certain the weapon has essential aspects defined
         if not rackBones then
             local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoSize then
             local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoDelay then
             local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
@@ -202,9 +204,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
-        local projVelX, _, projVelZ = UnitGetVelocity(launcher)
+        local projVelX, projVelY, projVelZ = UnitGetVelocity(launcher)
 
-        local targetPos
+        -- The projectile will have velocity in the horizontal plane equal to the unit's 3 dimensional speed
+        -- Multiply the XZ components by the ratio of the XYZ to XZ speeds to get the correct XZ components
+        local projVelXZSquareSum = projVelX * projVelX + projVelZ * projVelZ
+        local multiplier = MathSqrt((projVelXZSquareSum + projVelY * projVelY) / (projVelXZSquareSum))
+        projVelX = projVelX * multiplier
+        projVelZ = projVelZ * multiplier
+
+        local targetPos, _
         local targetVelX, targetVelZ = 0, 0
 
         local data = self.CurrentSalvoData
@@ -282,7 +291,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         if not targetPos then
             -- put the bomb cluster in free-fall
             local GetSurfaceHeight = GetSurfaceHeight
-            local MathSqrt = math.sqrt
             local spread = self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
             -- default gravitational acceleration is 4.9; however, bomb clusters adjust the time it takes to land
             -- so we convert the acceleration to time to add the spread and convert back:
@@ -772,7 +780,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.WeaponUnpackingState)
                 else
                     if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
-                        ChangeState(self, self.RackSalvoChargeState)
+                        -- don't charge and then possibly fire while unaimed
+                        if not bp.RackSalvoFiresAfterCharge then
+                            ChangeState(self, self.RackSalvoChargeState)
+                        end
                     else
                         ChangeState(self, self.RackSalvoFireReadyState)
                     end
@@ -1058,18 +1069,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
+                            -- Play the "Strategic launch detected" VO to all armies
                             unit:NukeCreatedAtUnit()
                             unit:RemoveNukeSiloAmmo(1)
+
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = {
-                                army = self.Army - 1,
-                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and
-                                    self:GetCurrentTargetPos() or nil
-                            }
-                            if not Sync.NukeLaunchData then
-                                Sync.NukeLaunchData = {}
+                            -- Enemies receive the notification without location data to avoid cheats, while still being notified visually instead of only by audio
+
+                            local isObsOrAlly = GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())
+
+                            -- the global VO plays only when the audio exists, so notify enemies if it exists
+                            if isObsOrAlly or unit.Blueprint.Audio.NuclearLaunchDetected ~= nil then
+                                local launchData = {
+                                    army = self.Army - 1,
+                                    location = isObsOrAlly and self:GetCurrentTargetPos() or nil
+                                }
+                                if not Sync.NukeLaunchData then
+                                    Sync.NukeLaunchData = {}
+                                end
+                                table.insert(Sync.NukeLaunchData, launchData)
                             end
-                            table.insert(Sync.NukeLaunchData, launchData)
                         else
                             unit:RemoveTacticalSiloAmmo(1)
                         end

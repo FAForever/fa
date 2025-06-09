@@ -53,16 +53,20 @@ end
 --- Ends an operation
 ---@param success boolean instructs UI which dialog to show
 ---@param allPrimary boolean
----@param allSecondary boolean
----@param allBonus boolean
+---@param allSecondary? boolean
+---@param allBonus? boolean
 function EndOperation(success, allPrimary, allSecondary, allBonus)
+    if allSecondary == nil then allSecondary = false end
+    if allBonus == nil then allBonus = false end
     local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
     local opData
     if DiskGetFileInfo(opFile) then
         opData = import(opFile)
     end
 
-    import("/lua/sim/matchstate.lua").CallEndGame() -- We need this here to populate the score screen
+    -- we need to end the game 'properly' to populate the score screen
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    victoryCondition:EndGame()
 
     ForkThread(EndOperationThread, {
         success = success,
@@ -259,10 +263,10 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self:ForkThread(self.DeathThread, overkillRatio, instigator)
 end
 
----
+--- Transfers `unit` to `army`, ignoring unit restrictions
 ---@param unit Unit
----@param army number
----@param triggerOnGiven boolean
+---@param army Army
+---@param triggerOnGiven? boolean If to call :OnGiven() method on the original unit.
 ---@return Unit
 function GiveUnitToArmy(unit, army, triggerOnGiven)
     -- Shared army mod will result in different players having the same army number
@@ -325,7 +329,7 @@ CreateSubGroupDeathTrigger = TriggerFile.CreateSubGroupDeathTrigger
 
 -- Checks if units of `cat` are within the provided rectangle
 ---@param cat EntityCategory
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@return boolean
 function UnitsInAreaCheck(cat, area)
     if type(area) == 'string' then
@@ -345,7 +349,7 @@ end
 
 -- Returns the number of `cat` units in `area` belonging to `brain`
 ---@param cat EntityCategory
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@param brain AIBrain
 ---@return number
 function NumCatUnitsInArea(cat, area, brain)
@@ -370,7 +374,7 @@ end
 
 -- Returns the units in `area` of `cat` belonging to `brain`
 ---@param cat EntityCategory
----@param area Area | Rectangle
+---@param area AreaName | Rectangle
 ---@param brain AIBrain
 ---@return Unit[]
 function GetCatUnitsInArea(cat, area, brain)
@@ -415,7 +419,7 @@ CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 
 -- Orders a platoon to move along a route
 ---@param platoon Platoon
----@param route (Marker | Vector)[]
+---@param route (MarkerName | Vector)[]
 ---@param squad? string
 function PlatoonMoveRoute(platoon, route, squad)
     for _, node in route do
@@ -432,7 +436,7 @@ end
 
 --- Orders platoon to patrol a route
 ---@param platoon Platoon
----@param route (Marker | Vector)[]
+---@param route (MarkerName | Vector)[]
 ---@param squad? string
 function PlatoonPatrolRoute(platoon, route, squad)
     for _, node in route do
@@ -449,7 +453,7 @@ end
 
 --- Orders a platoon to attack-move along a route
 ---@param platoon Platoon
----@param route (Marker | Vector)[]
+---@param route (MarkerName | Vector)[]
 ---@param squad? string
 function PlatoonAttackRoute(platoon, route, squad)
     for _, node in route do
@@ -466,7 +470,7 @@ end
 
 --- Orders a platoon to move along a chain
 ---@param platoon Platoon
----@param chain MarkerChain
+---@param chain ChainName
 ---@param squad? string
 function PlatoonMoveChain(platoon, chain, squad)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
@@ -480,7 +484,7 @@ end
 
 --- Orders a platoon to patrol along a chain
 ---@param platoon Platoon
----@param chain MarkerChain
+---@param chain ChainName
 ---@param squad? string
 function PlatoonPatrolChain(platoon, chain, squad)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
@@ -494,11 +498,11 @@ end
 
 --- Orders a platoon to attack-move through a chain
 ---@param platoon Platoon
----@param chain MarkerChain
+---@param chain ChainName
 ---@param squad? string
----@return SimCommand # the last attack-move command
+---@return PlatoonCommand # the last attack-move command
 function PlatoonAttackChain(platoon, chain, squad)
-    local cmd = false
+    local cmd
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         if squad then
             cmd = platoon:AggressiveMoveToLocation(pos, squad)
@@ -512,7 +516,7 @@ end
 
 --- Orders a group to patrol along a chain
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 function GroupPatrolChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssuePatrol(units, pos)
@@ -521,7 +525,7 @@ end
 
 --- Orders a group to patrol a route
 ---@param units Unit[]
----@param route (Marker | Vector)[]
+---@param route (MarkerName | Vector)[]
 function GroupPatrolRoute(units, route)
     for _, node in route do
         if type(node) == 'string' then
@@ -533,7 +537,7 @@ end
 
 --- Orders a group to patrol a route in formation
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 ---@param formation string
 function GroupFormPatrolChain(units, chain, formation)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
@@ -543,7 +547,7 @@ end
 
 --- Orders a group to attack-move a along a chain
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 function GroupAttackChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssueAggressiveMove(units, pos)
@@ -552,7 +556,7 @@ end
 
 --- Orders a group to move along a chain
 ---@param units Unit[]
----@param chain MarkerChain
+---@param chain ChainName
 function GroupMoveChain(units, chain)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
         IssueMove(units, pos)
@@ -583,11 +587,11 @@ function GroupProgressTimerThread(units, time)
     end
 end
 
----
+---Adds a dialogue to the dialogue queue to be played.
 ---@param dialogueTable DialogueTable
----@param callback? fun()
----@param critical? boolean
----@param speaker? Unit
+---@param callback? fun()|false Function to call when the dialogue ends
+---@param critical? boolean Critical dialogues will always play. Non critical ones can be flushed by [FlushDialogueQueue]
+---@param speaker? Unit If this unit is dead the dialogue won't play.
 function Dialogue(dialogueTable, callback, critical, speaker)
     if not (speaker and speaker.Dead) then
         local dTable = table.deepcopy(dialogueTable)
@@ -611,7 +615,7 @@ function Dialogue(dialogueTable, callback, critical, speaker)
     end
 end
 
----
+--- Removes non critical dialogues from the queue
 function FlushDialogueQueue()
     if ScenarioInfo.DialogueQueue then
         for _, dialogue in ScenarioInfo.DialogueQueue do
@@ -802,7 +806,7 @@ function PlayVoiceOver(voSound)
 end
 
 --- Sets enhancement restrictions from the names of the enhancements you do not want the player to build
----@param enhancements string[]
+---@param enhancements Enhancement[]
 function RestrictEnhancements(enhancements)
     local restrict = {}
     for _, enh in enhancements do
@@ -841,16 +845,16 @@ end
 ---
 ---@param brain string
 ---@param unit string
----@param effect string
+---@param effect? "Gate"|"Warp" If to play Gate In or Warp In effect on the command unit
 ---@param name? string | true # if `true`, uses the brain's nickname
----@param pauseAtDeath? boolean
+---@param pauseAtDeath? boolean Delays the death explosion by few seconds for the cinematic camera to be able to catch it.
 ---@param deathTrigger? fun(self: Unit)
 ---@param enhancements? string[]
 ---@return CommandUnit
 function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, enhancements)
-    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
+    local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)--[[@as CommandUnit]]
     local bp = ACU:GetBlueprint()
-    local bonesToHide = bp.WarpInEffect.HideBones
+    local bonesToHide = bp.Display.WarpInEffect.HideBones
     local delay = 0
 
     local function CreateEnhancements(unit, enhancements, delay)
@@ -977,10 +981,10 @@ function FakeTeleportUnits(units, destroyUnits)
     end
 end
 
----
+--- Plays teleport effects for a unit
 ---@param unit Unit
----@param callback fun()
----@param bonesToHide Bone[]
+---@param callback? fun()
+---@param bonesToHide? Bone[]
 function FakeGateInUnit(unit, callback, bonesToHide)
     local bp = unit:GetBlueprint()
 
@@ -1035,6 +1039,10 @@ end
 ---@param unit Unit
 function UpgradeUnit(unit)
     local upgradeBP = unit:GetBlueprint().General.UpgradesTo
+    if not upgradeBP then
+        WARN("ScenarioFramework: UpgradeUnit: no upgrade found for unit: " .. unit.UnitId)
+        return
+    end
     IssueStop({unit})
     IssueToUnitClearCommands(unit)
     IssueUpgrade({unit}, upgradeBP)
@@ -1121,7 +1129,7 @@ end
 -- Returns lists of idle factories by category, optionally in a radius around a point.
 -- This allows you to know which factories can build and which can't.
 ---@param brain AIBrain
----@param point? Marker | Vector
+---@param point? MarkerName | Vector
 ---@param radius? number
 ---@return FactoriesAvailable
 function GetFactories(brain, point, radius)
@@ -1172,7 +1180,7 @@ end
 --- If `lifetime` is 0, the entity lasts forever, otherwise, for `lifetime` seconds.
 --- Returns a `VizMarker` so you can destroy it later if you want.
 ---@param radius number
----@param location Marker | Vector
+---@param location MarkerName | Vector
 ---@param lifetime number
 ---@param army AIBrain
 ---@return VizMarker
@@ -1282,7 +1290,7 @@ end
 --- Sets platoon to only be built once
 ---@param platoon Platoon
 function BuildOnce(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon:GetBrain()--[[@as CampaignAIBrain]]
     aiBrain:PBMSetPriority(platoon, 0)
 end
 
@@ -1310,139 +1318,139 @@ function StartCamera(area)
 end
 
 --- Sets an army color to Aeon
----@param army number
+---@param army Army
 function SetAeonColor(army)
     SetArmyColor(army, 41, 191, 41)
 end
 
 --- Sets an army color to Aeon ally
----@param army number
+---@param army Army
 function SetAeonAllyColor(army)
     SetArmyColor(army, 165, 200, 102)
 end
 
 --- Sets an army color to Aeon neutral
----@param army number
+---@param army Army
 function SetAeonNeutralColor(army)
     SetArmyColor(army, 16, 86, 16)
 end
 
 --- Sets an army color to Cybran
----@param army number
+---@param army Army
 function SetCybranColor(army)
     SetArmyColor(army, 128, 39, 37)
 end
 
 --- Sets an army color to Cybran ally
----@param army number
+---@param army Army
 function SetCybranAllyColor(army)
     SetArmyColor(army, 219, 74, 58)
 end
 
 --- Sets an army color to Cybran neutral
----@param army number
+---@param army Army
 function SetCybranNeutralColor(army)
     SetArmyColor(army, 165, 9, 1) -- 84, 13, 13
 end
 
 --- Sets an army color to UEF
----@param army number
+---@param army Army
 function SetUEFColor(army)
     SetArmyColor(army, 41, 40, 140)
 end
 
 --- Sets an army color to UEF ally
----@param army number
+---@param army Army
 function SetUEFAllyColor(army)
     SetArmyColor(army, 71, 114, 148)
 end
 
 --- Sets an army color to UEF neutral
----@param army number
+---@param army Army
 function SetUEFNeutralColor(army)
     SetArmyColor(army, 16, 16, 86)
 end
 
 --- Sets an army color to Coalition
----@param army number
+---@param army Army
 function SetCoalitionColor(army)
     SetArmyColor(army, 80, 80, 240)
 end
 
 --- Sets an army color to neutral
----@param army number
+---@param army Army
 function SetNeutralColor(army)
     SetArmyColor(army, 211, 211, 180)
 end
 
 --- Sets an army color to Aeon player
----@param army number
+---@param army Army
 function SetAeonPlayerColor(army)
     SetArmyColor(army, 36, 182, 36)
 end
 
 --- Sets an army color to evil Aeon
----@param army number
+---@param army Army
 function SetAeonEvilColor(army)
     SetArmyColor(army, 159, 216, 2)
 end
 
 --- Sets an army color to Aeon ally 1
----@param army number
+---@param army Army
 function SetAeonAlly1Color(army)
     SetArmyColor(army, 16, 86, 16)
 end
 
 --- Sets an army color to Aeon ally 2
----@param army number
+---@param army Army
 function SetAeonAlly2Color(army)
     SetArmyColor(army, 123, 255, 125)
 end
 
 --- Sets an army color to Cybran player
----@param army number
+---@param army Army
 function SetCybranPlayerColor(army)
     SetArmyColor(army, 231, 3, 3)
 end
 
 --- Sets an army color to evil Cybran
----@param army number
+---@param army Army
 function SetCybranEvilColor(army)
     SetArmyColor(army, 225, 70, 0)
 end
 
 --- Sets an army color to Cybran ally
----@param army number
+---@param army Army
 function SetCybranAllyColor(army)
     SetArmyColor(army, 130, 33, 30)
 end
 
 --- Sets an army color to UEF player
----@param army number
+---@param army Army
 function SetUEFPlayerColor(army)
     SetArmyColor(army, 41, 41, 225)
 end
 
 --- Sets an army color to UEF ally 1
----@param army number
+---@param army Army
 function SetUEFAlly1Color(army)
     SetArmyColor(army, 81, 82, 241)
 end
 
 --- Sets an army color to UEF ally 2
----@param army number
+---@param army Army
 function SetUEFAlly2Color(army)
     SetArmyColor(army, 133, 148, 255)
 end
 
 --- Sets an army color to Seraphim
----@param army number
+---@param army Army
 function SetSeraphimColor(army)
     SetArmyColor(army, 167, 150, 2)
 end
 
 --- Sets army color to Loyalist
----@param army number
+---@param army Army
 function SetLoyalistColor(army)
     SetArmyColor(army, 0, 100, 0)
 end
@@ -1462,10 +1470,10 @@ end
 
 ---
 ---@param platoon Platoon
----@param landingChain MarkerChain
----@param attackChain MarkerChain
+---@param landingChain ChainName
+---@param attackChain ChainName
 ---@param instant? boolean
----@param moveChain? MarkerChain
+---@param moveChain? ChainName
 function PlatoonAttackWithTransports(platoon, landingChain, attackChain, instant, moveChain)
     ForkThread(PlatoonAttackWithTransportsThread, platoon, landingChain, attackChain, instant, moveChain)
 end
@@ -1776,7 +1784,7 @@ end
 
 --- Ends the operation in safety, setting enemy alliances to neutral, and making all commanders
 --- and `units` to be invulnerable
----@param units Unit[]
+---@param units? Unit[]
 function EndOperationSafety(units)
     ScenarioInfo.OpEnded = true
     ResetUITimer() -- turn off any timer going

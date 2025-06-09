@@ -38,6 +38,7 @@ local AnimatorSetRate = moho.AnimationManipulator.SetRate
 ---@class CLandFactoryUnit : LandFactoryUnit
 ---@field BuildEffectsBag TrashBag
 ---@field BuildAnimManip moho.AnimationManipulator
+---@field BuildBones BuildBones
 CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self AirFactoryUnit
@@ -48,6 +49,8 @@ CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
         AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationBuild, true)
         AnimatorSetRate(buildAnimManip, 0)
         self.BuildAnimManip = self.Trash:Add(buildAnimManip)
+
+        self.BuildBones = self.Blueprint.General.BuildBones
     end,
 
     ---@param self CLandFactoryUnit
@@ -58,7 +61,7 @@ CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
         end
 
         WaitTicks(2)
-        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
+        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.BuildBones, self.BuildEffectsBag)
     end,
 
     ---@param self CLandFactoryUnit

@@ -1,186 +1,187 @@
---*****************************************************************************
---* File: lua/modules/ui/game/announcement.lua
---* Author: Ted Snook
---* Summary: Announcement UI for sending general messages to the user
---*
---* Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+--******************************************************************************************************
+--** Copyright (c) 2025  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
-local UIUtil = import("/lua/ui/uiutil.lua")
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
-local bg = false
+---@type TrashBag | UIAbstractAnnouncement[]
+local Announcements = TrashBag()
 
-function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
-    local scoreDlg = import("/lua/ui/dialogs/score.lua")
-    if scoreDlg.dialog then
-        if onFinished then
-            onFinished()
-        end
-        return
+--- Creates the default goal control that originates from the top of the screen, in the center.
+---@param frame Frame
+local function CreateDefaultGoalControl(frame)
+    goalControl = Group(frame)
+    goalControl.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)
+    goalControl.Right:Set(function() return frame.Left() + 0.51 * frame.Right() end)
+    goalControl.Top:Set(function() return frame.Top() end);
+    goalControl.Height:Set(0)
+
+    return goalControl
+end
+
+--- Determines when an announcement should be skipped.
+---@return boolean
+local function ShouldSkipAnnouncement()
+    -- early exit: don't show announcements when the score dialog is open
+    local scoreModule = import("/lua/ui/dialogs/score.lua")
+    if scoreModule.dialog then
+        return true
     end
-    if bg then
-        if bg.OnFinished then
-            bg.OnFinished()
-        end
-        bg.OnFrame = function(self, delta)
-            local newAlpha = self:GetAlpha() - (delta*2)
-            if newAlpha < 0 then
-                newAlpha = 0
-                self:Destroy()
-                bg.OnFinished = nil
-                bg = false
-                CreateAnnouncement(text, goalControl, secondaryText, onFinished)
-            end
-            self:SetAlpha(newAlpha, true)
-        end
-        return
-    end
-    bg = Bitmap(GetFrame(0), UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_m.dds'))
-    bg.Height:Set(0)
-    bg.Width:Set(0)
-    bg.Depth:Set(GetFrame(0):GetTopmostDepth()+1)
 
-    bg.border = CreateBorder(bg)
-    PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Open'}))
-    local textGroup = Group(bg)
-    if goalControl == nil then
-        goalControl = textGroup
-    end
-    LayoutHelpers.AtCenterIn(bg, goalControl)
-    local text = UIUtil.CreateText(textGroup, text, 22, UIUtil.titleFont)
-    LayoutHelpers.AtCenterIn(text, GetFrame(0), -250)
-    text:SetDropShadow(true)
-    text:SetColor(UIUtil.fontColor)
-    text:SetNeedsFrameUpdate(true)
+    return false
+end
 
-    if secondaryText then
-        secText = UIUtil.CreateText(textGroup, secondaryText, 18, UIUtil.bodyFont)
-        secText:SetDropShadow(true)
-        secText:SetColor(UIUtil.fontColor)
-        LayoutHelpers.Below(secText, text, 10)
-        LayoutHelpers.AtHorizontalCenterIn(secText, text)
-        textGroup.Top:Set(text.Top)
-        textGroup.Left:Set(function() return math.min(secText.Left(), text.Left()) end)
-        textGroup.Right:Set(function() return math.max(secText.Right(), text.Right()) end)
-        textGroup.Bottom:Set(secText.Bottom)
-    else
-        LayoutHelpers.FillParent(textGroup, text)
-    end
-    textGroup:SetAlpha(0, true)
-
-    bg:DisableHitTest(true)
-
-    bg.OnFinished = onFinished
-
-    bg.time = 0
-    bg:SetNeedsFrameUpdate(true)
-    bg.CloseSoundPlayed = false
-    bg.OnFrame = function(self, delta)
-        self.time = self.time + delta
-        if self.time >= 3.5 and self.time < 3.7 then
-            if not self.CloseSoundPlayed then
-                PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Announcement_Close'}))
-                self.CloseSoundPlayed = false
-            end
-            self.Top:Set(MATH_Lerp(self.time, 3.5, 3.7, textGroup.Top(), goalControl.Top()))
-            self.Left:Set(MATH_Lerp(self.time, 3.5, 3.7, textGroup.Left(), goalControl.Left()))
-            self.Right:Set(MATH_Lerp(self.time, 3.5, 3.7, textGroup.Right(), goalControl.Right()))
-            self.Bottom:Set(MATH_Lerp(self.time, 3.5, 3.7, textGroup.Bottom(), goalControl.Bottom()))
-            self.Height:Set(MATH_Lerp(self.time, 3.5, 3.7, textGroup.Height(), goalControl.Height()))
-            self.Width:Set(MATH_Lerp(self.time, 3.5, 3.7, textGroup.Width(), goalControl.Width()))
-        elseif self.time < .2 then
-            self.Top:Set(MATH_Lerp(self.time, 0, .2, goalControl.Top(), textGroup.Top()))
-            self.Left:Set(MATH_Lerp(self.time, 0, .2, goalControl.Left(), textGroup.Left()))
-            self.Right:Set(MATH_Lerp(self.time, 0, .2, goalControl.Right(), textGroup.Right()))
-            self.Bottom:Set(MATH_Lerp(self.time, 0, .2, goalControl.Bottom(), textGroup.Bottom()))
-            self.Height:Set(MATH_Lerp(self.time, 0, .2, goalControl.Height(), textGroup.Height()))
-            self.Width:Set(MATH_Lerp(self.time, 0, .2, goalControl.Width(), textGroup.Width()))
-        elseif self.time > .2 and self.time < 3.5 then
-            self.Top:Set(textGroup.Top)
-            self.Left:Set(textGroup.Left)
-            self.Right:Set(textGroup.Right)
-            self.Bottom:Set(textGroup.Bottom)
-            self.Height:Set(textGroup.Height)
-            self.Width:Set(textGroup.Width)
-        end
-
-        if self.time > 3 and textGroup:GetAlpha() != 0 then
-            textGroup:SetAlpha(math.max(textGroup:GetAlpha()-(delta*2), 0), true)
-        elseif self.time > .2 and self.time < 3 and text:GetAlpha() != 1 then
-            textGroup:SetAlpha(math.min(text:GetAlpha()+(delta*2), 1), true)
-        end
-        if goalControl == textGroup then
-            self:SetAlpha(textGroup:GetAlpha(), true)
-        end
-
-        if self.time > 3.7 then
-            if bg.OnFinished then
-                bg.OnFinished()
-            end
-            bg:Destroy()
-            bg.OnFinished = nil
-            bg = false
-        end
-    end
+--- Determines when an announcement should be hidden immediately.
+local function ShouldImmediatelyHideAnnouncement()
+    -- feature: immediately hide announcements when game UI is hidden
     if import("/lua/ui/game/gamemain.lua").gameUIHidden then
-        bg:Hide()
+        return true
+    end
+
+    return false
+end
+
+--- Aborts all existing announcements.
+local function AbortExistingAnnouncements()
+    for k, announcement in Announcements do
+        if not IsDestroyed(announcement) then
+            announcement:AbortAnnouncement()
+        end
     end
 end
 
+--- Create an announcement with a title.
+---@param titleText UnlocalizedString
+---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
+---@param onCompleteCallback? fun()
+CreateTitleAnnouncement = function(titleText, goalControl, onCompleteCallback)
+    if ShouldSkipAnnouncement() then
+        return
+    end
+
+    AbortExistingAnnouncements()
+
+    -- create a dummy goal control if we don't have one
+    local frame = GetFrame(0) --[[@as Frame]]
+    if IsDestroyed(goalControl) then
+        goalControl = CreateDefaultGoalControl(frame)
+    end
+
+    ---@cast goalControl -nil, -unknown
+
+    -- developers note: lazy load the module so that it remains unloaded unless used
+    local TitleAnnouncement = import("/lua/ui/game/announcement/TitleAnnouncement.lua").TitleAnnouncement
+
+    -- create the announcement
+    ---@type UIAbstractAnnouncement
+    local announcement = TitleAnnouncement(frame, titleText)
+    announcement:Animate(goalControl, 1.4, onCompleteCallback)
+    Announcements:Add(announcement)
+
+    if ShouldImmediatelyHideAnnouncement() then
+        announcement:Hide()
+    end
+end
+
+--- Create an announcement with a title and some text.
+---@param titleText UnlocalizedString
+---@param bodyText UnlocalizedString
+---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
+---@param onCompleteCallback? fun()
+CreateTitleTextAnnouncement = function(titleText, bodyText, goalControl, onCompleteCallback)
+    if ShouldSkipAnnouncement() then
+        return
+    end
+
+    AbortExistingAnnouncements()
+
+    -- create a dummy goal control if we don't have one
+    local frame = GetFrame(0) --[[@as Frame]]
+    if IsDestroyed(goalControl) then
+        goalControl = CreateDefaultGoalControl(frame)
+    end
+
+    ---@cast goalControl -nil, -unknown
+
+    -- developers note: lazy load the module so that it remains unloaded unless used
+    local TitleTextAnnouncement = import("/lua/ui/game/announcement/TitleTextAnnouncement.lua").TitleTextAnnouncement
+
+    -- create the announcement
+    ---@type UIAbstractAnnouncement
+    local announcement = TitleTextAnnouncement(frame, titleText, bodyText)
+    announcement:Animate(goalControl, 2.2, onCompleteCallback)
+    Announcements:Add(announcement)
+
+    if ShouldImmediatelyHideAnnouncement() then
+        announcement:Hide()
+    end
+end
+
+--- A general function to create an announcement UI for sending general messages to the user.
+---
+--- Exists for backwards compatibility.
+---@param titleText UnlocalizedString
+---@param goalControl? Control          # if defined, the announcement visually expands and contracts to this control.
+---@param bodyText? UnlocalizedString
+---@param onCompleteCallback? fun()
+function CreateAnnouncement(titleText, goalControl, bodyText, onCompleteCallback)
+    local typeOfBodyText = type(bodyText)
+    if typeOfBodyText == "string" or typeOfBodyText == "number" then
+        return CreateTitleTextAnnouncement(titleText, bodyText, goalControl, onCompleteCallback)
+    else
+        return CreateTitleAnnouncement(titleText, goalControl, onCompleteCallback)
+    end
+end
+
+--- Instantly hides the current announcement
 function Contract()
-    if bg then
-        bg:Hide()
+    for k, announcement in Announcements do
+        if not IsDestroyed(announcement) then
+            announcement:Hide()
+        end
     end
 end
 
+--- Instantly shows the current announcement
 function Expand()
-    if bg then
-        bg:Show()
+    for k, announcement in Announcements do
+        if not IsDestroyed(announcement) then
+            announcement:Show()
+        end
     end
 end
 
-function CreateBorder(parent)
-    local border = {}
+-------------------------------------------------------------------------------
+--#region Debug functionality
 
-    border.tl = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ul.dds'))
-    border.tm = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'))
-    border.tr = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ur.dds'))
-    border.ml = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_l.dds'))
-    border.mr = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'))
-    border.bl = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_ll.dds'))
-    border.bm = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lm.dds'))
-    border.br = Bitmap(parent, UIUtil.SkinnableFile('/game/filter-ping-list-panel/panel_brd_lr.dds'))
-
-    border.tl.Bottom:Set(parent.Top)
-    border.tl.Right:Set(parent.Left)
-
-    border.bl.Top:Set(parent.Bottom)
-    border.bl.Right:Set(parent.Left)
-
-    border.tr.Bottom:Set(parent.Top)
-    border.tr.Left:Set(parent.Right)
-
-    border.br.Top:Set(parent.Bottom)
-    border.br.Left:Set(parent.Right)
-
-    border.tm.Bottom:Set(parent.Top)
-    border.tm.Left:Set(parent.Left)
-    border.tm.Right:Set(parent.Right)
-
-    border.bm.Top:Set(parent.Bottom)
-    border.bm.Left:Set(parent.Left)
-    border.bm.Right:Set(parent.Right)
-
-    border.ml.Top:Set(parent.Top)
-    border.ml.Bottom:Set(parent.Bottom)
-    border.ml.Right:Set(parent.Left)
-
-    border.mr.Top:Set(parent.Top)
-    border.mr.Bottom:Set(parent.Bottom)
-    border.mr.Left:Set(parent.Right)
-
-    return border
+--- Creates a title announcement for debugging.
+DebugTitleAnnouncement = function()
+    local control = CreateDefaultGoalControl(GetFrame(0))
+    CreateAnnouncement("Title because X is defeated", control)
+    control:Destroy()
 end
+
+--- Creates a title-with-text announcement for debugging.
+DebugTitleTextAnnouncement = function()
+    CreateAnnouncement("Title", nil, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+end
+
+--#endregion

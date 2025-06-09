@@ -70,7 +70,8 @@ styles = {
 }
 
 ---@class Window : Group
----@field ClientGroup Control
+---@field TitleGroup Group
+---@field ClientGroup Group
 Window = ClassUI(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")

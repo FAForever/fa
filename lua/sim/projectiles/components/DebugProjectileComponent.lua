@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
+local DebugComponent = import("/lua/shared/components/debugcomponent.lua").DebugComponent
 
 ---@class DebugProjectileComponent: DebugComponent
 DebugProjectileComponent = Class(DebugComponent) {

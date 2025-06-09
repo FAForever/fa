@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local UIRenderableCircle = import('/lua/ui/game/renderable/circle.lua').UIRenderableCircle
+local CircleShape = import('/lua/ui/game/shapes/circleshape.lua')
 
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local DraggerInit = Dragger.__init
@@ -29,7 +29,7 @@ local TrashAdd = TrashBag.Add
 
 ---@class UIRadialDragger : Dragger
 ---@field Origin Vector
----@field RadiusCircle UIRenderableCircle
+---@field RadiusCircle UICircleShape
 ---@field MinimumDistance number
 ---@field WorldView WorldView
 ---@field Callback fun(origin: Vector, radius: number)
@@ -51,8 +51,7 @@ RadialDragger = Class(Dragger) {
         local mouseWorldPosition = GetMouseWorldPos()
 
         -- default 0.2 radius, `'ffffff'` (White) color, and 0.05 minimum thickness
-        self.RadiusCircle = TrashAdd(self.Trash, UIRenderableCircle(view, 'radialDragger' .. keycode, mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], 0.2, 'ffffff', 0.05))
+        self.RadiusCircle = TrashAdd(self.Trash, CircleShape.CreateCircleShape(view, mouseWorldPosition, 0.2, 'ffffff', 0.05))
 
         if minimumDistance > 0 then
             self.RadiusCircle:Hide()

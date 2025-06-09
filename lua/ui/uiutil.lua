@@ -630,10 +630,11 @@ function SetupEditStd(control, foreColor, backColor, highlightFore, highlightBac
         if charcode == VK_TAB then
             return true
         end
-        local charLim = self:GetMaxChars()
-        if STR_Utf8Len(self:GetText()) >= charLim then
-            local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
-            PlaySound(sound)
+        if STR_Utf8Len(self:GetText()) >= self:GetMaxChars() then
+            PlaySound(Sound {
+                Cue = 'UI_Menu_Error_01',
+                Bank = 'Interface',
+            })
         end
     end
 end
@@ -1030,7 +1031,7 @@ end
 ---@param button3Text? UnlocalizedString text for the first button
 ---@param button3Callback fun() | nil callback function for the first button
 ---@param destroyOnCallback? boolean if true, the popup is closed when a button with a callback is pressed (if false, you must destroy); defaults to `true` when all three callback functions are supplied and `false` otherwise
----@param modalInfo ModalityInfo Sets up modality info for dialog
+---@param modalInfo? ModalityInfo Sets up modality info for dialog
 ---@return Popup
 function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Text, button2Callback, button3Text, button3Callback, destroyOnCallback, modalInfo)
     -- if there is a callback and destroy not specified, assume destroy
@@ -1421,24 +1422,13 @@ end
 
 ---@param primary UnlocalizedString
 ---@param secondary UnlocalizedString
----@param control? Control defaults to duumy control at center of screen 
+---@param control? Control defaults to dummy control at center of screen 
 function CreateAnnouncementStd(primary, secondary, control)
-    -- make it originate from the top
-    if not control then
-        local frame = GetFrame(0)
-        control = Group(frame)
-        control.Left:Set(function() return frame.Left() + 0.49 * frame.Right() end)
-        control.Right:Set(function() return frame.Left() + 0.51 * frame.Right() end)
-        control.Top = frame.Top
-        control.Bottom = frame.Top
+    if not secondary then
+        return import("/lua/ui/game/announcement.lua").CreateAnnouncement(primary, control)
+    else
+        return import("/lua/ui/game/announcement.lua").CreateTitleTextAnnouncement(primary, secondary, control)
     end
-
-    -- create the announcement accordingly
-    import("/lua/ui/game/announcement.lua").CreateAnnouncement(
-        primary,
-        control,
-        secondary
-    )
 end
 
 

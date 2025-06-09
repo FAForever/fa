@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local BareBonesWeapon = import("/lua/sim/weapons/BareBonesWeapon.lua").BareBonesWeapon
+local BareBonesWeapon = import("/lua/sim/weapons/barebonesweapon.lua").BareBonesWeapon
 
 ---@class SCUDeathWeapon : BareBonesWeapon
 SCUDeathWeapon = ClassWeapon(BareBonesWeapon) {

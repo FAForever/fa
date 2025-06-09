@@ -25,7 +25,7 @@ local CSeaFactoryUnitOnCreate = CSeaFactoryUnit.OnCreate
 local CSeaFactoryUnitStartArmsMoving = CSeaFactoryUnit.StartArmsMoving
 local CSeaFactoryUnitStopArmsMoving = CSeaFactoryUnit.StopArmsMoving
 
-local Cybran3BuildArmComponent = import("/lua/sim/units/components/Cybran3BuildArmComponent.lua").Cybran3BuildArmComponent
+local Cybran3BuildArmComponent = import("/lua/sim/units/components/cybran3buildarmcomponent.lua").Cybran3BuildArmComponent
 local Cybran3BuildArmComponentOnCreate = Cybran3BuildArmComponent.OnCreate
 local Cybran3BuildArmComponentStopArmsMoving = Cybran3BuildArmComponent.StopArmsMoving
 

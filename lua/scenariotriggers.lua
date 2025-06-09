@@ -157,7 +157,7 @@ end
 --- If `name` is supplied, the callback is called with TriggerManager and the name as arguments.
 ---@param callback TriggerCallback | NamedTriggerCallback
 ---@param aiBrain AIBrain
----@param pos Marker | Vector
+---@param pos MarkerName | Vector
 ---@param rings boolean
 ---@param onceOnly boolean
 ---@param value number
@@ -315,7 +315,7 @@ end
 ---@param callback fun(blip: Blip)
 ---@param aiBrain AIBrain
 ---@param reconType string
----@param blip Blip
+---@param blip? Blip|false
 ---@param value boolean
 ---@param category EntityCategory
 ---@param onceOnly boolean
@@ -368,7 +368,7 @@ end
 --- before the unit.
 ---@param callback UnitTriggerCallback | NamedUnitTriggerCallback
 ---@param unit Unit
----@param marker Marker
+---@param marker MarkerName|Vector
 ---@param distance number
 ---@param name? string
 ---@return thread

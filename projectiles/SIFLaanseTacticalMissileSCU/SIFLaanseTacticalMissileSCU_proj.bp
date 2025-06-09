@@ -38,7 +38,7 @@ ProjectileBlueprint{
         Acceleration = 3,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        MaxSpeed = 20,
+        MaxSpeed = 16,
         MaxZigZag = 1,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,

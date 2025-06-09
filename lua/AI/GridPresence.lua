@@ -22,7 +22,7 @@
 --******************************************************************************************************
 
 local Grid = import("/lua/ai/grid.lua").Grid
-local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
+local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local NavUtils = import("/lua/sim/navutils.lua")
 
 -- upvalue scope for performance

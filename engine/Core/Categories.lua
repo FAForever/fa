@@ -69,6 +69,7 @@ categories = {
     CONSTRUCTION = categoryValue,
     CONSTRUCTIONSORTDOWN = categoryValue,
     COUNTERINTELLIGENCE = categoryValue,
+    --- Allows queuing commands before the unit is finished building
     CQUEMOV = categoryValue,
     CRABEGG = categoryValue,
     CRUISER = categoryValue,
@@ -85,10 +86,12 @@ categories = {
     ECONOMIC = categoryValue,
     ENERGYPRODUCTION = categoryValue,
     ENERGYSTORAGE = categoryValue,
+    --- Unit counts as an engineer for GetIdleEngineers()
     ENGINEER = categoryValue,
     ENGINEERPRESET = categoryValue,
     ENGINEERSTATION = categoryValue,
     EXPERIMENTAL = categoryValue,
+    --- Replaces the unit's command queue with the rally point orders. Also gives it a default rally point order upon creation
     FACTORY = categoryValue,
     FAVORSWATER = categoryValue,
     FERRYBEACON = categoryValue,
@@ -123,7 +126,7 @@ categories = {
     NAVALCARRIER = categoryValue,
     NAVAL = categoryValue,
 
-    -- Allows this unit to be build by engineers
+    --- Allows this unit to be built by engineers
     NEEDMOBILEBUILD = categoryValue,
     NOFORMATION = categoryValue,
     --- Prevents splash damage being applied to the entity
@@ -154,6 +157,7 @@ categories = {
     PRODUCTSC1 = categoryValue,
     PROJECTILE = categoryValue,
     RADAR = categoryValue,
+    -- Causes orders given to the unit to be added to the rally point queue
     RALLYPOINT = categoryValue,
     RAMBOPRESET = categoryValue,
     RASPRESET = categoryValue,

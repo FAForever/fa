@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local SHoverLandUnit = import('/lua/seraphimunits.lua').SHoverLandUnit
-local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapon
+local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
 
 -- Seraphim energy ball units
 ---@class SEnergyBallUnit : SHoverLandUnit

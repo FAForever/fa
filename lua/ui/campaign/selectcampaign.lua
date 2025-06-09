@@ -676,7 +676,7 @@ function TimelineFMV(toOpSelect)
         if toOpSelect then
             CreateUI()
         else
-            local opData = import('/maps/X1CA_001/X1CA_001_operation.lua').operationData
+            local opData = import('/maps/x1ca_001/x1ca_001_operation.lua').operationData
             import("/lua/ui/campaign/operationbriefing.lua").CreateUI('X1CA_001', opData)
         end
     end

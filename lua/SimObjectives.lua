@@ -25,6 +25,7 @@
 ---@field SimStartTime number           # Set when the objective starts
 ---@field AddProgressCallback function  # Adds a progression callback
 ---@field AddResultCallback function    # Adds a completion callback
+---@field ManualResult fun(obj: Objective, result: boolean)|nil # Ends the objective with given result
 
 -- SUPPORTED OBJECTIVE TYPES:
 -- Kill
@@ -1429,7 +1430,7 @@ end
 ---@param Complete ObjectiveStatus  # Completion status, usually this is 'incomplete' unless the player already completed it by chance
 ---@param Title string              # Title of the objective, supports strings with LOC
 ---@param Description string        # Description of the objective, supports strings with LOC
----@param Target table              # Objective data, see the description
+---@param Target? table             # Objective data, see the description
 ---@return Objective
 function Basic(Type, Complete, Title, Description, Image, Target)
     local objective = AddObjective(Type, Complete, Title, Description, Image, Target)

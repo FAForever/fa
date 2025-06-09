@@ -812,7 +812,15 @@ function GrowthFormation(formationUnits)
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
 
-    if unitsList.Air.Bomb3[1] then
+    if not table.empty(unitsList.Air.Bomb3) then
+        -- unitsList.Air.Bomb3 contains no more than one table with selected strat bombers in it
+        -- Cycle puts it at index 1 (as it was in the past) otherwise some code below won't work.
+        for k,v in unitsList.Air.Bomb3 do
+            if k != 1 then 
+                unitsList.Air.Bomb3[1] = unitsList.Air.Bomb3[k]
+            end
+            break
+        end
         local count = unitsList.Air.Bomb3[1].Count
         local oldAirArea = unitsList.Air.AreaTotal
         local oldUnitTotal = unitsList.Air.UnitTotal
@@ -820,7 +828,7 @@ function GrowthFormation(formationUnits)
         unitsList.Air.AreaTotal = count
         unitsList.Air.UnitTotal = count
 
-        BlockBuilderAirT3Bombers(unitsList.Air, 1.5) --strats formation
+        BlockBuilderAirT3Bombers(unitsList.Air, 1.2) --initial spacing was 1.5 that is a bit too wide
 
         --strats are already in formation so we remove them from table and adjust all parameters.
         unitsList.Air.Bomb3 = {}
@@ -1555,72 +1563,50 @@ function CalculateSizes(unitsList)
     return unitsList
 end
 
+-- reusable table for categorizing units in a formation 
+local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
+-- map layers to categories
+local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
+-- initialize the layer tables
+for unitType, categoriesForType in CategoryTables do
+    local typeData = UnitsList[unitType]
+    for unitTypeCategory, _ in categoriesForType do
+        typeData[unitTypeCategory] = {}
+    end
+    typeData.FootprintCounts = {}
+    typeData.FootprintSizes = {}
+end
+
+-- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
 ---@param formationUnits Unit[]
 ---@return table
 function CategorizeUnits(formationUnits)
-    local unitsList = {
-        Land = {
-            Bot1 = {}, Bot2 = {}, Bot3 = {}, Bot4 = {},
-            Tank1 = {}, Tank2 = {}, Tank3 = {}, Tank4 = {},
-            Sniper1 = {}, Sniper2 = {}, Sniper3 = {}, Sniper4 = {},
-            Art1 = {}, Art2 = {}, Art3 = {}, Art4 = {},
-            AA1 = {}, AA2 = {}, AA3 = {},
-            Com1 = {}, Com2 = {}, Com3 = {}, Com4 = {},
-            Util1 = {}, Util2 = {}, Util3 = {}, Util4 = {},
-            Shields = {},
-            RemainingCategory = {},
+    local categoryTables = CategoryTables
 
-            UnitTotal = 0,
-            AreaTotal = 0,
-            FootprintCounts = {},
-            FootprintSizes = {},
-        },
+    -- flush the table
+    for unitType, categoriesForType in categoryTables do
+        local typeData = UnitsList[unitType]
+        for unitTypeCategory, _ in categoriesForType do
+            local typeDataCategory = typeData[unitTypeCategory]
+            for k in pairs(typeDataCategory) do
+                typeDataCategory[k] = nil
+            end
+        end
 
-        Air = {
-            Ground1 = {}, Ground2 = {}, Ground3 = {},
-            Trans1 = {}, Trans2 = {}, Trans3 = {},
-            Bomb1 = {}, Bomb2 = {}, Bomb3 = {},
-            AA1 = {}, AA2 = {}, AA3 = {},
-            AN1 = {}, AN2 = {}, AN3 = {},
-            AIntel1 = {}, AIntel2 = {}, AIntel3 = {},
-            AExper = {},
-            AEngineer = {},
-            RemainingCategory = {},
+        local footprintCounts = typeData.FootprintCounts
+        for k in pairs(footprintCounts) do
+            footprintCounts[k] = nil
+        end
 
-            UnitTotal = 0,
-            AreaTotal = 0,
-            FootprintCounts = {},
-            FootprintSizes = {},
-        },
+        local footprintSizes = typeData.FootprintSizes
+        for k in pairs(footprintSizes) do
+            footprintSizes[k] = nil
+        end
 
-        Naval = {
-            CarrierCount = {},
-            BattleshipCount = {},
-            DestroyerCount = {},
-            CruiserCount = {},
-            FrigateCount = {},
-            LightCount = {},
-            NukeSubCount = {},
-            MobileSonarCount = {},
-            RemainingCategory = {},
-
-            UnitTotal = 0,
-            AreaTotal = 0,
-            FootprintCounts = {},
-            FootprintSizes = {},
-        },
-
-        Subs = {
-            SubCount = {},
-
-            UnitTotal = 0,
-            AreaTotal = 0,
-            FootprintCounts = {},
-            FootprintSizes = {},
-        },
-    }
-
-    local categoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
+        typeData.UnitTotal = 0
+        typeData.AreaTotal = 0
+        typeData.Scale = nil -- set elsewhere in formations logic
+    end
 
     -- Loop through each unit to get its category and size
     for _, u in formationUnits do
@@ -1632,17 +1618,17 @@ function CategorizeUnits(formationUnits)
                     local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
                     local id = bp.BlueprintId
 
-                    if not unitsList[type][cat][fs] then
-                        unitsList[type][cat][fs] = {Count = 0, Categories = {}}
+                    if not UnitsList[type][cat][fs] then
+                        UnitsList[type][cat][fs] = {Count = 0, Categories = {}}
                     end
-                    unitsList[type][cat][fs].Count = unitsList[type][cat][fs].Count + 1
-                    unitsList[type][cat][fs].Categories[id] = categories[id]
-                    unitsList[type].FootprintCounts[fs] = (unitsList[type].FootprintCounts[fs] or 0) + 1
+                    UnitsList[type][cat][fs].Count = UnitsList[type][cat][fs].Count + 1
+                    UnitsList[type][cat][fs].Categories[id] = categories[id]
+                    UnitsList[type].FootprintCounts[fs] = (UnitsList[type].FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
                         LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
-                    unitsList[type].UnitTotal = unitsList[type].UnitTotal + 1
+                    UnitsList[type].UnitTotal = UnitsList[type].UnitTotal + 1
                     identified = true
                     break
                 end
@@ -1660,8 +1646,8 @@ function CategorizeUnits(formationUnits)
     -- Loop through each category and combine the types within into a single filter category for each size
     for type, table in categoryTables do
         for cat, _ in table do
-            if unitsList[type][cat] then
-                for fs, data in unitsList[type][cat] do
+            if UnitsList[type][cat] then
+                for fs, data in UnitsList[type][cat] do
                     local filter = nil
                     for _, category in data.Categories do
                         if not filter then
@@ -1670,13 +1656,13 @@ function CategorizeUnits(formationUnits)
                             filter = filter + category
                         end
                     end
-                    unitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
+                    UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
                 end
             end
         end
     end
 
-    CalculateSizes(unitsList)
+    CalculateSizes(UnitsList)
 
-    return unitsList
+    return UnitsList
 end

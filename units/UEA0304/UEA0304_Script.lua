@@ -17,14 +17,27 @@ UEA0304 = ClassUnit(TAirUnit) {
         LinkedRailGun2 = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        TAirUnit.OnStopBeingBuilt(self,builder,layer)
-        --Turns Jamming off when unit is built
-        self:SetScriptBit('RULEUTC_JammingToggle', true)
+    ---@param self UEA0304
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        TAirUnit.OnStopBeingBuilt(self, builder, layer)
+        -- Don't turn off jamming for AI so that it uses it by default
+        if self.Brain.BrainType == 'Human' then
+            self:SetScriptBit('RULEUTC_JammingToggle', true)
+        else
+            self:SetMaintenanceConsumptionActive()
+        end
     end,
-    
+
+    --- Do not allow friendly fire from our own army's strategic bombers
+    ---@param self UEA0304
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator.Army == self.Army and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER then
+        if instigator and instigator.Army == self.Army and instigator.Blueprint.CategoriesHash["STRATEGICBOMBER"] then
             return
         end
 

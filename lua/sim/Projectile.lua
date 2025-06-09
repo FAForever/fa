@@ -26,7 +26,7 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local EntityCategoryContains = EntityCategoryContains
 
-local DebugProjectileComponent = import("/lua/sim/projectiles/components/DebugProjectileComponent.lua").DebugProjectileComponent
+local DebugProjectileComponent = import("/lua/sim/projectiles/components/debugprojectilecomponent.lua").DebugProjectileComponent
 
 local ProjectileMethods = moho.projectile_methods
 local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
@@ -89,10 +89,10 @@ local VectorCached = Vector(0, 0, 0)
 
 ---@class Projectile : moho.projectile_methods, InternalObject, DebugProjectileComponent
 ---@field Blueprint ProjectileBlueprint
----@field Army number
+---@field Army Army
 ---@field Trash TrashBag
 ---@field Launcher Unit
----@field OriginalTarget? Unit
+---@field OriginalTarget? Unit | Blip
 ---@field DamageData WeaponDamageTable
 ---@field MyDepthCharge? DepthCharge    # If weapon blueprint has a (valid) `DepthCharge` field
 ---@field MyFlare? Flare            # If weapon blueprint has a (valid) `Flare` field
@@ -309,7 +309,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- callbacks for launcher to have an idea what is going on for AIs
         local launcher = self.Launcher
         if not IsDestroyed(launcher) then
-            launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
+            launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition(), self)
 
             -- keep track of the number of intercepted missiles
             if not IsDestroyed(instigator) and instigator.GetStat then
@@ -323,9 +323,15 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by the engine when the projectile impacts something
     ---@param self Projectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
+        -- Since collision is checked before impacts are run, collision changes caused by impacts need to be checked by impacts
+        -- For example, a shield will first tell every projectile that it can collide with it, and then only afterwards will
+        -- HP be drained from the shield, and collisions turned off due to the shield being down. The same applies for units.
+        if targetEntity.DisallowCollisions then
+            return
+        end
 
         -- localize information for performance
         local position = self:GetPosition()

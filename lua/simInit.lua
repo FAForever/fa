@@ -103,6 +103,7 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
+
     ---@type AIBrain[]
     ArmyBrains = {}
 
@@ -295,7 +296,6 @@ end
 function BeginSession()
 
     -- imported for side effects
-    import("/lua/sim/matchstate.lua").Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 
     BeginSessionAI()
@@ -310,6 +310,9 @@ function BeginSession()
     import("/lua/sim/recall.lua").init()
 
     -- other logic at the start of the game --
+
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    victoryCondition:StartMonitoring()
 
     Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
     Sync.Restrictions = import("/lua/game.lua").GetRestrictions()

@@ -291,7 +291,6 @@ function Create(initial)
     end
 
     ---@type LazyVar
-    ---@diagnostic disable-next-line:assign-type-mismatch,miss-symbol,exp-in-action,unknown-symbol
     local result = {&1 &8} -- preallocate table with hashsize=1, arraysize=8
     setmetatable(result, LazyVarMetaTable)
     result[1] = initial

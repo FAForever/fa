@@ -20,6 +20,11 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class WeaponBlueprint: Blueprint
+--- During blueprint loading, which Label to look for when merging into a weapon blueprint.
+---@field MergeLabel? string
+--- During blueprint loading, if `MergeLabel` is not found, which index the weapon should be added at.  
+--- For example, index 1 controls the unit's weapon AI. Defaults to adding to the end of the `Weapon` table.
+---@field AddIndex? number
 --- if this weapon will only fire if it is above water
 ---@field AboveWaterFireOnly? boolean
 --- if this weapon will only fire at targets above water
@@ -31,8 +36,6 @@
 ---@field AimsStraightOnDisable boolean
 --- always recheck for better target regardless of whether you already have one or not
 ---@field AlwaysRecheckTarget boolean
---- used by the Omen's script
----@field AnimationOpen? FileName
 --- animation played by the weapon's Rack Salvo Reload Sequence
 ---@field AnimationReload? FileName
 --- if an anti-artillery shield will block this projectile
@@ -46,8 +49,7 @@
 ---@field AutoInitiateAttackCommand? boolean
 --- Ballistic arcs that should be used on the projectile
 ---@field BallisticArc? WeaponBallisticArc
---- every `X/10+1` game ticks, this beam will collide and do damage - using `0` will cause beams to
---- damage every tick
+--- Interval in seconds between beam collision checks (which take 1 tick) - using `0` will cause beams to damage every tick
 ---@field BeamCollisionDelay number
 --- the amount of time the beam exists
 ---@field BeamLifetime number
@@ -57,7 +59,7 @@
 ---@field BombDropThreshold? number
 --- information about the bonuses added to the weapon when it reaches a specific veterancy level
 ---@field Buffs BlueprintBuff[]
---- used by the Lobo script to pass the lifetime of the vision marker created upon landing
+--- used by UEL0103 (Lobo) script to pass the lifetime of the vision marker created upon landing
 ---@field CameraLifetime? number
 --- time to maintain the camera shake
 ---@field CameraShakeDuration? number
@@ -65,7 +67,7 @@
 ---@field CameraShakeMax? number
 --- minimum size of the camera shake
 ---@field CameraShakeMin? number
---- used by the Lobo script to pass the radius of the vision marker created upon landing
+--- used by UEL0103 (Lobo) script to pass the radius of the vision marker created upon landing
 ---@field CameraVisionRadius? number
 --- how far from the unit should the camera shake
 ---@field CameraShakeRadius number
@@ -142,10 +144,10 @@
 ---@field Flare WeaponBlueprintFlare
 --- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
---- controls what the weapon is allowed to target in reference to the heading of the unit
+--- controls what the weapon is allowed to target in reference to the heading of the unit. Defaults to 0
 ---@field HeadingArcCenter number
 --- controls what the weapon is allowed to target in reference to the arc center,
---- this is degrees on either side
+--- this is degrees on either side. Defaults to 180
 ---@field HeadingArcRange number
 --- does not consider the weapon when attacking targets if it is disabled
 ---@field IgnoreIfDisabled? boolean
@@ -193,7 +195,7 @@
 --- Speed at which the projectile comes out of the muzzle. This speed is used in the ballistics
 --- calculations. If you weapon doesn't fire at its max radius, this may be too low.
 ---@field MuzzleChargeStart? number
---- used by the Galactic Colossus
+--- Determines which bone units are tractored to. Used by `ADFTractorClaw` (UAL0401 Galactic Colossus's tractor beam)
 ---@field MuzzleSpecial? number
 --- the exit velocity of the projectile once created at the muzzle of the barrel 
 ---@field MuzzleVelocity number
@@ -220,7 +222,7 @@
 ---@field NukeInnerRingRadius? number
 --- How many damage ticks the inner damage ring of the nuke will be applied over to get from the
 --- epicenter to the inner ring radius. The ring will be broken up into this many disks.
----@field NukeInnerRingTicks? number
+---@field NukeInnerRingTicks? integer
 --- The total time in seconds it takes the inner damage ring to apply its damage from the epicenter
 --- of the nuke to its inner ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeInnerRingTotalTime? number
@@ -231,7 +233,7 @@
 ---@field NukeOuterRingRadius? number
 --- How many damage ticks the outer damage ring of the nuke will be applied over to get from the
 --- epicenter to the outer ring radius. The ring will be broken up into this many disks.
----@field NukeOuterRingTicks? number
+---@field NukeOuterRingTicks? integer
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
@@ -279,7 +281,7 @@
 ---@field ReTargetOnMiss? boolean
 --- if `true`, will set the orange work progress bar to display the reload progress of this weapon
 ---@field RenderFireClock? boolean
---- used by the Othuy ("lighting storm") to define the time to re-aquire a new target before going
+--- used by the XSL0402 (Othuy "lighting storm") to define the time to re-aquire a new target before going
 --- through the next lighting strike process
 ---@field RequireTime? number
 --- the number of projectiles in the firing salvo
@@ -287,10 +289,12 @@
 --- if the weapon goes directly from its `IdleState` to its `RackSalvoFiringState` without
 --- going through its `RackSalvoFireReadyState` first
 ---@field SkipReadyState? boolean
---- if the weapon is "slaved" to the unit's body, thus requiring it to face its target to fire
+--- If the weapon causes the unit to rotate towards the weapon's target when the target is outside of `SlavedToBodyArcRange`.
+--- With multiple slaved weapons, the first slaved weapon in the blueprint that currently has a target is used for turning.
+--- If `UnitBlueprintAI.AttackAngle` is true, then this causes the unit to rotate when attacking while idle.
 ---@field SlavedToBody? boolean
---- Range of arc in both directions to be considered "slaved" to a target. With multiple weapons, 
---- the first weapon in the blueprint that currently has a target is used for turning.
+--- Degrees to either side of the unit's heading outside of which the weapon will rotate the unit towards the target.
+--- Defaults to 1. Behavior gets overriden by `UnitBlueprintAI.AttackAngle`.
 ---@field SlavedToBodyArcRange? number
 --- flag to specify to not make the weapon active if the primary weapon has a current target
 ---@field StopOnPrimaryWeaponBusy? boolean
@@ -330,7 +334,7 @@
 ---@field TurretBoneYaw? Bone
 --- If two manipulators are needed for this weapon. Used for bots with arms.
 ---@field TurretDualManipulators? boolean
---- if this weapon has a turret
+--- if this weapon has a turret. Defaults to false
 ---@field Turreted boolean
 --- the center angle for determining pitch, based off the rest pose of the model
 ---@field TurretPitch number

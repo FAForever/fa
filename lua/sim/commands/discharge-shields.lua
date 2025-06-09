@@ -25,7 +25,7 @@ local TableGetn = table.getn
 local MathMin = math.min
 local StringFormat = string.format
 
-local CElectronBurstCloud01 = import("/lua/EffectTemplates.lua").CElectronBurstCloud01
+local CElectronBurstCloud01 = import("/lua/effecttemplates.lua").CElectronBurstCloud01
 
 --- Discharges the shields of the provided units
 ---@param units Unit[]

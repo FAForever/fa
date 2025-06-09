@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local SDFUltraChromaticBeamGenerator = import('/lua/sim/weapons/seraphim/SDFUltraChromaticBeamGenerator.lua').SDFUltraChromaticBeamGenerator
+local SDFUltraChromaticBeamGenerator = import('/lua/sim/weapons/seraphim/sdfultrachromaticbeamgenerator.lua').SDFUltraChromaticBeamGenerator
 local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
 
 ---@class SDFUltraChromaticBeamGenerator02 : SDFUltraChromaticBeamGenerator

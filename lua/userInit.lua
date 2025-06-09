@@ -18,6 +18,7 @@ end
 -- # Global (and shared) init
 doscript '/lua/globalInit.lua'
 doscript '/lua/ui/globals/GpgNetSend.lua'
+doscript '/lua/ui/globals/InternalSaveGame.lua'
 
 -- Do we have an custom language set inside user-options ?
 local selectedlanguage = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').selectedlanguage
@@ -273,9 +274,11 @@ do
         -- inform allies about self-destructed units
         if callback.Func == 'ToggleSelfDestruct' then
             local selectedUnits = GetSelectedUnits()
+            if selectedUnits then
+                -- try to inform moderators
+                ForkThread(SendModeratorEventThread, string.format('Self-destructed %d units', TableGetn(selectedUnits)))
+            end
 
-            -- try to inform moderators
-            ForkThread(SendModeratorEventThread, string.format('Self-destructed %d units', TableGetn(selectedUnits)))
         end
 
         -- inform moderators about pings
@@ -387,7 +390,7 @@ do
         commandMode.RestoreCommandMode(true)
     end
 
-    ---@param unit UserUnit[]
+    ---@param unit UserUnit
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
     ---@param count number
@@ -395,6 +398,16 @@ do
     _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
         UnitsCache[1] = unit
         IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
+    end
+
+    --- Issue a command to a given unit
+    ---@param unit UserUnit
+    ---@param command UserUnitCommand # Will crash the game if not a valid command.
+    ---@param luaParams? table | string | number | boolean # Will crash the game if the table contains non-serializable types.
+    ---@param clear? boolean
+    _G.IssueUnitCommandToUnit = function(unit, command, luaParams, clear)
+        UnitsCache[1] = unit
+        IssueUnitCommand(UnitsCache, command, luaParams, clear)
     end
 end
 

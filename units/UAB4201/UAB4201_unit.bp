@@ -2,7 +2,7 @@ UnitBlueprint{
     Description = "<LOC uab4201_desc>Tactical Missile Defense",
     AI = {
         TargetBones = {
-            "Door_Rt",
+            "Dome",
             "UAB4201",
         },
     },
@@ -118,7 +118,7 @@ UnitBlueprint{
     SelectionThickness = 0.45,
     CollisionOffsetY = -0.4,
     SizeX = 0.65,
-    SizeY = 0.9,
+    SizeY = 1.0,
     SizeZ = 1.25,
     StrategicIconName = "icon_structure2_antimissile",
     StrategicIconSortPriority = 200,

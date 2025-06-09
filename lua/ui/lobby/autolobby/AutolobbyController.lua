@@ -22,14 +22,16 @@
 
 local Utils = import("/lua/system/utils.lua")
 local MapUtil = import("/lua/ui/maputil.lua")
-local GameColors = import("/lua/GameColors.lua")
+local GameColors = import("/lua/gamecolors.lua")
 
 local MohoLobbyMethods = moho.lobby_methods
-local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
-local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/AutolobbyServerCommunicationsComponent.lua")
+local DebugComponent = import("/lua/shared/components/debugcomponent.lua").DebugComponent
+local AutolobbyServerCommunicationsComponent = import("/lua/ui/lobby/autolobby/components/autolobbyservercommunicationscomponent.lua")
     .AutolobbyServerCommunicationsComponent
 
-local AutolobbyMessages = import("/lua/ui/lobby/autolobby/AutolobbyMessages.lua").AutolobbyMessages
+local AutolobbyArgumentsComponent = import("/lua/ui/lobby/autolobby/components/autolobbyarguments.lua").AutolobbyArgumentsComponent
+
+local AutolobbyMessages = import("/lua/ui/lobby/autolobby/autolobbymessages.lua").AutolobbyMessages
 
 local AutolobbyEngineStrings = {
     --  General info strings
@@ -54,14 +56,35 @@ local AutolobbyEngineStrings = {
     ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
+-- associated textures are in `/textures/divisions/<division> <subdivision>.png` 
+-- Make note of the space, which isn't there for "grandmaster" and "unlisted" divisions
+
+---@alias Division
+---| "bronze"
+---| "silver"
+---| "gold"
+---| "diamond"
+---| "master"
+---| "grandmaster"
+---| "unlisted"
+
+---@alias Subdivision
+---| "I"
+---| "II"
+---| "III"
+---| "IV"
+---| "V"
+---| "" # when Division is grandmaster or unlisted
+
 ---@class UIAutolobbyPlayer: UILobbyLaunchPlayerConfiguration
 ---@field StartSpot number
 ---@field DEV number    # Related to rating/divisions
 ---@field MEAN number   # Related to rating/divisions
 ---@field NG number     # Related to rating/divisions
----@field DIV string    # Related to rating/divisions
----@field SUBDIV string # Related to rating/divisions
+---@field DIV Division    # Related to rating/divisions
+---@field SUBDIV Subdivision # Related to rating/divisions
 ---@field PL number     # Related to rating/divisions
+---@field PlayerClan string
 
 ---@alias UIAutolobbyConnections boolean[][]
 ---@alias UIAutolobbyStatus UIPeerLaunchStatus[]
@@ -86,7 +109,7 @@ local AutolobbyEngineStrings = {
 ---@field DesiredPeerId UILobbyPeerId
 
 --- Responsible for the behavior of the automated lobby.
----@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent
+---@class UIAutolobbyCommunications : moho.lobby_methods, DebugComponent, UIAutolobbyServerCommunicationsComponent, UIAutolobbyArgumentsComponent
 ---@field Trash TrashBag
 ---@field LocalPeerId UILobbyPeerId                             # a number that is stringified
 ---@field LocalPlayerName string                            # nickname
@@ -100,7 +123,7 @@ local AutolobbyEngineStrings = {
 ---@field LobbyParameters? UIAutolobbyParameters                # Used for rejoining functionality
 ---@field HostParameters? UIAutolobbyHostParameters             # Used for rejoining functionality
 ---@field JoinParameters? UIAutolobbyJoinParameters             # Used for rejoining functionality
-AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, DebugComponent) {
+AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsComponent, AutolobbyArgumentsComponent, DebugComponent) {
 
     ---@param self UIAutolobbyCommunications
     __init = function(self)
@@ -108,7 +131,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         self.LocalPeerId = "-2"
         self.LocalPlayerName = "Charlie"
-        self.PlayerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 2
+        self.PlayerCount = self:GetCommandLineArgumentNumber("/players", 2)
         self.HostID = "-2"
 
         self.GameMods = {}
@@ -147,20 +170,21 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         -- retrieve team and start spot
-        info.Team = tonumber(GetCommandLineArg("/team", 1)[1])
-        info.StartSpot = tonumber(GetCommandLineArg("/startspot", 1)[1]) or -1 -- TODO
+        info.Team = self:GetCommandLineArgumentNumber("/team", -1)
+        info.StartSpot = self:GetCommandLineArgumentNumber("/startspot", -1)
 
         -- determine army color based on start location
         info.PlayerColor = GameColors.MapToWarmCold(info.StartSpot)
         info.ArmyColor = GameColors.MapToWarmCold(info.StartSpot)
 
         -- retrieve rating
-        info.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or 500
-        info.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or 1500
-        info.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or 0
-        info.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
-        info.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
+        info.DEV = self:GetCommandLineArgumentNumber("/deviation", 500)
+        info.MEAN = self:GetCommandLineArgumentNumber("/mean", 1500)
+        info.NG = self:GetCommandLineArgumentNumber("/numgames", 0)
+        info.DIV = self:GetCommandLineArgumentString("/division", "")
+        info.SUBDIV = self:GetCommandLineArgumentString("/subdivision", "")
         info.PL = math.floor(info.MEAN - 3 * info.DEV)
+        info.PlayerClan = self:GetCommandLineArgumentString("/clan", "")
 
         return info
     end,
@@ -186,6 +210,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             Share = 'FullShare',
             ShareUnitCap = 'allies',
             DisconnectionDelay02 = '90',
+            DisconnectShare = 'SameAsShare',
+            DisconnectShareCommanders = 'Explode',
 
             -- yep, great
             Ranked = true,
@@ -193,7 +219,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         }
 
         -- process game options from the command line
-        for name, value in Utils.GetCommandLineArgTable("/gameoptions") do
+        for name, value in self:GetCommandLineArgumentArray("/gameoptions") do
             if name and value then
                 options[name] = value
             else
@@ -292,6 +318,59 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         end
 
         return 'Ready'
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, number>
+    CreateRatingsTable = function(self, playerOptions)
+        ---@type table<string, number>
+        local allRatings = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.Human and options.PL then
+                allRatings[options.PlayerName] = options.PL
+            end
+        end
+
+        return allRatings
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, string>
+    CreateDivisionsTable = function(self, playerOptions)
+        ---@type table<string, string>
+        local allDivisions = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.Human and options.PL then
+                if options.DIV ~= "unlisted" then
+                    local division = options.DIV
+                    if options.SUBDIV and options.SUBDIV ~= "" then
+                        division = division .. ' ' .. options.SUBDIV
+                    end
+                    allDivisions[options.PlayerName] = division
+                end
+            end
+        end
+
+        return allDivisions
+    end,
+
+    ---@param self UIAutolobbyCommunications
+    ---@param playerOptions UIAutolobbyPlayer[]
+    ---@return table<string, string>
+    CreateClanTagsTable = function(self, playerOptions)
+        local allClanTags = {}
+
+        for slot, options in pairs(playerOptions) do
+            if options.PlayerClan then
+                allClanTags[options.PlayerName] = options.PlayerClan
+            end
+        end
+
+        return allClanTags
     end,
 
     --- Verifies whether we can launch the game.
@@ -464,7 +543,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             self:SendLaunchStatusToServer(launchStatus)
 
             -- update UI for launch statuses
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
             WaitSeconds(2.0)
@@ -488,6 +567,12 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
                     end
 
+                    -- tuck them into the game options. By all means a hack, but
+                    -- this way they are available in both the sim and the UI
+                    self.GameOptions.Ratings = self:CreateRatingsTable(self.PlayerOptions)
+                    self.GameOptions.Divisions = self:CreateDivisionsTable(self.PlayerOptions)
+                    self.GameOptions.ClanTags = self:CreateClanTagsTable(self.PlayerOptions)
+
                     -- create game configuration
                     local gameConfiguration = {
                         GameMods = self.GameMods,
@@ -496,7 +581,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                         Observers = {},
                     }
 
-                    -- send it to all players and tell them to launch
+                    -- send it to all players and tell them to launch with the configuration
                     self:BroadcastData({ Type = "Launch", GameConfig = gameConfiguration })
                     self:LaunchGame(gameConfiguration)
                 end
@@ -537,13 +622,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:BroadcastData({ Type = "UpdatePlayerOptions", PlayerOptions = self.PlayerOptions })
 
         -- update UI for player options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
 
         local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
         if localIndex then
             local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateOwnership(ownershipMatrix)
         end
     end,
@@ -554,14 +639,14 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.PlayerOptions = data.PlayerOptions
 
         -- update UI for player options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
 
         local localIndex = self:PeerIdToIndex(self.PlayerOptions, self.LocalPeerId)
         if localIndex then
             local ownershipMatrix = self:CreateOwnershipMatrix(self.PlayerCount, localIndex)
             -- update UI for player options
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateOwnership(ownershipMatrix)
         end
     end,
@@ -574,7 +659,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:Prefetch(self.GameOptions, self.GameMods)
 
         -- update UI for game options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
     end,
 
@@ -590,7 +675,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self.LaunchStatutes[data.SenderID] = data.LaunchStatus
 
         -- update UI for launch statuses
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
     end,
 
@@ -822,7 +907,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:SendLaunchStatusToServer('Hosting')
 
         -- update UI for game options
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateScenario(self.GameOptions.ScenarioFile, self.PlayerOptions)
     end,
 
@@ -872,13 +957,13 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
 
         self.LaunchStatutes[peerId] = self.LaunchStatutes[peerId] or 'Unknown'
         -- update UI for launch statuses
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateLaunchStatuses(self:CreateConnectionStatuses(self.PlayerOptions, self.LaunchStatutes))
 
         -- update the matrix and the UI
         self.ConnectionMatrix[peerId] = peerConnectedTo
         local connections = self:CreateConnectionsMatrix(self.PlayerOptions, self.ConnectionMatrix)
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
             :UpdateConnections(connections)
     end,
 
@@ -913,7 +998,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- signal UI that we received something
         local peerIndex = self:PeerIdToIndex(self.PlayerOptions, data.SenderID)
         if peerIndex then
-            import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton()
+            import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton()
                 :UpdateIsAliveStamp(peerIndex)
         end
 
@@ -961,7 +1046,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         self:DebugSpew("GameLaunched")
 
         -- clear out the interface
-        import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").GetSingleton():Destroy()
+        import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").GetSingleton():Destroy()
 
         -- destroy ourselves, the game takes over the management of peers
         self:Destroy()

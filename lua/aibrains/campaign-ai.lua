@@ -13,10 +13,28 @@ local TableRemove = table.remove
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 
+---@class AiBuildLocation
+---@field Location Vector Position of the build location
+---@field Radius number
+---@field LocationType string Name of the location
+---@field PrimaryFactories table
+---@field UseCenterPoint boolean If its `true` and no specific rally point is specified, `Location`` is used as the rally position.
+
 --- A basic campaign brain. Contains all the functionality that a campaign brain requires. This
 --- brain is a 'blunt' copy of the functionality that is required to run various campaign maps.
 ---@class CampaignAIBrain: AIBrain
+---@field AIPlansList string[][]
+---@field AttackManager AttackManager
+---@field BaseManagers table<string, BaseManager>
+---@field BaseTemplates table<string, BmBaseTemplates> List of templates for the base manager to maintain
+---@field ConstantEval boolean
+---@field CurrentPlan string lua file which contains plan
+---@field CurrentPlanScript table
+---@field HasPlatoonList boolean
+---@field IgnoreArmyCaps boolean Allows spawning more units than the set unit capacity with `ScenarioUtilities` functions
+---@field LayerPref "LAND" | "AIR"
 ---@field PBM AiPlatoonBuildManager
+---@field RepeatExecution boolean
 AIBrain = Class(StandardBrain) {
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
@@ -49,7 +67,7 @@ AIBrain = Class(StandardBrain) {
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
     ---@param self CampaignAIBrain
-    ---@param planName string
+    ---@param planName FileName
     CreateBrainShared = function(self, planName)
         StandardBrain.CreateBrainShared(self, planName)
 
@@ -76,13 +94,13 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
-        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
+        self.GridPresence = import("/lua/ai/gridpresence.lua").Setup(self)
     end,
 
     ---@param self EasyAIBrain
@@ -99,7 +117,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ----------------------------------------------------------------------------------------
-    --- campaign functionality
+    --#region campaign functionality
 
     ---@param self CampaignAIBrain
     ---@param planName FileName
@@ -191,6 +209,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
+    ---@param repeatEx boolean
     SetRepeatExecution = function(self, repeatEx)
         self.RepeatExecution = repeatEx
     end,
@@ -242,7 +261,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param attackDataTable table
+    ---@param attackDataTable? table
     InitializeAttackManager = function(self, attackDataTable)
         self.AttackManager = import("/lua/ai/attackmanager.lua").AttackManager(self, attackDataTable)
         self.AttackData = self.AttackManager
@@ -266,6 +285,7 @@ AIBrain = Class(StandardBrain) {
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
             ---@class AiPlatoonBuildManager
+            ---@field Locations AiBuildLocation[]
             self.PBM = {
                 BuildCheckInterval = nil,
                 Platoons = {
@@ -569,9 +589,9 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self CampaignAIBrain
     ---@param factories Unit
-    ---@param location Vector
-    ---@param rallyLoc Vector
-    ---@param markerType string
+    ---@param location AiBuildLocation
+    ---@param rallyLoc? Vector
+    ---@param markerType? string Marker type to use. Defaults to `Rally Point`
     ---@return boolean
     PBMSetRallyPoint = function(self, factories, location, rallyLoc, markerType)
         if not TableEmpty(factories) then
@@ -614,12 +634,11 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self CampaignAIBrain
     ---@param factory Unit
-    ---@param location Vector
+    ---@param location AiBuildLocation|string
     ---@return boolean
     PBMFactoryLocationCheck = function(self, factory, location)
         -- If passed in a PBM Location table or location type name
         local locationName = location
-        local locationPosition
         if type(location) == 'table' then
             locationName = location.LocationType
         end
@@ -715,13 +734,11 @@ AIBrain = Class(StandardBrain) {
     ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@param amount number
-    ---@return boolean
     PBMAdjustPriority = function(self, platoon, amount)
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
                 if not v.PlatoonHandles then
                     error('*AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
-                    return false
                 end
                 for num, plat in v.PlatoonHandles do
                     if plat == platoon then
@@ -742,13 +759,11 @@ AIBrain = Class(StandardBrain) {
     ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@param amount number
-    ---@return boolean
     PBMSetPriority = function(self, platoon, amount)
         for typek, typev in self.PBM.PlatoonTypes do
             for k, v in self.PBM.Platoons[typev] do
                 if not v.PlatoonHandles then
                     error('*AI DEBUG: No PlatoonHandles for builder - ' .. v.BuilderName)
-                    return false
                 end
                 for num, plat in v.PlatoonHandles do
                     if plat == platoon then
@@ -768,15 +783,13 @@ AIBrain = Class(StandardBrain) {
 
     ---Adds a new build location
     ---@param self CampaignAIBrain
-    ---@param loc Vector
+    ---@param loc MarkerName|Vector
     ---@param radius number
     ---@param locType string
     ---@param useCenterPoint? boolean
-    ---@return boolean
     PBMAddBuildLocation = function(self, loc, radius, locType, useCenterPoint)
         if not radius or not loc or not locType then
             error('*AI ERROR: INVALID BUILD LOCATION FOR PBM', 2)
-            return false
         end
         if type(loc) == 'string' then
             loc = ScenarioUtils.MarkerToPosition(loc)
@@ -803,7 +816,6 @@ AIBrain = Class(StandardBrain) {
             TableInsert(self.PBM.Locations, spec)
         else
             error('*AI  ERROR: Attempting to add a build location with a duplicate name: '..spec.LocationType, 2)
-            return
         end
     end,
 
@@ -842,7 +854,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param loc Vector
+    ---@param loc string
     ---@return boolean
     PBMGetLocationRadius = function(self, loc)
         if not loc then
@@ -859,7 +871,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param location Vector
+    ---@param location string
     ---@return boolean
     PBMGetLocationFactories = function(self, location)
         if not location then
@@ -874,7 +886,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param location Vector
+    ---@param location string
     ---@return FactoryUnit[] | false
     PBMGetAllFactories = function(self, location)
         if not location then
@@ -903,8 +915,8 @@ AIBrain = Class(StandardBrain) {
     --- IF either is nil, then it will do the other.
     --- This way you can remove all of one type or all of one rectangle
     ---@param self CampaignAIBrain
-    ---@param loc Vector
-    ---@param locType string
+    ---@param loc? Vector
+    ---@param locType? string
     PBMRemoveBuildLocation = function(self, loc, locType)
         for k, v in self.PBM.Locations do
             if (loc and v.Location == loc) or (locType and v.LocationType == locType) then
@@ -916,12 +928,11 @@ AIBrain = Class(StandardBrain) {
     --- Sort platoon list
     ---@param self CampaignAIBrain
     ---@param platoonType PlatoonType
-    ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
-         if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
+        if platoonType ~= 'Air' and platoonType ~= 'Land' and platoonType ~= 'Sea' and platoonType ~= 'Gate' then
             error('*AI ERROR: TRYING TO SORT PLATOONS VIA PRIORITY BUT AN INVALID TYPE (' .. tostring(platoonType) .. ') WAS PASSED IN.', 2)
-            return false
         end
+
         local sortedList = {}
         -- Simple selection sort, this can be made faster later if we decide we need it.
         for i = 1, TableGetn(self.PBM.Platoons[platoonType]) do
@@ -1252,7 +1263,7 @@ AIBrain = Class(StandardBrain) {
     ---@param self CampaignAIBrain
     ---@param requireBuilding boolean `true` = platoon must have `'BUILDING'` has its handle, `false` = it'll form any platoon it can
     ---@param platoonType PlatoonType Platoontype is just `'Air'/'Land'/'Sea'`, those are found in the platoon build manager table template.
-    ---@param location Vector Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
+    ---@param location AiBuildLocation Specific build location where to do this.  If they aren't specified they will grab from anywhere.
     PBMFormPlatoons = function(self, requireBuilding, platoonType, location)
         local platoonList = self.PBM.Platoons
         local personality = self:GetPersonality()
@@ -1391,8 +1402,8 @@ AIBrain = Class(StandardBrain) {
     --- Get the primary factory with the lowest order count
     --- This is used for the 'Any' platoon type so we can find any primary factory to build from.
     ---@param self CampaignAIBrain
-    ---@param location Vector
-    ---@return Vector
+    ---@param location AiBuildLocation
+    ---@return FactoryUnit
     GetLowestOrderPrimaryFactory = function(self, location)
         local num
         local fac
@@ -1533,7 +1544,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---@param self CampaignAIBrain
-    ---@param location Vector
+    ---@param location AiBuildLocation
     ---@param pType PlatoonType
     ---@return integer
     PBMGetNumFactoriesAtLocation = function(self, location, pType)
@@ -1727,8 +1738,9 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
+    --#endregion
     ----------------------------------------------------------------------------------------
-    --- legacy functionality
+    --#region legacy functionality
     ---
     --- All functions below solely exist because the code is too tightly coupled. We can't
     --- remove them without drastically changing how the code base works. We can't do that
@@ -1745,4 +1757,5 @@ AIBrain = Class(StandardBrain) {
     ForceManagerSort = function(self)
     end,
 
+    --#endregion
 }

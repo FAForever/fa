@@ -497,9 +497,6 @@ FactoryBuilderManager = Class(BuilderManager) {
             return false
         end
 
-        local personality = self.Brain:GetPersonality()
-        local ptnSize = personality:GetPlatoonSize()
-
         -- This function takes a table of factories to determine if it can build
         return self.Brain:CanBuildPlatoon(template, params)
     end,

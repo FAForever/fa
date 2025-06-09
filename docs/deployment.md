@@ -21,7 +21,7 @@ The deployment procedure can be a lengthy process because it involves various st
 
 ### Deployment of engine patches
 
-The deployment of engine patches to the release branch is a manual process. This is intentional from a security perspective - it provides a second pair of eyes from a server administrator who is usually not directly related to the game team. 
+The deployment of engine patches to the release branch is a manual process. This is intentional from a security perspective - it provides a second pair of eyes from a server administrator who is usually not directly related to the game team.
 
 - (1) Make sure that any open changes that you want to include are merged to the `master` branch of the [Binary patches](https://github.com/FAForever/FA-Binary-Patches) repository.
 - (2) Update the executable of the `FAF Develop` and `FAF Beta Balance` game types using the [Upload workflow](https://github.com/FAForever/FA-Binary-Patches/actions).
@@ -65,7 +65,7 @@ At this point you need to wait until the `changelog branch` is merged.
 ### Deployment - final steps
 
 - (1) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [master](https://github.com/FAForever/fa/tree/master) branch.
-- - (1.1) Set the tag with the game version. 
+- - (1.1) Set the tag with the game version.
 - - (1.2) Match the format of the title with that of previous releases.
 - - (1.3) Copy and paste the changelog into the description. Make sure to remove the title as a release has its own title.
 - - (1.4) Create the release.
@@ -78,15 +78,47 @@ The workflow requires an approval of another maintainer. Once approved, wait for
 
 Once all this is run you can review the status of the deployment by the server in the [production environment](https://github.com/FAForever/fa/deployments/production). Once that returns green the deployment succeeded and you can inform the community of the deployment. Congratulations!
 
-## Automated deployments
+## Automation
 
-There are three workflows to help with deployment:
+Some facets of deployment are automated to make development easier.
 
-- [FAF game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
-- [FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml)
-- [FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml)
+### Staging
 
-The workflows for Beta Balance and Develop trigger periodically. You can review when by evaluating the [cron expression](https://crontab.cronhub.io/). The [API of FAForever](https://github.com/FAForever/faf-java-api/blob/develop/src/main/java/com/faforever/api/deployment/GitHubDeploymentService.java) registers the push to a deployment branch via a webhook. The server creates (and updates) a [deployment status](https://github.com/FAForever/fa/deployments). During that process the server retrieves the game related files, processes it and when everything is fine the new game version will be available in roughly 5 to 10 minutes.
+There are two workflows for staging changes:
+
+- [Stage FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/stage-fafbeta.yaml)
+- [Stage FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/stage-fafdevelop.yaml)
+
+Relevant branches for the respective game types:
+
+- FAF: `master`
+- FAF Beta Balance: `staging/fafbeta`
+- FAF Develop: `staging/fafdevelop`
+
+Staging branches make it easier to:
+
+- **Test individual changes or commits**: Force push the `master` branch to a staging branch, proceed to cherry-pick the desired changes and then trigger the deployment workflow.
+- **Test experimental changes from a pull request**: Force push the branch to a staging branch, then trigger the deployment workflow.
+
+Staging branches are periodically updated automatically to keep them aligned with ongoing development. You can review the schedule by evaluating the [cron expression](https://crontab.cronhub.io/) in the workflow files.
+
+### Deployment
+
+There are three workflows for deployment:
+
+- [Deploy FAF game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-faf.yaml)
+- [Deploy FAF Beta Balance game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafbeta.yaml)
+- [Deploy FAF Develop game type](https://github.com/FAForever/fa/blob/develop/.github/workflows/deploy-fafdevelop.yaml)
+
+Each deployment workflow picks up commits from a staging branch, post-processes them, and force pushes them to a branch that triggers deployment. Relevant branches:
+
+- FAF: `master` -> `deploy/faf`
+- FAF Beta Balance: `staging/fafbeta` -> `staging/fafbeta`
+- FAF Develop: `staging/fafdevelop` -> `staging/fafdevelop`
+
+The deployment workflows for FAF Beta Balance and FAF Develop are triggered periodically. You can review the schedule by evaluating the [cron expression](https://crontab.cronhub.io/) in the workflow files.
+
+The [FAForever API](https://github.com/FAForever/faf-java-api/blob/develop/src/main/java/com/faforever/api/deployment/GitHubDeploymentService.java) registers the push to a deployment branch via webhook. The server creates and updates a [deployment status](https://github.com/FAForever/fa/deployments). During this process, the server retrieves and processes the relevant game files. If successful, the new game version becomes available within approximately 5 to 10 minutes.
 
 ## Related deployments
 

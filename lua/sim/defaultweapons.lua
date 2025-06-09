@@ -20,14 +20,14 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-DefaultProjectileWeapon = import("/lua/sim/weapons/DefaultProjectileWeapon.lua").DefaultProjectileWeapon
-KamikazeWeapon = import("/lua/sim/weapons/KamikazeWeapon.lua").KamikazeWeapon
-BareBonesWeapon = import("/lua/sim/weapons/BareBonesWeapon.lua").BareBonesWeapon
-OverchargeWeapon = import("/lua/sim/weapons/OverchargeWeapon.lua").OverchargeWeapon
-DefaultBeamWeapon = import("/lua/sim/weapons/DefaultBeamWeapon.lua").DefaultBeamWeapon
-DeathNukeWeapon = import("/lua/sim/weapons/DeathNukeWeapon.lua").DeathNukeWeapon
-SCUDeathWeapon = import("/lua/sim/weapons/SCUDeathWeapon.lua").SCUDeathWeapon
-ACUDeathWeapon = import("/lua/sim/weapons/ACUDeathWeapon.lua").ACUDeathWeapon
+DefaultProjectileWeapon = import("/lua/sim/weapons/defaultprojectileweapon.lua").DefaultProjectileWeapon
+KamikazeWeapon = import("/lua/sim/weapons/kamikazeweapon.lua").KamikazeWeapon
+BareBonesWeapon = import("/lua/sim/weapons/barebonesweapon.lua").BareBonesWeapon
+OverchargeWeapon = import("/lua/sim/weapons/overchargeweapon.lua").OverchargeWeapon
+DefaultBeamWeapon = import("/lua/sim/weapons/defaultbeamweapon.lua").DefaultBeamWeapon
+DeathNukeWeapon = import("/lua/sim/weapons/deathnukeweapon.lua").DeathNukeWeapon
+SCUDeathWeapon = import("/lua/sim/weapons/scudeathweapon.lua").SCUDeathWeapon
+ACUDeathWeapon = import("/lua/sim/weapons/acudeathweapon.lua").ACUDeathWeapon
 
 -- kept for mod backwards compatibility
 local Weapon = import("/lua/sim/weapon.lua").Weapon

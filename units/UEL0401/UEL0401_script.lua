@@ -17,6 +17,8 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
+local IsDestroyed = IsDestroyed
+
 ---@class UEL0401 : TMobileFactoryUnit, ExternalFactoryComponent
 ---@field UnitBeingBuilt Unit | nil
 ---@field AttachmentSliderManip moho.SlideManipulator
@@ -100,6 +102,10 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+        -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
+        if not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
+            unitBeingBuilt:Destroy()
+        end
         self.BuildingUnit = false
     end,
 
@@ -184,6 +190,13 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+            -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled.
+            if unitBeingBuilt:GetFractionComplete() < 1 then
+                unitBeingBuilt:Destroy()
+                ChangeState(self, self.IdleState)
+                return
+            end
+
             ChangeState(self, self.RollingOffState)
         end,
     },
@@ -258,7 +271,8 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         local explosionBones = {}
         local explosionBoneCount = table.getn(self.ExplosionBones)
 
-        if instigator then
+        -- Since this is a thread, it is delayed by 1 tick so the instigator may be destroyed
+        if not IsDestroyed(instigator) then
             -- if there is an instigator, favor exploding bits that are near the instigator
             local ix, iy, iz = instigator:GetPositionXYZ()
             for k, bone in self.ExplosionBones do

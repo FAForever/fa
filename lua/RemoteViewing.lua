@@ -7,11 +7,29 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 -- TODO: make sure each new instance is using a previous metatable
+
+-- TODO: Fix the RemoteViewingUnit class annotation always taking definitions from the Unit class instead of the base class.
+
+---@class RemoteViewingData
+---@field RemoteViewingFunctions table
+---@field DisableCounter number
+---@field IntelButton boolean
+---@field Satellite VizMarker
+---@field PendingVisibleLocation Vector
+---@field VisibleLocation Vector
+
+---@generic T: Unit
+---@param SuperClass T | Unit
+---@return T | RemoteViewingUnit
 function RemoteViewing(SuperClass)
+    ---@class RemoteViewingUnit: Unit
+    ---@field RemoteViewingData RemoteViewingData
     return Class(SuperClass) {
+        ---@param self RemoteViewingUnit
         OnCreate = function(self)
             SuperClass.OnCreate(self)
             self.RemoteViewingData = {}
@@ -20,12 +38,19 @@ function RemoteViewing(SuperClass)
             self.RemoteViewingData.IntelButton = true
         end,
 
-        OnStopBeingBuilt = function(self,builder,layer)
+        ---@param self RemoteViewingUnit
+        ---@param builder Unit
+        ---@param layer Layer
+        OnStopBeingBuilt = function(self, builder, layer)
             self.Sync.Abilities = self:GetBlueprint().Abilities
             self:SetMaintenanceConsumptionInactive()
-            SuperClass.OnStopBeingBuilt(self,builder,layer)
+            SuperClass.OnStopBeingBuilt(self, builder, layer)
         end,
 
+        ---@param self RemoteViewingUnit
+        ---@param instigator Unit
+        ---@param type DamageType
+        ---@param overkillRatio number
         OnKilled = function(self, instigator, type, overkillRatio)
             SuperClass.OnKilled(self, instigator, type, overkillRatio)
             if self.RemoteViewingData.Satellite then
@@ -34,18 +59,21 @@ function RemoteViewing(SuperClass)
             self:SetMaintenanceConsumptionInactive()
         end,
 
+        ---@param self RemoteViewingUnit
         DisableRemoteViewingButtons = function(self)
             self.Sync.Abilities = self:GetBlueprint().Abilities
             self.Sync.Abilities.TargetLocation.Active = false
             self:RemoveToggleCap('RULEUTC_IntelToggle')
         end,
 
+        ---@param self RemoteViewingUnit
         EnableRemoteViewingButtons = function(self)
             self.Sync.Abilities = self:GetBlueprint().Abilities
             self.Sync.Abilities.TargetLocation.Active = true
             self:AddToggleCap('RULEUTC_IntelToggle')
         end,
 
+        ---@param self RemoteViewingUnit
         TargetLocationThread = function(self)
             local Cost = CreateEconomyEvent(self, self:GetBlueprint().Economy.InitialRemoteViewingEnergyDrain * (self.EnergyMaintAdjMod or 1), 0, 1, self.SetWorkProgress)
             WaitFor(Cost)
@@ -57,6 +85,8 @@ function RemoteViewing(SuperClass)
             self:CreateVisibleEntity()
         end,
 
+        ---@param self RemoteViewingUnit
+        ---@param location Vector
         OnTargetLocation = function(self, location)
             if self.RemoteViewingData.PendingVisibleLocation then
                 self.RemoteViewingData.PendingVisibleLocation = location
@@ -65,7 +95,8 @@ function RemoteViewing(SuperClass)
                 self:ForkThread(self.TargetLocationThread)
             end
         end,
-        
+
+        ---@param self RemoteViewingUnit
         CreateVisibleEntity = function(self)
             -- Only give a visible area if we have a location and intel button enabled
             if not self.RemoteViewingData.VisibleLocation then
@@ -94,7 +125,7 @@ function RemoteViewing(SuperClass)
                 else
                     -- Move and reactivate old visible area
                     if not self.RemoteViewingData.Satellite:BeenDestroyed() then
-                        Warp( self.RemoteViewingData.Satellite, self.RemoteViewingData.VisibleLocation )
+                        Warp(self.RemoteViewingData.Satellite, self.RemoteViewingData.VisibleLocation)
                         self.RemoteViewingData.Satellite:EnableIntel('Omni')
                         self.RemoteViewingData.Satellite:EnableIntel('Radar')
                         self.RemoteViewingData.Satellite:EnableIntel('Vision')
@@ -109,6 +140,7 @@ function RemoteViewing(SuperClass)
             end
         end,
 
+        ---@param self RemoteViewingUnit
         DisableVisibleEntity = function(self)
             -- visible entity already off
             if self.RemoteViewingData.DisableCounter > 1 then return end
@@ -121,6 +153,8 @@ function RemoteViewing(SuperClass)
             end
         end,
 
+        ---@param self RemoteViewingUnit
+        ---@param intel IntelType
         OnIntelEnabled = function(self, intel)
             -- Make sure the button is only calculated once rather than once per possible intel type
             if not self.RemoteViewingData.IntelButton then
@@ -131,6 +165,8 @@ function RemoteViewing(SuperClass)
             SuperClass.OnIntelEnabled(self, intel)
         end,
 
+        ---@param self RemoteViewingUnit
+        ---@param intel IntelType
         OnIntelDisabled = function(self, intel)
             -- make sure button is only calculated once rather than once per possible intel type
             if self.RemoteViewingData.IntelButton then
@@ -141,6 +177,7 @@ function RemoteViewing(SuperClass)
             SuperClass.OnIntelDisabled(self, intel)
         end,
 
+        ---@param self RemoteViewingUnit
         DisableResourceMonitor = function(self)
             WaitSeconds(0.5)
             local fraction = self:GetResourceConsumed()
@@ -155,6 +192,7 @@ function RemoteViewing(SuperClass)
             end
         end,
 
+        ---@param self RemoteViewingUnit
         EnableResourceMonitor = function(self)
             local recharge = self:GetBlueprint().Intel.ReactivateTime or 10
             WaitSeconds(recharge)

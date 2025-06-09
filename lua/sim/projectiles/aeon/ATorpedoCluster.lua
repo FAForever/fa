@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local ATorpedoShipProjectile = import("/lua/sim/projectiles/aeon/ATorpedoShipProjectile.lua").ATorpedoShipProjectile
+local ATorpedoShipProjectile = import("/lua/sim/projectiles/aeon/atorpedoshipprojectile.lua").ATorpedoShipProjectile
 
 --- AEON TORPEDO CLUSTER
 ---@class ATorpedoCluster : ATorpedoShipProjectile

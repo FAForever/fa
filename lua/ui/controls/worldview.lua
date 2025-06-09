@@ -20,6 +20,9 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
 local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
+local WorldViewCameraComponent = import("/lua/ui/controls/components/worldviewcameracomponent.lua").WorldViewCameraComponent
+local WorldViewShapeComponent = import("/lua/ui/controls/components/worldviewshapecomponent.lua").WorldViewShapeComponent
+
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
     ui_DisableCursorFixing = false,
@@ -32,17 +35,15 @@ local KeyCodeAlt = 18
 local KeyCodeCtrl = 17
 local KeyCodeShift = 16
 
+---@type table<UnitId, WeaponBlueprint[] | false>
 local unitsToWeaponsCached = { }
-
----@class Renderable : Destroyable
----@field OnRender fun(self:Renderable, worldView:WorldView)
 
 ---@class WorldViewDecalData
 ---@field texture string
 ---@field scale number
 
 --- Returns all unique weapon blueprints that match the predicate, and are from units with the `SHOWATTACKRETICLE` category set
----@param predicate function<WeaponBlueprint>
+---@param predicate fun(WeaponBlueprint: WeaponBlueprint): boolean
 ---@return table<UnitId, WeaponBlueprint[] | false> unitsToWeapons
 local function GetSelectedWeaponsWithReticules(predicate)
     local selectedUnits = GetSelectedUnits()
@@ -76,8 +77,8 @@ local function GetSelectedWeaponsWithReticules(predicate)
 end
 
 --- A generic decal texture / size computation function that uses the damage or spread radius
----@param predicate function<WeaponBlueprint>
----@return WorldViewDecalData[]
+---@param predicate fun(WeaponBlueprint: WeaponBlueprint): boolean
+---@return WorldViewDecalData[] | false
 local function RadiusDecalFunction(predicate)
     local unitsToWeapons = GetSelectedWeaponsWithReticules(predicate)
 
@@ -146,7 +147,7 @@ local function NukeDecalFunc()
 end
 
 --- A decal texture / size computation function for `RULEUCC_Tactical`
----@return WorldViewDecalData[]
+---@return WorldViewDecalData[] | false
 local function TacticalDecalFunc()
     return RadiusDecalFunction(
         function(w)
@@ -156,7 +157,7 @@ local function TacticalDecalFunc()
 end
 
 --- A decal texture / size computation function for `RULEUCC_Attack`
----@return WorldViewDecalData[]
+---@return WorldViewDecalData[] | false
 local function AttackDecalFunc(mode)
     return RadiusDecalFunction(
         function(w)
@@ -167,7 +168,7 @@ local function AttackDecalFunc(mode)
 end
 
 --- A decal texture / size computation function for `RULEUCC_Overcharge`
----@return WorldViewDecalData[]
+---@return WorldViewDecalData[] | false
 local function OverchargeDecalFunc()
     return RadiusDecalFunction(
         function(w)
@@ -215,24 +216,43 @@ local orderToCursorCallback = {
     RULEUCC_RetaliateToggle = nil,
 }
 
----@class WorldView : moho.UIWorldView, Control, InternalObject
+---@class PingGroup : Group
+---@field coords Vector2 # On-screen coordinates
+---@field data SyncPingData
+---@field Marker Bitmap
+
+---@class WorldView : moho.UIWorldView, Control, UIWorldViewShapeComponent, UIWorldViewCameraComponent
+---@field _cameraName string        # Name of the camera this world view is attached to.
+---@field _disableMarkers boolean   # If true then markers won't show.
+---@field _displayName string       # Used in the interface
+---@field _order number             # Appears unused
+---@field _registered boolean       # Flag that indicates if this world view is registered with the world view manager.
 ---@field Cursor table
 ---@field CursorTrash TrashBag
----@field CursorLastEvent any
+---@field CursorLastEvent CommandCap | 'MESSAGE' # Corresponds to keys in `orderToCursorCallback`
 ---@field CursorLastIdentifier CommandCap
 ---@field CursorOverride CommandCap
----@field CursorDecalTrash UserDecal[]
+---@field CursorDecalTrash TrashBag | UserDecal[]
 ---@field CursorOverWorld boolean
 ---@field IgnoreMode boolean
 ---@field Trash TrashBag
----@field Renderables table<string, Renderable>
-WorldView = ClassUI(moho.UIWorldView, Control) {
+---@field PaintingCanvas UIPaintingCanvas
+---@field SelectionTolerance? number
+---@field Markers table<integer, table<number, PingGroup>>
+---@field PingVis? boolean # If markers are visible
+---@overload fun(parentControl: Control, cameraName: string, depth: number, isMiniMap: boolean, trackCamera: boolean?): WorldView
+WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldViewCameraComponent) {
 
     PingThreads = {},
 
     ---@param self WorldView
-    ---@param spec any
-    __post_init = function(self, spec)
+    ---@param parentControl Control
+    ---@param cameraName string
+    ---@param depth number
+    ---@param isMiniMap boolean
+    ---@param trackCamera boolean?
+    __post_init = function(self, parentControl, cameraName, depth, isMiniMap, trackCamera)
+        WorldViewShapeComponent.__post_init(self)
 
         --- Contains cursor textures
         self.Cursor = { }
@@ -256,8 +276,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
         self.Trash = TrashBag()
 
-        self.Renderables = {}
-
+        -- we do not want the module to reload if we reload this
+        local CreatePaintingCanvas = import("/lua/ui/game/painting/PaintingCanvas.lua").CreatePaintingCanvas
+        self.PaintingCanvas = self.Trash:Add(CreatePaintingCanvas(self))
     end,
 
     ---@param self WorldView
@@ -272,7 +293,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     end,
 
     --- Sets the selection tolerance to ignore everything
-    ---@param self any
+    ---@param self WorldView
     SetIgnoreSelectTolerance = function(self)
         local tolerance = -1000
         if tolerance != self.SelectionTolerance then
@@ -283,7 +304,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     end,
 
     --- Reverts the selection tolerance back to the default
-    ---@param self any
+    ---@param self WorldView
     SetDefaultSelectTolerance = function(self)
         local tolerance
         if SessionIsReplay() then
@@ -300,7 +321,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     end,
 
     --- Sets the selection tolerance to make it easier to reclaim
-    ---@param self any
+    ---@param self WorldView
     SetReclaimSelectTolerance = function(self)
         local tolerance = Prefs.GetFieldFromCurrentProfile('options').selection_threshold_reclaim
 
@@ -312,7 +333,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     end,
 
     --- Only accept move and attack move commands, ignore everything else
-    ---@param self any
+    ---@param self WorldView
     ---@param enabled boolean
     EnableIgnoreMode = function(self, enabled)
         if enabled then
@@ -342,7 +363,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     end,
 
     --- Called each frame to update the cursor, by the engine. We use it to determine the correct command
-    ---@param self any
+    ---@param self WorldView
     OnUpdateCursor = function(self)
         -- gather all information
         local selection = GetSelectedUnits()
@@ -384,7 +405,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
 
         -- perform the action accordingly
-        self:OnCursor(order, selection, command_data)
+        self:OnCursor(order)
     end,
 
     --- Calls command-specific code to manage the cursor, if available
@@ -421,7 +442,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param identifier CommandCap
     ---@param enabled boolean
     ---@param changed boolean
-    ---@param getDecalsBasedOnSelection function # See the radial decal functions
+    ---@param getDecalsBasedOnSelection fun():(WorldViewDecalData[] | false) # See the radial decal functions
     OnCursorDecals = function(self, identifier, enabled, changed, getDecalsBasedOnSelection)
         if enabled then
             if changed then
@@ -453,7 +474,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
     --- Resets the cursor texture and state
     ---@param self WorldView
-    ---@param identifier CommandCap
+    ---@param identifier CommandCap # unused
     ---@param enabled boolean
     ---@param changed boolean
     OnCursorReset = function(self, identifier, enabled, changed)
@@ -471,19 +492,20 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
     --- Called when hovering over a command
     ---@param self WorldView
-    ---@param identifier CommandCap
+    ---@param identifier CommandCap # unused
     ---@param enabled boolean
     ---@param changed boolean
     OnCursorCommandHover = function(self, identifier, enabled, changed)
-        if self:ShowConvertToPatrolCursor() then
-            local cursor = self.Cursor
-            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("MOVE2PATROLCOMMAND")
-        else
-            local cursor = self.Cursor
-            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('HOVERCOMMAND')
+        if changed then
+            if self:ShowConvertToPatrolCursor() then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("MOVE2PATROLCOMMAND")
+            else
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('HOVERCOMMAND')
+            end
+            self:ApplyCursor()
         end
-
-        self:ApplyCursor()
     end,
 
     --- Called when the order `RULEUCC_Move` is being applied
@@ -635,7 +657,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-                CommandMode.GetCommandMode()[2].reticle = TeleportReticle(self)
+                TeleportReticle(self)
             end
         end
     end,
@@ -682,6 +704,12 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         self:OnCursorDecals(identifier, enabled, changed, NukeDecalFunc)
     end,
 
+    --- Applies the reclaim cursor with the Disabled version if necessary
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    ---@param canIssueReclaimOrders boolean
+    ---@param viaCommandMode boolean # unused
+    ---@param viaRightMouseButton boolean # unused
     ApplyReclaimCursor = function(self, identifier, canIssueReclaimOrders, viaCommandMode, viaRightMouseButton)
         local reference = identifier
         if not canIssueReclaimOrders then
@@ -845,7 +873,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
-    --- Called when the order `MESSAGE` is being applied
+    --- Called when the order `MESSAGE` is being applied (placing a marker using the multifunction panel's button)
     ---@param self WorldView
     ---@param identifier 'MESSAGE'
     ---@param enabled boolean
@@ -907,9 +935,18 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
     --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
     ---@param self WorldView
-    ---@param event any
+    ---@param event KeyEvent
     ---@return boolean
     HandleEvent = function(self, event)
+
+        -- pass down the event to the canvas manually. This way we skip the 
+        -- hierarchy of the engine. For more information, see the comment in 
+        -- the function. 
+        if self.PaintingCanvas then
+            self.PaintingCanvas:HandleWorldViewEvent(event)
+        end
+
+
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
             self.CursorOverWorld = true
             if not table.empty(self.Cursor) then
@@ -953,10 +990,11 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         return false
     end,
 
+    ---@param self WorldView
     OnDestroy = function(self)
-
         -- take out the trash
         self.Trash:Destroy()
+        self.Shapes:Destroy()
 
         -- take out all ping threads
         for i, v in self.PingThreads do
@@ -970,15 +1008,19 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         Ping.UpdateMarker({Action = 'renew'})
     end,
 
+    --- Called from `commandgraph.lua`, but that is currently disabled.
+    ---@param self WorldView
     OnCommandDragBegin = function(self)
     end,
 
+    --- Called from `commandgraph.lua`, but that is currently disabled.
+    ---@param self WorldView
     OnCommandDragEnd = function(self)
         self:OnUpdateCursor()
     end,
 
     --- Attempts to apply the current cursor textures
-    ---@param self any
+    ---@param self WorldView
     ApplyCursor = function(self)
         if self.Cursor and self.CursorOverWorld then
             GetCursor():SetTexture(unpack(self.Cursor))
@@ -1018,7 +1060,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     end,
 
     ---@param self WorldView
-    ---@param pingData table
+    ---@param pingData SyncPingData
     DisplayPing = function(self, pingData)
         -- Flash the scoreboard faction icon for the ping owner to indicate the source.
         if not pingData.Marker and not pingData.Renew then
@@ -1066,7 +1108,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                     end
                 end
                 table.insert(self.PingThreads, ForkThread(function()
-                    local Arrow = false
+                    local Arrow
                     if not self._disableMarkers then
                         Arrow = self:CreateCameraIndicator(self, pingData.Location, pingData.ArrowColor)
                     end
@@ -1215,6 +1257,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
+    --- Updates marker pings when they're flushed/deleted/moved/renamed.
+    ---@param self WorldView
+    ---@param pingData SyncPingData
     UpdatePing = function(self, pingData)
         if pingData.Action == 'flush' and self.Markers then
             for ownerID, pingTable in self.Markers do
@@ -1241,6 +1286,8 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
+    ---@param self WorldView
+    ---@param show boolean
     ShowPings = function(self, show)
         self.PingVis = show
         if not self:IsHidden() and self.Markers then
@@ -1257,111 +1304,34 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
+    ---@param self WorldView
+    ---@param parent Control
+    ---@param location Vector   # in world coordinates
+    ---@param color Color
+    ---@param stayOnScreen? boolean
+    ---@return UIOffScreenIndicator
     CreateCameraIndicator = function(self, parent, location, color, stayOnScreen)
-        local Arrow = Button(parent, UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_up.dds'),
-                UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_down.dds'),
-                UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_over.dds'),
-                UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_b_up.dds'))
-        Arrow.State = 'b'
-        LayoutHelpers.AtCenterIn(Arrow, self)
-        Arrow:SetNeedsFrameUpdate(true)
-        Arrow.Depth:Set(parent:GetRootFrame():GetTopmostDepth() + 1)
-        Arrow.Glow = Bitmap(Arrow, UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_glow.dds'))
-        LayoutHelpers.AtCenterIn(Arrow.Glow, Arrow)
-        Arrow.Glow:SetNeedsFrameUpdate(true)
-        Arrow.Glow:SetAlpha(0)
-        Arrow.Glow.time = 0
-        Arrow.Glow:DisableHitTest()
-        Arrow.Glow.OnFrame = function(glow, delta)
-            if delta then
-                glow.time = glow.time + math.pi * 0.05
-                glow:SetAlpha(MATH_Lerp(math.sin(glow.time), -1.0, 1.0, 0.0, 0.5))
-            end
+        local module = import("/lua/ui/game/offscreenmarkerindicator.lua")
+
+        if color == 'blue' then
+            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Blue')
+        elseif color == 'red' then
+            return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Red')
         end
-        Arrow.OnClick = function(arrow, modifiers)
-            local currentCamSettings = GetCamera('WorldCamera'):SaveSettings()
-            currentCamSettings.Focus = location
-            GetCamera(self._cameraName):RestoreSettings(currentCamSettings)
-        end
-        Arrow.OnFrame = function(arrow, deltatime)
-            local coords = self:Project(Vector(location[1], location[2], location[3]))
-            local horzStr = ''
-            local vertStr = ''
-            if self.Left() + coords.x < self.Left() then
-                horzStr = 'l'
-                arrow.Left:Set(self.Left)
-                LayoutHelpers.AtLeftIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetRight(arrow.Glow)
-                LayoutHelpers.ResetRight(arrow)
-            elseif coords.x > self.Right() then
-                horzStr = 'r'
-                arrow.Right:Set(self.Right)
-                LayoutHelpers.AtRightIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetLeft(arrow.Glow)
-                LayoutHelpers.ResetLeft(arrow)
-            else
-                arrow.Left:Set(function() return coords.x - arrow.Width() / 2 end)
-                LayoutHelpers.AtHorizontalCenterIn(arrow.Glow, arrow)
-                LayoutHelpers.ResetRight(arrow.Glow)
-                LayoutHelpers.ResetRight(arrow)
-            end
-            if self.Top() + coords.y > self.Bottom() then
-                vertStr = 't'
-                arrow.Bottom:Set(self.Bottom)
-                LayoutHelpers.AtBottomIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetTop(arrow.Glow)
-                LayoutHelpers.ResetTop(arrow)
-            elseif coords.y < self.Top() then
-                vertStr = 'b'
-                arrow.Top:Set(self.Top)
-                LayoutHelpers.AtTopIn(arrow.Glow, arrow, -10)
-                LayoutHelpers.ResetBottom(arrow.Glow)
-                LayoutHelpers.ResetBottom(arrow)
-            else
-                arrow.Top:Set(function() return coords.y - arrow.Height() / 2 end)
-                LayoutHelpers.AtVerticalCenterIn(arrow.Glow, arrow)
-                LayoutHelpers.ResetBottom(arrow.Glow)
-                LayoutHelpers.ResetBottom(arrow)
-            end
-            if horzStr != '' or vertStr != '' then
-                if arrow:IsHidden() then
-                    arrow:Show()
-                end
-                if arrow.State != vertStr..horzStr then
-                    arrow:SetTexture(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'))
-                    arrow:SetNewTextures(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'),
-                    UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_down.dds'),
-                    UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_over.dds'),
-                    UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_'..vertStr..horzStr..'_up.dds'))
-                    arrow.State = vertStr..horzStr
-                end
-                if arrow:IsDisabled() then
-                    arrow:Enable()
-                end
-            else
-                if stayOnScreen then
-                    if arrow.State != 't' then
-                        arrow:SetTexture(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'))
-                        arrow:SetNewTextures(UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'),
-                        UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_down.dds'),
-                        UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_over.dds'),
-                        UIUtil.UIFile('/game/ping_edge/ping_edge_'..color..'_t_up.dds'))
-                        arrow.State = 't'
-                    end
-                else
-                    if not arrow:IsHidden() then
-                        arrow:Hide()
-                    end
-                end
-                if not arrow:IsDisabled() then
-                    arrow:Disable()
-                end
-            end
-        end
-        return Arrow
+
+       -- default to yellow
+       return module.CreateOffScreenMarkerIndicatorFromPreset(parent, self, location, 'Yellow')
     end,
 
+    --- Registers a worldview with the manager and sets preferences.
+    ---@param self WorldView
+    ---@param cameraName string
+    ---@param disableMarkers boolean
+    ---@param displayName string
+    ---@param order number
     Register = function(self, cameraName, disableMarkers, displayName, order)
+        WorldViewCameraComponent.Register(self, cameraName, disableMarkers, displayName, order)
+        
         self._cameraName = cameraName
         self._disableMarkers = disableMarkers
         self._displayName = displayName
@@ -1379,57 +1349,8 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
-    OnIconsVisible = function(self, areIconsVisible)
-        -- called when strat icons are turned on/off
-    end,
-
-    ---Add a shape to the draw table, pass an id with no data to remove it
+    --- Called by the engine when strategic icons are turned on/off.
     ---@param self WorldView
-    ---@param id string -- id for tracking individual shapes
-    ---@param data? table -- data table for shape, pass nil to remove the given id
-    DrawShapeRegistry = function(self, id, data)
-        if data then
-            self:SetCustomRender(true)
-            self.DrawShapesTable[id] = data
-        else
-            self.DrawShapesTable[id] = nil
-        end
-    end,
-
-    --#region Custom Rendering
-
-    --- Register a renderable to render each frame
-    ---@param self WorldView
-    ---@param renderable Renderable
-    ---@param id string
-    RegisterRenderable = function(self, renderable, id)
-        self.Trash:Add(renderable)
-        self.Renderables[id] = renderable
-
-        if not table.empty(self.Renderables) then
-            self:SetCustomRender(true)
-        end
-    end,
-
-    --- Unregister a renderable
-    ---@param self WorldView
-    ---@param id string
-    UnregisterRenderable = function(self, id)
-        self.Renderables[id] = nil
-
-        if table.empty(self.Renderables) then
-            self:SetCustomRender(false)
-        end
-    end,
-
-    --- Is called each frame to render shapes when custom rendering is enabled
-    ---@param self WorldView
-    ---@param delta number
-    OnRenderWorld = function (self, delta)
-        for id, renderable in self.Renderables do
-            renderable:OnRender(delta, delta)
-        end
-    end,
-
-    --#endregion
+    ---@param areIconsVisible boolean
+    OnIconsVisible = function(self, areIconsVisible) end,
 }

@@ -1,6 +1,6 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local MicrowaveLaserCollisionBeam01 = import("/lua/sim/collisionBeams/MicrowaveLaserCollisionBeam01.lua").MicrowaveLaserCollisionBeam01
+local MicrowaveLaserCollisionBeam01 = import("/lua/sim/collisionbeams/microwavelasercollisionbeam01.lua").MicrowaveLaserCollisionBeam01
 
 -- Smaller MicrowaveLaser used by Cybran ACU URL0001's CDFHeavyMicrowaveLaserGeneratorCom
 ---@class MicrowaveLaserCollisionBeam02 : MicrowaveLaserCollisionBeam01

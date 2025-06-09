@@ -1,4 +1,4 @@
-import 'utils.lua'
+import '/lua/system/utils.lua'
 
 
 diff_fields = {'total', 'here', 'in_c_children', 'in_lua_children', 'yielded', 'ncalls'}

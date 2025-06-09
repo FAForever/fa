@@ -1,3 +1,4 @@
+---@type table<Blueprint, EntityCategory[][]>
 local parsedPriorities
 
 
@@ -8,7 +9,7 @@ local cachedLimitedTablePriorities = { }
 
 --- We can't serialize categories, therefore the UI sends us a string of categories. We manually
 --- parse the string here into categories. 
----@param inputString string
+---@param inputString string # category expressions in order of priority split by commas
 ---@return EntityCategory[] | nil
 ---@return EntityCategory[] | nil
 function ParseTableOfCategories(inputString)
@@ -61,6 +62,14 @@ function ParseTableOfCategories(inputString)
     return full, limited
 end
 
+---@class UIWeaponPriorityData
+---@field SelectedUnits EntityId[] # units to change priorities for
+---@field name string # name of the new priority set
+---@field prioritiesTable? string # category expressions in order of priority split by commas
+---@field exclusive? boolean # If exclusively the given priorities are used, or the default priorities are added underneath
+
+--- Set weapon priorities for units using data from the UI
+---@param data UIWeaponPriorityData
 function SetWeaponPriorities(data)
     local selectedUnits = data.SelectedUnits
     local prioritiesTable
@@ -101,7 +110,7 @@ function SetWeaponPriorities(data)
         name = data.name
     end
 
-    if GetEntityById(selectedUnits[1]).Army == GetFocusArmy() and not data.hideMsg then
+    if GetEntityById(selectedUnits[1])--[[@as Unit]] .Army == GetFocusArmy() and not data.hideMsg then
         --send the message to the owner of the army
         print('Target Priority:', name)
     end
@@ -110,7 +119,7 @@ function SetWeaponPriorities(data)
 
     -- prevent tampering
     for _, unitId in selectedUnits do
-        local unit = GetEntityById(unitId)
+        local unit = GetEntityById(unitId) --[[@as Unit]]
 
         if unit and OkayToMessWithArmy(unit.Army) then
             table.insert(units, unit)
@@ -131,6 +140,11 @@ function SetWeaponPriorities(data)
 
         --checks if unit is already in requested mode
         if weaponCount > 0 and unit.Sync.WepPriority ~= name then
+            ---@alias UnitSyncWepPriority 
+            ---| string # Custom priorities with a name
+            ---| "?????" # Custom priorities without a name
+            ---| "Default"
+
             unit.Sync.WepPriority = name or "?????"
 
 
@@ -175,18 +189,24 @@ function SetWeaponPriorities(data)
 end
 
 -- Parse and caching all TargetPriorities tables for every unit
+---@return table<Blueprint, EntityCategory[][]>
 function parseDefaultPriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
+    ---@type table<Blueprint, table<integer, EntityCategory[]>>
     local finalPriorities = {}
-
+    ---@type EntityCategory[]
     local parsedTemp = {}
 
 
     for _, id in idlist do
 
         local weapons = GetUnitBlueprintByName(id).Weapon
+        if not weapons then continue end
+        ---@type string[][]
         local priorities = {}
 
+        ---@param weaponNum integer
+        ---@param weapon WeaponBlueprint
         for weaponNum, weapon in weapons or {} do
             if weapon.TargetPriorities then
                 priorities[weaponNum] = weapon.TargetPriorities
@@ -196,12 +216,15 @@ function parseDefaultPriorities()
 
         end
 
-        for weaponNum, tbl in priorities do
+        ---@param weaponNum integer
+        ---@param prioTable string[]
+        for weaponNum, prioTable in priorities do
             if not finalPriorities[id] then finalPriorities[id] = {} end
             if not finalPriorities[id][weaponNum] then finalPriorities[id][weaponNum] = {} end
 
-
-            for line, categories in tbl or {} do
+            ---@param line integer
+            ---@param categories string
+            for line, categories in prioTable or {} do
                 if parsedTemp[categories] then
 
                     finalPriorities[id][weaponNum][line] = parsedTemp[categories]
