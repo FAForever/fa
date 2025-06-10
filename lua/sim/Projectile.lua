@@ -218,9 +218,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             return false
         end
 
-        -- flag if we can hit allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
-
         local selfHashedCategories = self.Blueprint.CategoriesHash
         local otherHashedCategories = other.Blueprint.CategoriesHash
 
@@ -243,7 +240,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         end
 
         -- enemies always hit
-        return alliedCheck
+        return not (self.CollideFriendly and IsAlly(self.Army, other.Army)) -- flag if we can hit allied projectiles
     end,
 
     --- Called by the engine when a projectile collides with a collision beam to check if the collision is valid
