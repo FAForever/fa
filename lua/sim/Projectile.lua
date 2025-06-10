@@ -165,8 +165,10 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     OnTrackTargetGround = function(self)
         local target = self.OriginalTarget or self:GetTrackingTarget() or self.Launcher:GetTargetEntity()
-        if target and target.IsUnit then
+        local physics = self.Blueprint.Physics
+        local offset = physics.TrackTargetGroundOffset or 0
 
+        if target and target.IsUnit then
             local unitBlueprint = target.Blueprint
 
             -- X-offset units often have displaced center bones, so they're not accounted for.
@@ -180,9 +182,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 cy = 0
             end
 
-            local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
-            local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
             sz = sz + offset
 
@@ -193,14 +193,12 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             local orientation = EntityGetOrientation(target)
 
             dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
-            
+
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
             local px, _, pz = self:GetCurrentTargetPositionXYZ()
 
-            local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0
-            local offset = physics.TrackTargetGroundOffset or 0
             local tx = px + (Random() - 0.5) * fuzziness * (1 + offset)
             local tz = pz + (Random() - 0.5) * fuzziness * (1 + offset)
 
