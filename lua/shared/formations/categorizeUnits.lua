@@ -224,7 +224,7 @@ function CategorizeUnits(formationUnits)
     return CalculateSizes(UnitsList)
 end
 
----@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: table<integer, string> }
+---@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: table<integer, FormationLayers> }
 ---@type { Land: TypeGroupData, Air: TypeGroupData, Sea: TypeGroupData  }
 local TypeGroups = {
     Land = {
