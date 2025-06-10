@@ -1091,9 +1091,10 @@ function GetLandRowModifer(unitsList, categoryTable, currRowLen)
     end
 
     local sizeTotal = 0
+    local footprintSizes = unitsList.FootprintSizes
     for group, _ in categoryTable do
         for fs, data in unitsList[group] do
-            sizeTotal = sizeTotal + unitsList.FootprintSizes[fs] * data.Count
+            sizeTotal = sizeTotal + footprintSizes[fs] * data.Count
         end
     end
     if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
