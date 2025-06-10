@@ -746,7 +746,7 @@ function AttackFormation(formationUnits)
     else -- 20 wide
         landBlock = EightRowAttackFormationBlock
     end
-    BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
+    BlockBuilderLand(landUnitsList, landBlock, LandCategories)
 
     local seaUnitsList = unitsList.Naval
     local subUnitsList = unitsList.Subs
@@ -768,8 +768,8 @@ function AttackFormation(formationUnits)
         seaBlock = ElevenWideNavalAttackFormation
         subBlock = TenWideSubAttackFormation
     end
-    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
-    BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
+    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories)
+    BlockBuilderLand(subUnitsList, subBlock, SubCategories)
     BlockBuilderAir(unitsList.Air, AttackChevronBlock, 1)
 
     CacheResults(FormationPos, formationUnits, 'AttackFormation')
@@ -803,7 +803,7 @@ function GrowthFormation(formationUnits)
     else
         landBlock = EightWideAttackFormationBlock
     end
-    BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
+    BlockBuilderLand(landUnitsList, landBlock, LandCategories)
 
     local seaUnitsList = unitsList.Naval
     local subUnitsList = unitsList.Subs
@@ -825,8 +825,8 @@ function GrowthFormation(formationUnits)
         seaBlock = NineNavalGrowthFormation
         subBlock = EightWideSubGrowthFormation
     end
-    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
-    BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
+    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories)
+    BlockBuilderLand(subUnitsList, subBlock, SubCategories)
 
     local airUnitsList = unitsList.Air
     local stratBombers = airUnitsList.Bomb3
@@ -953,10 +953,9 @@ end
 ---@param unitsList table
 ---@param formationBlock any
 ---@param categoryTable EntityCategory[]
----@param spacing? number defaults to 1
 ---@return table
-function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
-    spacing = (spacing or 1) * unitsList.Scale
+function BlockBuilderLand(unitsList, formationBlock, categoryTable)
+    local spacing = unitsList.Scale
     local numRows = TableGetn(formationBlock)
     local rowNum = 1
     local whichRow = 1
