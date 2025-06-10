@@ -13,8 +13,10 @@
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
 
+local TableEmpty = table.empty
 local TableGetn = table.getn
 local TableInsert = table.insert
+local TableRemove = table.remove
 local MathAbs = math.abs
 local MathCeil = math.ceil
 local MathCos = math.cos
@@ -82,7 +84,7 @@ function CacheResults(results, formationUnits, formationType)
 
     local cache = FormationCache[formationType]
     if TableGetn(cache) >= MaxCacheSize then
-        table.remove(cache)
+        TableRemove(cache)
     end
     TableInsert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
 end
@@ -828,7 +830,7 @@ function GrowthFormation(formationUnits)
 
     local airUnitsList = unitsList.Air
     local stratBombers = airUnitsList.Bomb3
-    if not table.empty(stratBombers) then
+    if not TableEmpty(stratBombers) then
         -- stratBombers contains no more than one table with selected strat bombers in it
         -- Cycle puts it at index 1 (as it was in the past) otherwise some code below won't work.
         for k in stratBombers do
