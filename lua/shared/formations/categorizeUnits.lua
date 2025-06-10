@@ -15,6 +15,37 @@ ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
 NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
 -- === TECH LEVEL LAND CATEGORIES ===
+---@alias LandCategoryNames
+---| "Shield"
+---| "Bot1"
+---| "Bot2"
+---| "Bot3"
+---| "Bot4"
+---| "Tank1"
+---| "Tank2"
+---| "Tank3"
+---| "Tank4"
+---| "Sniper1"
+---| "Sniper2"
+---| "Sniper3"
+---| "Sniper4"
+---| "Art1"
+---| "Art2"
+---| "Art3"
+---| "Art4"
+---| "AA1"
+---| "AA2"
+---| "AA3"
+---| "Com1"
+---| "Com2"
+---| "Com3"
+---| "Com4"
+---| "Util1"
+---| "Util2"
+---| "Util3"
+---| "Util4"
+---| "RemainingCategory"
+---@type table<LandCategoryNames, EntityCategory>
 LandCategories = {
     Shields = ShieldCategory,
 
@@ -66,6 +97,29 @@ local ExperimentalAir = categories.AIR * categories.EXPERIMENTAL
 local EngineerAir = categories.AIR * categories.ENGINEER
 
 -- === TECH LEVEL AIR CATEGORIES ===
+---@alias AirCategoryNames
+---| "Ground1"
+---| "Ground2"
+---| "Ground3"
+---| "Trans1"
+---| "Trans2"
+---| "Trans3"
+---| "Bomb1"
+---| "Bomb2"
+---| "Bomb3"
+---| "AA1"
+---| "AA2"
+---| "AA3"
+---| "AN1"
+---| "AN2"
+---| "AN3"
+---| "AIntel1"
+---| "AIntel2"
+---| "AIntel3"
+---| "AExper"
+---| "AEngineer"
+---| "RemainingCategory"
+---@type table<AirCategoryNames, EntityCategory>
 AirCategories = {
     Ground1 = GroundAttackAir * categories.TECH1,
     Ground2 = GroundAttackAir * categories.TECH2,
@@ -113,6 +167,17 @@ local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + Sub
                         CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
 
 -- === TECH LEVEL LAND CATEGORIES ===
+---@alias NavalCategoryNames
+---| "LightCount"
+---| "FrigateCount"
+---| "CruiserCount"
+---| "DestroyerCount"
+---| "BattleshipCount"
+---| "CarrierCount"
+---| "NukeSubCount"
+---| "MobileSonarCount"
+---| "RemainingCategory"
+---@type table<NavalCategoryNames, EntityCategory>
 NavalCategories = {
     LightCount = LightAttackNaval,
     FrigateCount = FrigateNaval,
@@ -129,16 +194,25 @@ NavalCategories = {
     RemainingCategory = RemainingNaval,
 }
 
+---@alias SubCategoryNames
+---| "SubCount"
+---@type table<SubCategoryNames, EntityCategory>
 SubCategories = {
     SubCount = SubNaval,
 }
 
----@alias FormationLayers "Land" | "Air" | "Naval" | "Subs"
+---@alias FormationLayerFootprintData table<number, FootprintSizeCategoryData>
+---@alias FormationLayerCommonData { FootprintSizes: table<number, integer>, FootprintCounts: table<number, integer>, UnitTotal: integer, AreaTotal: number, Scale: number? }
+---@alias FootprintSizeCategoryData { Count: integer, Filter: EntityCategory }
+
+---@class FormationData
+---@field Land table<LandCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
+---@field Air table<AirCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
+---@field Naval table<NavalCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
+---@field Subs table<SubCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
 -- reusable table for categorizing units in a formation
----@type table<FormationLayers, table>
 local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
 -- map layers to categories
----@type table<FormationLayers, table<string, EntityCategory>>
 local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
 -- initialize the layer tables
 for unitType, categoriesForType in pairs(CategoryTables) do
@@ -152,7 +226,7 @@ end
 
 -- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
 ---@param formationUnits Unit[]
----@return table
+---@return FormationData
 function CategorizeUnits(formationUnits)
     local categoryTables = CategoryTables
 
@@ -198,11 +272,13 @@ function CategorizeUnits(formationUnits)
 
                     local id = bp.BlueprintId
 
+                    ---@type FormationLayerFootprintData
                     local categoryData = typeData[cat]
 
                     if not categoryData[fs] then
                         categoryData[fs] = {Count = 0, Filter = categories[id]}
                     end
+                    ---@type FootprintSizeCategoryData
                     local footprintSizeData = categoryData[fs]
 
                     footprintSizeData.Count = footprintSizeData.Count + 1
@@ -232,6 +308,7 @@ function CategorizeUnits(formationUnits)
     return UnitsList
 end
 
+---@alias FormationLayers "Land" | "Air" | "Naval" | "Subs"
 ---@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: table<integer, FormationLayers> }
 ---@type { Land: TypeGroupData, Air: TypeGroupData, Sea: TypeGroupData  }
 local TypeGroups = {
@@ -257,8 +334,8 @@ local TypeGroups = {
     },
 }
 
----@param unitsList table
----@return table
+---@param unitsList FormationData
+---@return FormationData
 function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
