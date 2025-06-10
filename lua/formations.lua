@@ -828,8 +828,8 @@ function GrowthFormation(formationUnits)
     if not table.empty(unitsList.Air.Bomb3) then
         -- unitsList.Air.Bomb3 contains no more than one table with selected strat bombers in it
         -- Cycle puts it at index 1 (as it was in the past) otherwise some code below won't work.
-        for k,v in unitsList.Air.Bomb3 do
-            if k != 1 then 
+        for k in unitsList.Air.Bomb3 do
+            if k != 1 then
                 unitsList.Air.Bomb3[1] = unitsList.Air.Bomb3[k]
             end
             break
