@@ -969,6 +969,8 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
     local inserted = false
     local occupiedSpaces = {}
 
+    local homogenousRows = formationBlock.HomogenousRows
+
     while unitsList.UnitTotal > 0 do
         if whichCol > currRowLen then
             rowNum = rowNum + 1
@@ -1002,7 +1004,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
                 break
             end
             for _, group in type do
-                if not formationBlock.HomogenousRows or (rowType == false or rowType == type) then
+                if not homogenousRows or (rowType == false or rowType == type) then
                     local fs = 0
                     local size = 0
                     local evenSize = true
@@ -1051,7 +1053,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
                             end
                         end
 
-                        if formationBlock.HomogenousRows and not rowType then
+                        if homogenousRows and not rowType then
                             rowType = type
                         end
 
