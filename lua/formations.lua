@@ -15,6 +15,7 @@
 
 local TableGetn = table.getn
 local MathMod = math.mod
+local MathMin = math.min
 
 SurfaceFormations = {
     'AttackFormation',
@@ -879,7 +880,7 @@ function GuardFormation(formationUnits)
     for fs, count in footprintCounts do
         largestFootprint = math.max(largestFootprint, fs)
         if count >= minCount then
-            smallestFootprint = math.min(smallestFootprint, fs)
+            smallestFootprint = MathMin(smallestFootprint, fs)
         end
     end
 
@@ -906,9 +907,9 @@ function GuardFormation(formationUnits)
             end
 
             if ringCount == 2 or remainingShields >= (remainingUnits + ringChange + 6) * 0.19 then
-                shieldsInRing = math.min(ringChange / 2, remainingShields)
+                shieldsInRing = MathMin(ringChange / 2, remainingShields)
             elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.13 then
-                shieldsInRing = math.min(ringChange / 3, remainingShields)
+                shieldsInRing = MathMin(ringChange / 3, remainingShields)
             else
                 shieldsInRing = 0
             end
