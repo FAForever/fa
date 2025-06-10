@@ -102,7 +102,7 @@ UniqueAffectCalculation = {
     SeraphimACUAdvancedRegenAura = { Regen = regenAuraCalculate },
 }
 
---- Calculates the buff from all the buffs of the same time the unit has.
+--- Calculates the affect values from all the buffs a unit has for a given affect type.
 ---@param unit Unit
 ---@param buffName string
 ---@param affectType string
