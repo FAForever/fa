@@ -16,10 +16,12 @@
 local TableGetn = table.getn
 local MathAbs = math.abs
 local MathCeil = math.ceil
+local MathCos = math.cos
 local MathFloor = math.floor
 local MathMod = math.mod
 local MathMin = math.min
 local MathMax = math.max
+local MathSin = math.sin
 
 SurfaceFormations = {
     'AttackFormation',
@@ -925,8 +927,8 @@ function GuardFormation(formationUnits)
             end
         end
         local ringPosition = unitCount / ringChange * math.pi * 2.0
-        local offsetX = sizeMult * math.sin(ringPosition)
-        local offsetY = -sizeMult * math.cos(ringPosition)
+        local offsetX = sizeMult * MathSin(ringPosition)
+        local offsetY = -sizeMult * MathCos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
             table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
