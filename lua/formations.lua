@@ -16,6 +16,7 @@
 local TableGetn = table.getn
 local MathMod = math.mod
 local MathMin = math.min
+local MathMax = math.max
 
 SurfaceFormations = {
     'AttackFormation',
@@ -878,7 +879,7 @@ function GuardFormation(formationUnits)
     local smallestFootprint = 9999
     local minCount = remainingUnits / numSizes -- This could theoretically divide by 0, but it wouldn't be a problem because the result would never be used.
     for fs, count in footprintCounts do
-        largestFootprint = math.max(largestFootprint, fs)
+        largestFootprint = MathMax(largestFootprint, fs)
         if count >= minCount then
             smallestFootprint = MathMin(smallestFootprint, fs)
         end
@@ -913,7 +914,7 @@ function GuardFormation(formationUnits)
             else
                 shieldsInRing = 0
             end
-            shieldsInRing = math.max(shieldsInRing, remainingShields - (remainingUnits - ringChange))
+            shieldsInRing = MathMax(shieldsInRing, remainingShields - (remainingUnits - ringChange))
 
             if shieldsInRing > 0 then
                 unitsPerShield = ringChange / shieldsInRing
