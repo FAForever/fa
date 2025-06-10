@@ -925,8 +925,8 @@ function GuardFormation(formationUnits)
             end
         end
         local ringPosition = unitCount / ringChange * math.pi * 2.0
-        offsetX = sizeMult * math.sin(ringPosition)
-        offsetY = -sizeMult * math.cos(ringPosition)
+        local offsetX = sizeMult * math.sin(ringPosition)
+        local offsetY = -sizeMult * math.cos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
             table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
@@ -1201,7 +1201,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
             for _, type in currSlot do
                 for _, group in type do
                     for fs, groupData in unitsList[group] do
-                        size = unitsList.FootprintSizes[fs]
+                        local size = unitsList.FootprintSizes[fs]
                         if groupData.Count > 0 and size == data.size then
                             table.insert(FormationPos, {data.xPos * spacing, data.yPos * spacing, groupData.Filter, 0, true})
                             groupData.Count = groupData.Count - 1
