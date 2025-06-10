@@ -141,9 +141,9 @@ local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
 ---@type table<FormationLayers, table<string, EntityCategory>>
 local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
 -- initialize the layer tables
-for unitType, categoriesForType in CategoryTables do
+for unitType, categoriesForType in pairs(CategoryTables) do
     local typeData = UnitsList[unitType]
-    for unitTypeCategory, _ in categoriesForType do
+    for unitTypeCategory, _ in pairs(categoriesForType) do
         typeData[unitTypeCategory] = {}
     end
     typeData.FootprintCounts = {}
@@ -157,9 +157,9 @@ function CategorizeUnits(formationUnits)
     local categoryTables = CategoryTables
 
     -- flush the table
-    for unitType, categoriesForType in categoryTables do
+    for unitType, categoriesForType in pairs(categoryTables) do
         local typeData = UnitsList[unitType]
-        for unitTypeCategory, _ in categoriesForType do
+        for unitTypeCategory, _ in pairs(categoriesForType) do
             local typeDataCategory = typeData[unitTypeCategory]
             for k in pairs(typeDataCategory) do
                 typeDataCategory[k] = nil
@@ -182,11 +182,11 @@ function CategorizeUnits(formationUnits)
     end
 
     -- Loop through each unit to get its category and size
-    for _, u in formationUnits do
+    for _, u in pairs(formationUnits) do
         local identified = false
-        for type, table in categoryTables do
+        for type, table in pairs(categoryTables) do
             local typeData = UnitsList[type]
-            for cat, _ in table do
+            for cat, _ in pairs(table) do
                 if EntityCategoryContains(table[cat], u) then
                     local bp = u:GetBlueprint()
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
@@ -257,16 +257,16 @@ function CalculateSizes(unitsList)
     local largestFootprint = 1
     local smallestFootprints = {}
 
-    for group, data in TypeGroups do
+    for group, data in pairs(TypeGroups) do
         local groupFootprintCounts = {}
         local largestForGroup = 1
         local numSizes = 0
         local unitTotal = 0
-        for _, type in data.Types do
+        for _, type in pairs(data.Types) do
             local typeData = unitsList[type]
 
             unitTotal = unitTotal + typeData.UnitTotal
-            for fs, count in typeData.FootprintCounts do
+            for fs, count in pairs(typeData.FootprintCounts) do
                 groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
                 largestFootprint = MathMax(largestFootprint, fs)
                 largestForGroup = MathMax(largestForGroup, fs)
@@ -278,7 +278,7 @@ function CalculateSizes(unitsList)
         if numSizes > 0 then
             local minCount = unitTotal / 2
             local smallerUnitCount = 0
-            for fs, count in groupFootprintCounts do
+            for fs, count in pairs(groupFootprintCounts) do
                 smallerUnitCount = smallerUnitCount + count
                 if smallerUnitCount >= minCount then
                     smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
@@ -288,9 +288,9 @@ function CalculateSizes(unitsList)
         end
     end
 
-    for group, data in TypeGroups do
+    for group, data in pairs(TypeGroups) do
         local gridSize = MathMax(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
-        for _, type in data.Types do
+        for _, type in pairs(data.Types) do
             local unitData = unitsList[type]
 
              -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
@@ -298,7 +298,7 @@ function CalculateSizes(unitsList)
              -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
             unitData.Scale = gridSize / (largestFootprint + 2)
 
-            for fs, count in unitData.FootprintCounts do
+            for fs, count in pairs(unitData.FootprintCounts) do
                 local size = MathCeil(fs * data.MinSeparationFraction / gridSize)
                 unitData.FootprintSizes[fs] = size
                 unitData.AreaTotal = unitData.AreaTotal + count * size * size
