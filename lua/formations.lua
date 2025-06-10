@@ -849,11 +849,9 @@ function GrowthFormation(formationUnits)
         airUnitsList.Bomb3 = {}
         airUnitsList.AreaTotal = oldAirArea - count
         airUnitsList.UnitTotal = oldUnitTotal - count
-
-        BlockBuilderAir(airUnitsList, GrowthChevronBlock, 1)
-    else
-        BlockBuilderAir(airUnitsList, GrowthChevronBlock, 1)
     end
+
+    BlockBuilderAir(airUnitsList, GrowthChevronBlock, 1)
 
 
     CacheResults(FormationPos, formationUnits, 'GrowthFormation')
