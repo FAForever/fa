@@ -1157,13 +1157,14 @@ function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
         if not occupiedSpaces[yPos] then
             occupiedSpaces[yPos] = {}
         end
+        local occupiedYPos = occupiedSpaces[yPos]
         if whichCol == 1 and evenRowLen == evenSize then
             for x = 0, size - 1, 1 do
-                occupiedSpaces[yPos][whichCol + x] = true
+                occupiedYPos[whichCol + x] = true
             end
         else
             for x = 0, (size - 1) * 2, 2 do
-                occupiedSpaces[yPos][whichCol + x] = true
+                occupiedYPos[whichCol + x] = true
             end
         end
     end
