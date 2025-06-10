@@ -191,7 +191,7 @@ function CategorizeUnits(formationUnits)
                     local bp = unit:GetBlueprint()
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
 
-                    if fs == nil then
+                    if not fs then
                         WARN('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not have any footprint size X or Z data. Overriding to 0')
                         fs = 0
                     end
