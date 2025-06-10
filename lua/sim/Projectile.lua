@@ -192,7 +192,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
             local orientation = EntityGetOrientation(target)
 
-            local dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
+            dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
             
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
