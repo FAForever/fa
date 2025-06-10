@@ -825,32 +825,34 @@ function GrowthFormation(formationUnits)
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
 
-    if not table.empty(unitsList.Air.Bomb3) then
-        -- unitsList.Air.Bomb3 contains no more than one table with selected strat bombers in it
+    local airUnitsList = unitsList.Air
+    local stratBombers = airUnitsList.Bomb3
+    if not table.empty(stratBombers) then
+        -- stratBombers contains no more than one table with selected strat bombers in it
         -- Cycle puts it at index 1 (as it was in the past) otherwise some code below won't work.
-        for k in unitsList.Air.Bomb3 do
+        for k in stratBombers do
             if k != 1 then
-                unitsList.Air.Bomb3[1] = unitsList.Air.Bomb3[k]
+                stratBombers[1] = stratBombers[k]
             end
             break
         end
-        local count = unitsList.Air.Bomb3[1].Count
-        local oldAirArea = unitsList.Air.AreaTotal
-        local oldUnitTotal = unitsList.Air.UnitTotal
+        local count = stratBombers[1].Count
+        local oldAirArea = airUnitsList.AreaTotal
+        local oldUnitTotal = airUnitsList.UnitTotal
 
-        unitsList.Air.AreaTotal = count
-        unitsList.Air.UnitTotal = count
+        airUnitsList.AreaTotal = count
+        airUnitsList.UnitTotal = count
 
-        BlockBuilderAirT3Bombers(unitsList.Air, 1.2) --initial spacing was 1.5 that is a bit too wide
+        BlockBuilderAirT3Bombers(airUnitsList, 1.2) --initial spacing was 1.5 that is a bit too wide
 
         --strats are already in formation so we remove them from table and adjust all parameters.
-        unitsList.Air.Bomb3 = {}
-        unitsList.Air.AreaTotal = oldAirArea - count
-        unitsList.Air.UnitTotal = oldUnitTotal - count
+        airUnitsList.Bomb3 = {}
+        airUnitsList.AreaTotal = oldAirArea - count
+        airUnitsList.UnitTotal = oldUnitTotal - count
 
-        BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
+        BlockBuilderAir(airUnitsList, GrowthChevronBlock, 1)
     else
-        BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
+        BlockBuilderAir(airUnitsList, GrowthChevronBlock, 1)
     end
 
 
