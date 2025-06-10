@@ -64,8 +64,8 @@ local regenAuraDefaultCeilings = {
 ---@param unit Unit
 ---@param affectBuffName BuffAffectName
 ---@param affectBp BlueprintBuffAffectState
----@return number
----@return number
+---@return number Add
+---@return number Mult
 local function regenAuraCalculate(unit, affectBuffName, affectBp)
     local adds = 0
 
@@ -74,10 +74,9 @@ local function regenAuraCalculate(unit, affectBuffName, affectBp)
     end
 
     -- Take regen values from bp, keys have to match techCategory options
-    local bpCeilings = affectBp.BPCeilings
+    local bpCeilings = affectBp.BPCeilings --[[@as table<TechCategory, number>]]
 
     local techCat = unit.Blueprint.TechCategory
-    ---@diagnostic disable-next-line: need-check-nil
     local ceil = bpCeilings[techCat] or regenAuraDefaultCeilings[techCat]
 
     local mult = affectBp.Mult
