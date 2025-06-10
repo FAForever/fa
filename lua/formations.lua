@@ -22,6 +22,7 @@ local MathFloor = math.floor
 local MathMod = math.mod
 local MathMin = math.min
 local MathMax = math.max
+local MathPi = math.pi
 local MathSin = math.sin
 
 SurfaceFormations = {
@@ -929,7 +930,7 @@ function GuardFormation(formationUnits)
                 nextShield = unitsPerShield - 0.01 -- Rounding error could result in missing a shield if nextShield is supposed to equal ringChange.
             end
         end
-        local ringPosition = unitCount / ringChange * math.pi * 2.0
+        local ringPosition = unitCount / ringChange * MathPi * 2.0
         local offsetX = sizeMult * MathSin(ringPosition)
         local offsetY = -sizeMult * MathCos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
