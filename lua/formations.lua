@@ -14,6 +14,7 @@
 
 
 local TableGetn = table.getn
+local MathMod = math.mod
 
 SurfaceFormations = {
     'AttackFormation',
@@ -950,7 +951,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
     local currRowLen = TableGetn(formationBlock[whichRow])
     local rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
     currRowLen = currRowLen - rowModifier
-    local evenRowLen = math.mod(currRowLen, 2) == 0
+    local evenRowLen = MathMod(currRowLen, 2) == 0
     local rowType = false
     local formationLength = 0
     local inserted = false
@@ -974,7 +975,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                 rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
             end
             currRowLen = currRowLen - rowModifier
-            evenRowLen = math.mod(currRowLen, 2) == 0
+            evenRowLen = MathMod(currRowLen, 2) == 0
         end
 
         if occupiedSpaces[rowNum] and occupiedSpaces[rowNum][whichCol] then
@@ -996,7 +997,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                     local groupData = nil
                     for k, v in unitsList[group] do
                         size = unitsList.FootprintSizes[k]
-                        evenSize = math.mod(size, 2) == 0
+                        evenSize = MathMod(size, 2) == 0
                         if v.Count > 0 then
                             if size > 1 and IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, unitsList.UnitTotal) then
                                 continue
@@ -1024,7 +1025,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                         local xPos
                         if evenRowLen then
                             xPos = math.ceil(whichCol/2) - .5 + offsetX
-                            if not (math.mod(whichCol, 2) == 0) then
+                            if not (MathMod(whichCol, 2) == 0) then
                                 xPos = xPos * -1
                             end
                         else
@@ -1032,7 +1033,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                                 xPos = 0
                             else
                                 xPos = math.ceil(((whichCol-1) /2)) + offsetX
-                                if not (math.mod(whichCol, 2) == 0) then
+                                if not (MathMod(whichCol, 2) == 0) then
                                     xPos = xPos * -1
                                 end
                             end
@@ -1069,7 +1070,7 @@ end
 ---@param currRowLen number
 ---@return number
 function GetLandRowModifer(unitsList, categoryTable, currRowLen)
-    if unitsList.UnitTotal >= currRowLen or math.mod(unitsList.UnitTotal, 2) == math.mod(currRowLen, 2) then
+    if unitsList.UnitTotal >= currRowLen or MathMod(unitsList.UnitTotal, 2) == MathMod(currRowLen, 2) then
         return 0
     end
 
@@ -1094,8 +1095,8 @@ end
 ---@param remainingUnits number
 ---@return boolean
 function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
-    local evenRowLen = math.mod(currRowLen, 2) == 0
-    local evenSize = math.mod(size, 2) == 0
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
 
     if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
         return true
@@ -1131,8 +1132,8 @@ end
 ---@param whichCol number
 ---@param currRowLen number
 function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
-    local evenRowLen = math.mod(currRowLen, 2) == 0
-    local evenSize = math.mod(size, 2) == 0
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
 
     for y = 0, size - 1, 1 do
         local yPos = rowNum + y
@@ -1156,11 +1157,11 @@ end
 ---@return number
 function GetColSpot(rowLen, col)
     local len = rowLen
-    if math.mod(rowLen, 2) == 1 then
+    if MathMod(rowLen, 2) == 1 then
         len = rowLen + 1
     end
     local colType = 'left'
-    if math.mod(col, 2) == 0 then
+    if MathMod(col, 2) == 0 then
         colType = 'right'
     end
     local colSpot = math.floor(col / 2)
@@ -1211,19 +1212,19 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
         end
     end
 
-    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+    if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
         chevronPos = 2
     end
 
     while unitsList.UnitTotal > 0 do
         if chevronPos > chevronSize then
-            if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+            if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
                 chevronPos = 2
             else
                 chevronPos = 1
             end
             chevronType = false
-            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and math.mod(whichCol, 2) == 1 then
+            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and MathMod(whichCol, 2) == 1 then
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
@@ -1318,19 +1319,19 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
     local formationLength = 0
 
 
-    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+    if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
         chevronPos = 2
     end
 
     while unitsList.UnitTotal > 0 do
         if chevronPos > chevronSize then
-            if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+            if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
                 chevronPos = 2
             else
                 chevronPos = 1
             end
             chevronType = false
-            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and math.mod(whichCol, 2) == 1 then
+            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and MathMod(whichCol, 2) == 1 then
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
@@ -1471,14 +1472,14 @@ end
 function GetChevronPosition(chevronPos, currCol, formationLen)
     local offset = math.floor(chevronPos / 2)
     local xPos = offset * 0.5
-    if math.mod(chevronPos, 2) == 0 then
+    if MathMod(chevronPos, 2) == 0 then
         xPos = -xPos
     end
     local column = math.floor(currCol / 2)
     local yPos = (-offset + column * column) * 0.86603
     yPos = yPos - formationLen * 1.73205
     local blockOff = math.floor(currCol / 2) * 2.5
-    if math.mod(currCol, 2) == 1 then
+    if MathMod(currCol, 2) == 1 then
         blockOff = -blockOff
     end
     xPos = xPos + blockOff
