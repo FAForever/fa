@@ -1,0 +1,1 @@
+- (#6854) Upvalue and localize frequently used functions and tables in formations
