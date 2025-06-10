@@ -571,8 +571,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
-        local trackTarget = bp.TrackTarget
-        if not trackTarget then return end
+        if not bp.TrackTarget then return end
         if not bp.TrackTargetGround then
             TrashBagAdd(self.Trash, ForkThread(self.RetargetThread, self))
         end
