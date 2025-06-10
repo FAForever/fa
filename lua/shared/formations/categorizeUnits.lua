@@ -221,7 +221,9 @@ function CategorizeUnits(formationUnits)
         end
     end
 
-    return CalculateSizes(UnitsList)
+    CalculateSizes(UnitsList)
+
+    return UnitsList
 end
 
 ---@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: table<integer, FormationLayers> }
