@@ -936,11 +936,11 @@ function GuardFormation(formationUnits)
         local offsetX = sizeMult * MathSin(ringPosition)
         local offsetY = -sizeMult * MathCos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            TableInsert(FormationPos, { offsetX, offsetY, ShieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
-            TableInsert(FormationPos, { offsetX, offsetY, NonShieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
         end
         unitCount = unitCount + 1
         remainingUnits = remainingUnits - 1
