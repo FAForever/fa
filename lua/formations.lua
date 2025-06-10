@@ -970,6 +970,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
     local occupiedSpaces = {}
 
     local homogenousRows = formationBlock.HomogenousRows
+    local lineBreak = formationBlock.LineBreak or 0
 
     while unitsList.UnitTotal > 0 do
         if whichCol > currRowLen then
@@ -979,7 +980,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
             else
                 whichRow = whichRow + 1
             end
-            formationLength = formationLength + 1 + (formationBlock.LineBreak or 0)
+            formationLength = formationLength + 1 + lineBreak
             whichCol = 1
             rowType = false
             currRowLen = TableGetn(formationBlock[whichRow])
@@ -1031,7 +1032,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable)
                             else
                                 offsetX = (size - 1) / 2
                             end
-                            offsetY = (size - 1) / 2 * (1 + (formationBlock.LineBreak or 0))
+                            offsetY = (size - 1) / 2 * (1 + lineBreak)
 
                             OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
                         end
