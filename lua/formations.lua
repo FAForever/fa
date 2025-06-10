@@ -726,18 +726,19 @@ function AttackFormation(formationUnits)
 
     local unitsList = CategorizeUnits(formationUnits)
     local landUnitsList = unitsList.Land
+    local landArea = landUnitsList.AreaTotal
     local landBlock
-    if landUnitsList.AreaTotal <= 16 then -- 8 wide
+    if landArea <= 16 then -- 8 wide
         landBlock = TwoRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 30 then -- 10 wide
+    elseif landArea <= 30 then -- 10 wide
         landBlock = ThreeRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 48 then -- 12 wide
+    elseif landArea <= 48 then -- 12 wide
         landBlock = FourRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 70 then -- 14 wide
+    elseif landArea <= 70 then -- 14 wide
         landBlock = FiveRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 96 then -- 16 wide
+    elseif landArea <= 96 then -- 16 wide
         landBlock = SixRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 126 then -- 18 wide
+    elseif landArea <= 126 then -- 18 wide
         landBlock = SevenRowAttackFormationBlock
     else -- 20 wide
         landBlock = EightRowAttackFormationBlock
@@ -784,16 +785,17 @@ function GrowthFormation(formationUnits)
 
     local unitsList = CategorizeUnits(formationUnits)
     local landUnitsList = unitsList.Land
+    local landArea = landUnitsList.AreaTotal
     local landBlock
-    if landUnitsList.AreaTotal <= 3 then
+    if landArea <= 3 then
         landBlock = ThreeWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 12 then
+    elseif landArea <= 12 then
         landBlock = FourWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 20 then
+    elseif landArea <= 20 then
         landBlock = FiveWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 30 then
+    elseif landArea <= 30 then
         landBlock = SixWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 42 then
+    elseif landArea <= 42 then
         landBlock = SevenWideAttackFormationBlock
     else
         landBlock = EightWideAttackFormationBlock
