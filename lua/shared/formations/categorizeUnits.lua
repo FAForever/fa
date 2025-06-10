@@ -190,6 +190,12 @@ function CategorizeUnits(formationUnits)
                 if EntityCategoryContains(table[cat], u) then
                     local bp = u:GetBlueprint()
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
+
+                    if fs == nil then
+                        WARN('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not have any footprint size X or Z data. Overriding to 0')
+                        fs = 0
+                    end
+
                     local id = bp.BlueprintId
 
                     local categoryData = typeData[cat]
