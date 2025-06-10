@@ -1085,7 +1085,8 @@ end
 ---@param currRowLen number
 ---@return number
 function GetLandRowModifer(unitsList, categoryTable, currRowLen)
-    if unitsList.UnitTotal >= currRowLen or MathMod(unitsList.UnitTotal, 2) == MathMod(currRowLen, 2) then
+    local unitTotal = unitsList.UnitTotal
+    if unitTotal >= currRowLen or MathMod(unitTotal, 2) == MathMod(currRowLen, 2) then
         return 0
     end
 
