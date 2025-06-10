@@ -182,17 +182,17 @@ function CategorizeUnits(formationUnits)
     end
 
     -- Loop through each unit to get its category and size
-    for _, u in pairs(formationUnits) do
+    for _, unit in pairs(formationUnits) do
         local identified = false
         for type, table in pairs(categoryTables) do
             local typeData = UnitsList[type]
             for cat, _ in pairs(table) do
-                if EntityCategoryContains(table[cat], u) then
-                    local bp = u:GetBlueprint()
+                if EntityCategoryContains(table[cat], unit) then
+                    local bp = unit:GetBlueprint()
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
 
                     if fs == nil then
-                        WARN('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not have any footprint size X or Z data. Overriding to 0')
+                        WARN('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not have any footprint size X or Z data. Overriding to 0')
                         fs = 0
                     end
 
@@ -210,7 +210,7 @@ function CategorizeUnits(formationUnits)
                     typeData.FootprintCounts[fs] = (typeData.FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
+                        LOG('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
                     typeData.UnitTotal = typeData.UnitTotal + 1
                     identified = true
@@ -223,7 +223,7 @@ function CategorizeUnits(formationUnits)
             end
         end
         if not identified then
-            WARN('*FORMATION DEBUG: Unit ' .. u.UnitId .. ' was excluded from the formation because its layer could not be determined.')
+            WARN('*FORMATION DEBUG: Unit ' .. unit.UnitId .. ' was excluded from the formation because its layer could not be determined.')
         end
     end
 
