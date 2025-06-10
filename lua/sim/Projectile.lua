@@ -253,9 +253,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             return false
         end
 
-        -- flag that indicates whether we should impact allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
-
         local selfHashedCategories = self.Blueprint.CategoriesHash
 
         -- check for projectile types that require a defensive weapon to intercept
@@ -268,7 +265,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         end
 
         -- depend on allied flag whether we hit or not
-        return alliedCheck
+        return not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army)) -- flag that indicates whether we should impact allied projectiles
     end,
 
     --- Called by the engine when the projectile receives damage
