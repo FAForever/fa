@@ -15,6 +15,7 @@
 
 local TableGetn = table.getn
 local MathCeil = math.ceil
+local MathFloor = math.floor
 local MathMod = math.mod
 local MathMin = math.min
 local MathMax = math.max
@@ -1104,7 +1105,7 @@ function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen,
     if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
         return true
     end
-    if whichCol > currRowLen - math.floor(size / 2) * 2 and size <= math.floor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
+    if whichCol > currRowLen - MathFloor(size / 2) * 2 and size <= MathFloor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
         return true
     end
     for y = 0, size - 1, 1 do
@@ -1167,7 +1168,7 @@ function GetColSpot(rowLen, col)
     if MathMod(col, 2) == 0 then
         colType = 'right'
     end
-    local colSpot = math.floor(col / 2)
+    local colSpot = MathFloor(col / 2)
     local halfSpot = len/2
     if colType == 'left' then
         return halfSpot - colSpot
@@ -1473,15 +1474,15 @@ end
 ---@return number xPos
 ---@return number yPos
 function GetChevronPosition(chevronPos, currCol, formationLen)
-    local offset = math.floor(chevronPos / 2)
+    local offset = MathFloor(chevronPos / 2)
     local xPos = offset * 0.5
     if MathMod(chevronPos, 2) == 0 then
         xPos = -xPos
     end
-    local column = math.floor(currCol / 2)
+    local column = MathFloor(currCol / 2)
     local yPos = (-offset + column * column) * 0.86603
     yPos = yPos - formationLen * 1.73205
-    local blockOff = math.floor(currCol / 2) * 2.5
+    local blockOff = MathFloor(currCol / 2) * 2.5
     if MathMod(currCol, 2) == 1 then
         blockOff = -blockOff
     end
