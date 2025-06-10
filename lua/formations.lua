@@ -1413,8 +1413,9 @@ end
 ---@return table
 function GetLargeAirPositions(unitsList, airBlock)
     local sizeCounts = {}
-    for fs, count in unitsList.FootprintCounts do
-        local size = unitsList.FootprintSizes[fs]
+    local footprintCounts = unitsList.FootprintCounts
+    for fs, count in footprintCounts do
+        local size = footprintCounts[fs]
         if size > 1 then
             sizeCounts[size] = (sizeCounts[size] or 0) + count
         end
