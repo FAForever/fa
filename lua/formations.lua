@@ -45,7 +45,7 @@ local MaxCacheSize = 30
 
 ---@param formationUnits Unit[]
 ---@param formationType UnitFormations
----@return boolean
+---@return false | table
 function GetCachedResults(formationUnits, formationType)
     local cache = FormationCache[formationType]
     if not cache then
