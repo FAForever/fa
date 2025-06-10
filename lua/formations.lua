@@ -14,6 +14,7 @@
 
 
 local TableGetn = table.getn
+local MathCeil = math.ceil
 local MathMod = math.mod
 local MathMin = math.min
 local MathMax = math.max
@@ -1026,7 +1027,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
 
                         local xPos
                         if evenRowLen then
-                            xPos = math.ceil(whichCol/2) - .5 + offsetX
+                            xPos = MathCeil(whichCol/2) - .5 + offsetX
                             if not (MathMod(whichCol, 2) == 0) then
                                 xPos = xPos * -1
                             end
@@ -1034,7 +1035,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             if whichCol == 1 then
                                 xPos = 0
                             else
-                                xPos = math.ceil(((whichCol-1) /2)) + offsetX
+                                xPos = MathCeil(((whichCol-1) /2)) + offsetX
                                 if not (MathMod(whichCol, 2) == 0) then
                                     xPos = xPos * -1
                                 end
