@@ -1,0 +1,1 @@
+- (#6852) Use faster Lua Vector operations in remaining non-AI sim code
