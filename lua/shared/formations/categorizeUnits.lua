@@ -133,8 +133,8 @@ SubCategories = {
     SubCount = SubNaval,
 }
 
--- reusable table for categorizing units in a formation
 ---@alias FormationLayers "Land" | "Air" | "Naval" | "Subs"
+-- reusable table for categorizing units in a formation
 ---@type table<FormationLayers, table>
 local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
 -- map layers to categories
