@@ -5048,6 +5048,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local blocks = math.ceil(fraction * total)
         LOG('giving ', blocks, 'out of', total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+        -- Engine won't update work progress so we do it manually
+        self:SetWorkProgress(fraction)
     end,
 
     --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`. See `unit:UpdateStat` for an alternative
