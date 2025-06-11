@@ -5021,7 +5021,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local buildRate = self.Blueprint.Economy.BuildRate
+        local buildRate = self:GetEconomyBuildRate()
         if not buildRate then
             return
         end
