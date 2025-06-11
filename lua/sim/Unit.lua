@@ -1124,18 +1124,21 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.BuildTimeMultiplier = time_mult
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetMassBuildAdjMod = function(self)
         return self.MassBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetEnergyBuildAdjMod = function(self)
         return self.EnergyBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     GetEconomyBuildRate = function(self)
         return self:GetBuildRate()
@@ -5008,12 +5011,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Adds nuclear missiles to the unit.
     ---@param self Unit
     ---@param count number
     GiveNukeSiloAmmo = function(self, count)
         cUnit.GiveNukeSiloAmmo(self, count)
     end,
 
+    --- Sets build progress for nuclear/tactical missile construction.
     ---@param self Unit
     ---@param fraction number
     GiveNukeSiloBlocks = function(self, fraction)
