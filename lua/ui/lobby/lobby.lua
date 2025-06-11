@@ -183,7 +183,7 @@ local function parseCommandlineArguments()
         playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
         playerClan = tostring(GetCommandLineArgOrDefault("/clan", "")),
         playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500)),
-        debugLobby = HasCommandLineArg("/debugLobby"),
+        debugLobby = HasCommandLineArg("/debugLobby"), -- Used by LaunchFAInstances script to set players as ready by default
     }
 end
 local argv = parseCommandlineArguments()
