@@ -81,7 +81,8 @@ local WeaponMethods = moho.weapon_methods
 ---@field DamageMod number
 ---@field DamageModifiers number[] # Set of damage multipliers used by collision beams for the weapon
 ---@field DamageRadiusMod number
----@field damageTableCache WeaponDamageTable | false # Set to false when the weapon's damage is modified
+---@field damageTableCache WeaponDamageTable?
+---@field damageTableCacheValid boolean? # Set to false when the weapon's damage is modified and nil when it hasn't been tracked yet
 ---@field DisabledBuffs table
 ---@field DisabledFiringBones Bone[] # Bones that `Unit.Animator` cannot move when this weapon has a target
 ---@field EnergyRequired? number
@@ -472,29 +473,43 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     OnMotionHorzEventChange = function(self, new, old)
     end,
 
+    damageTableCache = nil,
+    -- Determine the validity of the damageTableCache:
+    -- nil -> never initialized;
+    -- false -> stale, needs to be updated;
+    -- true -> fresh, ready to use
+    damageTableCacheValid = nil,
     ---@param self Weapon
+    ---@return WeaponDamageTable
     GetDamageTableInternal = function(self)
         local weaponBlueprint = self.Blueprint
         ---@type WeaponDamageTable
-        local damageTable = {}
+        local damageTable
 
-        damageTable.DamageToShields = weaponBlueprint.DamageToShields
-        damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
-        damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
-        damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
-        damageTable.DamageType = weaponBlueprint.DamageType
-        damageTable.DamageFriendly = weaponBlueprint.DamageFriendly
-        if damageTable.DamageFriendly == nil then
-            damageTable.DamageFriendly = true
+        -- Setup the table for values that won't change later
+        if self.damageTableCacheValid == nil then
+            ---@diagnostic disable-next-line: missing-fields
+            damageTable = {}
+            damageTable.DamageToShields = weaponBlueprint.DamageToShields
+            damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
+            damageTable.DamageType = weaponBlueprint.DamageType
+            damageTable.DamageFriendly = weaponBlueprint.DamageFriendly
+            if damageTable.DamageFriendly == nil then
+                damageTable.DamageFriendly = true
+            end
+            damageTable.CollideFriendly = weaponBlueprint.CollideFriendly or false
+            damageTable.DoTTime = weaponBlueprint.DoTTime
+            damageTable.DoTPulses = weaponBlueprint.DoTPulses
+            damageTable.MetaImpactAmount = weaponBlueprint.MetaImpactAmount
+            damageTable.MetaImpactRadius = weaponBlueprint.MetaImpactRadius
+            damageTable.ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks
+        else
+            damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
         end
-        damageTable.CollideFriendly = weaponBlueprint.CollideFriendly or false
-        damageTable.DoTTime = weaponBlueprint.DoTTime
-        damageTable.DoTPulses = weaponBlueprint.DoTPulses
-        damageTable.MetaImpactAmount = weaponBlueprint.MetaImpactAmount
-        damageTable.MetaImpactRadius = weaponBlueprint.MetaImpactRadius
-        damageTable.ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks
 
         -- Add buff
+        damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
+        damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
         damageTable.Buffs = {}
         if weaponBlueprint.Buffs ~= nil then
             for k, v in weaponBlueprint.Buffs do
@@ -506,14 +521,15 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
         damageTable.__index = damageTable
 
+        self.damageTableCacheValid = true
+
         return damageTable
     end,
 
-    damageTableCache = false,
     ---@param self Weapon
     ---@return WeaponDamageTable
     GetDamageTable = function(self)
-        if not self.damageTableCache then
+        if not self.damageTableCacheValid then
             self.damageTableCache = self:GetDamageTableInternal()
         end
         return self.damageTableCache --[[@as WeaponDamageTable]]
@@ -669,7 +685,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param dmgMod number
     AddDamageMod = function(self, dmgMod)
         self.DamageMod = self.DamageMod + dmgMod
-        self.damageTableCache = false
+        self.damageTableCacheValid = false
     end,
 
     ---@param self Weapon
@@ -678,7 +694,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         if dmgRadMod then
             self.DamageRadiusMod = self.DamageRadiusMod + dmgRadMod
         end
-        self.damageTableCache = false
+        self.damageTableCacheValid = false
     end,
 
     ---@param self Weapon
@@ -698,7 +714,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     DisableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = true
-            self.damageTableCache = false
+            self.damageTableCacheValid = false
         else
             error('DisableBuff in weapon.lua does not have a buffname')
         end
@@ -709,7 +725,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ReEnableBuff = function(self, buffname)
         if buffname then
             self.DisabledBuffs[buffname] = nil
-            self.damageTableCache = false
+            self.damageTableCacheValid = false
         else
             error('ReEnableBuff in weapon.lua does not have a buffname')
         end
