@@ -33,6 +33,8 @@ local BackgroundTextures = {
     air = '/textures/ui/common/icons/units/air_up.dds',
 }
 
+local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
+
 ---@class UIUnitAdjacencyLabel: Group
 ---@field Unit UserUnit
 ---@field UnitIcon Bitmap
@@ -224,6 +226,66 @@ local function DrawUnitAdjacencyLabel(worldView, unit, adjacentBlueprint)
     unitAdjacencyLabel:UpdateReferences(worldView, unit)
 end
 
+---@param targetAdjacencyBuffs string[]
+---@param adjacentUnitBlueprint UnitBlueprint
+---@return BlueprintBuff?
+FirstBuffThatApplies = function(targetAdjacencyBuffs, adjacentUnitBlueprint)
+
+    ---@param adjacencyBuffName string
+    for k, adjacencyBuffName in targetAdjacencyBuffs do
+        local buffBlueprint = Buffs[adjacencyBuffName]
+        if buffBlueprint then
+            if buffBlueprint.EntityCategory then
+                local cat = ParseEntityCategory(buffBlueprint.EntityCategory)
+                if not EntityCategoryContains(cat, adjacentUnitBlueprint.BlueprintId) then
+                    continue
+                end
+
+                -- requires a unit reference, but we don't have that in the UI. Not sure what to do to proceed
+                -- if buffBlueprint.BuffCheckFunction then
+                --     if buffBlueprint:BuffCheckFunction(adjacentUnitBlueprint) then
+                --         return adjacencyBuffName
+                --     end 
+                -- end
+
+
+            end
+
+            return buffBlueprint
+        end
+    end
+
+    -- 
+    return nil
+end
+
+---@param targetUnitBlueprint UnitBlueprint
+---@param adjacentBlueprint UnitBlueprint
+BuffAppliesTo = function(targetUnitBlueprint, adjacentBlueprint)
+
+    -- mimics the behavior of 'ApplyBuff' in buffs.lua
+
+    -- early exit for dummy units
+    if EntityCategoryContains(categories.INSIGNIFICANTUNIT + categories.DUMMYUNIT, targetUnitBlueprint.BlueprintId) then
+        return false
+    end
+
+    -- early exit for units with no adjacency
+    if not targetUnitBlueprint.Adjacency then
+        return false
+    end
+
+    local adjacencyBuffNames = AdjacencyBuffs[targetUnitBlueprint.Adjacency]
+    if not adjacencyBuffNames then
+        return false
+    end
+
+    local buffBlueprint = FirstBuffThatApplies(adjacencyBuffNames, adjacentBlueprint)
+    reprsl(buffBlueprint)
+    return true
+
+end
+
 ---@param unit UserUnit                     # The unit that our build preview is adjacent to.
 ---@param adjacentBlueprint UnitBlueprint   # The blueprint of the build preview that is adjacent to the unit.
 OnAdjacentUnit = function(unit, adjacentBlueprint)
@@ -232,6 +294,8 @@ OnAdjacentUnit = function(unit, adjacentBlueprint)
     if not worldViewLeft then
         return
     end
+
+    BuffAppliesTo(unit:GetBlueprint(), adjacentBlueprint)
 
     DrawUnitAdjacencyLabel(worldViewLeft, unit, adjacentBlueprint)
 end
