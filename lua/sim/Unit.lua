@@ -5037,7 +5037,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             if weaponBp.MaxProjectileStorage >= 1 then
                 buildTime = __blueprints[weaponBp.ProjectileId].Economy.BuildTime
                 if buildTime then
-                    LOG('build time found', buildTime, weaponBp.ProjectileId)
                     break
                 end
             end
@@ -5046,7 +5045,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
-        LOG('giving ', blocks, 'out of', total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
         -- Engine won't update work progress so we do it manually
         self:SetWorkProgress(fraction)
