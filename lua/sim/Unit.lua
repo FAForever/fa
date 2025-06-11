@@ -5026,10 +5026,17 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local buildTime = self:GetWeapon(1):GetProjectileBlueprint().Economy.BuildTime
-        if not buildTime then
-            return
+        local buildTime
+        for i = 1, self.WeaponCount do
+            local weaponBp = self.WeaponInstances[i].Blueprint
+            if weaponBp.MaxProjectileStorage >= 1 then
+                buildTime = __blueprints[weaponBp.ProjectileId].Economy.BuildTime
+                if buildTime then
+                    break
+                end
+            end
         end
+        if not buildTime then return end
 
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
