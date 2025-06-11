@@ -26,7 +26,7 @@ if (Test-Path $debuggerExecutable) {
 }
 
 # Command-line arguments common for all instances
-$baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /gameoptions CheatsEnabled:true GameSpeed:adjustable'
+$baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /debugLobby /gameoptions CheatsEnabled:true GameSpeed:adjustable'
 # Add the players argument if we want to use autolobby
 if (-not $toLobby) {
     $baseArguments += " /players $players"
@@ -45,8 +45,8 @@ $subdivisions = @("I", "II", "III", "IV", "V")
 
 # Get the screen resolution (for placing and resizing the windows)
 Add-Type -AssemblyName System.Windows.Forms
-$screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
-$screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
+$screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea.Width
+$screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea.Height
 
 # Calculate the number of rows and columns for the grid layout
 $columns = [math]::Ceiling([math]::Sqrt($players))

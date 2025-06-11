@@ -183,6 +183,7 @@ local function parseCommandlineArguments()
         playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
         playerClan = tostring(GetCommandLineArgOrDefault("/clan", "")),
         playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500)),
+        debugLobby = HasCommandLineArg("/debugLobby"),
     }
 end
 local argv = parseCommandlineArguments()
@@ -444,6 +445,7 @@ function GetLocalPlayerData()
             GameType = gametype,
             Commit = commit,
 
+            Ready = argv.debugLobby,
         }
 )
 end
