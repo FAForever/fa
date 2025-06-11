@@ -62,11 +62,11 @@ local regenAuraDefaultCeilings = {
 
 --- Calculates regen for a unit using mults as a multiplier of the unit's HP that is then added to the final regen value.
 ---@param unit Unit
----@param affectBuffName BuffAffectName
+---@param buffName BuffName
 ---@param affectBp BlueprintBuffAffectState
----@return number Add
----@return number Mult
-local function regenAuraCalculate(unit, affectBuffName, affectBp)
+---@return number add
+---@return number mult
+local function regenAuraCalculate(unit, buffName, affectBp)
     local adds = 0
 
     if affectBp.Add and affectBp.Add ~= 0 then
@@ -93,9 +93,9 @@ local function regenAuraCalculate(unit, affectBuffName, affectBp)
 end
 
 --- A function that calculates buff add and mult values for a buff contributing to an "affect".
----@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffAffectName, affectBp: BlueprintBuffAffectState): add: number, mult: number
+---@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffName, affectBp: BlueprintBuffAffectState): add: number, mult: number
 
----@type table<BuffName, table<BuffAffectName, AffectCalculation>>
+---@type table<BuffName, table<BuffName, AffectCalculation>>
 UniqueAffectCalculation = {
     SeraphimACURegenAura = { Regen = regenAuraCalculate },
     SeraphimACUAdvancedRegenAura = { Regen = regenAuraCalculate },
@@ -125,7 +125,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
-    for affectBuffName, affectBp in pairs(unit.Buffs.Affects[affectType]) do
+    for originBuffName, affectBp in pairs(unit.Buffs.Affects[affectType]) do
         if affectBp.Floor then
             floor = affectBp.Floor
         end
@@ -136,9 +136,9 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             bool = true
         end
 
-        local uniqueCalculation = UniqueAffectCalculation[affectBuffName][affectType]
+        local uniqueCalculation = UniqueAffectCalculation[originBuffName][affectType]
         if uniqueCalculation then
-            local add, mult = uniqueCalculation(unit, affectBuffName, affectBp)
+            local add, mult = uniqueCalculation(unit, originBuffName, affectBp)
             adds = adds + add
             mults = mults * mult
         else
