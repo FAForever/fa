@@ -2,7 +2,8 @@
     [int]$players = 2,  # Default to 2 instances (1 host, 1 client)
     [string]$map = "/maps/scmp_009/SCMP_009_scenario.lua",  # Default map: Seton's Clutch
     [int]$port = 15000,  # Default port for hosting the game
-    [int]$teams = 2  # Default to two teams, 0 for FFA
+    [int]$teams = 2,  # Default to two teams, 0 for FFA
+    [switch]$toLobby # launches into custom lobby
 )
 
 # Base path to the bin directory
@@ -26,6 +27,10 @@ if (Test-Path $debuggerExecutable) {
 
 # Command-line arguments common for all instances
 $baseArguments = '/init "init_dev.lua" /EnableDiskWatch /nomovie /RunWithTheWind /gameoptions CheatsEnabled:true GameSpeed:adjustable'
+# Add the players argument if we want to use autolobby
+if (-not $toLobby) {
+    $baseArguments += " /players $players"
+}
 
 # Game-specific settings
 $hostProtocol = "udp"
@@ -96,7 +101,7 @@ function Get-DivisionArgText {
 }
 
 # Prepare arguments and launch instances
-if ($players -eq 1) {
+if ($players -eq 1 -and -not $toLobby) {
     $logFile = "dev.log"
     Launch-GameInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments "/log $logFile /showlog /map $map $baseArguments"
 } else {
@@ -105,7 +110,7 @@ if ($players -eq 1) {
     $hostTeamArgument = Get-TeamArgument -instanceNumber 0
 
     $divisionArgText = Get-DivisionArgText
-    $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /players $players /$hostFaction $hostTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
+    $hostArguments = "/log $hostLogFile /showlog /hostgame $hostProtocol $port $hostPlayerName $gameName $map /startspot 1 /$hostFaction $hostTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
 
     # Launch host game instance
     Launch-GameInstance -instanceNumber 1 -xPos 0 -yPos 0 -arguments $hostArguments
@@ -122,7 +127,7 @@ if ($players -eq 1) {
         $clientFaction = $factions | Get-Random
         $clientTeamArgument = Get-TeamArgument -instanceNumber $i
         $divisionArgText = Get-DivisionArgText
-        $clientArguments = "/log $clientLogFile /joingame $hostProtocol localhost:$port $clientPlayerName /startspot $($i + 1) /players $players /$clientFaction $clientTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
+        $clientArguments = "/log $clientLogFile /joingame $hostProtocol localhost:$port $clientPlayerName /startspot $($i + 1) /$clientFaction $clientTeamArgument $baseArguments $divisionArgText /clan $($clans | Get-Random)"
         
         Launch-GameInstance -instanceNumber ($i + 1) -xPos $xPos -yPos $yPos -arguments $clientArguments
     }
