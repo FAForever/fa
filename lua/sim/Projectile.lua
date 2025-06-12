@@ -165,8 +165,10 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     OnTrackTargetGround = function(self)
         local target = self.OriginalTarget or self:GetTrackingTarget() or self.Launcher:GetTargetEntity()
-        if target and target.IsUnit then
+        local physics = self.Blueprint.Physics
+        local offset = physics.TrackTargetGroundOffset or 0
 
+        if target and target.IsUnit then
             local unitBlueprint = target.Blueprint
 
             -- X-offset units often have displaced center bones, so they're not accounted for.
@@ -180,9 +182,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 cy = 0
             end
 
-            local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
-            local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
             sz = sz + offset
 
@@ -192,15 +192,13 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
             local orientation = EntityGetOrientation(target)
 
-            local dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
-            
+            dx, dy, dz = RotateVectorXYZByQuat(dx, dy, dz, orientation)
+
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
             local px, _, pz = self:GetCurrentTargetPositionXYZ()
 
-            local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0
-            local offset = physics.TrackTargetGroundOffset or 0
             local tx = px + (Random() - 0.5) * fuzziness * (1 + offset)
             local tz = pz + (Random() - 0.5) * fuzziness * (1 + offset)
 
@@ -217,9 +215,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if self.Army == other.Army then
             return false
         end
-
-        -- flag if we can hit allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
 
         local selfHashedCategories = self.Blueprint.CategoriesHash
         local otherHashedCategories = other.Blueprint.CategoriesHash
@@ -243,7 +238,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         end
 
         -- enemies always hit
-        return alliedCheck
+        return not (self.CollideFriendly and IsAlly(self.Army, other.Army)) -- flag if we can hit allied projectiles
     end,
 
     --- Called by the engine when a projectile collides with a collision beam to check if the collision is valid
@@ -255,9 +250,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if self.Army == firingWeapon.Army then
             return false
         end
-
-        -- flag that indicates whether we should impact allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
 
         local selfHashedCategories = self.Blueprint.CategoriesHash
 
@@ -271,7 +263,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         end
 
         -- depend on allied flag whether we hit or not
-        return alliedCheck
+        return not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army)) -- flag that indicates whether we should impact allied projectiles
     end,
 
     --- Called by the engine when the projectile receives damage
@@ -571,9 +563,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
-        local trackTarget = bp.TrackTarget
-        local trackTargetGround = bp.TrackTargetGround
-        if trackTarget and (not trackTargetGround) then
+        if bp.TrackTarget and not bp.TrackTargetGround then
             TrashBagAdd(self.Trash, ForkThread(self.RetargetThread, self))
         end
     end,
