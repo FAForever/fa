@@ -603,27 +603,29 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
     if (surfaceElevation > 0) {
         // we need this switch to make it consistent with the terrain shader coloration
         if (MapUsesAdvancedWater()) {
-            // We need to multiply by 2 to match the terrain shader.
-            float scaledDepth = (-depth / (surfaceElevation - abyssElevation)) * 2;
+            float scaledDepth = saturate(-depth / (surfaceElevation - abyssElevation));
             float3 up = float3(0,1,0);
-            // this is the length that the light travels underwater back to the camera
+            // This is the length that the light travels underwater back to the camera.
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
-            // Light gets absorbed exponentially.
-            // To simplify, we assume that the light enters vertically into the water.
-            float waterAbsorption = 1 - saturate(exp(-scaledDepth * (1 + oneOverCosV)));
-            // when the mesh emits light, then the path from the surface to the mesh doesn't apply
-            float emissionTransmitted = saturate(exp(-scaledDepth * oneOverCosV));
-            // darken the color first to simulate the light absorption on the way in and out
-            color *= 1 - waterAbsorption;
-            // lerp in the watercolor to simulate the scattered light from the dirty water
+            // Light gets absorbed exponentially with distance.
+            // Omnidirectional ambient light has an average underwater travel distance of 2 * depth.
+            // This is also the same value as directional light under 60 degrees. (30 degrees above
+            // the horizon.) This is a sufficient approximation of a typical sun angle on a map, so
+            // we don't need to bother with separating the ambient and sun light.
+            float inAttenuation = exp(-scaledDepth * 2);
+            float outAttenuation = exp(-scaledDepth * oneOverCosV);
+            float waterAbsorption = 1 - inAttenuation * outAttenuation;
+            // Absorb the emission only on the way out.
+            color *= inAttenuation;
+            color += emission;
+            color *= outAttenuation;
+            // Lerp in the watercolor to simulate the scattered light from the dirty water.
             float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
             color = lerp(color, waterColor.rgb, waterAbsorption);
-            // similarly tune down the emission light
-            color += emission * emissionTransmitted;
         } else {
+            color += emission;
             float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
             color = lerp(color, waterColor.rgb, waterColor.w);
-            color += emission;
         }
     } else {
         color += emission;
@@ -4772,7 +4774,7 @@ technique VertexNormal_MedFidelity
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 VertexNormalPS_HighFidelity(false, true, d3d_Greater, 0x23 );
+        PixelShader = compile ps_2_a VertexNormalPS_HighFidelity(false, true, d3d_Greater, 0x23 );
     }
 }
 
@@ -6994,7 +6996,7 @@ technique Wreckage_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_2_0 WreckageVS_HighFidelity();
-        PixelShader = compile ps_2_0 WreckagePS();
+        PixelShader = compile ps_2_a WreckagePS();
     }
 };
 
