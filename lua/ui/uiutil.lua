@@ -1520,32 +1520,32 @@ function CreateSCXMenuPanelBorder(parent)
 
     tbl.tl.Bottom:Set(parent.Top)
     tbl.tl.Right:Set(parent.Left)
-    
+
     tbl.tr.Bottom:Set(parent.Top)
     tbl.tr.Left:Set(parent.Right)
-    
+
     tbl.tm.Bottom:Set(parent.Top)
     tbl.tm.Right:Set(parent.Right)
     tbl.tm.Left:Set(parent.Left)
-    
+
     tbl.l.Bottom:Set(parent.Bottom)
     tbl.l.Top:Set(parent.Top)
     tbl.l.Right:Set(parent.Left)
-    
+
     tbl.r.Bottom:Set(parent.Bottom)
     tbl.r.Top:Set(parent.Top)
     tbl.r.Left:Set(parent.Right)
-    
+
     tbl.bl.Top:Set(parent.Bottom)
     tbl.bl.Right:Set(parent.Left)
-    
+
     tbl.br.Top:Set(parent.Bottom)
     tbl.br.Left:Set(parent.Right)
-    
+
     tbl.bm.Top:Set(parent.Bottom)
     tbl.bm.Right:Set(parent.Right)
     tbl.bm.Left:Set(parent.Left)
-    
+
     tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
@@ -1554,6 +1554,6 @@ function CreateSCXMenuPanelBorder(parent)
     tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
     tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-    
+
     return tbl
 end
