@@ -311,7 +311,7 @@ function BeginSession()
 
     -- other logic at the start of the game --
 
-    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    local victoryCondition = import("/lua/sim/victorycondition/victoryconditionsingleton.lua").GetSingleton()
     victoryCondition:StartMonitoring()
 
     Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
