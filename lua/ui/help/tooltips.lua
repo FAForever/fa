@@ -7,6 +7,12 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+---@class TooltipInfo
+---@field title UnlocalizedString # Title text of the tooltip.
+---@field description UnlocalizedString # Body text of the tooltip.
+---@field keyID string # Which key action to display the current keybind for in the title text of the tooltip. 
+
+---@type table<string, TooltipInfo>
 Tooltips = {
     -- *******************
     -- ** Orders Strings
@@ -1328,10 +1334,12 @@ Tooltips = {
     options_Pause = {
         title = "<LOC tooltipui0066>Pause",
         description = "",
+        keyID = 'pause'
     },
     options_Play = {
         title = "<LOC tooltipui0098>Play",
         description = "",
+        keyID = 'pause'
     },
 
     -- **********************
@@ -1420,10 +1428,12 @@ Tooltips = {
     construction_infinite = {
         title = "<LOC tooltipui0443>Infinite Build",
         description = "<LOC tooltipui0444>Toggle the infinite construction of the current queue",
+        keyID = "toggle_repeat_build",
     },
     construction_pause = {
         title = "<LOC tooltipui0445>Pause Construction",
         description = "<LOC tooltipui0446>[Pause/Unpause] the current construction order",
+        keyID = "pause_unit",
     },
 
 
@@ -1658,7 +1668,7 @@ Tooltips = {
     },
     mfd_defense = {
         title = "<LOC tooltipui0078>Player Colors",
-        description = "<LOC tooltipui0636>Toggle unit coloring between player and allegiance colors:\nYour Units\nAllied Units\nNeutral Units\nEnemy Units",
+        description = "<LOC tooltipui0636>Toggle unit coloring between player and allegiance colors (Right click to customize team colors and options):\nYour Units\nAllied Units\nNeutral Units\nEnemy Units",
         keyID = "tog_defense",
     },
     mfd_economy = {
