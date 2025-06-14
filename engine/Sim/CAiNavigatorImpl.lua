@@ -29,6 +29,7 @@ end
 
 ---
 --  This returns the current navigator target position for the unit
+---@return Vector
 function CNavigator:GetCurrentTargetPos()
 end
 

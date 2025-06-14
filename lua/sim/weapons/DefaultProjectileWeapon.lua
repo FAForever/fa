@@ -2,7 +2,6 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 -- upvalue globals for performance
 local GetSurfaceHeight = GetSurfaceHeight
-local VDist2 = VDist2
 
 local EntityMethods = moho.entity_methods
 local EntityGetPosition = EntityMethods.GetPosition
@@ -200,7 +199,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end
 
         local UnitGetVelocity = UnitGetVelocity
-        local VDist2 = VDist2
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
@@ -241,11 +239,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     targetVelX, _, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
-                local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+                local velDiffX = targetVelX - projVelX
+                local velDiffZ = targetVelZ - projVelZ
+                local distVel = MathSqrt(velDiffX * velDiffX + velDiffZ * velDiffZ)
                 if distVel == 0 then
                     return 4.9
                 end
-                local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+                local posDiffX = targetPosX - projPosX
+                local posDiffZ = targetPosZ - projPosZ
+                local distPos = MathSqrt(posDiffX * posDiffX + posDiffZ * posDiffZ)
                 do
                     local dropShort = self.DropBombShortRatio
                     if dropShort then
@@ -314,7 +316,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
-        local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+        local velDiffX = targetVelX - projVelX
+        local velDiffZ = targetVelZ - projVelZ
+        local distVel = MathSqrt(velDiffX * velDiffX + velDiffZ * velDiffZ)
         if distVel == 0 then
             data.lastAccel = 4.9
             return 4.9
@@ -322,7 +326,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         -- calculate the distance for this particular bomb
-        local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+        local posDiffX = targetPosX - projPosX
+        local posDiffY = targetPosZ - projPosZ
+        local distPos = MathSqrt(posDiffX * posDiffX + posDiffY * posDiffY)
         do
             local dropShort = self.DropBombShortRatio
             if dropShort then
@@ -342,8 +348,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- save the new predicted target position in case we lose the target
         -- so that we can drop the bomb salvo centered onto there.
         if data.target then
-            targetPos[1] = targetPos[1] + time * targetVelX
-            targetPos[3] = targetPos[3] + time * targetVelZ
+            targetPos[1] = targetPosX + time * targetVelX
+            targetPos[3] = targetPosZ + time * targetVelZ
             data.targetPos = targetPos
         end
 
@@ -1019,9 +1025,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
 
                 if bp.FixedSpreadRadius then
-                    local weaponPos = unit:GetPosition()
+                    local weaponPosX, _, weaponPosZ = unit:GetPositionXYZ()
                     local targetPos = self:GetCurrentTargetPos()
-                    local distance = VDist2(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
+                    local posDiffX = targetPos[1] - weaponPosX
+                    local posDiffZ = targetPos[3] - weaponPosZ
+                    local distance = MathSqrt(posDiffX * posDiffX + posDiffZ * posDiffZ)
 
                     -- This formula was obtained empirically and somehow it works :)
                     local randomness = 12 * bp.FixedSpreadRadius / distance
@@ -1353,3 +1361,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
     },
 }
+
+--#region Backwards compatibility
+---@diagnostic disable-next-line: deprecated
+local VDist2 = VDist2
+--#endregion

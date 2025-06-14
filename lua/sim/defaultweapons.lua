@@ -43,4 +43,5 @@ local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
 local GetSurfaceHeight = GetSurfaceHeight
+---@diagnostic disable-next-line: deprecated
 local VDist2 = VDist2
