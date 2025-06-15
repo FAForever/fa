@@ -481,7 +481,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     damageTableCacheValid = nil,
     ---@param self Weapon
     ---@return WeaponDamageTable
-    GetDamageTableInternal = function(self)
+    RefreshDamageTable = function(self)
         local weaponBlueprint = self.Blueprint
         ---@type WeaponDamageTable
         local damageTable
@@ -530,7 +530,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@return WeaponDamageTable
     GetDamageTable = function(self)
         if not self.damageTableCacheValid then
-            self.damageTableCache = self:GetDamageTableInternal()
+            self.damageTableCache = self:RefreshDamageTable()
         end
         return self.damageTableCache --[[@as WeaponDamageTable]]
     end,
