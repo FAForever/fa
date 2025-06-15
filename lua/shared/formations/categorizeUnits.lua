@@ -1,20 +1,19 @@
 local MathMax = math.max
 local MathCeil = math.ceil
 
--- === LAND CATEGORIES ===
----@type EntityCategory
+--#region Land Categories
+---@type EntityCategory # explicitly EntityCategory to fix unknown annotation
 local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
 local Sniper = categories.SNIPER * categories.LAND
 local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.SNIPER) * categories.LAND
 local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
 local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
----@type EntityCategory
+---@type EntityCategory # explicitly EntityCategory to fix unknown annotation
 ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
----@type EntityCategory
+---@type EntityCategory # explicitly EntityCategory to fix unknown annotation
 NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
--- === TECH LEVEL LAND CATEGORIES ===
 ---@alias LandCategoryNames
 ---| "Shield"
 ---| "Bot1"
@@ -85,8 +84,9 @@ LandCategories = {
 
     RemainingCategory = categories.LAND - (DirectFire + Sniper + Construction + Artillery + AntiAir + UtilityCat + ShieldCategory)
 }
+--#endregion
 
--- === AIR CATEGORIES ===
+--#region Air Categories
 local GroundAttackAir = (categories.AIR * categories.GROUNDATTACK) - categories.ANTIAIR
 local TransportationAir = categories.AIR * categories.TRANSPORTATION - categories.GROUNDATTACK
 local BomberAir = categories.AIR * categories.BOMBER
@@ -96,7 +96,6 @@ local IntelAir = categories.AIR * (categories.SCOUT + categories.RADAR)
 local ExperimentalAir = categories.AIR * categories.EXPERIMENTAL
 local EngineerAir = categories.AIR * categories.ENGINEER
 
--- === TECH LEVEL AIR CATEGORIES ===
 ---@alias AirCategoryNames
 ---| "Ground1"
 ---| "Ground2"
@@ -151,8 +150,9 @@ AirCategories = {
 
     RemainingCategory = categories.AIR - (GroundAttackAir + TransportationAir + BomberAir + AAAir + AntiNavyAir + IntelAir + ExperimentalAir + EngineerAir)
 }
+--#endregion
 
--- === NAVAL CATEGORIES ===
+--#region Naval Categories
 local LightAttackNaval = categories.LIGHTBOAT
 local FrigateNaval = categories.FRIGATE
 local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.TECH3 * categories.SUBMERSIBLE * categories.ANTINAVY * categories.NAVAL - categories.NUKE)
@@ -166,7 +166,6 @@ local DefensiveBoat = categories.DEFENSIVEBOAT
 local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
                         CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
 
--- === TECH LEVEL LAND CATEGORIES ===
 ---@alias NavalCategoryNames
 ---| "LightCount"
 ---| "FrigateCount"
@@ -193,24 +192,28 @@ NavalCategories = {
 
     RemainingCategory = RemainingNaval,
 }
+--#endregion
 
+--#region Sub Categories
 ---@alias SubCategoryNames
 ---| "SubCount"
 ---@type table<SubCategoryNames, EntityCategory>
 SubCategories = {
     SubCount = SubNaval,
 }
+--#endregion
 
----@alias FormationLayerFootprintData table<number, FootprintSizeCategoryData>
+--#region Table initialization
+---@alias FormationLayerFootprints table<number, { Count: integer, Filter: EntityCategory }>
+---@alias FormationLayerFootprintTable { Count: integer, Filter: EntityCategory }
 ---@alias FormationLayerCommonData { FootprintSizes: table<number, integer>, FootprintCounts: table<number, integer>, UnitTotal: integer, AreaTotal: number, Scale: number? }
----@alias FootprintSizeCategoryData { Count: integer, Filter: EntityCategory }
 
+-- Table for formation categorization
 ---@class FormationData
----@field Land table<LandCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
----@field Air table<AirCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
----@field Naval table<NavalCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
----@field Subs table<SubCategoryNames, FormationLayerFootprintData> | FormationLayerCommonData
--- reusable table for categorizing units in a formation
+---@field Land table<LandCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@field Air table<AirCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@field Naval table<NavalCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
+---@field Subs table<SubCategoryNames, FormationLayerFootprints> | FormationLayerCommonData
 local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
 -- map layers to categories
 local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
@@ -223,6 +226,7 @@ for unitType, categoriesForType in pairs(CategoryTables) do
     typeData.FootprintCounts = {}
     typeData.FootprintSizes = {}
 end
+--#endregion
 
 -- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
 ---@param formationUnits Unit[]
@@ -257,10 +261,14 @@ function CategorizeUnits(formationUnits)
 
     -- Loop through each unit to get its category and size
     for _, unit in pairs(formationUnits) do
+        -- If the unit is identified then do not iterate the remaining formation layer categories
         local identified = false
+        -- Loop through each of the static category tables
         for type, table in pairs(categoryTables) do
             local typeData = UnitsList[type]
+            -- Loop through each EntityCategory of each of the category tables
             for cat, _ in pairs(table) do
+                -- Attempt to match the unit to the category
                 if EntityCategoryContains(table[cat], unit) then
                     local bp = unit:GetBlueprint()
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
@@ -272,13 +280,13 @@ function CategorizeUnits(formationUnits)
 
                     local id = bp.BlueprintId
 
-                    ---@type FormationLayerFootprintData
+                    ---@type FormationLayerFootprints
                     local categoryData = typeData[cat]
 
                     if not categoryData[fs] then
                         categoryData[fs] = {Count = 0, Filter = categories[id]}
                     end
-                    ---@type FootprintSizeCategoryData
+                    ---@type FormationLayerFootprintTable
                     local footprintSizeData = categoryData[fs]
 
                     footprintSizeData.Count = footprintSizeData.Count + 1
