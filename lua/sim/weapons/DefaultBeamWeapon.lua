@@ -14,8 +14,6 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     OnCreate = function(self)
         DefaultProjectileWeapon.OnCreate(self)
 
-        self.Beams = {}
-
         -- Ensure that the weapon blueprint is set up properly for beams
         local bp = self.Blueprint
         if not bp.BeamCollisionDelay then
@@ -39,6 +37,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         }
 
         -- Create the beam
+        self.Beams = {}
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
                 beamData.OtherBone = muzzle
