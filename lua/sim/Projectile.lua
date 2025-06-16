@@ -806,21 +806,23 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
+        local radius = tbl.Radius
+
         self.MyFlare = Flare {
             Owner = self,
-            Radius = tbl.Radius,
+            Radius = radius,
             Category = tbl.Category, -- We pass the category bp value along so that it actually has a function.
         }
         if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
             self.MyUpperFlare = Flare {
                 Owner = self,
-                Radius = tbl.Radius,
+                Radius = radius,
                 OffsetMult = tbl.OffsetMult,
                 Category = tbl.Category,
             }
             self.MyLowerFlare = Flare {
                 Owner = self,
-                Radius = tbl.Radius,
+                Radius = radius,
                 OffsetMult = -tbl.OffsetMult,
                 Category = tbl.Category,
             }
