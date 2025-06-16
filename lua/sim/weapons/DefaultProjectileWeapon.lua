@@ -305,8 +305,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if halfHeight < 0.01 then return 4.9 end
             time = MathSqrt(0.816326530612 * halfHeight) + spread
 
-            local acc = halfHeight / (time * time)
-            return acc
+            return halfHeight / (time * time)
         end
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
