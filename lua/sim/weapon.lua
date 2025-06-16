@@ -483,13 +483,12 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@return WeaponDamageTable
     RefreshDamageTable = function(self)
         local weaponBlueprint = self.Blueprint
-        ---@type WeaponDamageTable
         local damageTable = self.damageTableCache or nil
 
         -- Setup the table for values that won't change later
         if not damageTable then
-            ---@diagnostic disable-next-line: missing-fields
             local damageFriendly = weaponBlueprint.DamageFriendly
+            ---@diagnostic disable-next-line: missing-fields
             damageTable = {
                 DamageToShields = weaponBlueprint.DamageToShields,
                 InitialDamageAmount = weaponBlueprint.InitialDamage or 0,
