@@ -484,7 +484,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     RefreshDamageTable = function(self)
         local weaponBlueprint = self.Blueprint
         ---@type WeaponDamageTable
-        local damageTable
+        local damageTable = self.damageTableCache or nil
 
         -- Setup the table for values that won't change later
         if self.damageTableCacheValid == nil then
