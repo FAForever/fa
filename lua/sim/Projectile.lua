@@ -807,7 +807,6 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if not tbl or not tbl.Radius then return end
         local radius = tbl.Radius
         local category = tbl.Category
-        local offsetMult = tbl.OffsetMult
 
         self.MyFlare = Flare {
             Owner = self,
@@ -817,6 +816,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         TrashBagAdd(self.Trash, self.MyFlare)
 
         if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
+            local offsetMult = tbl.OffsetMult
+
             self.MyUpperFlare = Flare {
                 Owner = self,
                 Radius = radius,
