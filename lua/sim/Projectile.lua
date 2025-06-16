@@ -441,14 +441,16 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 -- radius, lod and lifetime share the same rng adjustment
                 local rngRadius = altRadius * Random()
 
+                local splatRadius = 0.75 * altRadius + 0.2 * rngRadius
+
                 CreateSplat(
                     vc, -- position
                     6.28 * Random(), -- heading
                     splat, -- splat
 
                     -- scale the splat, lod and duration randomly
-                    0.75 * altRadius + 0.2 * rngRadius, -- size x
-                    0.75 * altRadius + 0.2 * rngRadius, -- size z
+                    splatRadius, -- size x
+                    splatRadius, -- size z
                     10 + 30 * altRadius + 30 * rngRadius, -- lod
                     8 + 8 * altRadius + 8 * rngRadius, -- duration
                     self.Army-- owner of splat
