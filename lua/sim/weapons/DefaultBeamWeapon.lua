@@ -31,16 +31,20 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
             return
         end
 
+        -- Store common data (-OtherBone) for creating beams
+        local beamData = {
+            Weapon = self,
+            BeamBone = 0,
+            CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
+        }
+
         -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
+                beamData.OtherBone = muzzle
                 ---@type CollisionBeam
-                local beam = self.BeamType {
-                    Weapon = self,
-                    BeamBone = 0,
-                    OtherBone = muzzle,
-                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
-                }
+                local beam = self.BeamType(beamData)
+
                 local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
                 table.insert(self.Beams, beamTable)
                 self.Trash:Add(beam)
