@@ -528,7 +528,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     ---@return WeaponDamageTable
     GetDamageTable = function(self)
-        if not self.damageTableCacheValid then
+        if not self.damageTableCacheValid or not self.damageTableCache then
             self.damageTableCache = self:RefreshDamageTable()
         end
         return self.damageTableCache --[[@as WeaponDamageTable]]
