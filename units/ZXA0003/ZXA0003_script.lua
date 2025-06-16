@@ -26,6 +26,8 @@ local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
 ZXA0003 = ClassUnit(DummyUnit) {
 
     OnCreate = function (self)
+        DummyUnit.OnCreate(self)
+
         self:HideBone(0, true)
         -- do not allow the unit to be killed or to take damage
         self.CanTakeDamage = false
