@@ -38,8 +38,8 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
             CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
         }
 
-        -- Create the beam
         self.Beams = {}
+        -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
                 beamData.OtherBone = muzzle
