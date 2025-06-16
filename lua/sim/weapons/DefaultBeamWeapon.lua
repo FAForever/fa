@@ -31,7 +31,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
             return
         end
 
-        -- Store common data (-OtherBone) for creating beams
+        -- Store common data for creating beams
         local beamData = {
             Weapon = self,
             BeamBone = 0,
