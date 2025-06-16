@@ -213,7 +213,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         projVelZ = projVelZ * multiplier
 
         local targetPos
-        local targetVelX, targetVelZ = 0, 0
+        local targetVelX, _, targetVelZ = 0, nil, 0
 
         local data = self.CurrentSalvoData
 
