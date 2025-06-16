@@ -860,6 +860,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param effectScale? number
     CreateImpactEffects = function(self, army, effectTable, effectScale)
         local emit = nil
+        local scaleEmit = effectScale and effectScale ~= 1
         local fxImpactTrajectoryAligned = self.FxImpactTrajectoryAligned
         for _, v in effectTable do
             if fxImpactTrajectoryAligned then
@@ -868,7 +869,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 emit = CreateEmitterAtEntity(self, army, v)
             end
 
-            if effectScale and effectScale ~= 1 then
+            if scaleEmit then
                 emit:ScaleEmitter(effectScale or 1)
             end
         end
@@ -881,9 +882,11 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param effectScale? number
     CreateTerrainEffects = function(self, army, effectTable, effectScale)
         local emit = nil
+        local scaleEmit = effectScale and effectScale ~= 1
         for _, v in effectTable do
             emit = CreateEmitterAtBone(self, -2, army, v)
-            if emit and effectScale and effectScale ~= 1 then
+            if emit and scaleEmit then
+                ---@diagnostic disable-next-line: param-type-mismatch
                 emit:ScaleEmitter(effectScale)
             end
         end
