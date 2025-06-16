@@ -899,8 +899,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param position Vector
     ---@return string[] | boolean
     GetTerrainEffects = function(self, targetType, impactEffectType, position)
-
-        local position = position or self:GetPosition()
+        position = position or self:GetPosition()
 
         local terrainType = nil
         if impactEffectType then
