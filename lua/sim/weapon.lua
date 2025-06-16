@@ -489,20 +489,19 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         -- Setup the table for values that won't change later
         if self.damageTableCacheValid == nil then
             ---@diagnostic disable-next-line: missing-fields
-            damageTable = {}
-            damageTable.DamageToShields = weaponBlueprint.DamageToShields
-            damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
-            damageTable.DamageType = weaponBlueprint.DamageType
-            damageTable.DamageFriendly = weaponBlueprint.DamageFriendly
-            if damageTable.DamageFriendly == nil then
-                damageTable.DamageFriendly = true
-            end
-            damageTable.CollideFriendly = weaponBlueprint.CollideFriendly or false
-            damageTable.DoTTime = weaponBlueprint.DoTTime
-            damageTable.DoTPulses = weaponBlueprint.DoTPulses
-            damageTable.MetaImpactAmount = weaponBlueprint.MetaImpactAmount
-            damageTable.MetaImpactRadius = weaponBlueprint.MetaImpactRadius
-            damageTable.ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks
+            local damageFriendly = weaponBlueprint.DamageFriendly
+            damageTable = {
+                DamageToShields = weaponBlueprint.DamageToShields,
+                InitialDamageAmount = weaponBlueprint.InitialDamage or 0,
+                DamageType = weaponBlueprint.DamageType,
+                DamageFriendly = damageFriendly == nil and true or damageFriendly,
+                CollideFriendly = weaponBlueprint.CollideFriendly or false,
+                DoTTime = weaponBlueprint.DoTTime,
+                DoTPulses = weaponBlueprint.DoTPulses,
+                MetaImpactAmount = weaponBlueprint.MetaImpactAmount,
+                MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
+                ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
+            }
         else
             damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
         end
