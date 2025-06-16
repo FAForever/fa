@@ -815,6 +815,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             Radius = radius,
             Category = category, -- We pass the category bp value along so that it actually has a function.
         }
+        self.Trash:Add(self.MyFlare)
+
         if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
             self.MyUpperFlare = Flare {
                 Owner = self,
@@ -822,17 +824,16 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 OffsetMult = offsetMult,
                 Category = category,
             }
+            self.Trash:Add(self.MyUpperFlare)
+
             self.MyLowerFlare = Flare {
                 Owner = self,
                 Radius = radius,
                 OffsetMult = -offsetMult,
                 Category = category,
             }
-            self.Trash:Add(self.MyUpperFlare)
             self.Trash:Add(self.MyLowerFlare)
         end
-
-        self.Trash:Add(self.MyFlare)
     end,
 
     ---@param self TDepthChargeProjectile
