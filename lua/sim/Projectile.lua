@@ -42,6 +42,7 @@ local EntitySetHealth = EntityMethods.SetHealth
 local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 local EntityDestroy = EntityMethods.Destroy
 local EntityGetOrientation = EntityMethods.GetOrientation
+local EntityPlaySound = EntityMethods.PlaySound
 
 local TrashBag = TrashBag
 local TrashBagAdd = TrashBag.Add
@@ -359,25 +360,28 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         local instigator = launcher or self
 
         -- localize information for performance
-        local vc = VectorCached
-        vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
+        local vcx, vcy, vcz = EntityGetPositionXYZ(self)
 
         -- adjust the impact location based on the velocity of the thing we're hitting, this fixes a bug with damage being applied the tick after the collision
         -- is registered. As a result, the unit has moved one step ahead already, allowing it to 'miss' the area damage that we're trying to apply. Usually
         -- air units are affected by this, see also the pull request for a visual aid on this issue on Github
         if radius > 0 and targetEntity then
             if targetType == 'Unit' or targetType == 'UnitAir' then
-                local vx, vy, vz = targetEntity:GetVelocity()
-                vc[1] = vc[1] + vx
-                vc[2] = vc[2] + vy
-                vc[3] = vc[3] + vz
+                local velx, vely, velz = targetEntity:GetVelocity()
+                vcx = vcx + velx
+                vcy = vcy + vely
+                vcz = vcz + velz
             elseif targetType == 'Shield' then
-                local vx, vy, vz = targetEntity.Owner:GetVelocity()
-                vc[1] = vc[1] + vx
-                vc[2] = vc[2] + vy
-                vc[3] = vc[3] + vz
+                local velx, vely, velz = targetEntity.Owner:GetVelocity()
+                vcx = vcx + velx
+                vcy = vcy + vely
+                vcz = vcz + velz
             end
         end
+
+        -- localize information for performance
+        local vc = VectorCached
+        vc[1], vc[2], vc[3] = vcx, vcy, vcz
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
@@ -385,8 +389,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- compute whether we should spawn additional effects for this
         -- projectile, there's always a 10% chance or if we're far away from
         -- the previous impact
-        local dx = OnImpactPreviousX - vc[1]
-        local dz = OnImpactPreviousZ - vc[3]
+        local dx = OnImpactPreviousX - vcx
+        local dz = OnImpactPreviousZ - vcz
         local dsqrt = dx * dx + dz * dz
         local doEffects = Random() < 0.1 or dsqrt > radius
 
@@ -394,8 +398,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if radius > 0 and doEffects then
 
             -- update last position of known effects
-            OnImpactPreviousX = vc[1]
-            OnImpactPreviousZ = vc[3]
+            OnImpactPreviousX = vcx
+            OnImpactPreviousZ = vcz
 
             -- knock over trees
             DamageArea(
@@ -429,14 +433,16 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 -- radius, lod and lifetime share the same rng adjustment
                 local rngRadius = altRadius * Random()
 
+                local splatRadius = 0.75 * altRadius + 0.2 * rngRadius
+
                 CreateSplat(
                     vc, -- position
                     6.28 * Random(), -- heading
                     splat, -- splat
 
                     -- scale the splat, lod and duration randomly
-                    0.75 * altRadius + 0.2 * rngRadius, -- size x
-                    0.75 * altRadius + 0.2 * rngRadius, -- size z
+                    splatRadius, -- size x
+                    splatRadius, -- size z
                     10 + 30 * altRadius + 30 * rngRadius, -- lod
                     8 + 8 * altRadius + 8 * rngRadius, -- duration
                     self.Army-- owner of splat
@@ -450,9 +456,9 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
         local snd = blueprintAudio['Impact' .. targetType]
         if snd then
-            self:PlaySound(snd)
+            EntityPlaySound(self, snd)
         elseif blueprintAudio.Impact then
-            self:PlaySound(blueprintAudio.Impact)
+            EntityPlaySound(self, blueprintAudio.Impact)
         end
 
         -- Possible 'target' values are:
@@ -535,7 +541,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             end
 
             if blueprintAudio then
-                self:PlaySound(blueprintAudio)
+                EntityPlaySound(self, blueprintAudio)
             end
         end
     end,
@@ -553,7 +559,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             end
 
             if blueprintAudio then
-                self:PlaySound(blueprintAudio)
+                EntityPlaySound(self, blueprintAudio)
             end
         end
     end,
@@ -789,40 +795,35 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to add a flare
     ---@param self Projectile
-    ---@param tbl? table
+    ---@param tbl? WeaponBlueprintFlare
     AddFlare = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
-        self.MyFlare = Flare {
+        if not (tbl and tbl.Radius) then return end
+        local flareSpec = {
             Owner = self,
             Radius = tbl.Radius,
             Category = tbl.Category, -- We pass the category bp value along so that it actually has a function.
         }
-        if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
-            self.MyUpperFlare = Flare {
-                Owner = self,
-                Radius = tbl.Radius,
-                OffsetMult = tbl.OffsetMult,
-                Category = tbl.Category,
-            }
-            self.MyLowerFlare = Flare {
-                Owner = self,
-                Radius = tbl.Radius,
-                OffsetMult = -tbl.OffsetMult,
-                Category = tbl.Category,
-            }
-            self.Trash:Add(self.MyUpperFlare)
-            self.Trash:Add(self.MyLowerFlare)
-        end
 
-        self.Trash:Add(self.MyFlare)
+        self.MyFlare = Flare(flareSpec)
+        TrashBagAdd(self.Trash, self.MyFlare)
+
+        if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
+            local offsetMutl = tbl.OffsetMult
+
+            flareSpec.OffSetMult = offsetMutl
+            self.MyUpperFlare = Flare(flareSpec)
+            TrashBagAdd(self.Trash, self.MyUpperFlare)
+
+            flareSpec.OffSetMult = -offsetMutl
+            self.MyLowerFlare = Flare(flareSpec)
+            TrashBagAdd(self.Trash, self.MyLowerFlare)
+        end
     end,
 
     ---@param self TDepthChargeProjectile
     ---@param blueprint WeaponBlueprintDepthCharge
     AddDepthCharge = function(self, blueprint)
-        if not blueprint then return end
-        if not blueprint.Radius then return end
+        if not (blueprint and blueprint.Radius) then return end
 
         ---@type DepthChargeSpec
         local depthChargeSpec = {
@@ -831,7 +832,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             ProjectilesToDeflect = blueprint.ProjectilesToDeflect
         }
 
-        self.MyDepthCharge = self.Trash:Add(DepthCharge(depthChargeSpec))
+        self.MyDepthCharge = TrashBagAdd(self.Trash, DepthCharge(depthChargeSpec))
     end,
 
     --- Called by Lua to create the impact effects
@@ -841,6 +842,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param effectScale? number
     CreateImpactEffects = function(self, army, effectTable, effectScale)
         local emit = nil
+        local scaleEmit = effectScale and effectScale ~= 1
         local fxImpactTrajectoryAligned = self.FxImpactTrajectoryAligned
         for _, v in effectTable do
             if fxImpactTrajectoryAligned then
@@ -849,7 +851,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 emit = CreateEmitterAtEntity(self, army, v)
             end
 
-            if effectScale and effectScale ~= 1 then
+            if scaleEmit then
                 emit:ScaleEmitter(effectScale or 1)
             end
         end
@@ -862,9 +864,11 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param effectScale? number
     CreateTerrainEffects = function(self, army, effectTable, effectScale)
         local emit = nil
+        local scaleEmit = effectScale and effectScale ~= 1
         for _, v in effectTable do
             emit = CreateEmitterAtBone(self, -2, army, v)
-            if emit and effectScale and effectScale ~= 1 then
+            if emit and scaleEmit then
+                ---@diagnostic disable-next-line: param-type-mismatch
                 emit:ScaleEmitter(effectScale)
             end
         end
@@ -877,8 +881,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param position Vector
     ---@return string[] | boolean
     GetTerrainEffects = function(self, targetType, impactEffectType, position)
-
-        local position = position or self:GetPosition()
+        position = position or self:GetPosition()
 
         local terrainType = nil
         if impactEffectType then
