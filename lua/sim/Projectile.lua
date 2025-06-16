@@ -850,7 +850,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             ProjectilesToDeflect = blueprint.ProjectilesToDeflect
         }
 
-        self.MyDepthCharge = self.Trash:Add(DepthCharge(depthChargeSpec))
+        self.MyDepthCharge = TrashBagAdd(self.Trash, DepthCharge(depthChargeSpec))
     end,
 
     --- Called by Lua to create the impact effects
