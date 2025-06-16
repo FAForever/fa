@@ -367,8 +367,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         local instigator = launcher or self
 
         -- localize information for performance
-        local vc = VectorCached
-        vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
+        local vcx, vcy, vcz = EntityGetPositionXYZ(self)
 
         -- adjust the impact location based on the velocity of the thing we're hitting, this fixes a bug with damage being applied the tick after the collision
         -- is registered. As a result, the unit has moved one step ahead already, allowing it to 'miss' the area damage that we're trying to apply. Usually
@@ -376,16 +375,20 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if radius > 0 and targetEntity then
             if targetType == 'Unit' or targetType == 'UnitAir' then
                 local velx, vely, velz = targetEntity:GetVelocity()
-                vc[1] = vc[1] + velx
-                vc[2] = vc[2] + vely
-                vc[3] = vc[3] + velz
+                vcx = vcx + velx
+                vcy = vcy + vely
+                vcz = vcz + velz
             elseif targetType == 'Shield' then
                 local velx, vely, velz = targetEntity.Owner:GetVelocity()
-                vc[1] = vc[1] + velx
-                vc[2] = vc[2] + vely
-                vc[3] = vc[3] + velz
+                vcx = vcx + velx
+                vcy = vcy + vely
+                vcz = vcz + velz
             end
         end
+
+        -- localize information for performance
+        local vc = VectorCached
+        vc[1], vc[2], vc[3] = vcx, vcy, vcz
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
@@ -393,8 +396,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- compute whether we should spawn additional effects for this
         -- projectile, there's always a 10% chance or if we're far away from
         -- the previous impact
-        local dx = OnImpactPreviousX - vc[1]
-        local dz = OnImpactPreviousZ - vc[3]
+        local dx = OnImpactPreviousX - vcx
+        local dz = OnImpactPreviousZ - vcz
         local dsqrt = dx * dx + dz * dz
         local doEffects = Random() < 0.1 or dsqrt > radius
 
@@ -402,8 +405,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if radius > 0 and doEffects then
 
             -- update last position of known effects
-            OnImpactPreviousX = vc[1]
-            OnImpactPreviousZ = vc[3]
+            OnImpactPreviousX = vcx
+            OnImpactPreviousZ = vcz
 
             -- knock over trees
             DamageArea(
