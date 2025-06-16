@@ -807,8 +807,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     ---@param tbl? table
     AddFlare = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
+        if not (tbl and tbl.Radius) then return end
         local radius = tbl.Radius
         local category = tbl.Category
 
@@ -843,8 +842,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self TDepthChargeProjectile
     ---@param blueprint WeaponBlueprintDepthCharge
     AddDepthCharge = function(self, blueprint)
-        if not blueprint then return end
-        if not blueprint.Radius then return end
+        if not (blueprint and blueprint.Radius) then return end
 
         ---@type DepthChargeSpec
         local depthChargeSpec = {
