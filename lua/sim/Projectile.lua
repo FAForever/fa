@@ -808,6 +808,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         if not tbl.Radius then return end
         local radius = tbl.Radius
         local category = tbl.Category
+        local offsetMult = tbl.OffsetMult
 
         self.MyFlare = Flare {
             Owner = self,
@@ -818,13 +819,13 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
             self.MyUpperFlare = Flare {
                 Owner = self,
                 Radius = radius,
-                OffsetMult = tbl.OffsetMult,
+                OffsetMult = offsetMult,
                 Category = category,
             }
             self.MyLowerFlare = Flare {
                 Owner = self,
                 Radius = radius,
-                OffsetMult = -tbl.OffsetMult,
+                OffsetMult = -offsetMult,
                 Category = category,
             }
             self.Trash:Add(self.MyUpperFlare)
