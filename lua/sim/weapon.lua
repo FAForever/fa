@@ -487,7 +487,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         local damageTable = self.damageTableCache or nil
 
         -- Setup the table for values that won't change later
-        if self.damageTableCacheValid == nil then
+        if not damageTable then
             ---@diagnostic disable-next-line: missing-fields
             local damageFriendly = weaponBlueprint.DamageFriendly
             damageTable = {
