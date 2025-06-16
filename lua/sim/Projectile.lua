@@ -808,33 +808,24 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param tbl? WeaponBlueprintFlare
     AddFlare = function(self, tbl)
         if not (tbl and tbl.Radius) then return end
-        local radius = tbl.Radius
-        local category = tbl.Category
-
-        self.MyFlare = Flare {
+        local flareSpec = {
             Owner = self,
-            Radius = radius,
-            Category = category, -- We pass the category bp value along so that it actually has a function.
+            Radius = tbl.Radius,
+            Category = tbl.Category, -- We pass the category bp value along so that it actually has a function.
         }
+
+        self.MyFlare = Flare(flareSpec)
         TrashBagAdd(self.Trash, self.MyFlare)
 
         if tbl.Stack == true then -- Secondary flare hitboxes, one above, one below (Aeon TMD)
-            local offsetMult = tbl.OffsetMult
+            local offsetMutl = tbl.OffsetMult
 
-            self.MyUpperFlare = Flare {
-                Owner = self,
-                Radius = radius,
-                OffsetMult = offsetMult,
-                Category = category,
-            }
+            flareSpec.OffSetMult = offsetMutl
+            self.MyUpperFlare = Flare(flareSpec)
             TrashBagAdd(self.Trash, self.MyUpperFlare)
 
-            self.MyLowerFlare = Flare {
-                Owner = self,
-                Radius = radius,
-                OffsetMult = -offsetMult,
-                Category = category,
-            }
+            flareSpec.OffSetMult = -offsetMutl
+            self.MyLowerFlare = Flare(flareSpec)
             TrashBagAdd(self.Trash, self.MyLowerFlare)
         end
     end,
