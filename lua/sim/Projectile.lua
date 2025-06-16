@@ -375,15 +375,15 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
         -- air units are affected by this, see also the pull request for a visual aid on this issue on Github
         if radius > 0 and targetEntity then
             if targetType == 'Unit' or targetType == 'UnitAir' then
-                local vx, vy, vz = targetEntity:GetVelocity()
-                vc[1] = vc[1] + vx
-                vc[2] = vc[2] + vy
-                vc[3] = vc[3] + vz
+                local velx, vely, velz = targetEntity:GetVelocity()
+                vc[1] = vc[1] + velx
+                vc[2] = vc[2] + vely
+                vc[3] = vc[3] + velz
             elseif targetType == 'Shield' then
-                local vx, vy, vz = targetEntity.Owner:GetVelocity()
-                vc[1] = vc[1] + vx
-                vc[2] = vc[2] + vy
-                vc[3] = vc[3] + vz
+                local velx, vely, velz = targetEntity.Owner:GetVelocity()
+                vc[1] = vc[1] + velx
+                vc[2] = vc[2] + vely
+                vc[3] = vc[3] + velz
             end
         end
 
