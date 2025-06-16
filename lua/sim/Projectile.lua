@@ -805,7 +805,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
 
     --- Called by Lua to add a flare
     ---@param self Projectile
-    ---@param tbl? table
+    ---@param tbl? WeaponBlueprintFlare
     AddFlare = function(self, tbl)
         if not (tbl and tbl.Radius) then return end
         local radius = tbl.Radius
