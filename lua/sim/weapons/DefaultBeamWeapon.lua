@@ -1,6 +1,8 @@
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
+local TableInsert = table.insert
+
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
 ---@field DisableBeamThreadInstance? thread
 ---@field Beams { Beam: CollisionBeam, Muzzle: string, Destroyables: table}[]
@@ -45,7 +47,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
                 local beam = self.BeamType(beamData)
 
                 local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
-                table.insert(self.Beams, beamTable)
+                TableInsert(self.Beams, beamTable)
                 self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
