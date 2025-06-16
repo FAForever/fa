@@ -804,7 +804,8 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
     ---@param self Projectile
     ---@param tbl? table
     AddFlare = function(self, tbl)
-        if not tbl or not tbl.Radius then return end
+        if not tbl then return end
+        if not tbl.Radius then return end
         local radius = tbl.Radius
         local category = tbl.Category
 
