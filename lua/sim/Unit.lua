@@ -2844,11 +2844,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return false -- Report failure of OnStartBuild
         end
 
-        -- If desired, prevent engineer stations from building their upgrades as a separate unit
+        -- If desired, prevent engineer stations and factories from building their upgrades as a separate unit
         -- We need a separate table for this just in case a unit is intended to be able to build its own upgrade as a separate unit too
         -- Its type is `UnparsedCategory[]` to make it behave identically to `Blueprint.Economy.BuildableCategory`
         local upgradeOnlyCategory = self.Blueprint.Economy.UpgradeOnlyCategory
-        if upgradeOnlyCategory and order == "MobileBuild" then
+        if upgradeOnlyCategory and (order == "MobileBuild" or order == "FactoryBuild") then
             for _, unparsedCat in upgradeOnlyCategory do
                 if EntityCategoryContains(ParseEntityCategory(unparsedCat), built) then
                     -- Destroying the built unit will clear the command too, so we don't need to clear the entire queue (in case this exploit was done on accident).
