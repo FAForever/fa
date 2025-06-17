@@ -34,7 +34,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- Store common data for creating beams
         ---@type CollisionBeamSpec
         ---@diagnostic disable-next-line: missing-fields
-        local beamData = {
+        local beamSpec = {
             Weapon = self,
             BeamBone = 0,
             CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
@@ -44,9 +44,9 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
-                beamData.OtherBone = muzzle
+                beamSpec.OtherBone = muzzle
                 ---@type CollisionBeam
-                local beam = self.BeamType(beamData)
+                local beam = self.BeamType(beamSpec)
 
                 local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
                 TableInsert(self.Beams, beamTable)
