@@ -495,6 +495,7 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
                 ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
             }
+            damageTable.__index = damageTable
         else
             damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
         end
@@ -510,8 +511,6 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
                 end
             end
         end
-
-        damageTable.__index = damageTable
 
         self.damageTableCacheValid = true
 
