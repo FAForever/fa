@@ -473,12 +473,6 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     OnMotionHorzEventChange = function(self, new, old)
     end,
 
-    damageTableCache = nil,
-    -- Determine the validity of the damageTableCache:
-    -- nil -> never initialized;
-    -- false -> stale, needs to be updated;
-    -- true -> fresh, ready to use
-    damageTableCacheValid = nil,
     ---@param self Weapon
     ---@return WeaponDamageTable
     RefreshDamageTable = function(self)
