@@ -685,8 +685,8 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     AddDamageRadiusMod = function(self, dmgRadMod)
         if dmgRadMod then
             self.DamageRadiusMod = self.DamageRadiusMod + dmgRadMod
+            self.damageTableCacheValid = false
         end
-        self.damageTableCacheValid = false
     end,
 
     ---@param self Weapon
