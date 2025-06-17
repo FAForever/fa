@@ -475,31 +475,40 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     ---@return WeaponDamageTable
-    RefreshDamageTable = function(self)
+    GetNewDamageTable = function(self)
         local weaponBlueprint = self.Blueprint
+
+        local damageFriendly = weaponBlueprint.DamageFriendly
+        local damageTable = {
+            DamageToShields = weaponBlueprint.DamageToShields,
+            InitialDamageAmount = weaponBlueprint.InitialDamage or 0,
+            DamageType = weaponBlueprint.DamageType,
+            DamageFriendly = damageFriendly == nil and true or damageFriendly,
+            CollideFriendly = weaponBlueprint.CollideFriendly or false,
+            DoTTime = weaponBlueprint.DoTTime,
+            DoTPulses = weaponBlueprint.DoTPulses,
+            MetaImpactAmount = weaponBlueprint.MetaImpactAmount,
+            MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
+            ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
+        }
+        damageTable.__index = damageTable
+
+        return damageTable
+    end,
+
+    ---@param self Weapon
+    ---@return WeaponDamageTable
+    RefreshDamageTable = function(self)
         local damageTable = self.damageTableCache or nil
 
         -- Setup the table for values that won't change later
         if not damageTable then
-            local damageFriendly = weaponBlueprint.DamageFriendly
-            ---@diagnostic disable-next-line: missing-fields
-            damageTable = {
-                DamageToShields = weaponBlueprint.DamageToShields,
-                InitialDamageAmount = weaponBlueprint.InitialDamage or 0,
-                DamageType = weaponBlueprint.DamageType,
-                DamageFriendly = damageFriendly == nil and true or damageFriendly,
-                CollideFriendly = weaponBlueprint.CollideFriendly or false,
-                DoTTime = weaponBlueprint.DoTTime,
-                DoTPulses = weaponBlueprint.DoTPulses,
-                MetaImpactAmount = weaponBlueprint.MetaImpactAmount,
-                MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
-                ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
-            }
-            damageTable.__index = damageTable
+            damageTable = self:GetNewDamageTable()
         else
             damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
         end
 
+        local weaponBlueprint = self.Blueprint
         -- Add buff
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
         damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
