@@ -82,7 +82,7 @@ local WeaponMethods = moho.weapon_methods
 ---@field DamageModifiers number[] # Set of damage multipliers used by collision beams for the weapon
 ---@field DamageRadiusMod number
 ---@field damageTableCache WeaponDamageTable?
----@field damageTableCacheValid boolean? # Set to false when the weapon's damage is modified and nil when it hasn't been tracked yet
+---@field damageTableCacheValid boolean? # false when the damage table needs to be updated with changed damage/radius modifiers or Buffs
 ---@field DisabledBuffs table
 ---@field DisabledFiringBones Bone[] # Bones that `Unit.Animator` cannot move when this weapon has a target
 ---@field EnergyRequired? number
