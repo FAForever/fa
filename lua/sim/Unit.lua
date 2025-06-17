@@ -4087,6 +4087,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         return false
     end,
 
+    --- Called by the engine on `FactoryBuild` and `MobileBuild` orders to determine if a unit is allowed to be built.
     ---@param self Unit
     ---@param target_bp UnitBlueprint
     ---@return boolean

@@ -289,7 +289,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
-    ---@param target_bp any
+    ---@param target_bp UnitBlueprint
     ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
