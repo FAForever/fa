@@ -107,8 +107,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
+    ---@return boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
-        StructureUnitOnStartBuild(self, unitBeingBuilt, order)
+        if not StructureUnitOnStartBuild(self, unitBeingBuilt, order) then return false end
 
         self.FactoryBuildFailed = nil
         self.BuildingUnit = true
@@ -120,6 +121,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
         end
+
+        return true
     end,
 
     --- Introduce a rolloff delay, where defined.
