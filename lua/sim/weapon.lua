@@ -498,17 +498,10 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
 
     ---@param self Weapon
     ---@return WeaponDamageTable
-    RefreshDamageTable = function(self)
-        local damageTable = self.damageTableCache or nil
-
-        -- Setup the table for values that won't change later
-        if not damageTable then
-            damageTable = self:GetNewDamageTable()
-        else
-            damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
-        end
-
+    GetUpdatedDamageTable = function(self)
+        local damageTable = self.damageTableCache --[[@as WeaponDamageTable]]
         local weaponBlueprint = self.Blueprint
+
         -- Add buff
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + self.DamageRadiusMod
         damageTable.DamageAmount = weaponBlueprint.Damage + self.DamageMod
@@ -529,8 +522,11 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
     ---@param self Weapon
     ---@return WeaponDamageTable
     GetDamageTable = function(self)
-        if not self.damageTableCacheValid or not self.damageTableCache then
-            self.damageTableCache = self:RefreshDamageTable()
+        if not self.damageTableCache then
+            self.damageTableCache = self:GetNewDamageTable()
+        end
+        if not self.damageTableCacheValid then
+            self.damageTableCache = self:GetUpdatedDamageTable()
         end
         return self.damageTableCache --[[@as WeaponDamageTable]]
     end,
