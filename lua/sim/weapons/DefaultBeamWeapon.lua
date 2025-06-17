@@ -32,6 +32,8 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         end
 
         -- Store common data for creating beams
+        ---@type CollisionBeamSpec
+        ---@diagnostic disable-next-line: missing-fields
         local beamData = {
             Weapon = self,
             BeamBone = 0,
