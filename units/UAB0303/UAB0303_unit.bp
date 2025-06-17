@@ -90,6 +90,9 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY AEON STRUCTURE NAVAL",
             "BUILTBYTIER3FACTORY AEON MOBILE NAVAL",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER3FACTORY AEON STRUCTURE NAVAL",
+        },
         DifferentialUpgradeCostCalculation = true,
         InitialRallyX = 0,
         InitialRallyZ = 10,

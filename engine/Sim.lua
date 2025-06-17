@@ -1045,6 +1045,11 @@ end
 function MetaImpact(instigator, location, maxRadius, amount, affectsCategory, damageFriendly)
 end
 
+--- Handles command structure when a unit upgrades to another:
+--- - Adds the new unit to the old unit's queued commands.
+--- - Retargets assisters onto the new unit.
+--- - Sets repeat queue.
+--- - Sets missing health proportion of the new unit.
 ---@param from Unit
 ---@param to Unit
 function NotifyUpgrade(from, to)
