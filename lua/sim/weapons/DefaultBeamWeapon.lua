@@ -1,6 +1,8 @@
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
+local TableInsert = table.insert
+
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
 ---@field DisableBeamThreadInstance? thread
 ---@field Beams { Beam: CollisionBeam, Muzzle: string, Destroyables: table}[]
@@ -13,8 +15,6 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param self DefaultBeamWeapon
     OnCreate = function(self)
         DefaultProjectileWeapon.OnCreate(self)
-
-        self.Beams = {}
 
         -- Ensure that the weapon blueprint is set up properly for beams
         local bp = self.Blueprint
@@ -31,18 +31,25 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
             return
         end
 
+        -- Store common data for creating beams
+        ---@type CollisionBeamSpec
+        ---@diagnostic disable-next-line: missing-fields
+        local beamSpec = {
+            Weapon = self,
+            BeamBone = 0,
+            CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
+        }
+
+        self.Beams = {}
         -- Create the beam
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
+                beamSpec.OtherBone = muzzle
                 ---@type CollisionBeam
-                local beam = self.BeamType {
-                    Weapon = self,
-                    BeamBone = 0,
-                    OtherBone = muzzle,
-                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- convert seconds to ticks
-                }
+                local beam = self.BeamType(beamSpec)
+
                 local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
-                table.insert(self.Beams, beamTable)
+                TableInsert(self.Beams, beamTable)
                 self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
