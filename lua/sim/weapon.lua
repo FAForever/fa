@@ -479,11 +479,14 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
         local weaponBlueprint = self.Blueprint
 
         local damageFriendly = weaponBlueprint.DamageFriendly
+        if damageFriendly == nil then
+            damageFriendly = true
+        end
         local damageTable = {
             DamageToShields = weaponBlueprint.DamageToShields,
             InitialDamageAmount = weaponBlueprint.InitialDamage or 0,
             DamageType = weaponBlueprint.DamageType,
-            DamageFriendly = damageFriendly == nil and true or damageFriendly,
+            DamageFriendly = damageFriendly,
             CollideFriendly = weaponBlueprint.CollideFriendly or false,
             DoTTime = weaponBlueprint.DoTTime,
             DoTPulses = weaponBlueprint.DoTPulses,
