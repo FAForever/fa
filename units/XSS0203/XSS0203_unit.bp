@@ -220,7 +220,6 @@ UnitBlueprint{
             Damage = 75,
             DamageType = "Normal",
             DisplayName = "Uall Cavitation Torpedo",
-            EffectiveRadius = 29,
             FireTargetLayerCapsTable = {
                 Sub = "Seabed|Sub|Water",
                 Water = "Seabed|Sub|Water",
@@ -278,7 +277,6 @@ UnitBlueprint{
             DamageType = "Normal",
             DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
-            EffectiveRadius = 26,
             FireTargetLayerCapsTable = {
                 Sub = "Water",
                 Water = "Water",
