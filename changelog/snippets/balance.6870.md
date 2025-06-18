@@ -1,4 +1,5 @@
-- (#6870) FAF significantly increased the uniform scales of both the Bulwark and the Mermaid. As shown in the screenshots below, these changes were a bit excessive, with both (relatively cheap) units being approximately 2/3 to 3/4 the size of their faction's destroyer. Additionally, FAF reworked the Bulwark to be cheaper but less effective, so there is really no reason for it to be this large anymore.
+- (#6870) FAF significantly increased the uniform scales of both the Bulwark and the Mermaid. These changes were a bit excessive, however, with both (relatively cheap) units being approximately 2/3 to 3/4 the size of their faction's destroyer. Furthermore, FAF reworked the Bulwark to be cheaper but less effective, so from a gameplay perspective, there is no reason for it to be this large anymore. To prevent the already powerful Mermaid from becoming too strong, and to encourage more counterplay, its high hp/mass ratio is reduced.
+
 
   **Bulwark: T2 Shield Boat (XES0205):**
     - Display
