@@ -40,8 +40,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 1500,
-        MaxHealth = 1500,
+        Health = 1250,
+        MaxHealth = 1250,
     },
     Display = {
         Abilities = {
@@ -101,7 +101,7 @@ UnitBlueprint{
                 },
             },
         },
-        UniformScale = 0.12,
+        UniformScale = 0.1,
     },
     Economy = {
         BuildCostEnergy = 6000,
@@ -158,14 +158,14 @@ UnitBlueprint{
         TurnRadius = 10,
         TurnRate = 55,
     },
-    SelectionSizeX = 0.65,
-    SelectionSizeZ = 2.15,
+    SelectionSizeX = 0.55,
+    SelectionSizeZ = 1.85,
     SelectionThickness = 0.3,
     CollisionOffsetY = -0.4,
     CollisionOffsetZ = 0.1,
-    SizeX = 1.25,
-    SizeY = 1.5,
-    SizeZ = 3.6,
+    SizeX = 1.1,
+    SizeY = 1.3,
+    SizeZ = 3.2,
     StrategicIconName = "icon_ship2_counterintel",
     StrategicIconSortPriority = 165,
     Weapon = {
