@@ -114,19 +114,12 @@ AbstractVictoryCondition = Class(DebugComponent) {
         return false
     end,
 
-    --- Retrieves a unique name for the given brain.
-    ---@param self AbstractVictoryCondition
-    ---@param aiBrain AIBrain
-    GetBrainName = function(self, aiBrain)
-        return aiBrain.Name
-    end,
-
     --- A utility function that returns whether a brain is eligible to be considered for victory conditions.
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     ---@return boolean
     BrainIsEligible = function(self, aiBrain)
-        if self.ProcessedBrains[self:GetBrainName(aiBrain)] then
+        if self.ProcessedBrains[aiBrain.Name] then
             return false
         end
 
@@ -348,7 +341,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     FlagBrainAsProcessed = function(self, aiBrain)
-        local aiBrainName = self:GetBrainName(aiBrain)
+        local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
             SPEW("Flagging brain as processed: " .. aiBrainName)
@@ -361,7 +354,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DrawForArmy = function(self, aiBrain)
-        local aiBrainName = self:GetBrainName(aiBrain)
+        local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
             SPEW("Army forfeit the game: ", aiBrainName)
@@ -379,7 +372,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     VictoryForArmy = function(self, aiBrain)
-        local aiBrainName = self:GetBrainName(aiBrain)
+        local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
             SPEW("Army is victorious: ", aiBrainName)
@@ -397,7 +390,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     ---@param aiBrain AIBrain
     DefeatForArmy = function(self, aiBrain)
-        local aiBrainName = self:GetBrainName(aiBrain)
+        local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
             SPEW("Army is defeated: ", aiBrainName)
