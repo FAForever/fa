@@ -90,16 +90,7 @@ UnitCondition = Class(AbstractVictoryCondition) {
 
         -- check if all remaining players are allied
         if self:RemainingBrainsAreAllied(aliveBrains) then
-            if self.EnabledSpewing then
-                SPEW("All remaining players are allied, game will end")
-            end
-
-            for k = 1, TableGetn(aliveBrains) do
-                local aliveBrain = aliveBrains[k]
-                self:VictoryForArmy(aliveBrain)
-            end
-
-            self:EndGame()
+            self:TryDeclareVictory(aliveBrains)
             return
         end
     end,
