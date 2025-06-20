@@ -111,12 +111,7 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
                 SPEW("All remaining players are allied, game will end")
             end
 
-            for k = 1, TableGetn(aliveBrains) do
-                local aliveBrain = aliveBrains[k]
-                self:VictoryForArmy(aliveBrain)
-            end
-
-            self:EndGame()
+            self:TryDeclareVictory(aliveBrains)
             return
         end
     end,

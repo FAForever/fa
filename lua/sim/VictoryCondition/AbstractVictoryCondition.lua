@@ -37,12 +37,22 @@ local TableInsert = table.insert
 ---@field Trash TrashBag
 ---@field ProcessGameStateThreadInstance? thread
 ---@field ProcessedBrains table<string, boolean>    # Indicates that we already processed this brain.
+---@field WinningBrains? AIBrain[]
 AbstractVictoryCondition = Class(DebugComponent) {
+
+    --- An attempt to end the game. The monitoring thread continues to catch draws. It will take this many seconds to declare victory and start the end game procedure.
+    DelayBeforeVictory = 5,
+
+    --- Once the game is guaranteed to end, it will take this many seconds to end the game.
+    DelayBeforeGameEnds = 3,
 
     ---@param self AbstractVictoryCondition
     __init = function(self)
         self.Trash = TrashBag()
         self.ProcessedBrains = {}
+
+        self.VictoryToBeDeclaredFor = nil
+        self.VictoryDeclaredAt = nil
     end,
 
     ---@param self AbstractVictoryCondition
@@ -214,7 +224,61 @@ AbstractVictoryCondition = Class(DebugComponent) {
         error("Missing implementation of ProcessGameState")
     end,
 
-    --- Ends the game by starting a thread that ends the game 3 seconds later.
+    --- Is called when the game should be ending, but we need to wait for the game state to resolve.
+    --- 
+    --- As an example, death and sinking animations may take some time to finalize. This is especially relevant for Supremacy-like game modes where non-ACU units may not be destroyed immediately.
+    ---@param self AbstractVictoryCondition
+    ---@param winningBrains AIBrain[]
+    TryDeclareVictory = function(self, winningBrains)
+        -- quick exit: no brains tried to call victory yet, start the procedure
+        if not self.VictoryToBeDeclaredFor then
+            self.VictoryToBeDeclaredFor = winningBrains
+            self.VictoryDeclaredAt = GetGameTimeSeconds() + self.DelayBeforeVictory
+            return
+        end
+
+        -- check if we have the same brains calling victory since last attempt
+        local brainCounter = { }
+
+        ---@type AIBrain
+        for _, aiBrain in self.VictoryToBeDeclaredFor do
+            brainCounter[aiBrain.Name] =  (brainCounter[aiBrain.Name] or 0) + 1
+        end
+
+        ---@type AIBrain
+        for _, aiBrain in winningBrains do
+            brainCounter[aiBrain.Name] =  (brainCounter[aiBrain.Name] or 0) + 1
+        end
+
+        -- if both tables are equal, we'll have a count of 2 for each brain name
+        for k, count in brainCounter do
+            if count < 2 then
+                self.VictoryToBeDeclaredFor = winningBrains
+                self.VictoryDeclaredAt = GetGameTimeSeconds() + self.DelayBeforeVictory
+                return
+            end
+        end
+
+        -- time has passed, we're all good - call out the victors and end the game
+        if self.VictoryDeclaredAt < GetGameTimeSeconds() then
+            if self.EnabledSpewing then
+                SPEW("Victory declared!")
+            end
+
+            -- call them out as victors
+            for k, aiBrain in winningBrains do
+                self:VictoryForArmy(aiBrain)
+            end
+
+            self:EndGame()
+        else
+            if self.EnabledSpewing then
+                SPEW("Trying to declare victory...")
+            end
+        end
+    end,
+
+    --- Ends the game. The monitoring thread is stopped. The game ends three seconds later to give all players a window of opportunity to share the game results with the server. 
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
         -- stop checking the game state
