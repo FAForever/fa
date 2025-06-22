@@ -40,8 +40,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 1250,
-        MaxHealth = 1250,
+        Health = 1000,
+        MaxHealth = 1000,
     },
     Display = {
         Abilities = {

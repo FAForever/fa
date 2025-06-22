@@ -9,7 +9,7 @@
 
   **CI:18 Mermaid: T2 Counter-Intelligence Boat (XRS0205):**
     - Defense
-      - Health: 1500 --> 1250
+      - Health: 1500 --> 1000
     - Display
       - UniformScale: 0.12 --> 0.10
     - SizeX: 1.25 --> 1.1
