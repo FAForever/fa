@@ -3,9 +3,10 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
-local error = function(string)
+-- The engine doesn't log errors when the command line launch errors, so we fix that here. 
+local function error(string)
     WARN(string.format('Error launching session: %s\n%s', string, debug.traceback()))
-    error(string)
+    _G.error(string)
 end
 
 ---@param faction integer
