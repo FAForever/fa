@@ -166,8 +166,8 @@ Note that the last path is incomplete: you need replace `%USER_NAME%` with your 
 
 You can start a singleplayer session quickly by adding the following command line arguments to your launch script or shortcut:
 
-- `/map <path>`: the local path to the scenario file for the map you want to launch with, for example `"/maps/SCMP_001/SCMP_001_scenario.lua"`
-- `/noAi`: by default the map's slots are filled with the default rush AI, this option removes them.
+- `/map <pathOrFolder>`: the local path to the scenario file of the map you want to launch (ex: `"/maps/scmp_001/scmp_001_scenario.lua"`), or the folder name (ex: `"scmp_001"`). It is case insensitive.
+- `/noAi`: removes the AI that fill the map by default.
 
 ## Multiple instances
 

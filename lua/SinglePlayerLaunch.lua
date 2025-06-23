@@ -3,6 +3,11 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
+local error = function(string)
+    WARN(string.format('Error launching session: %s\n%s', string, debug.traceback()))
+    error(string)
+end
+
 ---@param faction integer
 ---@param aiKey string
 ---@return LocalizedString
@@ -122,12 +127,28 @@ end
 
 
 --- Gets the scenario file from a map name if it isn't a scenario file already.
---- Doesn't work because of the "v0001" versioning that FAF adds to maps.
 ---@param mapName FileName | string
 ---@return FileName
 function FixupMapName(mapName)
     if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
-        mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
+        local files = DiskFindFiles('/maps', mapName .. '_scenario.lua')
+        if files[1] then
+            mapName = files[1]
+        else
+            error('Could not find scenario file for map name "' .. mapName .. '"')
+        end
+    else
+        -- FAF map folders are versioned but the engine doesn't expect that.
+        -- So when the user passes in a name instead of a path the engine gives us what it thinks
+        -- is the correct scenario path `"/maps/<name.v0001>/<name.v0001>_scenario.lua"`
+        -- So we remove the versioning from the scenario file name.
+        -- There should really be some map util to do this.
+
+        mapName = string.gsub(mapName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+        local info = DiskGetFileInfo(mapName)
+        if not info then
+            error('Map scenario file does not exist at location "' .. mapName .. '"')
+        end
     end
     ---@cast mapName FileName
     return mapName
