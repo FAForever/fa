@@ -162,6 +162,13 @@ Copy that replay to the replays folder of the game:
 
 Note that the last path is incomplete: you need replace `%USER_NAME%` with your systems profile name and `%PROFILE_NAME%` with the profile name you use in the game. You can launch the game using the bat files as described earlier.
 
+## Starting a singleplayer session quickly
+
+You can start a singleplayer session quickly by adding the following command line arguments to your launch script or shortcut:
+
+- `/map <path>`: the local path to the scenario file for the map you want to launch with, for example `"/maps/SCMP_001/SCMP_001_scenario.lua"`
+- `/noAi`: by default the map's slots are filled with the default rush AI, this option removes them.
+
 ## Multiple instances
 
 You can start several processes at once when the debug facilities are enabled. You can do this by adding the following line to your preference file:
