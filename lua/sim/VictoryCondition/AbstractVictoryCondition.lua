@@ -233,12 +233,12 @@ AbstractVictoryCondition = Class(DebugComponent) {
         -- check if we have the same brains calling victory since last attempt
         local brainCounter = { }
 
-        ---@type AIBrain
+        ---@param aiBrain AIBrain
         for _, aiBrain in self.VictoryToBeDeclaredFor do
             brainCounter[aiBrain.Name] =  (brainCounter[aiBrain.Name] or 0) + 1
         end
 
-        ---@type AIBrain
+        ---@param aiBrain AIBrain
         for _, aiBrain in winningBrains do
             brainCounter[aiBrain.Name] =  (brainCounter[aiBrain.Name] or 0) + 1
         end
