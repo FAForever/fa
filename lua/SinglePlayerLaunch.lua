@@ -253,32 +253,40 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
         sessionInfo.RandomSeed = 2071971
     end
 
+    local GetDefaultPlayerOptions = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions
     local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
-
     local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
 
-    for index, name in armies do
-        sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
-        if index == 1 then
-            sessionInfo.teamInfo[index].PlayerName = sessionInfo.playerName
-            sessionInfo.teamInfo[index].Faction = faction
-            sessionInfo.teamInfo[index].Human = true
-        else
-            sessionInfo.teamInfo[index].AIPersonality = 'rush'
-            sessionInfo.teamInfo[index].Faction = GetRandomFaction()
-            sessionInfo.teamInfo[index].PlayerName = GetRandomName(sessionInfo.teamInfo[index].Faction, sessionInfo.teamInfo[index].AIPersonality)
-            sessionInfo.teamInfo[index].Human = false
+    local playerOptions = GetDefaultPlayerOptions(sessionInfo.playerName)
+    playerOptions.PlayerName = sessionInfo.playerName
+    playerOptions.Faction = faction
+    playerOptions.Human = true
+    playerOptions.ArmyName = armies[1]
+    playerOptions.PlayerColor = math.mod(1, numColors)
+    playerOptions.ArmyColor = math.mod(1, numColors)
+    sessionInfo.teamInfo[1] = playerOptions
+
+    if not HasCommandLineArg("/noAi") then
+        local name
+        for index = 2, table.getn(armies) do
+            name = armies[index]
+            local aiOptions = GetDefaultPlayerOptions(sessionInfo.playerName)
+            aiOptions.AIPersonality = 'rush'
+            aiOptions.Faction = GetRandomFaction()
+            aiOptions.PlayerName = GetRandomName(aiOptions.Faction, aiOptions.AIPersonality)
+            aiOptions.Human = false
+            aiOptions.ArmyName = name
+            aiOptions.PlayerColor = math.mod(index, numColors)
+            aiOptions.ArmyColor = math.mod(index, numColors)
+            sessionInfo.teamInfo[index] = aiOptions
         end
-        sessionInfo.teamInfo[index].ArmyName = name
-        sessionInfo.teamInfo[index].PlayerColor = math.mod(index, numColors)
-        sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
     end
 
     local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
     if extras then
         for k,armyName in extras do
             local index = table.getn(sessionInfo.teamInfo) + 1
-            sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
+            sessionInfo.teamInfo[index] = GetDefaultPlayerOptions("civilian")
             sessionInfo.teamInfo[index].PlayerName = 'civilian'
             sessionInfo.teamInfo[index].Civilian = true
             sessionInfo.teamInfo[index].ArmyName = armyName
@@ -291,6 +299,9 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     return sessionInfo
 end
 
+--- Called by the engine using the `/map <mapPath>` launch arg
+---@param mapName FileName
+---@param isPerfTest any
 function StartCommandLineSession(mapName, isPerfTest)
     if not mapName then
         error("SetupCommandLineSession - mapName required")
