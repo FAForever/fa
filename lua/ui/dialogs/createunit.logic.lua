@@ -115,12 +115,17 @@ end
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-local FactionData = {
-    { color = 'ff00c1ff', name = 'UEF', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(0)) },
-    { color = 'ff89d300', name = 'AEON', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(1)) },
-    { color = 'ffff0000', name = 'CYBRAN', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(2)) },
-    { color = 'FFFFBF00', name = 'SERAPHIM', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(3)) },
-}
+local FactionData = {}
+local Factions = import('/lua/factions.lua').GetFactions()
+local skins = import("/lua/skins/skins.lua").skins
+---@param faction FactionData
+for _, faction in Factions do
+    table.insert(FactionData, {
+        name = faction.Category,
+        icon = UIUtil.UIFile(faction.Icon),
+        color = skins[faction.Key].factionTextColor
+    })
+end
 
 function GetUnitFactionInfo(id)
     local bp = __blueprints[id]
