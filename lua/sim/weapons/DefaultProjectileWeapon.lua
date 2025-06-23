@@ -213,7 +213,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         projVelZ = projVelZ * multiplier
 
         local targetPos
-        local targetVelX, _, targetVelZ = 0, nil, 0
+        local targetVelX, targetVelY, targetVelZ = 0, 0, 0
 
         local data = self.CurrentSalvoData
 
@@ -224,7 +224,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
                 if not target.IsProp then
-                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
             else -- target is a position i.e. attack ground
                 targetPos = self:GetCurrentTargetPos()
@@ -237,7 +237,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     return 4.9
                 end
                 if target and not target.IsProp then
-                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
@@ -278,7 +278,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     targetPos = data.targetPos
                 else
                     if not target.IsProp then
-                        targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                        targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
                 end
