@@ -1,4 +1,4 @@
--- Call these in your scripts where you need them
+--#region Call these in your scripts where you need them
 
 --- Returns a list of faction data, which is mostly used for faction-specific UI but is also used to determine the initial unit to spawn.
 --- Call this in your scripts.
@@ -42,8 +42,9 @@ function GetNewFactionAIPlans(offset)
     return aiplans
 end
 
--- ----------------------------------------------------------------------------------------------------------------
--- Don't touch these!
+--#endregion
+
+--#region Don't touch these!
 
 NewFactionAiData = {}
 
@@ -385,8 +386,7 @@ function OrgFactions()
     }
 end
 
--- ----------------------------------------------------------------------------------------------------------------
--- Original faction variables
+--#region Original faction variables
 
 Factions = GetFactions()
 
@@ -407,3 +407,6 @@ for index, value in Factions do
     FactionDesToKey[value.CampaignFileDesignator] = value.Key
     FactionInUnitBpToKey[value.FactionInUnitBp] = index
 end
+--#endregion
+
+--#endregion
