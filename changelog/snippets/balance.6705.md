@@ -1,5 +1,11 @@
-- (#6705) Adjust costs of Aeon ACU's range upgrade so that range + speed matches the cost of other factions' gun upgrades.
+- (#6705) Adjust costs of Aeon ACU's range upgrade so that range + speed matches the cost of other factions' gun upgrades, and make the costs of speed and range equal to make it harder to rush either upgrade on small maps.
 
-  - Aeon ACU first range upgrade:
-    - Energy cost: 6000 -> 9000
-    - Buildtime: 350 -> 300
+  - Aeon ACU (UAL0001):
+    - First range upgrade:
+      - Mass cost: 300 -> 400
+      - Energy cost: 6000 -> 12000 (20 -> 30 energy per mass)
+      - Buildtime: 350 -> 400
+    - Fire rate upgrade:
+      - Mass cost: 500 -> 400
+      - Energy cost: 15000 -> 12000
+      - Buildtime: 500 -> 400
