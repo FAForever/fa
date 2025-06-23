@@ -294,6 +294,20 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
         end
     end
 
+    local index = table.getn(sessionInfo.teamInfo) + 1
+    local enemyCivOptions = GetDefaultPlayerOptions("Civilian")
+    enemyCivOptions = GetDefaultPlayerOptions("Civilian")
+    enemyCivOptions.Civilian = true
+    enemyCivOptions.ArmyName = 'ARMY_17'
+    enemyCivOptions.Human = false
+    sessionInfo.teamInfo[index] = enemyCivOptions
+    index = index + 1
+    local neutralCivOptions = GetDefaultPlayerOptions("Civilian")
+    neutralCivOptions.Civilian = true
+    neutralCivOptions.ArmyName = 'NEUTRAL_CIVILIAN'
+    neutralCivOptions.Human = false
+    sessionInfo.teamInfo[index] = neutralCivOptions
+
     Prefs.SetToCurrentProfile('LoadingFaction', faction)
 
     return sessionInfo
