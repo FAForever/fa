@@ -1,11 +1,17 @@
 -- Call these in your scripts where you need them
 
+--- Returns a list of faction data, which is mostly used for faction-specific UI but is also used to determine the initial unit to spawn.
+--- Call this in your scripts.
+---@param AllowedMods? uidSet # A table of currently enabled mods, keyed by mod ID, or `true` to get all mods. Ignores mods if not used.
+---@return FactionData[]
 function GetFactions(AllowedMods)
     -- AllowedMods  -> a table of currently enabled mods, keyed by mod ID. Ignore if not used
     -- returns a list of factions. All 4 of the original factions are included plus all enabled custom factions.
     return GetCustomFactions(OrgFactions(), AllowedMods)
 end
 
+--- Gets a name for AI players. Unused, even in Nomads code.
+---@return table
 function GetNewFactionAINames()
     -- Gets a name for AI players
     local ainames = {}
@@ -15,6 +21,9 @@ function GetNewFactionAINames()
     return ainames
 end
 
+--- Gets an AI plan for computer players. Unused, even in Nomads code.
+---@param offset integer # key with which the table should begin, counting up from this value + 1
+---@return table
 function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
@@ -38,6 +47,8 @@ end
 
 NewFactionAiData = {}
 
+---@param FactionsTable FactionData[]
+---@param AllowedMods uidSet
 function GetCustomFactions(FactionsTable, AllowedMods)
     if not FactionsTable or type(FactionsTable) ~= 'table' then
         FactionsTable = {}
@@ -68,6 +79,8 @@ function GetCustomFactions(FactionsTable, AllowedMods)
     return FactionsTable
 end
 
+---@param AllowedMods uidSet
+---@return uidSet
 function GetSelectedMods(AllowedMods)
     -- We need an array with it's keys being mod uids and the values being true. but this function can be called
     -- while loading the game which means /lua/mods.lua.GetSelectedMods() doesn't work. In that case we look in
@@ -93,6 +106,9 @@ function GetSelectedMods(AllowedMods)
     return mods
 end
 
+---@param tbl table
+---@param keys string[]
+---@return boolean
 function TableHasKeys(tbl, keys)
     for _, k in keys do
         if not tbl[k] then
@@ -102,6 +118,56 @@ function TableHasKeys(tbl, keys)
     return true
 end
 
+---@class FactionData
+---@field Key FactionKey
+---@field Category FactionCategory
+---@field FactionInUnitBp FactionName
+---@field IsCustomFaction false
+---@field DisplayName UnlocalizedString # "<LOC _UEF>UEF"
+---@field SoundPrefix string # 'UEF'
+---@field InitialUnit UnitId # 'uel0001'
+---@field CampaignFileDesignator FactionDesignator
+---@field TransmissionLogColor Color
+---@field Icon FileName # ex: "/widgets/faction-icons-alpha_bmp/uef_ico.dds"
+---@field VeteranIcon FileName # ex: "/game/veteran-logo_bmp/uef-veteran_bmp.dds"
+---@field SmallIcon FileName # ex: "/faction_icon-sm/uef_ico.dds"
+---@field LargeIcon FileName # ex: "/faction_icon-lg/uef_ico.dds"
+---@field TooltipID string # 'lob_uef'
+---@field DefaultSkin Skin
+---@field loadingMovie FileName # ex: '/movies/UEF_load.sfd'
+---@field loadingColor Color
+---@field loadingTexture FileName # ex: '/UEF_load.dds'
+---@field IdleEngTextures IdleEngTextures
+---@field IdleFactoryTextures IdleFactoryTextures
+---@field GAZ_UI_Info GAZ_UI_Info
+---@field AI table # Unused, even in Nomads
+
+---@alias FactionKey 'uef' | 'aeon' | 'cybran' | 'seraphim'
+---@alias FactionName 'UEF' | 'Aeon' | 'Cybran' | 'Seraphim'
+---@alias FactionDesignator 'E' | 'A' | 'R' | 'S'
+
+---@class IdleEngTextures
+---@field T1 FileName # ex: '/icons/units/uel0105_icon.dds'
+---@field T2 FileName # ex: '/icons/units/uel0208_icon.dds'
+---@field T2F FileName # T2 field engineer. ex: '/icons/units/xel0209_icon.dds'
+---@field T3 FileName # ex: '/icons/units/uel0309_icon.dds'
+---@field SCU FileName # ex: '/icons/units/uel0301_icon.dds'
+
+--- Icons for factories of a given layer and tech level.
+---@alias IdleFactoryTextures table<LayerCategory, IdleFactoryTexturesLayer>
+--- FileName is a unit icon for the respective tech level factory for a given layer.
+---@alias IdleFactoryTexturesLayer table<1|2|3, FileName>
+
+---@class GAZ_UI_Info
+---@field BuildingIdPrefixes BuildingIdPrefixes
+
+---@alias BuildingIdPrefixes BuildingIdPrefixesUEF | BuildingIdPrefixesAeon | BuildingIdPrefixesCybran | BuildingIdPrefixesSeraphim
+---@alias BuildingIdPrefixesUEF 'ueb' | 'xeb' | 'deb' | 'zeb'
+---@alias BuildingIdPrefixesAeon 'uab' | 'xab'| 'dab'| 'zab'
+---@alias BuildingIdPrefixesCybran 'urb' | 'xrb'| 'drb'| 'zrb'
+---@alias BuildingIdPrefixesSeraphim 'xsb' | 'usb'| 'dsb'| 'zsb'
+
+---@return FactionData[]
 function OrgFactions()
     return {
     {
@@ -324,12 +390,16 @@ end
 
 Factions = GetFactions()
 
--- Map faction key to index, as this lookup is done frequently
+--- Maps faction key to faction index, as this lookup is done frequently
+---@type table<FactionKey, integer>
 FactionIndexMap = {}
 
--- File designator to faction key
+--- Maps faction campaign file designator to faction key
+---@type table<FactionDesignator, FactionKey>
 FactionDesToKey = {}
 
+--- Maps unit bp FactionName to faction index
+---@type table<FactionName, integer>
 FactionInUnitBpToKey = {}
 
 for index, value in Factions do
