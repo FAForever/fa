@@ -3,6 +3,9 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
+---@param faction integer
+---@param aiKey string
+---@return LocalizedString
 function GetRandomName(faction, aiKey)
     WARN('GRN: ',faction)
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
@@ -25,10 +28,12 @@ function GetRandomName(faction, aiKey)
     return name
 end
 
+---@return integer
 function GetRandomFaction()
-    return math.random(table.getn(import("/lua/factions.lua").Factions))
+    return math.random(table.getn(import("/lua/factions.lua").Factions))--[[@as integer]]
 end
 
+---@param scenarioInfo UIScenarioInfoFile
 function VerifyScenarioConfiguration(scenarioInfo)
     if scenarioInfo == nil then
         error("VerifyScenarioConfiguration - no scenarioInfo")
@@ -50,6 +55,12 @@ end
 
 
 -- Note that the map name must include the full path, it won't try to guess the path based on name
+---@param scenario UILobbyScenarioInfo
+---@param difficulty integer
+---@param inFaction? Faction
+---@param campaignFlowInfo? table
+---@param isTutorial? boolean
+---@return table
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
     local factions = import("/lua/factions.lua").Factions
     local faction = inFaction or 1
@@ -110,16 +121,19 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
 end
 
 
-
-
+--- Gets the scenario file from a map name if it isn't a scenario file already.
+--- Doesn't work because of the "v0001" versioning that FAF adds to maps.
+---@param mapName FileName | string
+---@return FileName
 function FixupMapName(mapName)
     if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
         mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
     end
+    ---@cast mapName FileName
     return mapName
 end
 
-
+---@type GameOptions
 local defaultOptions = {
     FogOfWar = 'explored',
     NoRushOption = 'Off',
@@ -134,6 +148,14 @@ local defaultOptions = {
     CivilianAlliance = 'enemy',
 }
 
+--- Gets the game options with changes from the command line args:
+--- - `/nofog`
+--- - `/norush <duration>`
+--- - `/predeployed`
+--- - `/victory <VictoryCondition>`
+--- - `/diff <Difficulty>`
+---@param isPerfTest boolean
+---@return GameOptions
 local function GetCommandLineOptions(isPerfTest)
     local options = table.copy(defaultOptions)
 
@@ -143,7 +165,7 @@ local function GetCommandLineOptions(isPerfTest)
         options.FogOfWar = 'none'
     end
 
-    local norush = GetCommandLineArg("/norush", 1)
+    local norush = GetCommandLineArg("/norush", 1) --[[@as number|string?[] ]]
     if norush then
         options.NoRushOption = norush[1]
     end
@@ -152,7 +174,7 @@ local function GetCommandLineOptions(isPerfTest)
         options.PrebuiltUnits = 'On'
     end
 
-    local victory = GetCommandLineArg("/victory", 1)
+    local victory = GetCommandLineArg("/victory", 1) --[[@as string?[] ]]
     if victory then
         options.Victory = victory[1]
     end
@@ -196,7 +218,7 @@ function SetupBotSession(mapName)
     if aiopt then
         ai = aiopt[1]
     else
-        ai = aitypes[1].key
+        ai = aiTypes[1].key
     end
 
     for index, name in armies do
@@ -332,11 +354,12 @@ function StartCommandLineSession(mapName, isPerfTest)
     if scenario.type == 'campaign' then
         local difficulty = 2
         if HasCommandLineArg("/diff") then
-            difficulty = tonumber(GetCommandLineArg("/diff", 1)[1])
+            difficulty = tonumber(GetCommandLineArg("/diff", 1)[1])--[[@as integer]]
         end
+        ---@type Faction
         local faction = false
         if HasCommandLineArg("/faction") then
-            faction = GetCommandLineArg("/faction", 1)[1]
+            faction = GetCommandLineArg("/faction", 1)[1]--[[@as integer]]
         end
         sessionInfo = SetupCampaignSession(scenario, difficulty, faction)
     else
