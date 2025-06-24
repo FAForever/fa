@@ -104,18 +104,21 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
     ---@param order BuildOrderType
     OnStartBuild = function(self, unitBeingBuilt, order)
         AShieldStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.MercuryPool = CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
-        self.MercuryPool2 = CreateMercuryPoolOnBone(self, self.Army, 'Ramp2', 0.65, 0.65, 0.65, 0.1)
 
-        local orbManip1 = self.OrbManip1
-        if orbManip1 then
-            orbManip1:SetSpinDown(true)
-            orbManip1:SetTargetSpeed(9999)
-        end
-        local orbManip2 = self.OrbManip2
-        if orbManip2 then
-            orbManip2:SetSpinDown(true)
-            orbManip2:SetTargetSpeed(9999)
+        if order == "Upgrade" then
+            self.MercuryPool = CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
+            self.MercuryPool2 = CreateMercuryPoolOnBone(self, self.Army, 'Ramp2', 0.65, 0.65, 0.65, 0.1)
+
+            local orbManip1 = self.OrbManip1
+            if orbManip1 then
+                orbManip1:SetSpinDown(true)
+                orbManip1:SetTargetSpeed(9999)
+            end
+            local orbManip2 = self.OrbManip2
+            if orbManip2 then
+                orbManip2:SetSpinDown(true)
+                orbManip2:SetTargetSpeed(9999)
+            end
         end
     end,
 
@@ -124,18 +127,21 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
     ---@param order BuildOrderType
     OnStopBuild = function(self, unitBeingBuilt, order)
         AShieldStructureUnit.OnStopBuild(self, unitBeingBuilt, order)
-        self.MercuryPool:Destroy()
-        self.MercuryPool2:Destroy()
-        if self.ShieldEnabled then
-            local orbManip1 = self.OrbManip1
-            if orbManip1 then
-                orbManip1:SetSpinDown(false)
-                orbManip1:SetTargetSpeed(45)
-            end
-            local orbManip2 = self.OrbManip2
-            if orbManip2 then
-                orbManip2:SetSpinDown(false)
-                orbManip2:SetTargetSpeed(45)
+
+        if order == "Upgrade" then
+            self.MercuryPool:Destroy()
+            self.MercuryPool2:Destroy()
+            if self.ShieldEnabled then
+                local orbManip1 = self.OrbManip1
+                if orbManip1 then
+                    orbManip1:SetSpinDown(false)
+                    orbManip1:SetTargetSpeed(45)
+                end
+                local orbManip2 = self.OrbManip2
+                if orbManip2 then
+                    orbManip2:SetSpinDown(false)
+                    orbManip2:SetTargetSpeed(45)
+                end
             end
         end
     end,
