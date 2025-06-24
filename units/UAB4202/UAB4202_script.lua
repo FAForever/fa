@@ -102,8 +102,9 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
     ---@param self UAB4202
     ---@param unitBeingBuilt Unit
     ---@param order BuildOrderType
+    ---@return boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
-        AShieldStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
+        if not AShieldStructureUnit.OnStartBuild(self, unitBeingBuilt, order) then return false end
 
         if order == "Upgrade" then
             self.MercuryPool = CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
@@ -120,6 +121,8 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
                 orbManip2:SetTargetSpeed(9999)
             end
         end
+
+        return true
     end,
 
     ---@param self UAB4202
