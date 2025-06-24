@@ -106,14 +106,16 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         AShieldStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.MercuryPool = CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
         self.MercuryPool2 = CreateMercuryPoolOnBone(self, self.Army, 'Ramp2', 0.65, 0.65, 0.65, 0.1)
-        if self.OrbManip1 then
-            self.OrbManip1:SetSpinDown(true)
-            self.OrbManip1:SetTargetSpeed(9999)
-        end
 
-        if self.OrbManip2 then
-            self.OrbManip2:SetSpinDown(true)
-            self.OrbManip2:SetTargetSpeed(9999)
+        local orbManip1 = self.OrbManip1
+        if orbManip1 then
+            orbManip1:SetSpinDown(true)
+            orbManip1:SetTargetSpeed(9999)
+        end
+        local orbManip2 = self.OrbManip2
+        if orbManip2 then
+            orbManip2:SetSpinDown(true)
+            orbManip2:SetTargetSpeed(9999)
         end
     end,
 
@@ -125,14 +127,15 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         self.MercuryPool:Destroy()
         self.MercuryPool2:Destroy()
         if self.ShieldEnabled then
-            if self.OrbManip1 then
-                self.OrbManip1:SetSpinDown(false)
-                self.OrbManip1:SetTargetSpeed(45)
+            local orbManip1 = self.OrbManip1
+            if orbManip1 then
+                orbManip1:SetSpinDown(false)
+                orbManip1:SetTargetSpeed(45)
             end
-
-            if self.OrbManip2 then
-                self.OrbManip2:SetSpinDown(false)
-                self.OrbManip2:SetTargetSpeed(45)
+            local orbManip2 = self.OrbManip2
+            if orbManip2 then
+                orbManip2:SetSpinDown(false)
+                orbManip2:SetTargetSpeed(45)
             end
         end
     end,
