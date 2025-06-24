@@ -14,7 +14,12 @@ local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffect
 local TrashBagAdd = TrashBag.Add
 
 
----@class UAB4202 : AShieldStructureUnit
+---@class UAB4202 : AShieldStructureUnit, ShieldEffectsComponent
+---@field OrbManip1? moho.RotateManipulator
+---@field OrbManip2? moho.RotateManipulator
+---@field MercuryPool? Projectile # Upgrade effect
+---@field MercuryPool2? Projectile # Upgrade effect
+---@field ShieldEnabled? boolean # Used in logic for upgrade effect
 UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
 
     ShieldEffectsScale = 0.75,
@@ -26,12 +31,14 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         '/effects/emitters/aeon_shield_generator_t3_04_emit.bp',
     },
 
+    ---@param self UAB4202
     OnCreate = function(self)
         AShieldStructureUnit.OnCreate(self)
         ShieldEffectsComponent.OnCreate(self)
         self.ShieldEnabled = false
     end,
 
+    ---@param self UAB4202
     OnShieldEnabled = function(self)
         AShieldStructureUnit.OnShieldEnabled(self)
         ShieldEffectsComponent.OnShieldEnabled(self)
@@ -74,6 +81,7 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         self.ShieldEnabled = true
     end,
 
+    ---@param self UAB4202
     OnShieldDisabled = function(self)
         AShieldStructureUnit.OnShieldDisabled(self)
         ShieldEffectsComponent.OnShieldDisabled(self)
@@ -91,6 +99,9 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         self.ShieldEnabled = false
     end,
 
+    ---@param self UAB4202
+    ---@param unitBeingBuilt Unit
+    ---@param order BuildOrderType
     OnStartBuild = function(self, unitBeingBuilt, order)
         AShieldStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.MercuryPool = import("/lua/EffectUtilitiesAeon.lua").CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
@@ -106,6 +117,9 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         end
     end,
 
+    ---@param self UAB4202
+    ---@param unitBeingBuilt Unit
+    ---@param order BuildOrderType
     OnStopBuild = function(self, unitBeingBuilt, order)
         AShieldStructureUnit.OnStopBuild(self, unitBeingBuilt, order)
         self.MercuryPool:Destroy()
