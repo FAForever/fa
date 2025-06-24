@@ -56,10 +56,8 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         else
             if self:IsUnitState('Upgrading') then
                 orbManip1:SetSpinDown(true)
-                orbManip1:SetTargetSpeed(9999)
             else
                 orbManip1:SetSpinDown(false)
-                orbManip1:SetTargetSpeed(45)
             end
         end
 
@@ -71,10 +69,8 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         else
             if self:IsUnitState('Upgrading') then
                 orbManip2:SetSpinDown(true)
-                orbManip2:SetTargetSpeed(9999)
             else
                 orbManip2:SetSpinDown(false)
-                orbManip2:SetTargetSpeed(45)
             end
         end
 
@@ -113,12 +109,10 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
             local orbManip1 = self.OrbManip1
             if orbManip1 then
                 orbManip1:SetSpinDown(true)
-                orbManip1:SetTargetSpeed(9999)
             end
             local orbManip2 = self.OrbManip2
             if orbManip2 then
                 orbManip2:SetSpinDown(true)
-                orbManip2:SetTargetSpeed(9999)
             end
         end
 
@@ -138,12 +132,10 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
                 local orbManip1 = self.OrbManip1
                 if orbManip1 then
                     orbManip1:SetSpinDown(false)
-                    orbManip1:SetTargetSpeed(45)
                 end
                 local orbManip2 = self.OrbManip2
                 if orbManip2 then
                     orbManip2:SetSpinDown(false)
-                    orbManip2:SetTargetSpeed(45)
                 end
             end
         end
