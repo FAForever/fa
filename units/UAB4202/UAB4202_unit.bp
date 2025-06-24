@@ -1,13 +1,13 @@
 UnitBlueprint{
-    Description = "<LOC UAB42022_desc>Shield Generator",
+    Description = "<LOC uab4202_desc>Shield Generator",
     AI = {
         TargetBones = { "Orb" },
     },
     Audio = {
         Destroyed   = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge',      LodCutoff = 'UnitMove_LodCutoff' },
         Killed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge',      LodCutoff = 'UnitMove_LodCutoff' },
-        ShieldOff   = Sound { Bank = 'UAB',        Cue = 'UAB42022_Activate',      LodCutoff = 'UnitMove_LodCutoff' },
-        ShieldOn    = Sound { Bank = 'UAB',        Cue = 'UAB42022_Activate',      LodCutoff = 'UnitMove_LodCutoff' },
+        ShieldOff   = Sound { Bank = 'UAB',        Cue = 'UAB4202_Activate',      LodCutoff = 'UnitMove_LodCutoff' },
+        ShieldOn    = Sound { Bank = 'UAB',        Cue = 'UAB4202_Activate',      LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },
     },
     AverageDensity = 150,
@@ -53,12 +53,19 @@ UnitBlueprint{
         },
     },
     Display = {
-        Abilities = { 
-		    "<LOC ability_shielddome>Shield Dome",
-            '<LOC ability_upgradable>Upgradeable',			
-		},
-		AnimationUpgrade = '/mods/AEON T2 to T3 Shild/unit/UAB42022/UAB42022_aupgrade.sca',		
-        AnimationDeath = {   },
+        Abilities = {
+            "<LOC ability_shielddome>Shield Dome",
+            "<LOC ability_upgradable>Upgradeable",
+        },
+        AnimationDeath = {
+            {
+                Animation = "/units/uab4202/uab4202_ADeath.sca",
+                AnimationRateMax = 1.2,
+                AnimationRateMin = 1.2,
+                Weight = 1,
+            },
+        },
+        AnimationUpgrade = "/units/uab4202/uab4202_aupgrade.sca",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -70,8 +77,8 @@ UnitBlueprint{
                 {
                     LODCutoff = 300,
                     ShaderName = "Aeon",
-                    AlbedoName = "UAB42022_lod1_albedo.dds",
-                    SpecularName = "UAB42022_lod1_specteam.dds",
+                    AlbedoName = "uab4202_lod1_albedo.dds",
+                    SpecularName = "uab4202_lod1_specteam.dds",
                 },
             },
         },
@@ -92,13 +99,13 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 5760,
         BuildCostMass = 480,
-		BuildRate = 20,
+        BuildRate = 20,
         BuildTime = 950,
-        BuildableCategory = { "uab43012" },
+        BuildableCategory = { "uab4301" },
         MaintenanceConsumptionPerSecondEnergy = 150,
         RebuildBonusIds = {
-            "UAB42022",
-            "uab43012",
+            "uab4202",
+            "uab4301",
         },
     },
     Footprint = {
@@ -120,8 +127,8 @@ UnitBlueprint{
         },
         SelectionPriority = 5,
         ToggleCaps = { RULEUTC_ShieldToggle = true },
-        UnitName = "<LOC UAB42022_name>Shield of Light",
-        UpgradesTo = 'uab43012',
+        UnitName = "<LOC uab4202_name>Shield of Light",
+        UpgradesTo = 'uab4301',
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
