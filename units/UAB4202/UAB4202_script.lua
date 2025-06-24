@@ -9,10 +9,10 @@
 ----****************************************************************************
 local AShieldStructureUnit = import("/lua/aeonunits.lua").AShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
+local CreateMercuryPoolOnBone = import("/lua/EffectUtilitiesAeon.lua").CreateMercuryPoolOnBone
 
 -- upvalue for perfomance
 local TrashBagAdd = TrashBag.Add
-
 
 ---@class UAB4202 : AShieldStructureUnit, ShieldEffectsComponent
 ---@field OrbManip1? moho.RotateManipulator
@@ -104,8 +104,8 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
     ---@param order BuildOrderType
     OnStartBuild = function(self, unitBeingBuilt, order)
         AShieldStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
-        self.MercuryPool = import("/lua/EffectUtilitiesAeon.lua").CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
-        self.MercuryPool2 = import("/lua/EffectUtilitiesAeon.lua").CreateMercuryPoolOnBone(self, self.Army, 'Ramp2', 0.65, 0.65, 0.65, 0.1)
+        self.MercuryPool = CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
+        self.MercuryPool2 = CreateMercuryPoolOnBone(self, self.Army, 'Ramp2', 0.65, 0.65, 0.65, 0.1)
         if self.OrbManip1 then
             self.OrbManip1:SetSpinDown(true)
             self.OrbManip1:SetTargetSpeed(9999)
