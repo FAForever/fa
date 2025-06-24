@@ -54,6 +54,7 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
             TrashBagAdd(trash, orbManip1)
             self.OrbManip1 = orbManip1
         else
+            -- Spin down very quickly since the rotator bugs out with the upgrade animation
             if self:IsUnitState('Upgrading') then
                 orbManip1:SetSpinDown(true)
                 orbManip1:SetTargetSpeed(9999)
@@ -69,6 +70,7 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
             TrashBagAdd(trash, orbManip2)
             self.OrbManip2 = orbManip2
         else
+            -- Spin down very quickly since the rotator bugs out with the upgrade animation
             if self:IsUnitState('Upgrading') then
                 orbManip2:SetSpinDown(true)
                 orbManip2:SetTargetSpeed(9999)
@@ -110,6 +112,7 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
             self.MercuryPool = CreateMercuryPoolOnBone(self, self.Army, 'Pool', 1.5, 1.5, 1.5, 0.1)
             self.MercuryPool2 = CreateMercuryPoolOnBone(self, self.Army, 'Ramp2', 0.65, 0.65, 0.65, 0.1)
 
+            -- Spin down very quickly since the rotator bugs out with the upgrade animation
             local orbManip1 = self.OrbManip1
             if orbManip1 then
                 orbManip1:SetSpinDown(true)
