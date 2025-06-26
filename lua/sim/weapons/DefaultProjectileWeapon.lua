@@ -18,7 +18,6 @@ local MathSqrt = math.sqrt
 ---@class WeaponSalvoData
 ---@field target? Unit | Prop   if absent, will use `targetPos` instead
 ---@field targetPos Vector      stores the last location upon which we dropped bombs for a target, or the ground fire location
----@field lastAccel number      stores the last acceleration that was used
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
@@ -213,8 +212,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         projVelX = projVelX * multiplier
         projVelZ = projVelZ * multiplier
 
-        local targetPos, _
-        local targetVelX, targetVelZ = 0, 0
+        local targetPos
+        local targetVelX, targetVelY, targetVelZ = 0, 0, 0
 
         local data = self.CurrentSalvoData
 
@@ -225,7 +224,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
                 if not target.IsProp then
-                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
             else -- target is a position i.e. attack ground
                 targetPos = self:GetCurrentTargetPos()
@@ -238,7 +237,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     return 4.9
                 end
                 if target and not target.IsProp then
-                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
@@ -260,7 +259,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 return 200 * projPosY / (time * time)
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
-                    lastAccel = 4.9,
                     targetPos = targetPos,
                 }
                 if target then
@@ -280,7 +278,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     targetPos = data.targetPos
                 else
                     if not target.IsProp then
-                        targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                        targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
                 end
@@ -307,16 +305,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if halfHeight < 0.01 then return 4.9 end
             time = MathSqrt(0.816326530612 * halfHeight) + spread
 
-            local acc = halfHeight / (time * time)
-            data.lastAccel = acc
-            return acc
+            return halfHeight / (time * time)
         end
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
         local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
-            data.lastAccel = 4.9
             return 4.9
         end
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
@@ -334,7 +329,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local time = distPos / distVel
         local adjustedTime = time + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
         if adjustedTime == 0 then
-            data.lastAccel = 4.9
             return 4.9
         end
 
@@ -359,10 +353,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- a = 2 * h / t^2
 
         -- also convert time from ticks to seconds (multiply by 10, twice)
-        local acc = 200 * projPosY / (adjustedTime * adjustedTime)
-
-        data.lastAccel = acc
-        return acc
+        return 200 * projPosY / (adjustedTime * adjustedTime)
     end,
 
     -- Triggers when the weapon is moved horizontally, usually by owner's motion
