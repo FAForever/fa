@@ -1,4 +1,3 @@
 - (#6851) Push the rendering distance of tree (groups) to better match the values in Steam
 
-After thorough testing we think it is safe to increase the rendering distance without running the risk to destroying the framerate of the average user. With thanks to an observation of Strogo, most of the frame time was spent on the shadow pass of the image. Two years ago we made it so that shadows would render regardless of the distance. This means that whenever there's a mesh, the mesh would have a shadow, which was not the case in Steam, and apparently this is what makes tree (groups) very expensive. With #6763, we turned the shadow rendering distance into a slider in the game options, so players with better hardware can be more on the edge of what is possible, while players with weaker hardware can still see the trees at a greater distance, but without a shadow.
-
+After thorough testing we think it is safe to increase the rendering distance without running the risk to destroying the framerate of the average user. 
