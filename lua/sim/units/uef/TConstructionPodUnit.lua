@@ -13,6 +13,7 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param self TConstructionPodUnit
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
+        print("made a dummy unit")
         self.guardDummy = CreateUnitHPR('ZXA0003', self:GetArmy(), 0,0,0,0,0,0)
         self.guardDummy:AttachTo(self, -1)
         self.Trash:Add(self.guardDummy)
