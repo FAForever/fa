@@ -2,16 +2,13 @@ local MathMax = math.max
 local MathCeil = math.ceil
 
 --#region Land Categories
----@type EntityCategory # explicitly EntityCategory to fix unknown annotation
 local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
 local Sniper = categories.SNIPER * categories.LAND
 local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.SNIPER) * categories.LAND
 local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
 local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
 local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
----@type EntityCategory # explicitly EntityCategory to fix unknown annotation
 ShieldCategory = categories.uel0307 + categories.ual0307 + categories.xsl0307
----@type EntityCategory # explicitly EntityCategory to fix unknown annotation
 NonShieldCategory = categories.ALLUNITS - ShieldCategory
 
 ---@alias LandCategoryNames
