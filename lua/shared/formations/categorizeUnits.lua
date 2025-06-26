@@ -317,7 +317,7 @@ function CategorizeUnits(formationUnits)
 end
 
 ---@alias FormationLayers "Land" | "Air" | "Naval" | "Subs"
----@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: table<integer, FormationLayers> }
+---@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: FormationLayers[] }
 ---@type { Land: TypeGroupData, Air: TypeGroupData, Sea: TypeGroupData  }
 local TypeGroups = {
     Land = {
