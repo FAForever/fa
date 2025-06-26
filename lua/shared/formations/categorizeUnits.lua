@@ -388,7 +388,7 @@ function CategorizeUnits(formationUnits)
             end
         end
         if not identified then
-            WARN('*FORMATION DEBUG: Unit ' .. unit.UnitId .. ' was excluded from the formation because its layer could not be determined.')
+            WARN('*FORMATION DEBUG: Unit ' .. unit:GetUnitId() .. ' was excluded from the formation because its layer could not be determined.')
         end
     end
 
