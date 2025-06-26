@@ -225,6 +225,90 @@ for unitType, categoriesForType in pairs(CategoryTables) do
 end
 --#endregion
 
+---@alias FormationLayers "Land" | "Air" | "Naval" | "Subs"
+---@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: FormationLayers[] }
+---@type { Land: TypeGroupData, Air: TypeGroupData, Sea: TypeGroupData  }
+local TypeGroups = {
+    Land = {
+        GridSizeFraction = 2.75,
+        GridSizeAbsolute = 2,
+        MinSeparationFraction = 2.25,
+        Types = {'Land'}
+    },
+
+    Air = {
+        GridSizeFraction = 1.3,
+        GridSizeAbsolute = 2,
+        MinSeparationFraction = 1,
+        Types = {'Air'}
+    },
+
+    Sea = {
+        GridSizeFraction = 1.75,
+        GridSizeAbsolute = 4,
+        MinSeparationFraction = 1.15,
+        Types = {'Naval', 'Subs'}
+    },
+}
+
+---@param unitsList FormationData
+---@return FormationData
+function CalculateSizes(unitsList)
+    local largestFootprint = 1
+    local smallestFootprints = {}
+
+    for group, data in pairs(TypeGroups) do
+        local groupFootprintCounts = {}
+        local largestForGroup = 1
+        local numSizes = 0
+        local unitTotal = 0
+        for _, type in pairs(data.Types) do
+            local typeData = unitsList[type]
+
+            unitTotal = unitTotal + typeData.UnitTotal
+            for fs, count in pairs(typeData.FootprintCounts) do
+                groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
+                largestFootprint = MathMax(largestFootprint, fs)
+                largestForGroup = MathMax(largestForGroup, fs)
+                numSizes = numSizes + 1
+            end
+        end
+
+        smallestFootprints[group] = largestForGroup
+        if numSizes > 0 then
+            local minCount = unitTotal / 2
+            local smallerUnitCount = 0
+            for fs, count in pairs(groupFootprintCounts) do
+                smallerUnitCount = smallerUnitCount + count
+                if smallerUnitCount >= minCount then
+                    smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
+                    break
+                end
+            end
+        end
+    end
+
+    for group, data in pairs(TypeGroups) do
+        local gridSize = MathMax(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
+        for _, type in pairs(data.Types) do
+            local unitData = unitsList[type]
+
+             -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
+             -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
+             -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
+            unitData.Scale = gridSize / (largestFootprint + 2)
+
+            for fs, count in pairs(unitData.FootprintCounts) do
+                local size = MathCeil(fs * data.MinSeparationFraction / gridSize)
+                unitData.FootprintSizes[fs] = size
+                unitData.AreaTotal = unitData.AreaTotal + count * size * size
+            end
+        end
+    end
+
+    return unitsList
+end
+
 -- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
 ---@param formationUnits Unit[]
 ---@return FormationData
@@ -311,88 +395,4 @@ function CategorizeUnits(formationUnits)
     CalculateSizes(UnitsList)
 
     return UnitsList
-end
-
----@alias FormationLayers "Land" | "Air" | "Naval" | "Subs"
----@alias TypeGroupData { GridSizeFraction: number, GridSizeAbsolute: integer, MinSeparationFraction: number, Types: FormationLayers[] }
----@type { Land: TypeGroupData, Air: TypeGroupData, Sea: TypeGroupData  }
-local TypeGroups = {
-    Land = {
-        GridSizeFraction = 2.75,
-        GridSizeAbsolute = 2,
-        MinSeparationFraction = 2.25,
-        Types = {'Land'}
-    },
-
-    Air = {
-        GridSizeFraction = 1.3,
-        GridSizeAbsolute = 2,
-        MinSeparationFraction = 1,
-        Types = {'Air'}
-    },
-
-    Sea = {
-        GridSizeFraction = 1.75,
-        GridSizeAbsolute = 4,
-        MinSeparationFraction = 1.15,
-        Types = {'Naval', 'Subs'}
-    },
-}
-
----@param unitsList FormationData
----@return FormationData
-function CalculateSizes(unitsList)
-    local largestFootprint = 1
-    local smallestFootprints = {}
-
-    for group, data in pairs(TypeGroups) do
-        local groupFootprintCounts = {}
-        local largestForGroup = 1
-        local numSizes = 0
-        local unitTotal = 0
-        for _, type in pairs(data.Types) do
-            local typeData = unitsList[type]
-
-            unitTotal = unitTotal + typeData.UnitTotal
-            for fs, count in pairs(typeData.FootprintCounts) do
-                groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
-                largestFootprint = MathMax(largestFootprint, fs)
-                largestForGroup = MathMax(largestForGroup, fs)
-                numSizes = numSizes + 1
-            end
-        end
-
-        smallestFootprints[group] = largestForGroup
-        if numSizes > 0 then
-            local minCount = unitTotal / 2
-            local smallerUnitCount = 0
-            for fs, count in pairs(groupFootprintCounts) do
-                smallerUnitCount = smallerUnitCount + count
-                if smallerUnitCount >= minCount then
-                    smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
-                    break
-                end
-            end
-        end
-    end
-
-    for group, data in pairs(TypeGroups) do
-        local gridSize = MathMax(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
-        for _, type in pairs(data.Types) do
-            local unitData = unitsList[type]
-
-             -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
-             -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
-             -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
-            unitData.Scale = gridSize / (largestFootprint + 2)
-
-            for fs, count in pairs(unitData.FootprintCounts) do
-                local size = MathCeil(fs * data.MinSeparationFraction / gridSize)
-                unitData.FootprintSizes[fs] = size
-                unitData.AreaTotal = unitData.AreaTotal + count * size * size
-            end
-        end
-    end
-
-    return unitsList
 end
