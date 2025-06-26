@@ -56,17 +56,6 @@ UnitCondition = Class(AbstractVictoryCondition) {
             end
         end
 
-        -- no remaining players, just end the game
-        if table.empty(aliveBrains) then
-            if self.EnabledSpewing then
-                SPEW("All players are defeated, game will end")
-            end
-
-            self:EndGame()
-            return
-        end
-
-
         -- process all defeated brains
         for k = 1, TableGetn(defeatedBrains) do
             local defeatedBrain = defeatedBrains[k]
@@ -82,6 +71,16 @@ UnitCondition = Class(AbstractVictoryCondition) {
             for k = 1, TableGetn(aliveBrains) do
                 local aliveBrain = aliveBrains[k]
                 self:DrawForArmy(aliveBrain)
+            end
+
+            self:EndGame()
+            return
+        end
+
+        -- no remaining players, just end the game
+        if table.empty(aliveBrains) then
+            if self.EnabledSpewing then
+                SPEW("All players are defeated, game will end")
             end
 
             self:EndGame()
