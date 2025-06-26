@@ -152,9 +152,6 @@ end
 --- - .github\workflows\bake-blueprints.yaml
 ---@param blueprints BlueprintsTable
 function BakePropBlueprints(blueprints)
-
-
-
     if blueprints.Prop then
         for _, prop in pairs(blueprints.Prop) do
             ProcessInvulnerability(prop)
