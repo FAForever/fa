@@ -355,7 +355,7 @@ function CategorizeUnits(formationUnits)
                     local fs = MathMax(bp.Footprint.SizeX, bp.Footprint.SizeZ)
 
                     if not fs then
-                        WARN('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not have any footprint size X or Z data. Overriding to 0')
+                        WARN('*FORMATION DEBUG: Unit ' .. tostring(bp.BlueprintId) .. ' does not have any footprint size X or Z data. Overriding to 0')
                         fs = 0
                     end
 
@@ -375,7 +375,7 @@ function CategorizeUnits(formationUnits)
                     typeData.FootprintCounts[fs] = (typeData.FootprintCounts[fs] or 0) + 1
 
                     if cat == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG: Unit ' .. tostring(unit:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
+                        LOG('*FORMATION DEBUG: Unit ' .. tostring(bp.BlueprintId) .. ' does not match any ' .. type .. ' categories.')
                     end
                     typeData.UnitTotal = typeData.UnitTotal + 1
                     identified = true
