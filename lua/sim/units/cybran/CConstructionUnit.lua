@@ -113,7 +113,7 @@ CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate) {
         end
 
         if old ~= 'None' then
-            self.TerrainLayerTransitionThread = TrashBagAdd(trash, ForkThread(self.TransformThread, self, true))
+            self.TerrainLayerTransitionThread = TrashBagAdd(trash, ForkThread(self.TransformThread, self, (new == 'Water')))
         end
     end,
 
