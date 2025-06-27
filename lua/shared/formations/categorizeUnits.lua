@@ -365,7 +365,7 @@ function CategorizeUnits(formationUnits)
                     local categoryData = typeData[cat]
 
                     if not categoryData[fs] then
-                        categoryData[fs] = {Count = 0, Filter = categories[id]}
+                        categoryData[fs] = {Count = 0, Filter = categories[id]} -- This will duplicate the first category but doesn't affect the result
                     end
                     ---@type FormationLayerFootprintTable
                     local footprintSizeData = categoryData[fs]
