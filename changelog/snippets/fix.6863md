@@ -1,0 +1,1 @@
+- (#6863) Fix `OnAdjacentTo` error caused by dummy units attached to external factories and UEF engineering drones.
