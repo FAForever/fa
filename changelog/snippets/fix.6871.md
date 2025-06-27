@@ -1,0 +1,1 @@
+- (#6871) Increase the `StrategicIconSize` of the Seraphim ACU's OC projectile to match that of the other ACUs.
