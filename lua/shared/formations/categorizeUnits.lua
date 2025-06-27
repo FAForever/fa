@@ -310,7 +310,7 @@ function CalculateSizes(unitsList)
 end
 
 -- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
----@param formationUnits Unit[]
+---@param formationUnits Unit[] | UserUnit[]
 ---@return FormationData
 function CategorizeUnits(formationUnits)
     local categoryTables = CategoryTables
