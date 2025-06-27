@@ -91,6 +91,9 @@ UnitBlueprint{
             "BUILTBYTIER1FACTORY AEON STRUCTURE NAVAL",
             "BUILTBYTIER1FACTORY AEON MOBILE NAVAL",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER1FACTORY AEON STRUCTURE NAVAL",
+        },
         InitialRallyX = 0,
         InitialRallyZ = 10,
         RebuildBonusIds = { "uab0103" },

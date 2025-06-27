@@ -97,6 +97,9 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY UEF MOBILE LAND",
             "BUILTBYLANDTIER2FACTORY UEF MOBILE CONSTRUCTION",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2FACTORY UEF STRUCTURE LAND",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "ueb0201" },
         StorageEnergy = 0,

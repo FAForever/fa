@@ -101,6 +101,9 @@ UnitBlueprint{
             "BUILTBYTIER1FACTORY CYBRAN STRUCTURE NAVAL",
             "BUILTBYTIER1FACTORY CYBRAN MOBILE NAVAL",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER1FACTORY CYBRAN STRUCTURE NAVAL",
+        },
         InitialRallyX = 0,
         InitialRallyZ = 10,
         RebuildBonusIds = { "urb0103" },
