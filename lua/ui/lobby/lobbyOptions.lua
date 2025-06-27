@@ -24,7 +24,7 @@
 ---@field FogOfWar 'none' | 'explored'
 ---@field GameSpeed 'normal' | 'fast' | 'adjustable'
 ---@field ManualUnitShare 'none' | 'no_builders' | 'all'
----@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60'
+---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60' | 'Off'
 ---@field PrebuiltUnits 'Off' | 'On'
 ---@field Ranked boolean
 ---@field RevealCivilians 'No' | 'Yes'
@@ -34,7 +34,7 @@
 ---@field DisconnectShare 'SameAsShare' | 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@field DisconnectShareCommanders 'Explode' | 'Recall' | 'RecallDelayed' | 'Permanent'
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
----@field Timeouts '0' | '3'| '-1'
+---@field Timeouts '0' | '3'| '-1' | -1
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
 ---@field Unranked 'No' | 'Yes'
 ---@field Victory VictoryCondition
