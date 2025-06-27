@@ -69,12 +69,11 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Commander",
-        EconomyThreatLevel = 746,
         Health = 12000,
         MaxHealth = 12000,
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
-        SurfaceThreatLevel = 765,
+        SurfaceThreatLevel = 45,
     },
     Display = {
         Abilities = {
