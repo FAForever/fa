@@ -417,14 +417,27 @@ TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
+        -- early exit: do not create treads if we do not have the blueprint
         local treads = self.TreadBlueprint
         if not treads then
+            return
+        end
+
+        -- early exit: do not create treads if we're in the air or on water
+        local layer = self.Layer
+        if layer == "Air" or layer == "Water" then
+            return
+        end
+
+        -- early exit: do not create treads if we are attached to something (like a transport)
+        if self:IsUnitState("Attached") then
             return
         end
 
         if treads.ScrollTreads then
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
         end
+
         local treadMarks = treads.TreadMarks
         local treadType = self.TerrainType.Treads
         if treadMarks and treadType and treadType ~= 'None' then
