@@ -226,11 +226,29 @@ There are two main ways to make balance changes.
 
 First, a mod can merge or override blueprints as described above.
 
-Second, a mod can hook the `/lua/system/Blueprints.lua` file and override the `ModBlueprints`
-function to modify existing blueprints in an organized manner. Be sure to call the old function like
-this, so that other mods' changes aren't overridden:
+Second, mods can directly modify all blueprints in an organized manner using lua.
+The newer method is using the function `SetModBlueprintFunction`, which you can call from a `.bp`
+file and set a function to run. Only one function can be set to run per file.
+Example:
+```
+    -- file: /mod/**/changes.bp
+    SetModBlueprintFunction(function(all_bps)
+        for id, unitBp in all_bps.Unit do
+            -- some systematic change to each `unitBp`
+        end
+    end)
+```
+This new method can be hot-reloaded when the command line arg "/EnableDiskWatch" is present. So
+when you change your .bp file, you don't need to restart the game session to see your changes.
+It is also better organized and simpler. Unfortunately it currently doesn't support mod load order.
 
-    -- introduce new scope to gaurentee our local variables don't overwrite anything in another mod
+The older method is hooking `/lua/system/Blueprints.lua` and overriding the `ModBlueprints`
+function to modify existing blueprints. `ModBlueprints` runs before mod blueprint functions.
+Be sure to call the old `ModBlueprints` like this, so that other mods' changes aren't overridden:
+```
+    -- file: /mod/hook/lua/system/Blueprints.lua
+
+    -- introduce new scope to guarantee our local variables don't overwrite anything in another mod
     do
         local oldModBlueprints = ModBlueprints
         function ModBlueprints(all_bps)
@@ -243,7 +261,7 @@ this, so that other mods' changes aren't overridden:
             end
         end
     end
-
+```
 
 ----------
 Custom skins
