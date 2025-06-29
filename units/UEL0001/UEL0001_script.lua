@@ -720,3 +720,11 @@ UEL0001 = ClassUnit(ACUUnit) {
 }
 
 TypeClass = UEL0001
+
+local oldUnit = UEL0001
+UEL0001 = ClassUnit(oldUnit) {
+    Weapons = table.merged(oldUnit.Weapons, {
+        SniperRightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
+    }),
+}
+TypeClass = UEL0001
