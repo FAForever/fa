@@ -193,25 +193,30 @@ The pattern for overriding a class method called `Method` in a class called `Cls
 Blueprints
 ----------
 
-If an active sim mod has any .bp files, they will be automatically ran during blueprint loading to
-register all blueprint definitions inside. The ID of the blueprint can be specified by the
-`BlueprintId` field, but if absent, it will default to the file source (lowercased). For unit
-blueprints, the source is shortened to the filename without the suffix (e.g. `"_unit.bp"`) in that
-case. If you have multiple blueprints in a file, be sure to specify each `BlueprintId`.
+If an active sim mod has any .bp files, they will be automatically run during blueprint loading
+(as lua code) to register all blueprint definitions inside. Maps can also have .bp files. 
+You do not need to place blueprints in the `/hook` folder!
+
+Each blueprint definition needs a unique blueprint ID. This is defined by the field `BlueprintId`,
+but if absent, it defaults to the file source (lowercased), or for unit blueprints, the filename 
+without the suffix (`_unit.bp`). 
+If you have multiple blueprints in a file, be sure to specify each `BlueprintId`.
 
 If the blueprint ID ends up matching the ID of an existing blueprint, then the mod's blueprint will
 replace the one currently there unless the `Merge = true` flag is set in the blueprint. This will
 make the blueprint only add or override the fields it defines (including nested tables - the entire
 subtable isn't replaced in this mode), leaving the rest intact (which could possibly also have been
-changed by other mods).
-To remove a field from the original blueprint, set the field to `"__nil"` in your merge blueprint.
-To add or remove categories from a blueprint, set `AddCategories` and `DelCategories` to tables of
-category names (strings) you want to add or remove.
-To add or merge weapons in a blueprint, place your weapon blueprint in the `ModWeapon` table with 
-`MergeLabel` corresponding to the weapon label to merge the new blueprint with, and in case the 
-label doesn't exist, use `AddIndex` to specify where in the Weapon array the new blueprint should
-be placed, which is useful to place weapons at index 1 which controls the unit AI. 
-
+changed by other mods). 
+Merging includes workarounds for the limitations involving arrays and removing fields:
+  - To remove a field from the original blueprint, set it to `"__nil"` in the merge blueprint.
+  - To add or remove categories from a blueprint, set `AddCategories` and `DelCategories` to tables
+    of category names (strings) you want to add or remove.
+  - To change weapon blueprints, use the `ModWeapon` table, which consists of weapon blueprints
+    with special fields:
+    - `MergeLabel` merges the blueprint with the weapon blueprint that has the same `label`.
+    - When a label is not found, `AddIndex` adds the weapon at the specified index.
+        - This is mostly useful for adding a weapon to index 1, which is what controls unit AI.
+    - Neither are necessary, new blueprints are added to the end of the weapon array by default.
 
 ----------
 Balance changes
