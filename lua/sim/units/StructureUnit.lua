@@ -774,9 +774,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     OnAdjacentTo = function(self, adjacentUnit, triggerUnit)
 
         -- make sure we're both finished building
-        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt()
-            or adjacentUnit.Blueprint.CategoriesHash["DUMMYUNIT"]
-        then
+        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
             LOG('OnAdjacentTo return')
             return
         end
@@ -819,9 +817,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     OnNotAdjacentTo = function(self, adjacentUnit)
 
         -- make sure we're both finished building
-        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt()
-            or adjacentUnit.Blueprint.CategoriesHash["DUMMYUNIT"]
-        then
+        if self:IsBeingBuilt() or adjacentUnit:IsBeingBuilt() then
             LOG('OnNotAdjacentTo return')
             return
         end
