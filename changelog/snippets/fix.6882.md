@@ -1,0 +1,1 @@
+- (#6882) Fix a bug where non-dummy weapons are assigned dummy weapon blueprints because they are positioned after a dummy weapon blueprint in the `Weapon` table of the unit blueprint.
