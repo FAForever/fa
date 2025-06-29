@@ -152,7 +152,9 @@ function ProcessWeapons(allBlueprints, units)
     for _, unit in units do
         if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId or "")] then
             if unit.Weapon then
-                for _, weapon in unit.Weapon do
+                local giveWarning = false
+                local firstDummyIndex
+                for i, weapon in unit.Weapon do
                     if not weapon.DummyWeapon then
 
                         local projectile
@@ -165,7 +167,25 @@ function ProcessWeapons(allBlueprints, units)
                         end
 
                         ProcessWeapon(unit, weapon, projectile)
+
+                        -- Prevent a bug where non-dummy weapons are assigned a dummy weapon's blueprint by
+                        -- the engine because it expects all non-dummy weapons to be at the start of the table.
+                        if firstDummyIndex then
+                            local unitWeapon = unit.Weapon
+                            ---@cast unitWeapon WeaponBlueprint[]
+                            unitWeapon[firstDummyIndex], unitWeapon[i] = unitWeapon[i], unitWeapon[firstDummyIndex]
+                            firstDummyIndex = firstDummyIndex + 1
+                            giveWarning = true
+                        end
+                    else
+                        if not firstDummyIndex then
+                            firstDummyIndex = i
+                        end
                     end
+                end
+                if giveWarning then
+                    WARN(string.format("Weapon Blueprint Processing - Weapons for unit %s were reordered so that weapons with `DummyWeapon = true` were placed at the end of the `Weapon` table."
+                    , unit.BlueprintId))
                 end
             end
         end
