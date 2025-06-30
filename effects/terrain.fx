@@ -413,19 +413,21 @@ float3 ApplyWaterColor(float3 viewDirection, float terrainHeight, float waterDep
 {
     if (waterDepth > 0) {
         // With this extra check we get rid of unwanted coloration on steep cliffs when zoomed in,
-        // but we prevent that terrain tesselation swallows too much of the water when zoomed out
+        // but we prevent that terrain tesselation swallows too much of the water when zoomed out.
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
         if (MapUsesAdvancedWater()) {
             float3 up = float3(0,1,0);
-            // this is the length that the light travels underwater back to the camera
+            // This is the length that the light travels underwater back to the camera.
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
-            // Light gets absorbed exponentially,
-            // to simplify, we assume that the light enters vertically into the water.
-            // We need to multiply by 2 to reach 98% absorption as the waterDepth can't go over 1.
-            float waterAbsorption = 1 - saturate(exp(-waterDepth * 2 * (1 + oneOverCosV)));
-            // darken the color first to simulate the light absorption on the way in and out
+            // Light gets absorbed exponentially with distance.
+            // Omnidirectional ambient light has an average underwater travel distance of 2 * depth.
+            // This is also the same value as directional light under 60 degrees. (30 degrees above
+            // the horizon.) This is a sufficient approximation of a typical sun angle on a map, so
+            // we don't need to bother with separating the ambient and sun light.
+            float waterAbsorption = 1 - exp(-waterDepth * (2 + oneOverCosV));
+            // Darken the color to simulate the light absorption on the way in and out.
             color *= 1 - waterAbsorption * opacity;
-            // lerp in the watercolor to simulate the scattered light from the dirty water
+            // Lerp in the watercolor to simulate the scattered light from the dirty water.
             float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
             color = lerp(color, waterColor.rgb, waterAbsorption * opacity);
         } else {
@@ -798,7 +800,7 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
 {
     // sample all the textures we'll need
     float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale));
-
+    //clip(0.8 - (mask.y * 2 - 1));
     float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT * TerrainScale * LowerNormalTile ) * 2 - 1);
     float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, inV.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
     float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, inV.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
@@ -903,36 +905,6 @@ float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
     return result;
 }
 
-
-float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
-{
-    // sample all the textures we'll need
-    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale) * 2 - 1);
-    float4 upperAlbedo = tex2D( UpperAlbedoSampler, inV.mTexWT * TerrainScale * UpperAlbedoTile);
-    float4 lowerAlbedo = tex2D( LowerAlbedoSampler, inV.mTexWT * TerrainScale * LowerAlbedoTile);
-    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, inV.mTexWT * TerrainScale * Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, inV.mTexWT * TerrainScale * Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, inV.mTexWT * TerrainScale * Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, inV.mTexWT * TerrainScale * Stratum3AlbedoTile);
-
-    float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz*2-1;
-
-    // blend all albedos together
-    float4 albedo = lowerAlbedo;
-    albedo = lerp( albedo, stratum0Albedo, mask.x );
-    albedo = lerp( albedo, stratum1Albedo, mask.y );
-    albedo = lerp( albedo, stratum2Albedo, mask.z );
-    albedo = lerp( albedo, stratum3Albedo, mask.w );
-    albedo.xyz = lerp( albedo.xyz, upperAlbedo.xyz, upperAlbedo.w );
-
-    // get the water depth
-    float waterDepth = tex2D( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
-
-    // calculate the lit pixel
-    float4 outColor = CalculateLighting( normal, inV.mTexWT.xyz, albedo.xyz, 1-albedo.w, waterDepth, inV.mShadow, inShadows);
-
-    return outColor;
-}
 
 float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
 {
@@ -1059,6 +1031,36 @@ technique TVerticalBlurDepthToVariance
         VertexShader = FIXED_FUNC_VS;
         PixelShader = compile ps_2_0 VerticalBlurDepthToVariancePS();
     }
+}
+float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
+{
+    // sample all the textures we'll need
+    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale) * 2 - 1);
+    //clip(0.8 - mask.y);
+    float4 upperAlbedo = tex2D( UpperAlbedoSampler, inV.mTexWT * TerrainScale * UpperAlbedoTile);
+    float4 lowerAlbedo = tex2D( LowerAlbedoSampler, inV.mTexWT * TerrainScale * LowerAlbedoTile);
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, inV.mTexWT * TerrainScale * Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, inV.mTexWT * TerrainScale * Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, inV.mTexWT * TerrainScale * Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, inV.mTexWT * TerrainScale * Stratum3AlbedoTile);
+
+    float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz*2-1;
+
+    // blend all albedos together
+    float4 albedo = lowerAlbedo;
+    albedo = lerp( albedo, stratum0Albedo, mask.x );
+    albedo = lerp( albedo, stratum1Albedo, mask.y );
+    albedo = lerp( albedo, stratum2Albedo, mask.z );
+    albedo = lerp( albedo, stratum3Albedo, mask.w );
+    albedo.xyz = lerp( albedo.xyz, upperAlbedo.xyz, upperAlbedo.w );
+
+    // get the water depth
+    float waterDepth = tex2D( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+
+    // calculate the lit pixel
+    float4 outColor = CalculateLighting( normal, inV.mTexWT.xyz, albedo.xyz, 1-albedo.w, waterDepth, inV.mShadow, inShadows);
+
+    return outColor;
 }
 
 technique TTerrain <
@@ -1355,6 +1357,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz * 2 -1;
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+    clip(0.3 - decalAlbedo.r);
 
     float3 color;
     // We want the decals to behave consistently with the rest of the ground
@@ -1364,6 +1367,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     } else {
         color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
     }
+    //if (color.r > 0.4) color.r = 1;
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
