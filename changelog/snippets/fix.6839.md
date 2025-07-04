@@ -1,0 +1,1 @@
+- (#6839) Fix `Health` (adjusts unit health) and `DamageRadius` (adjusts damage radius for unit weapons) buff effect types. Previously they would just error if you used them.
