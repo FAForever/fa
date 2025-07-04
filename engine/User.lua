@@ -361,7 +361,7 @@ end
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
----@return string[] | false
+---@return (string | number | integer)[] | false
 function GetCommandLineArg(option, maxArgs)
 end
 
@@ -1054,7 +1054,7 @@ end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
 --- Unlike other engine functions that return tables, this function returns the same table each time it is called.
----@return UISessionSenarioInfo
+---@return UISessionScenarioInfo
 function SessionGetScenarioInfo()
 end
 
