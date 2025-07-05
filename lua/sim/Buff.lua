@@ -64,9 +64,10 @@ local regenAuraDefaultCeilings = {
 ---@param unit Unit
 ---@param buffName BuffName
 ---@param affectState BlueprintBuffAffectState
+---@param buffsForAffect table<BuffName, BlueprintBuffAffectState>
 ---@return number add
 ---@return number mult
-local function regenAuraCalculate(unit, buffName, affectState)
+local function regenAuraCalculate(unit, buffName, affectState, buffsForAffect)
     local adds = 0
 
     if affectState.Add and affectState.Add ~= 0 then
@@ -93,7 +94,7 @@ local function regenAuraCalculate(unit, buffName, affectState)
 end
 
 --- A function that calculates buff add and mult values for a buff contributing to an "affect".
----@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffName, affectState: BlueprintBuffAffectState): add: number, mult: number
+---@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffName, affectState: BlueprintBuffAffectState, buffsForAffect: table<BuffName, BlueprintBuffAffectState>): add: number, mult: number
 
 ---@type table<BuffName, table<BuffName, AffectCalculation>>
 UniqueAffectCalculation = {
@@ -123,9 +124,10 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local bool = initialBool or false
     local floor = 0
 
-    if not unit.Buffs.Affects[affectType] then return initialVal, bool end
+    local buffsForAffect = unit.Buffs.Affects[affectType]
+    if not buffsForAffect then return initialVal, bool end
 
-    for originBuffName, affectState in unit.Buffs.Affects[affectType] do
+    for originBuffName, affectState in buffsForAffect do
         if affectState.Floor then
             floor = affectState.Floor
         end
@@ -138,7 +140,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
         local uniqueCalculation = UniqueAffectCalculation[originBuffName][affectType]
         if uniqueCalculation then
-            local add, mult = uniqueCalculation(unit, originBuffName, affectState)
+            local add, mult = uniqueCalculation(unit, originBuffName, affectState, buffsForAffect)
             adds = adds + add
             mults = mults * mult
         else
