@@ -150,7 +150,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             end
 
             local mult = affectState.Mult
-            if mult then
+            if mult and mult ~= 1 then
                 for i = 1, affectState.Count do
                     mults = mults * mult
                 end
