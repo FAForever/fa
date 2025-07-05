@@ -119,13 +119,13 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     -- if not, do the typical buff computation
 
-    local adds = 0
-    local mults = 1.0
     local bool = initialBool or false
-    local floor = 0
-
     local buffsForAffect = unit.Buffs.Affects[affectType]
     if not buffsForAffect then return initialVal, bool end
+
+    local adds = 0
+    local mults = 1.0
+    local floor = 0
 
     for originBuffName, affectState in buffsForAffect do
         if affectState.Floor then
