@@ -63,26 +63,26 @@ local regenAuraDefaultCeilings = {
 --- Calculates regen for a unit using mults as a multiplier of the unit's HP that is then added to the final regen value.
 ---@param unit Unit
 ---@param buffName BuffName
----@param affectBp BlueprintBuffAffectState
+---@param affectState BlueprintBuffAffectState
 ---@return number add
 ---@return number mult
-local function regenAuraCalculate(unit, buffName, affectBp)
+local function regenAuraCalculate(unit, buffName, affectState)
     local adds = 0
 
-    if affectBp.Add and affectBp.Add ~= 0 then
-        adds = adds + (affectBp.Add * affectBp.Count)
+    if affectState.Add and affectState.Add ~= 0 then
+        adds = adds + (affectState.Add * affectState.Count)
     end
 
     -- Take regen values from bp, keys have to match techCategory options
-    local bpCeilings = affectBp.BPCeilings --[[@as table<TechCategory, number>]]
+    local bpCeilings = affectState.BPCeilings --[[@as table<TechCategory, number>]]
 
     local techCat = unit.Blueprint.TechCategory
     local ceil = bpCeilings[techCat] or regenAuraDefaultCeilings[techCat]
 
-    local mult = affectBp.Mult
+    local mult = affectState.Mult
     if mult then
         local maxHealth = unit.Blueprint.Defense.MaxHealth
-        for i = 1, affectBp.Count do
+        for i = 1, affectState.Count do
             local multHp = mult * maxHealth
             if ceil and multHp > ceil then multHp = ceil end
             adds = adds + multHp
@@ -93,7 +93,7 @@ local function regenAuraCalculate(unit, buffName, affectBp)
 end
 
 --- A function that calculates buff add and mult values for a buff contributing to an "affect".
----@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffName, affectBp: BlueprintBuffAffectState): add: number, mult: number
+---@alias AffectCalculation fun(unit: Unit, affectBuffName: BuffName, affectState: BlueprintBuffAffectState): add: number, mult: number
 
 ---@type table<BuffName, table<BuffName, AffectCalculation>>
 UniqueAffectCalculation = {
@@ -125,12 +125,12 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
-    for originBuffName, affectBp in unit.Buffs.Affects[affectType] do
-        if affectBp.Floor then
-            floor = affectBp.Floor
+    for originBuffName, affectState in unit.Buffs.Affects[affectType] do
+        if affectState.Floor then
+            floor = affectState.Floor
         end
 
-        if not affectBp.Bool then
+        if not affectState.Bool then
             bool = false
         else
             bool = true
@@ -138,18 +138,18 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
         local uniqueCalculation = UniqueAffectCalculation[originBuffName][affectType]
         if uniqueCalculation then
-            local add, mult = uniqueCalculation(unit, originBuffName, affectBp)
+            local add, mult = uniqueCalculation(unit, originBuffName, affectState)
             adds = adds + add
             mults = mults * mult
         else
-            local add = affectBp.Add
+            local add = affectState.Add
             if add and add ~= 0 then
-                adds = adds + (add * affectBp.Count)
+                adds = adds + (add * affectState.Count)
             end
 
-            local mult = affectBp.Mult
+            local mult = affectState.Mult
             if mult then
-                for i = 1, affectBp.Count do
+                for i = 1, affectState.Count do
                     mults = mults * mult
                 end
             end
