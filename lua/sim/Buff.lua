@@ -125,7 +125,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
 
-    for originBuffName, affectBp in pairs(unit.Buffs.Affects[affectType]) do
+    for originBuffName, affectBp in unit.Buffs.Affects[affectType] do
         if affectBp.Floor then
             floor = affectBp.Floor
         end
