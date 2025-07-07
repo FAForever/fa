@@ -146,7 +146,7 @@ end
 function GetUnitFactionInfo(id)
     local bp = __blueprints[id]
     if bp and bp.CategoriesHash and IsUnitPlayable(id) then
-        for k, faction in GetFactionColorsAndIcons() do
+        for _, faction in GetFactionColorsAndIcons() do
             if bp.CategoriesHash[faction.name] then return faction end
         end
     end
