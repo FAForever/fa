@@ -127,8 +127,8 @@ local function GetFactionColorsAndIcons()
     if not FactionDataCache then
         local Factions = import('/lua/factions.lua').GetFactions()
         local skins = import("/lua/skins/skins.lua").skins
+
         FactionDataCache = {}
-        ---@param faction FactionData
         for i, faction in Factions do
             FactionDataCache[i] = {
                 name = faction.Category,
