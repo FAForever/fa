@@ -115,7 +115,14 @@ end
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 
+---@class UICreateUnitDialog_FactionData
+---@field name FactionCategory
+---@field icon FileName
+---@field color Color
+
+---@type UICreateUnitDialog_FactionData[]?
 local FactionDataCache
+---@return UICreateUnitDialog_FactionData[]
 local function GetFactionColorsAndIcons()
     if not FactionDataCache then
         FactionDataCache = {}
@@ -135,6 +142,8 @@ local function GetFactionColorsAndIcons()
     return FactionDataCache
 end
 
+---@param id UnitId
+---@return UICreateUnitDialog_FactionData | { color: false, icon: false }
 function GetUnitFactionInfo(id)
     local bp = __blueprints[id]
     if bp and bp.CategoriesHash and IsUnitPlayable(id) then
