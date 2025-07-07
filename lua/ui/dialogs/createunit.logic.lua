@@ -115,22 +115,30 @@ end
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-local FactionData = {}
-local Factions = import('/lua/factions.lua').GetFactions()
-local skins = import("/lua/skins/skins.lua").skins
----@param faction FactionData
-for _, faction in Factions do
-    table.insert(FactionData, {
-        name = faction.Category,
-        icon = UIUtil.UIFile(faction.Icon),
-        color = skins[faction.Key].factionTextColor
-    })
+local FactionDataCache
+local function GetFactionColorsAndIcons()
+    if not FactionDataCache then
+        FactionDataCache = {}
+        local Factions = import('/lua/factions.lua').GetFactions()
+        local skins = import("/lua/skins/skins.lua").skins
+
+        ---@param faction FactionData
+        for i, faction in Factions do
+            FactionDataCache[i] = {
+                name = faction.Category,
+                icon = UIUtil.UIFile(faction.Icon),
+                color = skins[faction.Key].factionTextColor
+            }
+        end
+    end
+
+    return FactionDataCache
 end
 
 function GetUnitFactionInfo(id)
     local bp = __blueprints[id]
     if bp and bp.CategoriesHash and IsUnitPlayable(id) then
-        for k, faction in FactionData do
+        for k, faction in GetFactionColorsAndIcons() do
             if bp.CategoriesHash[faction.name] then return faction end
         end
     end
