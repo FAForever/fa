@@ -1,1 +1,1 @@
-- (#6882) Fix a bug where non-dummy weapons are assigned dummy weapon blueprints because they are positioned after a dummy weapon blueprint in the `Weapon` table of the unit blueprint.
+- (#6882) Fix the `ModWeapons` blueprint field adding weapons after dummy weapons, causing the unit weapon to incorrectly get the dummy weapon's blueprint for the new weapon.
