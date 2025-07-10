@@ -59,6 +59,7 @@ categories = {
     CANNOTUSEAIRSTAGING = categoryValue,
     CANTRANSPORTCOMMANDER = categoryValue,
     CAPTURE = categoryValue,
+    --- Changes engine behavior of units attached to this unit: Hides units and makes them unselectable.
     CARRIER = categoryValue,
     --- Allows the unit to land on water. Is introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
     CANLANDONWATER = categoryValue,
