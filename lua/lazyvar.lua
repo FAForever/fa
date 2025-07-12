@@ -159,7 +159,11 @@ LazyVarMetaTable = {
 
         -- tell those that use us that we have a new value
         for k = 7, head - 1 do
-            self[k]:OnDirty()
+            local lv = self[k]
+            onDirty = lv.OnDirty
+            if onDirty then
+                onDirty(lv)
+            end
             self[k] = nil
         end
     end,
@@ -204,7 +208,11 @@ LazyVarMetaTable = {
 
         -- tell those that use us that we have a new value
         for k = 7, head - 1 do
-            self[k]:OnDirty()
+            local lv = self[k]
+            onDirty = lv.OnDirty
+            if onDirty then
+                onDirty(lv)
+            end
             self[k] = nil
         end
     end,
