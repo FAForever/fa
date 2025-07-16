@@ -28,7 +28,11 @@ local function GetDefaultOptions ()
     return defaultOptions
 end
 
-function GetRandomName(faction, aiKey)
+--- Generates a random, thematic name used by AIs.
+---@param faction number
+---@param aiKey string
+---@return string
+local function GetRandomName(faction, aiKey)
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local factions = import("/lua/factions.lua").Factions
 
@@ -38,7 +42,7 @@ function GetRandomName(faction, aiKey)
 
     if aiKey then
         local aiName = "AI"
-        for index, value in aiTypes do
+        for _, value in aiTypes do
             if aiKey == value.key then
                 aiName = value.name
             end
@@ -49,11 +53,15 @@ function GetRandomName(faction, aiKey)
     return name
 end
 
-function GetRandomFaction()
+--- Generates a random faction.
+---@return number
+local function GetRandomFaction()
     return math.random(table.getn(import("/lua/factions.lua").Factions))
 end
 
-function VerifyScenarioConfiguration(scenarioInfo)
+--- Validates the scenario file.
+---@param scenarioInfo UIScenarioInfoFile
+local function VerifyScenarioConfiguration(scenarioInfo)
     if scenarioInfo == nil then
         error("VerifyScenarioConfiguration - no scenarioInfo")
     end
@@ -71,7 +79,15 @@ function VerifyScenarioConfiguration(scenarioInfo)
     end
 end
 
-
+--- Transforms a map name into a path to the scenario file. This is based on an educated guess - there's no guarantee.
+---@param mapName FileName | string
+---@return FileName
+local function FixupMapName(mapName)
+    if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
+        mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
+    end
+    return mapName --[[@as FileName]]
+end
 
 -- Note that the map name must include the full path, it won't try to guess the path based on name
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
@@ -136,12 +152,6 @@ end
 
 
 
-function FixupMapName(mapName)
-    if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
-        mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
-    end
-    return mapName
-end
 
 
 
