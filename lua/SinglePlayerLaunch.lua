@@ -3,6 +3,31 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
+--- Assigns the default value of all options to the defaultOptions table.
+---@param defaultOptions table
+---@param options ScenarioOption[]
+local function AssignDefaultOptions (defaultOptions, options)
+    ---@param option ScenarioOption
+    for index, option in options do
+        if option.key and option.values and option.default then
+            defaultOptions[option.key] = option.values[option.default].key
+        end
+    end
+end
+
+--- Generates a table of all default lobby options
+--- @return table
+local function GetDefaultOptions ()
+    local allLobbyOptions = import("/lua/ui/lobby/lobbyOptions.lua")
+
+    local defaultOptions = {}
+    AssignDefaultOptions(defaultOptions, allLobbyOptions.teamOptions)
+    AssignDefaultOptions(defaultOptions, allLobbyOptions.globalOpts)
+    AssignDefaultOptions(defaultOptions, allLobbyOptions.AIOpts)
+
+    return defaultOptions
+end
+
 function GetRandomName(faction, aiKey)
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local factions = import("/lua/factions.lua").Factions
@@ -119,22 +144,12 @@ function FixupMapName(mapName)
 end
 
 
-local defaultOptions = {
-    FogOfWar = 'explored',
-    NoRushOption = 'Off',
-    PrebuiltUnits = 'Off',
-    Difficulty = 2,
-    DoNotShareUnitCap = true,
-    Timeouts = -1,
-    GameSpeed = 'normal',
-    UnitCap = '500',
-    Victory = 'sandbox',
-    CheatsEnabled = 'true',
-    CivilianAlliance = 'enemy',
-}
 
 local function GetCommandLineOptions(isPerfTest)
-    local options = table.copy(defaultOptions)
+
+    local options = GetDefaultOptions()
+
+    reprsl(options)
 
     if isPerfTest then
         options.FogOfWar = 'none'
