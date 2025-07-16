@@ -46,6 +46,22 @@ local function GetOptions()
     return options
 end
 
+--- Generates a table of all set game mods.
+--- 
+--- Lobby options can be set using the `/gamemods` argument. The format is `/gamemods name:uid name:uid`. The name is not used but it is useful to document what mod the UID is supposed to represent. As an example: `/gamemods m27ai:f27c55b4-v075-55b4-92b6-64398e75e23f rngai:faf0863e-94a0-b0b0-9ba583e9feb4`
+local function GetMods()
+    local mods = {}
+    local parsedMods = import("/lua/system/utils.lua").GetCommandLineArgTable("/gamemods")
+
+    ---@param name string
+    ---@param uid string
+    for name, uid in parsedMods do
+        mods[uid]=true
+    end
+
+    return mods
+end
+
 --- Generates a random, thematic name used by AIs.
 ---@param faction number
 ---@param aiKey string
