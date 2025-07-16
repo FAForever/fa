@@ -290,6 +290,9 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     return sessionInfo
 end
 
+--- Called by the engine when the `/map` or `/scenario` command line switch is detected.
+---@param mapName FileName        # Full path to a scenario, e.g. /maps/SCMP_007/SCMP_007_scenario.lua for Open Palms.
+---@param isPerfTest boolean
 function StartCommandLineSession(mapName, isPerfTest)
     if not mapName then
         error("SetupCommandLineSession - mapName required")
