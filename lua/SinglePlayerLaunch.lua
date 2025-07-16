@@ -28,6 +28,24 @@ local function GetDefaultOptions ()
     return defaultOptions
 end
 
+--- Generates a table of all set lobby options. 
+--- 
+--- Lobby options can be set using the `/gameoptions` argument. The format is `/gameoptions key:value key:value`. The correct key-value pairs can be found in `lua\ui\lobby\lobbyOptions.lua`. As an example: `/gameoptions AllowObservers:true CivilianAlliance:Enemy`
+local function GetOptions()
+    local options = GetDefaultOptions()
+    local parsedOptions = import("/lua/system/utils.lua").GetCommandLineArgTable("/gameoptions")
+
+    for key, value in parsedOptions do
+        if options[key] then
+            options[key] = value
+        else
+            WARN("Unknown option: " .. tostring(key) .. " with value " .. tostring(value))
+        end
+    end
+
+    return options
+end
+
 --- Generates a random, thematic name used by AIs.
 ---@param faction number
 ---@param aiKey string
@@ -191,9 +209,9 @@ local function GetCommandLineOptions(isPerfTest)
 end
 
 --- Populates a session where all armies are AI.
----@param mapName any
+---@param scenario UIScenarioInfoFile
 ---@return table
-local function SetupBotSession(mapName)
+local function SetupBotSession(scenario)
     if not mapName then
         error("SetupBotSession - mapName required")
     end
@@ -348,7 +366,11 @@ function StartCommandLineSession(mapName, isPerfTest)
         end
         sessionInfo = SetupCampaignSession(scenario, difficulty, faction)
     else
-        sessionInfo = SetupSkirmishSession(scenario, isPerfTest)
+        if HasCommandLineArg("/observe") then
+            sessionInfo = SetupBotSession(scenario)
+        else
+            sessionInfo = SetupSkirmishSession(scenario, isPerfTest)
+        end
     end
     LaunchSinglePlayerSession(sessionInfo)
 end
