@@ -89,7 +89,13 @@ local function FixupMapName(mapName)
     return mapName --[[@as FileName]]
 end
 
--- Note that the map name must include the full path, it won't try to guess the path based on name
+--- Populates a session to launch a campaign scenario.
+---@param scenario UIScenarioInfoFile       # Map name must be a full path to a campaign scenario, it won't try to guess it based on just a name. 
+---@param difficulty number
+---@param inFaction? number
+---@param campaignFlowInfo? any
+---@param isTutorial? boolean
+---@return UISinglePlayerSessionConfiguration
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
     local factions = import("/lua/factions.lua").Factions
     local faction = inFaction or 1
@@ -150,11 +156,6 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
 end
 
 
-
-
-
-
-
 local function GetCommandLineOptions(isPerfTest)
 
     local options = GetDefaultOptions()
@@ -189,8 +190,10 @@ local function GetCommandLineOptions(isPerfTest)
     return options
 end
 
-
-function SetupBotSession(mapName)
+--- Populates a session where all armies are AI.
+---@param mapName any
+---@return table
+local function SetupBotSession(mapName)
     if not mapName then
         error("SetupBotSession - mapName required")
     end
@@ -245,8 +248,11 @@ function SetupBotSession(mapName)
     return sessionInfo
 end
 
-
-local function SetupCommandLineSkirmish(scenario, isPerfTest)
+--- Populates a session designed for a simple skirmish. The player is put into the first slot. All other slots are populated by AIs.
+---@param scenario UIScenarioInfoFile
+---@param isPerfTest boolean
+---@return table
+local function SetupSkirmishSession(scenario, isPerfTest)
 
     local faction
     if HasCommandLineArg("/faction") then
@@ -342,7 +348,7 @@ function StartCommandLineSession(mapName, isPerfTest)
         end
         sessionInfo = SetupCampaignSession(scenario, difficulty, faction)
     else
-        sessionInfo = SetupCommandLineSkirmish(scenario, isPerfTest)
+        sessionInfo = SetupSkirmishSession(scenario, isPerfTest)
     end
     LaunchSinglePlayerSession(sessionInfo)
 end
