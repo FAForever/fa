@@ -16,11 +16,12 @@ FastDecayComponent = ClassSimple {
         -- walls' highest cost is 20 energy, so they decay in 200 ticks total
         -- Make all units decay at this rate
         local decayPerTick = -maxHealth * (1 / 200 - 0.1 / highestEcoStat)
+        local completionThreshold = 200 / highestEcoStat
         if decayPerTick < 0 then
             local decayedHp = 0
             while self:IsBeingBuilt() and not (self.Dead or IsDestroyed(self)) do
-                -- unit is not being actively built and is low completion (10% for a t1 pd, less for very expensive buildings)
-                if not self:IsUnitState("NoReclaim") and self:GetFractionComplete() * highestEcoStat <= 200 then
+                -- units actively being built cannot be reclaimed
+                if not self:IsUnitState("NoReclaim") and self:GetFractionComplete() < completionThreshold then
                     decayedHp = decayedHp + decayPerTick
                     self:AdjustHealth(self, decayPerTick)
                 else
