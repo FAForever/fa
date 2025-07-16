@@ -229,29 +229,16 @@ end
 ---@param scenario UIScenarioInfoFile
 ---@return table
 local function SetupBotSession(scenario)
-    if not mapName then
-        error("SetupBotSession - mapName required")
-    end
 
-    mapName = FixupMapName(mapName)
-
-    local sessionInfo = {}
-
+    ---@type UISinglePlayerSessionConfiguration
+    sessionInfo = { }
     sessionInfo.playerName = Prefs.GetFromCurrentProfile('Name') or 'Player'
-    sessionInfo.createReplay = false
-
-    sessionInfo.scenarioInfo = import("/lua/ui/maputil.lua").LoadScenario(mapName)
-    if not sessionInfo.scenarioInfo then
-        error("Unable to load map " .. mapName)
-    end
+    sessionInfo.createReplay = true
+    sessionInfo.scenarioInfo = scenario
+    sessionInfo.scenarioInfo.Options = GetOptions()
+    sessionInfo.scenarioMods = GetMods()
 
     VerifyScenarioConfiguration(sessionInfo.scenarioInfo)
-
-    local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
-
-    sessionInfo.teamInfo = {}
-
-    local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
 
     local ai
     local aiopt = GetCommandLineArg("/ai", 1)
@@ -261,6 +248,10 @@ local function SetupBotSession(scenario)
         ai = aitypes[1].key
     end
 
+    sessionInfo.teamInfo = { }
+
+    local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
+    local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
     for index, name in armies do
         sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
         sessionInfo.teamInfo[index].PlayerName = name
@@ -271,9 +262,6 @@ local function SetupBotSession(scenario)
         sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
         sessionInfo.teamInfo[index].AIPersonality = ai
     end
-
-    sessionInfo.scenarioInfo.Options = GetCommandLineOptions(false)
-    sessionInfo.scenarioMods = import("/lua/mods.lua").GetCampaignMods(sessionInfo.scenarioInfo)
 
     local seed = GetCommandLineArg("/seed", 1)
     if seed then
