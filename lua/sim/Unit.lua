@@ -353,6 +353,31 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
         self:AddOnGivenCallback(self.OnGivenDisableWeapons)
+
+        TrashAdd(self.Trash, ForkThread(function()
+            local maxHealth = self:GetMaxHealth()
+            -- compensate for natural decay rate
+            local highestEcoStat = math.max(bpEcon.BuildCostEnergy, bpEcon.BuildCostMass, bpEcon.BuildTime)
+            -- walls' highest cost is 20 energy, so they decay in 200 ticks total
+            -- Make all units decay at this rate
+            local decayPerTick = -maxHealth * (1/200 - 0.1 / highestEcoStat)
+            if decayPerTick < 0 then
+                local decayedHp = 0
+                while self:IsBeingBuilt() do
+                    -- unit is not being actively built and is low completion
+                    if not self:IsUnitState("NoReclaim") and self:GetFractionComplete() <= 0.1 then
+                        decayedHp = decayedHp + decayPerTick
+                        self:AdjustHealth(self, decayPerTick)
+                    else
+                        -- Natural decay decays build progress so decayed hp gets restored with building
+                        -- We need to restore our artificially decayed hp too so that the final unit is max hp
+                        self:AdjustHealth(self, -decayedHp)
+                        decayedHp = 0
+                    end
+                    WaitTicks(1)
+                end
+            end
+        end))
     end,
 
     -------------------------------------------------------------------------------------------
