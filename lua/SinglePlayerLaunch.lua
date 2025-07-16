@@ -4,7 +4,6 @@ local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
 function GetRandomName(faction, aiKey)
-    WARN('GRN: ',faction)
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local factions = import("/lua/factions.lua").Factions
 
