@@ -1,12 +1,18 @@
 local TrashAdd = TrashBag.Add
 
+--- Provides a method to make units decay quickly when they are at a low completion %.
+--- This prevents unbuilt buildings from blocking pathfinding for a long time.
+--- Used in T1 PD (##B2101), AA (##B2104), and torpedo launchers (##B2109).
 ---@class FastDecayComponent : Unit
 FastDecayComponent = ClassSimple {
+    --- Call this at the end of your OnCreate function.
     ---@param self FastDecayComponent
     StartFastDecayThread = function(self)
         TrashAdd(self.Trash, ForkThread(self.FastDecayThread, self))
     end,
 
+    --- While the unit is at low completion and not actively being built, rapidly reduces its HP.
+    --- Starting construction on the unit restores decayed HP.
     ---@param self FastDecayComponent
     FastDecayThread = function(self)
         local maxHealth = self:GetMaxHealth()
