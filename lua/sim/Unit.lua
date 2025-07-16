@@ -364,8 +364,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             if decayPerTick < 0 then
                 local decayedHp = 0
                 while self:IsBeingBuilt() do
-                    -- unit is not being actively built and is low completion
-                    if not self:IsUnitState("NoReclaim") and self:GetFractionComplete() <= 0.1 then
+                    -- unit is not being actively built and is low completion (10% for a t1 pd, less for very expensive buildings)
+                    if not self:IsUnitState("NoReclaim") and self:GetFractionComplete() * highestEcoStat <= 200 then
                         decayedHp = decayedHp + decayPerTick
                         self:AdjustHealth(self, decayPerTick)
                     else
