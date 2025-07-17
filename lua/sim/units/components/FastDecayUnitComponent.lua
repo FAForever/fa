@@ -8,28 +8,29 @@ FastDecayComponent = ClassSimple {
     --- Call this at the end of your OnCreate function.
     ---@param self FastDecayComponent
     ---@param decayPerTick? number # HP fraction lost per tick when unit is decaying quickly. Defaults to wall decay rate.
-    ---@param completionThreshold? number # Below this fraction completion, units decay quickly. Defaults to 200 resources invested.
+    ---@param completionThreshold? number # Below this fraction completion, units decay quickly. Defaults to 15 buildpower invested.
     StartFastDecayThread = function(self, decayPerTick, completionThreshold)
         TrashAdd(self.Trash, ForkThread(self.FastDecayThread, self, decayPerTick, completionThreshold))
     end,
 
-    --- While the unit is at low completion and not actively being built, rapidly reduces its HP.
-    --- Starting construction on the unit restores decayed HP.
+    --- While the unit is at low completion and not actively being built, rapidly reduces its HP. Defaults to wall decay rate.
+    --- Starting construction on the unit restores decayed HP. Defaults to 15 buildpower invested.
     ---@param self FastDecayComponent
     ---@param decayPerTick? number # HP fraction lost per tick when unit is decaying quickly.
     ---@param completionThreshold? number # Below this fraction completion, units decay quickly.
     FastDecayThread = function(self, decayPerTick, completionThreshold)
         local maxHealth = self:GetMaxHealth()
         local bpEcon = self.Blueprint.Economy
-        local highestEcoStat = math.max(bpEcon.BuildCostEnergy, bpEcon.BuildCostMass, bpEcon.BuildTime)
+        local buildTime = bpEcon.BuildTime
+        local highestEcoStat = math.max(bpEcon.BuildCostEnergy, bpEcon.BuildCostMass, buildTime)
 
-        -- Defaults to decaying as fast as walls naturally decay (their highest cost is 20 energy)
-        decayPerTick = decayPerTick or (0.1 / 20)
+        -- Defaults to decaying as fast as walls naturally decay if they had equal buildpower invested
+        decayPerTick = decayPerTick or (0.1 / 20 * 15 / buildTime)
         -- Compensate for engine's decay of 0.1 resource/tick of the highest cost resource
         local naturalPercentDecayPerTick = 0.1 / highestEcoStat
         decayPerTick = -maxHealth * (decayPerTick - naturalPercentDecayPerTick)
-        -- Defaults to a limit of 200 resources invested
-        completionThreshold = completionThreshold or (200 / highestEcoStat)
+        -- Defaults to a limit of 15 buildpower invested
+        completionThreshold = completionThreshold or (15 / buildTime)
 
         if decayPerTick < 0 and completionThreshold > 0 then
             local decayedHp = 0
