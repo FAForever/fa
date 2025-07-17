@@ -31,7 +31,7 @@ FastDecayComponent = ClassSimple {
         -- Defaults to a limit of 200 resources invested
         completionThreshold = completionThreshold or (200 / highestEcoStat)
 
-        if decayPerTick < 0 then
+        if decayPerTick < 0 and completionThreshold > 0 then
             local decayedHp = 0
             while self:IsBeingBuilt() and not (self.Dead or IsDestroyed(self)) do
                 -- units actively being built cannot be reclaimed
