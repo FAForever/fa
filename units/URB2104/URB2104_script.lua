@@ -10,16 +10,23 @@
 
 local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
 local CAAAutocannon = import("/lua/cybranweapons.lua").CAAAutocannon
+local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
 
----@class URB2104 : CStructureUnit
-URB2104 = ClassUnit(CStructureUnit) {
+---@class URB2104 : CStructureUnit, FastDecayComponent
+URB2104 = ClassUnit(CStructureUnit, FastDecayComponent) {
 
     Weapons = {
         AAGun = ClassWeapon(CAAAutocannon) {
             FxMuzzleScale = 2.25,
         },
     },
+
+    ---@param self URB2104
+    OnCreate = function(self)
+        CStructureUnit.OnCreate(self)
+        self:StartFastDecayThread()
+    end,
 }
 
 

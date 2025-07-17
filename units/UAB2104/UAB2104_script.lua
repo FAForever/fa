@@ -10,15 +10,22 @@
 
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AAASonicPulseBatteryWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
+local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
----@class UAB2104 : AStructureUnit
-UAB2104 = ClassUnit(AStructureUnit) {
+---@class UAB2104 : AStructureUnit, FastDecayComponent
+UAB2104 = ClassUnit(AStructureUnit, FastDecayComponent) {
 
     Weapons = {
         AAGun = ClassWeapon(AAASonicPulseBatteryWeapon) {
             FxMuzzleScale = 2.25,
         },
     },
+
+    ---@param self UAB2104
+    OnCreate = function(self)
+        AStructureUnit.OnCreate(self)
+        self:StartFastDecayThread()
+    end,
 }
 
 TypeClass = UAB2104

@@ -10,13 +10,20 @@
 
 local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
 local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedoWeapon
+local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
 
----@class URB2109 : CStructureUnit
-URB2109 = ClassUnit(CStructureUnit) {
+---@class URB2109 : CStructureUnit, FastDecayComponent
+URB2109 = ClassUnit(CStructureUnit, FastDecayComponent) {
     Weapons = {
         Turret01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
     },
+
+    ---@param self URB2109
+    OnCreate = function(self)
+        CStructureUnit.OnCreate(self)
+        self:StartFastDecayThread()
+    end,
 }
 
 TypeClass = URB2109

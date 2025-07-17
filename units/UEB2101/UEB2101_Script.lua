@@ -10,12 +10,19 @@
 
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TDFLightPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFLightPlasmaCannonWeapon
+local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
----@class UEB2101 : TStructureUnit
-UEB2101 = ClassUnit(TStructureUnit) {
+---@class UEB2101 : TStructureUnit, FastDecayComponent
+UEB2101 = ClassUnit(TStructureUnit, FastDecayComponent) {
     Weapons = {
         MainGun = ClassWeapon(TDFLightPlasmaCannonWeapon) {}
     },
+
+    ---@param self UEB2101
+    OnCreate = function(self)
+        TStructureUnit.OnCreate(self)
+        self:StartFastDecayThread()
+    end,
 }
 
 TypeClass = UEB2101

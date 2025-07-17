@@ -10,12 +10,19 @@
 
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local ADFGravitonProjectorWeapon = import("/lua/aeonweapons.lua").ADFGravitonProjectorWeapon
+local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
----@class UAB2101 : AStructureUnit
-UAB2101 = ClassUnit(AStructureUnit) {
+---@class UAB2101 : AStructureUnit, FastDecayComponent
+UAB2101 = ClassUnit(AStructureUnit, FastDecayComponent) {
     Weapons = {
         MainGun = ClassWeapon(ADFGravitonProjectorWeapon) {},
     },
+
+    ---@param self UAB2101
+    OnCreate = function(self)
+        AStructureUnit.OnCreate(self)
+        self:StartFastDecayThread()
+    end,
 }
 
 TypeClass = UAB2101
