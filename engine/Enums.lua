@@ -53,7 +53,7 @@
 ---| "RULEUMT_Amphibious"
 ---| "RULEUMT_Hover"
 ---| "RULEUMT_AmphibiousFloating"
----| "RULEUMT_Special"
+---| "RULEUMT_Special" # Identical to "None"?
 
 ---@alias UnitBuildRestriction
 ---| "RULEUBR_None"

@@ -1157,7 +1157,7 @@
 --- Used by some build animations to scale their effects
 ---@field MeshExtentsZ number
 ---@field MinSpeedPercent number
---- method of locomotion
+--- method of locomotion. Defaults to "RULEUMT_None" if MaxSpeed = 0.
 ---@field MotionType UnitMotionType
 --- The occupy rectangles of the unit that will override the footprint. Every 4 numbers in the
 --- array define a occupation rectangle for the override (offsetX, offsetZ, sizeX, sizeZ).
