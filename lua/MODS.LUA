@@ -216,7 +216,8 @@ Merging includes workarounds for the limitations involving arrays and removing f
     - `MergeLabel` merges the blueprint with the weapon blueprint that has the same `label`.
     - When a label is not found, `AddIndex` adds the weapon at the specified index.
         - This is mostly useful for adding a weapon to index 1, which is what controls unit AI.
-    - Neither are necessary, new blueprints are added to the end of the weapon array by default.
+    - Neither fields are necessary, as by default the blueprints in `ModWeapon` are added to
+      the end of the `Weapon` array.
 
 ----------
 Balance changes
