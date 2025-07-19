@@ -40,9 +40,8 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     ---@param transport Unit
     ---@param bone number
     OnAttachedToTransport = function(self, transport, bone)
-        local guards = self:GetGuards()
-        IssueClearCommands(guards)
-        IssueGuard(guards, self.guardDummy)
+        -- Removing the state allows guards to keep assisting the drone
+        self:SetUnitState("Attached", false)
         TConstructionUnit.OnAttachedToTransport(self, transport, bone)
     end,
 
