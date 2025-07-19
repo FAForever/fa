@@ -739,4 +739,9 @@ end
 ---@type fun(self: Unit, type: DamageType)
 Unit.OnExtraDamageDealt = nil
 
+--- Called by the engine when a unit changes motion state,
+--- usually when it attaches/detaches from other entities such as transports.
+---@type fun(self: Unit, new: MotionState, old: MotionState)
+Unit.OnMotionStateChange = nil
+
 return Unit

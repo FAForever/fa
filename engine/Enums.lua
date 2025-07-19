@@ -87,6 +87,12 @@
 ---| "Air"
 ---| "Orbital"
 
+---@alias MotionState
+---| "None"         # Unit is moving normally
+---| "Attached"     # Unit attached to entity (ex: transport, factory)
+---| "Ballistic"    # Unit detached from entity and now falling
+---| "Crashed"      # Unit that was falling crashed to the ground
+
 ---@alias HorizontalMovementState
 ---| 'TopSpeed'
 ---| 'Stopped'
