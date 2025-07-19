@@ -5,7 +5,7 @@ local oldGetGuards = TConstructionUnit.GetGuards
 ---@field Pod string
 ---@field Parent? UEL0301 | UEL0001 # Only these two units set the parent properly
 ---@field guardCache table
----@field guardDummy Unit
+---@field guardDummy Unit # Dummy unit to allow assist orders targeting the drone to persist after the drone docks and undocks
 ---@field rebuildDrone boolean # If true, the parent should rebuild the pod. Caches script bit 1.
 TConstructionPodUnit = ClassUnit(TConstructionUnit) {
     Parent = nil,
