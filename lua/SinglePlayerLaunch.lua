@@ -14,7 +14,12 @@ local function AssignDefaultOptions(defaultOptions, options)
     ---@param option ScenarioOption
     for index, option in options do
         if option.key and option.values and option.default then
-            defaultOptions[option.key] = option.values[option.default].key
+            local value = option.values[option.default]
+            if type(value) == "table" then
+                defaultOptions[option.key] = value.key
+            else
+                defaultOptions[option.key] = value
+            end
         end
     end
 end
