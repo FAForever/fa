@@ -434,5 +434,11 @@ function StartCommandLineSession(mapName, isPerfTest)
             sessionInfo = SetupSkirmishSession(scenario, isPerfTest)
         end
     end
+
+    -- feature: run the skirmish as fast as possible
+    if HasCommandLineArg("/runWithTheWind") then
+        ConExecute("wld_RunWithTheWind 1")
+    end
+
     LaunchSinglePlayerSession(sessionInfo)
 end
