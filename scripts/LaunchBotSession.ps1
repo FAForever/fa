@@ -51,12 +51,12 @@ $args = @(
     # Bot configuration. There should be no spaces.
     # Format: "/gameais", "1:ai_name", "2:ai_name"
 
-    "/gameais", "1:$ai", "2:$ai"
+    "/gameais", "1:$ai", "2:$ai",
 
     # Lobby option configuration. There should be no spaces.
     # Format: "/gameoptions", "option_key:option_value"
 
-    "/gameoptions", "UnitCap:750"
+    "/gameoptions", "UnitCap:750", "GameSpeed:adjustable",
 
     # Game option to run the skirmish as fast as possible. 
     # the `wld_RunWithTheWind` console command in the background.
