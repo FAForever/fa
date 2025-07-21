@@ -1,6 +1,6 @@
-Increase cost of Cybran ACU nano upgrade by 33%
+(#6690) Increase cost of Cybran ACU nano upgrade by 33%
 
-**Cybran ACU**
+**Cybran ACU (URL0001)**
   - Nano regen: 
     - BuildCostEnergy 45000 -> 60000
     - BuildCostMass = 1500 -> 2000
