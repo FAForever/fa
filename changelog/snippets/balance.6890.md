@@ -1,4 +1,4 @@
-(#6690) Increase cost of Cybran ACU nano upgrade by 33%
+(#6890) Increase cost of Cybran ACU nano upgrade by 33%
 
 **Cybran ACU (URL0001)**
   - Nano regen: 
