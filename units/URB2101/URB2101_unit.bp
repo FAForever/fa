@@ -18,6 +18,7 @@ UnitBlueprint{
         "DEFENSE",
         "DIRECTFIRE",
         "DRAGBUILD",
+        "FASTDECAY",
         "OVERLAYDIRECTFIRE",
         "PRODUCTSC1",
         "RECLAIMABLE",

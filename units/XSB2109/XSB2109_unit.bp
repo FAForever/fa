@@ -23,6 +23,7 @@ UnitBlueprint{
         "CQUEMOV",
         "DEFENSE",
         "DRAGBUILD",
+        "FASTDECAY",
         "OVERLAYANTINAVY",
         "OVERLAYSONAR",
         "PRODUCTFA",
