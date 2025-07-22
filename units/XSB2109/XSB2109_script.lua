@@ -10,18 +10,11 @@
 
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SANUallCavitationTorpedo = import("/lua/seraphimweapons.lua").SANUallCavitationTorpedo
-local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
----@class XSB2109 : SStructureUnit, FastDecayComponent
-XSB2109 = ClassUnit(SStructureUnit, FastDecayComponent) {
+---@class XSB2109 : SStructureUnit
+XSB2109 = ClassUnit(SStructureUnit) {
     Weapons = {
         Turret01 = ClassWeapon(SANUallCavitationTorpedo) {},
-    },
-
-    ---@param self XSB2109
-    OnCreate = function(self)
-        SStructureUnit.OnCreate(self)
-        self:StartFastDecayThread()
-    end,
+    },     
 }
 TypeClass = XSB2109

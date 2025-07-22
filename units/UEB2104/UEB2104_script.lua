@@ -7,23 +7,15 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TAALinkedRailgun = import("/lua/terranweapons.lua").TAALinkedRailgun
-local FastDecayComponent = import("/lua/sim/units/components/FastDecayUnitComponent.lua").FastDecayComponent
 
 
----@class UEB2104 : TStructureUnit, FastDecayComponent
-UEB2104 = ClassUnit(TStructureUnit, FastDecayComponent) {
+---@class UEB2104 : TStructureUnit
+UEB2104 = ClassUnit(TStructureUnit) {
     Weapons = {
         AAGun = ClassWeapon(TAALinkedRailgun) {},
     },
-
-    ---@param self UEB2104
-    OnCreate = function(self)
-        TStructureUnit.OnCreate(self)
-        self:StartFastDecayThread()
-    end,
 }
 
 TypeClass = UEB2104
