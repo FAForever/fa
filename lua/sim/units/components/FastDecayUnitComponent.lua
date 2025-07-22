@@ -1,12 +1,15 @@
 local TrashAdd = TrashBag.Add
 
+--- Intellisense helper class
+---@class FastDecayUnit : FastDecayComponent, Unit
+
 --- Provides a method to make units decay quickly when they are at a low completion %.
 --- This prevents unbuilt buildings from blocking pathfinding for a long time.
 --- Used in T1 PD (##B2101), AA (##B2104), and torpedo launchers (##B2109).
----@class FastDecayComponent : Unit
+---@class FastDecayComponent
 FastDecayComponent = ClassSimple {
-    --- Call this at the end of your OnCreate function.
-    ---@param self FastDecayComponent
+    --- Call this at the end of your unit's `OnStartBeingBuilt` function.
+    ---@param self FastDecayUnit
     ---@param decayPerTick? number # HP fraction lost per tick when unit is decaying quickly. Defaults to wall decay rate.
     ---@param completionThreshold? number # Below this fraction completion, units decay quickly. Defaults to 15 buildpower invested.
     StartFastDecayThread = function(self, decayPerTick, completionThreshold)
@@ -15,7 +18,7 @@ FastDecayComponent = ClassSimple {
 
     --- While the unit is at low completion and not actively being built, rapidly reduces its HP. Defaults to wall decay rate.
     --- Starting construction on the unit restores decayed HP. Defaults to 15 buildpower invested.
-    ---@param self FastDecayComponent
+    ---@param self FastDecayUnit
     ---@param decayPerTick? number # HP fraction lost per tick when unit is decaying quickly.
     ---@param completionThreshold? number # Below this fraction completion, units decay quickly.
     FastDecayThread = function(self, decayPerTick, completionThreshold)
