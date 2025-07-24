@@ -1,0 +1,1 @@
+- (#6891) Remove redundant category for t1 Hive.
