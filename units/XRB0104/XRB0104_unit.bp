@@ -22,7 +22,6 @@ UnitBlueprint{
     BuildBotTotal = 1,
     BuildIconSortPriority = 200,
     Categories = {
-        "BUILTBYCOMMANDER",
         "BUILTBYTIER2COMMANDER",
         "BUILTBYTIER2ENGINEER",
         "BUILTBYTIER3COMMANDER",
