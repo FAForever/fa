@@ -1,3 +1,5 @@
+local EntityCategoryContains = EntityCategoryContains
+
 -- This file contains the functions needed to keep track of ACU upgrade queueing
 
 local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
@@ -125,14 +127,13 @@ function ModifyBuildablesForACU(originalBuildables, selection)
             end
         end
 
-        local factionCategory = categories[faction]
         SetIgnoreSelection(true)
-
         UISelectionByCategory("RESEARCH " .. faction, false, false, false, false)
         local hqs = GetSelectedUnits()
         if table.empty(hqs) then
             newBuildableCategories = newBuildableCategories - categories.SUPPORTFACTORY
         else
+            local factionCategory = categories[faction]
             local supportFactories = newBuildableCategories - categories.SUPPORTFACTORY
 
             ---@param hq UserUnit
