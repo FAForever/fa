@@ -133,6 +133,7 @@ function ModifyBuildablesForACU(originalBuildables, selection)
         if table.empty(hqs) then
             newBuildableCategories = newBuildableCategories - categories.SUPPORTFACTORY
         else
+            local categories = categories
             local factionCategory = categories[faction]
             local supportFactories = newBuildableCategories - categories.SUPPORTFACTORY
 
