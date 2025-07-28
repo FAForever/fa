@@ -1,1 +1,1 @@
-- (#6891) Remove redundant category for t1 Hive.
+- (#6891) Remove a redundant category from the unupgraded Cybran T2 Engineering Station (XRB0104).
