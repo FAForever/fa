@@ -4,6 +4,7 @@
 -- Summary  :  UEF Heavy Air Transport Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local WeaponsFile = import("/lua/terranweapons.lua")
@@ -13,6 +14,9 @@ local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
 ---@class XEA0306 : AirTransport
+---@field MyShield TransportShield
+---@field LandingAnimManip moho.AnimationManipulator
+---@field UnfoldAnim moho.AnimationManipulator
 XEA0306 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = { 'FrontRight_Engine_Exhaust', 'FrontLeft_Engine_Exhaust', 'BackRight_Engine_Exhaust',
         'BackLeft_Engine_Exhaust' },
@@ -36,6 +40,7 @@ XEA0306 = ClassUnit(AirTransport) {
 
     EngineRotateBones = { 'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
 
+    ---@param self XEA0306
     OnCreate = function(self)
         AirTransport.OnCreate(self)
 
@@ -44,6 +49,9 @@ XEA0306 = ClassUnit(AirTransport) {
         self.UnfoldAnim:SetRate(0)
     end,
 
+    ---@param self XEA0306
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         AirTransport.OnStopBeingBuilt(self, builder, layer)
         self.EngineManipulators = {}
@@ -68,16 +76,28 @@ XEA0306 = ClassUnit(AirTransport) {
     end,
 
     -- When a unit attaches or detaches, tell the shield about it.
+    ---@param self XEA0306
+    ---@param attachBone Bone
+    ---@param unit Unit
     OnTransportAttach = function(self, attachBone, unit)
         AirTransport.OnTransportAttach(self, attachBone, unit)
         self.MyShield:AddProtectedUnit(unit)
     end,
 
+    ---@param self XEA0306
+    ---@param attachBone Bone
+    ---@param unit Unit
     OnTransportDetach = function(self, attachBone, unit)
         AirTransport.OnTransportDetach(self, attachBone, unit)
         self.MyShield:RemoveProtectedUnit(unit)
     end,
 
+
+    ---@param self XEA0306
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, vector, damageType)
         if damageType == 'Nuke' or damageType == 'Deathnuke' or damageType == 'NukeIgnoreShields' then
             self.MyShield:SetContentsVulnerable(true)
@@ -99,10 +119,13 @@ XEA0306 = ClassUnit(AirTransport) {
     end,
 
     -- Override air destruction effects so we can do something custom here
+    ---@param self XEA0306
+    ---@param scale number
     CreateUnitAirDestructionEffects = function(self, scale)
         self:ForkThread(self.AirDestructionEffectsThread, self)
     end,
 
+    ---@param self XEA0306
     AirDestructionEffectsThread = function(self)
         local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
@@ -112,6 +135,7 @@ XEA0306 = ClassUnit(AirTransport) {
         end
     end,
 
+    ---@param self XEA0306
     GetUnitSizes = function(self)
         local bp = self.Blueprint
         if self:GetFractionComplete() < 1.0 then
