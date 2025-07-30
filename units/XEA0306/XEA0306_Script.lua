@@ -79,7 +79,7 @@ XEA0306 = ClassUnit(AirTransport) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if damageType == 'Nuke' or damageType == 'Deathnuke' then
+        if damageType == 'Nuke' or damageType == 'Deathnuke' or damageType == 'NukeIgnoreShields' then
             self.MyShield:SetContentsVulnerable(true)
         end
 
