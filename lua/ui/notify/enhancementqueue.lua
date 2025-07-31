@@ -156,7 +156,7 @@ function ModifyBuildablesForACU(originalBuildables, selection)
                 end
                 supportFactories = supportFactories + supportCategory
             end
-            newBuildableCategories = supportFactories * supportFactories
+            newBuildableCategories = newBuildableCategories * supportFactories
         end
 
         SelectUnits(selection)
