@@ -148,13 +148,14 @@ function ModifyBuildablesForACU(originalBuildables, selection)
                 end
 
                 if EntityCategoryContains(categories.LAND, hq) then
-                    supportCategory = supportCategory * categories.LAND
-                elseif EntityCategoryContains(categories.AIR, hq) then
-                    supportCategory = supportCategory * categories.AIR
-                elseif EntityCategoryContains(categories.NAVAL, hq) then
-                    supportCategory = supportCategory * categories.NAVAL
+                    supportFactories = supportFactories + supportCategory * categories.LAND
                 end
-                supportFactories = supportFactories + supportCategory
+                if EntityCategoryContains(categories.AIR, hq) then
+                    supportFactories = supportFactories + supportCategory * categories.AIR
+                end
+                if EntityCategoryContains(categories.NAVAL, hq) then
+                    supportFactories = supportFactories + supportCategory * categories.NAVAL
+                end
             end
             newBuildableCategories = newBuildableCategories * supportFactories
         end
