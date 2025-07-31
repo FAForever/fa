@@ -494,6 +494,9 @@ Weapon = ClassWeapon(WeaponMethods, DebugWeaponComponent) {
             MetaImpactRadius = weaponBlueprint.MetaImpactRadius,
             ArtilleryShieldBlocks = weaponBlueprint.ArtilleryShieldBlocks,
         }
+        -- Projectiles use the damage table as a metatable for their `DamageData` table.
+        -- This saves memory by not copying the damage table contents for every projectile.
+        -- See `Projectile.PassMetaDamage`
         damageTable.__index = damageTable
 
         return damageTable
