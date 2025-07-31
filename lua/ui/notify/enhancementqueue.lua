@@ -143,7 +143,7 @@ function ModifyBuildablesForACU(originalBuildables, selection)
 
                 if hashedCategories["TECH3"] then
                     supportCategory = supportCategory * (categories.TECH3 + categories.TECH2)
-                elseif hashedCategories["TECH3"] then
+                elseif hashedCategories["TECH2"] then
                     supportCategory = supportCategory * categories.TECH2
                 end
 
