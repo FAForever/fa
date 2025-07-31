@@ -1,0 +1,1 @@
+- (#6860) Reduce weapon damage table computations when applying buffs by storing constant data.
