@@ -1,5 +1,3 @@
-local EntityCategoryContains = EntityCategoryContains
-
 -- This file contains the functions needed to keep track of ACU upgrade queueing
 
 local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
@@ -139,21 +137,23 @@ function ModifyBuildablesForACU(originalBuildables, selection)
 
             ---@param hq UserUnit
             for _, hq in hqs do
+                local bp = hq:GetBlueprint()
+                local hashedCategories = bp.CategoriesHash
                 local supportCategory = categories.SUPPORTFACTORY * factionCategory
 
-                if EntityCategoryContains(categories.TECH3, hq) then
+                if hashedCategories["TECH3"] then
                     supportCategory = supportCategory * (categories.TECH3 + categories.TECH2)
-                elseif EntityCategoryContains(categories.TECH2, hq) then
+                elseif hashedCategories["TECH3"] then
                     supportCategory = supportCategory * categories.TECH2
                 end
 
-                if EntityCategoryContains(categories.LAND, hq) then
+                if hashedCategories["LAND"] then
                     supportFactories = supportFactories + supportCategory * categories.LAND
                 end
-                if EntityCategoryContains(categories.AIR, hq) then
+                if hashedCategories["AIR"] then
                     supportFactories = supportFactories + supportCategory * categories.AIR
                 end
-                if EntityCategoryContains(categories.NAVAL, hq) then
+                if hashedCategories["NAVAL"] then
                     supportFactories = supportFactories + supportCategory * categories.NAVAL
                 end
             end
