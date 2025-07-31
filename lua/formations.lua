@@ -12,6 +12,13 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
+local LandCategories = import("/lua/shared/formations/categorizeunits.lua").LandCategories
+local NavalCategories = import("/lua/shared/formations/categorizeunits.lua").NavalCategories
+local SubCategories = import("/lua/shared/formations/categorizeunits.lua").SubCategories
+local ShieldCategory = import("/lua/shared/formations/categorizeunits.lua").ShieldCategory
+local NonShieldCategory = import("/lua/shared/formations/categorizeunits.lua").NonShieldCategory
+
+local CategorizeUnits = import("/lua/shared/formations/categorizeunits.lua").CategorizeUnits
 
 SurfaceFormations = {
     'AttackFormation',
@@ -79,56 +86,6 @@ end
 -- ================ LAND DATA ==============
 -- =========================================
 local RemainingCategory = { 'RemainingCategory', }
-
--- === LAND CATEGORIES ===
-local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
-local Sniper = categories.SNIPER * categories.LAND
-local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.SNIPER) * categories.LAND
-local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND
-local Construction = ((categories.COMMAND + categories.CONSTRUCTION + categories.ENGINEER) - (DirectFire + Sniper + Artillery)) * categories.LAND
-local UtilityCat = (((categories.RADAR + categories.COUNTERINTELLIGENCE) - categories.DIRECTFIRE) + categories.SCOUT) * categories.LAND
-local ShieldCat = categories.uel0307 + categories.ual0307 + categories.xsl0307
-
--- === TECH LEVEL LAND CATEGORIES ===
-local LandCategories = {
-    Shields = ShieldCat,
-
-    Bot1 = (DirectFire * categories.TECH1) * categories.BOT - categories.SCOUT,
-    Bot2 = (DirectFire * categories.TECH2) * categories.BOT - categories.SCOUT,
-    Bot3 = (DirectFire * categories.TECH3) * categories.BOT - categories.SCOUT,
-    Bot4 = (DirectFire * categories.EXPERIMENTAL) * categories.BOT - categories.SCOUT,
-
-    Tank1 = (DirectFire * categories.TECH1) - categories.BOT - categories.SCOUT,
-    Tank2 = (DirectFire * categories.TECH2) - categories.BOT - categories.SCOUT,
-    Tank3 = (DirectFire * categories.TECH3) - categories.BOT - categories.SCOUT,
-    Tank4 = (DirectFire * categories.EXPERIMENTAL) - categories.BOT - categories.SCOUT,
-
-    Sniper1 = (Sniper * categories.TECH1) - categories.SCOUT,
-    Sniper2 = (Sniper * categories.TECH2) - categories.SCOUT,
-    Sniper3 = (Sniper * categories.TECH3) - categories.SCOUT,
-    Sniper4 = (Sniper * categories.EXPERIMENTAL) - categories.SCOUT,
-
-    Art1 = Artillery * categories.TECH1,
-    Art2 = Artillery * categories.TECH2,
-    Art3 = Artillery * categories.TECH3,
-    Art4 = Artillery * categories.EXPERIMENTAL,
-
-    AA1 = AntiAir * categories.TECH1,
-    AA2 = AntiAir * categories.TECH2,
-    AA3 = AntiAir * categories.TECH3,
-
-    Com1 = Construction * categories.TECH1,
-    Com2 = Construction * categories.TECH2,
-    Com3 = Construction - (categories.TECH1 + categories.TECH2 + categories.EXPERIMENTAL),
-    Com4 = Construction * categories.EXPERIMENTAL,
-
-    Util1 = (UtilityCat * categories.TECH1) + categories.OPERATION,
-    Util2 = UtilityCat * categories.TECH2,
-    Util3 = UtilityCat * categories.TECH3,
-    Util4 = UtilityCat * categories.EXPERIMENTAL,
-
-    RemainingCategory = categories.LAND - (DirectFire + Sniper + Construction + Artillery + AntiAir + UtilityCat + ShieldCat)
-}
 
 -- === SUB GROUP ORDERING ===
 local Bots = { 'Bot4', 'Bot3', 'Bot2', 'Bot1', }
@@ -330,49 +287,6 @@ local EightRowAttackFormationBlock = {
 -- ================ AIR DATA ===============
 -- =========================================
 
--- === AIR CATEGORIES ===
-local GroundAttackAir = (categories.AIR * categories.GROUNDATTACK) - categories.ANTIAIR
-local TransportationAir = categories.AIR * categories.TRANSPORTATION - categories.GROUNDATTACK
-local BomberAir = categories.AIR * categories.BOMBER
-local AAAir = categories.AIR * categories.ANTIAIR
-local AntiNavyAir = categories.AIR * categories.ANTINAVY
-local IntelAir = categories.AIR * (categories.SCOUT + categories.RADAR)
-local ExperimentalAir = categories.AIR * categories.EXPERIMENTAL
-local EngineerAir = categories.AIR * categories.ENGINEER
-
--- === TECH LEVEL AIR CATEGORIES ===
-local AirCategories = {
-    Ground1 = GroundAttackAir * categories.TECH1,
-    Ground2 = GroundAttackAir * categories.TECH2,
-    Ground3 = GroundAttackAir * categories.TECH3,
-
-    Trans1 = TransportationAir * categories.TECH1,
-    Trans2 = TransportationAir * categories.TECH2,
-    Trans3 = TransportationAir* categories.TECH3,
-
-    Bomb1 = BomberAir * categories.TECH1,
-    Bomb2 = BomberAir * categories.TECH2,
-    Bomb3 = BomberAir * categories.TECH3,
-
-    AA1 = AAAir * categories.TECH1,
-    AA2 = AAAir * categories.TECH2,
-    AA3 = AAAir * categories.TECH3,
-
-    AN1 = AntiNavyAir * categories.TECH1,
-    AN2 = AntiNavyAir * categories.TECH2,
-    AN3 = AntiNavyAir * categories.TECH3,
-
-    AIntel1 = IntelAir * categories.TECH1,
-    AIntel2 = IntelAir * categories.TECH2,
-    AIntel3 = IntelAir * categories.TECH3,
-
-    AExper = ExperimentalAir,
-
-    AEngineer = EngineerAir,
-
-    RemainingCategory = categories.AIR - (GroundAttackAir + TransportationAir + BomberAir + AAAir + AntiNavyAir + IntelAir + ExperimentalAir + EngineerAir)
-}
-
 -- === SUB GROUP ORDERING ===
 local GroundAttack = { 'Ground3', 'Ground2', 'Ground1', }
 local Transports = { 'Trans3', 'Trans2', 'Trans1', }
@@ -446,41 +360,6 @@ local GrowthChevronBlock = {
 -- =========================================
 -- ============== NAVAL DATA ===============
 -- =========================================
-
-local LightAttackNaval = categories.LIGHTBOAT
-local FrigateNaval = categories.FRIGATE
-local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.TECH3 * categories.SUBMERSIBLE * categories.ANTINAVY * categories.NAVAL - categories.NUKE)
-local DestroyerNaval = categories.DESTROYER
-local CruiserNaval = categories.CRUISER
-local BattleshipNaval = categories.BATTLESHIP
-local CarrierNaval = categories.NAVALCARRIER
-local NukeSubNaval = categories.NUKESUB - SubNaval
-local MobileSonar = categories.MOBILESONAR
-local DefensiveBoat = categories.DEFENSIVEBOAT
-local RemainingNaval = categories.NAVAL - (LightAttackNaval + FrigateNaval + SubNaval + DestroyerNaval + CruiserNaval + BattleshipNaval +
-                        CarrierNaval + NukeSubNaval + DefensiveBoat + MobileSonar)
-
-
--- === TECH LEVEL LAND CATEGORIES ===
-local NavalCategories = {
-    LightCount = LightAttackNaval,
-    FrigateCount = FrigateNaval,
-
-    CruiserCount = CruiserNaval,
-    DestroyerCount = DestroyerNaval,
-
-    BattleshipCount = BattleshipNaval,
-    CarrierCount = CarrierNaval,
-
-    NukeSubCount = NukeSubNaval,
-    MobileSonarCount = MobileSonar + DefensiveBoat,
-
-    RemainingCategory = RemainingNaval,
-}
-
-local SubCategories = {
-    SubCount = SubNaval,
-}
 
 -- === SUB GROUP ORDERING ===
 local Frigates = { 'FrigateCount', 'LightCount', }
@@ -851,13 +730,11 @@ function GuardFormation(formationUnits)
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
 
-    local shieldCategory = ShieldCat
-    local nonShieldCategory = categories.ALLUNITS - shieldCategory
     local footprintCounts = {}
     local remainingUnits = table.getn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
-        if EntityCategoryContains(ShieldCat, u) then
+        if EntityCategoryContains(ShieldCategory, u) then
             remainingShields = remainingShields + 1
         end
 
@@ -920,11 +797,11 @@ function GuardFormation(formationUnits)
         offsetX = sizeMult * math.sin(ringPosition)
         offsetY = -sizeMult * math.cos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
+            table.insert(FormationPos, { offsetX, offsetY, ShieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
-            table.insert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
+            table.insert(FormationPos, { offsetX, offsetY, NonShieldCategory, 0, rotate })
         end
         unitCount = unitCount + 1
         remainingUnits = remainingUnits - 1
@@ -1481,188 +1358,4 @@ function GetChevronPosition(chevronPos, currCol, formationLen)
     end
     xPos = xPos + blockOff
     return xPos, yPos
-end
-
--- ========= UNIT SORTING ==========
----@param unitsList table
----@return any
-function CalculateSizes(unitsList)
-    local largestFootprint = 1
-    local smallestFootprints = {}
-
-    local typeGroups = {
-        Land = {
-            GridSizeFraction = 2.75,
-            GridSizeAbsolute = 2,
-            MinSeparationFraction = 2.25,
-            Types = {'Land'}
-        },
-
-        Air = {
-            GridSizeFraction = 1.3,
-            GridSizeAbsolute = 2,
-            MinSeparationFraction = 1,
-            Types = {'Air'}
-        },
-
-        Sea = {
-            GridSizeFraction = 1.75,
-            GridSizeAbsolute = 4,
-            MinSeparationFraction = 1.15,
-            Types = {'Naval', 'Subs'}
-        },
-    }
-
-    for group, data in typeGroups do
-        local groupFootprintCounts = {}
-        local largestForGroup = 1
-        local numSizes = 0
-        local unitTotal = 0
-        for _, type in data.Types do
-            unitTotal = unitTotal + unitsList[type].UnitTotal
-            for fs, count in unitsList[type].FootprintCounts do
-                groupFootprintCounts[fs] = (groupFootprintCounts[fs] or 0) + count
-                largestFootprint = math.max(largestFootprint, fs)
-                largestForGroup = math.max(largestForGroup, fs)
-                numSizes = numSizes + 1
-            end
-        end
-
-        smallestFootprints[group] = largestForGroup
-        if numSizes > 0 then
-            local minCount = unitTotal / 2
-            local smallerUnitCount = 0
-            for fs, count in groupFootprintCounts do
-                smallerUnitCount = smallerUnitCount + count
-                if smallerUnitCount >= minCount then
-                    smallestFootprints[group] = fs -- Base the grid size on the median unit size to avoid a few small units shrinking a formation of large untis
-                    break
-                end
-            end
-        end
-    end
-
-    for group, data in typeGroups do
-        local gridSize = math.max(smallestFootprints[group] * data.GridSizeFraction, smallestFootprints[group] + data.GridSizeAbsolute)
-        for _, type in data.Types do
-            local unitData = unitsList[type]
-
-             -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
-             -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
-             -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
-            unitData.Scale = gridSize / (largestFootprint + 2)
-
-            for fs, count in unitData.FootprintCounts do
-                local size = math.ceil(fs * data.MinSeparationFraction / gridSize)
-                unitData.FootprintSizes[fs] = size
-                unitData.AreaTotal = unitData.AreaTotal + count * size * size
-            end
-        end
-    end
-
-    return unitsList
-end
-
--- reusable table for categorizing units in a formation 
-local UnitsList = {Land = {}, Air = {}, Naval = {}, Subs = {}}
--- map layers to categories
-local CategoryTables = {Land = LandCategories, Air = AirCategories, Naval = NavalCategories, Subs = SubCategories}
--- initialize the layer tables
-for unitType, categoriesForType in CategoryTables do
-    local typeData = UnitsList[unitType]
-    for unitTypeCategory, _ in categoriesForType do
-        typeData[unitTypeCategory] = {}
-    end
-    typeData.FootprintCounts = {}
-    typeData.FootprintSizes = {}
-end
-
--- place units into formation categories, accumulate (unit type) & (unit type footprint counts by size), and map unit type category footprint size categories from blueprint id to global category of blueprint id
----@param formationUnits Unit[]
----@return table
-function CategorizeUnits(formationUnits)
-    local categoryTables = CategoryTables
-
-    -- flush the table
-    for unitType, categoriesForType in categoryTables do
-        local typeData = UnitsList[unitType]
-        for unitTypeCategory, _ in categoriesForType do
-            local typeDataCategory = typeData[unitTypeCategory]
-            for k in pairs(typeDataCategory) do
-                typeDataCategory[k] = nil
-            end
-        end
-
-        local footprintCounts = typeData.FootprintCounts
-        for k in pairs(footprintCounts) do
-            footprintCounts[k] = nil
-        end
-
-        local footprintSizes = typeData.FootprintSizes
-        for k in pairs(footprintSizes) do
-            footprintSizes[k] = nil
-        end
-
-        typeData.UnitTotal = 0
-        typeData.AreaTotal = 0
-        typeData.Scale = nil -- set elsewhere in formations logic
-    end
-
-    -- Loop through each unit to get its category and size
-    for _, u in formationUnits do
-        local identified = false
-        for type, table in categoryTables do
-            for cat, _ in table do
-                if EntityCategoryContains(table[cat], u) then
-                    local bp = u:GetBlueprint()
-                    local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
-                    local id = bp.BlueprintId
-
-                    if not UnitsList[type][cat][fs] then
-                        UnitsList[type][cat][fs] = {Count = 0, Categories = {}}
-                    end
-                    UnitsList[type][cat][fs].Count = UnitsList[type][cat][fs].Count + 1
-                    UnitsList[type][cat][fs].Categories[id] = categories[id]
-                    UnitsList[type].FootprintCounts[fs] = (UnitsList[type].FootprintCounts[fs] or 0) + 1
-
-                    if cat == "RemainingCategory" then
-                        LOG('*FORMATION DEBUG: Unit ' .. tostring(u:GetBlueprint().BlueprintId) .. ' does not match any ' .. type .. ' categories.')
-                    end
-                    UnitsList[type].UnitTotal = UnitsList[type].UnitTotal + 1
-                    identified = true
-                    break
-                end
-            end
-
-            if identified then
-                break
-            end
-        end
-        if not identified then
-            WARN('*FORMATION DEBUG: Unit ' .. u.UnitId .. ' was excluded from the formation because its layer could not be determined.')
-        end
-    end
-
-    -- Loop through each category and combine the types within into a single filter category for each size
-    for type, table in categoryTables do
-        for cat, _ in table do
-            if UnitsList[type][cat] then
-                for fs, data in UnitsList[type][cat] do
-                    local filter = nil
-                    for _, category in data.Categories do
-                        if not filter then
-                            filter = category
-                        else
-                            filter = filter + category
-                        end
-                    end
-                    UnitsList[type][cat][fs] = {Count = data.Count, Filter = filter}
-                end
-            end
-        end
-    end
-
-    CalculateSizes(UnitsList)
-
-    return UnitsList
 end
