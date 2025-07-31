@@ -13,6 +13,20 @@
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
 
+local TableEmpty = table.empty
+local TableGetn = table.getn
+local TableInsert = table.insert
+local TableRemove = table.remove
+local MathAbs = math.abs
+local MathCeil = math.ceil
+local MathCos = math.cos
+local MathFloor = math.floor
+local MathMod = math.mod
+local MathMin = math.min
+local MathMax = math.max
+local MathPi = math.pi
+local MathSin = math.sin
+
 SurfaceFormations = {
     'AttackFormation',
     'GrowthFormation',
@@ -34,14 +48,14 @@ local MaxCacheSize = 30
 
 ---@param formationUnits Unit[]
 ---@param formationType UnitFormations
----@return boolean
+---@return false | table
 function GetCachedResults(formationUnits, formationType)
     local cache = FormationCache[formationType]
     if not cache then
         return false
     end
 
-    local unitCount = table.getn(formationUnits)
+    local unitCount = TableGetn(formationUnits)
     for _, data in cache do
         if data.UnitCount == unitCount then
             local match = true
@@ -69,10 +83,10 @@ function CacheResults(results, formationUnits, formationType)
     end
 
     local cache = FormationCache[formationType]
-    if table.getn(cache) >= MaxCacheSize then
-        table.remove(cache)
+    if TableGetn(cache) >= MaxCacheSize then
+        TableRemove(cache)
     end
-    table.insert(cache, 1, {Results = results, Units = formationUnits, UnitCount = table.getn(formationUnits)})
+    TableInsert(cache, 1, {Results = results, Units = formationUnits, UnitCount = TableGetn(formationUnits)})
 end
 
 -- =========================================
@@ -715,23 +729,24 @@ function AttackFormation(formationUnits)
 
     local unitsList = CategorizeUnits(formationUnits)
     local landUnitsList = unitsList.Land
+    local landArea = landUnitsList.AreaTotal
     local landBlock
-    if landUnitsList.AreaTotal <= 16 then -- 8 wide
+    if landArea <= 16 then -- 8 wide
         landBlock = TwoRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 30 then -- 10 wide
+    elseif landArea <= 30 then -- 10 wide
         landBlock = ThreeRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 48 then -- 12 wide
+    elseif landArea <= 48 then -- 12 wide
         landBlock = FourRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 70 then -- 14 wide
+    elseif landArea <= 70 then -- 14 wide
         landBlock = FiveRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 96 then -- 16 wide
+    elseif landArea <= 96 then -- 16 wide
         landBlock = SixRowAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 126 then -- 18 wide
+    elseif landArea <= 126 then -- 18 wide
         landBlock = SevenRowAttackFormationBlock
     else -- 20 wide
         landBlock = EightRowAttackFormationBlock
     end
-    BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
+    BlockBuilderLand(landUnitsList, landBlock, LandCategories)
 
     local seaUnitsList = unitsList.Naval
     local subUnitsList = unitsList.Subs
@@ -753,8 +768,8 @@ function AttackFormation(formationUnits)
         seaBlock = ElevenWideNavalAttackFormation
         subBlock = TenWideSubAttackFormation
     end
-    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
-    BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
+    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories)
+    BlockBuilderLand(subUnitsList, subBlock, SubCategories)
     BlockBuilderAir(unitsList.Air, AttackChevronBlock, 1)
 
     CacheResults(FormationPos, formationUnits, 'AttackFormation')
@@ -773,21 +788,22 @@ function GrowthFormation(formationUnits)
 
     local unitsList = CategorizeUnits(formationUnits)
     local landUnitsList = unitsList.Land
+    local landArea = landUnitsList.AreaTotal
     local landBlock
-    if landUnitsList.AreaTotal <= 3 then
+    if landArea <= 3 then
         landBlock = ThreeWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 12 then
+    elseif landArea <= 12 then
         landBlock = FourWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 20 then
+    elseif landArea <= 20 then
         landBlock = FiveWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 30 then
+    elseif landArea <= 30 then
         landBlock = SixWideAttackFormationBlock
-    elseif landUnitsList.AreaTotal <= 42 then
+    elseif landArea <= 42 then
         landBlock = SevenWideAttackFormationBlock
     else
         landBlock = EightWideAttackFormationBlock
     end
-    BlockBuilderLand(landUnitsList, landBlock, LandCategories, 1)
+    BlockBuilderLand(landUnitsList, landBlock, LandCategories)
 
     local seaUnitsList = unitsList.Naval
     local subUnitsList = unitsList.Subs
@@ -809,36 +825,36 @@ function GrowthFormation(formationUnits)
         seaBlock = NineNavalGrowthFormation
         subBlock = EightWideSubGrowthFormation
     end
-    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
-    BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
+    BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories)
+    BlockBuilderLand(subUnitsList, subBlock, SubCategories)
 
-    if not table.empty(unitsList.Air.Bomb3) then
-        -- unitsList.Air.Bomb3 contains no more than one table with selected strat bombers in it
+    local airUnitsList = unitsList.Air
+    local stratBombers = airUnitsList.Bomb3
+    if not TableEmpty(stratBombers) then
+        -- stratBombers contains no more than one table with selected strat bombers in it
         -- Cycle puts it at index 1 (as it was in the past) otherwise some code below won't work.
-        for k,v in unitsList.Air.Bomb3 do
-            if k != 1 then 
-                unitsList.Air.Bomb3[1] = unitsList.Air.Bomb3[k]
+        for k in stratBombers do
+            if k != 1 then
+                stratBombers[1] = stratBombers[k]
             end
             break
         end
-        local count = unitsList.Air.Bomb3[1].Count
-        local oldAirArea = unitsList.Air.AreaTotal
-        local oldUnitTotal = unitsList.Air.UnitTotal
+        local count = stratBombers[1].Count
+        local oldAirArea = airUnitsList.AreaTotal
+        local oldUnitTotal = airUnitsList.UnitTotal
 
-        unitsList.Air.AreaTotal = count
-        unitsList.Air.UnitTotal = count
+        airUnitsList.AreaTotal = count
+        airUnitsList.UnitTotal = count
 
-        BlockBuilderAirT3Bombers(unitsList.Air, 1.2) --initial spacing was 1.5 that is a bit too wide
+        BlockBuilderAirT3Bombers(airUnitsList, 1.2) --initial spacing was 1.5 that is a bit too wide
 
         --strats are already in formation so we remove them from table and adjust all parameters.
-        unitsList.Air.Bomb3 = {}
-        unitsList.Air.AreaTotal = oldAirArea - count
-        unitsList.Air.UnitTotal = oldUnitTotal - count
-
-        BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
-    else
-        BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
+        airUnitsList.Bomb3 = {}
+        airUnitsList.AreaTotal = oldAirArea - count
+        airUnitsList.UnitTotal = oldUnitTotal - count
     end
+
+    BlockBuilderAir(airUnitsList, GrowthChevronBlock, 1)
 
 
     CacheResults(FormationPos, formationUnits, 'GrowthFormation')
@@ -854,7 +870,7 @@ function GuardFormation(formationUnits)
     local shieldCategory = ShieldCat
     local nonShieldCategory = categories.ALLUNITS - shieldCategory
     local footprintCounts = {}
-    local remainingUnits = table.getn(formationUnits)
+    local remainingUnits = TableGetn(formationUnits)
     local remainingShields = 0
     for _, u in formationUnits do
         if EntityCategoryContains(ShieldCat, u) then
@@ -874,9 +890,9 @@ function GuardFormation(formationUnits)
     local smallestFootprint = 9999
     local minCount = remainingUnits / numSizes -- This could theoretically divide by 0, but it wouldn't be a problem because the result would never be used.
     for fs, count in footprintCounts do
-        largestFootprint = math.max(largestFootprint, fs)
+        largestFootprint = MathMax(largestFootprint, fs)
         if count >= minCount then
-            smallestFootprint = math.min(smallestFootprint, fs)
+            smallestFootprint = MathMin(smallestFootprint, fs)
         end
     end
 
@@ -903,28 +919,28 @@ function GuardFormation(formationUnits)
             end
 
             if ringCount == 2 or remainingShields >= (remainingUnits + ringChange + 6) * 0.19 then
-                shieldsInRing = math.min(ringChange / 2, remainingShields)
+                shieldsInRing = MathMin(ringChange / 2, remainingShields)
             elseif remainingShields >= (remainingUnits + ringChange + 6) * 0.13 then
-                shieldsInRing = math.min(ringChange / 3, remainingShields)
+                shieldsInRing = MathMin(ringChange / 3, remainingShields)
             else
                 shieldsInRing = 0
             end
-            shieldsInRing = math.max(shieldsInRing, remainingShields - (remainingUnits - ringChange))
+            shieldsInRing = MathMax(shieldsInRing, remainingShields - (remainingUnits - ringChange))
 
             if shieldsInRing > 0 then
                 unitsPerShield = ringChange / shieldsInRing
                 nextShield = unitsPerShield - 0.01 -- Rounding error could result in missing a shield if nextShield is supposed to equal ringChange.
             end
         end
-        local ringPosition = unitCount / ringChange * math.pi * 2.0
-        offsetX = sizeMult * math.sin(ringPosition)
-        offsetY = -sizeMult * math.cos(ringPosition)
+        local ringPosition = unitCount / ringChange * MathPi * 2.0
+        local offsetX = sizeMult * MathSin(ringPosition)
+        local offsetY = -sizeMult * MathCos(ringPosition)
         if shieldsInRing > 0 and unitCount >= nextShield then
-            table.insert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, shieldCategory, 0, rotate })
             remainingShields = remainingShields - 1
             nextShield = nextShield + unitsPerShield
         else
-            table.insert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
+            TableInsert(FormationPos, { offsetX, offsetY, nonShieldCategory, 0, rotate })
         end
         unitCount = unitCount + 1
         remainingUnits = remainingUnits - 1
@@ -937,22 +953,24 @@ end
 ---@param unitsList table
 ---@param formationBlock any
 ---@param categoryTable EntityCategory[]
----@param spacing? number defaults to 1
 ---@return table
-function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
-    spacing = (spacing or 1) * unitsList.Scale
-    local numRows = table.getn(formationBlock)
+function BlockBuilderLand(unitsList, formationBlock, categoryTable)
+    local spacing = unitsList.Scale
+    local numRows = TableGetn(formationBlock)
     local rowNum = 1
     local whichRow = 1
     local whichCol = 1
-    local currRowLen = table.getn(formationBlock[whichRow])
+    local currRowLen = TableGetn(formationBlock[whichRow])
     local rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
     currRowLen = currRowLen - rowModifier
-    local evenRowLen = math.mod(currRowLen, 2) == 0
+    local evenRowLen = MathMod(currRowLen, 2) == 0
     local rowType = false
     local formationLength = 0
     local inserted = false
     local occupiedSpaces = {}
+
+    local homogenousRows = formationBlock.HomogenousRows
+    local lineBreak = formationBlock.LineBreak or 0
 
     while unitsList.UnitTotal > 0 do
         if whichCol > currRowLen then
@@ -962,17 +980,17 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
             else
                 whichRow = whichRow + 1
             end
-            formationLength = formationLength + 1 + (formationBlock.LineBreak or 0)
+            formationLength = formationLength + 1 + lineBreak
             whichCol = 1
             rowType = false
-            currRowLen = table.getn(formationBlock[whichRow])
+            currRowLen = TableGetn(formationBlock[whichRow])
             if occupiedSpaces[rowNum] then
                 rowModifier = 0
             else
                 rowModifier = GetLandRowModifer(unitsList, categoryTable, currRowLen)
             end
             currRowLen = currRowLen - rowModifier
-            evenRowLen = math.mod(currRowLen, 2) == 0
+            evenRowLen = MathMod(currRowLen, 2) == 0
         end
 
         if occupiedSpaces[rowNum] and occupiedSpaces[rowNum][whichCol] then
@@ -987,14 +1005,14 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                 break
             end
             for _, group in type do
-                if not formationBlock.HomogenousRows or (rowType == false or rowType == type) then
+                if not homogenousRows or (rowType == false or rowType == type) then
                     local fs = 0
                     local size = 0
                     local evenSize = true
                     local groupData = nil
                     for k, v in unitsList[group] do
                         size = unitsList.FootprintSizes[k]
-                        evenSize = math.mod(size, 2) == 0
+                        evenSize = MathMod(size, 2) == 0
                         if v.Count > 0 then
                             if size > 1 and IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, unitsList.UnitTotal) then
                                 continue
@@ -1014,33 +1032,33 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             else
                                 offsetX = (size - 1) / 2
                             end
-                            offsetY = (size - 1) / 2 * (1 + (formationBlock.LineBreak or 0))
+                            offsetY = (size - 1) / 2 * (1 + lineBreak)
 
                             OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
                         end
 
                         local xPos
                         if evenRowLen then
-                            xPos = math.ceil(whichCol/2) - .5 + offsetX
-                            if not (math.mod(whichCol, 2) == 0) then
+                            xPos = MathCeil(whichCol/2) - .5 + offsetX
+                            if not (MathMod(whichCol, 2) == 0) then
                                 xPos = xPos * -1
                             end
                         else
                             if whichCol == 1 then
                                 xPos = 0
                             else
-                                xPos = math.ceil(((whichCol-1) /2)) + offsetX
-                                if not (math.mod(whichCol, 2) == 0) then
+                                xPos = MathCeil(((whichCol-1) /2)) + offsetX
+                                if not (MathMod(whichCol, 2) == 0) then
                                     xPos = xPos * -1
                                 end
                             end
                         end
 
-                        if formationBlock.HomogenousRows and not rowType then
+                        if homogenousRows and not rowType then
                             rowType = type
                         end
 
-                        table.insert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, formationLength, true})
+                        TableInsert(FormationPos, {xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, formationLength, true})
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
@@ -1067,14 +1085,16 @@ end
 ---@param currRowLen number
 ---@return number
 function GetLandRowModifer(unitsList, categoryTable, currRowLen)
-    if unitsList.UnitTotal >= currRowLen or math.mod(unitsList.UnitTotal, 2) == math.mod(currRowLen, 2) then
+    local unitTotal = unitsList.UnitTotal
+    if unitTotal >= currRowLen or MathMod(unitTotal, 2) == MathMod(currRowLen, 2) then
         return 0
     end
 
     local sizeTotal = 0
+    local footprintSizes = unitsList.FootprintSizes
     for group, _ in categoryTable do
         for fs, data in unitsList[group] do
-            sizeTotal = sizeTotal + unitsList.FootprintSizes[fs] * data.Count
+            sizeTotal = sizeTotal + footprintSizes[fs] * data.Count
         end
     end
     if sizeTotal < currRowLen then -- This doesn't allow for large units hanging over the sides, but it's too hard to handle that correctly.
@@ -1092,13 +1112,13 @@ end
 ---@param remainingUnits number
 ---@return boolean
 function IsLandSpaceOccupied(occupiedSpaces, size, rowNum, whichCol, currRowLen, remainingUnits)
-    local evenRowLen = math.mod(currRowLen, 2) == 0
-    local evenSize = math.mod(size, 2) == 0
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
 
     if whichCol == 1 and (not evenRowLen) and evenSize and remainingUnits > 1 then -- Don't put an even-sized unit in the middle of an odd-length row unless it's the last unit
         return true
     end
-    if whichCol > currRowLen - math.floor(size / 2) * 2 and size <= math.floor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
+    if whichCol > currRowLen - MathFloor(size / 2) * 2 and size <= MathFloor(currRowLen / 2) then -- Don't put a large unit at the end of a row unless the row is too narrow
         return true
     end
     for y = 0, size - 1, 1 do
@@ -1129,21 +1149,22 @@ end
 ---@param whichCol number
 ---@param currRowLen number
 function OccupyLandSpace(occupiedSpaces, size, rowNum, whichCol, currRowLen)
-    local evenRowLen = math.mod(currRowLen, 2) == 0
-    local evenSize = math.mod(size, 2) == 0
+    local evenRowLen = MathMod(currRowLen, 2) == 0
+    local evenSize = MathMod(size, 2) == 0
 
     for y = 0, size - 1, 1 do
         local yPos = rowNum + y
         if not occupiedSpaces[yPos] then
             occupiedSpaces[yPos] = {}
         end
+        local occupiedYPos = occupiedSpaces[yPos]
         if whichCol == 1 and evenRowLen == evenSize then
             for x = 0, size - 1, 1 do
-                occupiedSpaces[yPos][whichCol + x] = true
+                occupiedYPos[whichCol + x] = true
             end
         else
             for x = 0, (size - 1) * 2, 2 do
-                occupiedSpaces[yPos][whichCol + x] = true
+                occupiedYPos[whichCol + x] = true
             end
         end
     end
@@ -1154,14 +1175,14 @@ end
 ---@return number
 function GetColSpot(rowLen, col)
     local len = rowLen
-    if math.mod(rowLen, 2) == 1 then
+    if MathMod(rowLen, 2) == 1 then
         len = rowLen + 1
     end
     local colType = 'left'
-    if math.mod(col, 2) == 0 then
+    if MathMod(col, 2) == 0 then
         colType = 'right'
     end
-    local colSpot = math.floor(col / 2)
+    local colSpot = MathFloor(col / 2)
     local halfSpot = len/2
     if colType == 'left' then
         return halfSpot - colSpot
@@ -1177,11 +1198,11 @@ end
 ---@return table
 function BlockBuilderAir(unitsList, airBlock, spacing)
     spacing = (spacing or 1) * unitsList.Scale
-    local numRows = table.getn(airBlock)
+    local numRows = TableGetn(airBlock)
     local whichRow = 1
     local whichCol = 1
     local chevronPos = 1
-    local currRowLen = table.getn(airBlock[whichRow])
+    local currRowLen = TableGetn(airBlock[whichRow])
     local chevronSize = airBlock.ChevronSize or 5
     local chevronType = false
     local formationLength = 0
@@ -1193,9 +1214,9 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
             for _, type in currSlot do
                 for _, group in type do
                     for fs, groupData in unitsList[group] do
-                        size = unitsList.FootprintSizes[fs]
+                        local size = unitsList.FootprintSizes[fs]
                         if groupData.Count > 0 and size == data.size then
-                            table.insert(FormationPos, {data.xPos * spacing, data.yPos * spacing, groupData.Filter, 0, true})
+                            TableInsert(FormationPos, {data.xPos * spacing, data.yPos * spacing, groupData.Filter, 0, true})
                             groupData.Count = groupData.Count - 1
                             if groupData.Count <= 0 then
                                 unitsList[group][fs] = nil
@@ -1209,27 +1230,27 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
         end
     end
 
-    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+    if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
         chevronPos = 2
     end
 
     while unitsList.UnitTotal > 0 do
         if chevronPos > chevronSize then
-            if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+            if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
                 chevronPos = 2
             else
                 chevronPos = 1
             end
             chevronType = false
-            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and math.mod(whichCol, 2) == 1 then
+            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and MathMod(whichCol, 2) == 1 then
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
-                        currRowLen = table.getn(airBlock[whichRow])
+                        currRowLen = TableGetn(airBlock[whichRow])
                     end
                 else
                     whichRow = whichRow + 1
-                    currRowLen = table.getn(airBlock[whichRow])
+                    currRowLen = TableGetn(airBlock[whichRow])
                 end
                 formationLength = formationLength + 1
                 whichCol = 1
@@ -1260,7 +1281,7 @@ function BlockBuilderAir(unitsList, airBlock, spacing)
                         if airBlock.HomogenousBlocks and not chevronType then
                             chevronType = type
                         end
-                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
+                        TableInsert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
@@ -1306,37 +1327,37 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
         }
     end
 
-    local numRows = table.getn(airBlock)
+    local numRows = TableGetn(airBlock)
     local whichRow = 1
     local whichCol = 1
     local chevronPos = 1
-    local currRowLen = table.getn(airBlock[whichRow])
+    local currRowLen = TableGetn(airBlock[whichRow])
     local chevronSize = 1
     local chevronType = false
     local formationLength = 0
 
 
-    if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+    if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
         chevronPos = 2
     end
 
     while unitsList.UnitTotal > 0 do
         if chevronPos > chevronSize then
-            if unitsList.UnitTotal < chevronSize and math.mod(unitsList.UnitTotal, 2) == 0 then
+            if unitsList.UnitTotal < chevronSize and MathMod(unitsList.UnitTotal, 2) == 0 then
                 chevronPos = 2
             else
                 chevronPos = 1
             end
             chevronType = false
-            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and math.mod(whichCol, 2) == 1 then
+            if whichCol >= currRowLen or unitsList.UnitTotal < chevronSize or unitsList.UnitTotal < chevronSize * 2 and MathMod(whichCol, 2) == 1 then
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
-                        currRowLen = table.getn(airBlock[whichRow])
+                        currRowLen = TableGetn(airBlock[whichRow])
                     end
                 else
                     whichRow = whichRow + 1
-                    currRowLen = table.getn(airBlock[whichRow])
+                    currRowLen = TableGetn(airBlock[whichRow])
                 end
                 formationLength = formationLength + 1
                 whichCol = 1
@@ -1367,7 +1388,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
                         if airBlock.HomogenousBlocks and not chevronType then
                             chevronType = type
                         end
-                        table.insert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
+                        TableInsert(FormationPos, {xPos * spacing, yPos * spacing, groupData.Filter, 0, true})
                         inserted = true
 
                         groupData.Count = groupData.Count - 1
@@ -1392,14 +1413,15 @@ end
 ---@return table
 function GetLargeAirPositions(unitsList, airBlock)
     local sizeCounts = {}
-    for fs, count in unitsList.FootprintCounts do
-        local size = unitsList.FootprintSizes[fs]
+    local footprintCounts = unitsList.FootprintCounts
+    for fs, count in footprintCounts do
+        local size = footprintCounts[fs]
         if size > 1 then
             sizeCounts[size] = (sizeCounts[size] or 0) + count
         end
     end
 
-    local numRows = table.getn(airBlock)
+    local numRows = TableGetn(airBlock)
     local whichRow = 0
     local whichCol = 0
     local currRowLen = 0
@@ -1414,16 +1436,16 @@ function GetLargeAirPositions(unitsList, airBlock)
                 if whichRow >= numRows then
                     if airBlock.RepeatAllRows then
                         whichRow = 1
-                        currRowLen = table.getn(airBlock[whichRow])
+                        currRowLen = TableGetn(airBlock[whichRow])
                     end
                 else
                     whichRow = whichRow + 1
-                    currRowLen = table.getn(airBlock[whichRow])
+                    currRowLen = TableGetn(airBlock[whichRow])
                 end
                 formationLength = formationLength + 1
                 whichCol = 1
                 local x, y = GetChevronPosition(1, currRowLen, formationLength)
-                wideRow = math.abs(x) >= radius
+                wideRow = MathAbs(x) >= radius
             else
                 whichCol = whichCol + 2
             end
@@ -1433,7 +1455,7 @@ function GetLargeAirPositions(unitsList, airBlock)
             end
 
             local xPos, yPos = GetChevronPosition(1, whichCol, formationLength)
-            if whichCol ~= 1 and math.abs(xPos) < radius then
+            if whichCol ~= 1 and MathAbs(xPos) < radius then
                 continue
             end
 
@@ -1447,11 +1469,11 @@ function GetLargeAirPositions(unitsList, airBlock)
                 end
             end
             if not blocked then
-                table.insert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
+                TableInsert(results, {row = whichRow, col = whichCol, xPos = xPos, yPos = yPos, size = size})
                 count = count - 1
                 numResults = numResults + 1
                 if whichCol ~= 1 then
-                    table.insert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
+                    TableInsert(results, {row = whichRow, col = whichCol - 1, xPos = -xPos, yPos = yPos, size = size})
                     count = count - 1
                     numResults = numResults + 1
                 end
@@ -1467,16 +1489,16 @@ end
 ---@return number xPos
 ---@return number yPos
 function GetChevronPosition(chevronPos, currCol, formationLen)
-    local offset = math.floor(chevronPos / 2)
+    local offset = MathFloor(chevronPos / 2)
     local xPos = offset * 0.5
-    if math.mod(chevronPos, 2) == 0 then
+    if MathMod(chevronPos, 2) == 0 then
         xPos = -xPos
     end
-    local column = math.floor(currCol / 2)
+    local column = MathFloor(currCol / 2)
     local yPos = (-offset + column * column) * 0.86603
     yPos = yPos - formationLen * 1.73205
-    local blockOff = math.floor(currCol / 2) * 2.5
-    if math.mod(currCol, 2) == 1 then
+    local blockOff = MathFloor(currCol / 2) * 2.5
+    if MathMod(currCol, 2) == 1 then
         blockOff = -blockOff
     end
     xPos = xPos + blockOff
