@@ -66,7 +66,7 @@ At this point you need to wait until the `changelog branch` is merged.
 
 ### Deployment - final steps
 
-- (1) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [staging/faf](https://github.com/FAForever/fa/tree/staging/faf) branch.
+- (1) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [develop(https://github.com/FAForever/fa/tree/develop) branch.
 - - (1.1) Set the tag with the game version.
 - - (1.2) Match the format of the title with that of previous releases.
 - - (1.3) Copy and paste the changelog into the description. Make sure to remove the title as a release has its own title.
