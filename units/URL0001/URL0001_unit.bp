@@ -317,9 +317,9 @@ UnitBlueprint{
             Slot = "LCH",
         },
         FAF_SelfRepairSystem = {
-            BuildCostEnergy = 45000,
-            BuildCostMass = 1500,
-            BuildTime = 1500,
+            BuildCostEnergy = 60000,
+            BuildCostMass = 2000,
+            BuildTime = 2000,
             Icon = "srs",
             Name = "<LOC enhancements_0150_faf>Nano-Repair System",
             NewHealth = 1500,
