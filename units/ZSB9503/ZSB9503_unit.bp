@@ -108,6 +108,9 @@ UnitBlueprint{
             "BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE NAVAL",
             "BUILTBYTIER2FACTORY SERAPHIM MOBILE NAVAL",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE NAVAL",
+        },
         DifferentialUpgradeCostCalculation = true,
         InitialRallyX = 0,
         InitialRallyZ = 10,

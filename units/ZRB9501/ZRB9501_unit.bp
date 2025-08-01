@@ -98,6 +98,9 @@ UnitBlueprint{
             "BUILTBYTIER2SUPPORTFACTORY CYBRAN STRUCTURE LAND",
             "BUILTBYTIER2FACTORY CYBRAN MOBILE LAND",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2SUPPORTFACTORY CYBRAN STRUCTURE LAND",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "zrb9501" },
         StorageEnergy = 0,
