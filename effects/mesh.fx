@@ -4774,7 +4774,7 @@ technique VertexNormal_MedFidelity
 #endif
 
         VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_a VertexNormalPS_HighFidelity(false, true, d3d_Greater, 0x23 );
+        PixelShader = compile ps_2_0 VertexNormalPS_HighFidelity(false, true, d3d_Greater, 0x23 );
     }
 }
 
@@ -6996,7 +6996,7 @@ technique Wreckage_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_2_0 WreckageVS_HighFidelity();
-        PixelShader = compile ps_2_a WreckagePS();
+        PixelShader = compile ps_2_0 WreckagePS();
     }
 };
 
