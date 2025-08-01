@@ -114,6 +114,7 @@ UnitBlueprint{
         SelectionPriority = 5,
         ToggleCaps = { RULEUTC_ShieldToggle = true },
         UnitName = "<LOC uab4301_name>Radiance",
+        UpgradesFrom = "uab4202",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
