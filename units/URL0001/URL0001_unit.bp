@@ -323,7 +323,7 @@ UnitBlueprint{
             Icon = "srs",
             Name = "<LOC enhancements_0150_faf>Nano-Repair System",
             NewHealth = 1500,
-            NewRegenRate = 60,
+            NewRegenRate = 50,
             Prerequisite = "StealthGenerator",
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
@@ -469,7 +469,7 @@ UnitBlueprint{
             Icon = "psg",
             MaintenanceConsumptionPerSecondEnergy = 50,
             Name = "<LOC enhancements_0101>Personal Stealth Generator",
-            NewHealth = 2000,
+            NewHealth = 1500,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = {
