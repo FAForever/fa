@@ -51,7 +51,7 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     -- reduce due to distance
     LaunchTicks = 6,
-    HeightDistanceFactor = 7,
+    HeightDistanceFactor = 8,
     FinalBoostAngle = 30,
 
     ---@param self TIFMissileCruiseCDR

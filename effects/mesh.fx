@@ -4085,6 +4085,8 @@ float4 CybranShieldImpactPS( SHIELDIMPACT_VERTEX vertex, uniform float fadeTime,
 
 float4 PhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
+    if (1 == mirrored) clip(vertex.depth.x);
+
     float2 tc1 = vertex.texcoord0.xy * 0.5;
     tc1.x += 0.005 * vertex.material.x;
     tc1.y += 0.02 * vertex.material.x;
@@ -4108,6 +4110,8 @@ float4 PhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 float4 AeonPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
+    if (1 == mirrored) clip(vertex.depth.x);
+
     float2 tc1 = vertex.texcoord0.xy * 2;
     tc1.x += 0.005 * vertex.material.x;
     tc1.y += 0.02 * vertex.material.x;
@@ -4131,6 +4135,8 @@ float4 AeonPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
+    if (1 == mirrored) clip(vertex.depth.x);
+
     float2 tc1 = vertex.texcoord0.xy * 2;
     tc1.x += 0.1 * vertex.material.x;
     tc1.y += 0.5 * vertex.material.x;
@@ -4156,6 +4162,8 @@ float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 float4 SeraphimPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
+    if (1 == mirrored) clip(vertex.depth.x);
+
     float2 tc1 = vertex.texcoord0.xy * 0.5;
     tc1.x += 0.005 * vertex.material.x;
     tc1.y += 0.02 * vertex.material.x;

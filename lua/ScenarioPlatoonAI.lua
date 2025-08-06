@@ -27,7 +27,7 @@ end
 
 ---@param platoon Platoon
 function BuildOnce(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon:GetBrain()--[[@as CampaignAIBrain]]
     if aiBrain.HasPlatoonList then
         aiBrain:PBMSetPriority(platoon, 0)
     else
@@ -39,7 +39,7 @@ end
 function DefaultOSBasePatrol(platoon)
     local aiBrain = platoon:GetBrain()
     local master = string.sub(platoon.PlatoonData.BuilderName, 11)
-    local chain = false
+    local chain
     if platoon.PlatoonData.LocationType and Scenario.Chains[aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'] then
         chain = aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'
     elseif Scenario.Chains[master .. '_BasePatrolChain'] then
@@ -56,7 +56,6 @@ end
 
 --- Uses OrderName - Name of the Order from the editor & Target - Handle to Unit used in orders that require a target (OPTIONAL)
 ---@param platoon Platoon
----@return boolean
 function PlatoonAssignOrders(platoon)
     platoon:Stop()
     local data = platoon.PlatoonData
@@ -695,11 +694,11 @@ function CategoryHunterPlatoonAI(platoon)
     local aiBrain = platoon:GetBrain()
     local platoonUnits = platoon:GetPlatoonUnits()
     local data = platoon.PlatoonData
-    local target = false
+    local target
     while aiBrain:PlatoonExists(platoon) do
         -- Find nearest enemy category to this platoon
         -- Cheat to find the focus army's units
-        local newTarget = false
+        local newTarget
         local platPos = platoon:GetPlatoonPosition()
         local enemies = table.shuffle(GetHumanEnemies(aiBrain:GetArmyIndex()))
         for i, enemy in enemies do
@@ -1098,7 +1097,7 @@ end
 
 --- Utility Function
 --- Uses GroupBuildOnce and builds each thing in said group once and only once
----@param eng EngineerManager
+---@param eng ConstructionUnit
 ---@param engTable table
 ---@param data table
 ---@param aiBrain AIBrain
@@ -1137,10 +1136,10 @@ end
 
 --- Utility Function
 --- Uses Construction blocks in engineers using StartBaseEngineer
----@param eng EngineerManager
+---@param eng ConstructionUnit
 ---@param engTable table
 ---@param data table
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@return boolean
 function StartBaseConstruction(eng, engTable, data, aiBrain)
     local cons = data.Construction
@@ -1184,7 +1183,7 @@ end
 
 --- Utility Function
 --- Builds a base using BuildBaseTemplate for engineers using StartBaseEngineer
----@param eng EngineerManager
+---@param eng ConstructionUnit
 ---@param engTable table
 ---@param data table
 ---@param aiBrain AIBrain
@@ -1233,7 +1232,7 @@ end
 --- Utility Function
 --- Maintains a base for engs using StartBaseEngineer
 ---@param platoon Platoon
----@param eng EngineerManager
+---@param eng ConstructionUnit
 ---@param engTable table
 ---@param data table
 ---@param aiBrain AIBrain
@@ -1316,7 +1315,7 @@ end
 
 --- Utility Function
 --- Sends engineers on patrol for StartBaseEngineer
----@param eng EngineerManager
+---@param eng ConstructionUnit
 ---@param engTable table
 ---@param data table
 ---@return boolean
@@ -1351,10 +1350,10 @@ end
 
 --- Utility Function
 --- Resets main engineer and engTablef or StartBaseEngineer
----@param eng EngineerManager
+---@param eng ConstructionUnit
 ---@param engTable table
 ---@param unitBeingBuilt Unit
----@return EngineerManager|false
+---@return ConstructionUnit|false
 ---@return table
 function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
     if engTable and not table.empty(engTable) then
@@ -1454,7 +1453,7 @@ end
 ---@param locationType string
 function EngineersAssistFactories(platoon, locationType)
     locationType = locationType or platoon.PlatoonData.LocationType
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon:GetBrain()--[[@as CampaignAIBrain]]
     local location, radius
     local needReorganize = true
     local reassignEngs = false
@@ -1611,7 +1610,7 @@ end
 ---@param engTable table
 function ReorganizeEngineers(platoon, engTable)
     local unbalanced = true
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon:GetBrain()--[[@as CampaignAIBrain]]
     local loopCounter = 0
     while unbalanced and loopCounter < 20 do
         loopCounter = loopCounter + 1
@@ -1668,7 +1667,7 @@ end
 ---@param platoon Platoon
 ---@param engTable table
 function EngAssist(platoon, engTable)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon:GetBrain()--[[@as CampaignAIBrain]]
     -- Have engineers assist the factories
     local engNum = 1
     while engNum <= table.getn(engTable) do
@@ -2423,10 +2422,10 @@ end
 --- Utility Function
 --- Moves a platoon along a route holding up the thread until finished
 ---@param platoon Platoon
----@param route any
+---@param route Vector[]
 ---@return boolean
 function MoveAlongRoute(platoon, route)
-    local cmd = false
+    local cmd
     local aiBrain = platoon:GetBrain()
 
     -- Move platoon along route

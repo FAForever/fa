@@ -146,7 +146,7 @@ Tooltips = {
     },
     dock = {
         title = "<LOC tooltipui0425>Dock",
-        description = "<LOC tooltipui0477>Recall aircraft to nearest air staging facility for refueling and repairs",
+        description = "<LOC tooltipui0477>Recall aircraft to nearest air staging facility for refueling and repairs. Right-click to only recall aircraft below 90% health.",
         keyID = "dock",
     },
     deploy = {
@@ -375,7 +375,7 @@ Tooltips = {
     },
     chat_filter = {
         title = "<LOC tooltipui0401>Chat Filters",
-        description = "<LOC tooltipui0402>Show or hide messages from players",
+        description = "<LOC tooltipui0402>Show or hide messages and paintings from players",
     },
     chat_color = {
         title = "<LOC tooltipui0403>Chat Color",
@@ -606,6 +606,16 @@ Tooltips = {
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
+    options_painting = {
+        title = "<LOC options_painting_title>Painting",
+        description = "<LOC options_painting_description>When enabled, you can send and receive brush strokes to or from other players.\r\nYou can create a brush stroke using the right mouse button. Painting is disabled when you have a unit selection or when you hold shift. You can delete a brush stroke by holding ALT while drawing. You can mute a player by holding CTRL and ALT while drawing.",
+    },
+
+    options_painting_duration = {
+        title = "<LOC options_painting_duration_title>Duration of paintings",
+        description = "<LOC options_painting_duration_description>The higher the value, the longer it takes for a painting to decay and be removed.",
+    },
+
     options_wheel_sensitivity = {
         title = "<LOC OPTIONS_0001>Zoom Wheel Sensitivity",
         description = "<LOC OPTIONS_0035>Sets the Zoom Speed when using the Mouse Wheel",
@@ -726,6 +736,14 @@ Tooltips = {
     options_shadow_quality = {
         title = "<LOC OPTIONS_0024>Shadow Fidelity",
         description = "<LOC OPTIONS_0056>Sets Rendering Fidelity for Shadows (off = fastest)",
+    },
+    options_shadow_resolution = {
+        title = "<LOC OPTIONS_SHADOW_RESOLUTION_TITLE>Shadow Resolution",
+        description = "<LOC OPTIONS_SHADOW_RESOLUTION_DESCRIPTION>Sets resolution of shadows (lower = faster). High values require more VRAM.",
+    },
+    options_shadow_render_distance = {
+        title = "<LOC OPTIONS_SHADOW_RENDER_DISTANCE_TITLE>Shadow Resolution",
+        description = "<LOC OPTIONS_SHADOW_RENDER_DISTANCE_DESCRIPTION>Sets the rendering distance (level of detail) of shadows (lower = faster). High values can have a significant impact on your framerate.",
     },
     options_antialiasing = {
         title = "<LOC OPTIONS_0015>Anti-Aliasing",
@@ -1073,10 +1091,6 @@ Tooltips = {
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
         description = '<LOC OPTIONS_0306>Shows the cursor locations of alive players and other observers as you observe a game.\r\nDoes not apply for replays, including live ones.',
-    },
-    options_casting_painting = {
-        title = '<LOC OPTIONS_0307>Painting for Observers',
-        description = '<LOC OPTIONS_0308>Allows you to paint directly on the map using the assigned hotkey. \r\nDoes not apply for defeated players.',
     },
     -- **********************
     -- ** Lobby Strings
@@ -2259,5 +2273,26 @@ Tooltips = {
     },
     minimap_mesh = {
         description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
+    },
+
+    profiler_print_to_log = {
+        title = "<LOC profiler_0013>Print to log",
+        description = "<LOC profiler_0014>Print function bytecode to log",
+    },
+    profiler_benchmark_baseline_mode_none = {
+        title = "<LOC profiler_0031>No baseline data",
+        description = "<LOC profiler_0032>Ignore each samples' baseline",
+    },
+    profiler_benchmark_baseline_mode_paired = {
+        title = "<LOC profiler_0033>Paired baseline data",
+        description = "<LOC profiler_0034>Divide each samples' baseline into itself",
+    },
+    profiler_benchmark_baseline_mode_ratio = {
+        title = "<LOC profiler_0035>Baseline data ratio",
+        description = "<LOC profiler_0036>Treat the data and its baselines independently and perform a ratio test",
+    },
+    profiler_benchmark_clear_stats = {
+        title = "<LOC profiler_0041>Clear stats",
+        description = "<LOC profiler_0042>Clear all samples for this benchmark",
     },
 }

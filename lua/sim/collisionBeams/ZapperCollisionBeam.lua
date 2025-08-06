@@ -1,6 +1,6 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionbeams/sccollisionbeam.lua").SCCollisionBeam
 
 -- Used by Cybran Tactical Missile Defense URB4201's CAMZapperWeapon
 ---@class ZapperCollisionBeam : SCCollisionBeam

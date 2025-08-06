@@ -380,9 +380,9 @@ function CreateTemplateFactory()
 end
 
 --- Creates a sim callback to set the priorities of the selected units
----@param prioritiesString string A string of categories
----@param name string Name of the priority set, used when printing on screen
----@param exclusive boolean ??
+---@param prioritiesString string | any unparsed category expressions split by commas in order of decreasing priority. Non-string values reset priorities to bluperint spec.
+---@param name string Name of the priority set, used when printing on screen, and synced in unit data `WepPriority` field
+---@param exclusive? boolean If exclusively the given priorities are used, or the default priorities are added underneath
 function SetWeaponPriorities(prioritiesString, name, exclusive)
     local priotable
     if type(prioritiesString) == 'string' then
@@ -395,8 +395,11 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
         table.insert(unitIds, unit:GetEntityId())
     end
 
-    SimCallback({ Func = 'WeaponPriorities',
-        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false } })
+    SimCallback({
+        Func = 'WeaponPriorities',
+        ---@type UIWeaponPriorityData
+        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }
+    })
 end
 
 --- Sets selected units to target the unit (and similar units) that is hovered over

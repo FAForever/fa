@@ -11,6 +11,7 @@ PreviousSync = {}
 
 -- Unit specific data that's been sync'd. Data changes are accumulated by merging
 -- the Sync.UnitData table into this table each sync (if there's new data)
+---@type table<EntityId, UnitSyncData>
 UnitData = {}
 
 local UIUtil = import("/lua/ui/uiutil.lua")
@@ -48,6 +49,21 @@ function RemoveOnSyncHashedCallback(cat, id)
         HashedSyncCallbacks[cat][id] = nil
     end
 end
+
+local transferReasonToAnnouncementTitle = {
+    ["FullShare"] = "<LOC lobui_0742>Full Share",
+    ["PartialShare"] = "<LOC lobui_0796>Partial Share",
+    ["TransferToKiller"] = "<LOC lobui_0762>Traitors",
+    ["Defectors"] = "<LOC lobui_0766>Defectors",
+    ["CivilianDeserter"] = "<LOC lobui_0764>Civilian Desertion",
+    ["DisconnectShareTemporary"] = "<LOC usersync_0005>Disconnect Temporary Share",
+    ["DisconnectSharePermanent"] = "<LOC usersync_0006>Disconnect Share",
+}
+
+local transferReasonToAnnouncementText = {
+    ["DisconnectShareTemporary"] = "<LOC usersync_0007>%s\'s units and ACU transferred to you until ACU dies/recalls",
+    ["DisconnectSharePermanent"] = "<LOC usersync_0008>%s\'s units and ACU transferred to you until ACU dies",
+}
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
@@ -154,28 +170,39 @@ function OnSync()
         end
     end
 
-    if Sync.ArmyTransfer then 
+    if Sync.ArmyTransfer --[[@as { [1]: { from: number, to: number, reason: string } }]] then 
         local army = GetFocusArmy()
         for k, transfer in Sync.ArmyTransfer do 
             local other = GetArmiesTable().armiesTable[transfer.from].nickname 
             if transfer.to == army then 
-                local primary = "Fullshare"
-                local secondary = LOCF('<LOC fullshare_announcement>%s\'s units have been transferred to you', other)
-                local control = nil
-                UIUtil.CreateAnnouncementStd(primary, secondary, control)
+                local reason = transfer.reason
+
+                local primary = LOC(transferReasonToAnnouncementTitle[reason] or "<LOC lobui_0742>Full Share")
+                local secondary = LOCF(transferReasonToAnnouncementText[reason] or "<LOC fullshare_announcement>%s\'s units have been transferred to you", other)
+
+                if reason == "DisconnectShareTemporary" or reason == "DisconnectSharePermanent" then
+                    local shareOption = SessionGetScenarioInfo().Options.DisconnectShare
+                    secondary = secondary .. LOCF("<LOC usersync_0009>\nShare Condition after: %s", LOC(transferReasonToAnnouncementTitle[shareOption] or "<LOC lobui_0744>Share Until Death"))
+                end
+                
+                UIUtil.CreateAnnouncementStd(primary, secondary, nil)
             end
         end
     end
 
-    if Sync.ProfilerData then 
+    if Sync.ProfilerData then
         import("/lua/ui/game/profiler.lua").ReceiveData(Sync.ProfilerData)
     end
 
-    if Sync.Benchmarks then 
-        import("/lua/ui/game/profiler.lua").ReceiveBenchmarks(Sync.Benchmarks)
+    if Sync.BenchmarkModules then
+        import("/lua/ui/game/profiler.lua").ReceiveBenchmarkModules(Sync.BenchmarkModules)
     end
 
-    if Sync.BenchmarkOutput then 
+    if Sync.BenchmarkInfo then
+        import("/lua/ui/game/profiler.lua").ReceiveBenchmarkInfo(Sync.BenchmarkInfo)
+    end
+
+    if Sync.BenchmarkOutput then
         import("/lua/ui/game/profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
     end
 

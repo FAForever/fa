@@ -182,11 +182,17 @@ Tips
 
 Helpful hotkeys and resource you can use in game
 
-* <kbd>Alt</kbd> + <kbd>F2</kbd> to invoke the unit spawning page, great for making units for free or taking control of an AI.
-* <kbd>F9</kbd> to open the log window if you close it or it's not open for whatever reason.
-* <kbd>~</kbd> to Open the Console
-* In the Console run `ren_ShowNetworkStats` for the sim rate / package drops, on the top right
-* In the Console run `ShowStats` for engine stats, on the left
+- <kbd>Alt</kbd> + <kbd>F2</kbd> to show the unit creation dialog, great for cheating in units or taking control of an AI.
+- <kbd>F9</kbd> to open the log window if you close it or it's not open for whatever reason.
+- <kbd>~</kbd> to Open the Console.
+- In the Console run `ren_ShowNetworkStats` for the sim rate / package drops, on the top right.
+- In the Console run `ShowStats` for engine stats, on the left.
+- Use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> to copy selected units to the clipboard, so that you can spawn them again ("paste" them) with <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd>.
+  - In general, <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd> runs Lua UI code from your clipboard.
+- In the Console run `SimLua` with Lua code to test Sim code, and `UI_Lua` to test UI code.
+- The Sim-side global function `SelectUnit()` gives the sim-side of the currently selected unit; useful for testing scripts or logging information.
+- In the Console run `ui_SelectAnything` to be able to select enemy units; useful for copying test scenarios or debugging selected units.
+- In the Console run `ui_DebugAltClick` to be able to quickly switch armies by <kbd>Alt</kbd> + left-clicking a unit in the army you want to switch to.
 
 Frequently asked Questions (FAQ)
 --------------------------------

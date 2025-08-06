@@ -1,8 +1,8 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
+local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local NavUtils = import('/lua/sim/NavUtils.lua')
+local NavUtils = import('/lua/sim/navutils.lua')
 
 local TableInsert = table.insert
 local TableGetn = table.getn
@@ -156,7 +156,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     if not unit.CaptureDoneCallbackSet then
                         self:LogDebug(string.format('No Capture Callback set on engineer, setting '))
                         -- This needs to do an EngineerCaptureDone callback. Either edit the default or add a statemachine specific one.
-                        import('/lua/ScenarioTriggers.lua').CreateUnitStopCaptureTrigger(PlatoonModule.EngineerCaptureDone, unit)
+                        import('/lua/scenariotriggers.lua').CreateUnitStopCaptureTrigger(PlatoonModule.EngineerCaptureDone, unit)
                         unit.CaptureDoneCallbackSet = true
                     end
                     local captureUnit = self.PlatoonData.CaptureUnit
@@ -611,7 +611,7 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             elseif cons.OrderedTemplate then
                 local relativeTo = TableCopy(eng:GetPosition())
                 relative = true
-                local baseTmplDefault = import('/lua/BaseTemplates.lua')
+                local baseTmplDefault = import('/lua/basetemplates.lua')
                 local tmpReference = aiBrain:FindPlaceToBuild('T3EnergyProduction', 'ueb1301', baseTmplDefault['BaseTemplates'][factionIndex], relative, eng, nil, relativeTo[1], relativeTo[3])
                 if tmpReference then
                     reference = eng:CalculateWorldPositionFromRelative(tmpReference)

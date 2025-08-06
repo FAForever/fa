@@ -3,7 +3,7 @@
 ---@class moho.AnimationManipulator : moho.manipulator_methods
 local CAnimationManipulator = {}
 
----
+--- Returns 0 for an invalid animation.
 ---@return number
 function CAnimationManipulator:GetAnimationDuration()
 end
@@ -23,9 +23,11 @@ end
 function CAnimationManipulator:GetRate()
 end
 
----
 --  AnimManipulator:PlayAnim(entity, animName, looping=false)
-function CAnimationManipulator:PlayAnim(entity,  animName,  looping)
+
+---@param animName FileName Must be a full file path.
+---@param looping boolean? Defaults to false
+function CAnimationManipulator:PlayAnim(animName,  looping)
 end
 
 ---

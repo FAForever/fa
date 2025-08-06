@@ -33,6 +33,7 @@
 local Control = import("/lua/maui/control.lua").Control
 local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 ---@class Edit : moho.edit_methods, Control, InternalObject
 Edit = ClassUI(moho.edit_methods, Control) {
@@ -43,37 +44,35 @@ Edit = ClassUI(moho.edit_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
-        self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
-        self._font._family.OnDirty = function(var)
+        self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
+        local onFontChanged = function(var)
             self:_internalSetFont()
         end
-        self._font._pointsize.OnDirty = function(var)
-            self:_internalSetFont()
-        end
+        self._font._family.OnDirty = onFontChanged
+        self._font._pointsize.OnDirty = onFontChanged
 
-        self._fg = LazyVar.Create()
+        self._fg = LazyVarCreate()
         self._fg.OnDirty = function(var)
             self:SetNewForegroundColor(var())
         end
 
-        self._bg = LazyVar.Create()
+        self._bg = LazyVarCreate()
         self._bg.OnDirty = function(var)
             self:SetNewBackgroundColor(var())
         end
 
-        self._cc = LazyVar.Create()
+        self._cc = LazyVarCreate()
         self._cc.OnDirty = function(var)
             self:SetNewCaretColor(var())
         end
 
-        self._hfg = LazyVar.Create()
+        self._hfg = LazyVarCreate()
         self._hfg.OnDirty = function(var)
             self:SetNewHighlightForegroundColor(var())
         end
 
-        self._hbg = LazyVar.Create()
+        self._hbg = LazyVarCreate()
         self._hbg.OnDirty = function(var)
             self:SetNewHighlightBackgroundColor(var())
         end

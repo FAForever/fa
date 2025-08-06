@@ -22,7 +22,17 @@
 
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 
+---@class PodDataEntry
+---@field PodHandle XEA3204
+---@field PodUnitID "XEA3204" # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field PodName string # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field Active boolean
+---@field PodAttachpoint Bone # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+---@field CreateWithUnit boolean # Determined in pod tower's blueprint's `Economy.EngineeringPods`
+
 ---@class TPodTowerUnit : TStructureUnit
+---@field PodData table<string, PodDataEntry>
+---@field OpenAnim moho.AnimationManipulator
 TPodTowerUnit = ClassUnit(TStructureUnit) {
 
     ---@param self TPodTowerUnit
@@ -134,8 +144,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@return Unit
     CreatePod = function(self, podName)
         local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
-        self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1],
-            location[2], location[3], 0, 0, 0)
+        self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)--[[@as XEA3204]]
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
         return self.PodData[podName].PodHandle
@@ -356,8 +365,8 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
             self.MaintainState = true
         end,
 
-        OnStopBuild = function(self, unitBuilding)
-            TStructureUnit.OnStopBuild(self, unitBuilding)
+        OnStopBuild = function(self, unitBuilding, order)
+            TStructureUnit.OnStopBuild(self, unitBuilding, order)
             self:EnableDefaultToggleCaps()
             if unitBuilding:GetFractionComplete() == 1 then
                 NotifyUpgrade(self, unitBuilding)

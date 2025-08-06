@@ -49,6 +49,23 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
         self:SetWeaponEnabledByLabel('HackPegLauncher', true)
     end,
 
+    --- Temporarily disable the unit's weapons when it is transferred to prevent bypassing the fire rate
+    --- Add an exception for the hack peg launcher.
+    ---@param newUnit XRL0403
+    OnGivenDisableWeapons = function(newUnit)
+        -- disable all weapons and enable after a delay
+        local disableWeaponsThread = newUnit.OnGivenDisableWeaponsThread
+        for i = 1, newUnit.WeaponCount do
+            local weapon = newUnit.WeaponInstances[i]
+            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
+            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
+            if weapon.Label ~= "HackPegLauncher" and (not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement)) then
+                weapon:SetEnabled(false)
+                weapon:ForkThread(disableWeaponsThread)
+            end
+        end
+    end,
+
     ---@param self XRL0403 |m
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)

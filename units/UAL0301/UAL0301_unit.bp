@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ual0301_desc>Support Armored Command Unit",
-    AI = { GuardScanRadius = 26 },
+    AI = { GuardScanRadius = 44 },
     Audio = {
         CaptureLoop                   = Sound { Bank = 'UAL',         Cue = 'UAL0301_Capture_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         CommanderArrival              = Sound { Bank = 'UAL',         Cue = 'UAL0001_Gate_In',         LodCutoff = 'UnitMove_LodCutoff' },
@@ -531,8 +531,8 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 15,
-        TeleportFlatEnergyCost = 75000,
+        TeleportDelay = 20,
+        TeleportFlatEnergyCost = 100000,
     },
     Intel = {
         FreeIntel = true,

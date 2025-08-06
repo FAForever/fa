@@ -73,6 +73,7 @@ end
 function debug.allocatedsize(obj)
 end
 
+--- Returns a cached table of all table allocations tracked between calls of `debug.trackallocations(true)` and `debug.trackallocations(false)`.
 ---@return table<any, string>
 function debug.allocinfo()
 end
@@ -139,6 +140,15 @@ table.getsize = nil
 ---@param table table
 ---@return integer
 function table.getsize2(table)
+end
+
+--- Sets the size index `n` in the table or in its internal table.  
+--- `n` is used in the table library functions and can also be retrieved using `table.getn`.
+---
+--- [View Online Documentation](https://www.lua.org/pil/19.1.html)
+---@param table table
+---@param n number # floored to int
+function table.setn(table, n)
 end
 
 serialize = {}

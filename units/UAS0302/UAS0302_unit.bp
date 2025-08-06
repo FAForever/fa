@@ -173,7 +173,6 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
-            AnimationOpen = "/units/uas0302/uas0302_awepF01.sca",
             Audio = {
                 BarrelLoop  = Sound { Bank = 'UAS',       Cue = 'UAS_Turret_Lrg_Loop',     LodCutoff = 'WeaponBig_LodCutoff' },
                 BarrelStart = Sound { Bank = 'UAS',       Cue = 'UAS_Turret_Lrg_Start',    LodCutoff = 'WeaponBig_LodCutoff' },
@@ -236,7 +235,6 @@ UnitBlueprint{
         },
         {
             AboveWaterTargetsOnly = true,
-            AnimationOpen = "/units/uas0302/uas0302_awepM01.sca",
             Audio = {
                 BarrelLoop  = Sound { Bank = 'UAS',       Cue = 'UAS_Turret_Lrg_Loop',     LodCutoff = 'WeaponBig_LodCutoff' },
                 BarrelStart = Sound { Bank = 'UAS',       Cue = 'UAS_Turret_Lrg_Start',    LodCutoff = 'WeaponBig_LodCutoff' },
@@ -300,7 +298,6 @@ UnitBlueprint{
         },
         {
             AboveWaterTargetsOnly = true,
-            AnimationOpen = "/units/uas0302/uas0302_awepB01.sca",
             Audio = {
                 BarrelLoop  = Sound { Bank = 'UAS',       Cue = 'UAS_Turret_Lrg_Loop',     LodCutoff = 'WeaponBig_LodCutoff' },
                 BarrelStart = Sound { Bank = 'UAS',       Cue = 'UAS_Turret_Lrg_Start',    LodCutoff = 'WeaponBig_LodCutoff' },

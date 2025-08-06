@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
 --- Used by XSS0303
 ---@class SIFLaanseTacticalMissile03 : SLaanseTacticalMissile, TacticalMissileComponent

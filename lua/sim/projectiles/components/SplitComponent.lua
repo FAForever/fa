@@ -23,13 +23,19 @@
 -- upvalue scope for performance
 local ForkThread = ForkThread
 
+--- Adds an OnSplit function to a projectile that creates child projectiles when called.
 ---@class SplitComponent
+---@field ChildCount integer
+---@field ChildProjectileBlueprint BlueprintId
 SplitComponent = ClassSimple {
 
     ChildCount = 3,
     ChildProjectileBlueprint = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp',
 
+    --- Creates a number of child projectiles that directly inherit the damage data of the main projectile.
+    --- If the child projectile doesn't have a `MovementThread` field, it is given a zig zag movement effect.
     ---@param self SplitComponent | Projectile
+    ---@param inheritTargetGround? boolean
     OnSplit = function(self, inheritTargetGround)
         local childCount = self.ChildCount
         local childBlueprint = self.ChildProjectileBlueprint
@@ -53,7 +59,9 @@ SplitComponent = ClassSimple {
                 childProjectile:TrackTarget(false)
             end
 
-            childProjectile.Trash:Add(ForkThread(self.ZigZagThread, self, childProjectile))
+            if not childProjectile.MovementThread then
+                childProjectile.Trash:Add(ForkThread(self.ZigZagThread, self, childProjectile))
+            end
         end
     end,
 

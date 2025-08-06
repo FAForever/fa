@@ -33,11 +33,6 @@ end
 function CMauiBitmap:SetForwardPattern()
 end
 
----Sets color mask applied to bitmap during rendering (white images will get this color for example)
----@param color Color
-function CMauiBitmap:SetColorMask(color)
-end
-
 ---
 ---@param frame number
 function CMauiBitmap:SetFrame(frame)

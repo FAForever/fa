@@ -552,10 +552,11 @@ local function PostProcessUnit(unit)
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
 
-    -- Define a specific TransportSpeedReduction for all land and naval units.
-    -- Experimentals have a TransportSpeedReduction of 1 due to transports gaining 1 speed and some survival maps loading experimentals into transports.
+    -- Define a specific TransportSpeedReduction for all units.
+    -- Experimentals and structures have a TransportSpeedReduction of 1 due to transports gaining 1 speed
+    -- and some survival maps loading experimentals or structures into transports.
     -- Naval units also gain a TransportSpeedReduction of 1 to ensure mod compatibility.
-    if unit.Physics and not unit.Physics.TransportSpeedReduction and not isStructure then
+    if unit.Physics and not unit.Physics.TransportSpeedReduction then
         if isLand and isTech1 then
             unit.Physics.TransportSpeedReduction = 0.15
         elseif isLand and isTech2 then
@@ -568,7 +569,7 @@ local function PostProcessUnit(unit)
             unit.Physics.TransportSpeedReduction = 1
         elseif isACU then
             unit.Physics.TransportSpeedReduction = 1
-        elseif isNaval then
+        elseif isNaval or isStructure then
             unit.Physics.TransportSpeedReduction = 1
         end
     end
@@ -596,6 +597,22 @@ local function PostProcessUnit(unit)
     -- so that rollover unit view can work with Mantis.
     if unit.Economy and not unit.Economy.BuildRate then
         unit.Economy.BuildRate = 0
+    end
+
+    -- Verify existence of death animations as units will get stuck in the default `DeathThread` otherwise
+    local deathAnimationTables = unit.Display.AnimationDeath
+    if deathAnimationTables then
+        for i, animationTable in deathAnimationTables do
+            local animationPath = animationTable.Animation
+            if animationPath and not DiskGetFileInfo(animationPath) then
+                WARN(string.format('Unit "%s": Could not find death animation at path: "%s" \nRemoving the animation so that the unit does not get stuck dying!', tostring(unit.BlueprintId), tostring(animationPath)))
+
+                unit.Display.AnimationDeath[i] = nil
+            end
+        end
+        if table.empty(deathAnimationTables) then
+            unit.Display.AnimationDeath = nil
+        end
     end
 end
 

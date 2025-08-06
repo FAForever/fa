@@ -506,16 +506,21 @@ function CommonLogic()
                 end
             end
             tab.OnCheck = function(self, checked)
-                if checked then
+                if not SessionIsPaused() then
                     if not CanUserPause() then
                         return
                     end
+
                     SessionRequestPause()
                     self:SetGlowState(checked)
                 else
-                    SessionSendChatMessage({SendResumedBy=true})
-                    SessionResume()
-                    self:SetGlowState(checked)
+                    local status = SessionResume()
+                    if status == 'Accepted' then
+                        self:SetGlowState(checked)
+                    else
+                        -- reset the check since the resume was declined
+                        self:SetCheck(not checked, true)
+                    end
                 end
             end
             tab.OnClick = function(self, modifiers)

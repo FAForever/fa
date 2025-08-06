@@ -36,6 +36,9 @@
 -- read more here: https://wiki.faforever.com/en/Blueprints
 
 ---@class UnitBlueprint: EntityBlueprint
+--- Table keyed with a `ScriptTask`'s `TaskName` that determines the properties of the order button for that ability.
+--- The `OrderInfo.behavior` is overwritten in `orders.lua`.
+---@field Abilities table<string, OrderInfo>
 --- the number of build bots a Cybran builder has
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons
@@ -52,13 +55,13 @@
 --- the localised language). If the localisation part is not set, the description in tags will be
 --- used for any language, which would be "Medium Tank" for this example
 ---@field Description UnlocalizedString
---- used by the Othuy ("lighting storm") script
+--- used by the XSL0402 (Othuy "lighting storm") script
 ---@field Lifetime? number
---- used by the Othuy ("lighting storm") script
+--- used by the XSL0402 (Othuy "lighting storm") script
 ---@field MaxMoveRange? number
---- used by the Loyalist script
+--- used by the URL0303 (Loyalist) script
 ---@field SecondsBeforeChargeKicksIn? number
---- used by the Loyalist script
+--- used by the URL0303 (Loyalist) script
 ---@field SecondsBeforeExplosionWhenCharging? number
 --- if defined, the collision shape will be a sphere of this radius using the
 --- `CollisionSphereOffset` species of collision offsets
@@ -98,6 +101,7 @@
 ---@field Transport? UnitBlueprintTransport
 ---@field Veteran? UnitBlueprintVeterancy
 ---@field Weapon? WeaponBlueprint[]
+---@field ModWeapon? WeaponBlueprint[] # Used during blueprint loading to mod `Weapon` table
 ---@field Wreckage? UnitBlueprintWreckage
 ---
 --- Auto-generated unit id from the folder name. When modifying a blueprint, this must be defined to
@@ -127,7 +131,9 @@
 
 
 ---@class UnitBlueprintAI
---- under what angle the unit attacks its target after getting an attack order
+--- At what angle (to either side) the unit attacks its target after getting an attack order. 
+--- If one of the unit's weapons has a target and has `SlavedToBody = true`, it will rotate when idle and attacking.
+--- Overrides Weapon `SlavedToBody` and `SlavedToBodyArcRange` behavior.
 ---@field AttackAngle number
 --- automatically surface to attack ground targets
 ---@field AutoSurfaceToAttack boolean
@@ -343,7 +349,7 @@
 
 
 ---@class UnitBlueprintDefense
---- used by the Loyalist script
+--- used by URL0303 (Loyalist) script
 ---@field AntiMissile? {AttachBone: Bone, Radius: number, RedirectRateOfFire: number}
 --- the armor type name
 ---@field ArmorType ArmorType
@@ -476,7 +482,7 @@
 ---@field AnimationBuildRate? number
 --- The table of animations shown at death. One will be randomly pulled.
 ---@field AnimationDeath UnitBlueprintAnimationDeath[]
---- used by the HARMS script
+--- used by the XRB2309 (submerged HARMS) script
 ---@field AnimationDeploy? FileName
 --- factories will play this animation on land units they build
 ---@field AnimationFinishBuildLand? FileName
@@ -484,8 +490,9 @@
 ---@field AnimationIdle? FileName
 --- used by several transports' scripts
 ---@field AnimationLand? FileName
----@field AnimationLoop? FileName used but present on the Cybran builder bot
---- Animation open file is linked here: '/units/UnitID/UnitID_aopen.sca'
+--- unused but present on the Cybran builder bot
+---@field AnimationLoop? FileName
+--- Used by various units in various circumstances to open something. Base game path is typically `'/units/UnitID/UnitID_aopen.sca'` but mods should use their mod path `'/mods/ModName/...'`.
 ---@field AnimationOpen? FileName
 --- The animation that is played when the unit is done building
 ---@field AnimationPermOpen? FileName
@@ -493,13 +500,13 @@
 ---@field AnimationSurface? FileName
 --- used by several transports' scripts
 ---@field AnimationTakeOff? FileName
---- used by the Salem class destroyer script
+--- used by the URS0201 (Salem class destroyer) script
 ---@field AnimationTransform? FileName
 --- the animation that is played when the unit is upgrading
 ---@field AnimationUpgrade FileName
 --- A table of animations to use while upgrading, depending on the unit it is upgrading to.
 ---@field AnimationUpgradeTable? table<UnitId, FileName>
---- Animation walk file is linked here: '/units/UnitID/UnitID_??.sca'
+--- Full path to file. Base game path is typically `'/units/UnitID/UnitID_awalk.sca'` but mods should use their mod path `'/mods/ModName/...'`.
 ---@field AnimationWalk? FileName
 --- controls the speed of the animation. Adjusting this number can cause or prevent "skating"
 ---@field AnimationWalkRate number
@@ -512,7 +519,7 @@
 ---@field BuildAttachBone? Bone
 --- used while cloaked
 ---@field CloakMeshBlueprint? FileName
---- used by the Seraphim Yathsou script
+--- used by the XSS0304 and XSS0203 (Seraphim T3 and T1 sub) scripts
 ---@field CannonOpenAnimation? FileName
 ---@field DamageEffects? UnitBlueprintDamageEffect[]
 --- overrides the rolloff point's orientation
@@ -522,7 +529,7 @@
 --- Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can
 --- be used. The key should be the name of the layer where effects should be displayed
 ---@field IdleEffects table<Layer, UnitBlueprintEffects>
---- used by the Salem Class destroyer script 
+--- used by the URS0201 (Salem class destroyer) script 
 ---@field LandAnimationDeath? {Animation: FileName, Weight: number}
 --- effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off)
 --- Defines for what transition the effects are created. 'string' is composed of 2 names of layers,
@@ -530,14 +537,14 @@
 --- aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be
 --- airLand (LandAir would be the opposite - take off). Note: there is NO space between layer names
 ---@field LayerChangeEffects table<LayerChangeType, UnitBlueprintEffects>
---- used by the Seraphim hydrocarbon powerplant script
+--- used by the XSB1102 (Seraphim hydrocarbon powerplant) script
 ---@field LoopingAnimation? FileName
 ---@field MaxRockSpeed? number
 ---@field Mesh MeshBlueprint
 ---@field MeshBlueprint FileName
 --- used for the wreackge if `Wreckage.UseCustomMesh` is set
 ---@field MeshBlueprintWrecked? FileName
---- used by the Yolona Oss script
+--- used by the XSB2401 (Yolona Oss) script
 ---@field MissileBone? Bone
 ---@field MotionChangeEffects table<MotionChangeType, UnitBlueprintEffects>
 --- Effects displayed during movement of the unit. Key should be Name of the layer for which the
@@ -556,22 +563,23 @@
 --- this the collision hitbox should be adapted under `SizeX`, `SizeY`, and `SizeZ` as well.
 ---@field UniformScale number
 ---@field WarpInEffect? UnitBlueprintWarpInEffect
---- used by the Salem Class            
+--- used by the URS0201 (Salem class destroyer) script 
 ---@field WaterAnimationDeath? {}                   
 ---
 --- auto-generated field that points to the mesh to use while building
 ---@field BuildMeshBlueprint BlueprintId
 
 ---@class UnitBlueprintAnimationDeath
---- animation death file is linked here: '/units/UnitID/UnitID_??.sca'
----@field Animation string
+--- Full path of the animation file. Typically `'/units/UnitID/UnitID_ADeath.sca'` but mods should use their mod path `'/mods/ModName/...'`.
+--- The animation will be removed in blueprint postprocessing if this file does not exist.
+---@field Animation FileName
 --- the maximum speed this animation is played at
 ---@field AnimationRateMax number
 --- the minimum speed this animation is played at
 ---@field AnimationRateMin number
---- this number affects how often a death animation is used when there are more than one. This value is relative rather than absolute
 ---@field Mesh? FileName
 ---@field HitBox? HitBox
+--- this number affects how often a death animation is used when there are more than one. This value is relative rather than absolute
 ---@field Weight? number
 
 ---@class UnitBlueprintDamageEffect
@@ -687,8 +695,10 @@
 ---@field AdjacentEnergyProductionMod? number
 ---@field AdjacentMassProductionMod? number
 ---@field AdjacentStructureEnergyMod? number
---- this define what units could be produced
----@field BuildableCategory CategoryName[]
+--- Defines what units can be built. Used by the engine.
+---@field BuildableCategory UnparsedCategory[]
+--- Defines what buildable units can only be produced through upgrading. Used in Lua.
+---@field UpgradeOnlyCategory UnparsedCategory[]
 --- energy cost to build this unit
 ---@field BuildCostEnergy number
 --- mass cost to build this unit
@@ -700,7 +710,7 @@
 ---@field BuildTime number
 --- present in UEF engineering drones
 ---@field BuildRadius? number
---- used by crab eggs
+--- What unit spawns out of the egg. Used by `CConstructionEggUnit` (Megalith's crab eggs)
 ---@field BuildUnit? UnitId
 --- present in Cybran build drones
 ---@field ConsumptionPerSecondEnergy? number
@@ -713,7 +723,7 @@
 ---@field InitialRallyX number
 --- default rally point Z for the factory
 ---@field InitialRallyZ number
---- used by the Eye of Rhianne
+--- Total energy drain when changing scrying locations. Used by XAB3301 (Eye of Rhianne)
 ---@field InitialRemoteViewingEnergyDrain? number
 --- amount that define which amount of energy the unit is consuming per second; Used for Shields
 ---@field MaintenanceConsumptionPerSecondEnergy? number
@@ -721,9 +731,9 @@
 --- Maximum build range of the unit. The target must be within this range before the
 --- builder can perform operation.
 ---@field MaxBuildDistance number
---- used by the Paragon
+--- used by XAB1401 (Paragon) script
 ---@field MaxEnergy? number
---- used by the Paragon
+--- used by XAB1401 (Paragon) script
 ---@field MaxMass? number
 ---@field MinBuildTime number
 ---@field MinConsumptionPerSecondEnergy? number
@@ -1022,15 +1032,15 @@
 --- The intel is free. Without this, the unit will try drain energy for its
 --- intelligence (radar, sonar, etc) and turn off if you run out.
 ---@field FreeIntel boolean
---- used by the Seraphim T1 air scout for how long the after-death vison remains
+--- Used by XSA0101 (Seraphim T1 air scout) for how long the after-crash vison remains
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
 ---@field JamRadius { Max: number, Min: number }
 --- How many blips a jammer produces. Maximum 255
 ---@field JammerBlips number
---- used by the Soothsayer
+--- Vision radius when powered on. Used by XRB3301 (Soothsayer).
 ---@field MaxVisionRadius? number
---- used by the Soothsayer
+--- Vision radius when powered off. Used by XRB3301 (Soothsayer).
 ---@field MinVisionRadius? number
 --- how far our omni coverage goes
 ---@field OmniRadius? number
@@ -1043,7 +1053,7 @@
 ---@field RadarStealthFieldRadius? number
 --- how long until this unit turns back on when you run out of power
 ---@field ReactivateTime? number
---- used by the Eye of Rianne for its scrying vision radius
+--- used by XAB3301 (Eye of Rianne) for its scrying vision radius
 ---@field RemoteViewingRadius? number
 --- Show intel radius of unit if selected
 ---@field ShowIntelOnSelect boolean
@@ -1056,11 +1066,11 @@
 ---@field SonarStealthFieldRadius number
 --- how far off displace blips
 ---@field SpoofRadius { Max: number, Min: number }
---- used by the Selen to define how it needs to sit still while its cloak is enabled for it to work
+--- used by XSL0101 (Selen) to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
 --- how far the unit can see above water and land
 ---@field VisionRadius number
---- used by the Seraphim T1 air scout to set its vision radius when it crashes
+--- used by XSA0101 (Seraphim T1 air scout) to set its vision radius when it crashes
 ---@field VisionRadiusOnDeath? number
 --- how far the unit can see underwater
 ---@field WaterVisionRadius number
@@ -1107,8 +1117,8 @@
 ---@field GroundCollisionOffset? number
 --- Used in combination with `FlattenSkirt` to guarantee the result is completely horizontal
 ---@field HorizontalSkirt boolean
---- used by the Seraphim sniper bot script as the speed multiplier when the alternate sniper mode
---- is activated
+--- used by XSL0305 (Seraphim sniper bot) script as the speed multiplier during the reload of the alternate sniper mode
+--- also used by URS0201 (Salem class destroyer) script as the speed multiplier when walking on land
 ---@field LandSpeedMultiplier? number
 --- an offset to the layer change height used during the transition between seabed/water and land
 ---@field LayerChangeOffsetHeight number
@@ -1153,7 +1163,7 @@
 ---@field RotateOnSpot? boolean
 --- threshold speed in ogrids/s for rotate on spot to take effect. defaults to 0.5
 ---@field RotateOnSpotThreshold? number
---- unknown behavior, used by Spiderbot and Megabot
+--- Allows the unit to sink a bit into the ground so that its legs can touch the ground on uneven terrain.
 ---@field SinkLower? boolean
 --- used by the sinker projectile script as the acceleration to reach the bottom of the seabed
 ---@field SinkSpeed? number
@@ -1167,8 +1177,11 @@
 ---@field SkirtSizeZ number
 --- Stands upright regardless of terrain
 ---@field StandUpright boolean
---- used by XSB3202 when the vertical layer changes from top to sub
+--- used by XSB3202 (T2 sonar) and XSS0201 (Destroyer) when the vertical layer changes from top to sub
 ---@field SubSpeedMultiplier? number
+--- How much this unit slows down transports it is loaded in.  
+--- Defaults to 0.15 (Tech 1), 0.3 (Tech 2), 0.6 (Tech 3), and 1 (ACU/SACU/Experimentals).
+---@field TransportSpeedReduction number
 --- turn facing damping for the unit, usually used for hover units only
 ---@field TurnFacingRate number
 --- turn radius for the unit, in world units. Used when the nav waypoint is further than `TurnRadius` distance,

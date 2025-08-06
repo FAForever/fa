@@ -10,13 +10,24 @@
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
-local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+local KillArmy = import("/lua/simutils.lua").KillArmy
+local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
+local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
+local DisableAI = import("/lua/simutils.lua").DisableAI
+local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
+local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
+local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
+local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
+local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
+local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 
-local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
-local FactoryManagerBrainComponent = import("/lua/aibrains/components/FactoryManagerBrainComponent.lua").FactoryManagerBrainComponent
-local JammerManagerBrainComponent = import("/lua/aibrains/components/JammerManagerBrainComponent.lua").JammerManagerBrainComponent
-local StatManagerBrainComponent = import("/lua/aibrains/components/StatManagerBrainComponent.lua").StatManagerBrainComponent
-local EnergyManagerBrainComponent = import("/lua/aibrains/components/EnergyManagerBrainComponent.lua").EnergyManagerBrainComponent
+local StorageManagerBrainComponent = import("/lua/aibrains/components/storagemanagerbraincomponent.lua").StorageManagerBrainComponent
+local FactoryManagerBrainComponent = import("/lua/aibrains/components/factorymanagerbraincomponent.lua").FactoryManagerBrainComponent
+local JammerManagerBrainComponent = import("/lua/aibrains/components/jammermanagerbraincomponent.lua").JammerManagerBrainComponent
+local StatManagerBrainComponent = import("/lua/aibrains/components/statmanagerbraincomponent.lua").StatManagerBrainComponent
+local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanagerbraincomponent.lua").EnergyManagerBrainComponent
+
+local CommanderSafeTime = import("/lua/simutils.lua").CommanderSafeTime
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -55,6 +66,10 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 ---@field CustomUnits { [string]: EntityId[] }
+---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
+---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
+---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
+---@field Army Army # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
     EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
@@ -289,7 +304,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         self.VOTable[key] = true
 
-        import("/lua/SimSyncUtils.lua").SyncVoice(data)
+        import("/lua/simsyncutils.lua").SyncVoice(data)
         WaitSeconds(sound.timeout)
 
         self.VOTable[key] = nil
@@ -432,287 +447,111 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     OnDefeat = function(self)
+        -- OnDefeat runs after AbandonedByPlayer, so we need to prevent killing the army twice
+        if self.Status == 'Defeat' then
+            return
+        end
         self.Status = 'Defeat'
 
-        import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
-        import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
-        import("/lua/sim/Recall.lua").OnArmyDefeat(self:GetArmyIndex())
-
-        local function KillArmy()
-            local shareOption = ScenarioInfo.Options.Share
-
-            local function KillWalls()
-                -- Kill all walls while the ACU is blowing up
-                local tokill = self:GetListOfUnits(categories.WALL, false)
-                if tokill and not table.empty(tokill) then
-                    for index, unit in tokill do
-                        unit:Kill()
-                    end
-                end
-            end
-
-            if shareOption == 'ShareUntilDeath' then
-                ForkThread(KillWalls)
-            end
-
-            WaitSeconds(10) -- Wait for commander explosion, then transfer units.
-            local selfIndex = self:GetArmyIndex()
-            local shareOption = ScenarioInfo.Options.Share
-            local victoryOption = ScenarioInfo.Options.Victory
-            local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
-
-            -- Used to have units which were transferred to allies noted permanently as belonging to the new player
-            local function TransferOwnershipOfBorrowedUnits(brains)
-                for index, brain in brains do
-                    local units = brain:GetListOfUnits(categories.ALLUNITS, false)
-                    if units and not table.empty(units) then
-                        for _, unit in units do
-                            if unit.oldowner == selfIndex then
-                                unit.oldowner = nil
-                            end
-                        end
-                    end
-                end
-            end
-
-            -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
-            -- Optional Categories input (defaults to all units except wall and command)
-            local function TransferUnitsToBrain(brains, categoriesToTransfer)
-                if not table.empty(brains) then
-                    local units
-                    if shareOption == 'FullShare' then
-                        local indexes = {}
-                        for _, brain in brains do
-                            table.insert(indexes, brain.index)
-                        end
-                        units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        TransferUnfinishedUnitsAfterDeath(units, indexes)
-                    end
-
-                    for k, brain in brains do
-                        if categoriesToTransfer then
-                            units = self:GetListOfUnits(categoriesToTransfer, false)
-                        else
-                            units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        end
-                        if units and not table.empty(units) then
-                            local givenUnits = TransferUnitsOwnership(units, brain.index)
-
-                            -- only show message when we actually gift that player some units
-                            if not table.empty(givenUnits) then
-                                Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
-                            end
-
-                            WaitSeconds(1)
-                        end
-                    end
-                end
-            end
-
-            -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
-            -- optional category input (default of everything but walls and command)
-            local function TransferUnitsToHighestBrain(brains, categoriesToTransfer)
-                if not table.empty(brains) then
-                    local ratings = ScenarioInfo.Options.Ratings
-                    for i, brain in brains do
-                        if ratings[brain.Nickname] then
-                            brain.rating = ratings[brain.Nickname]
-                        else
-                            -- if there is no rating, create a fake negative rating based on score
-                            brain.rating = -(1 / brain.score)
-                        end
-                    end
-                    -- sort brains by rating
-                    table.sort(brains, function(a, b) return a.rating > b.rating end)
-                    TransferUnitsToBrain(brains, categoriesToTransfer)
-                end
-            end
-
-            -- Transfer units to the player who killed me
-            local function TransferUnitsToKiller()
-                local KillerIndex = 0
-                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                if units and not table.empty(units) then
-                    if victoryOption == 'demoralization' then
-                        KillerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
-                        TransferUnitsOwnership(units, KillerIndex)
-                    else
-                        KillerIndex = ArmyBrains[selfIndex].LastUnitKilledBy or selfIndex
-                        TransferUnitsOwnership(units, KillerIndex)
-                    end
-                end
-                WaitSeconds(1)
-            end
-
-            -- Return units transferred during the game to me
-            local function ReturnBorrowedUnits()
-                local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                local borrowed = {}
-                for index, unit in units do
-                    local oldowner = unit.oldowner
-                    if oldowner and oldowner ~= self:GetArmyIndex() and not GetArmyBrain(oldowner):IsDefeated() then
-                        if not borrowed[oldowner] then
-                            borrowed[oldowner] = {}
-                        end
-                        table.insert(borrowed[oldowner], unit)
-                    end
-                end
-
-                for owner, units in borrowed do
-                    TransferUnitsOwnership(units, owner)
-                end
-
-                WaitSeconds(1)
-            end
-
-            -- Return units I gave away to my control. Mainly needed to stop EcoManager mods bypassing all this stuff with auto-give
-            local function GetBackUnits(brains)
-                local given = {}
-                for index, brain in brains do
-                    local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                    if units and not table.empty(units) then
-                        for _, unit in units do
-                            if unit.oldowner == selfIndex then -- The unit was built by me
-                                table.insert(given, unit)
-                                unit.oldowner = nil
-                            end
-                        end
-                    end
-                end
-
-                TransferUnitsOwnership(given, selfIndex)
-            end
-
-            -- Sort brains out into mutually exclusive categories
-            for index, brain in ArmyBrains do
-                brain.index = index
-                brain.score = CalculateBrainScore(brain)
-
-                if not brain:IsDefeated() and selfIndex ~= index then
-                    if ArmyIsCivilian(index) then
-                        table.insert(BrainCategories.Civilians, brain)
-                    elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
-                        table.insert(BrainCategories.Enemies, brain)
-                    else
-                        table.insert(BrainCategories.Allies, brain)
-                    end
-                end
-            end
-
-            local KillSharedUnits = import("/lua/simutils.lua").KillSharedUnits
-
-            -- This part determines the share condition
-            if shareOption == 'ShareUntilDeath' then
-                KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
-                ReturnBorrowedUnits() -- Give back things I was given by others
-            elseif shareOption == 'FullShare' then
-                TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest rating first
-                TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
-            elseif shareOption == 'PartialShare' then
-                KillSharedUnits(self:GetArmyIndex(), categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER) -- Kill some things I gave away
-                ReturnBorrowedUnits() -- Give back things I was given by others
-                TransferUnitsToHighestBrain(BrainCategories.Allies, categories.STRUCTURE + categories.ENGINEER) -- Transfer some things to allies, highest rating first
-                TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
-            else
-                GetBackUnits(BrainCategories.Allies) -- Get back units I gave away
-                if shareOption == 'CivilianDeserter' then
-                    TransferUnitsToBrain(BrainCategories.Civilians)
-                elseif shareOption == 'TransferToKiller' then
-                    TransferUnitsToKiller()
-                elseif shareOption == 'Defectors' then
-                    TransferUnitsToHighestBrain(BrainCategories.Enemies)
-                else -- Something went wrong in settings. Act like share until death to avoid abuse
-                    WARN('Invalid share condition was used for this game. Defaulting to killing all units')
-                    KillSharedUnits(self:GetArmyIndex()) -- Kill things I gave away
-                    ReturnBorrowedUnits() -- Give back things I was given by other
-                end
-            end
-
-            -- Kill all units left over
-            local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if tokill and not table.empty(tokill) then
-                for index, unit in tokill do
-                    unit:Kill()
-                end
-            end
-        end
+        local selfIndex = self:GetArmyIndex()
+        UpdateUnitCap(selfIndex)
+        SimPingOnArmyDefeat(selfIndex)
+        RecallOnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == 'AI' then
-            -- print AI "ilost" text to chat
-            SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
-            -- remove PlatoonHandle from all AI units before we kill / transfer the army
-            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if units and not table.empty(units) then
-                for _, unit in units do
-                    if not unit.Dead then
-                        if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
-                            unit.PlatoonHandle:Stop()
-                            unit.PlatoonHandle:PlatoonDisbandNoAssign()
-                        end
-                        IssueStop({ unit })
-                        IssueToUnitClearCommands(unit)
-                    end
-                end
-            end
-            -- Stop the AI from executing AI plans
-            self.RepeatExecution = false
-            -- removing AI BrainConditionsMonitor
-            if self.ConditionsMonitor then
-                self.ConditionsMonitor:Destroy()
-            end
-            -- removing AI BuilderManagers
-            if self.BuilderManagers then
-                for k, manager in self.BuilderManagers do
-                    if manager.EngineerManager then
-                        manager.EngineerManager:SetEnabled(false)
-                    end
-
-                    if manager.FactoryManager then
-                        manager.FactoryManager:SetEnabled(false)
-                    end
-
-                    if manager.PlatoonFormManager then
-                        manager.PlatoonFormManager:SetEnabled(false)
-                    end
-
-                    if manager.EngineerManager then
-                        manager.EngineerManager:Destroy()
-                    end
-
-                    if manager.FactoryManager then
-                        manager.FactoryManager:Destroy()
-                    end
-
-                    if manager.PlatoonFormManager then
-                        manager.PlatoonFormManager:Destroy()
-                    end
-                    if manager.StrategyManager then
-                        manager.StrategyManager:SetEnabled(false)
-                        manager.StrategyManager:Destroy()
-                    end
-                    self.BuilderManagers[k].EngineerManager = nil
-                    self.BuilderManagers[k].FactoryManager = nil
-                    self.BuilderManagers[k].PlatoonFormManager = nil
-                    self.BuilderManagers[k].BaseSettings = nil
-                    self.BuilderManagers[k].BuilderHandles = nil
-                    self.BuilderManagers[k].Position = nil
-                end
-            end
-            -- delete the AI pathcache
-            self.PathCache = nil
+            DisableAI(self--[[@as BaseAIBrain]])
         end
 
-        ForkThread(KillArmy)
+        ForkThread(KillArmy, self, ScenarioInfo.Options.Share)
 
         if self.Trash then
             self.Trash:Destroy()
         end
     end,
 
+    --- Called by the engine when a player disconnects.
+    ---@param self AIBrain
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            self:OnDefeat()
+            self.Status = 'Defeat'
+
+            import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
+            import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
+
+            -- AI
+            if self.BrainType == 'AI' then
+                DisableAI(self)
+            end
+
+            local shareOption = ScenarioInfo.Options.DisconnectShare
+            local shareAcuOption = ScenarioInfo.Options.DisconnectShareCommanders
+            local victoryOption = ScenarioInfo.Options.Victory
+
+            if shareOption == 'SameAsShare' then
+                shareOption = ScenarioInfo.Options.Share
+            end
+
+            -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
+            -- and might have intentionally disconnected.
+            if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
+                local safeCommanders = {}
+
+                local commanders = self:GetListOfUnits(categories.COMMAND, false)
+                if shareAcuOption == 'Recall' then
+                    local gameTick = GetGameTick()
+                    for _, com in commanders do
+                        if com.LastTickDamaged <= gameTick - CommanderSafeTime then
+                            table.insert(safeCommanders, com)
+                        else
+                            -- explode unsafe ACUs because KillArmy might not
+                            com:Kill()
+                        end
+                    end
+                else
+                    -- explode all the ACUs so they don't get shared
+                    for _, com in commanders do
+                        com:Kill()
+                    end
+                end
+
+                -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
+                if victoryOption == 'demoralization' and table.empty(safeCommanders) then
+                    shareOption = ScenarioInfo.Options.Share
+                end
+
+                -- non-assassination modes can have armies abandon without commanders
+                if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
+                    -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
+                    ForkThread(FakeTeleportUnits, safeCommanders, true)
+                end
+
+                ForkThread(KillArmy, self, shareOption)
+
+            elseif shareAcuOption == 'RecallDelayed' or shareAcuOption == 'Permanent' then
+
+                if victoryOption ~= 'demoralization' then
+                    shareOption = 'FullShare'
+                end
+
+                if shareAcuOption == 'RecallDelayed' then
+                    local shareTime = GetGameTick() + CommanderSafeTime
+                    if shareTime < 3000 then
+                        shareTime = 3000
+                    end
+                    ForkThread(KillArmyOnDelayedRecall, self, shareOption, shareTime)
+                else
+                    ForkThread(KillArmyOnACUDeath, self, shareOption)
+                end
+            else
+                WARN('Invalid disconnection ACU share condition was used for this game: `' .. (shareAcuOption or 'nil') .. '` Defaulting to exploding ACU.')
+                ForkThread(KillArmy, self, shareOption)
+            end
+
+
+            if self.Trash then
+                self.Trash:Destroy()
+            end
         end
     end,
 
@@ -726,7 +565,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param recallingUnits Unit[]
     RecallArmyThread = function(self, recallingUnits)
         if recallingUnits then
-            import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
+            FakeTeleportUnits(recallingUnits, true)
         end
         self:OnRecalled()
     end,
@@ -735,135 +574,38 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
-        local army = self.Army
-        import("/lua/simutils.lua").UpdateUnitCap(army)
-        import("/lua/simping.lua").OnArmyDefeat(army)
+        local selfIndex = self:GetArmyIndex()
+        UpdateUnitCap(selfIndex)
+        SimPingOnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == "AI" then
-            -- print AI "ilost" text to chat
-            SUtils.AISendChat("enemies", ArmyBrains[army].Nickname, "ilost")
-            -- remove PlatoonHandle from all AI units before we kill / transfer the army
-            local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if units and units[1] then
-                local halt = 0
-                local haltUnits = {}
-                for _, unit in units do
-                    if not unit.Dead then
-                        local handle = unit.PlatoonHandle
-                        if handle and self:PlatoonExists(handle) then
-                            handle:Stop()
-                            handle:PlatoonDisbandNoAssign()
-                        end
-                        halt = halt + 1
-                        haltUnits[halt] = unit
-                    end
-                end
-                IssueStop(haltUnits)
-                IssueClearCommands(haltUnits)
-            end
-
-            -- Stop the AI from executing AI plans
-            self.RepeatExecution = false
-
-            -- removing AI BrainConditionsMonitor
-            if self.ConditionsMonitor then
-                self.ConditionsMonitor:Destroy()
-            end
-
-            -- removing AI BuilderManagers
-            if self.BuilderManagers then
-                for _, v in self.BuilderManagers do
-                    local manager = v.EngineerManager
-                    manager:SetEnabled(false)
-                    manager:Destroy()
-                    manager = v.FactoryManager
-                    manager:SetEnabled(false)
-                    manager:Destroy()
-                    manager = v.PlatoonFormManager
-                    manager:SetEnabled(false)
-                    manager:Destroy()
-                    manager = v.StrategyManager
-                    if manager then
-                        manager:SetEnabled(false)
-                        manager:Destroy()
-                    end
-                    v.EngineerManager = nil
-                    v.FactoryManager = nil
-                    v.PlatoonFormManager = nil
-                    v.BaseSettings = nil
-                    v.BuilderHandles = nil
-                    v.Position = nil
-                end
-            end
-            -- delete the AI pathcache
-            self.PathCache = nil
+            DisableAI(self)
         end
 
         local enemies, civilians = {}, {}
 
-        -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
-        local function TransferUnitsToBrain(brains)
-            if brains[1] then
-                local cat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
-                for _, brain in brains do
-                    local units = self:GetListOfUnits(cat, false)
-                    if units and units[1] then
-                        local givenUnits = TransferUnitsOwnership(units, brain.index)
-
-                        -- only show message when we actually gift that player some units
-                        if not table.empty(givenUnits) then
-                            Sync.ArmyTransfer = { {
-                                from = army,
-                                to = brain.index,
-                                reason = "fullshare",
-                            } }
-                        end
-
-                        WaitSeconds(1)
-                    end
-                end
-            end
-        end
-
-        -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
-        local function TransferUnitsToHighestBrain(brains)
-            if not table.empty(brains) then
-                local ratings = ScenarioInfo.Options.Ratings
-                for _, brain in brains do
-                    if ratings[brain.Nickname] then
-                        brain.rating = ratings[brain.Nickname]
-                    else
-                        -- if there is no rating, create a fake negative rating based on score
-                        brain.rating = -1 / brain.score
-                    end
-                end
-                -- sort brains by rating
-                table.sort(brains, function(a, b) return a.rating > b.rating end)
-                TransferUnitsToBrain(brains)
-            end
-        end
-
         -- Sort brains out into mutually exclusive categories
         for index, brain in ArmyBrains do
             brain.index = index
-            brain.score = CalculateBrainScore(brain)
 
-            if not brain:IsDefeated() and army ~= index then
+            if not brain:IsDefeated() and selfIndex ~= index then
                 if ArmyIsCivilian(index) then
                     table.insert(civilians, brain)
-                elseif IsEnemy(army, brain:GetArmyIndex()) then
+                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
                     table.insert(enemies, brain)
                 end
             end
         end
 
-        -- This part determines the share condition
+        -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
+        -- Recalling recalls all SACU, so they shouldn't be transferred.
+        local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
         local shareOption = ScenarioInfo.Options.Share
         if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(civilians)
+            TransferUnitsToBrain(self, civilians, false, recallCat, "CivilianDeserter")
         elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(enemies)
+            TransferUnitsToHighestBrain(self, enemies, false, recallCat, "Defectors")
         end
 
         -- let the average, team vs team game end first
@@ -926,7 +668,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param category EntityCategory The categories the units should fit.
     ---@param position Vector The center point to start looking for units.
     ---@param radius number The radius of the circle we look for units in.
-    ---@param alliance AllianceStatus
+    ---@param alliance? AllianceStatus
     ---@return Unit[]
     GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then
@@ -1523,3 +1265,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --#endregion
     -------------------------------------------------------------------------------
 }
+
+---#region backwards compatibility
+
+local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+
+--#endregion

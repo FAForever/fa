@@ -42,7 +42,7 @@ AMissileCruiseSubProjectile = ClassProjectile(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectileOnCreate(self)
         local blueprintPhysics = self.Blueprint.Physics
-        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        local radius = 0.11 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 }

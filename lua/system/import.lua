@@ -100,7 +100,7 @@ local __lazyimport_metatable = {
 local indent = 0
 
 ---The global import function used to keep track of modules
----@param name FileName path to the module to load
+---@param name FileName # path to the module to load. Lowercase paths are more performant.
 ---@param isLazy boolean?
 ---@return Module
 function import(name, isLazy)

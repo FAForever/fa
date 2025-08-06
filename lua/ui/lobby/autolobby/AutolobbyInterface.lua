@@ -32,8 +32,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
-local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/AutolobbyMapPreview.lua")
-local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/AutolobbyConnectionMatrix.lua")
+local AutolobbyMapPreview = import("/lua/ui/lobby/autolobby/autolobbymappreview.lua")
+local AutolobbyConnectionMatrix = import("/lua/ui/lobby/autolobby/autolobbyconnectionmatrix.lua")
 
 ---@class UIAutolobbyInterfaceState
 ---@field PlayerCount number
@@ -135,8 +135,8 @@ local AutolobbyInterface = Class(Group) {
 
         if pathToScenarioInfo and playerOptions then
             -- hide it for now until we have a better way to decipher its possible (negative) impact
-            -- self.Preview:Show()
-            -- self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
+            self.Preview:Show()
+            self.Preview:UpdateScenario(pathToScenarioInfo, playerOptions)
         end
     end,
 
