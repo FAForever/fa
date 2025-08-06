@@ -160,7 +160,6 @@ local function RecallVotingThread(requestingArmy)
             SyncRecallStatus()
         end
         requestingBrain.RecallVoteCancelled = nil
-        LOG(GetGameTick(), 'Removing RecallVoteStartTime for ' .. requestingBrain.Nickname .. ' due to RecallVoteCancelled')
         requestingBrain.RecallVoteStartTime = nil
         requestingBrain.recallVotingThread = nil
         return
@@ -223,7 +222,6 @@ local function RecallVotingThread(requestingArmy)
         -- update UI once the cooldown dissipates
         SyncRecallStatus()
     end
-    LOG(GetGameTick(), 'Removing RecallVoteStartTime for ' .. requestingBrain.Nickname .. ' due to End of Recall Vote')
     requestingBrain.RecallVoteStartTime = nil
     requestingBrain.recallVotingThread = nil
 end
@@ -266,9 +264,7 @@ end
 local function ArmyRequestRecall(army, teammates)
     local brain = GetArmyBrain(army)
     if teammates > 0 then
-        LOG(GetGameTick(), 'Request recall for ', brain.Nickname)
         brain.recallVotingThread = ForkThread(RecallVotingThread, army)
-        LOG(GetGameTick(), 'Setting RecallVoteStartTime for ' .. brain.Nickname)
         brain.RecallVoteStartTime = GetGameTick()
         if ArmyVoteRecall(army, true, false) then
             SyncOpenRecallVote(teammates + 1, army)
@@ -382,7 +378,6 @@ local function GetRecallSyncTable()
 end
 
 function ResyncRecallVoting()
-    LOG(GetGameTick(), 'Resyncing recall vote', debug.traceback())
     local focus = GetFocusArmy()
     local teamSize = 0
     local yes, no = 0, 0
