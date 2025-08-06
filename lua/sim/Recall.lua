@@ -150,8 +150,7 @@ end
 ---@param requestingArmy number
 local function RecallVotingThread(requestingArmy)
     local requestingBrain = GetArmyBrain(requestingArmy)
-    LOG(GetGameTick(), 'Setting RecallVoteStartTime for ' .. requestingBrain.Nickname)
-    requestingBrain.RecallVoteStartTime = GetGameTick()
+
     WaitTicks(VoteTime) -- may be interrupted if the vote closes or is canceled by an alliance break
 
     local focus = GetFocusArmy()
@@ -269,6 +268,8 @@ local function ArmyRequestRecall(army, teammates)
     if teammates > 0 then
         LOG(GetGameTick(), 'Request recall for ', brain.Nickname)
         brain.recallVotingThread = ForkThread(RecallVotingThread, army)
+        LOG(GetGameTick(), 'Setting RecallVoteStartTime for ' .. brain.Nickname)
+        brain.RecallVoteStartTime = GetGameTick()
         if ArmyVoteRecall(army, true, false) then
             SyncOpenRecallVote(teammates + 1, army)
         end
