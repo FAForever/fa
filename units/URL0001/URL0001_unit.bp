@@ -469,7 +469,7 @@ UnitBlueprint{
             Icon = "psg",
             MaintenanceConsumptionPerSecondEnergy = 50,
             Name = "<LOC enhancements_0101>Personal Stealth Generator",
-            NewHealth = 1500,
+            NewHealth = 2000,
             ShowBones = { "Back_Upgrade" },
             Slot = "Back",
             UpgradeEffectBones = {
