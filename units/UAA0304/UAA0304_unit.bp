@@ -3,7 +3,7 @@ UnitBlueprint{
     AI = { GuardReturnRadius = 125 },
     Air = {
         AutoLandTime = 1,
-        BankFactor = 3,
+        BankFactor = 2.5,
         BankForward = false,
         BreakOffDistance = 40,
         BreakOffIfNearNewTarget = true,
