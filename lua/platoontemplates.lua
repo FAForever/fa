@@ -1131,28 +1131,8 @@ PlatoonTemplates = {
         },
         T2Shield={
             "T2Shield",
-            "DummyAI",
-            { "uab4202", 1, 1, "attack", "None" }
-        },
-        T2Shield1={
-            "T2Shield1",
-            "DummyAI",
-            { "uab4202", 1, 1, "attack", "None" }
-        },
-        T2Shield2={
-            "T2Shield2",
-            "DummyAI",
-            { "uab4202", 1, 1, "attack", "None" }
-        },
-        T2Shield3={
-            "T2Shield3",
-            "DummyAI",
-            { "uab4202", 1, 1, "attack", "None" }
-        },
-        T2Shield4={
-            "T2Shield4",
-            "DummyAI",
-            { "uab4202", 1, 1, "attack", "None" }
+            "UnitUpgradeAI",
+            { "uab4202", 1, 1, "support", "None" }
         },
         T2SonarUpgrade={
             "T2SonarUpgrade",
