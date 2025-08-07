@@ -1596,7 +1596,7 @@ Unit_Description_0111="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0112="Doubles the main cannon's rate of fire, and increases its range and that of Overcharge. Increases the range of the Microwave Laser if present.\n\n+100% Main cannon rate of fire\n+8 Main cannon range\n+8 Microwave Laser range"
 Unit_Description_0113="Enhances the ACU with a Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 225\nNanite Torpedo range = 60\n+34 Sonar Radius"
-Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
+Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour as well as providing an HP boost.\n\n+1500 Health\n+50 Regen"
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
