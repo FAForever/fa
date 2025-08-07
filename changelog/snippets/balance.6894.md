@@ -1,4 +1,4 @@
-- (#6894) Nerf the Cybran ACU's Personal Stealth Generator and Nano-Repair System, as both had overtuned statlines. Especially the Nano-Repair System was a very oppressive tool that caused the Cybran ACU to significantly overperform in both the Tech 2 and early Tech 3 stages.
+- (#6894) Nerf the Cybran ACU's Nano-Repair System, as it has proven to be an oppressive tool that causes the Cybran ACU to significantly overperform during both the Tech 2 and early Tech 3 stages.
 
   **Cybran ACU (URL0001)**
   - Nano-Repair System
