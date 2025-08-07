@@ -10,7 +10,7 @@ UnitBlueprint{
         BreakOffTrigger = 30,
         RandomBreakOffDistanceMult = 1,
         CanFly = true,
-        CombatTurnSpeed = 1.5,
+        CombatTurnSpeed = 1.2,
         EngageDistance = 50,
         KLift = 3,
         KLiftDamping = 2.5,
@@ -26,7 +26,7 @@ UnitBlueprint{
         PredictAheadForBombDrop = 3,
         StartTurnDistance = 5,
         TightTurnMultiplier = 0,
-        TurnSpeed = 1.5,
+        TurnSpeed = 1.2,
         Winged = true,
     },
     Audio = {
