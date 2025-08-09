@@ -320,8 +320,12 @@ end
 function Unit:GetWorkProgress()
 end
 
---- Adds nuclear missiles to the unit.
---- This is the method to call for both SML's and SMD's.
+--- With [FA-Binary-Patches#15](https://github.com/FAForever/FA-Binary-Patches/pull/15),
+--- `InBlocks` makes `amount` set the number of "blocks" for the in-progress tactical or nuclear missile.
+--- A projectile is built out of `10 * (buildTime / buildRate)` blocks.
+--- Use `Unit:GiveNukeSiloBlocks()` to use this feature.
+
+--- Adds nuclear missiles to the unit
 ---@see GiveTacticalSiloAmmo() # for tactical missiles
 ---@param amount number
 ---@param inBlocks? boolean
