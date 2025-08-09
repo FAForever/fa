@@ -24,6 +24,7 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
 local DebugUnitComponent = import("/lua/sim/units/components/debugunitcomponent.lua").DebugUnitComponent
+local FastDecayComponent = import("/lua/sim/units/components/fastdecayunitcomponent.lua").FastDecayComponent
 
 local GetBlueprintCaptureCost = import('/lua/shared/capturecost.lua').GetBlueprintCaptureCost
 
@@ -123,7 +124,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
 ---@field BuffTable table<BuffType, table<BuffName, BuffData>>
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent, FastDecayComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -174,7 +175,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ImmuneToStun? boolean
 ---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
 ---@field IsBeingTransferred? boolean
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -2357,6 +2358,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- for AI events
         self.Brain:OnUnitStartBeingBuilt(self, builder, layer)
+
+        if self.Blueprint.CategoriesHash["FASTDECAY"] then
+            self:StartFastDecayThread()
+        end
     end,
 
     ---@param self Unit
