@@ -682,7 +682,7 @@ end
 --- If `scenario` is a campaign type, returns only the FAF campaign mod
 --- (`6AAFE20A-E851-11DB-B8BE-ECC755D89593`) or an empty list if it is not enabled.
 --- Otherwise, returns `GetGameMods()`.
----@param scenario UIScenarioInfo
+---@param scenario UILobbyScenarioInfo
 ---@return uidSet #set of mod UID's
 function GetCampaignMods(scenario)
     local r
