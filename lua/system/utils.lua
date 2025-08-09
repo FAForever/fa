@@ -750,6 +750,8 @@ end
 -- Example:
 --  command line args: /arg key1:value1 key2:value2
 --  GetCommandLineArgTable("/arg") -> {key1="value1", key2="value2"}
+---@param option string
+---@return table
 function GetCommandLineArgTable(option)
     -- Find total number of args
     local nextMax = 1

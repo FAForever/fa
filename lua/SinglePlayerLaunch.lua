@@ -3,8 +3,104 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
-function GetRandomName(faction, aiKey)
-    WARN('GRN: ',faction)
+---@class UISessionBotInfo
+---@field Key string
+---@field StartSlot number
+
+--- Assigns the default value of all options to the defaultOptions table.
+---@param defaultOptions table
+---@param options ScenarioOption[]
+local function AssignDefaultOptions(defaultOptions, options)
+    ---@param option ScenarioOption
+    for index, option in options do
+        if option.key and option.values and option.default then
+            local value = option.values[option.default]
+            if type(value) == "table" then
+                defaultOptions[option.key] = value.key
+            else
+                defaultOptions[option.key] = value
+            end
+        end
+    end
+end
+
+--- Generates a table of all default lobby options
+--- @return table
+local function GetDefaultOptions()
+    local allLobbyOptions = import("/lua/ui/lobby/lobbyOptions.lua")
+
+    local defaultOptions = {}
+    AssignDefaultOptions(defaultOptions, allLobbyOptions.teamOptions)
+    AssignDefaultOptions(defaultOptions, allLobbyOptions.globalOpts)
+    AssignDefaultOptions(defaultOptions, allLobbyOptions.AIOpts)
+
+    return defaultOptions
+end
+
+--- Generates a table of all set lobby options.
+---
+--- Lobby options can be set using the `/gameoptions` argument. The format is `/gameoptions key:value key:value ...`. The correct key-value pairs can be found in `lua\ui\lobby\lobbyOptions.lua`. As an example: `/gameoptions AllowObservers:true CivilianAlliance:Enemy`
+--- @return table
+local function GetOptions()
+    local options = GetDefaultOptions()
+    local parsedOptions = import("/lua/system/utils.lua").GetCommandLineArgTable("/gameoptions")
+
+    for key, value in parsedOptions do
+        if options[key] then
+            options[key] = value
+        else
+            WARN("Unknown option: " .. tostring(key) .. " with value " .. tostring(value))
+        end
+    end
+
+    return options
+end
+
+--- Generates a table of all set game mods.
+---
+--- Lobby options can be set using the `/gamemods` argument. The format is `/gamemods uid:name uid:name ...`. The name is not used but it is useful to document what mod the UID is supposed to represent. As an example: `/gamemods f27c55b4-v075-55b4-92b6-64398e75e23f:m27ai faf0863e-94a0-b0b0-9ba583e9feb4:rngai`
+---@return ModInfo[]
+local function GetMods()
+    local mods = {}
+    local parsedMods = import("/lua/system/utils.lua").GetCommandLineArgTable("/gamemods")
+
+    ---@param name string
+    ---@param uid string
+    for uid, name in parsedMods do
+        mods[uid] = true
+    end
+
+    return import("/lua/MODS.LUA").GetGameMods(mods)
+end
+
+--- Generates a table of all defined bots.
+---
+--- Lobby options can be set using the `/gameais` argument. The format is `/gameais slot:bot slot:bot ...`. The name is not used but it is useful to document what mod the UID is supposed to represent. As an example: `/gameais 1:m27ai 4:rngai`
+---@return UISessionBotInfo[]
+local function GetBots()
+    ---@type UISessionBotInfo[]
+    local bots = {}
+    local parsedBots = import("/lua/system/utils.lua").GetCommandLineArgTable("/gameais")
+
+    ---@param key string
+    ---@param slot string
+    for slot, key in parsedBots do
+        local parsedSlot = tonumber(slot)
+        if parsedSlot then
+            table.insert(bots, { Key = key, StartSlot = parsedSlot })
+        else
+            WARN("Invalid slot for AI: " .. tostring(id) .. " with value " .. tostring(slot))
+        end
+    end
+
+    return bots
+end
+
+--- Generates a random, thematic name used by AIs.
+---@param faction number
+---@param aiKey string
+---@return string
+local function GetRandomName(faction, aiKey)
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local factions = import("/lua/factions.lua").Factions
 
@@ -14,7 +110,7 @@ function GetRandomName(faction, aiKey)
 
     if aiKey then
         local aiName = "AI"
-        for index, value in aiTypes do
+        for _, value in aiTypes do
             if aiKey == value.key then
                 aiName = value.name
             end
@@ -25,11 +121,15 @@ function GetRandomName(faction, aiKey)
     return name
 end
 
-function GetRandomFaction()
+--- Generates a random faction.
+---@return number
+local function GetRandomFaction()
     return math.random(table.getn(import("/lua/factions.lua").Factions))
 end
 
-function VerifyScenarioConfiguration(scenarioInfo)
+--- Validates the scenario file.
+---@param scenarioInfo UIScenarioInfoFile
+local function VerifyScenarioConfiguration(scenarioInfo)
     if scenarioInfo == nil then
         error("VerifyScenarioConfiguration - no scenarioInfo")
     end
@@ -47,9 +147,23 @@ function VerifyScenarioConfiguration(scenarioInfo)
     end
 end
 
+--- Transforms a map name into a path to the scenario file. This is based on an educated guess - there's no guarantee.
+---@param mapName FileName | string
+---@return FileName
+local function FixupMapName(mapName)
+    if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
+        mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
+    end
+    return mapName --[[@as FileName]]
+end
 
-
--- Note that the map name must include the full path, it won't try to guess the path based on name
+--- Populates a session to launch a campaign scenario.
+---@param scenario UIScenarioInfoFile       # Map name must be a full path to a campaign scenario, it won't try to guess it based on just a name.
+---@param difficulty number
+---@param inFaction? number
+---@param campaignFlowInfo? any
+---@param isTutorial? boolean
+---@return UISinglePlayerSessionConfiguration
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
     local factions = import("/lua/factions.lua").Factions
     local faction = inFaction or 1
@@ -109,33 +223,11 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
     return sessionInfo
 end
 
-
-
-
-function FixupMapName(mapName)
-    if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
-        mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
-    end
-    return mapName
-end
-
-
-local defaultOptions = {
-    FogOfWar = 'explored',
-    NoRushOption = 'Off',
-    PrebuiltUnits = 'Off',
-    Difficulty = 2,
-    DoNotShareUnitCap = true,
-    Timeouts = -1,
-    GameSpeed = 'normal',
-    UnitCap = '500',
-    Victory = 'sandbox',
-    CheatsEnabled = 'true',
-    CivilianAlliance = 'enemy',
-}
-
 local function GetCommandLineOptions(isPerfTest)
-    local options = table.copy(defaultOptions)
+
+    local options = GetDefaultOptions()
+
+    reprsl(options)
 
     if isPerfTest then
         options.FogOfWar = 'none'
@@ -165,38 +257,61 @@ local function GetCommandLineOptions(isPerfTest)
     return options
 end
 
+--- Populates a session where all defined armies are AI.
+---@param scenario UIScenarioInfoFile
+---@return table
+local function SetupBotSession(scenario)
 
-function SetupBotSession(mapName)
-    if not mapName then
-        error("SetupBotSession - mapName required")
-    end
+    VerifyScenarioConfiguration(scenario)
 
-    mapName = FixupMapName(mapName)
-
-    local sessionInfo = {}
-
+    ---@type UISinglePlayerSessionConfiguration
+    sessionInfo = {}
     sessionInfo.playerName = Prefs.GetFromCurrentProfile('Name') or 'Player'
-    sessionInfo.createReplay = false
+    sessionInfo.createReplay = true
+    sessionInfo.scenarioInfo = scenario
+    sessionInfo.scenarioInfo.Options = GetOptions()
+    sessionInfo.scenarioMods = GetMods()
 
-    sessionInfo.scenarioInfo = import("/lua/ui/maputil.lua").LoadScenario(mapName)
-    if not sessionInfo.scenarioInfo then
-        error("Unable to load map " .. mapName)
+    local seed = tonumber(GetCommandLineArg("/seed", 1))
+    if seed then
+        sessionInfo.RandomSeed = seed
     end
-
-    VerifyScenarioConfiguration(sessionInfo.scenarioInfo)
-
-    local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
 
     sessionInfo.teamInfo = {}
-
+    local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
     local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
 
-    local ai
-    local aiopt = GetCommandLineArg("/ai", 1)
-    if aiopt then
-        ai = aiopt[1]
-    else
-        ai = aitypes[1].key
+    -- advanced bot assignment. Useful if you want specific bots at specific slots.
+    local bots = GetBots()
+    if not table.empty(bots) then
+
+        ---@param index number
+        ---@param botInfo UISessionBotInfo
+        for index, botInfo in bots do
+            local faction = GetRandomFaction()
+            local name = GetRandomName(faction, botInfo.Key)
+
+            sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
+            sessionInfo.teamInfo[index].Faction = faction
+            sessionInfo.teamInfo[index].PlayerName = name
+            sessionInfo.teamInfo[index].ArmyName = armies[botInfo.StartSlot]
+
+            sessionInfo.teamInfo[index].AIPersonality = botInfo.Key
+            sessionInfo.teamInfo[index].StartSlot = botInfo.StartSlot
+
+            sessionInfo.teamInfo[index].Human = false
+            sessionInfo.teamInfo[index].PlayerColor = math.mod(index, numColors)
+            sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
+        end
+
+        return sessionInfo
+    end
+
+    -- simple bot assignment. Allows you to quickly populate all slots with a given bot type.
+    local ai = "rush"
+    local aiType = GetCommandLineArg("/ai", 1)
+    if aiType then
+        ai = aiType[1]
     end
 
     for index, name in armies do
@@ -210,26 +325,21 @@ function SetupBotSession(mapName)
         sessionInfo.teamInfo[index].AIPersonality = ai
     end
 
-    sessionInfo.scenarioInfo.Options = GetCommandLineOptions(false)
-    sessionInfo.scenarioMods = import("/lua/mods.lua").GetCampaignMods(sessionInfo.scenarioInfo)
-
-    local seed = GetCommandLineArg("/seed", 1)
-    if seed then
-        sessionInfo.RandomSeed = tonumber(seed[1])
-    end
-
     return sessionInfo
 end
 
-
-local function SetupCommandLineSkirmish(scenario, isPerfTest)
+--- Populates a session designed for a simple skirmish. The player is put into the first slot. All other slots are populated by AIs.
+---@param scenario UIScenarioInfoFile
+---@param isPerfTest boolean
+---@return table
+local function SetupSkirmishSession(scenario, isPerfTest)
 
     local faction
     if HasCommandLineArg("/faction") then
         faction = tonumber(GetCommandLineArg("/faction", 1)[1])
         local maxFaction = table.getn(import("/lua/factions.lua").Factions)
         if faction < 1 or faction > maxFaction then
-            error("SetupCommandLineSession - selected faction index " .. faction .. " must be between 1 and " ..  maxFaction)
+            error("SetupCommandLineSession - selected faction index " .. faction .. " must be between 1 and " .. maxFaction)
         end
     else
         faction = GetRandomFaction()
@@ -239,7 +349,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
 
     scenario.Options = GetCommandLineOptions(isPerfTest)
 
-    sessionInfo = { }
+    sessionInfo = {}
     sessionInfo.playerName = Prefs.GetFromCurrentProfile('Name') or 'Player'
     sessionInfo.createReplay = true
     sessionInfo.scenarioInfo = scenario
@@ -276,7 +386,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
 
     local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
     if extras then
-        for k,armyName in extras do
+        for k, armyName in extras do
             local index = table.getn(sessionInfo.teamInfo) + 1
             sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
             sessionInfo.teamInfo[index].PlayerName = 'civilian'
@@ -291,6 +401,9 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     return sessionInfo
 end
 
+--- Called by the engine when the `/map` or `/scenario` command line switch is detected.
+---@param mapName FileName        # Full path to a scenario, e.g. /maps/SCMP_007/SCMP_007_scenario.lua for Open Palms.
+---@param isPerfTest boolean
 function StartCommandLineSession(mapName, isPerfTest)
     if not mapName then
         error("SetupCommandLineSession - mapName required")
@@ -315,7 +428,17 @@ function StartCommandLineSession(mapName, isPerfTest)
         end
         sessionInfo = SetupCampaignSession(scenario, difficulty, faction)
     else
-        sessionInfo = SetupCommandLineSkirmish(scenario, isPerfTest)
+        if HasCommandLineArg("/observe") then
+            sessionInfo = SetupBotSession(scenario)
+        else
+            sessionInfo = SetupSkirmishSession(scenario, isPerfTest)
+        end
     end
+
+    -- feature: run the skirmish as fast as possible
+    if HasCommandLineArg("/runWithTheWind") then
+        ConExecute("wld_RunWithTheWind 1")
+    end
+
     LaunchSinglePlayerSession(sessionInfo)
 end
