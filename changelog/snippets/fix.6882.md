@@ -1,0 +1,1 @@
+- (#6882) Fix the `ModWeapons` blueprint field adding weapons after dummy weapons, causing the unit weapon to incorrectly get the dummy weapon's blueprint for the new weapon.
