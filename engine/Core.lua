@@ -113,11 +113,11 @@ end
 function EndLoggingStats(exit)
 end
 
----@overload fun (unit: UserUnit): boolean
----@overload fun (unit: UnitId): boolean
----@overload fun (unit: Projectile): boolean
----@overload fun (unit: Blip): boolean
----@overload fun (unit: Prop): boolean
+---@overload fun (category: EntityCategory, unit: UserUnit): boolean
+---@overload fun (category: EntityCategory, unit: UnitId): boolean
+---@overload fun (category: EntityCategory, unit: Projectile): boolean
+---@overload fun (category: EntityCategory, unit: Blip): boolean
+---@overload fun (category: EntityCategory, unit: Prop): boolean
 ---Returns true iff the entity or blueprint id is of the given category.
 ---@param category EntityCategory
 ---@param unit Unit
@@ -131,8 +131,8 @@ end
 function EntityCategoryEmpty(category)
 end
 
----@overload fun(units: UserUnit[]): UserUnit[]
----@overload fun(unitIds: UnitId[]): UnitId[]       
+---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
+---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
 --- filters a list of (user) units or unit ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
