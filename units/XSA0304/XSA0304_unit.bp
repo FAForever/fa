@@ -208,10 +208,29 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
+            AutoInitiateAttackCommand = true,
+            FireTargetLayerCapsTable = {
+                Air = "Land|Water|Seabed",
+                Land = "Land|Water|Seabed",
+            },
+            TrackingRadius = 1,
+            TargetCheckInterval = 3,
+            RateOfFire = 0,
+            MaxRadius = 64,
+            TargetPriorities = {
+                "TECH4",
+                "TECH3 STRUCTURE",
+                "TECH2 STRUCTURE",
+                "TECH1 STRUCTURE",
+                "ALLUNITS",
+             },
+            TargetRestrictDisallow = "UNTARGETABLE",
+        },
+        {
+            AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound { Bank = 'XSA_Weapon', Cue = 'XSA0304_Zhanasse_Bomb', LodCutoff = 'Weapon_LodCutoff' },
             },
-            AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             BombDropThreshold = 8,
             CollideFriendly = false,
