@@ -1,1 +1,0 @@
-- (#6885) Check whether LazyVar.OnDirty exists in case it was destroyed earlier.

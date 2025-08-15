@@ -1,1 +1,0 @@
-- (#6797) Remove the teleport reticle object from the command mode data.

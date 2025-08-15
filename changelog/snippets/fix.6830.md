@@ -1,1 +1,0 @@
-- (#6830) Fix unit/projectile/weapon debug component logging and drawing causing desyncs.

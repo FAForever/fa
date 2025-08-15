@@ -1,1 +1,0 @@
-- (#6866) Reuse tables when creating beam weapons instead of allocating new ones.

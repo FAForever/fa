@@ -1,1 +1,0 @@
-- (#6884) Fix being unable to build adjacent to the north or south side of an air factory that is building a continental.
