@@ -17,6 +17,7 @@ UnitBlueprint{
         "CQUEMOV",
         "DEFENSE",
         "DRAGBUILD",
+        "FASTDECAY",
         "OVERLAYANTIAIR",
         "PRODUCTFA",
         "RECLAIMABLE",
