@@ -1,8 +1,24 @@
 ---@type number
-last_version = 3824
+last_version = 3825
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3825,
+        name = "Game patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "# Game version 3825 (15th of August 2025)",
+            "",
+            "Another three months have passed which means it is time for another game patch.",
+            "You can find the complete changelog on github by clicking the button below.",
+            "",
+            "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3824,
         name = "Hotfix",

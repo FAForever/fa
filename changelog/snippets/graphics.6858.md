@@ -1,3 +1,0 @@
-- (#6858) The water changes less when tilting the camera on maps using advanced water absorption. The effect was too big before, now it looks more reasonable.
-
-This change also makes the water appear slightly brighter when viewed from the top. Only the handful of maps using advanced water absorption are affected, and they can compensate by increasing the abyss height. The vast majority of maps are unaffected.

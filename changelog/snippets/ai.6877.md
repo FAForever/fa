@@ -1,1 +1,0 @@
-- (#6877) Add the now upgradeable Aeon T2 shield to the existing T2 shield upgrade AI behaviors (upgrade templates, platoon templates, builder group).

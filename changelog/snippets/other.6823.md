@@ -1,1 +1,0 @@
-- (#6823) Proper type annotation for `GetCommandMode`.

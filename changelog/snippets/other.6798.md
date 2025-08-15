@@ -1,1 +1,0 @@
-- (#6798) Annotate WorldView control and ping sync data.

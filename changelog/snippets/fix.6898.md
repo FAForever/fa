@@ -1,1 +1,0 @@
-- (#6898) Fix a desync-causing error when a player is defeated the same tick a recall vote is started.
