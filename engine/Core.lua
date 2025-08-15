@@ -1,8 +1,11 @@
 ---@meta
 ---@diagnostic disable: lowercase-global
 
----@class FileName: string, stringlib
----@operator concat(FileName | string): FileName
+---@class string : stringlib
+---@operator concat(FileName): FileName
+
+---@class FileName: string
+---@operator concat(string): FileName
 
 ---@class VectorBase
 ---@field [1] number    # x

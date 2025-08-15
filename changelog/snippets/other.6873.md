@@ -1,0 +1,1 @@
+- (#6873) Improve singleplayer command line launch by adding a `/noAi` command line option and neutral/enemy civilian armies when launching from the command line.
