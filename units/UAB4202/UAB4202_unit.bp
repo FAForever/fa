@@ -53,7 +53,10 @@ UnitBlueprint{
         },
     },
     Display = {
-        Abilities = { "<LOC ability_shielddome>Shield Dome" },
+        Abilities = {
+            "<LOC ability_shielddome>Shield Dome",
+            "<LOC ability_upgradable>Upgradeable",
+        },
         AnimationDeath = {
             {
                 Animation = "/units/uab4202/uab4202_ADeath.sca",
@@ -62,6 +65,7 @@ UnitBlueprint{
                 Weight = 1,
             },
         },
+        AnimationUpgrade = "/units/uab4202/uab4202_aupgrade.sca",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -90,12 +94,14 @@ UnitBlueprint{
                 Width = 12.8,
             },
         },
-        UniformScale = 0.06,
+        UniformScale = 0.05,
     },
     Economy = {
         BuildCostEnergy = 5760,
         BuildCostMass = 480,
+        BuildRate = 20,
         BuildTime = 950,
+        BuildableCategory = { "uab4301" },
         MaintenanceConsumptionPerSecondEnergy = 150,
         RebuildBonusIds = {
             "uab4202",
@@ -107,7 +113,10 @@ UnitBlueprint{
         SizeZ = 3,
     },
     General = {
-        CommandCaps = { RULEUCC_Pause = true },
+        CommandCaps = {
+            RULEUCC_Pause = true,
+            RULEUCC_Stop = true,
+        },
         FactionName = "Aeon",
         Icon = "land",
         OrderOverrides = {
@@ -119,6 +128,7 @@ UnitBlueprint{
         SelectionPriority = 5,
         ToggleCaps = { RULEUTC_ShieldToggle = true },
         UnitName = "<LOC uab4202_name>Shield of Light",
+        UpgradesTo = 'uab4301',
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
