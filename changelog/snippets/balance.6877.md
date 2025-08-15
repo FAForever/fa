@@ -1,0 +1,1 @@
+- (#6877) The Aeon T2 shield can now be upgraded to T3. It has the same 20 buildpower as UEF and Seraphim T2 shields.
