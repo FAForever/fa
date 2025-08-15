@@ -1,1 +1,0 @@
-- (#6853) Reduce conditional table accesses of projectiles when colliding or losing targets

@@ -1,1 +1,0 @@
-- (#6877) With its new upgrade ability, the Aeon T2 shield has an adjusted model and a new upgrade animation.
