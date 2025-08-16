@@ -115,7 +115,7 @@ Tree = Class(Prop) {
                 EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
             end
 
-        elseif type == 'Nuke' and canBurn then
+        elseif (type == 'Nuke' or type == 'NukeIgnoreShields') and canBurn then
             -- slight chance we catch fire
             if Random(1, 250) < 5 then
                 self:Burn()
