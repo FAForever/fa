@@ -1,8 +1,23 @@
 ---@type number
-last_version = 3825
+last_version = 3826
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3826,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3826 (16th of August 2025)",
+            "",
+            "Fix an edge case where announcements would break cinematic mode. This caused coop missions to hang.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3825,
         name = "Game patch",
