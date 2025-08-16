@@ -2849,20 +2849,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return false -- Report failure of OnStartBuild
         end
 
-        -- If desired, prevent engineer stations from building their upgrades as a separate unit
-        -- We need a separate table for this just in case a unit is intended to be able to build its own upgrade as a separate unit too
-        -- Its type is `UnparsedCategory[]` to make it behave identically to `Blueprint.Economy.BuildableCategory`
-        local upgradeOnlyCategory = self.Blueprint.Economy.UpgradeOnlyCategory
-        if upgradeOnlyCategory and order == "MobileBuild" then
-            for _, unparsedCat in upgradeOnlyCategory do
-                if EntityCategoryContains(ParseEntityCategory(unparsedCat), built) then
-                    -- Destroying the built unit will clear the command too, so we don't need to clear the entire queue (in case this exploit was done on accident).
-                    built:Destroy()
-                    return false
-                end
-            end
-        end
-
         -- We just started a construction (and haven't just been tasked to work on a half-done
         -- project.)
         if built:GetHealth() == 1 then
@@ -4106,11 +4092,25 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         return false
     end,
 
+    --- Called by the engine on `FactoryBuild` and `MobileBuild` orders to determine if a unit is allowed to be built.
     ---@param self Unit
     ---@param target_bp UnitBlueprint
     ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         if self:CanBuild(target_bp.BlueprintId) then
+
+            -- If desired, prevent engineer stations and factories from building their upgrades as a separate unit
+            -- We need a separate table for this just in case a unit is intended to be able to build its own upgrade as a separate unit too
+            -- Its type is `UnparsedCategory[]` to make it behave identically to `Blueprint.Economy.BuildableCategory`
+            local upgradeOnlyCategory = self.Blueprint.Economy.UpgradeOnlyCategory
+            if upgradeOnlyCategory then
+                for _, unparsedCat in upgradeOnlyCategory do
+                    if EntityCategoryContains(ParseEntityCategory(unparsedCat), target_bp.BlueprintId) then
+                        return false
+                    end
+                end
+            end
+
             return true
         else
             return false

@@ -104,6 +104,9 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY CYBRAN MOBILE AIR",
             "TRANSPORTBUILTBYTIER2FACTORY CYBRAN MOBILE AIR",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2FACTORY CYBRAN STRUCTURE AIR",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "urb0202" },
         StorageEnergy = 0,

@@ -101,6 +101,9 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY AEON STRUCTURE LAND",
             "BUILTBYTIER2FACTORY AEON MOBILE LAND",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2FACTORY AEON STRUCTURE LAND",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "uab0201" },
         StorageEnergy = 0,
