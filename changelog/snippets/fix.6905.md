@@ -1,0 +1,1 @@
+- (#6905) Fix an edge case where announcements would break cinematic mode
