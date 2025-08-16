@@ -300,11 +300,12 @@ AbstractAnnouncement = ClassUI(Group) {
         ---@type LazyVar
         local animationProgress = CreateLazyVar(0)
 
-        -- use last known position of control if it is destroyed, this happens when you fail an objective.
-        local controlTopValue = control.Top()
-        local controlBottomValue = control.Bottom()
-        local controlLeftValue = control.Left()
-        local controlRightValue = control.Right()
+        -- use last known position of control if it is destroyed, this happens when you fail an objective. 
+        -- we can't initialize it with the position of the control as it may not be layout correctly yet.
+        local controlTopValue = 0
+        local controlBottomValue = 0
+        local controlLeftValue = 0
+        local controlRightValue = 0
 
         background.Top:Set(
             function()
