@@ -162,7 +162,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field ignoreDetectionFrom table<Army, true>? # Armies being given free vision to reveal beams hitting targets
 ---@field reallyDetectedBy table<Army, true>?    # Armies that detected the unit without free vision and don't need intel flushed when beam weapons stop hitting
 ---@field Weapons table<string, Weapon> # string is weapon Label
----@field WeaponInstances Weapon[]
+---@field WeaponInstances table<integer|string, Weapon> # string matches weapon label
 ---@field WeaponCount number
 ---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
 ---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
