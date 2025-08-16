@@ -1,0 +1,1 @@
+- (#6828) Fix typo in descriptionRU translation of UEF T2 transport.
