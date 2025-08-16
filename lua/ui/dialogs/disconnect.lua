@@ -16,7 +16,6 @@ local scenario = SessionGetScenarioInfo()
 
 local parent = nil
 local myIndex = ''
-local CreateBorder
 
 function DestroyDialog()
     SessionClients.ResetInterval()
@@ -42,7 +41,7 @@ local function CreateDialog(clients)
     bg = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
     LayoutHelpers.FillParent(bg, parent)
 
-    bg.border = CreateBorder(bg)
+    bg.border = UIUtil.CreateSCXMenuPanelBorder(bg)
 
     local dlgTitle = UIUtil.CreateText(bg, "<LOC UI_Disco0000>Connectivity", 18)
     LayoutHelpers.AtTopIn(dlgTitle, bg, -52)
@@ -233,57 +232,6 @@ function Update()
         if parent then DestroyDialog() end
     end
 
-end
-
-function CreateBorder(parent)
-    local tbl = {}
-    tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
-    tbl.tm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds'))
-    tbl.tr = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ur.dds'))
-    tbl.l = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_l.dds'))
-    tbl.r = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_vert_r.dds'))
-    tbl.bl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ll.dds'))
-    tbl.bm = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lm.dds'))
-    tbl.br = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_lr.dds'))
-
-    tbl.tl.Bottom:Set(parent.Top)
-    tbl.tl.Right:Set(parent.Left)
-
-    tbl.tr.Bottom:Set(parent.Top)
-    tbl.tr.Left:Set(parent.Right)
-
-    tbl.tm.Bottom:Set(parent.Top)
-    tbl.tm.Right:Set(parent.Right)
-    tbl.tm.Left:Set(parent.Left)
-
-    tbl.l.Bottom:Set(parent.Bottom)
-    tbl.l.Top:Set(parent.Top)
-    tbl.l.Right:Set(parent.Left)
-
-    tbl.r.Bottom:Set(parent.Bottom)
-    tbl.r.Top:Set(parent.Top)
-    tbl.r.Left:Set(parent.Right)
-
-    tbl.bl.Top:Set(parent.Bottom)
-    tbl.bl.Right:Set(parent.Left)
-
-    tbl.br.Top:Set(parent.Bottom)
-    tbl.br.Left:Set(parent.Right)
-
-    tbl.bm.Top:Set(parent.Bottom)
-    tbl.bm.Right:Set(parent.Right)
-    tbl.bm.Left:Set(parent.Left)
-
-    tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.l.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.r.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
-    tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
-
-    return tbl
 end
 
 -- kept for mod backwards compatibility
