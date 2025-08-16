@@ -955,8 +955,8 @@
 --- command capability flags for this unit
 ---@field CommandCaps table<CommandCap, boolean>
 ---@field ExcludeFromVeterancy? boolean
---- faction the unit belongs to. Factions are 'Aeon', 'Cybran' and 'UEF'
----@field FactionName Faction
+--- Faction the unit belongs to.
+---@field FactionName FactionName
 ---@field FractionThreshold? number
 --- indicates the background for the build icon
 ---@field Icon IconBackgroundType
