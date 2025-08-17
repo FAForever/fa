@@ -19,7 +19,7 @@
 ---@field maxstack number
 
 ----------
--- Moho discrepancies
+--#region Moho discrepancies
 ----------
 
 -- variables set from the engine
@@ -35,6 +35,7 @@ __EngineStats = { } -- populated by the engine, each frame in the UI thread
 function __pow(a, b)
 end
 
+--- Prints to the moho logger with "info:" prefix. Unlike LOG, doesn't add the prefix for newlines.
 ---@param out any
 ---@param ... any
 function _ALERT(out, ...)
@@ -61,7 +62,11 @@ end
 function LOG(out, ...)
 end
 
-function LuaDumpBinary()
+--- Compiles a source file into a binary lua file that can be loaded using dofile but cannot be hooked.
+---@param sourcePath FileName
+---@param outputPath FileName
+---@return boolean success
+function LuaDumpBinary(sourcePath, outputPath)
 end
 
 ---@return any[]
@@ -74,6 +79,7 @@ function debug.allocatedsize(obj)
 end
 
 --- Returns a cached table of all table allocations tracked between calls of `debug.trackallocations(true)` and `debug.trackallocations(false)`.
+--- Since it is cached, make sure to clear it or mark seen objects after you finish tracking.
 ---@return table<any, string>
 function debug.allocinfo()
 end
@@ -117,10 +123,6 @@ end
 ---@param doTrack boolean
 function debug.trackallocations(doTrack)
 end
-
--- these are available in the initfile, but are removed from the game
-io = nil
-os = nil
 
 --- Returns if the table is empty
 ---@param table table
@@ -173,17 +175,34 @@ end
 function string.lualex(str)
 end
 
+--#region these are available in the init file, but are removed from the game
+
+--- Only available in the init file.
+io = nil
+--- Only available in the init file.
+os = nil
+
+---
+---Dynamically links the host program with the C library `libname`.
+---
+---Only available in the init file.
+---
+---[View documents](command:extension.lua.doc?["en-us/51/manual.html/pdf-package.loadlib"])
+---
+---@param libname string
+---@param funcname string
+---@return any
+function loadlib(libname, funcname)
+end
+
+--#endregion
+
 ----------
---- Version discrepancies
+--#region Version discrepancies
 ----------
 
 _LOADED = {} -- used by `requires`
 _VERSION = "Lua 5.0.1" -- override the version from the extension
-
----@param libname string
----@param funcname string
-function loadlib(libname, funcname)
-end
 
 -- renamed in 5.1
 math.mod = math.fmod
@@ -217,3 +236,4 @@ string.pack           = nil
 string.packsize       = nil
 string.reverse        = nil
 string.unpack         = nil
+--#endregion
