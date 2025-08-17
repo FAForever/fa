@@ -1,0 +1,1 @@
+- (#6910) Improve annotations of the trail emitter blueprint
