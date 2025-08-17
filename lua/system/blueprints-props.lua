@@ -128,12 +128,12 @@ local function ProcessLOD(prop)
         for k = 1, n do
             local data = prop.Display.Mesh.LODs[k]
 
-            -- https://www.desmos.com/calculator (x * x)
-            local factor = (k / n) * (k / n)
+            -- https://www.desmos.com/calculator (x ^ 4)
+            local factor = (k / n) * (k / n) * (k / n) * (k / n)
             local LODCutoff = factor * lod
 
-            -- sanitize the value
-            data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+            -- Sanitize the value and add a flat value of 30 to each level to prevent some LODCutoffs from becoming to small
+            data.LODCutoff = 30 + MathFloor(LODCutoff / 10 + 1) * 10
         end
     end
 end
