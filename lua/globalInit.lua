@@ -78,3 +78,5 @@ elseif trace:find("userinit.lua") then
         )
     )
 end
+
+_G.LuaDumpBinary = nil
