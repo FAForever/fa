@@ -1493,22 +1493,12 @@ function CreateHorzFillGroup(parent, filename)
     return group
 end
 
----@class SCXMenuPanelBorderTable
----@field tl Bitmap
----@field tm Bitmap
----@field tr Bitmap
----@field l Bitmap
----@field r Bitmap
----@field bl Bitmap
----@field bm Bitmap
----@field br Bitmap
-
 --- Creates a thick white border with large metal corners.
 --- Used for disconnect and connectivity dialogs.
 ---@param parent Control
 ---@return SCXMenuPanelBorderTable
 function CreateSCXMenuPanelBorder(parent)
-    ---@type SCXMenuPanelBorderTable
+    ---@class SCXMenuPanelBorderTable
     local tbl = {
         tl = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_ul.dds')),
         tm = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds')),
