@@ -1,0 +1,1 @@
+- (#6857) Refactor duplicated SCX menu panel border creation into a uiutil function.
