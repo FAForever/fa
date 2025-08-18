@@ -1,0 +1,1 @@
+- (#6848) Fix `RemoveOutliers` statistics function used in the profiler for when all given values are the same.
