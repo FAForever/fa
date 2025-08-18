@@ -1503,6 +1503,8 @@ end
 ---@field bm Bitmap
 ---@field br Bitmap
 
+--- Creates a thick white border with large metal corners.
+--- Used for disconnect and connectivity dialogs.
 ---@param parent Control
 ---@return SCXMenuPanelBorderTable
 function CreateSCXMenuPanelBorder(parent)
