@@ -1,1 +1,1 @@
-- (#6828) Fix typo in descriptionRU translation of UEF T2 transport.
+- (#6828) Fix typo in RU translation of UEF T2 transport description for how many T3 units it can carry.
