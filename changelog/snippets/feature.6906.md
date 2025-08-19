@@ -1,0 +1,1 @@
+- (#6906) Add support for props to skip the automatic computation of LODs via the `USEBLUEPRINTLOD` category.
