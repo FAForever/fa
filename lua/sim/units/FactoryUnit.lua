@@ -138,8 +138,10 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
-        if unitBeingBuilt:GetFractionComplete() < 1 then
-            unitBeingBuilt:Destroy()
+        if not unitBeingBuilt.isFinishedUnit and not self.FactoryBuildFailed then
+            unitBeingBuilt:OnFailedToBeBuilt()
+            self:OnFailedToBuild()
+            return
         end
 
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
