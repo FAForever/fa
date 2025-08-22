@@ -962,6 +962,51 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     return positions, positionCount, distance, threats, tHead - 1
 end
 
+--- Retrieves the leaf at the given world coordinates.
+--- 
+--- Note that in no circumstances you should edit the table that is returned!
+---@param layer NavLayers
+---@param x number
+---@param z number
+---@return NavLeaf?
+---@return 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'Unpathable' | nil
+function GetLeafXZ(layer, x, z)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- check position argument
+    local leaf = grid:FindLeafXZ(x, z)
+    if not leaf then
+        return nil, 'OutsideMap'
+    end
+
+    -- check if leaf is pathable
+    if leaf.Label == -1 then
+        return nil, 'Unpathable'
+    end
+
+    return leaf, nil
+end
+
+--- Retrieves the leaf at the given world position.
+--- 
+--- Note that in no circumstances you should edit the table that is returned!
+---@param layer NavLayers
+---@param position Vector
+---@return NavLeaf?
+---@return 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'Unpathable' | nil
+function GetLeaf(layer, position)
+    return GetLeafXZ(layer, position[1], position[3])
+end
+
 --- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetTerrainLabel` this function will try to find the nearest valid neighbor
 ---@see GetTerrainLabel
 ---@param layer NavLayers
