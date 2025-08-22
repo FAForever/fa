@@ -1,0 +1,1 @@
+- (#6913) Improve implementation of the edge case fix from #6700 related to using mobile build orders on factories.
