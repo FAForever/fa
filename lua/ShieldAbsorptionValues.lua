@@ -35,5 +35,6 @@ shieldAbsorptionValues = {
 	["StaticShield"] = { -- For mod support, auto-assigned if the owner has STRUCTURE category.
 		["Deathnuke"] = 1.0,
 		["Overcharge"] = 1.0,
+		["NukeIgnoreShields"] = 0.0,
 	},
 }

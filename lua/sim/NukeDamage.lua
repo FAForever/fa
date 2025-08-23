@@ -30,23 +30,25 @@ NukeAOE = ClassSimple {
         if self.TotalTime == 0 then
             import("/lua/sim/damagearea.lua").DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true, brain, army)
         else
-            ForkThread(self.SlowNuke, self, instigator, pos)
+            ForkThread(self.SlowNuke, self, instigator, pos, damageType)
         end
     end,
 
     ---@param self NukeAOE
     ---@param instigator Unit
     ---@param pos Vector
-    SlowNuke = function(self, instigator, pos)
+    ---@param damageType? DamageType
+    SlowNuke = function(self, instigator, pos, damageType)
+        damageType = damageType or 'Nuke'
         local ringWidth = (self.Radius / self.Ticks)
         local tickLength = (self.TotalTime / self.Ticks)
 
         -- Since we're not allowed to have an inner radius of 0 in the DamageRing function,
         -- I'm manually executing the first tick of damage with a DamageArea function.
-        DamageArea(instigator, pos, ringWidth, self.Damage, 'Nuke', true, true)
+        DamageArea(instigator, pos, ringWidth, self.Damage, damageType, true, true)
         WaitSeconds(tickLength)
         for i = 2, self.Ticks do
-            DamageRing(instigator, pos, ringWidth * (i - 1), ringWidth * i, self.Damage, 'Nuke', true, true)
+            DamageRing(instigator, pos, ringWidth * (i - 1), ringWidth * i, self.Damage, damageType, true, true)
             WaitSeconds(tickLength)
         end
     end,
