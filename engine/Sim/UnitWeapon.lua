@@ -87,7 +87,7 @@ function UnitWeapon:GetBlueprint()
 end
 
 ---
----@return Blip | Unit | nil
+---@return Blip | Unit | Projectile | nil
 function UnitWeapon:GetCurrentTarget()
 end
 
