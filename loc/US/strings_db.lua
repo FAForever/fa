@@ -1754,7 +1754,7 @@ Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilize
 Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge.\n\n+8 Main cannon range"
 Unit_Description_0159="Grants the ACU a medium range omni Sensor and increased optical range.\n\n+54 Vision Radius\n+12 Omni Radius"
 Unit_Description_0160="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1000 Health\n+10 Regen"
-Unit_Description_0161="Doubles the main cannon's rate of fire.\n\n+100% Rate of fire"
+Unit_Description_0161="Doubles the main cannon's rate of fire.\n\n<VAR NewRateOfFire> Rate of fire"
 Unit_Description_0162="Increases ACU's resource generation to 19 mass per second and 1720 energy per second."
 Unit_Description_0163="Increases ACU's resource generation to 37 mass per second and 3420 energy per second."
 Unit_Description_0164="Creates a rapidly-recharging, protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 75 seconds"
