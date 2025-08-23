@@ -4114,25 +4114,28 @@ float4 AeonPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
     if (1 == mirrored) clip(vertex.depth.x);
 
-    float2 tc1 = vertex.texcoord0.xy * 2;
-    tc1.x += 0.005 * vertex.material.x;
-    tc1.y += 0.02 * vertex.material.x;
-    float4 lookup = tex2D( lookupSampler, tc1);
+    float2 tc1 = vertex.texcoord0.xy * 0.16;
+    tc1.y += 0.03 / 33 * vertex.material.x;
+    tc1.x += 0.03 / 18 * vertex.material.x;
+    float4 lookup1 = tex2D( lookupSampler, tc1);
 
-    float2 tc2 = vertex.texcoord0.xy * 8;
-    tc2.y += 0.02 * vertex.material.x;
-    tc2.x -= 0.02 * vertex.material.x;
+    float2 tc2 = vertex.texcoord0.xy * 2.5;
+    tc2.y -= 0.03 / 25 * vertex.material.x;
+    tc2.x -= 0.03 / 25 * vertex.material.x;
     float4 lookup2 = tex2D( lookupSampler, tc2);
 
-    float2 tc3 = vertex.texcoord0.xy * 0.03 ;
-    tc3.x -= 0.001 * vertex.material.x;
+    float2 tc3 = vertex.texcoord0.xy * .16;
+    tc3.y -= 0.03 / 20 * vertex.material.x;
+    tc3.x -= 0.03 / 40 * vertex.material.x;
     float4 lookup3 = tex2D( lookupSampler, tc3);
 
-    float electricity = lookup.r * lookup2.b * 0.75;
-    float4 baseshellcolor = float4( 0.4, 1, 0.6, 0.8);
-    float4 glowpulse = float4(lookup3.ggg, min(lookup3.g, 0.65) + electricity );
+    float4 negative = float4(1, 1, 1, 0.4) * lookup2.g;
+    float4 blueglow = float4(0, 0.8 + 0.2 * lookup3.b, 0.95 - 0.95 * lookup2.b, lookup3.b) * lookup3.g * 0.75;
+    float4 darkshell = float4(0,0,0, 0.52 + 0.3 * lookup2.g);
 
-    return (baseshellcolor + electricity) * glowpulse;
+    float4 glowpulse = max(blueglow - negative, darkshell);
+
+    return glowpulse;
 }
 
 float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
