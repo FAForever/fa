@@ -123,9 +123,10 @@ FactoryUnit = ClassUnit(StructureUnit) {
     end,
 
     --- Introduce a rolloff delay, where defined.
+    --- Called by the engine when the unit finishes a build order or cancels a mobile build order.
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order string
+    ---@param order BuildOrderType
     OnStopBuild = function(self, unitBeingBuilt, order)
         StructureUnitOnStopBuild(self, unitBeingBuilt, order)
 
@@ -138,8 +139,10 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
 
         -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
-        if unitBeingBuilt:GetFractionComplete() < 1 then
-            unitBeingBuilt:Destroy()
+        if not unitBeingBuilt.isFinishedUnit and not self.FactoryBuildFailed then
+            unitBeingBuilt:OnFailedToBeBuilt()
+            self:OnFailedToBuild()
+            return
         end
 
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
@@ -196,6 +199,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         self:CreateBlinkingLights()
     end,
 
+    --- Called by the engine when a build order is cancelled.
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
         StructureUnitOnFailedToBuild(self)
@@ -256,7 +260,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean
+    ---@param order BuildOrderType
     ---@param rollOffPointSpin number?
     FinishBuildThread = function(self, unitBeingBuilt, order, rollOffPointSpin)
         self:SetBusy(true)
