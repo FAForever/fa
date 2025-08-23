@@ -108,6 +108,9 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY SERAPHIM MOBILE AIR",
             "TRANSPORTBUILTBYTIER2FACTORY SERAPHIM MOBILE AIR",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2SUPPORTFACTORY SERAPHIM STRUCTURE AIR",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "zsb9502" },
         StorageEnergy = 0,

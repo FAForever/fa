@@ -97,6 +97,9 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY AEON MOBILE AIR",
             "TRANSPORTBUILTBYTIER2FACTORY AEON MOBILE AIR",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2SUPPORTFACTORY AEON STRUCTURE AIR",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "zab9502" },
         StorageEnergy = 0,
