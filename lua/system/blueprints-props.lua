@@ -121,17 +121,19 @@ local function ProcessLOD(prop)
     -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
     local lod = 0.9 * MathSqrt(100 * 500 * weighted)
 
-    if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs then
+    -- If the prop has the 'USEBLUEPRINTLOD' category, the LODs defined in its blueprint take precedent
+    local useBlueprintLOD = TableFind(prop.Categories, 'USEBLUEPRINTLOD')
+    if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs and not useBlueprintLOD then
         local n = TableGetn(prop.Display.Mesh.LODs)
         for k = 1, n do
             local data = prop.Display.Mesh.LODs[k]
 
-            -- https://www.desmos.com/calculator (x * x)
-            local factor = (k / n) * (k / n)
+            -- https://www.desmos.com/calculator (x ^ 4)
+            local factor = (k / n) * (k / n) * (k / n) * (k / n)
             local LODCutoff = factor * lod
 
-            -- sanitize the value
-            data.LODCutoff = MathFloor(LODCutoff / 10 + 1) * 10
+            -- Sanitize the value and add a flat value of 30 to each level to prevent some LODCutoffs from becoming to small
+            data.LODCutoff = 30 + MathFloor(LODCutoff / 10 + 1) * 10
         end
     end
 end
