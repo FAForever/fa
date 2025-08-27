@@ -265,7 +265,6 @@ BuffEffects = {
         end
     end,
 
-    --- Quite confident that this one is broken
     ---@param buffDefinition BlueprintBuff
     ---@param buffValues BlueprintBuffAffect
     ---@param unit Unit
@@ -279,14 +278,12 @@ BuffEffects = {
         local healthadj = val - health
 
         if healthadj < 0 then
-            -- fixme: DoTakeDamage shouldn't be called directly
-            local data = {
-                Instigator = instigator,
-                Amount = -1 * healthadj,
-                Type = buffDefinition.DamageType or 'Spell',
-                Vector = VDiff(instigator:GetPosition(), unit:GetPosition()),
-            }
-            unit:DoTakeDamage(data)
+            unit:OnDamage(
+                instigator,
+                -1 * healthadj,
+                VDiff(instigator:GetPosition(), unit:GetPosition()),
+                buffDefinition.DamageType or 'Spell'
+            )
         else
             unit:AdjustHealth(instigator, healthadj)
         end
@@ -360,8 +357,8 @@ BuffEffects = {
             local wepbp = wep:GetBlueprint()
             local weprad = wepbp.DamageRadius
             local val = BuffCalculate(unit, buffName, 'DamageRadius', weprad)
-
-            wep:SetDamageRadius(val)
+            wep.DamageRadiusMod = val
+            wep.damageTableCache = false
         end
     end,
 
