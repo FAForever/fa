@@ -983,6 +983,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local notExclusive = bp.NotExclusive
             local rackBones = bp.RackBones
 
+            local usesFuelToFire = bp.UsesFuelToFire
+            local fuelUsedToFire = bp.FuelUsedToFire
+
             local numRackFiring = self.CurrentRackSalvoNumber
             --This is done to make sure that when racks should fire together, they do
             if bp.RackFireTogether then
@@ -1056,6 +1059,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
 
                     local proj = self:CreateProjectileAtMuzzle(muzzle)
+
+                    
+                    if usesFuelToFire then
+                        local fuel = unit:GetFuelRatio()
+                        if fuel > fuelUsedToFire then
+                            unit:SetFuelRatio(fuel-fuelUsedToFire)
+                        elseif fuel == 0 then
+                            proj:Destroy()
+                        else
+                            unit:SetFuelRatio(0)
+                            unit:OnRunOutOfFuel()
+                        end
+                    end
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
