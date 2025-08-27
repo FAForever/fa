@@ -149,7 +149,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Sonance Artillery",
             DoTPulses = 2,
-            DoTTime = 1,
+            DoTTime = 3.8,
             EnergyDrainPerSecond = 4250,
             EnergyRequired = 17000,
             FireTargetLayerCapsTable = {
