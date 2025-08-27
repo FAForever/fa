@@ -30,6 +30,8 @@ local MathSqrt = math.sqrt
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 ---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
 ---@field EconDrain? moho.EconomyEvent
+---@field AdjEnergyMod number? # Energy drain multiplier from buffs
+---@field AdjRoFMod number? # Firerate multiplier from buffs
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -416,7 +418,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Determine how much Energy is required to fire
     ---@param self DefaultProjectileWeapon
-    ---@return integer
+    ---@return number
     GetWeaponEnergyRequired = function(self)
         local weapNRG = (self.EnergyRequired or 0) * (self.AdjEnergyMod or 1)
         if weapNRG < 0 then
@@ -427,9 +429,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Determine how much Energy should be drained per second
     ---@param self DefaultProjectileWeapon
-    ---@return integer
+    ---@return number
     GetWeaponEnergyDrain = function(self)
-        local weapNRG = (self.EnergyDrainPerSecond or 0) * (self.AdjEnergyMod or 1)
+        local weapNRG = (self.EnergyDrainPerSecond or 0) / (self.AdjRoFMod or 1) * (self.AdjEnergyMod or 1)
         return weapNRG
     end,
 
