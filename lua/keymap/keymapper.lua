@@ -10,6 +10,7 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 local KeyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
+local TableFind = table.find
 
 function GetActionName(action)
     local name = ''
@@ -96,21 +97,8 @@ end
 ---@param action string
 ---@return string | false
 function GetCurrentKeyBinding(action)
-    local TableFind = table.find -- luckily, this handles nil tables
 
-    local binding = TableFind(Prefs.GetFromCurrentProfile("UserKeyMap"), action)
-    if binding then return binding end
-    binding = TableFind(Prefs.GetFromCurrentProfile("UserDebugKeyMap"), action)
-    if binding then return binding end
-
-    local defaultKeyMap = import(GetDefaultKeyMapName())
-
-    binding = TableFind(defaultKeyMap.defaultKeyMap, action)
-    if binding then return binding end
-    binding = TableFind(defaultKeyMap.debugKeyMap, action)
-    if binding then return binding end
-
-    return false
+    return TableFind(GetCurrentKeyMap(), action) or false
 end
 
 function ClearUserKeyMapping(key)
