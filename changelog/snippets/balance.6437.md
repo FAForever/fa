@@ -1,0 +1,3 @@
+- (#6437, #6574) Automatically rotate Cybran Carrier, Othuum, and Monkeylord towards their targets when idle or attacking so that all their weapons can fire.
+    - Monkeylord will not automatically rotate within 50 range, to make it not get in the way of micro.
+    - The units rotate in place when aiming like this.

@@ -336,6 +336,23 @@ UnitBlueprint{
             WeaponUnpacks = false,
         },
         {
+            -- Dummy weapon limiting the auto rotate behavior of the secondaries to outside a range
+            AboveWaterTargetsOnly = true,
+            FireTargetLayerCapsTable = {
+                Land = "Land|Water|Seabed",
+                Seabed = "Land|Water|Seabed",
+                Water = "Land|Water|Seabed",
+            },
+            TrackingRadius = 1,
+            TargetCheckInterval = 0.1,
+            RateOfFire = 0,
+            MaxRadius = 50,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 180,
+            TargetPriorities = { "ALLUNITS" },
+            TargetRestrictDisallow = "UNTARGETABLE",
+        },
+        {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -378,7 +395,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 10/7, --10/integer interval in ticks
-            SlavedToBody = false,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 39,
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -444,7 +462,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 10/7, --10/integer interval in ticks
-            SlavedToBody = false,
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 39,
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
