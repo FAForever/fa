@@ -1,8 +1,37 @@
 ---@type number
-last_version = 3826
+last_version = 3827
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3827,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "This patch removes access to a potentially dangerous engine function that was exposed to all Lua environments.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+            "",
+            "## Bug fixes",
+            "",
+            "- (#6911) Remove lingering print statements that trigger to events of the construction drones from Kennels.",
+            "",
+            "## Contributors",
+            "",
+            "With thanks to the following people who contributed through coding:",
+            "",
+            "- Nomander",
+            "- 4z0t",
+            "- Jip",
+            "",
+            "And, last but certainly not least - with thanks to those that took part in constructive discussions:",
+            "",
+            "- MostLostNoob",
+        }
+    },
     {
         version = 3826,
         name = "Hotfix",
