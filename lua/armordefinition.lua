@@ -20,6 +20,7 @@
 ---| "FireBeetleExplosion"
 ---| "Normal"
 ---| "Nuke"
+---| "NukeIgnoreShields"
 ---| "Overcharge"
 ---| "Reclaimed"
 ---| "Spell"
