@@ -340,7 +340,7 @@ end
 ---@param object BoneObject
 ---@param bone Bone
 ---@param axis "x" | "y" | "z" | "-x" | "-y" | "-z"
----@param goal? unknown
+---@param goal? number
 ---@param speed? number
 ---@param accel? number
 ---@param goalspeed? number
