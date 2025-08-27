@@ -1,4 +1,7 @@
 
+local Unit = import("/lua/sim/unit.lua").Unit
+local UnitOnStopBuild = Unit.OnStopBuild
+
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 local StructureUnitOnCreate = StructureUnit.OnCreate
 local StructureUnitOnDestroy = StructureUnit.OnDestroy
@@ -198,6 +201,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
+        -- Instantly clear the build area so the next build can start, since unit `Destroy` doesn't do so.
+        self.UnitBeingBuilt:SetCollisionShape('None')
         StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
@@ -461,6 +466,30 @@ FactoryUnit = ClassUnit(StructureUnit) {
         ---@param self FactoryUnit
         Main = function(self)
             self:RolloffBody()
+        end,
+    },
+
+    UpgradingState = State(StructureUnit.UpgradingState) {
+        --- Adapted from StructureUnit to unblock the build area when the factory upgrade finishes.
+        ---@param self FactoryUnit
+        ---@param unitBuilding Unit
+        ---@param order string
+        OnStopBuild = function(self, unitBuilding, order)
+            UnitOnStopBuild(self, unitBuilding, order)
+            self:EnableDefaultToggleCaps()
+
+            if unitBuilding:GetFractionComplete() == 1 then
+                NotifyUpgrade(self, unitBuilding)
+                self:StopUpgradeEffects(unitBuilding)
+                self:PlayUnitSound('UpgradeEnd')
+
+                -- Since `Destroy` wouldn't do so, immediately unblock the build area
+                -- of the new factory by setting collision shape to none. This allows
+                -- the new factory to immediately start working on its queue.
+                self:SetCollisionShape("None")
+
+                self:Destroy()
+            end
         end,
     },
 
