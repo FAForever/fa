@@ -685,7 +685,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     local isOldSelection = table.equal(oldSelection, newSelection)
 
     if not gameUIHidden then
-        if not isReplay then
+        -- Not necessary to update the available orders if we're in a replay or the selection hasn't changed
+        if not (isReplay or isOldSelection) then
             import("/lua/ui/game/orders.lua").SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
         -- TODO change the current command mode if no longer available? or set to nil?
