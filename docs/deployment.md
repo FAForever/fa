@@ -57,12 +57,12 @@ permalink: changelog/3811
 - (6) commit this file to the changelog branch.
 - (7) Delete the current snippets.
 - (8) Update the game version in [mod_info.lua](https://github.com/FAForever/fa/blob/develop/mod_info.lua) and [version.lua](https://github.com/FAForever/fa/blob/develop/lua/version.lua).
-- (9) Update the latest version in [changelogData.lua](https://github.com/FAForever/fa/blob/develop/lua/ui/lobby/changelogData.lua) and add a short version of the patchnotes there. Add an explanation that players can use the in-game button to github to read the detailed changes.
+- (9) Update the latest version in [changelogData.lua](https://github.com/FAForever/fa/blob/develop/lua/ui/lobby/changelogData.lua) (at the top of the file) and add a short version of the patchnotes there. Add an explanation that players can use the in-game button to github to read the detailed changes.
 - (10) Push the changes to GitHub. Create a pull request on GitHub to allow other maintainers to review the changelog. Make sure the pull request points to [develop](https://github.com/FAForever/fa/tree/develop).
 
 At this point you need to wait until the `changelog branch` is merged.
 
-- (11) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [develop(https://github.com/FAForever/fa/tree/develop) branch.
+- (11) Create a [release on GitHub](https://github.com/FAForever/fa/releases) that targets the [develop](https://github.com/FAForever/fa/tree/develop) branch.
 - - (11.1) Set the tag with the game version.
 - - (11.2) Match the format of the title with that of previous releases.
 - - (11.3) Copy and paste the changelog into the description. Make sure to remove the title as a release has its own title.
