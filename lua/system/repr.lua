@@ -25,11 +25,31 @@
 -- SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --******************************************************************************************************
 
+-- upvalue scope for performance
+local DebugAllocatedSize = debug.allocatedsize
+local DebugGetInfo = debug.getinfo
+local MathFloor = math.floor
+local StringFormat = string.format
+local StringGsub = string.gsub
+local StringMatch = string.match
+local StringRep = string.rep
+local StringSub = string.sub
+local TableEmpty = table.empty
+local TableSort = table.sort
+
+local getmetatable = getmetatable
+local next = next
+local rawget = rawget
+local tostring = tostring
+local type = type
+
+local DiskToLocal = DiskToLocal
+
 ---@class DebugInspector
 ---@field buf table
 ---@field depth integer
 ---@field level integer
----@field ids table<any, integer>
+---@field ids table<type, integer> | table<any, integer|string>
 ---@field newline string
 ---@field meta boolean
 ---@field indent string
@@ -42,18 +62,6 @@ local Inspector_mt = { __index = Inspector }
 ---@field indent? string
 ---@field meta? boolean
 
--- upvalue scope for performance
-local tostring = tostring
-local rep = string.rep
-local flr = math.floor
-local match = string.match
-local gsub = string.gsub
-local fmt = string.format
-local _rawget = rawget
-local type = type
-
-local TableSort = table.sort
-
 ---@param t table
 ---@return function
 ---@return table
@@ -65,10 +73,10 @@ end
 ---@param str string
 ---@return string
 local function smartQuote(str)
-    if match(str, '"') and not match(str, "'") then
+    if StringMatch(str, '"') and not StringMatch(str, "'") then
         return "'" .. str .. "'"
     end
-    return '"' .. gsub(str, '"', '\\"') .. '"'
+    return '"' .. StringGsub(str, '"', '\\"') .. '"'
 end
 
 ---@type table<string, boolean>
@@ -101,6 +109,7 @@ local luaKeywords = {
 ---@return boolean
 local function isIdentifier(str)
     return type(str) == "string" and
+---@diagnostic disable-next-line: undefined-field
         not not str:match("^[_%a][_%a%d]*$") and
         not luaKeywords[str]
 end
@@ -110,7 +119,7 @@ end
 ---@return boolean
 local function isSequenceKey(k, sequenceLength)
     return type(k) == "number" and
-        flr(k) == k and
+        MathFloor(k) == k and
         1 <= (k) and
         k <= sequenceLength
 end
@@ -146,7 +155,7 @@ end
 local function getKeys(t)
 
     local seqLen = 1
-    while _rawget(t, seqLen) ~= nil do
+    while rawget(t, seqLen) ~= nil do
         seqLen = seqLen + 1
     end
     seqLen = seqLen - 1
@@ -171,7 +180,7 @@ end
 
 ---@param inspector DebugInspector
 local function tabify(inspector)
-    puts(inspector.buf, inspector.newline .. rep(inspector.indent, inspector.level))
+    puts(inspector.buf, inspector.newline .. StringRep(inspector.indent, inspector.level))
 end
 
 ---@param v any
@@ -182,9 +191,118 @@ function Inspector:getId(v)
     if not id then
         local tv = type(v)
         id = (ids[tv] or 0) + 1
-        ids[v], ids[tv] = id, id
+        ids[tv] = id
+        if tv == "function" then
+            local info = DebugGetInfo(v, "S")
+            id = StringFormat("%s %s(%d)", id, DiskToLocal(StringSub(info.source, 2)--[[@as FileName]]), info.linedefined)
+        end
+        ids[v] = id
     end
     return tostring(id)
+end
+
+local VectorMeta = getmetatable(Vector2(0, 0))
+local LazyVarMeta = import('/lua/lazyvar.lua').LazyVarMetaTable
+
+-- Converts the `__name` field added to engine classes in `classes.lua` to a friendlier name
+local CClassNameToString = {
+    -- moho classes that share the same name across user and sim
+
+    CPrefetchSet = "CPrefetchSet",
+    EntityCategory = "Entity Category",
+    -- sound_methods = "Sound", -- In moho but has no fields, including `__name`
+
+    --Sim moho classes
+
+    aibrain_methods = "AIBrain",
+    aipersonality_methods = "AIPersonality",
+    platoon_methods = "Platoon",
+
+    ScriptTask_Methods = "Script Task",
+
+    IEffect = "IEffect",
+    CDecalHandle = "Decal",
+
+    entity_methods = "Entity",
+
+    unit_methods = "Unit",
+    navigator_methods = "Navigator",
+    blip_methods = "Blip",
+    shield_methods = "Shield",
+    weapon_methods = "Weapon",
+    projectile_methods = "Projectile",
+    CollisionBeamEntity = "Collision Beam",
+    -- EconomyEvent = "EconomyEvent", -- In moho but has no fields, including `__name`
+
+    prop_methods = "Prop",
+    MotorFallDown = "MotorFallDown",
+
+    manipulator_methods = "Manipulator",
+    AimManipulator = "AimManipulator",
+    RotateManipulator = "RotateManipulator",
+    StorageManipulator = "StorageManipulator",
+    CollisionManipulator = "CollisionManipulator",
+    SlaveManipulator = "SlaveManipulator",
+    ThrustManipulator = "ThrustManipulator",
+    BoneEntityManipulator = "BoneEntityManipulator",
+    SlideManipulator = "SlideManipulator",
+    BuilderArmManipulator = "BuilderArmManipulator",
+    AnimationManipulator = "AnimationManipulator",
+    FootPlantManipulator = "FootPlantManipulator",
+
+    CDamage = "CDamage",
+    CAiAttackerImpl_methods = "CAiAttackerImpl",
+
+    --User moho classes
+
+    cursor_methods = "Cursor",
+
+    control_methods = "Control",
+    scrollbar_methods = "Scrollbar",
+    bitmap_methods = "Bitmap",
+    dragger_methods = "Dragger",
+    item_list_methods = "ItemList",
+    movie_methods = "Movie",
+    border_methods = "Border",
+    text_methods = "Text",
+    edit_methods = "Edit",
+    group_methods = "Group",
+    frame_methods = "Frame",
+
+    lobby_methods = "Lobby Communications",
+    discovery_service_methods = "Discovery Service",
+    ui_map_preview_methods = "Map Preview",
+    WldUIProvider_methods = "WldUIProvider",
+
+    UIWorldView = "WorldView",
+    userDecal_methods = "UserDecal",
+    world_mesh_methods = "WorldMesh",
+
+    mesh_methods = "mesh_methods",
+    histogram_methods = "Histogram",
+    PathDebugger_methods = "PathDebugger",
+
+    -- Shared class implemented in Lua
+    Trashbag = "Trashbag",
+}
+
+---@param v table | fa-class | fa-class-state
+local function objectToString(v)
+    local mt = getmetatable(v)
+    if rawget(v, "__State") then
+        return StringFormat("%s (State %s)", tostring(v), tostring(v.__StateIdentifier))
+    elseif mt == VectorMeta then
+        return StringFormat("%s (%s)", tostring(v), "Vector")
+    elseif mt == LazyVarMeta then
+        return StringFormat("%s (%s)", tostring(v), "LazyVar")
+    else
+        local friendlyName = CClassNameToString[mt.__name]
+        if friendlyName then
+            return StringFormat("%s (%s)", tostring(v), friendlyName)
+        else
+            return tostring(v)
+        end
+    end
 end
 
 ---@param v any
@@ -200,11 +318,11 @@ function Inspector:putValue(v)
         local t = v
 
         if self.level >= self.depth then
-            puts(buf, string.format("{...} -- %s (%g bytes)", tostring(t), debug.allocatedsize(t)))
+            puts(buf, StringFormat("{...} -- %s (%g bytes)", objectToString(t), DebugAllocatedSize(t)))
         else
             local keys, keysLen, seqLen = getKeys(t)
 
-            puts(buf, string.format("{ -- %s (%d bytes)", tostring(t), debug.allocatedsize(t)))
+            puts(buf, StringFormat("{ -- %s (%d bytes)", objectToString(t), DebugAllocatedSize(t)))
             self.level = self.level + 1
 
             for i = 1, seqLen + keysLen do
@@ -223,23 +341,31 @@ function Inspector:putValue(v)
                         puts(buf, "]")
                     end
                     puts(buf, ' = ')
-                    self:putValue(t[k])
+                    if k == "__index" and tostring(t[k]) == tostring(t) then
+                        puts(buf, StringFormat("{...} -- %s (%g bytes)", 'table (self): ' .. string.sub(tostring(v), 8), DebugAllocatedSize(t)))
+                    else
+                        self:putValue(t[k])
+                    end
                 end
             end
 
-            local mt = getmetatable(t)
+            local mt
+            local checkMeta
             if self.meta then
-                if type(mt) == 'table' and not table.empty(mt) then
-                    if seqLen + keysLen > 0 then puts(buf, ',') end
-                    tabify(self)
-                    puts(buf, '<metatable> = ')
-                    self:putValue(mt)
-                end
+                mt = getmetatable(t)
+                checkMeta = type(mt) == 'table' and not TableEmpty(mt)
+            end
+
+            if checkMeta then
+                if seqLen + keysLen > 0 then puts(buf, ',') end
+                tabify(self)
+                puts(buf, '<metatable> = ')
+                self:putValue(mt)
             end
 
             self.level = self.level - 1
 
-            if keysLen > 0 or (self.meta and type(mt) == 'table' and not table.empty(mt)) then
+            if keysLen > 0 or checkMeta then
                 tabify(self)
             elseif seqLen > 0 then
                 puts(buf, ' ')
@@ -249,7 +375,7 @@ function Inspector:putValue(v)
         end
 
     else
-        puts(buf, fmt('<%s %d>', tv, self:getId(v)))
+        puts(buf, StringFormat('<%s %s>', tv, self:getId(v)))
     end
 end
 

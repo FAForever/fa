@@ -1,0 +1,1 @@
+- (#6597) Improve the details printed by `repr`: print base class names, function sources, and skip __index tables that reference their parent.
