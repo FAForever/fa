@@ -429,7 +429,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param self DefaultProjectileWeapon
     ---@return integer
     GetWeaponEnergyDrain = function(self)
-        local weapNRG = (self.EnergyDrainPerSecond or 0) * (self.AdjEnergyMod or 1)
+        local weapNRG = (self.EnergyDrainPerSecond or 0) / (self.AdjRoFMod or 1) * (self.AdjEnergyMod or 1)
         return weapNRG
     end,
 
