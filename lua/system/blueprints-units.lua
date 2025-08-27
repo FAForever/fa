@@ -614,6 +614,21 @@ local function PostProcessUnit(unit)
             unit.Display.AnimationDeath = nil
         end
     end
+
+    -- Optimize reverse movement
+    local bpPhysics = unit.Physics
+    local maxSpeedReverse = bpPhysics.MaxSpeedReverse
+    if maxSpeedReverse then
+        local maxSpeed = bpPhysics.MaxSpeed
+        local reverseSpeedDiff = maxSpeed - maxSpeedReverse
+        if reverseSpeedDiff > 0 then
+            local effectiveTurnRate = math.max(57.2957795131 / (bpPhysics.TurnRadius / maxSpeed), bpPhysics.TurnRate)
+            local optimalBackUpDistance = 180 / effectiveTurnRate * maxSpeedReverse / reverseSpeedDiff
+            bpPhysics.BackUpDistance = bpPhysics.BackUpDistance and math.max(bpPhysics.BackUpDistance, optimalBackUpDistance) or optimalBackUpDistance
+        else
+            bpPhysics.BackUpDistance = 32
+        end
+    end
 end
 
 --- Feature: re-apply the ability to land on water
