@@ -101,9 +101,7 @@ UnitBlueprint{
         UnitName = "<LOC xrb2308_name>HARMS",
     },
     Intel = {
-        RadarStealth = false,
         SonarRadius = 40,
-        SonarStealth = false,
         VisionRadius = 20,
         WaterVisionRadius = 44,
     },
