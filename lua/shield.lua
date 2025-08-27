@@ -139,6 +139,13 @@ for k, bp in __blueprints do
     end
 end
 
+--- Resources consumed this tick by any army assisting shields.
+---@type table<Army, number?>
+local ArmyResourceEfficiencyCache = {}
+--- If the resource efficiency was updated this tick for an army
+---@type {NeedsClear: boolean?, [Army]: boolean? }
+local IsArmyResourceEfficiencyUpdated = {}
+
 ---@class Shield : moho.shield_methods, Entity
 ---@field Army Army
 ---@field EntityId EntityId
@@ -151,8 +158,12 @@ end
 ---@field ShieldRechargeTime number
 ---@field ShieldEnergyDrainRechargeTime number
 ---@field ShieldVerticalOffset number
----@field RegenRate number
+---@field RegenRate number # Determines HP/second regen. Also used by the engine for regen assist.
 ---@field RegenStartTime number
+---@field RegenAssistMult number # cached from shield spec
+---@field RegenAssistersPerArmy table<Army, Unit[]>
+---@field RegenAssisters table<EntityId, Unit>
+---@field RegenAssistThreadSuspended boolean
 ---@field PassOverkillDamage boolean
 ---@field ImpactMeshBp string
 ---@field SkipAttachmentCheck boolean
@@ -192,6 +203,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.ShieldVerticalOffset = spec.ShieldVerticalOffset
         self.RegenRate = spec.ShieldRegenRate
         self.RegenStartTime = spec.ShieldRegenStartTime
+        self.RegenAssistMult = spec.RegenAssistMult or 1 -- 1 is engine default
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
@@ -263,6 +275,13 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.RegenThreadState = "On"
         self.RegenThread = ForkThread(self.RegenThread, self)
         TrashAdd(self.Trash, self.RegenThread)
+
+        -- manage regen assist validation thread
+        self.RegenAssisters = {}
+        self.NumAssisters = 0
+        self.RegenAssistThreadSuspended = false
+        self.RegenAssistThread = ForkThread(self.RegenAssistThread, self)
+        TrashAdd(self.Trash, self.RegenAssistThread)
 
         -- manage the loss of shield when energy is depleted
         self.Brain:AddEnergyDependingEntity(self)
@@ -337,6 +356,123 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- adjust shield bar as we may be assisted
                 self:UpdateShieldRatio(health / maxHealth)
             end
+
+            -- wait till next tick
+            CoroutineYield(1)
+        end
+    end,
+
+    ---@param self Shield
+    ---@param builder Unit
+    OnBeingRepaired = function(self, builder)
+        self.RegenAssisters[builder.EntityId] = builder
+        self.NumAssisters = self.NumAssisters + 1
+
+        if self.RegenAssistThreadSuspended then
+            ResumeThread(self.RegenAssistThread)
+            -- set here so assisters in the same tick don't resume thread many times
+            self.RegenAssistThreadSuspended = false
+        end
+    end,
+
+    ---@param self Shield
+    ---@param builder Unit
+    OnStopBeingRepaired = function(self, builder)
+        self.RegenAssisters[builder.EntityId] = nil
+        self.NumAssisters = self.NumAssisters - 1
+    end,
+
+    --- Validates regeneration given by shield repair, since the engine gives full regen
+    --- regardless of resources consumed
+    ---@param self Shield
+    RegenAssistThread = function(self)
+        -- cache globals
+        local GetGameTick = GetGameTick
+        local CoroutineYield = CoroutineYield
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        -- cache cfunctions
+        local EntityGetHealth = EntityGetHealth
+        local EntityGetMaxHealth = EntityGetMaxHealth
+        local EntityAdjustHealth = EntityAdjustHealth
+
+        -- cache table operations
+        local regenAssistMult = self.RegenAssistMult
+        local regenAssistersPerArmy = self.RegenAssistersPerArmy
+        local owner = self.Owner
+
+        -- variables needed across ticks
+
+        -- Tracks changes to RegenRate since the engine uses it to determine regen assist amount
+        local regenRate = self.RegenRate
+        -- HP regenerated per 1 buildpower per tick
+        local repairPerBuildrate = regenRate / regenAssistMult / 10
+        -- Owner damaged state affects repairs of next tick
+        local ownerIsDamaged = EntityGetHealth(owner) < EntityGetMaxHealth(owner)
+
+        while not IsDestroyed(self) do
+            -- update regen info if it changed
+            if regenRate ~= self.RegenRate then
+                regenRate = self.RegenRate
+                repairPerBuildrate = regenRate / regenAssistMult / 10
+            end
+
+            -- gather information
+            local health = EntityGetHealth(self)
+            local maxHealth = EntityGetMaxHealth(self)
+
+            -- check if we need to suspend ourself
+            if  -- we have nobody assisting
+                -- also includes:
+                -- - shield is not enabled
+                -- - shield is not recharged
+                -- - shield has full or 0 health
+                self.NumAssisters == 0
+                -- shield is max health but still being assisted because owner is damaged
+                or health == maxHealth
+                -- when owner started upgrade which takes priority over assist
+                -- TODO: can't use num assisters here because repair orders don't switch target once upgrade starts
+                -- TODO: fix suspending an upgrade causes 1 tick of free regen from all but the first builder
+                or owner:GetFocusUnit()
+            then
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+
+                -- suspend ourselves and wait
+                self.RegenAssistThreadSuspended = true
+                SuspendCurrentThread()
+                -- RegenAssistThreadSuspended set to false in OnStartBeingRepaired
+
+                -- update data since time passed
+                health = EntityGetHealth(self)
+                maxHealth = EntityGetMaxHealth(self)
+            end
+
+            local excessBuildpower = 0
+            for _, builder in self.RegenAssisters do
+                local resourcesConsumed = builder:GetResourceConsumed()
+                    -- *Immediately* detects paused builders. 
+                    -- Resource consumption == 0 for pausing is delayed by 1 tick, which would cause an HP loss on pause.
+                if  builder.ActiveConsumption
+                    -- 0 when builder just started building but hasn't added HP
+                    and resourcesConsumed > 0
+                then
+                    local builderExcessBp = builder:GetBuildRate() * (1 - resourcesConsumed)
+                    -- Engine splits buildpower 50/50 when owner was damaged last tick
+                    excessBuildpower = excessBuildpower + (ownerIsDamaged and builderExcessBp * 0.5 or builderExcessBp)
+                end
+            end
+
+            -- Note: If a shield has enough buildpower this tick to restore it to full HP, 
+            -- then it will do so (for free) and the builders will automatically stop repairing,
+            -- causing the thread to break. It's a massive amount of buildpower so I won't fix it.
+
+            local healthToRemove = repairPerBuildrate * excessBuildpower
+            EntityAdjustHealth(self, self.Owner, -healthToRemove)
+            self:UpdateShieldRatio((health - healthToRemove) / maxHealth)
+
+            -- update for next tick
+            ownerIsDamaged = EntityGetHealth(owner) < EntityGetMaxHealth(owner)
 
             -- wait till next tick
             CoroutineYield(1)
@@ -628,6 +764,11 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 self.RegenThreadStartTick = tick + 10 * self.RegenStartTime
                 if self.RegenThreadSuspended then
                     ResumeThread(self.RegenThread)
+                end
+
+                -- Resume regen assist thread if it was paused because we were at full HP
+                if self.RegenAssistThreadSuspended and self.NumAssisters > 0 then
+                    ResumeThread(self.RegenAssistThread)
                 end
             end
         end

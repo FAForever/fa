@@ -842,6 +842,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             end)
         end
 
+        local unitShield = unit.MyShield
+        if unitShield and unitShield:IsUp() then
+            unitShield:OnBeingRepaired(self)
+        end
+
         -- for AI events
         self.Brain:OnUnitStartRepair(self, unit)
     end,
@@ -850,6 +855,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param unit Unit
     OnStopRepair = function(self, unit)
         unit.Repairers[self.EntityId] = nil
+
+        local unitShield = unit.MyShield
+        if unitShield and unitShield:IsUp() then
+            unitShield:OnStopBeingRepaired(self)
+        end
 
         -- for AI events
         self.Brain:OnUnitStopRepair(self, unit)
@@ -2922,7 +2932,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.TransferUpgradeProgress = nil
 
         if built.Repairers[self.EntityId] then
-            self:OnStopRepair(self, built)
+            self:OnStopRepair(built)
             built.Repairers[self.EntityId] = nil
         end
 
