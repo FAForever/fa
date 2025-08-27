@@ -910,10 +910,23 @@ function HideGameUI(state)
     end
 end
 
--- Given an UserUnit that is adjacent to a given blueprint, does it yield a
--- bonus? Used by the UI to draw extra info
-function OnDetectAdjacencyBonus(userUnit, otherBp)
-    return true
+--- Is called by the engine to detect adjacency (bonus) as you are trying to issue build 
+--- orders. Works for single-build orders, drag-build orders and template-build orders.
+---
+---@param userUnit UserUnit         # The unit that our build preview is adjacent to.
+---@param adjacentBlueprint UnitBlueprint     # The blueprint of the build preview that is adjacent to the unit.
+---@return boolean
+function OnDetectAdjacencyBonus(userUnit, adjacentBlueprint)
+    if GetOptions('adjacent_unit_icons') > 0 then
+        import("/lua/ui/game/cursor/adjacencypreview.lua").OnAdjacentUnit(userUnit, adjacentBlueprint)
+    end
+
+    -- We should always return false here or engine behavior takes over. The engine behavior 
+    -- will no longer call this function on the first adjacent unit that returns true. Since
+    -- we want to preview all adjacent units and create our own UI elements we have to return 
+    -- false here.
+
+    return false
 end
 
 function OnFocusArmyUnitDamaged(unit)

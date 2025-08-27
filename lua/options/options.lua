@@ -1043,6 +1043,19 @@ options = {
             },
 
             {
+                title = "<LOC ADJACENT_UNIT_ICONS>Show adjacent units when building",
+                key = 'adjacent_unit_icons',
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE>Scale strategic icons",
                 key = 'strat_icon_scale',
                 type = 'toggle',
