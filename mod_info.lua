@@ -27,7 +27,7 @@
 -- - https://github.com/FAForever/fa/blob/deploy/fafdevelop/lua/MODS.LUA
 
 name = "Forged Alliance Forever"
-version = 3826          -- needs to be an integer as it is parsed as a short (16 bit integer)
+version = 3827          -- needs to be an integer as it is parsed as a short (16 bit integer)
 _faf_modname='faf'
 copyright = "Forged Alliance Forever Community"
 description = "Forged Alliance Forever extends Forged Alliance, bringing new patches, game modes, units, ladder, and much more!"
