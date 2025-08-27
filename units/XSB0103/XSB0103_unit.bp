@@ -103,6 +103,9 @@ UnitBlueprint{
             "BUILTBYTIER1FACTORY SERAPHIM STRUCTURE NAVAL",
             "BUILTBYTIER1FACTORY SERAPHIM MOBILE NAVAL",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER1FACTORY SERAPHIM STRUCTURE NAVAL",
+        },
         InitialRallyX = 0,
         InitialRallyZ = 10,
         RebuildBonusIds = { "xsb0103" },

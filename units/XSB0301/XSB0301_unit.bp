@@ -99,6 +99,9 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY SERAPHIM STRUCTURE LAND",
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE LAND",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER3FACTORY SERAPHIM STRUCTURE LAND",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "xsb0301" },
         StorageEnergy = 0,

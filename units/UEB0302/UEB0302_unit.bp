@@ -95,6 +95,9 @@ UnitBlueprint{
             "TRANSPORTBUILTBYTIER3FACTORY UEF MOBILE AIR",
             "BUILTBYAIRTIER3FACTORY UEF MOBILE CONSTRUCTION",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER3FACTORY UEF STRUCTURE AIR",
+        },
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "ueb0302" },
         StorageEnergy = 0,

@@ -107,8 +107,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
+    ---@return boolean
     OnStartBuild = function(self, unitBeingBuilt, order)
-        StructureUnitOnStartBuild(self, unitBeingBuilt, order)
+        if not StructureUnitOnStartBuild(self, unitBeingBuilt, order) then return false end
 
         self.FactoryBuildFailed = nil
         self.BuildingUnit = true
@@ -120,6 +121,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
         end
+
+        return true
     end,
 
     --- Introduce a rolloff delay, where defined.
@@ -286,20 +289,6 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
         end
-    end,
-
-    ---@param self FactoryUnit
-    ---@param target_bp any
-    ---@return boolean
-    CheckBuildRestriction = function(self, target_bp)
-        -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
-        if not StructureUnitCheckBuildRestriction(self, target_bp) then
-            return false
-        end
-        -- Factories never build factories (this does not break Upgrades since CheckBuildRestriction is never called for Upgrades)
-        -- Note: We check for the primary category, since e.g. AircraftCarriers have the FACTORY category.
-        -- TODO: This is a hotfix for --1043, remove when engymod design is properly fixed
-        return target_bp.General.Category ~= 'Factory'
     end,
 
     ---@param self FactoryUnit

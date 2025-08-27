@@ -104,6 +104,9 @@ UnitBlueprint{
             "BUILTBYTIER2SUPPORTFACTORY CYBRAN STRUCTURE NAVAL",
             "BUILTBYTIER2FACTORY CYBRAN MOBILE NAVAL",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2SUPPORTFACTORY CYBRAN STRUCTURE NAVAL",
+        },
         DifferentialUpgradeCostCalculation = true,
         InitialRallyX = 0,
         InitialRallyZ = 10,

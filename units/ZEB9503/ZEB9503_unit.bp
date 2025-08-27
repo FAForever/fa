@@ -99,6 +99,9 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY UEF MOBILE NAVAL",
             "BUILTBYNAVALTIER2FACTORY UEF MOBILE CONSTRUCTION",
         },
+        UpgradeOnlyCategory = {
+        	"BUILTBYTIER2SUPPORTFACTORY UEF STRUCTURE NAVAL",
+        },
         DifferentialUpgradeCostCalculation = true,
         InitialRallyX = 0,
         InitialRallyZ = 10,
