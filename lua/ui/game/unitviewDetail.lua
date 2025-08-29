@@ -227,15 +227,6 @@ function GetShortDesc(bp)
 end
 
 IsAbilityExist = {
-    ability_radar = function(bp)
-        return bp.Intel.RadarRadius > 0
-    end,
-    ability_sonar = function(bp)
-        return bp.Intel.SonarRadius > 0
-    end,
-    ability_omni = function(bp)
-        return bp.Intel.OmniRadius > 0
-    end,
     ability_visionfield = function(bp)
         return bp.Intel.MaxVisionRadius > 0
     end,
@@ -321,15 +312,6 @@ IsAbilityExist = {
     ability_personalstealth = function(bp)
         return bp.Intel.RadarStealth and bp.Intel.RadarStealthFieldRadius <= 0
     end,
-    ability_stealthfield = function(bp)
-        return bp.Intel.RadarStealthFieldRadius > 0
-    end,
-    ability_stealth_sonar = function(bp)
-        return bp.Intel.SonarStealth and bp.Intel.SonarStealthFieldRadius <= 0
-    end,
-    ability_stealth_sonarfield = function(bp)
-        return bp.Intel.SonarStealthFieldRadius > 0
-    end,
     ability_customizable = function(bp)
         return not table.empty(bp.Enhancements)
     end,
@@ -407,12 +389,6 @@ GetAbilityDesc = {
         return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize/2)..', '
              ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)..', '
              ..LOCF('<LOC uvd_RechargeTime>', bp.Defense.Shield.ShieldRechargeTime)
-    end,
-    ability_stealthfield = function(bp)
-        return LOCF('<LOC uvd_Radius>', bp.Intel.RadarStealthFieldRadius)
-    end,
-    ability_stealth_sonarfield = function(bp)
-        return LOCF('<LOC uvd_Radius>', bp.Intel.SonarStealthFieldRadius)
     end,
     ability_customizable = function(bp)
         local cnt = 0
@@ -783,15 +759,22 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 end
             end
         end
-        --Other parameters
+        -- Other parameters
         lines = {}
-        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Regen: %.3g, Cap Cost: %.3g",
-            bp.Intel.VisionRadius, bp.Intel.WaterVisionRadius, bp.Defense.RegenRate, bp.General.CapCost))
+        if(bp.Intel.RadarStealthFieldRadius > 0) then
+            table.insert(lines, LOCF("<LOC uvd_0022>Radar Stealth: %d, Sonar Stealth: %d",
+            bp.Intel.RadarStealthFieldRadius, bp.Intel.SonarStealthFieldRadius))
+        end
 
+        -- Insert intel-related parameters
+        table.insert(lines, LOCF("<LOC uvd_0013>Vision: %d, Underwater Vision: %d, Radar: %d, Sonar: %d, Omni: %d",
+            bp.Intel.VisionRadius, bp.Intel.WaterVisionRadius, bp.Intel.RadarRadius, bp.Intel.SonarRadius, bp.Intel.OmniRadius))
+        
+        -- Insert movement-related parameters
         if (bp.Physics.MotionType ~= 'RULEUMT_Air' and bp.Physics.MotionType ~= 'RULEUMT_None')
         or (bp.Physics.AltMotionType ~= 'RULEUMT_Air' and bp.Physics.AltMotionType ~= 'RULEUMT_None') then
             table.insert(lines, LOCF("<LOC uvd_0012>Speed: %.3g, Reverse: %.3g, Acceleration: %.3g, Turning: %d",
-                bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
+            bp.Physics.MaxSpeed, bp.Physics.MaxSpeedReverse, bp.Physics.MaxAcceleration, bp.Physics.TurnRate))
         end
         
         -- Display the TransportSpeedReduction stat in the UI.
@@ -800,6 +783,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
         if bp.Physics.TransportSpeedReduction and not (bp.CategoriesHash.NAVAL or bp.CategoriesHash.EXPERIMENTAL) then
             table.insert(lines, LOCF("<LOC uvd_0017>Transport Speed Reduction: %.3g",
             bp.Physics.TransportSpeedReduction))
+        end
+
+        -- Insert cap cost if it does not equal 1
+        if bp.General.CapCost ~= 1 then
+            table.insert(lines, LOCF("<LOC uvd_0023>Cap cost: %.3g",
+            bp.General.CapCost))
         end
 
         table.insert(blocks, {color = 'FFB0FFB0', lines = lines})
