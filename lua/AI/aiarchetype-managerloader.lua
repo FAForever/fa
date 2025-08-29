@@ -62,7 +62,7 @@ function ExecutePlan(aiBrain)
                 mainManagers.FactoryManager:AddFactory(v)
             end
         end
-        aiBrain:ForkThread(UnitCapWatchThread)
+        aiBrain:ForkThread(UnitCapWatchThread, 0.9, 30)
     end
     if aiBrain.PBM then
         aiBrain:PBMSetEnabled(false)
@@ -84,43 +84,117 @@ function SetupMainBase(aiBrain)
     aiBrain:ForceManagerSort()
 end
 
---- Modeled after GPGs LowMass and LowEnergy functions.
---- Runs the whole game and kills off units when the AI hits unit cap.
+---@class UnitCapCullEntry
+---@field categories any  -- Typically a category expression used by the AI
+---@field compare boolean -- Whether this entry compares with another category
+---@field compareTo any?  -- The category to compare against, if compare is true
+---@field cullRatio number -- The ratio (0.0 to 1.0) of units to cull under pressure
+---@field checkAttached boolean -- Whether attached units should be considered
+
+---@type table<string, UnitCapCullEntry>
+local UnitCapCullTable = {
+    Walls = {
+        categories = categories.WALL * categories.STRUCTURE * categories.DEFENSE - categories.CIVILIAN,
+        cullRatio = 0.4,
+        checkAttached = false
+    },
+    T1DefensiveUnits = {
+        categories = categories.TECH1 * categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE),
+        cullRatio = 0.3,
+        checkAttached = true
+    },
+    T1AirUnits = {
+        categories = categories.MOBILE * categories.TECH1 * categories.AIR - categories.TRANSPORTFOCUS - categories.ENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true
+    },
+    T1NavalUnits = {
+        categories = categories.MOBILE * categories.TECH1 * categories.NAVAL - categories.ENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true
+    },
+    T1LandUnits = {
+        categories = categories.MOBILE * categories.TECH1 * categories.LAND - categories.ENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true
+    },
+    T1LandEngineer = {
+        categories = categories.MOBILE * categories.TECH1 * categories.LAND * categories.ENGINEER - categories.COMMAND,
+        compareTo = categories.MOBILE * categories.LAND * categories.ENGINEER * (categories.TECH2 + categories.TECH3)- categories.COMMAND - categories.SUBCOMMANDER - categories.POD - categories.FIELDENGINEER,
+        cullRatio = 0.2,
+        checkAttached = true,
+    },
+}
+
+--- Runs the whole game and kills off units when the AI hits get close to unit cap.
 ---@param aiBrain AIBrain
-function UnitCapWatchThread(aiBrain)
-    --DUNCAN - Added T1 kill and check every 30 seconds and within 10 of the unit cap
-    KillPD = false
-    KillT1 = false
+---@param unitCapDesiredRatio number
+---@param maxCullNumber number
+function UnitCapWatchThread(aiBrain, unitCapDesiredRatio, maxCullNumber)
+    -- Remember that this table will run in order, so we want the most deisred to cull first
+    -- There is also two configurable settings
+    -- cullPressure - Indicates how many units we want to cull per pass. The closer we are to the unit cap the more units we will cull.
+    -- dynamicRatioThreshold - What sort of ratio we want when performing compares. So that we dont instantly cull lots of units just because 
+    -- one of the next tier is available
+
+
     while true do
         WaitSeconds(30)
-        if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 10) then
-            if not KillT1 then
-                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.MOBILE * categories.LAND, true)
-                local count = 0
-                for k, v in units do
-                    v:Kill()
-                    count = count + 1
-                    if count >= 20 then break end
+        local brainIndex = aiBrain:GetArmyIndex()
+        local currentCount = GetArmyUnitCostTotal(brainIndex)
+        local cap = GetArmyUnitCap(brainIndex)
+        local capRatio = currentCount / cap
+        if capRatio > unitCapDesiredRatio then
+            local cullPressure = math.min((capRatio - 0.80) / 0.2, 1)
+            local dynamicRatioThreshold = 2.0 - (capRatio - 0.80) * 9
+            local culledUnitCount = 0
+            for k, cullType in UnitCapCullTable do
+                if cullType.compareTo then
+                    local compareFrom = aiBrain:GetCurrentUnits(cullType.categories)
+                    local compareTo = aiBrain:GetCurrentUnits(cullType.compareTo)
+                    if compareTo > 0 and compareFrom > 0 then
+                        local ratio = compareFrom / compareTo
+                        if ratio > dynamicRatioThreshold then
+                            local toCull = math.min(compareTo, math.ceil(compareTo * ratio * cullType.cullRatio * cullPressure))
+                            if toCull > 0 then
+                                culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
+                            end
+                        end
+                    end
+                else
+                    local units = aiBrain:GetCurrentUnits(cullType.categories)
+                    if units > 0 then
+                        local toCull = math.min(units, math.ceil(units * cullType.cullRatio * cullPressure))
+                        if toCull > 0 then
+                            culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
+                        end
+                    end
                 end
-                KillT1 = true
-            elseif not KillPD then
-                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE, true)
-
-                for k, v in units do
-                    v:Kill()
+                if culledUnitCount >= maxCullNumber then
+                    break
                 end
-                KillPD = true
-            else
-                --DUNCAN - dont kill power, it kills the econ, will now be reclaimed
-                --local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE, true)
-                --for k, v in units do
-                --    v:Kill()
-                --end
-                KillPD = false
-                KillT1 = false
             end
         end
     end
+end
+
+function CullUnitsOfCategory(aiBrain, category, toCull, checkAttached)
+    -- Culls units based on the categories passed in
+    local units = aiBrain:GetListOfUnits(category, true)
+    local culledUnitCount = 0
+    for k, v in units do
+        if not v.Dead then
+            if checkAttached and v:IsUnitState('Attached') then
+                continue
+            end
+            culledUnitCount = culledUnitCount + 1
+            v:Kill()
+            if culledUnitCount >= toCull then
+                return culledUnitCount
+            end
+        end
+    end
+    return culledUnitCount
 end
 
 ---@param aiBrain AIBrain

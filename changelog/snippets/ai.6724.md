@@ -1,0 +1,1 @@
+- (#6724) Refactor UnitCapWatchThread to provide better functionality for managing the AI unit cap when it is under pressure.
