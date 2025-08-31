@@ -38,6 +38,23 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         self.ShieldEnabled = false
     end,
 
+    ---@param self AShieldStructureUnit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function (self, builder, layer)
+        AShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
+
+        local trash = self.Trash
+
+        local orbManip1 = CreateRotator(self, 'Orb', '-x', nil, 0, 45, 45)
+        TrashBagAdd(trash, orbManip1)
+        self.OrbManip1 = orbManip1
+
+        local orbManip2 = CreateRotator(self, 'Orb', 'z', nil, 0, 45, 45)
+        TrashBagAdd(trash, orbManip2)
+        self.OrbManip2 = orbManip2
+    end,
+
     ---@param self UAB4202
     OnShieldEnabled = function(self)
         AShieldStructureUnit.OnShieldEnabled(self)
@@ -46,14 +63,8 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
             effect:OffsetEmitter(0, -2.2, 0)
         end
 
-        local trash = self.Trash
-
         local orbManip1 = self.OrbManip1
-        if not orbManip1 then
-            orbManip1 = CreateRotator(self, 'Orb', '-x', nil, 0, 45, 45)
-            TrashBagAdd(trash, orbManip1)
-            self.OrbManip1 = orbManip1
-        else
+        if orbManip1 then
             -- Spin down very quickly since the rotator bugs out with the upgrade animation
             if self:IsUnitState('Upgrading') then
                 orbManip1:SetSpinDown(true)
@@ -65,11 +76,7 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         end
 
         local orbManip2 = self.OrbManip2
-        if not orbManip2 then
-            orbManip2 = CreateRotator(self, 'Orb', 'z', nil, 0, 45, 45)
-            TrashBagAdd(trash, orbManip2)
-            self.OrbManip2 = orbManip2
-        else
+        if orbManip2 then
             -- Spin down very quickly since the rotator bugs out with the upgrade animation
             if self:IsUnitState('Upgrading') then
                 orbManip2:SetSpinDown(true)
