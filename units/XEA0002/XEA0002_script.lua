@@ -9,6 +9,8 @@ local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 local TOrbitalDeathLaserBeamWeapon = import("/lua/terranweapons.lua").TOrbitalDeathLaserBeamWeapon
 
 ---@class XEA0002 : TAirUnit
+---@field IsDying boolean?
+---@field Parent XEB2402? # Set in XEB2402 script
 XEA0002 = ClassUnit(TAirUnit) {
     DestroyNoFallRandomChance = 1.1,
 
@@ -18,16 +20,19 @@ XEA0002 = ClassUnit(TAirUnit) {
         OrbitalDeathLaserWeapon = ClassWeapon(TOrbitalDeathLaserBeamWeapon) {},
     },
 
+    ---@param self XEA0002
     OnDestroy = function(self)
         if not self.IsDying and self.Parent then
             self.Parent.Satellite = nil
-            if self:GetAIBrain().BrainType ~= 'Human' then
-                IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
-            end
+            IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
         end
         TAirUnit.OnDestroy(self)
     end,
 
+    ---@param self XEA0002
+    ---@param instigator Unit | Projectile
+    ---@param type DamageType
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.IsDying then
             return
@@ -42,9 +47,7 @@ XEA0002 = ClassUnit(TAirUnit) {
 
         if self.Parent then
             self.Parent.Satellite = nil
-            if self:GetAIBrain().BrainType ~= 'Human' then
-                IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
-            end
+            IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -98,11 +101,13 @@ XEA0002 = ClassUnit(TAirUnit) {
         end
     end,
 
+    ---@param self XEA0002
     Open = function(self)
         ChangeState(self, self.OpenState)
     end,
 
     OpenState = State() {
+        ---@param self XEA0002
         Main = function(self)
             -- Create the animator to open the fins
             self.OpenAnim = CreateAnimator(self)
