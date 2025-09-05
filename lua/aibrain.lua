@@ -562,7 +562,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param self AIBrain
     RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
+        ForkThread(self.RecallArmyThread, self, self:GetListOfUnits(commandCat, false))
     end,
 
     ---@param self AIBrain
