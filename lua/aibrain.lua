@@ -474,7 +474,6 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param self AIBrain
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            LOG(GetGameTick(), self.Nickname, 'has been abandoned.')
             self.Status = 'Defeat'
 
             import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
@@ -511,10 +510,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                     end
                 else
                     -- explode all the ACUs so they don't get shared
-                    LOG('trying to kill acus for ', self.Nickname)
-                    LOG('there are ', table.getsize(commanders))
                     for _, com in commanders do
-                        com:DebugLog('Killed by aibrain abandonment; can we be killed? ', com.CanBeKilled)
                         com:Kill()
                     end
                 end

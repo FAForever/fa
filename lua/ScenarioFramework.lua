@@ -942,12 +942,6 @@ end
 ---@param units Unit[]
 ---@param destroyUnits? boolean
 function FakeTeleportUnits(units, destroyUnits)
-    local brain = units[1].Brain.Nickname
-    LOG(string.format('brain %s: Fake teleporting %d units, and destroy is %s'
-        , brain
-        , table.getn(units)
-        , tostring(destroyUnits))
-    )
     IssueStop(units)
     IssueClearCommands(units)
     local buildingUnits = {}
@@ -958,46 +952,33 @@ function FakeTeleportUnits(units, destroyUnits)
             if unit:GetFractionComplete() < 1 then
                 buildingUnits[unit] = true
             else
-                LOG(brain, 'play tele charge')
                 unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-                LOG(brain, 'play tele charge sound')
                 unit:PlayUnitSound('GateCharge')
             end
         end
     end
-    LOG(brain, 'finished tele charge')
 
     WaitSeconds(2)
 
-    LOG(brain, 'start tele out', table.getsize(units))
-    for _, unit in pairs(units) do
+    for _, unit in units do
         if not IsDestroyed(unit) then
             if not buildingUnits[unit] then
-                LOG(brain, 'clean up tele')
                 unit:CleanupTeleportChargeEffects()
                 unit:PlayUnitSound('GateOut')
             end
-            LOG(brain, 'play tele out')
             unit:PlayTeleportOutEffects()
-        else
-            unit:DebugLog(brain, 'unit is destroyed')
         end
     end
 
     WaitSeconds(1)
 
     if destroyUnits then
-        LOG(brain, 'count of units to destroy:', table.getsize(units))
-        for _, unit in pairs(units) do
+        for _, unit in units do
             if not IsDestroyed(unit) then
-                unit:DebugLog(brain, 'destroying unit')
                 unit:Destroy()
-            else
-                unit:DebugLog(brain, 'Unit is already destroyed')
             end
         end
     end
-    LOG(brain, 'fake tele end')
 end
 
 --- Plays teleport effects for a unit
