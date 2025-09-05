@@ -21,9 +21,7 @@ XEA0002 = ClassUnit(TAirUnit) {
     OnDestroy = function(self)
         if not self.IsDying and self.Parent then
             self.Parent.Satellite = nil
-            if self:GetAIBrain().BrainType ~= 'Human' then
-                IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
-            end
+            IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
         end
         TAirUnit.OnDestroy(self)
     end,
@@ -42,9 +40,7 @@ XEA0002 = ClassUnit(TAirUnit) {
 
         if self.Parent then
             self.Parent.Satellite = nil
-            if self:GetAIBrain().BrainType ~= 'Human' then
-                IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
-            end
+            IssueBuildFactory({ self.Parent }, 'XEA0002', 1)
         end
 
         TAirUnit.OnKilled(self, instigator, type, overkillRatio)
