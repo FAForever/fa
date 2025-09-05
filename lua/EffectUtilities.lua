@@ -1040,6 +1040,7 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
     end
 
     if teleDelay then
+        LOG('tele delay is ', teleDelay)
         WaitSeconds(teleDelay)
     end
 
@@ -1119,6 +1120,8 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
             teleportDestFxEntity:Destroy()
         end
     end
+
+    LOG(unit.Brain.Nickname, 'play tele charge end')
 end
 
 --- Gets a unit's teleport effect y-offset, so it appears centered
