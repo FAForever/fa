@@ -504,7 +504,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 10/38, --10/integer interval in ticks
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
