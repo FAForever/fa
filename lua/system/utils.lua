@@ -106,9 +106,10 @@ end
 
 --- Returns the key for `val` if it is in table `t`.
 --- Otherwise, returns nil.
----@param t? table
----@param val any
----@return any keyOrNil
+---@generic K, V
+---@param t? table<K, V>
+---@param val V
+---@return K? keyOrNil
 function table.find(t,val)
     if not t then return end -- prevents looping over nil table
     for k,v in t do
