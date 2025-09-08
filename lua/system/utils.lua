@@ -110,9 +110,9 @@ end
 ---@param t? table<K, V>
 ---@param val V
 ---@return K? keyOrNil
-function table.find(t,val)
+function table.find(t, val)
     if not t then return end -- prevents looping over nil table
-    for k,v in t do
+    for k, v in t do
         if v == val then
             return k
         end
