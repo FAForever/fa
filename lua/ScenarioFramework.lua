@@ -939,7 +939,7 @@ function FakeTeleportUnit(unit, destroyUnit)
 end
 
 --- Run teleport effect and then optionally delete the units. The 'CanBeKilled' flag remains false if the units are not deleted
----@param units Unit
+---@param units Unit[]
 ---@param destroyUnits? boolean
 function FakeTeleportUnits(units, destroyUnits)
     IssueStop(units)
