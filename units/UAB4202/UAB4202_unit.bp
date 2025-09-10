@@ -18,6 +18,7 @@ UnitBlueprint{
         "BUILTBYTIER2ENGINEER",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
+        "CQUEMOV",
         "DEFENSE",
         "DRAGBUILD",
         "OVERLAYDEFENSE",
