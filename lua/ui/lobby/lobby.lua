@@ -5641,7 +5641,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     ---@param self UILobbyCommunication
     ---@param data UILobbyReceivedMessage
     lobbyComm.DataReceived = function(self, data)
-
+        -- make it more convenient to debug malicious traffic
+        SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
