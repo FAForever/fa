@@ -1,5 +1,5 @@
 ---@type number
-last_version = 3827
+last_version = 3828
 
 ---@type PatchNotes[]
 gamePatches = {
