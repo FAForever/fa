@@ -1509,8 +1509,8 @@ Unit_Description_0072="Stationary Heavy Artillery with excellent range and damag
 Unit_Description_0073="Strategic Missile Launcher. Automatically constructs expensive and extremely destructive strategic missiles. Toggleable missile construction."
 Unit_Description_0075="Strategic Assassination Artillery. Can hit any target on the map regardless of motion, range, or protection. Rate of fire increased when adjacent to energy production buildings."
 Unit_Description_0313="Heavy surface defense turret."
-Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite."
-Unit_Description_0316="Satellite is untargetable by any weapon, but can attack enemy units and structures with very high precision. It can be destroyed only if its control center is destroyed."
+Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite. Automatically starts rebuilding the Satellite if it is destroyed."
+Unit_Description_0316="Satellite is untargetable by any weapon, and can attack enemy units and structures with very high precision. Is destroyed if its control center is destroyed. Auto-rebuilds at the control center if destroyed by other means."
 
 -- UEF -- Defensive Structures
 Unit_Description_0060="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
