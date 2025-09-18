@@ -1262,16 +1262,6 @@ function RequestAlliedVictory(data)
     brain.RequestingAlliedVictory = data.Value
 end
 
----@param data {Army: Army, Value: boolean}
-function SetOfferDraw(data)
-    local army = data.Army
-    if not OkayToMessWithArmy(army) then
-        return
-    end
-    local brain = GetArmyBrain(army)
-    brain.OfferingDraw = data.Value
-end
-
 ---@param data {Sender: integer, Msg: string}
 function SendChatToReplay(data)
     if data.Sender and data.Msg then

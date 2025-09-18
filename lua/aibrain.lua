@@ -26,6 +26,7 @@ local FactoryManagerBrainComponent = import("/lua/aibrains/components/factoryman
 local JammerManagerBrainComponent = import("/lua/aibrains/components/jammermanagerbraincomponent.lua").JammerManagerBrainComponent
 local StatManagerBrainComponent = import("/lua/aibrains/components/statmanagerbraincomponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanagerbraincomponent.lua").EnergyManagerBrainComponent
+local DrawBrainComponent = import("/lua/aibrains/components/drawbraincomponent.lua").DrawBrainComponent
 
 local CommanderSafeTime = import("/lua/simutils.lua").CommanderSafeTime
 
@@ -54,7 +55,7 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
----@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods
+---@class AIBrain: FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent, EnergyManagerBrainComponent, StorageManagerBrainComponent, DrawBrainComponent, moho.aibrain_methods
 ---@field AI boolean
 ---@field Name string           # Army name
 ---@field Nickname string       # Player / AI / character name
@@ -71,7 +72,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
 ---@field Army Army # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
-    EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
+    EnergyManagerBrainComponent, StorageManagerBrainComponent, DrawBrainComponent, moho.aibrain_methods) {
 
     Status = 'InProgress',
 
@@ -433,11 +434,6 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
 
         self:PlayVOSound('OnTransportFull', Sound { Bank = 'XGG', Cue = cue })
-    end,
-
-    ---@param self AIBrain
-    OnDraw = function(self)
-        self.Status = 'Draw'
     end,
 
     ---@param self AIBrain

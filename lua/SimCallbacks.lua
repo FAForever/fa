@@ -153,8 +153,6 @@ Callbacks.SetResourceSharing = SimUtils.SetResourceSharing
 
 Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 
-Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
-
 Callbacks.SetRecallVote = import("/lua/sim/recall.lua").SetRecallVote
 
 Callbacks.SpawnPing = SimPing.SpawnPing
@@ -302,6 +300,27 @@ Callbacks.FlagShield = function(data, units)
         end
     end
 end
+
+--#region Draw functionality
+
+--- Initiates or cancels a draw offer.
+---@param data { Value : boolean }
+Callbacks.SetOfferDraw = function(data)
+    local commandSource = GetCurrentCommandSource()
+    local brain = GetArmyBrain(commandSource) --[[@as AIBrain]]
+    if not brain then
+        WARN("Invalid draw offer. No pun intended, but the source has no brain.")
+        return
+    end
+
+    if (data.Value) then
+        brain:OfferDraw()
+    else
+        brain:WithdrawDrawOffer()
+    end
+end
+
+--#endregion
 
 -------------------------------------------------------------------------------
 --#region General orders

@@ -609,7 +609,6 @@ function BuildPlayerLines()
                 SimCallback({
                     Func = "SetOfferDraw",
                     Args = {
-                        Army = GetFocusArmy(),
                         Value = checked,
                     },
                 })
