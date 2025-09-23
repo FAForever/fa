@@ -35,7 +35,7 @@ DebugComponent = ClassSimple {
     EnabledLogging = true,
     EnabledWarnings = true,
     EnabledErrors = true,
-    EnabledDrawing = false,
+    EnabledDrawing = true,
 
     --#endregion
 }
