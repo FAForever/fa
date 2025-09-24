@@ -1768,7 +1768,7 @@ options = {
                 title = "<LOC OPTIONS_FRAMETIME>Frametime",
                 key = 'frametime',
                 type = 'slider',
-                default = 16,
+                default = 8,
                 update = function(control, value)
                     logic = import("/lua/options/optionslogic.lua")
                     logic.SetValue('vsync', 0)
@@ -1789,6 +1789,12 @@ options = {
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
+                update = function(control, value)
+                    if value == 1 then
+                        logic = import("/lua/options/optionslogic.lua")
+                        logic.SetValue('frametime', 8)
+                    end
+                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))
