@@ -1,1 +1,1 @@
-- (#6932) Adjust default frametime to not interfere with vsync
+- (#6932) Adjust default maximum frame time to not interfere with vsync
