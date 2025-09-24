@@ -1,0 +1,1 @@
+- (#6932) Adjust default frametime to not interfere with vsync
