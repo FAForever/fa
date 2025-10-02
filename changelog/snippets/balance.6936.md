@@ -1,1 +1,1 @@
-- (#6936) Adjust HP of T2 Air/Land HQs so that Cybran T2 HQs do not die to 1 TML hit.
+- (#6936) Adjust HP of T2 Air/Land HQs so that Cybran T2 HQs do not die to 1 TML hit. This prevents Cybran players from being unfairly locked out of the tech needed to counter TMLs.
