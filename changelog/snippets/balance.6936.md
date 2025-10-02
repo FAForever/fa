@@ -1,1 +1,1 @@
-- (#6936) Adjust HP of factories so that Cybran T2 Air/Land HQs and T3 Air/Land Support Factories are not one shot by TMLs or die to one T3 pgen explosion.
+- (#6936) Adjust HP of T2 Air/Land HQs so that Cybran T2 HQs do not die to 1 TML hit.
