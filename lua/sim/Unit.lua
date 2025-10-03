@@ -4609,8 +4609,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Called by the engine to determine whether or not the unit's shield can be assisted
     ---@param self Unit
-    ---@return boolean
+    ---@return boolean?
     ShieldIsOn = function(self)
         if self.MyShield then
             return self.MyShield:IsOn()
