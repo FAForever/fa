@@ -1235,32 +1235,43 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
                 else
                     if self:IsUnitState('Repairing') and focus.isFinishedUnit then -- also applies to shield assisting
-                        if focus.Blueprint.CategoriesHash['SHIELD'] then
+                        local function SetDefaultRepairCosts()
+                            time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                            energy = energy * repairRatio
+                            mass = mass * repairRatio
+                        end
+
+                        if not focus.Blueprint.CategoriesHash["SHIELD"] then
+                            -- units without SHIELD category cannot be shield assisted
+                            SetDefaultRepairCosts()
+                        else
                             local focusShield = focus.MyShield
                             local shieldAssistEnergy = focusShield.AssistCostEnergyPerBuildRate
                             local shieldAssistMass = focusShield.AssistCostMassPerBuildRate
 
-                            if focusShield
-                                and shieldAssistEnergy
-                                and shieldAssistMass
-                                and focusShield:IsUp()
-                                and focus:GetFocusUnit() == nil
+                            if not focusShield
+                                -- units default to repair cost for shield assist costs
+                                or not shieldAssistEnergy
+                                or not shieldAssistMass
+                                -- units not focused on a shield that is up cannot be shield assisted
+                                or not focusShield:IsUp()
+                                or not focus:GetFocusUnit() == nil
                             then
-                                -- Determine exactly what we are repairing
+                                SetDefaultRepairCosts()
+                            else
+                                -- Determine what we are repairing, since they have different costs
                                 local repairingFocusUnit = focus:GetMaxHealth() > focus:GetHealth()
                                 local repairingFocusShield = focusShield:GetMaxHealth() > focusShield:GetHealth()
-                                -- Apply unit repair costs
+
                                 if repairingFocusUnit then
-                                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                                    energy = energy * repairRatio
-                                    mass = mass * repairRatio
+                                    SetDefaultRepairCosts()
                                     -- Engine splits repair effect 50/50 so reduce costs in that case
                                     if repairingFocusShield then
                                         energy = energy * 0.5
                                         mass = mass * 0.5
                                     end
                                 end
-                                -- Apply custom shield assist costs
+
                                 if repairingFocusShield then
                                     local buildRate = self:GetBuildRate()
                                     -- Engine splits repair effect 50/50 so reduce costs in that case
@@ -1271,15 +1282,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                                     energy_rate = energy_rate + shieldAssistEnergy * buildRate
                                     mass_rate = mass_rate + shieldAssistMass * buildRate
                                 end
-                            else
-                                time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                                energy = energy * repairRatio
-                                mass = mass * repairRatio
                             end
-                        else
-                            time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                            energy = energy * repairRatio
-                            mass = mass * repairRatio
                         end
                     end
                 end
