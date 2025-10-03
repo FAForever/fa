@@ -134,10 +134,6 @@ local function AdjustShieldAssistCost(unit, shieldBp)
     local regenPerBuildRate = shieldBp.RegenPerBuildRate
     if regenPerBuildRate then
         local regen = shieldBp.ShieldRegenRate
-        -- local economy = unit.Economy
-        -- local costMass = economy.BuildCostMass
-        -- local costEnergy = economy.BuildCostEnergy
-
         -- RegenAssistMult is used by the engine to determine how much buildpower is needed to
         -- provide 1x the shield's regen rate as HP restored.
         -- Exception: RegenRate is read from the Shield's lua table during run time, so
@@ -152,15 +148,6 @@ local function AdjustShieldAssistCost(unit, shieldBp)
         -- RAM = RR / (HPR/BP)
 
         shieldBp.RegenAssistMult = regen / shieldBp.RegenPerBuildRate
-
-        -- Mass/Second = BP * BuildCost / BT
-        -- Mass/Second/BP = BuildCost / BT
-        --   BuildCost = HPR/Mass
-        --   BT = HPR = RR/RAM
-        -- Mass/Second/BP = HPR/Mass / (RR/RAM)
-        -- Mass/Second/BP = HPR/Mass / RAM * RR
-
-        -- shieldBp.AssistCostMassPerBuildRate = shieldBp.RegenPerMassCost / shieldBp.RegenAssistMult * shieldBp.ShieldRegenRate
     end
 end
 
