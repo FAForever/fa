@@ -1279,8 +1279,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                                         shieldAssistEnergy = shieldAssistEnergy * 0.5
                                         shieldAssistMass = shieldAssistMass * 0.5
                                     end
-                                    energy_rate = energy_rate + shieldAssistEnergy * buildRate
-                                    mass_rate = mass_rate + shieldAssistMass * buildRate
+                                    energy = energy + shieldAssistEnergy * buildRate * time
+                                    mass = mass + shieldAssistMass * buildRate * time
                                 end
                             end
                         end
@@ -1290,8 +1290,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
             energy = math.max(0, energy * (self.EnergyBuildAdjMod or 1))
             mass = math.max(0, mass * (self.MassBuildAdjMod or 1))
-            energy_rate = energy_rate + energy / time
-            mass_rate = mass_rate + mass / time
+            energy_rate = energy / time
+            mass_rate = mass / time
         end
 
         local myBlueprint = self.Blueprint
