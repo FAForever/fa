@@ -16,6 +16,7 @@
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---@field TeamShareOverspill "enabled" | "disabled" | "toggle"
 ---
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
@@ -192,6 +193,30 @@ teamOptions =
                 key = 'Common'
             }
         }
+    },
+
+    {
+        default = 2,
+        label = "<LOC lobui_resource_sharing_label>Share overspilled resource",
+        help = "<LOC lobui_resource_sharing_help>Allows you to enforce whether the sharing of overspilled resources with allies is enabled, disabled or toggleable.",
+        key = 'TeamShareOverspill',
+        values = {
+            {
+                text = "<LOC lobui_resource_sharing_enabled_text>Enabled",
+                help = "<LOC lobui_resource_sharing_enabled_help>The feature is enabled. Players are not able to toggle it.",
+                key = 'enabled',
+            },
+            {
+                text = "<LOC lobui_resource_sharing_toggle_text>Enabled by default, toggleable",
+                help = "<LOC lobui_resource_sharing_toggle_help>The feature is enabled by default, but players can toggle it on and off.",
+                key = 'toggle',
+            },
+            {
+                text = "<LOC lobui_resource_sharing_disabled_text>Disabled",
+                help = "<LOC lobui_resource_sharing_disabled_help>The feature is disabled. Players are not able to toggle it.",
+                key = 'disabled',
+            },
+        },
     },
 }
 
