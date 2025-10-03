@@ -451,6 +451,13 @@
 --- If this shield is one that unequivocally protects all attached units.
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
+--- Overrides `RegenAssistMult` during blueprint loading so that the given amount of regen is given
+--- per buildpower assisting the shield.
+---@field RegenPerBuildRate number
+--- Engineers spend this amount in energy * their buildpower assisting the shield.
+---@field AssistCostEnergyPerBuildRate number
+--- Engineers spend this amount in mass * their buildpower assisting the shield.
+---@field AssistCostMassPerBuildRate number
 
 ---@class UnitBlueprintBlinkingLightsData
 ---@field BLBone Bone
