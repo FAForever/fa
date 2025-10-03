@@ -1232,9 +1232,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                                 and shieldAssistEnergy
                                 and shieldAssistMass
                                 and focusShield:IsUp()
-                                -- shield units SetFocusEntity to the shield to make it repairable
-                                -- but the shield is not a unit, so GetFocusUnit returns nil.
-                                -- So assume if its nil the shield is focused, and the shield is repairable.
                                 and focus:GetFocusUnit() == nil
                             then
                                 -- Determine exactly what we are repairing
