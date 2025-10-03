@@ -127,6 +127,43 @@ local function DetermineWeaponCategory(weapon)
     return nil
 end
 
+--- Adjusts `RegenAssistMult` of a shield blueprint according to its `RegenPerBuildRate`
+---@param unit UnitBlueprint
+---@param shieldBp UnitBlueprintDefenseShield
+local function AdjustShieldAssistCost(unit, shieldBp)
+    local regenPerBuildRate = shieldBp.RegenPerBuildRate
+    if regenPerBuildRate then
+        local regen = shieldBp.ShieldRegenRate
+        -- local economy = unit.Economy
+        -- local costMass = economy.BuildCostMass
+        -- local costEnergy = economy.BuildCostEnergy
+
+        -- RegenAssistMult is used by the engine to determine how much buildpower is needed to
+        -- provide 1x the shield's regen rate as HP restored.
+        -- Exception: RegenRate is read from the Shield's lua table during run time, so
+        -- the actual HP restored/second may vary from blueprint spec.
+
+        -- HP Restored/second = RegenRate * Buildpower / RegenAssistMult
+        --   We want to be able to assign it simply using HP Restored/s per buildpower.
+        -- HPR = RR * BP / RAM
+        -- HPR * RAM = RR * BP
+        -- RAM = RR * BP / HPR
+        -- RAM = RR * 1 / (HPR/BP)
+        -- RAM = RR / (HPR/BP)
+
+        shieldBp.RegenAssistMult = regen / shieldBp.RegenPerBuildRate
+
+        -- Mass/Second = BP * BuildCost / BT
+        -- Mass/Second/BP = BuildCost / BT
+        --   BuildCost = HPR/Mass
+        --   BT = HPR = RR/RAM
+        -- Mass/Second/BP = HPR/Mass / (RR/RAM)
+        -- Mass/Second/BP = HPR/Mass / RAM * RR
+
+        -- shieldBp.AssistCostMassPerBuildRate = shieldBp.RegenPerMassCost / shieldBp.RegenAssistMult * shieldBp.ShieldRegenRate
+    end
+end
+
 --- Post process a unit
 ---@param unit UnitBlueprint
 local function PostProcessUnit(unit)
@@ -614,6 +651,22 @@ local function PostProcessUnit(unit)
             unit.Display.AnimationDeath = nil
         end
     end
+
+    --#region Adjust shield assist effectiveness
+    -- Engine only implements assist for SHIELD category units
+    if unit.CategoriesHash["SHIELD"] then
+        if unit.Defense.Shield then
+            AdjustShieldAssistCost(unit, unit.Defense.Shield)
+        end
+        if unit.Enhancements then
+            for _, enh in unit.Enhancements do
+                if enh.ShieldSize then
+                    AdjustShieldAssistCost(unit, unit.Defense.Shield)
+                end
+            end
+        end
+    end
+    --#endregion
 end
 
 --- Feature: re-apply the ability to land on water

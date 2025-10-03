@@ -1222,18 +1222,64 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 0)
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
                 else
-                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                     if self:IsUnitState('Repairing') and focus.isFinishedUnit then -- also applies to shield assisting
-                        energy = energy * repairRatio
-                        mass = mass * repairRatio
+                        if focus.Blueprint.CategoriesHash['SHIELD'] then
+                            local focusShield = focus.MyShield
+                            local shieldAssistEnergy = focusShield.AssistCostEnergyPerBuildRate
+                            local shieldAssistMass = focusShield.AssistCostMassPerBuildRate
+
+                            if focusShield
+                                and shieldAssistEnergy
+                                and shieldAssistMass
+                                and focusShield:IsUp()
+                                -- shield units SetFocusEntity to the shield to make it repairable
+                                -- but the shield is not a unit, so GetFocusUnit returns nil.
+                                -- So assume if its nil the shield is focused, and the shield is repairable.
+                                and focus:GetFocusUnit() == nil
+                            then
+                                -- Determine exactly what we are repairing
+                                local repairingFocusUnit = focus:GetMaxHealth() > focus:GetHealth()
+                                local repairingFocusShield = focusShield:GetMaxHealth() > focusShield:GetHealth()
+                                -- Apply unit repair costs
+                                if repairingFocusUnit then
+                                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                                    energy = energy * repairRatio
+                                    mass = mass * repairRatio
+                                    -- Engine splits repair effect 50/50 so reduce costs in that case
+                                    if repairingFocusShield then
+                                        energy = energy * 0.5
+                                        mass = mass * 0.5
+                                    end
+                                end
+                                -- Apply custom shield assist costs
+                                if repairingFocusShield then
+                                    local buildRate = self:GetBuildRate()
+                                    -- Engine splits repair effect 50/50 so reduce costs in that case
+                                    if repairingFocusUnit then
+                                        shieldAssistEnergy = shieldAssistEnergy * 0.5
+                                        shieldAssistMass = shieldAssistMass * 0.5
+                                    end
+                                    energy_rate = energy_rate + shieldAssistEnergy * buildRate
+                                    mass_rate = mass_rate + shieldAssistMass * buildRate
+                                end
+                            else
+                                time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                                energy = energy * repairRatio
+                                mass = mass * repairRatio
+                            end
+                        else
+                            time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                            energy = energy * repairRatio
+                            mass = mass * repairRatio
+                        end
                     end
                 end
             end
 
             energy = math.max(0, energy * (self.EnergyBuildAdjMod or 1))
             mass = math.max(0, mass * (self.MassBuildAdjMod or 1))
-            energy_rate = energy / time
-            mass_rate = mass / time
+            energy_rate = energy_rate + energy / time
+            mass_rate = mass_rate + mass / time
         end
 
         local myBlueprint = self.Blueprint

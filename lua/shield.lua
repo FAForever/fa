@@ -195,6 +195,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+        self.AssistCostEnergyPerBuildRate = spec.AssistCostEnergyPerBuildRate
+        self.AssistCostMassPerBuildRate = spec.AssistCostMassPerBuildRate
         self.DisallowCollisions = false
 
         if spec.ImpactEffects ~= '' then
