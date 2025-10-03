@@ -1240,6 +1240,11 @@ end
 
 ---@param data {Army: integer, Value: boolean}
 function SetResourceSharing(data)
+    -- feature: empower host to enforce resource sharing
+    if ScenarioInfo.Options.TeamShareOverspill ~= "toggle" then
+        return
+    end
+
     local army = data.Army
     if not OkayToMessWithArmy(army) then
         return

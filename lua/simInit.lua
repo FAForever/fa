@@ -284,6 +284,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         ScenarioInfo.GameHasAIs = true
         SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality")
     end
+
+    -- feature: empower host to enforce resource sharing
+    if ScenarioInfo.Options.TeamShareOverspill == "enabled" then
+        ArmyBrains[index]:SetResourceSharing(true)
+    elseif ScenarioInfo.Options.TeamShareOverspill == "disabled" then
+        ArmyBrains[index]:SetResourceSharing(false)
+    end
 end
 
 function InitializePrebuiltUnits(name)
