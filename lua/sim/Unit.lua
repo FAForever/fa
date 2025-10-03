@@ -1478,6 +1478,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- inform the brain of the event
         self.Brain:OnUnitHealthChanged(self, new, old)
+
+        -- Manage shield assisters: unit is damaged/no longer damaged so assist consumption changes
+        if new == 1 or old == 1 and self.Blueprint.CategoriesHash["SHIELD"] then
+            local myShield = self.MyShield
+            if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
+                for _, unit in self.Repairers do
+                    unit:UpdateConsumptionValues()
+                end
+            end
+        end
     end,
 
     ---@param self Unit
@@ -5324,12 +5334,32 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnShieldEnabled = function(self) 
         -- for AI events
         self.Brain:OnUnitShieldEnabled(self)
+
+        -- Manage shield assisters: shield was enabled and may be assistable now
+        if self.Blueprint.CategoriesHash["SHIELD"] then
+            local myShield = self.MyShield
+            if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
+                for _, unit in self.Repairers do
+                    unit:UpdateConsumptionValues()
+                end
+            end
+        end
     end,
 
     ---@param self Unit
     OnShieldDisabled = function(self) 
         -- for AI events
         self.Brain:OnUnitShieldDisabled(self)
+
+        -- Manage shield assisters: shield is disabled and cannot be assisted anymore
+        if self.Blueprint.CategoriesHash["SHIELD"] then
+            local myShield = self.MyShield
+            if myShield.AssistCostEnergyPerBuildRate and myShield.AssistCostMassPerBuildRate then
+                for _, unit in self.Repairers do
+                    unit:UpdateConsumptionValues()
+                end
+            end
+        end
     end,
 
     -- Called by the brain when the unit registered itself

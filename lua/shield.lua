@@ -319,11 +319,27 @@ Shield = ClassShield(moho.shield_methods, Entity) {
                 -- adjust shield bar one last time
                 self:UpdateShieldRatio(health / maxHealth)
 
+                -- Manage shield assisters: shield is full HP and cannot be assisted anymore
+                if health == maxHealth
+                    and self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate
+                then
+                    for _, unit in self.Owner.Repairers do
+                        unit:UpdateConsumptionValues()
+                    end
+                end
+
                 -- suspend ourselves and wait
                 self.RegenThreadSuspended = true
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
                 fromSuspension = true
+
+                -- Manage shield assisters: shield was damaged from full HP and can now be assisted
+                if self.AssistCostEnergyPerBuildRate and self.AssistCostMassPerBuildRate then
+                    for _, unit in self.Owner.Repairers do
+                        unit:UpdateConsumptionValues()
+                    end
+                end
             end
 
             -- if we didn't suspend then check regeneration conditions
