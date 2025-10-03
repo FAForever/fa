@@ -168,6 +168,7 @@ local defaultOptions = {
     Victory = 'sandbox',
     CheatsEnabled = 'true',
     CivilianAlliance = 'enemy',
+    TeamShareOverspill = "toggle",
 }
 
 --- Gets the game options with changes from the command line args:
