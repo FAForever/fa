@@ -158,6 +158,8 @@ end
 ---@field SkipAttachmentCheck boolean
 ---@field AbsorptionTypeDamageTypeToMulti table<DamageType, number>
 ---@field DisallowCollisions boolean
+---@field AssistCostEnergyPerBuildRate? number
+---@field AssistCostMassPerBuildRate? number
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
