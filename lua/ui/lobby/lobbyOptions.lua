@@ -197,23 +197,23 @@ teamOptions =
 
     {
         default = 2,
-        label = "<LOC lobui_resource_sharing_label>Share overspilled resource",
-        help = "<LOC lobui_resource_sharing_help>Allows you to enforce whether the sharing of overspilled resources with allies is enabled, disabled or toggleable.",
+        label = "<LOC lobui_resource_sharing_label>Share excess resources",
+        help = "<LOC lobui_resource_sharing_help>Allows you to enforce whether the sharing of excess resources with allies is enabled, disabled or toggleable.",
         key = 'TeamShareOverspill',
         values = {
             {
                 text = "<LOC lobui_resource_sharing_enabled_text>Enabled",
-                help = "<LOC lobui_resource_sharing_enabled_help>The feature is enabled. Players are not able to toggle it.",
+                help = "<LOC lobui_resource_sharing_enabled_help>Excess resources are always shared.",
                 key = 'enabled',
             },
             {
-                text = "<LOC lobui_resource_sharing_toggle_text>Enabled by default, toggleable",
-                help = "<LOC lobui_resource_sharing_toggle_help>The feature is enabled by default, but players can toggle it on and off.",
+                text = "<LOC lobui_resource_sharing_toggle_text>Enabled by default",
+                help = "<LOC lobui_resource_sharing_toggle_help>Excess resources are shared by default. Players can toggle the behavior individually.",
                 key = 'toggle',
             },
             {
                 text = "<LOC lobui_resource_sharing_disabled_text>Disabled",
-                help = "<LOC lobui_resource_sharing_disabled_help>The feature is disabled. Players are not able to toggle it.",
+                help = "<LOC lobui_resource_sharing_disabled_help>Excess resources are never shared.",
                 key = 'disabled',
             },
         },
