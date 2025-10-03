@@ -5341,9 +5341,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnShieldEnabled = function(self) 
         -- for AI events
         self.Brain:OnUnitShieldEnabled(self)
-
-        -- Manage shield assisters: shield was enabled and may be assistable now
-        self:UpdateShieldAssistersConsumption()
     end,
 
     ---@param self Unit
