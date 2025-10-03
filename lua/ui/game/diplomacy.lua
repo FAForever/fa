@@ -528,17 +528,7 @@ function BuildPlayerLines()
 
         local allyTitle = allyGroup.title
 
-        local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
-        srCheck:SetCheck(shareResources, true)
-        LayoutHelpers.AtRightIn(srCheck, allyTitle)
-        srCheck.Top:Set(function() return allyGroup.Top() + 4 end)
-        Tooltip.AddCheckboxTooltip(srCheck, 'dip_share_resources')
-        allyTitle.srCheck = srCheck
 
-        local icon = CreateBitmapStd(srCheck, "/game/toggle_btn/icon-shared-resources")
-        icon:DisableHitTest()
-        LayoutHelpers.AtCenterIn(icon, srCheck)
-        srCheck.label = icon
 
         if sessionOptions.TeamLock == "unlocked" then
             local avCheck = UIUtil.CreateCheckboxStd(allyTitle, "/game/toggle_btn/toggle")
@@ -564,18 +554,33 @@ function BuildPlayerLines()
             end
         end
 
-        belowEntry = allyGroup._bottom
+        -- feature: empower host to enforce resource sharing
+        if sessionOptions.TeamShareOverspill == "toggle" then
+            local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
+            srCheck:SetCheck(shareResources, true)
+            LayoutHelpers.AtRightIn(srCheck, allyTitle)
+            srCheck.Top:Set(function() return allyGroup.Top() + 4 end)
+            Tooltip.AddCheckboxTooltip(srCheck, 'dip_share_resources')
+            allyTitle.srCheck = srCheck
 
-        srCheck.OnCheck = function(self, checked)
-            shareResources = checked
-            SimCallback({
-                Func = "SetResourceSharing",
-                Args = {
-                    Army = GetFocusArmy(),
-                    Value = checked,
-                },
-            })
+            local icon = CreateBitmapStd(srCheck, "/game/toggle_btn/icon-shared-resources")
+            icon:DisableHitTest()
+            LayoutHelpers.AtCenterIn(icon, srCheck)
+            srCheck.icon = icon
+
+            srCheck.OnCheck = function(self, checked)
+                shareResources = checked
+                SimCallback({
+                    Func = "SetResourceSharing",
+                    Args = {
+                        Army = GetFocusArmy(),
+                        Value = checked,
+                    },
+                })
+            end
         end
+
+        belowEntry = allyGroup._bottom
     end
 
     if enemyCount > 0 then
