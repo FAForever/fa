@@ -28,7 +28,7 @@ local CreateBitmapStd = UIUtil.CreateBitmapStd
 
 ---@type Group
 local parent = false
-local shareResources = true
+local shareResources = SessionGetScenarioInfo().Options.TeamShareOverflow == "enabled"
 local alliedVictory = true
 
 local dialogue = false
@@ -531,31 +531,6 @@ function BuildPlayerLines()
 
 
         if sessionOptions.TeamLock == "unlocked" then
-            local avCheck = UIUtil.CreateCheckboxStd(allyTitle, "/game/toggle_btn/toggle")
-            avCheck:SetCheck(alliedVictory, true)
-            LayoutHelpers.LeftOf(avCheck, srCheck)
-            Tooltip.AddCheckboxTooltip(avCheck, "dip_allied_victory")
-            allyTitle.avCheck = avCheck
-
-            icon = CreateBitmapStd(avCheck, "/game/toggle_btn/icon-allied-victory")
-            icon:DisableHitTest()
-            LayoutHelpers.AtCenterIn(icon, avCheck)
-            avCheck.label = icon
-
-            avCheck.OnCheck = function(self, checked)
-                alliedVictory = checked
-                SimCallback({
-                    Func = "RequestAlliedVictory",
-                    Args = {
-                        Army = GetFocusArmy(),
-                        Value = checked,
-                    },
-                })
-            end
-        end
-
-        -- feature: empower host to enforce resource sharing
-        if sessionOptions.TeamShareOverflow == "toggle" then
             local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
             srCheck:SetCheck(shareResources, true)
             LayoutHelpers.AtRightIn(srCheck, allyTitle)
@@ -572,6 +547,28 @@ function BuildPlayerLines()
                 shareResources = checked
                 SimCallback({
                     Func = "SetResourceSharing",
+                    Args = {
+                        Army = GetFocusArmy(),
+                        Value = checked,
+                    },
+                })
+            end
+
+            local avCheck = UIUtil.CreateCheckboxStd(allyTitle, "/game/toggle_btn/toggle")
+            avCheck:SetCheck(alliedVictory, true)
+            LayoutHelpers.LeftOf(avCheck, srCheck)
+            Tooltip.AddCheckboxTooltip(avCheck, "dip_allied_victory")
+            allyTitle.avCheck = avCheck
+
+            icon = CreateBitmapStd(avCheck, "/game/toggle_btn/icon-allied-victory")
+            icon:DisableHitTest()
+            LayoutHelpers.AtCenterIn(icon, avCheck)
+            avCheck.label = icon
+
+            avCheck.OnCheck = function(self, checked)
+                alliedVictory = checked
+                SimCallback({
+                    Func = "RequestAlliedVictory",
                     Args = {
                         Army = GetFocusArmy(),
                         Value = checked,
