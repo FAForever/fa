@@ -1241,7 +1241,7 @@ end
 ---@param data {Army: integer, Value: boolean}
 function SetResourceSharing(data)
     -- feature: empower host to enforce resource sharing
-    if ScenarioInfo.Options.TeamShareOverspill ~= "toggle" then
+    if ScenarioInfo.Options.TeamShareOverflow ~= "toggle" then
         return
     end
 

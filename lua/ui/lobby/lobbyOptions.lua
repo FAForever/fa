@@ -16,7 +16,7 @@
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
----@field TeamShareOverspill "enabled" | "disabled" | "toggle"
+---@field TeamShareOverflow "enabled" | "disabled" | "toggle"
 ---
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
@@ -196,24 +196,19 @@ teamOptions =
     },
 
     {
-        default = 2,
+        default = 1,
         label = "<LOC lobui_resource_sharing_label>Share excess resources",
-        help = "<LOC lobui_resource_sharing_help>Allows you to enforce whether the sharing of excess resources with allies is enabled, disabled or toggleable.",
-        key = 'TeamShareOverspill',
+        help = "<LOC lobui_resource_sharing_help>Allows you to enforce whether the sharing of excess resources with allies is enabled or disabled by default. When teams are unlocked, players can choose whether to share or spill resources.",
+        key = 'TeamShareOverflow',
         values = {
             {
                 text = "<LOC lobui_resource_sharing_enabled_text>Enabled",
-                help = "<LOC lobui_resource_sharing_enabled_help>Excess resources are always shared.",
+                help = "<LOC lobui_resource_sharing_enabled_help>Excess resources are shared with allies by default.",
                 key = 'enabled',
             },
             {
-                text = "<LOC lobui_resource_sharing_toggle_text>Enabled by default",
-                help = "<LOC lobui_resource_sharing_toggle_help>Excess resources are shared by default. Players can toggle the behavior individually.",
-                key = 'toggle',
-            },
-            {
                 text = "<LOC lobui_resource_sharing_disabled_text>Disabled",
-                help = "<LOC lobui_resource_sharing_disabled_help>Excess resources are never shared.",
+                help = "<LOC lobui_resource_sharing_disabled_help>Excess resources are spilled by default.",
                 key = 'disabled',
             },
         },

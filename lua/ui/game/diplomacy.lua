@@ -555,7 +555,7 @@ function BuildPlayerLines()
         end
 
         -- feature: empower host to enforce resource sharing
-        if sessionOptions.TeamShareOverspill == "toggle" then
+        if sessionOptions.TeamShareOverflow == "toggle" then
             local srCheck = UIUtil.CreateCheckboxStd(allyTitle, '/game/toggle_btn/toggle')
             srCheck:SetCheck(shareResources, true)
             LayoutHelpers.AtRightIn(srCheck, allyTitle)

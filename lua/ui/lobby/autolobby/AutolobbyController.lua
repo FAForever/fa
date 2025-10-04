@@ -212,7 +212,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             DisconnectionDelay02 = '90',
             DisconnectShare = 'SameAsShare',
             DisconnectShareCommanders = 'Explode',
-            TeamShareOverspill = "toggle",
+            TeamShareOverflow = "toggle",
 
             -- yep, great
             Ranked = true,

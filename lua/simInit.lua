@@ -286,9 +286,9 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     end
 
     -- feature: empower host to enforce resource sharing
-    if ScenarioInfo.Options.TeamShareOverspill == "enabled" then
+    if ScenarioInfo.Options.TeamShareOverflow == "enabled" then
         ArmyBrains[index]:SetResourceSharing(true)
-    elseif ScenarioInfo.Options.TeamShareOverspill == "disabled" then
+    elseif ScenarioInfo.Options.TeamShareOverflow == "disabled" then
         ArmyBrains[index]:SetResourceSharing(false)
     end
 end
