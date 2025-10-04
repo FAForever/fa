@@ -16,7 +16,7 @@
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
----@field TeamShareOverflow "enabled" | "disabled" | "toggle"
+---@field TeamShareOverflow "enabled" | "disabled"
 ---
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
