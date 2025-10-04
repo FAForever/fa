@@ -1240,8 +1240,8 @@ end
 
 ---@param data {Army: integer, Value: boolean}
 function SetResourceSharing(data)
-    -- feature: empower host to enforce resource sharing
-    if ScenarioInfo.Options.TeamShareOverflow ~= "toggle" then
+    -- feature: resource sharing can only be changed when teams are unlocked
+    if ScenarioInfo.Options.TeamLock == "locked" then
         return
     end
 

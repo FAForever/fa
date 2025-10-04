@@ -285,7 +285,7 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality")
     end
 
-    -- feature: empower host to enforce resource sharing
+    -- feature: enable or disable sharing of excess resources through the lobby
     if ScenarioInfo.Options.TeamShareOverflow == "enabled" then
         ArmyBrains[index]:SetResourceSharing(true)
     elseif ScenarioInfo.Options.TeamShareOverflow == "disabled" then
