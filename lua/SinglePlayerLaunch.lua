@@ -304,6 +304,19 @@ local function SetupBotSession(scenario)
             sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
         end
 
+        -- add all additional, non-player armies
+        local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
+        if extras then
+            for k,armyName in extras do
+                local index = table.getn(sessionInfo.teamInfo) + 1
+                sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
+                sessionInfo.teamInfo[index].PlayerName = 'civilian'
+                sessionInfo.teamInfo[index].Civilian = true
+                sessionInfo.teamInfo[index].ArmyName = armyName
+                sessionInfo.teamInfo[index].Human = false
+            end
+        end
+
         return sessionInfo
     end
 
@@ -323,6 +336,19 @@ local function SetupBotSession(scenario)
         sessionInfo.teamInfo[index].PlayerColor = math.mod(index, numColors)
         sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
         sessionInfo.teamInfo[index].AIPersonality = ai
+    end
+
+    -- add all additional, non-player armies
+    local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
+    if extras then
+        for k,armyName in extras do
+            local index = table.getn(sessionInfo.teamInfo) + 1
+            sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
+            sessionInfo.teamInfo[index].PlayerName = 'civilian'
+            sessionInfo.teamInfo[index].Civilian = true
+            sessionInfo.teamInfo[index].ArmyName = armyName
+            sessionInfo.teamInfo[index].Human = false
+        end
     end
 
     return sessionInfo

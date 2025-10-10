@@ -431,12 +431,14 @@ end
 ---@return string[]
 function GetExtraArmies(scenario)
     if scenario.Configurations.standard and scenario.Configurations.standard.teams then
-        local teams = scenario.Configurations.standard.teams
-        if teams.ExtraArmies then
-            local armies = STR_GetTokens(teams.ExtraArmies, ' ')
+        local properties = scenario.Configurations.standard.customprops
+        if properties.ExtraArmies then
+            local armies = StringSplit(properties.ExtraArmies, ' ')
             return armies
         end
     end
+
+    return {}
 end
 
 --- Validate options provided by the scenario file.
