@@ -117,7 +117,10 @@ UnitBlueprint{
                 helpText = "Detonate",
             },
         },
-        ToggleCaps = { RULEUTC_ProductionToggle = true },
+        ToggleCaps = {
+            RULEUTC_ProductionToggle = true,
+            RULEUTC_CloakToggle = true,
+        },
         UnitName = "<LOC xrl0302_name>Fire Beetle",
     },
     Intel = {
