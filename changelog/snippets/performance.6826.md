@@ -1,1 +1,0 @@
-- (#6826) Reuse unit categorization table instead of allocating a new one when issuing uncached formation orders.

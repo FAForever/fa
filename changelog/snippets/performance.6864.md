@@ -1,1 +1,0 @@
-- (#6864) Remove unused lastAccel field from default projectile weapon salvo data.

@@ -1509,8 +1509,8 @@ Unit_Description_0072="Stationary Heavy Artillery with excellent range and damag
 Unit_Description_0073="Strategic Missile Launcher. Automatically constructs expensive and extremely destructive strategic missiles. Toggleable missile construction."
 Unit_Description_0075="Strategic Assassination Artillery. Can hit any target on the map regardless of motion, range, or protection. Rate of fire increased when adjacent to energy production buildings."
 Unit_Description_0313="Heavy surface defense turret."
-Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite."
-Unit_Description_0316="Satellite is untargetable by any weapon, but can attack enemy units and structures with very high precision. It can be destroyed only if its control center is destroyed."
+Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite. Automatically starts rebuilding the Satellite if it is destroyed."
+Unit_Description_0316="Satellite is untargetable by any weapon, and can attack enemy units and structures with very high precision. Is destroyed if its control center is destroyed. Auto-rebuilds at the control center if destroyed by other means."
 
 -- UEF -- Defensive Structures
 Unit_Description_0060="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
@@ -1596,7 +1596,7 @@ Unit_Description_0111="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0112="Doubles the main cannon's rate of fire, and increases its range and that of Overcharge. Increases the range of the Microwave Laser if present.\n\n+100% Main cannon rate of fire\n+8 Main cannon range\n+8 Microwave Laser range"
 Unit_Description_0113="Enhances the ACU with a Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 225\nNanite Torpedo range = 60\n+34 Sonar Radius"
-Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
+Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour as well as providing an HP boost.\n\n+1500 Health\n+50 Regen"
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."

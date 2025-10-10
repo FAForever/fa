@@ -3,6 +3,15 @@ local Prefs = import("/lua/user/prefs.lua")
 local MapUtils = import("/lua/ui/maputil.lua")
 local aiTypes = import("/lua/ui/lobby/aitypes.lua").aitypes
 
+-- The engine doesn't log errors when the command line launch errors, so we fix that here. 
+local function error(string)
+    WARN(string.format('Error launching session: %s\n%s', string, debug.traceback()))
+    _G.error(string)
+end
+
+---@param faction integer
+---@param aiKey string
+---@return LocalizedString
 function GetRandomName(faction, aiKey)
     WARN('GRN: ',faction)
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
@@ -25,10 +34,12 @@ function GetRandomName(faction, aiKey)
     return name
 end
 
+---@return integer
 function GetRandomFaction()
-    return math.random(table.getn(import("/lua/factions.lua").Factions))
+    return math.random(table.getn(import("/lua/factions.lua").Factions))--[[@as integer]]
 end
 
+---@param scenarioInfo UIScenarioInfoFile
 function VerifyScenarioConfiguration(scenarioInfo)
     if scenarioInfo == nil then
         error("VerifyScenarioConfiguration - no scenarioInfo")
@@ -50,6 +61,12 @@ end
 
 
 -- Note that the map name must include the full path, it won't try to guess the path based on name
+---@param scenario UILobbyScenarioInfo
+---@param difficulty integer
+---@param inFaction? Faction
+---@param campaignFlowInfo? table
+---@param isTutorial? boolean
+---@return table
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
     local factions = import("/lua/factions.lua").Factions
     local faction = inFaction or 1
@@ -110,16 +127,35 @@ function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo,
 end
 
 
-
-
+--- Gets the scenario file from a map name if it isn't a scenario file already.
+---@param mapName FileName | string
+---@return FileName
 function FixupMapName(mapName)
     if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
-        mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
+        local files = DiskFindFiles('/maps', mapName .. '_scenario.lua')
+        if files[1] then
+            mapName = files[1]
+        else
+            error('Could not find scenario file for map name "' .. mapName .. '"')
+        end
+    else
+        -- FAF map folders are versioned but the engine doesn't expect that.
+        -- So when the user passes in a name instead of a path the engine gives us what it thinks
+        -- is the correct scenario path `"/maps/<name.v0001>/<name.v0001>_scenario.lua"`
+        -- So we remove the versioning from the scenario file name.
+        -- There should really be some map util to do this.
+
+        mapName = string.gsub(mapName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
+        local info = DiskGetFileInfo(mapName)
+        if not info then
+            error('Map scenario file does not exist at location "' .. mapName .. '"')
+        end
     end
+    ---@cast mapName FileName
     return mapName
 end
 
-
+---@type GameOptions
 local defaultOptions = {
     FogOfWar = 'explored',
     NoRushOption = 'Off',
@@ -134,6 +170,14 @@ local defaultOptions = {
     CivilianAlliance = 'enemy',
 }
 
+--- Gets the game options with changes from the command line args:
+--- - `/nofog`
+--- - `/norush <duration>`
+--- - `/predeployed`
+--- - `/victory <VictoryCondition>`
+--- - `/diff <Difficulty>`
+---@param isPerfTest boolean
+---@return GameOptions
 local function GetCommandLineOptions(isPerfTest)
     local options = table.copy(defaultOptions)
 
@@ -143,7 +187,7 @@ local function GetCommandLineOptions(isPerfTest)
         options.FogOfWar = 'none'
     end
 
-    local norush = GetCommandLineArg("/norush", 1)
+    local norush = GetCommandLineArg("/norush", 1) --[[@as number|string?[] ]]
     if norush then
         options.NoRushOption = norush[1]
     end
@@ -152,7 +196,7 @@ local function GetCommandLineOptions(isPerfTest)
         options.PrebuiltUnits = 'On'
     end
 
-    local victory = GetCommandLineArg("/victory", 1)
+    local victory = GetCommandLineArg("/victory", 1) --[[@as string?[] ]]
     if victory then
         options.Victory = victory[1]
     end
@@ -196,7 +240,7 @@ function SetupBotSession(mapName)
     if aiopt then
         ai = aiopt[1]
     else
-        ai = aitypes[1].key
+        ai = aiTypes[1].key
     end
 
     for index, name in armies do
@@ -253,32 +297,40 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
         sessionInfo.RandomSeed = 2071971
     end
 
+    local GetDefaultPlayerOptions = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions
     local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
-
     local numColors = table.getn(import("/lua/gamecolors.lua").GameColors.PlayerColors)
 
-    for index, name in armies do
-        sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions(sessionInfo.playerName)
-        if index == 1 then
-            sessionInfo.teamInfo[index].PlayerName = sessionInfo.playerName
-            sessionInfo.teamInfo[index].Faction = faction
-            sessionInfo.teamInfo[index].Human = true
-        else
-            sessionInfo.teamInfo[index].AIPersonality = 'rush'
-            sessionInfo.teamInfo[index].Faction = GetRandomFaction()
-            sessionInfo.teamInfo[index].PlayerName = GetRandomName(sessionInfo.teamInfo[index].Faction, sessionInfo.teamInfo[index].AIPersonality)
-            sessionInfo.teamInfo[index].Human = false
+    local playerOptions = GetDefaultPlayerOptions(sessionInfo.playerName)
+    playerOptions.PlayerName = sessionInfo.playerName
+    playerOptions.Faction = faction
+    playerOptions.Human = true
+    playerOptions.ArmyName = armies[1]
+    playerOptions.PlayerColor = math.mod(1, numColors)
+    playerOptions.ArmyColor = math.mod(1, numColors)
+    sessionInfo.teamInfo[1] = playerOptions
+
+    if not HasCommandLineArg("/noAi") then
+        local name
+        for index = 2, table.getn(armies) do
+            name = armies[index]
+            local aiOptions = GetDefaultPlayerOptions(sessionInfo.playerName)
+            aiOptions.AIPersonality = 'rush'
+            aiOptions.Faction = GetRandomFaction()
+            aiOptions.PlayerName = GetRandomName(aiOptions.Faction, aiOptions.AIPersonality)
+            aiOptions.Human = false
+            aiOptions.ArmyName = name
+            aiOptions.PlayerColor = math.mod(index, numColors)
+            aiOptions.ArmyColor = math.mod(index, numColors)
+            sessionInfo.teamInfo[index] = aiOptions
         end
-        sessionInfo.teamInfo[index].ArmyName = name
-        sessionInfo.teamInfo[index].PlayerColor = math.mod(index, numColors)
-        sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
     end
 
     local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
     if extras then
         for k,armyName in extras do
             local index = table.getn(sessionInfo.teamInfo) + 1
-            sessionInfo.teamInfo[index] = import("/lua/ui/lobby/lobbycomm.lua").GetDefaultPlayerOptions("civilian")
+            sessionInfo.teamInfo[index] = GetDefaultPlayerOptions("civilian")
             sessionInfo.teamInfo[index].PlayerName = 'civilian'
             sessionInfo.teamInfo[index].Civilian = true
             sessionInfo.teamInfo[index].ArmyName = armyName
@@ -286,11 +338,28 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
         end
     end
 
+    local index = table.getn(sessionInfo.teamInfo) + 1
+    local enemyCivOptions = GetDefaultPlayerOptions("Civilian")
+    enemyCivOptions = GetDefaultPlayerOptions("Civilian")
+    enemyCivOptions.Civilian = true
+    enemyCivOptions.ArmyName = 'ARMY_17'
+    enemyCivOptions.Human = false
+    sessionInfo.teamInfo[index] = enemyCivOptions
+    index = index + 1
+    local neutralCivOptions = GetDefaultPlayerOptions("Civilian")
+    neutralCivOptions.Civilian = true
+    neutralCivOptions.ArmyName = 'NEUTRAL_CIVILIAN'
+    neutralCivOptions.Human = false
+    sessionInfo.teamInfo[index] = neutralCivOptions
+
     Prefs.SetToCurrentProfile('LoadingFaction', faction)
 
     return sessionInfo
 end
 
+--- Called by the engine using the `/map <mapPath>` launch arg
+---@param mapName FileName
+---@param isPerfTest any
 function StartCommandLineSession(mapName, isPerfTest)
     if not mapName then
         error("SetupCommandLineSession - mapName required")
@@ -307,11 +376,12 @@ function StartCommandLineSession(mapName, isPerfTest)
     if scenario.type == 'campaign' then
         local difficulty = 2
         if HasCommandLineArg("/diff") then
-            difficulty = tonumber(GetCommandLineArg("/diff", 1)[1])
+            difficulty = tonumber(GetCommandLineArg("/diff", 1)[1])--[[@as integer]]
         end
+        ---@type Faction
         local faction = false
         if HasCommandLineArg("/faction") then
-            faction = GetCommandLineArg("/faction", 1)[1]
+            faction = GetCommandLineArg("/faction", 1)[1]--[[@as integer]]
         end
         sessionInfo = SetupCampaignSession(scenario, difficulty, faction)
     else

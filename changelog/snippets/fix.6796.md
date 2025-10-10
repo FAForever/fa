@@ -1,1 +1,0 @@
-- (#6796) Fix error when lobby rejects a data message with no sender name.

@@ -1,1 +1,0 @@
-- (#6868) Correct ACU threat values after they were accidentally miscalcuated in a previous PR. SurfaceThreatLevel from an average of 765 to 45.

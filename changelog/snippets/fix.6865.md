@@ -1,0 +1,1 @@
+- (#6865) Fix unit view detail error when nuke damage isn't written properly in the blueprint for a unit.
