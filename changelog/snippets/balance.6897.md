@@ -1,3 +1,5 @@
-- (#6897) Add energy consumption for beetles cloak. Currently beetles are the only cloaked unit that has no E drain. Every other cloak (mole, selen, acu) or stealth (both personal and field) in the game consumes E. Not only beetles are weird exception from this rule, it allows them to be rushed at early T2 stage using combined low build cost and low e cost. This change will slightly nerf beetles rush pre-T2 pgen and make it pay for its cloak.
-  - **"Fire Beetle" Mobile Bomb (XRL0302)**:
-    - Energy consumption: 0 -> 10
+- (#6897) Make the Beetles' cloak consume 10 Energy per second. Beetles were previously the only cloaked unit without an energy upkeep, which allowed players to rush them at the early T2 stage with both low build and upkeep costs. Since the unit is already very strong, this exception was not necessary. Adding a 10 E/s drain brings Beetles in line with other cloaked units and tones down their early rush potential while still preserving their identity.
+  
+  **Fire Beetle: T2 Mobile Bomb (XRL0302):**
+    - Economy
+      - Energy consumption: 0 -> 10
