@@ -197,7 +197,7 @@ teamOptions =
 
     {
         default = 1,
-        label = "<LOC lobui_resource_sharing_label>Share excess resources",
+        label = "<LOC lobui_resource_sharing_label>Overflow",
         help = "<LOC lobui_resource_sharing_help>Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked.",
         key = 'TeamShareOverflow',
         values = {
