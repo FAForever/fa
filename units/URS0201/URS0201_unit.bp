@@ -2,6 +2,7 @@ UnitBlueprint{
     Description = "<LOC urs0201_desc>Destroyer",
     AI = {
         GuardReturnRadius = 30,
+        GuardScanRadius = 93,
         TargetBones = {
             "URS0201",
             "Muzzle_Back",

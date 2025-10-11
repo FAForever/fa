@@ -2,6 +2,7 @@ UnitBlueprint{
     Description = "<LOC uas0102_desc>Air Attack Boat",
     AI = {
         GuardReturnRadius = 40,
+        GuardScanRadius = 52,
         TargetBones = {
             "Turret",
             "UAS0102",
