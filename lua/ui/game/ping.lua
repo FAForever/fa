@@ -71,6 +71,31 @@ local function GetAlliedAndObserverClients()
     return table.keys(recipients)
 end
 
+--- Special ping with text underneath
+---@param callback fun(markerName: string) # The callback to perform when the dialog is complete.
+---@param curName? string # unused
+function NamePing(callback, curName)
+
+    -- do not make dialog on top of dialogs
+    if dialog then return end
+
+    -- localize for scope
+    local cb = callback
+    dialog = UIUtil.CreateInputDialog(
+        GetFrame(0),                                -- parent
+        LOC("<LOC markers_0000>Enter Marker Name"), -- text
+        function(self, markerName)                  -- callback when dialog completes
+            cb(markerName)
+        end
+    )
+
+    -- when closed, allow us to start another
+    dialog.OnClosed = function()
+        dialog = nil
+    end
+end
+
+
 --- Performs a ping operation.
 ---@param pingType PingTypeLowercase
 function DoPing(pingType)
@@ -147,30 +172,6 @@ function DoPing(pingType)
         -- typical ping, just do it
     else
         SimCallback({ Func = 'SpawnPing', Args = data })
-    end
-end
-
---- Special ping with text underneath
----@param callback fun(markerName: string) # The callback to perform when the dialog is complete.
----@param curName? string # unused
-function NamePing(callback, curName)
-
-    -- do not make dialog on top of dialogs
-    if dialog then return end
-
-    -- localize for scope
-    local cb = callback
-    dialog = UIUtil.CreateInputDialog(
-        GetFrame(0),                                -- parent
-        LOC("<LOC markers_0000>Enter Marker Name"), -- text
-        function(self, markerName)                  -- callback when dialog completes
-            cb(markerName)
-        end
-    )
-
-    -- when closed, allow us to start another
-    dialog.OnClosed = function()
-        dialog = nil
     end
 end
 
