@@ -26,7 +26,7 @@ local Edit = import("/lua/maui/edit.lua").Edit
 ---@field Action? 'delete' | 'move' | 'rename' | 'renew' # Synced to UI from SimPing.
 
 --- The dialog used to define marker-pings.
----@type InputDialog?
+---@type InputDialog | false | nil
 local dialog = false
 
 --- The maximum number of marker-pings. Defined elsewhere and received through the sync.
