@@ -7,12 +7,16 @@ local Button = import("/lua/maui/button.lua").Button
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Edit = import("/lua/maui/edit.lua").Edit
 
+---@alias PingType 'Alert' | 'Move' | 'Attack' | 'Marker'
+
+---@alias PingTypeLowercase 'alert' | 'move' | 'attack' | 'marker'
+
 ---@class SyncPingData
 ---@field Owner integer # Army index of who sent the ping
 ---@field Location Vector # position
----@field Type 'Alert' | 'Move' | 'Attack' | 'Marker'
+---@field Type PingType
 ---@field Lifetime number
----@field Ring FileName # 
+---@field Ring FileName
 ---@field ArrowColor 'yellow' | 'blue' | 'red'
 ---@field Sound string # 'UI_Main_IG_Click'
 ---@field Marker? true
@@ -23,6 +27,7 @@ local Edit = import("/lua/maui/edit.lua").Edit
 ---@field Action? 'delete' | 'move' | 'rename' | 'renew' # Synced to UI from SimPing.
 
 --- The dialog used to define marker-pings.
+---@type InputDialog?
 local dialog = false
 
 --- The maximum number of marker-pings. Defined elsewhere and received through the sync.
@@ -46,8 +51,8 @@ local markers = {}
 local clients = GetSessionClients()
 local armies = GetArmiesTable().armiesTable
 
----comment
----@return table
+--- Gets the armies that are allies or observers relative to the player's original focus army.
+---@return number[]
 local function GetAlliedAndObserverClients()
 
     local focusArmy = OriginalFocusArmy
@@ -68,7 +73,7 @@ local function GetAlliedAndObserverClients()
 end
 
 --- Performs a ping operation.
--- @param pingType can be 'alert', 'move', 'attack' or 'marker'.
+---@param pingType PingTypeLowercase
 function DoPing(pingType)
 
     -- can't ping in replays
@@ -147,8 +152,8 @@ function DoPing(pingType)
 end
 
 --- Special ping with text underneath
--- @param callback The callback to perform when the dialog is complete.
--- @param curName the text of the marker.
+---@param callback fun(markerName: string) # The callback to perform when the dialog is complete.
+---@param curName? string # unused
 function NamePing(callback, curName)
     
     -- do not make dialog on top of dialogs
@@ -171,13 +176,13 @@ function NamePing(callback, curName)
 end
 
 --- Allows updating of special markers.
--- @param data The typical ping data as defined in DoPing.
+---@param data SyncPingData # The typical ping data as defined in DoPing.
 function UpdateMarker(data)
     SimCallback({Func = 'UpdateMarker', Args = data})
 end
 
 --- Displays all pings in the table for each world view. The ping format is the same as defined in the DoPing function.
--- @param data A table where each element is data about a ping.
+---@param data SyncPingData[] # A table where each element is data about a ping.
 function DisplayPing(data)
     --Table of all map views to display pings in
     local views = import("/lua/ui/game/worldview.lua").GetWorldViews()
