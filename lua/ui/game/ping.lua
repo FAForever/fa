@@ -1,10 +1,4 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local Group = import("/lua/maui/group.lua").Group
-local Text = import("/lua/maui/text.lua").Text
-local Button = import("/lua/maui/button.lua").Button
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local Edit = import("/lua/maui/edit.lua").Edit
 
 ---@alias PingType 'Alert' | 'Move' | 'Attack' | 'Marker'
 
@@ -218,3 +212,13 @@ function DisplayPing(data)
         end
     end
 end
+
+--#region Backwards compatibility
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local Button = import("/lua/maui/button.lua").Button
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
+--#endregion
+
