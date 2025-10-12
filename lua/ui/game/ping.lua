@@ -1,4 +1,3 @@
-
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
@@ -36,10 +35,10 @@ MaxMarkers = false
 -- Table of ping types
 -- All of this data is sent to the sim and back to the UI for display on the world views
 PingTypes = {
-    alert = {Type = 'Alert', Lifetime = 6, Mesh = 'alert_marker', Ring = '/game/marker/ring_yellow02-blur.dds', ArrowColor = 'yellow', Sound = 'UEF_Select_Radar'},
-    move = {Type = 'Move', Lifetime = 6, Mesh = 'move', Ring = '/game/marker/ring_blue02-blur.dds', ArrowColor = 'blue', Sound = 'Cybran_Select_Radar'},
-    attack = {Type = 'Attack', Lifetime = 6, Mesh = 'attack_marker', Ring = '/game/marker/ring_red02-blur.dds', ArrowColor = 'red', Sound = 'Aeon_Select_Radar'},
-    marker = {Type = 'Marker', Lifetime = 5, Ring = '/game/marker/ring_yellow02-blur.dds', ArrowColor = 'yellow', Sound = 'UI_Main_IG_Click', Marker = true},
+    alert = { Type = 'Alert', Lifetime = 6, Mesh = 'alert_marker', Ring = '/game/marker/ring_yellow02-blur.dds', ArrowColor = 'yellow', Sound = 'UEF_Select_Radar' },
+    move = { Type = 'Move', Lifetime = 6, Mesh = 'move', Ring = '/game/marker/ring_blue02-blur.dds', ArrowColor = 'blue', Sound = 'Cybran_Select_Radar' },
+    attack = { Type = 'Attack', Lifetime = 6, Mesh = 'attack_marker', Ring = '/game/marker/ring_red02-blur.dds', ArrowColor = 'red', Sound = 'Aeon_Select_Radar' },
+    marker = { Type = 'Marker', Lifetime = 5, Ring = '/game/marker/ring_yellow02-blur.dds', ArrowColor = 'yellow', Sound = 'UI_Main_IG_Click', Marker = true },
 }
 
 --- The original army that this player represents. Is populated else where during initialisation of the game.
@@ -60,7 +59,7 @@ local function GetAlliedAndObserverClients()
         return {}
     end
 
-    local recipients = { }
+    local recipients = {}
     for k, client in clients do
         for l, source in client.authorizedCommandSources do
             if IsAlly(focusArmy, source) then
@@ -77,9 +76,9 @@ end
 function DoPing(pingType)
 
     -- can't ping in replays
-    if SessionIsReplay() or import("/lua/ui/game/gamemain.lua").supressExitDialog then 
+    if SessionIsReplay() or import("/lua/ui/game/gamemain.lua").supressExitDialog then
         WARN("You can not ping in a replay.")
-        return 
+        return
     end
 
     -- ... what?
@@ -98,7 +97,7 @@ function DoPing(pingType)
         return
     end
 
-    -- you can only ping for your allies when you've changed armies 
+    -- you can only ping for your allies when you've changed armies
     if not IsAlly(focusArmy, OriginalFocusArmy) then
         WARN("You can not ping for an opponent team.")
         return
@@ -107,8 +106,8 @@ function DoPing(pingType)
     -- prepare ping data
     ---@type SyncPingData
     local data = {
-        Owner = OriginalFocusArmy - 1, 
-        Type = pingType, 
+        Owner = OriginalFocusArmy - 1,
+        Type = pingType,
         Location = position
     }
 
@@ -119,15 +118,15 @@ function DoPing(pingType)
 
         -- check if we ran out of marker-pings
         if markers[data.Owner] and table.getsize(markers[data.Owner]) >= MaxMarkers then
-            UIUtil.QuickDialog(GetFrame(0), '<LOC markers_0001>You must delete an existing marker before making a new one.','<LOC _OK>', nil, nil, nil, nil, nil, true, {escapeButton = 1, enterButton = 1, worldCover = 1})
+            UIUtil.QuickDialog(GetFrame(0), '<LOC markers_0001>You must delete an existing marker before making a new one.', '<LOC _OK>', nil, nil, nil, nil, nil, true, { escapeButton = 1, enterButton = 1, worldCover = 1 })
 
-        -- do a marker ping
+            -- do a marker ping
         else
             NamePing(function(name)
                 data.Name = name
                 local armies = GetArmiesTable()
                 data.Color = armies.armiesTable[armies.focusArmy].color
-                SimCallback({Func = 'SpawnPing', Args = data})
+                SimCallback({ Func = 'SpawnPing', Args = data })
 
                 -- carefully chosen settings at the given zoom (for full hd)
                 local cameraSettings = GetCamera('WorldCamera'):SaveSettings()
@@ -145,9 +144,9 @@ function DoPing(pingType)
             end)
         end
 
-    -- typical ping, just do it
+        -- typical ping, just do it
     else
-        SimCallback({Func = 'SpawnPing', Args = data})
+        SimCallback({ Func = 'SpawnPing', Args = data })
     end
 end
 
@@ -155,16 +154,16 @@ end
 ---@param callback fun(markerName: string) # The callback to perform when the dialog is complete.
 ---@param curName? string # unused
 function NamePing(callback, curName)
-    
+
     -- do not make dialog on top of dialogs
     if dialog then return end
 
     -- localize for scope
     local cb = callback
     dialog = UIUtil.CreateInputDialog(
-        GetFrame(0),                                    -- parent
-        LOC("<LOC markers_0000>Enter Marker Name"),     -- text
-        function(self, markerName)                      -- callback when dialog completes
+        GetFrame(0),                                -- parent
+        LOC("<LOC markers_0000>Enter Marker Name"), -- text
+        function(self, markerName)                  -- callback when dialog completes
             cb(markerName)
         end
     )
@@ -178,7 +177,7 @@ end
 --- Allows updating of special markers.
 ---@param data SyncPingData # The typical ping data as defined in DoPing.
 function UpdateMarker(data)
-    SimCallback({Func = 'UpdateMarker', Args = data})
+    SimCallback({ Func = 'UpdateMarker', Args = data })
 end
 
 --- Displays all pings in the table for each world view. The ping format is the same as defined in the DoPing function.
@@ -214,7 +213,7 @@ function DisplayPing(data)
 
         -- for new pings we perform a sound
         if ping.Sound and not ping.Renew then
-            PlaySound(Sound{Bank = 'Interface', Cue = ping.Sound})
+            PlaySound(Sound { Bank = 'Interface', Cue = ping.Sound })
         end
     end
 end
