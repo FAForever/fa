@@ -213,13 +213,13 @@ local function PostProcessUnit(unit)
                 if isTech1 and not isNaval and unit.AI.GuardScanRadius > 40 then
                     unit.AI.GuardScanRadius = 40
 
-                elseif (isTech1 and isNaval and unit.AI.GuardScanRadius > 80) or (isTech2 and not isNaval and unit.AI.GuardScanRadius > 80) then
+                elseif (isTech1 and isNaval or isTech2 and not isNaval) and unit.AI.GuardScanRadius > 80 then
                     unit.AI.GuardScanRadius = 80
 
-                elseif (isTech2 and isNaval and unit.AI.GuardScanRadius > 120) or (isTech3 and not isNaval and unit.AI.GuardScanRadius > 120) then
+                elseif (isTech2 and isNaval or isTech3 and not isNaval) and unit.AI.GuardScanRadius > 120 then
                     unit.AI.GuardScanRadius = 120
 
-                elseif (isTech3 and isNaval and unit.AI.GuardScanRadius > 160) or (isExperimental and unit.AI.GuardScanRadius > 160) then
+                elseif (isTech3 and isNaval or isExperimental) and unit.AI.GuardScanRadius > 160 then
                     unit.AI.GuardScanRadius = 160
                 end
 
