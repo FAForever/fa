@@ -1233,8 +1233,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
                     energy = (energy / siloBuildRate) * (self:GetBuildRate() or 0)
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
-                else
-                    if self:IsUnitState('Repairing') and focus.isFinishedUnit then -- also applies to shield assisting
+                elseif self:IsUnitState('Repairing') and focus.isFinishedUnit then
+                    -- repairing a unit or assisting a shield
                         local function SetDefaultRepairCosts()
                             time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                             energy = energy * repairRatio
@@ -1284,7 +1284,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                                 end
                             end
                         end
-                    end
+                else
+                    -- building a unit
+                    time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                    energy = energy * repairRatio
+                    mass = mass * repairRatio
                 end
             end
 
