@@ -209,18 +209,21 @@ local function PostProcessUnit(unit)
                     unit.AI.GuardScanRadius = 0
                 end
 
-                -- cap it, some units have extreme values based on their attack radius
-                if isTech1 and unit.AI.GuardScanRadius > 40 then
+                -- Cap it, since some units would have extreme values due to their large attack radii
+                if isTech1 and not isNaval and unit.AI.GuardScanRadius > 40 then
                     unit.AI.GuardScanRadius = 40
-                elseif isTech2 and unit.AI.GuardScanRadius > 80 then
+
+                elseif (isTech1 and isNaval and unit.AI.GuardScanRadius > 80) or (isTech2 and not isNaval and unit.AI.GuardScanRadius > 80) then
                     unit.AI.GuardScanRadius = 80
-                elseif isTech3 and unit.AI.GuardScanRadius > 120 then
+
+                elseif (isTech2 and isNaval and unit.AI.GuardScanRadius > 120) or (isTech3 and not isNaval and unit.AI.GuardScanRadius > 120) then
                     unit.AI.GuardScanRadius = 120
-                elseif isExperimental and unit.AI.GuardScanRadius > 160 then
+
+                elseif (isTech3 and isNaval and unit.AI.GuardScanRadius > 160) or (isExperimental and unit.AI.GuardScanRadius > 160) then
                     unit.AI.GuardScanRadius = 160
                 end
 
-                -- sanitize it
+                -- Sanitize it
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
             end
         end
