@@ -1235,55 +1235,55 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                     mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
                 elseif self:IsUnitState('Repairing') and focus.isFinishedUnit then
                     -- repairing a unit or assisting a shield
-                        local function SetDefaultRepairCosts()
-                            time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
-                            energy = energy * repairRatio
-                            mass = mass * repairRatio
-                        end
+                    local function SetDefaultRepairCosts()
+                        time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
+                        energy = energy * repairRatio
+                        mass = mass * repairRatio
+                    end
 
-                        if not focus.Blueprint.CategoriesHash["SHIELD"] then
-                            -- units without SHIELD category cannot be shield assisted
+                    if not focus.Blueprint.CategoriesHash["SHIELD"] then
+                        -- units without SHIELD category cannot be shield assisted
+                        SetDefaultRepairCosts()
+                    else
+                        local focusShield = focus.MyShield
+                        local shieldAssistEnergy = focusShield.AssistCostEnergyPerBuildRate
+                        local shieldAssistMass = focusShield.AssistCostMassPerBuildRate
+
+                        if not focusShield
+                            -- units default to repair cost for shield assist costs
+                            or not shieldAssistEnergy
+                            or not shieldAssistMass
+                            -- units not focused on a shield that is up cannot be shield assisted
+                            or not focusShield:IsUp()
+                            or not focus:GetFocusUnit() == nil
+                        then
                             SetDefaultRepairCosts()
                         else
-                            local focusShield = focus.MyShield
-                            local shieldAssistEnergy = focusShield.AssistCostEnergyPerBuildRate
-                            local shieldAssistMass = focusShield.AssistCostMassPerBuildRate
+                            -- Determine what we are repairing, since they have different costs
+                            local repairingFocusUnit = focus:GetMaxHealth() > focus:GetHealth()
+                            local repairingFocusShield = focusShield:GetMaxHealth() > focusShield:GetHealth()
 
-                            if not focusShield
-                                -- units default to repair cost for shield assist costs
-                                or not shieldAssistEnergy
-                                or not shieldAssistMass
-                                -- units not focused on a shield that is up cannot be shield assisted
-                                or not focusShield:IsUp()
-                                or not focus:GetFocusUnit() == nil
-                            then
+                            if repairingFocusUnit then
                                 SetDefaultRepairCosts()
-                            else
-                                -- Determine what we are repairing, since they have different costs
-                                local repairingFocusUnit = focus:GetMaxHealth() > focus:GetHealth()
-                                local repairingFocusShield = focusShield:GetMaxHealth() > focusShield:GetHealth()
-
-                                if repairingFocusUnit then
-                                    SetDefaultRepairCosts()
-                                    -- Engine splits repair effect 50/50 so reduce costs in that case
-                                    if repairingFocusShield then
-                                        energy = energy * 0.5
-                                        mass = mass * 0.5
-                                    end
-                                end
-
+                                -- Engine splits repair effect 50/50 so reduce costs in that case
                                 if repairingFocusShield then
-                                    local buildRate = self:GetBuildRate()
-                                    -- Engine splits repair effect 50/50 so reduce costs in that case
-                                    if repairingFocusUnit then
-                                        shieldAssistEnergy = shieldAssistEnergy * 0.5
-                                        shieldAssistMass = shieldAssistMass * 0.5
-                                    end
-                                    energy = energy + shieldAssistEnergy * buildRate * time
-                                    mass = mass + shieldAssistMass * buildRate * time
+                                    energy = energy * 0.5
+                                    mass = mass * 0.5
                                 end
                             end
+
+                            if repairingFocusShield then
+                                local buildRate = self:GetBuildRate()
+                                -- Engine splits repair effect 50/50 so reduce costs in that case
+                                if repairingFocusUnit then
+                                    shieldAssistEnergy = shieldAssistEnergy * 0.5
+                                    shieldAssistMass = shieldAssistMass * 0.5
+                                end
+                                energy = energy + shieldAssistEnergy * buildRate * time
+                                mass = mass + shieldAssistMass * buildRate * time
+                            end
                         end
+                    end
                 else
                     -- building a unit
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
