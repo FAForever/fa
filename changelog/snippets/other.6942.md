@@ -1,0 +1,1 @@
+- (#6942) Annotate the UI function `OnMouseButtonPress` and related code.
