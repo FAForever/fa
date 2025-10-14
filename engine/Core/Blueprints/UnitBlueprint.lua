@@ -145,7 +145,7 @@
 ---@field GuardRadius number
 --- maximum range from the guarded unit before initiating return
 ---@field GuardReturnRadius number
---- Guard scan range for the unit. The guard scan radius is used applied for attack move and patrol orders. Through this scanning mechanic the patrolling (or attack moving) unit can find a target to chase. 
+--- Guard scan range for the unit. The guard scan radius is used by attack move and patrol orders. Through this scanning mechanic the patrolling (or attack moving) unit can find a target to chase. The scanning behavior includes neutral units.
 ---
 --- Through a binary patch the guard scan radius is reset to 0 when the unit is not patrolling and/or attack moving:
 --- - https://faforever.zulipchat.com/#narrow/channel/203495-game-development/topic/Guard.20scan.20radius/with/285967051
