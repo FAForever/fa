@@ -154,6 +154,8 @@
 --- Large values can be computationally expensive. This value was partially responsible for games slowing down during large ASF battles. For more information:
 --- - https://github.com/FAForever/fa/pull/3891
 --- - https://github.com/FAForever/fa/pull/3892
+---
+--- The value is automatically populated during blueprint loading to a sensible default if it is not set in the blueprint.
 ---@field GuardScanRadius number
 --- initial toggle of automatic behaviors (silo building and auto-assist)
 ---@see SetAutoMode
