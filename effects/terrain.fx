@@ -3493,11 +3493,12 @@ float3 PBR_old(VS_OUTPUT inV, float3 albedo, float3 n, float roughness, float wa
     // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
     float shadow = 1;
+    float terrainShadow = tex2D(UpperAlbedoSampler, TerrainScale * inV.mTexWT).w; // 1 where sun is, 0 where shadow is
     if (ShadowsEnabled == 1) {
-        float terrainShadow = tex2D(UpperAlbedoSampler, TerrainScale * inV.mTexWT).w; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-        shadow *= terrainShadow;
     }
+    shadow *= terrainShadow;
+
 
     float facingSpecular = 0.04;
     // using only the texture looks bad when zoomed in, using only the mesh 
