@@ -560,10 +560,17 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                 if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
 
                     -- send player options to the server
-                    for slot, playerOptions in self.PlayerOptions do
+                    local slots = {}
+                    for slotIndex, _ in pairs(self.PlayerOptions) do
+                        table.insert(slots, slotIndex)
+                    end
+                    table.sort(slots)
+
+                    for armyIndex, slotIndex in ipairs(slots) do
+                        local playerOptions = self.PlayerOptions[slotIndex]
                         local ownerId = playerOptions.OwnerID
                         self:SendPlayerOptionToServer(ownerId, 'Team', playerOptions.Team)
-                        self:SendPlayerOptionToServer(ownerId, 'Army', playerOptions.StartSpot)
+                        self:SendPlayerOptionToServer(ownerId, 'Army', armyIndex)
                         self:SendPlayerOptionToServer(ownerId, 'StartSpot', playerOptions.StartSpot)
                         self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
                     end
