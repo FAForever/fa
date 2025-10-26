@@ -390,6 +390,7 @@ function CreateQueueGrid(parent)
     controls.queue:Hide()
 end
 
+---@param info RolloverInfo
 function UpdateWindow(info)
     if info.blueprintId == 'unknown' then
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
@@ -779,7 +780,15 @@ function UpdateWindow(info)
                 local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then
-                    shield = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back]
+                    local enhancements = getEnh.GetEnhancements(info.entityId)
+                    local enhBps = unitBp.Enhancements
+                    for _, enhName in enhancements do
+                        local enhancement = enhBps[enhName]
+                        if enhancement.ShieldMaxHealth > 0 then
+                            shield = enhancement
+                            break
+                        end
+                    end
                 end
                 local shieldMaxHealth, shieldRegenRate = shield.ShieldMaxHealth or 0, shield.ShieldRegenRate or 0
                 if shieldMaxHealth > 0 then
