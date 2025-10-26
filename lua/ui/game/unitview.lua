@@ -776,11 +776,10 @@ function UpdateWindow(info)
             end
 
             if info.shieldRatio > 0 then
-                local getEnh = import("/lua/enhancementcommon.lua")
                 local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then
-                    local enhancements = getEnh.GetEnhancements(info.entityId)
+                    local enhancements = EnhancementCommon.GetEnhancements(info.entityId)
                     local enhBps = unitBp.Enhancements
                     for _, enhName in enhancements do
                         local enhancement = enhBps[enhName]
