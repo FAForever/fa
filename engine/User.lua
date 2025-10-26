@@ -7,6 +7,7 @@
 ---@field targetId? EntityId
 ---@field blueprintId? UnitId
 ---@field commandType number
+---@field commandId integer
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
