@@ -417,9 +417,9 @@ UnitBlueprint{
             Slot = "RCH",
         },
         Shield = {
-            BuildCostEnergy = 107500,
-            BuildCostMass = 1050,
-            BuildTime = 6720,
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 1,
             Icon = "sp",
             ImpactEffects = "SeraphimShieldHit01",
             MaintenanceConsumptionPerSecondEnergy = 300,
@@ -433,7 +433,7 @@ UnitBlueprint{
             ShieldRegenRate = 22,
             ShieldRegenStartTime = 1,
             ShowBones = { "Back_Upgrade" },
-            Slot = "Back",
+            Slot = "LCH",
             UpgradeEffectBones = { "Back_Upgrade" },
             UpgradeUnitAmbientBones = { "Torso" },
         },
@@ -449,7 +449,7 @@ UnitBlueprint{
                 "Shield",
                 "ShieldRemove",
             },
-            Slot = "Back",
+            Slot = "LCH",
         },
         Slots = {
             Back = {
