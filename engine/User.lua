@@ -14,7 +14,6 @@
 ---|  0  # unknown
 ---|  1  # not submerged
 
-
 ---@alias FireState
 ---| 0 # Return fire
 ---| 1 # Hold fire
