@@ -434,6 +434,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                 local rngRadius = altRadius * Random()
 
                 local splatRadius = 0.75 * altRadius + 0.2 * rngRadius
+                local duration = 2 + 2 * altRadius + 4 * rngRadius
 
                 CreateSplat(
                     vc, -- position
@@ -444,7 +445,7 @@ Projectile = ClassProjectile(ProjectileMethods, DebugProjectileComponent) {
                     splatRadius, -- size x
                     splatRadius, -- size z
                     10 + 30 * altRadius + 30 * rngRadius, -- lod
-                    8 + 8 * altRadius + 8 * rngRadius, -- duration
+                    duration, -- duration
                     self.Army-- owner of splat
                 )
             end
