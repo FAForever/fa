@@ -1326,7 +1326,7 @@ function GetReplayId()
         id = GetFrontEndData('syncreplayid')
     elseif HasCommandLineArg("/savereplay") then
         -- /savereplay format is gpgnet://local_ip:port/replay_id/USERNAME.SCFAreplay
-        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java--L192
+        -- see https://github.com/FAForever/downlords-faf-client/blob/d44f97dd40c011f391c8d97f122b54bb61a23c80/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java#L260
         local url = GetCommandLineArg("/savereplay", 1)[1]
         url = string.gsub(tostring(url), "\\", "/")
         id = string.match(url, ".*/([0-9]+)/[^/]*$") -- number between last two "/" "/"
