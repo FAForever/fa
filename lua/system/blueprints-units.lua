@@ -4,6 +4,7 @@ local TableGetn = table.getn
 
 local MathMax = math.max
 local MathFloor = math.floor
+local MathCeil = math.ceil
 
 local StringFind = string.find
 
@@ -232,8 +233,17 @@ local function PostProcessUnit(unit)
         -- guarantee that the table exists
         if not unit.AI then unit.AI = {} end
 
-        -- Engine allows building +2 range outside the max distance (or even more for large buildings)
-        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + 2
+        -- Engine adds builder footprint max size and target skirt max size when allowing building
+        -- so add the builder footprint and a minimal 1 skirt size to the overlay radius.
+        local footprintSize
+        local footprint = unit.Footprint
+        if footprint then
+            footprintSize = MathMax(MathFloor(footprint.SizeX), MathFloor(footprint.SizeZ))
+        else
+            footprintSize = MATH_IRound(MathMax(unit.SizeX or 0, unit.SizeZ or 0))
+            if footprintSize > 6 then footprintSize = 6 end
+        end
+        local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + footprintSize + 1
 
         -- Display auto-assist range for engineer stations instead of max build distance if it is smaller and exists
         if unit.CategoriesHash['ENGINEERSTATION'] then
