@@ -559,13 +559,14 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
                 WaitSeconds(5.0)
                 if (not IsDestroyed(self)) and self:CanLaunch(self.LaunchStatutes) then
 
-                    -- send player options to the server
+                    -- Army numbers need to be calculated: they are numbered incrementally in slot order.
                     local slots = {}
                     for slotIndex, _ in pairs(self.PlayerOptions) do
                         table.insert(slots, slotIndex)
                     end
                     table.sort(slots)
 
+                    -- send player options to the server
                     for armyIndex, slotIndex in ipairs(slots) do
                         local playerOptions = self.PlayerOptions[slotIndex]
                         local ownerId = playerOptions.OwnerID
