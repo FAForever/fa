@@ -4,7 +4,6 @@ local TableGetn = table.getn
 
 local MathMax = math.max
 local MathFloor = math.floor
-local MathCeil = math.ceil
 
 local StringFind = string.find
 
