@@ -1,1 +1,1 @@
-- (#6947) Fix replay ID extraction possible breaking UI
+- (#6947) Fix replay ID extraction possibly breaking UI.
