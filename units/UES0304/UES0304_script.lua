@@ -24,12 +24,14 @@ UES0304 = ClassUnit(TSubUnit) {
 
             PlayFxRackReloadSequence = function(self)
                 self.Trash:Add(ForkThread(function()
-                    -- Wait 1 second for the missile to clear the hatch.
-                    WaitSeconds(1)
-                    self.Rotator:SetGoal(0)
-                    WaitFor(self.Rotator)
-                    self.Rotator:Destroy()
-                    self.Rotator = nil
+                    if self.Rotator then
+                        -- Wait 1 second for the missile to clear the hatch.
+                        WaitSeconds(1)
+                        self.Rotator:SetGoal(0)
+                        WaitFor(self.Rotator)
+                        self.Rotator:Destroy()
+                        self.Rotator = nil
+                    end
                 end))
                 TIFCruiseMissileLauncherSub.PlayFxRackReloadSequence(self)
             end,
@@ -46,12 +48,14 @@ UES0304 = ClassUnit(TSubUnit) {
 
             PlayFxRackReloadSequence = function(self)
                 self.Trash:Add(ForkThread(function()
-                    -- Wait 1 second for the missile to clear the hatch.
-                    WaitSeconds(1)
-                    self.Rotator:SetGoal(0)
-                    WaitFor(self.Rotator)
-                    self.Rotator:Destroy()
-                    self.Rotator = nil
+                    if self.Rotator then
+                        -- Wait 1 second for the missile to clear the hatch.
+                        WaitSeconds(1)
+                        self.Rotator:SetGoal(0)
+                        WaitFor(self.Rotator)
+                        self.Rotator:Destroy()
+                        self.Rotator = nil
+                    end
                 end))
                 TIFCruiseMissileLauncherSub.PlayFxRackReloadSequence(self)
             end,
