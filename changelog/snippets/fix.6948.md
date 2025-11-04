@@ -1,1 +1,1 @@
-- (#6948) Fix wrong army report to lobby server with uneven teams
+- (#6948) Fix wrong army report to lobby server with uneven teams.
