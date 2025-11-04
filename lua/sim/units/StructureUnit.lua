@@ -11,7 +11,7 @@ local UnitStopBeingBuiltEffects = Unit.StopBeingBuiltEffects
 local UnitDoTakeDamage = Unit.DoTakeDamage
 local UnitCreateWreckage = Unit.CreateWreckage
 
-local BlinkingLightsUnitComponent = import("/lua/sim/units/components/BlinkingLightsUnitComponent.lua").BlinkingLightsUnitComponent
+local BlinkingLightsUnitComponent = import("/lua/sim/units/components/blinkinglightsunitcomponent.lua").BlinkingLightsUnitComponent
 
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
@@ -593,7 +593,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Check for death loop
         if not UnitOnStartBuild(self, unitBeingBuilt, order) then
-            return
+            return false
         end
         self.UnitBeingBuilt = unitBeingBuilt
 
@@ -635,6 +635,8 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 end
             end
         end
+
+        return true
     end,
 
     ---@param self StructureUnit
@@ -939,7 +941,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
     end,
 
     ---@param self StructureUnit
-    ---@param adjacentUnit StructureUnit
+    ---@param adjacentUnit? StructureUnit
     DestroyAdjacentEffects = function(self, adjacentUnit)
         if not self.AdjacencyBeamsBag then return end
 

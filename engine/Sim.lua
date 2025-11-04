@@ -34,6 +34,9 @@
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
+---@type AIBrain[]
+ArmyBrains = {}
+
 --- restricts the army from building the unit category
 ---@param army Army
 ---@param category EntityCategory
@@ -84,13 +87,14 @@ end
 function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
--- engine patched to allow commanders to be able to be shared
-
---- changes the army of a unit, returning the new unit and destroying the old one
+--- Changes the army of a unit, returning the new unit and destroying the old one
+--- Modified by an engine patch to allow commanders to be given.
+--- `COMMAND` units are filtered out in SimHooks.lua for legacy compatibility.
 ---@param unit Unit
 ---@param army Army
----@return Unit
-function ChangeUnitArmy(unit, army)
+---@param allowCommanders? boolean
+---@return Unit|nil
+function ChangeUnitArmy(unit, army, allowCommanders)
 end
 
 --- returns true if cheats are enabled and logs the cheat attempt no matter what
@@ -103,14 +107,15 @@ end
 function CoordinateAttacks()
 end
 
---- Creates a bone manipulator for a weapon, allowing it to aim at a target
+--- Creates a bone manipulator for a weapon, allowing it to aim at a target  
+--- At least one bone must be defined.
 ---@param weapon Weapon
 ---@param label string
----@param turretBone Bone
----@param barrelBone? Bone
+---@param yawBone? Bone # turret bone
+---@param pitchBone? Bone # barrel bone
 ---@param muzzleBone? Bone
 ---@return moho.AimManipulator
-function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
+function CreateAimController(weapon, label, yawBone, pitchBone, muzzleBone)
 end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
@@ -727,11 +732,11 @@ end
 function IsUnit(object)
 end
 
---- Orders a group of units to attack-move to a position
+--- Orders a group of units to attack-move to a target
 ---@param units Unit[]
----@param position Vector
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
-function IssueAggressiveMove(units, position)
+function IssueAggressiveMove(units, target)
 end
 
 --- Orders a group of units to attack a target
@@ -741,7 +746,8 @@ end
 function IssueAttack(units, target)
 end
 
---- Orders a group of units to build a unit
+--- Orders a group of units to build a unit.
+--- Takes 1 tick to apply.
 ---@param units Unit[]
 ---@param blueprintID string
 ---@param count number
@@ -907,9 +913,11 @@ end
 function IssuePatrol(units, position)
 end
 
---- Orders a unit to pause, this happens immediately
----@param unit Unit
-function IssuePause(unit)
+--- Orders a group of units to pause building, upgrading, and other tasks.
+--- This pause order is put into the order queue, so it may not apply immediately.
+--- Use `Unit:SetPaused` to pause a unit in the middle of a task.
+---@param units Unit[]
+function IssuePause(units)
 end
 
 --- Orders a group of units to reclaim a target
@@ -1163,9 +1171,9 @@ function SetArmyUnitCap(army, unitCap)
 end
 
 --- Sets the command source of an army to match another army's command source.
----@param targetArmyIndex number
----@param sourceHumanIndex number
----@param enable boolean
+---@param targetArmyIndex number        # The target army that we're managing command sources for
+---@param sourceHumanIndex number       # The source index that is added or removed as a command source
+---@param enable boolean                # Whether or not the source index is a command source for the target army
 function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 

@@ -1,6 +1,7 @@
 local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
+---@field LastTickDamaged? number
 ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
@@ -57,6 +58,19 @@ ACUUnit = ClassUnit(CommandUnit) {
         CommandUnit.OnStopBeingBuilt(self, builder, layer)
         ArmyBrains[self.Army]:SetUnitStat(self.UnitId, "lowest_health", self:GetHealth())
         self.WeaponEnabled = {}
+    end,
+
+    ---@param self ACUUnit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if self.CanTakeDamage and damageType ~= "TreeForce" and damageType ~= "TreeFire" then
+            self.LastTickDamaged = GetGameTick()
+        end
+
+        CommandUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
 
     ---@param self ACUUnit
@@ -123,7 +137,8 @@ ACUUnit = ClassUnit(CommandUnit) {
             })
 
         end
-        ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
+        self.Brain.CommanderKilledBy = (instigator or self).Army
+        self.Brain.CommanderKilledTick = GetGameTick()
     end,
 
     ---@param self ACUUnit

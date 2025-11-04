@@ -1,8 +1,11 @@
 ---@meta
 ---@diagnostic disable: lowercase-global
 
----@class FileName: string, stringlib
----@operator concat(FileName | string): FileName
+---@class string : stringlib
+---@operator concat(FileName): FileName
+
+---@class FileName: string
+---@operator concat(string): FileName
 
 ---@class VectorBase
 ---@field [1] number    # x
@@ -41,7 +44,7 @@
 
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
----@alias Army string | number
+---@alias Army string | integer
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
 -- note that these object span both the sim and user states
@@ -250,6 +253,10 @@ end
 ---@param thread thread
 function KillThread(thread)
 end
+
+---@class thread
+local thread = {}
+thread.Destroy = KillThread -- Set in /lua/system/config.lua
 
 --- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
 --- This means that it returns the closest integer and tie-breaks towards even numbers

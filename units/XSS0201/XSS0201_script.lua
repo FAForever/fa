@@ -55,14 +55,17 @@ XSS0201 = ClassUnit(SSubUnit) {
         if new == 'Top' then
             self:SetWeaponEnabledByLabel('FrontTurret', true)
             self:SetWeaponEnabledByLabel('BackTurret', true)
+            self:SetSpeedMult(1)
         elseif new == 'Down' then
             self:SetWeaponEnabledByLabel('FrontTurret', false)
             self:SetWeaponEnabledByLabel('BackTurret', false)
+            self:SetSpeedMult(self.Blueprint.Physics.SubSpeedMultiplier or 1)
         end
     end,
 
     OnStopBeingBuilt = function(self, builer, layer)
         SSubUnit.OnStopBeingBuilt(self, builer, layer)
+        self:SetSpeedMult(self.Blueprint.Physics.SubSpeedMultiplier or 1)
         if self.originalBuilder then
             IssueDive({self})
         end

@@ -134,12 +134,13 @@ XSL0305 = ClassUnit(SLandUnit) {
         -- weapon blueprint so that it works
         weapon.Blueprint = bp
         weapon.FxMuzzleFlash = self.Weapons[label].FxMuzzleFlash
-        weapon.damageTableCache = false
+        weapon.damageTableCache = false -- Force recomputation of the weapon table cache
+        weapon.damageTableCacheValid = false -- Force recomputation of the weapon table cache
         weapon:ChangeProjectileBlueprint(bp.ProjectileId)
-        weapon:ChangeFiringTolerance(bp.FiringTolerance)
+        weapon:ChangeFiringTolerance(bp.FiringTolerance) -- kept for backwards compatibility
         weapon:ChangeMaxRadius(bp.MaxRadius)
         weapon:ChangeRateOfFire(bp.RateOfFire)
-        weapon:SetTurretYawSpeed(bp.TurretYawSpeed)
+        weapon:SetTurretYawSpeed(bp.TurretYawSpeed) -- kept for backwards compatibility
 
         -- old dummy weapon introduced to make the sniper bot go to the correct attack distance
         -- (orders use the max range of the first weapon in the blueprint) back when both weapons

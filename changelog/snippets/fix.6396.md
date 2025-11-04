@@ -1,1 +1,0 @@
-- (#6396, #6538) Fix recall failing on 1 "no" vote less than needed, dead players having their previous recall votes still in effect, and multiple bugs with the voting UI (mainly previous votes showing up again for new recalls).

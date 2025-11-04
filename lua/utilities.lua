@@ -487,13 +487,32 @@ end
 ---@param dz number
 ---@return Quaternion
 function QuatFromXZDirection(dx, dz)
-    -- ang = atan2(dx, dz) -- `dz` is adjacent
-    -- {0, sin(ang/2), 0, cos(ang/2)}
+    -- division by zero case
+    if dx == 0 and dz == 0 then
+        return UnsafeQuaternion(0, 0, 0, 1)
+    end
+
+    -- q = (0, sin(ang/2), 0, cos(ang/2))       -- definition of our y-axis rotation quaternion we want to get for angle `ang`
+
+    -- sin(ang/2) = +/-sqrt((1-cos(ang))/2)     -- half angle formula for sin. +/- is sign of sin(ang/2)
+    --            = +/-sqrt( 0.5 - cos(ang)/2 )
+    --            = +/-sqrt( 0.5 - a/2h )       -- cos(ang) = adjacent/hypotenuse
+    -- similar is repeated for cos(ang/2)
+
     local hypot = MathSqrt(dx*dx + dz*dz)
-    -- use the half-angle formulas
     local halfCosA = dz / (2 * hypot)
     local sinHalfA = MathSqrt(0.5 - halfCosA)
     local cosHalfA = MathSqrt(0.5 + halfCosA)
+
+    -- Resolve the +/- part of our result:
+    -- sign of sin(ang/2) is + for ang in (0, 2pi)
+    -- sign of cos(ang/2) is + for ang in (0, pi) and - for ang in (pi, 2pi)
+    -- ang in (pi, 2pi) is when dx is negative, so negate cosHalfA in that case
+
+    if dx < 0 then
+        return UnsafeQuaternion(0, sinHalfA, 0, -cosHalfA)
+    end
+
     return UnsafeQuaternion(0, sinHalfA, 0, cosHalfA)
 end
 

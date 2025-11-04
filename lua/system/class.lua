@@ -522,8 +522,8 @@ function ConstructClass(bases, specs)
                             if hierarchy then
                                 class[l] = hierarchy
                                 seen[l] = hierarchy
-                            else -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambigious!
-                                error("Class initialisation: field '" .. tostring(l).. "' is ambigious between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
+                            else -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambiguous!
+                                error("Class initialisation: field '" .. tostring(l).. "' is ambiguous between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
                             end
                         end
                     end

@@ -105,7 +105,7 @@ end
 --- See also:
 --- - https://github.com/FAForever/fa/pull/3662
 --- - https://github.com/FAForever/fa/pull/4675
----@param prop any
+---@param prop PropBlueprint
 local function ProcessLOD(prop)
 
     local sx = prop.SizeX or 1
@@ -115,7 +115,7 @@ local function ProcessLOD(prop)
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
     if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
-        weighted = 2.6
+        weighted = 10.0
     end
 
     -- https://www.desmos.com/calculator (0.9 * sqrt(100 * 500 * x))
@@ -148,9 +148,10 @@ function PostProcessProps(props)
     end
 end
 
---- Batch process all props
+--- Post-processing that is used by the bake workflow. All changes are baked into the blueprints. For more information, see the following file:
+--- - .github\workflows\bake-blueprints.yaml
 ---@param blueprints BlueprintsTable
-function BatchProcessProps(blueprints)
+function BakePropBlueprints(blueprints)
     if blueprints.Prop then
         for _, prop in pairs(blueprints.Prop) do
             ProcessInvulnerability(prop)

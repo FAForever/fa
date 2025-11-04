@@ -15,6 +15,10 @@ local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = DefaultWep.SCUDeathWeapon
 
 ---@class UEL0301 : CommandUnit
+---@field HasPodEnh boolean
+---@field RebuildPodThread? thread
+---@field RebuildingPod? EconomyEvent
+---@field Pod TConstructionPodUnit
 UEL0301 = ClassUnit(CommandUnit) {
     IntelEffects = {
         {
@@ -112,7 +116,7 @@ UEL0301 = ClassUnit(CommandUnit) {
 
     ---@param self UEL0301
     RebuildPod = function(self)
-        if self.HasPod == true then
+        if self.HasPodEnh == true then
             self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
             self:RequestRefreshUI()
             WaitFor(self.RebuildingPod)
@@ -120,6 +124,8 @@ UEL0301 = ClassUnit(CommandUnit) {
             RemoveEconomyEvent(self, self.RebuildingPod)
             self.RebuildingPod = nil
             local location = self:GetPosition('AttachSpecial01')
+            ---@type UEA0003
+            ---@diagnostic disable-next-line: assign-type-mismatch
             local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'Pod')
             pod:SetCreator(self)
@@ -133,8 +139,8 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param rebuildDrone boolean
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
-            if self.HasPod == true then
-                self.RebuildThread = self:ForkThread(self.RebuildPod)
+            if self.HasPodEnh == true then
+                self.RebuildPodThread = self:ForkThread(self.RebuildPod)
             end
         else
             self:CreateEnhancement('PodRemove')
@@ -154,7 +160,7 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param self UEL0301
     ---@return Unit[]? pods
     GetPods = function(self)
-        return {self.Pod}
+        return { self.Pod }
     end,
 
     ---@param self UEL0301
@@ -182,19 +188,21 @@ UEL0301 = ClassUnit(CommandUnit) {
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementPod = function(self, bp)
         local location = self:GetPosition('AttachSpecial01')
+        ---@type UEA0003
+        ---@diagnostic disable-next-line: assign-type-mismatch
         local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
         pod:SetParent(self, 'Pod')
         pod:SetCreator(self)
         self.Trash:Add(pod)
-        self.HasPod = true
+        self.HasPodEnh = true
         self.Pod = pod
     end,
 
     ---@param self UEL0301
     ---@param bp UnitBlueprintEnhancement unused
     ProcessEnhancementPodRemove = function(self, bp)
-        if self.HasPod == true then
-            self.HasPod = false
+        if self.HasPodEnh == true then
+            self.HasPodEnh = false
             if self.Pod and not self.Pod:BeenDestroyed() then
                 self.Pod:Kill()
                 self.Pod = nil
@@ -204,7 +212,7 @@ UEL0301 = ClassUnit(CommandUnit) {
                 self.RebuildingPod = nil
             end
         end
-        KillThread(self.RebuildThread)
+        KillThread(self.RebuildPodThread)
     end,
 
     ---@param self UEL0301

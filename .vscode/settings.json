@@ -24,6 +24,9 @@
   "Lua.runtime.exportEnvDefault": true,
   "Lua.completion.autoRequire": false,
   "Lua.diagnostics.globals": ["ScenarioInfo"],
+  "Lua.format.defaultConfig": {
+    "max_line_length": "unset",
+  },
 
   // used for grammar checks of changelog
   "grammarly.files.include": [

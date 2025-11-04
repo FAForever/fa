@@ -21,7 +21,8 @@ local mouseoverDisplay = false
 local createThread = false
 
 -- creates a tooltip box from ID table and with optional parameters
----@param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
+---@param ID table | string e.g. { text = 'tooltip header', body = 'tooltip description' } 
+---@param delay? number minimum delay compared against the prefs `tooltip_delay` option
 ---@param extended? boolean indicates whether to just create tooltip header or also tooltip description
 ---@param width? number is optional width of tooltip or it is auto calculated based on length of header/description
 ---@param forced? boolean determine if the tooltip should override hiding tooltips set in game options
@@ -37,7 +38,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padd
     local text = ""
     local body = ""
     if not position then position = 'center' end
-    
+
     -- remove previous instance
     if mouseoverDisplay then
         mouseoverDisplay:Destroy()
@@ -199,6 +200,11 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
     -- when adjusting position of tooltip elements
     -- default padding should be 2-4 to text is not to close to tooltip border but kept original value
     padding = LayoutHelpers.ScaleNumber(padding or 0)
+    -- scale width by UI scaling factor so we do not need to do this later in code adjusting tooltip width.
+    -- If width is absent, the text advance will be used instead, which is already scaled through font size.
+    if width then
+        width = LayoutHelpers.ScaleNumber(width)
+    end
     -- using passed font size or falling back to default values which should be the same but kept original values
     descFontSize = descFontSize or 12
     textFontSize = textFontSize or 14
@@ -261,7 +267,7 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
                     textBoxWidth = math.max(textBoxWidth, tooltip.title.TextAdvance())
                 end
             else
-                textBoxWidth = LayoutHelpers.ScaleNumber(width - padding - padding)
+                textBoxWidth = width - padding - padding
             end
             tempTable = import("/lua/maui/text.lua").WrapText(desc, textBoxWidth,
             function(text)

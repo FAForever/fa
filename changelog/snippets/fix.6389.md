@@ -1,1 +1,0 @@
-- (#6389) Improve tech 2 static artillery's ability to shoot up cliffs.

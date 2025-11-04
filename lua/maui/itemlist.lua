@@ -18,6 +18,8 @@
 local Control = import("/lua/maui/control.lua").Control
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
+local MultiplyAlpha = import("/lua/shared/color.lua").MultiplyAlpha
 
 ---@class ItemList : moho.item_list_methods, Control, InternalObject
 ItemList = ClassUI(moho.item_list_methods, Control) {
@@ -28,44 +30,55 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
-        self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
-        self._font._family.OnDirty = function(var)
+        self._font = {_family = LazyVarCreate(), _pointsize = LazyVarCreate()}
+        local onFontChanged = function(var)
             self:_internalSetFont()
         end
-        self._font._pointsize.OnDirty = function(var)
-            self:_internalSetFont()
+        self._font._family.OnDirty = onFontChanged
+        self._font._pointsize.OnDirty = onFontChanged
+
+        self._alpha = LazyVarCreate(1)
+        self._alpha.OnDirty = function(var)
+            local alpha = var()
+            self:SetNewColors(
+                self._fg() ~= 0 and MultiplyAlpha(self._fg(), alpha) or nil,
+                self._bg() ~= 0 and MultiplyAlpha(self._bg(), alpha) or nil,
+                self._sfg() ~= 0 and MultiplyAlpha(self._sfg(), alpha) or nil,
+                self._sbg() ~= 0 and MultiplyAlpha(self._sbg(), alpha) or nil,
+                self._mofg() ~= 0 and MultiplyAlpha(self._mofg(), alpha) or nil,
+                self._mobg() ~= 0 and MultiplyAlpha(self._mobg(), alpha) or nil
+            )
         end
 
-        self._fg = LazyVar.Create()
+        self._fg = LazyVarCreate()
         self._fg.OnDirty = function(var)
-            self:SetNewColors(var(), nil, nil, nil, nil, nil)
+            self:SetNewColors(MultiplyAlpha(var(), self._alpha()), nil, nil, nil, nil, nil)
         end
 
-        self._bg = LazyVar.Create()
+        self._bg = LazyVarCreate()
         self._bg.OnDirty = function(var)
-            self:SetNewColors(nil, var(), nil, nil, nil, nil)
+            self:SetNewColors(nil, MultiplyAlpha(var(), self._alpha()), nil, nil, nil, nil)
         end
 
-        self._sfg = LazyVar.Create()
+        self._sfg = LazyVarCreate()
         self._sfg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, var(), nil, nil, nil)
+            self:SetNewColors(nil, nil, MultiplyAlpha(var(), self._alpha()), nil, nil, nil)
         end
 
-        self._sbg = LazyVar.Create()
+        self._sbg = LazyVarCreate()
         self._sbg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, nil, var(), nil, nil)
+            self:SetNewColors(nil, nil, nil, MultiplyAlpha(var(), self._alpha()), nil, nil)
         end
 
-        self._mofg = LazyVar.Create()
+        self._mofg = LazyVarCreate()
         self._mofg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, nil, nil, var(), nil)
+            self:SetNewColors(nil, nil, nil, nil, MultiplyAlpha(var(), self._alpha()), nil)
         end
 
-        self._mobg = LazyVar.Create()
+        self._mobg = LazyVarCreate()
         self._mobg.OnDirty = function(var)
-            self:SetNewColors(nil, nil, nil, nil, nil, var())
+            self:SetNewColors(nil, nil, nil, nil, nil, MultiplyAlpha(var(), self._alpha()))
         end
     end,
 
@@ -95,6 +108,10 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
         if mouseover_background and self._mobg then self._mobg:Set(mouseover_background) end
     end,
 
+    SetAlphaOfColors = function(self, alpha)
+        if alpha and self._alpha then self._alpha:Set(alpha) end
+    end,
+
     OnDestroy = function(self)
         self._font._family:Destroy()
         self._font = nil
@@ -110,6 +127,16 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
         self._mofg = nil
         self._mobg:Destroy()
         self._mobg = nil
+    end,
+
+    ---@param self ItemList
+    ---@return LocalizedString[]
+    GetAllItems = function(self)
+        local items = {}
+        for i = 0, self:GetItemCount() - 1 do
+            items[i] = self:GetItem(i)
+        end
+        return items
     end,
 
     -- default override methods, event has the whole event so you can get modifiers
@@ -129,4 +156,3 @@ ItemList = ClassUI(moho.item_list_methods, Control) {
     OnMouseoverItem = function(self, row)
     end,
 }
-

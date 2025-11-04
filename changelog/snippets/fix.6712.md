@@ -1,0 +1,1 @@
+- (#6712) Fix the attack-move engagement range for Torrent (increased from 120 to 180)

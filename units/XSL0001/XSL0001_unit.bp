@@ -75,12 +75,11 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Commander",
-        EconomyThreatLevel = 716,
         Health = 11500,
         MaxHealth = 11500,
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
-        SurfaceThreatLevel = 765,
+        SurfaceThreatLevel = 45,
     },
     Display = {
         Abilities = {
@@ -654,8 +653,8 @@ UnitBlueprint{
         Icon = "amph",
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 15,
-        TeleportFlatEnergyCost = 75000,
+        TeleportDelay = 20,
+        TeleportFlatEnergyCost = 100000,
     },
     Intel = {
         FreeIntel = true,

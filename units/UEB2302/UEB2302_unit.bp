@@ -66,9 +66,9 @@ UnitBlueprint{
         UniformScale = 0.04,
     },
     Economy = {
-        BuildCostEnergy = 1350000,
-        BuildCostMass = 72000,
-        BuildTime = 115000,
+        BuildCostEnergy = 1424000,
+        BuildCostMass = 76000,
+        BuildTime = 121400,
         RebuildBonusIds = { "ueb2302" },
     },
     Footprint = {
@@ -137,7 +137,7 @@ UnitBlueprint{
             CameraShakeMin = 0,
             CameraShakeRadius = 50,
             CollideFriendly = false,
-            Damage = 5500,
+            Damage = 7840,
             DamageFriendly = true,
             DamageRadius = 6,
             DamageType = "Normal",
@@ -148,7 +148,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
-            FiringRandomness = 0.525,
+            FiringRandomness = 0.467,
             FiringTolerance = 2,
             Label = "MainGun",
             MaxRadius = 825,
@@ -176,7 +176,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/100, --10/integer interval in ticks
+            RateOfFire = 10/133, --10/integer interval in ticks
             RenderFireClock = true,
             TargetPriorities = {
                 "EXPERIMENTAL MASSFABRICATION",

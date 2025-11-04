@@ -46,6 +46,7 @@ local AnimatorSetRate = moho.AnimationManipulator.SetRate
 
 ---@class CSeaFactoryUnit : SeaFactoryUnit
 ---@field BuildEffectsBag TrashBag
+---@field BuildBones BuildBones
 CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
@@ -56,8 +57,9 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
         AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationBuild, true)
         AnimatorSetRate(buildAnimManip, 0)
         self.BuildAnimManip = self.Trash:Add(buildAnimManip)
-    end,
 
+        self.BuildBones = self.Blueprint.General.BuildBones
+    end,
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -68,7 +70,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
         end
 
         WaitTicks(2)
-        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.BuildBones, self.BuildEffectsBag)
     end,
 
     ---@param self CSeaFactoryUnit

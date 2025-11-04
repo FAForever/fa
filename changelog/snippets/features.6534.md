@@ -1,1 +1,0 @@
-- (#6534) Select/go to commander hotkeys will now search for commanders in transports if it doesn't find any on the ground

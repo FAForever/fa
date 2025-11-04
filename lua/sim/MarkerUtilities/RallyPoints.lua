@@ -21,7 +21,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local NavUtils = import("/lua/sim/NavUtils.lua")
+local NavUtils = import("/lua/sim/navutils.lua")
 
 ---@class MarkerRallyPoint : MarkerData
 ---@field PartOf MarkerExpansion
@@ -73,11 +73,11 @@ end
 function Generate()
 
     -- verify that we have what we need
-    if not import("/lua/sim/markerutilities/Expansions.lua").IsGenerated() then
+    if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
         WARN("Unable to generate rally point markers without expansion markers")
     end
 
-    if not import("/lua/sim/NavUtils.lua").IsGenerated() then
+    if not import("/lua/sim/navutils.lua").IsGenerated() then
         WARN("Unable to generate rally point markers without navigational mesh")
     end
 

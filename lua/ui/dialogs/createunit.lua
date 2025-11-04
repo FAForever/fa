@@ -465,7 +465,7 @@ GetNameFilters = {
                     {
                         key = 'eco',
                         display = '<LOC spawn_filter_build_eco>Economy',
-                        tooltip = '<LOC spawn_filter_build_eco>_tipToggle Economy units',
+                        tooltip = '<LOC spawn_filter_build_eco_tip>Toggle Economy units',
                         sortFunc = Logic.IsEconomy,
                     },
                     {
@@ -835,7 +835,7 @@ function CreateDialog()
     }
     dialog = import('/lua/maui/window.lua').Window(
         GetFrame(0), --Parent
-        'Debug Spawn and Army Focus', --title
+        "<LOC spawn_filter_title>Debug Spawn and Army Focus", --title
         nil, -- icon --[==["/textures/ui/common/lobby/uef_ico.dds"]==]
         nil, -- pin button
         true, -- config button
@@ -942,14 +942,14 @@ function CreateDialog()
     local NumberInputFields = {
         units = {
             -- creating input fields for count, vet, and rotation
-            {label='Count', name = 'Count',     default=1,   check=math.max},
-            {label='Vet',   name = 'Veterancy', default=0,   check=math.max, max=5},
-            {label='Yaw',   name = 'Rotation',  default=360, check=math.mod},
+            {label='Count', name = '<LOC spawn_filter_count>Count',     default=1,   check=math.max},
+            {label='Vet',   name = '<LOC spawn_filter_veterancy>Veterancy', default=0,   check=math.max, max=5},
+            {label='Yaw',   name = '<LOC spawn_filter_rotation>Rotation',  default=360, check=math.mod},
         },
         props = {
-            {label='Count', name = 'Count',    default=1,   check=math.max},
-            {label='Yaw',   name = 'Rotation', default=360, check=math.mod},
-            {label='Rand',  name = 'Scatter',  default=0,   check=math.max},
+            {label='Count', name = '<LOC spawn_filter_count>Count',    default=1,   check=math.max},
+            {label='Yaw',   name = '<LOC spawn_filter_rotation>Rotation', default=360, check=math.mod},
+            {label='Rand',  name = '<LOC spawn_filter_scatter>Scatter',  default=0,   check=math.max},
         },
     }
 
@@ -1267,7 +1267,7 @@ function CreateDialog()
 
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
-    local filterPresetLabel = UIUtil.CreateText(windowGroup, 'Filter Preset', 14, UIUtil.bodyFont)
+    local filterPresetLabel = UIUtil.CreateText(windowGroup, '<LOC spawn_filter_preset>Filter Preset', 14, UIUtil.bodyFont)
     LayoutHelpers.Below(filterPresetLabel, armiesGroup, 5)
     LayoutHelpers.AtLeftIn(filterPresetLabel, windowGroup, 5)
     filterPresetLabel.Width:Set(function() return FilterHeaderWidth end)
@@ -1311,11 +1311,11 @@ function CreateDialog()
         return btn
     end
 
-    local filterSaveButton = CreatePressButton 'Save'
+    local filterSaveButton = CreatePressButton '<LOC spawn_filter_save>Save'
     LayoutHelpers.Below(filterSaveButton, armiesGroup)
     LayoutHelpers.RightOf(filterSaveButton, filterPresetCombo, 10)
     LayoutHelpers.AtVerticalCenterIn(filterSaveButton, filterPresetCombo)
-    Tooltip.AddControlTooltip(filterSaveButton, { text = ' Save current filter as preset ' })
+    Tooltip.AddControlTooltip(filterSaveButton, { text = LOC("<LOC spawn_filter_save_tip>Save current filter as preset") })
     filterSaveButton.OnClick = function(self, modifiers)
         NameSet(function(name)
             local newFilterListing = {}
@@ -1330,11 +1330,11 @@ function CreateDialog()
         end)
     end
 
-    local filterDeleteButton = CreatePressButton 'Delete'
+    local filterDeleteButton = CreatePressButton '<LOC spawn_filter_delete>Delete'
     LayoutHelpers.Below(filterDeleteButton, armiesGroup)
     LayoutHelpers.RightOf(filterDeleteButton, filterSaveButton)
     LayoutHelpers.AtVerticalCenterIn(filterDeleteButton, filterPresetCombo)
-    Tooltip.AddControlTooltip(filterDeleteButton, { text = ' Delete current filter preset ' })
+    Tooltip.AddControlTooltip(filterDeleteButton, { text = LOC("<LOC spawn_filter_delete_tip>Delete current filter preset") })
     filterDeleteButton.OnClick = function(self, modifiers)
         local index = filterPresetCombo:GetItem()
         if index >= 1 then
@@ -1348,11 +1348,11 @@ function CreateDialog()
        end
     end
 
-    local filterClearButton = CreatePressButton('Clear All')
+    local filterClearButton = CreatePressButton('<LOC spawn_filter_clear>Clear All')
     LayoutHelpers.Below(filterClearButton, armiesGroup)
     LayoutHelpers.RightOf(filterClearButton, filterDeleteButton)
     LayoutHelpers.AtVerticalCenterIn(filterClearButton, filterPresetCombo)
-    Tooltip.AddControlTooltip(filterClearButton, { text = ' Clear all filters' })
+    Tooltip.AddControlTooltip(filterClearButton, { text = LOC("<LOC spawn_filter_clear_tip>Clear all filters") })
     filterClearButton.OnClick = ClearFilters
 
     RefreshFilterList()
@@ -1393,7 +1393,7 @@ function CreateDialog()
 
     local mouseover = false
     local function SetUnitImage(bitmap, id, smol)
-        local icon = __blueprints[id].Source and (__blueprints[id].Source):gsub('/units/.*', '')..'/textures/ui/common/icons/units/'..id..'_icon.dds'
+        local icon = UIUtil.UIFile('/icons/units/' .. id .. '_icon.dds', true)
         local lods = __blueprints[id].Display.Mesh.LODs
         local albedo = lods[smol and lods and table.getn(lods) or 1].AlbedoName
 
@@ -1440,6 +1440,7 @@ function CreateDialog()
 
         for i = 3, table.getn(td) do
             local id = td[i][1]
+            if not __blueprints[id] then return end
             local w, h = GetUnitSkirtSizes(id)
             local posX, posZ = td[i][3], td[i][4]
             local cOffX, cOffZ = GetSkirtCentreOffset(id)
@@ -1474,7 +1475,7 @@ function CreateDialog()
 
         mouseover.Left:Set(x+20  * UIScale)
         mouseover.Top:Set(y+20 * UIScale)
-        LayoutHelpers.SetDimensions(mouseover.img, 300, 300)
+        LayoutHelpers.SetDimensions(mouseover, 300, 300)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
     local function CreateElementMouseover(unitData,x,y)
@@ -1861,7 +1862,7 @@ function CreateDebugConfig()
 
     debugConfig = import('/lua/maui/window.lua').Window(
         GetFrame(0), --Parent
-        'Debug Options', --title
+        "<LOC spawn_debug_000>Debug Options", --title
         nil, -- icon --[==["/textures/ui/common/lobby/uef_ico.dds"]==]
         nil, -- pin button
         nil, -- config button
@@ -1883,34 +1884,34 @@ function CreateDebugConfig()
     local wrap = CreateWindowContentGroup(debugConfig)
 
     local configOptions = {
-        {style = 'title',  name = 'Spawn menu mode:' },
-        {style = 'toggle', name = 'Unit spawn',     prefid = 'spawn_menu_main_mode', check = function() return DialogMode == 'units' end,     activate = function() DialogMode = 'units' ClearFilters() return DialogMode end },
-        {style = 'toggle', name = 'Template spawn', prefid = 'spawn_menu_main_mode', check = function() return DialogMode == 'templates' end, activate = function() DialogMode = 'templates' ClearFilters() return DialogMode end },
-        {style = 'toggle', name = 'Prop spawn',     prefid = 'spawn_menu_main_mode', check = function() return DialogMode == 'props' end,     activate = function() DialogMode = 'props' ClearFilters() return DialogMode end },
+        {style = 'title',  name = "<LOC spawn_debug_001>Spawn menu mode:" },
+        {style = 'toggle', name = "<LOC spawn_debug_002>Unit spawn",     prefid = 'spawn_menu_main_mode', check = function() return DialogMode == 'units' end,     activate = function() DialogMode = 'units' ClearFilters() return DialogMode end },
+        {style = 'toggle', name = "<LOC spawn_debug_003>Template spawn", prefid = 'spawn_menu_main_mode', check = function() return DialogMode == 'templates' end, activate = function() DialogMode = 'templates' ClearFilters() return DialogMode end },
+        {style = 'toggle', name = "<LOC spawn_debug_004>Prop spawn",     prefid = 'spawn_menu_main_mode', check = function() return DialogMode == 'props' end,     activate = function() DialogMode = 'props' ClearFilters() return DialogMode end },
 
-        {style = 'title',        name = 'Unit spawn settings:' },
-        {style = 'configtoggle', name = 'Spawn structure tarmacs',                    prefid = 'spawn_menu_tarmacs_enabled', },
-        {style = 'configtoggle', name = 'Spawn mesh entites instead of units',        prefid = 'spawn_menu_mesh_only', },
-        {style = 'toggle',       name = 'Clear spawned entity meshes', activate = function() SimCallback{Func = 'ClearSpawnedMeshes'} end },
-        {style = 'configtoggle', name = 'Position camera for build icon on spawn',    prefid = 'spawn_menu_unit_icon_camera' },
-        {style = 'configtoggle', name = 'Ignore terrain blocking (disables preview)', prefid = 'spawn_menu_force_dummy_spawn'},
-        {style = 'configtoggle', name = 'Show raised platforms',                      prefid = 'spawn_menu_show_raised_platforms', },
+        {style = 'title',        name = "<LOC spawn_debug_005>Unit spawn settings:" },
+        {style = 'configtoggle', name = "<LOC spawn_debug_006>Spawn structure tarmacs",                    prefid = 'spawn_menu_tarmacs_enabled', },
+        {style = 'configtoggle', name = "<LOC spawn_debug_007>Spawn mesh entites instead of units",        prefid = 'spawn_menu_mesh_only', },
+        {style = 'toggle',       name = "<LOC spawn_debug_008>Clear spawned entity meshes", activate = function() SimCallback{Func = 'ClearSpawnedMeshes'} end },
+        {style = 'configtoggle', name = "<LOC spawn_debug_009>Position camera for build icon on spawn",    prefid = 'spawn_menu_unit_icon_camera' },
+        {style = 'configtoggle', name = "<LOC spawn_debug_010>Ignore terrain blocking (disables preview)", prefid = 'spawn_menu_force_dummy_spawn'},
+        {style = 'configtoggle', name = "<LOC spawn_debug_011>Show raised platforms",                      prefid = 'spawn_menu_show_raised_platforms', },
 
-        {style = 'title',        name = 'Unit spawn filter settings:' },
-        {style = 'configtoggle', name = 'Include build-menu filters',     refresh = true, prefid = 'spawn_menu_filter_build_menu', check = function() return options.spawn_menu_filter_build_menu ~= false end },
-        {style = 'configtoggle', name = 'Include visibility filters',     refresh = true, prefid = 'spawn_menu_filter_visibility', check = function() return options.spawn_menu_filter_visibility ~= false end },
-        {style = 'configtoggle', name = 'Include source filters',         refresh = true, prefid = 'spawn_menu_filter_source', check = function() return options.spawn_menu_filter_source ~= false end },
-        {style = 'configtoggle', name = 'Split core game source filter',  refresh = true, prefid = 'spawn_menu_split_sources', check = function() return options.spawn_menu_split_sources ~= false end },
+        {style = 'title',        name = "<LOC spawn_debug_012>Unit spawn filter settings:" },
+        {style = 'configtoggle', name = "<LOC spawn_debug_013>Include build-menu filters",     refresh = true, prefid = 'spawn_menu_filter_build_menu', check = function() return options.spawn_menu_filter_build_menu ~= false end },
+        {style = 'configtoggle', name = "<LOC spawn_debug_014>Include visibility filters",     refresh = true, prefid = 'spawn_menu_filter_visibility', check = function() return options.spawn_menu_filter_visibility ~= false end },
+        {style = 'configtoggle', name = "<LOC spawn_debug_015>Include source filters",         refresh = true, prefid = 'spawn_menu_filter_source', check = function() return options.spawn_menu_filter_source ~= false end },
+        {style = 'configtoggle', name = "<LOC spawn_debug_016>Split core game source filter",  refresh = true, prefid = 'spawn_menu_split_sources', check = function() return options.spawn_menu_split_sources ~= false end },
         -- {style = 'configtoggle', name = 'Include no-tech filter',        refresh = true, prefid = 'spawn_menu_notech_filter', },
         --{style = 'configtoggle', name = 'Include ACU/Paragon filter',    refresh = true, prefid = 'spawn_menu_paragon_filter', },
-        {style = 'toggle',       name = 'Filter Type by motion type',    refresh = true, prefid = 'spawn_menu_type_filter_mode', check = function() return options.spawn_menu_type_filter_mode == 'motion' end,   activate = function() return 'motion'   end },
-        {style = 'toggle',       name = 'Filter Type by category',       refresh = true, prefid = 'spawn_menu_type_filter_mode', check = function() return options.spawn_menu_type_filter_mode == 'category' end, activate = function() return 'category' end },
+        {style = 'toggle',       name = "<LOC spawn_debug_017>Filter Type by motion type",    refresh = true, prefid = 'spawn_menu_type_filter_mode', check = function() return options.spawn_menu_type_filter_mode == 'motion' end,   activate = function() return 'motion'   end },
+        {style = 'toggle',       name = "<LOC spawn_debug_018>Filter Type by category",       refresh = true, prefid = 'spawn_menu_type_filter_mode', check = function() return options.spawn_menu_type_filter_mode == 'category' end, activate = function() return 'category' end },
 
-        {style = 'title',        name = 'Display settings:'},
-        {style = 'configtoggle', name = 'Show item icons',                    refresh = true, prefid = 'spawn_menu_show_icons' },
-        {style = 'slider',       name = 'Army focus cell minimum width:',     refresh = true, prefid = 'spawn_menu_team_column_min_width', min = 30, max = 300, inc = 5, default = 145 },
-        {style = 'slider',       name = 'Dialogue transparency:',             refresh = true, prefid = 'spawn_menu_alpha',                 min = 0,  max = 100, inc = 5, default = 80  },
-        {style = 'configtoggle', name = 'Show text input instead of sliders', refresh = true, prefid = 'spawn_menu_footer_text_input' },
+        {style = 'title',        name = "<LOC spawn_debug_019>Display settings:"},
+        {style = 'configtoggle', name = "<LOC spawn_debug_020>Show item icons",                    refresh = true, prefid = 'spawn_menu_show_icons' },
+        {style = 'slider',       name = "<LOC spawn_debug_021>Army focus cell minimum width:",     refresh = true, prefid = 'spawn_menu_team_column_min_width', min = 30, max = 300, inc = 5, default = 145 },
+        {style = 'slider',       name = "<LOC spawn_debug_022>Dialogue transparency:",             refresh = true, prefid = 'spawn_menu_alpha',                 min = 0,  max = 100, inc = 5, default = 80  },
+        {style = 'configtoggle', name = "<LOC spawn_debug_023>Show text input instead of sliders", refresh = true, prefid = 'spawn_menu_footer_text_input' },
     }
     local sectFuncs = {
         title = function(data, parent)
@@ -2013,7 +2014,7 @@ function CreateTemplateOptionsMenu(button)
                 end
             end
             for iconType, _ in contents do
-                local bmp = Bitmap(group, '/textures/ui/common/icons/units/'..iconType..'_icon.dds')
+                local bmp = Bitmap(group, UIUtil.UIFile('/icons/units/' .. iconType .. '_icon.dds', true))
                 bmp.Height:Set(30 * UIScale)
                 bmp.Width:Set(30 * UIScale)
                 bmp.ID = iconType

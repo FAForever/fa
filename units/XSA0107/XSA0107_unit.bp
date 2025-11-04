@@ -125,8 +125,8 @@ UnitBlueprint{
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 4,
-        SizeZ = 6,
+        SizeX = 1,
+        SizeZ = 3,
     },
     General = {
         CommandCaps = {
@@ -173,7 +173,7 @@ UnitBlueprint{
         Class1Capacity = 8,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsLarge = 2,
+        SlotsLarge = 1,
         SlotsMedium = 4,
         SlotsSmall = 8,
         TransportClass = 10,

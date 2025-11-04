@@ -207,7 +207,7 @@ function GetKeyActions()
     local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
 
     for k,v in keyActions do
-        if ret[k] and ret[k] != v.action then
+        if ret[k] and ret[k].action != v.action then
             WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
         end
 
@@ -215,7 +215,7 @@ function GetKeyActions()
     end
 
     for k,v in debugKeyActions do
-        if ret[k] and ret[k] != v.action then
+        if ret[k] and ret[k].action != v.action then
             WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
         end
 

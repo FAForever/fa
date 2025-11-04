@@ -208,7 +208,7 @@ end
 
 function LOCStr(str)
     local id = str:lower()
-    id = id:gsub(' ', '_')
+    id = id:gsub(' ', '_'):gsub('%-', '_')
     return LOC('<LOC ls_'..id..'>'..str)
 end
 
@@ -593,7 +593,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails1 = weaponDetails1..LOC('<LOC uvd_ManualFire>')
                         end
                         local weaponDetails2
-                        if info.NukeInnerRingDamage then
+                        -- matches the requirements in weapon.lua for a projectile to have nuke damage
+                        if info.NukeOuterRingDamage and info.NukeOuterRingRadius and info.NukeOuterRingTicks and info.NukeOuterRingTotalTime
+                            and info.NukeInnerRingDamage and info.NukeInnerRingRadius and info.NukeInnerRingTicks and info.NukeInnerRingTotalTime
+                        then
                             weaponDetails2 = string.format(LOC('<LOC uvd_0014>Damage: %.8g - %.8g, Splash: %.3g - %.3g')..', '..LOC('<LOC uvd_Range>'),
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius, info.MinRadius, info.MaxRadius)
@@ -727,13 +730,13 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
 
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
-                            local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
+                            local weaponDetails3 = string.format(LOC('<LOC uvd_cost>Charge Cost: -%d E (-%d E/s)'), info.EnergyRequired, info.EnergyDrainPerSecond)
                             table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails3}})
                         end
 
                         local ProjectileEco = __blueprints[info.ProjectileId].Economy
                         if ProjectileEco and (ProjectileEco.BuildCostMass > 0 or ProjectileEco.BuildCostEnergy > 0) and ProjectileEco.BuildTime > 0 then
-                            local weaponDetails4 = string.format('Missile Cost: %d M, %d E, %d BT', ProjectileEco.BuildCostMass, ProjectileEco.BuildCostEnergy, ProjectileEco.BuildTime)
+                            local weaponDetails4 = string.format(LOC('<LOC uvd_missile>Missile Cost: %d M, %d E, %d BT'), ProjectileEco.BuildCostMass, ProjectileEco.BuildCostEnergy, ProjectileEco.BuildTime)
                             table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails4}})
                         end
                     end

@@ -51,7 +51,7 @@ ShieldCollider = ClassProjectile(Projectile) {
     ---@param other any
     OnCollisionCheck = function(self, other)
         -- We intercept this just incase the projectile collides with something it shouldn't
-        WARN('Shield collision projectile checking collision! Fix me!')
+        WARN('Shield collision projectile checking collision! Fix me!', debug.traceback())
         if IsUnit(other) then WARN('It was a unit!') return end
 
         Projectile.OnCollisionCheck(self, other)

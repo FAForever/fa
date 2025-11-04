@@ -52,7 +52,7 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
         return
     end
 
-    if (not target) or (IsDestroyed(target)) then
+    if (not target) or (IsDestroyed(target)) or (target.Dead) then
         return
     end
 

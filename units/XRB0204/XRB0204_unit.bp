@@ -91,6 +91,7 @@ UnitBlueprint{
         BuildRate = 37,
         BuildTime = 1171,
         BuildableCategory = { "xrb0304" },
+        UpgradeOnlyCategory = { "xrb0304" },
         DifferentialUpgradeCostCalculation = true,
         MaxBuildDistance = 20,
         RebuildBonusIds = { "xrb0104" },

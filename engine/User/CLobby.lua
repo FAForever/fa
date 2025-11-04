@@ -43,6 +43,8 @@ local CLobby = {}
 ---@field Timeouts any          # Read by the engine to determine the behavior of time outs.
 ---@field CivilianAlliance any  # Read by the engine to determine the alliance towards civilians.
 ---@field GameSpeed any         # Read by the engine to determine the behavior of game speed (adjustments).
+---@field Ratings table<string, number>
+---@field Divisions table<string, string>
 
 ---@class UILobbyLaunchGameModsConfiguration
 ---@field name string           # Read by the engine, TODO

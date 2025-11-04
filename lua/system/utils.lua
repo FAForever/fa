@@ -63,7 +63,7 @@ if not rawget(table, 'empty') then
     -- - https://github.com/FAForever/FA-Binary-Patches/pull/98
 
     --- table.empty(t) returns true iff t has no keys/values.
-    ---@param t table
+    ---@param t? table
     ---@return boolean
     function table.empty(t)
         if type(t) ~= 'table' then return true end
@@ -176,13 +176,18 @@ function table.deepcopy(t,backrefs)
     end
 end
 
---- table.merged(t1,t2) returns a table in which fields from t2 overwrite
---- fields from t1. Neither t1 nor t2 is modified. The returned table may
---- share structure with either t1 or t2, so it is not safe to modify.
--- e.g.  t1 = { x=1, y=2, sub1={z=3}, sub2={w=4} }
---       t2 = { y=5, sub1={a=6}, sub2="Fred" }
---       merged(t1,t2) -> { x=1, y=5, sub1={a=6,z=3}, sub2="Fred" }
---       merged(t2,t1) -> { x=1, y=2, sub1={a=6,z=3}, sub2={w=4} }
+--- Overwrites fields in t1 with fields from t2, and returns t1.  
+--- The returned table may share structure with t2, so it is not safe to modify.  
+--- For example: 
+--- ```lua
+---   t1 = { x=1, y=2, sub1={z=3}, sub2={w=4} }  
+---   t2 = { y=5, sub1={a=6}, sub2="Fred" }  
+---   merged(t2,t1) -> t1: { x=1, y=2, sub1={a=6,z=3}, sub2={w=4} }
+---   merged(t1,t2) -> t1: { x=1, y=5, sub1={a=6,z=3}, sub2="Fred" }  
+--- ```
+---@param t1 table
+---@param t2 table # Overwrites t1
+---@return table
 function table.merged(t1, t2)
 
     if t1==t2 then

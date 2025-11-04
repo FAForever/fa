@@ -534,8 +534,8 @@ end
 ---@param aigroup string
 ---@param ainickname string
 ---@param aiaction string
----@param targetnickname string
----@param extrachat string
+---@param targetnickname? string
+---@param extrachat? string
 function AISendChat(aigroup, ainickname, aiaction, targetnickname, extrachat)
     if aigroup and not GetArmyData(ainickname):IsDefeated() and (aigroup ~='allies' or AIHasAlly(GetArmyData(ainickname))) then
         if aiaction and AIChatText[aiaction] then

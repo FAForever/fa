@@ -32,7 +32,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 
 --- Heavy Cavitation Torpedo Projectile script, XSA0204
----@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo, SplitComponent`
+---@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo, SplitComponent
 SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo, SplitComponent) {
     FxSplashScale = 0.4,
     FxTrails = {

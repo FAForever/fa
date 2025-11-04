@@ -5,6 +5,7 @@ ProjectileBlueprint{
         ImpactWater   = Sound { Bank = 'XSA_Destroy', Cue = 'XSA_Strag_Bomb_Explosion', LodCutoff = 'Weapon_LodCutoff' },
     },
     Categories = {
+        "IGNOREASFONCOLLISION",
         "INDIRECTFIRE",
         "PROJECTILE",
         "SERAPHIM",

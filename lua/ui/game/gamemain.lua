@@ -168,7 +168,6 @@ function CreateUI(isReplay)
     -- casting tools
 
     import("/lua/ui/game/casting/mouse.lua")
-    import("/lua/ui/game/casting/painting.lua")
 
     -- overwrite some globals for performance / safety
 
@@ -191,16 +190,6 @@ function CreateUI(isReplay)
     ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
     ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
-
-    -- always try and render shadows
-    ConExecute("ren_ShadowLOD 20000")
-
-    -- enable experimental graphics
-    if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
-        Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
-    then
-        ForkThread(ExperimentalGraphicsSettingsThread)
-    end
 
     local focusArmy = GetFocusArmy()
 
@@ -257,6 +246,16 @@ function CreateUI(isReplay)
 
     controls.gameParent = UIUtil.CreateScreenGroup(GetFrame(0), "GameMain ScreenGroup")
     gameParent = controls.gameParent
+    if options.gui_draggable_queue ~= 0 then
+        -- Add gameparent handleevent for if the drag ends outside the queue window
+        local oldGameParentHandleEvent = gameParent.HandleEvent
+        gameParent.HandleEvent = function(self, event)
+            if event.Type == 'ButtonRelease' then
+                import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
+            end
+            return oldGameParentHandleEvent(self, event)
+        end
+    end
 
     controlClusterGroup, statusClusterGroup, mapGroup, windowGroup = import("/lua/ui/game/borders.lua").SetupBorderControl(gameParent)
 
@@ -346,31 +345,41 @@ function CreateUI(isReplay)
     import("/lua/ui/game/reclaim.lua").SetMapSize()
 end
 
-function ExperimentalGraphicsSettingsThread()
-    WaitSeconds(1.0)
-
-    if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-        ConExecute("cam_SetLOD WorldCamera 0.70")
-    end
-
-    if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-        ConExecute("ren_ShadowSize 2048")
-    end
-end
-
--- Current SC_FrameTimeClamp settings allows up to 100 fps as default (some users probably set this to 0 to "increase fps" which would be counter-productive)
--- Let's find out max Hz capability of adapter so we don't render unnecessary frames, should help a bit with render thread at 100%
+--- Find out the max Hz capability of the adapter so we don't render unnecessary frames, reducing the load on the render thread.
+--- Some users might set SC_FrameTimeClamp to 0 which would be counterproductive for fps.
 function AdjustFrameRate()
+    -- vsync will automatically sync to max adapter framerate
     if options.vsync == 1 then return end
 
-    local video = options.video
+    local frametimeOption = Prefs.GetFromCurrentProfile('options.frametime')
+    if frametimeOption then
+        ConExecute("SC_FrameTimeClamp " .. frametimeOption)
+        return
+    end
+
+    -- SC_FrameTimeClamp defaults to 10ms, which is 100 fps
     local fps = 100
 
-    if type(options.primary_adapter) == 'string' then
-        local data = utils.StringSplit(options.primary_adapter, ',')
-        local hz = tonumber(data[3])
-        if hz then
-            fps = math.max(60, hz)
+    local primaryAdapter = options.primary_adapter
+    if type(primaryAdapter) == 'string' then
+        if primaryAdapter ~= 'windowed' then
+            -- the value for the option is formatted as `width,height,fps`
+            local data = utils.StringSplit(primaryAdapter, ',')
+            local hz = tonumber(data[3])
+            if hz then
+                fps = hz
+            end
+        else
+            -- if we're in windowed mode, maximize the framerate based on the engine-generated possible adapter settings
+            -- can't use `Prefs` because `options_overrides` isn't stored in a profile
+            local allAdapterOptions = GetPreference('options_overrides.primary_adapter.custom.states')
+            for _, option in allAdapterOptions do
+                local data = utils.StringSplit(option.key, ',')
+                local hz = tonumber(data[3])
+                if hz and hz > fps then
+                    fps = hz
+                end
+            end
         end
     end
 
@@ -581,7 +590,7 @@ function DeselectSelens(selection)
     return otherUnits, true
 end
 
---- A cache used with ObserveSelection to prevent continious table allocations
+--- A cache used with ObserveSelection to prevent continuous table allocations
 local cachedSelection = {
     oldSelection = { },
     newSelection = { },
@@ -725,9 +734,12 @@ function OnQueueChanged(newQueue)
     end
 end
 
--- Called after the Sim has confirmed the game is indeed paused. This will happen
--- on everyone's machine in a network game.
+--- Called by the engine after the sim confirmed that the game is indeed paused. This is run on all instances that are connected to the lobby.
+---@param pausedBy integer   # The index of the client in the clients list (that you get via `GetSessionClients`)
+---@param timeoutsRemaining number
 function OnPause(pausedBy, timeoutsRemaining)
+    import("/lua/ui/game/pause.lua").OnPause(pausedBy, timeoutsRemaining)
+
     PauseSound("World",true)
     PauseSound("Music",true)
     PauseVoice("VO",true)
@@ -737,11 +749,17 @@ end
 
 -- Called after the Sim has confirmed that the game has resumed.
 local ResumedBy = nil
+
+--- Transmitted via a Chat command by another user to inform Lua who sent the resume command. 
+---@param sender string # The name of the player that resumed the game. 
 function SendResumedBy(sender)
     if not ResumedBy then ResumedBy = sender end
 end
 
+--- Called by the engine when the simulation is resumed
 function OnResume()
+    import("/lua/ui/game/pause.lua").OnResume()
+
     PauseSound("World",false)
     PauseSound("Music",false)
     PauseVoice("VO",false)
@@ -753,6 +771,8 @@ end
 -- Called immediately when the user hits the pause button on the machine
 -- that initiated the pause and other network players won't call this function
 function OnUserPause(pause)
+    import("/lua/ui/game/pause.lua").OnUserPause(pause)
+
     local Tabs = import("/lua/ui/game/tabs.lua")
     local focus = GetArmiesTable().focusArmy
     if Tabs.CanUserPause() then
@@ -770,7 +790,7 @@ function OnUserPause(pause)
             else
                 SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
                     to = 'all',
-                    text = 'Unpaused the game',
+                    text = 'Resumed the game',
                     Chat = true,
                 })
             end
@@ -908,7 +928,6 @@ local NISControls = {
 local rangePrefs = {
     range_RenderHighlighted = false,
     range_RenderSelected = false,
-    range_RenderHighlighted = false
 }
 
 local preNISSettings = {}

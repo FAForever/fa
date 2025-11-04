@@ -222,7 +222,7 @@ local keyActionsDebug = {
         category = 'debug',
     },
     ['debug_connectivity'] = {
-        action = 'UI_Lua import("/lua/ui/dialogs/connection/ConnectionDialog.lua").ToggleDialog()',
+        action = 'UI_Lua import("/lua/ui/dialogs/connection/connectiondialog.lua").ToggleDialog()',
         category = 'ui'
     },
 }
@@ -234,23 +234,23 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['toggle_ai_nav_directions_from'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionsFrom.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/directionsfrom.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_random_direction_from'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/RandomDirectionFrom.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/randomdirectionfrom.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_retreat_direction_from'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/RetreatDirectionFrom.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/retreatdirectionfrom.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_direction_to'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionTo.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/directionto.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_nav_get_positions_in_radius'] = {
-        action = 'UI_Lua import("/lua/ui/game/NavDebug/GetPositionsInRadius.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/navdebug/getpositionsinradius.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_base_ui'] = {
@@ -274,7 +274,7 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['toggle_ai_economy_ui'] = {
-        action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',
+        action = 'UI_Lua import("/lua/ui/game/aibraineconomydata.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_platoon_behavior_silo'] = {
@@ -290,24 +290,32 @@ local keyActionsDebugAI = {
         category = 'ai'
     },
     ['create_build_template_02'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(2)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(2)',
         category = 'ai'
     },
     ['create_build_template_04'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(4)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(4)',
         category = 'ai'
     },
     ['create_build_template_08'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(8)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(8)',
         category = 'ai'
     },
     ['create_build_template_16'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(16)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(16)',
         category = 'ai'
     },
     ['create_build_template_32'] = {
-        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(32)',
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").AddUnitSelectionToEmptyChunkTemplate(32)',
         category = 'ai'
+    },
+    ['create_title_announcement'] = {
+        action = 'UI_Lua import("/lua/ui/game/announcement.lua").DebugTitleAnnouncement()',
+        category = 'debug'
+    },
+    ['create_title_text_announcement'] = {
+        action = 'UI_Lua import("/lua/ui/game/announcement.lua").DebugTitleTextAnnouncement()',
+        category = 'debug'
     },
 }
 

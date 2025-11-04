@@ -76,14 +76,21 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 
     ---@param self AirTransport
-    ---@param totalweight CargoWeight
-    ---@param unit Unit
     ReduceTransportSpeed = function(self)
         local transportspeed = self.Blueprint.Air.MaxAirspeed
+        -- add a minimum speed of 30% base to prevent breaking the transport with a zero or negative speed multiplier
+        local maxWeight = transportspeed - transportspeed * 0.3
         local totalweight = 0
         for _, unit in self:GetCargo() do
-            totalweight = totalweight + unit.Blueprint.Physics.TransportSpeedReduction
-	    end
+            local reduction = unit.Blueprint.Physics.TransportSpeedReduction
+            if not reduction then continue end
+            totalweight = totalweight + reduction
+
+            if totalweight > maxWeight then
+                totalweight = maxWeight
+                break
+            end
+        end
         self:SetSpeedMult(1 - (totalweight / transportspeed))
     end,
 
@@ -141,7 +148,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         end
         -- these need to be defined for certain behaviors (like ctrl-k) to function
         damageType = damageType or "Normal"
-        excessDamageRatio =  excessDamageRatio or 0
+        excessDamageRatio = excessDamageRatio or 0
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 

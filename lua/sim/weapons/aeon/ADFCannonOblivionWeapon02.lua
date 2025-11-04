@@ -26,5 +26,5 @@ local EffectTemplate = import('/lua/effecttemplates.lua')
 ---@class ADFCannonOblivionWeapon02 : DefaultProjectileWeapon
 ADFCannonOblivionWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AOblivionCannonMuzzleFlash02,
-    FxChargeMuzzleFlash = EffectTemplate.AOblivionCannonChargeMuzzleFlash02,
+    FxRackChargeMuzzleFlash = EffectTemplate.AOblivionCannonChargeMuzzleFlash02,
 }

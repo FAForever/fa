@@ -1,1 +1,0 @@
-- (#6514) Fix extremely large amounts of energy storage preventing structures from re-enabling themselves after an energy stall due to requiring 0.1% of storage to be full. Now there is an upper limit of 10k on the energy requirement, which is reached at 100k storage.

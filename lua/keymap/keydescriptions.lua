@@ -142,6 +142,7 @@ keyDescriptions = {
     ['nuke'] = '<LOC key_desc_0063>Nuke',
     ['mode'] = '<LOC key_desc_0101>Cycle through all of the available fire states.',
     ['dock'] = '<LOC key_desc_0405>Dock',
+    ['dock_damaged'] = '<LOC key_dock_damaged>Dock damaged units',
     ['shift_repair'] = '<LOC key_desc_0036>Repair',
     ['shift_reclaim'] = '<LOC key_desc_0037>Reclaim',
     ['shift_patrol'] = '<LOC key_desc_0043>Patrol',
@@ -157,6 +158,7 @@ keyDescriptions = {
     ['shift_move'] = '<LOC key_desc_0065>Move',
     ['shift_nuke'] = '<LOC key_desc_0063>Nuke',
     ['shift_dock'] = '<LOC key_desc_0405>Dock',
+    ['shift_dock_damaged'] = '<LOC key_shift_dock_damaged>Dock damaged units',
     ['rename'] = '<LOC key_desc_0064>Rename the selected unit',
     ['goto_engineer'] = '<LOC key_desc_0066>Go to the nearest idle Engineer',
     ['select_idle_engineer'] = '<LOC key_desc_0067>Select the nearest idle Engineer',
@@ -560,4 +562,11 @@ keyDescriptions = {
 
     ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Normal)',
     ['select_torpedo_bombers'] = '<LOC key_desc_0408>Select all Bombers (Torpedo)',
+
+    ['create_build_template_02'] = '<LOC key_desc_create_build_template_02>Create a 2x2 chunk template',
+    ['create_build_template_04'] = '<LOC key_desc_create_build_template_02>Create a 4x4 chunk template',
+    ['create_build_template_08'] = '<LOC key_desc_create_build_template_02>Create a 8x8 chunk template',
+    ['create_build_template_16'] = '<LOC key_desc_create_build_template_02>Create a 16x16 chunk template',
+    ['create_build_template_32'] = '<LOC key_desc_create_build_template_02>Create a 32x32 chunk template',
+
 }
