@@ -53,9 +53,9 @@ UnitBlueprint{
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 10000,
-        BuildCostMass = 800,
-        BuildTime = 2000,
+        BuildCostEnergy = 7500,
+        BuildCostMass = 600,
+        BuildTime = 1500,
         BuildUnit = "drlk001",
     },
     Footprint = {
