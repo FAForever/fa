@@ -1,7 +1,7 @@
 - (#6559) Various fixes and improvements for Megalith's build capabilities:
-    - Fix the build range preview to display the real build range.
-    - Extend build range by +1 so that eggs can be more easily placed far enough away so that the Megalith doesn't have to walk due to the egg being placed within its footprint.
-    - Add repair capability to the Megalith so it can finish unfinished eggs.
-    - Add reclaim capability to make it more clear that it can reclaim. Previously it could only reclaim by building an egg on top of wrecks.
-    - Add pause capability as is standard with engineering units.
-    - Update the T3 Mobile Arty and T3 Mobile Anti-Air crab eggs stats to reflect previous balance changes to those units.
+  - Fix the build range preview to display the real build range.
+  - Extend build range by +1 so that eggs can be more easily placed far enough away so that the Megalith doesn't have to walk due to the egg being placed within its footprint.
+  - Add repair capability to the Megalith so it can finish unfinished eggs.
+  - Add reclaim capability to make it more clear that it can reclaim. Previously it could only reclaim by building an egg on top of wrecks.
+  - Add pause capability as is standard with engineering units.
+  - Update the T3 Mobile Arty and T3 Mobile Anti-Air crab eggs stats to reflect previous balance changes to those units.
