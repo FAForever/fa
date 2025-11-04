@@ -15,13 +15,18 @@ local EffectTemplate = import('/lua/effecttemplates.lua')
 UES0304 = ClassUnit(TSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
+        ---@class UES0304_CruiseMissiles : TIFCruiseMissileLauncherSub
+        ---@field Rotator? moho.RotateManipulator
         CruiseMissiles = ClassWeapon(TIFCruiseMissileLauncherSub) {
+            ---@param self UES0304_CruiseMissiles
+            ---@param muzzle Bone
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
                 self.Rotator = CreateRotator(self.unit, self:GetBlueprint().RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
                 TIFCruiseMissileLauncherSub.PlayFxMuzzleChargeSequence(self, muzzle)
             end,
 
+            ---@param self UES0304_CruiseMissiles
             PlayFxRackReloadSequence = function(self)
                 self.Trash:Add(ForkThread(function()
                     if self.Rotator then
@@ -37,15 +42,19 @@ UES0304 = ClassUnit(TSubUnit) {
             end,
         },
 
+        ---@class UES0304_NukeMissiles : TIFStrategicMissileWeapon
+        ---@field Rotator? moho.RotateManipulator
         NukeMissiles = ClassWeapon(TIFStrategicMissileWeapon) {
             FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
-
+            ---@param self UES0304_NukeMissiles
+            ---@param muzzle Bone
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
                 self.Rotator = CreateRotator(self.unit, self:GetBlueprint().RackBones[self.CurrentRackSalvoNumber].RackBone, 'z', 90, 90, 90, 90)
                 TIFCruiseMissileLauncherSub.PlayFxMuzzleChargeSequence(self, muzzle)
             end,
 
+            ---@param self UES0304_NukeMissiles
             PlayFxRackReloadSequence = function(self)
                 self.Trash:Add(ForkThread(function()
                     if self.Rotator then
