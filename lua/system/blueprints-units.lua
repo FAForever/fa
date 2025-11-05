@@ -241,6 +241,7 @@ local function PostProcessUnit(unit)
             footprintSize = MathMax(MathFloor(footprint.SizeX), MathFloor(footprint.SizeZ))
         else
             footprintSize = MATH_IRound(MathMax(unit.SizeX or 0, unit.SizeZ or 0))
+            -- Cap at 6 because that is the largest amphibious unit footprint (see footprints.lua)
             if footprintSize > 6 then footprintSize = 6 end
         end
         local overlayRadius = (unit.Economy.MaxBuildDistance or 5) + footprintSize + 1
