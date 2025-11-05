@@ -237,7 +237,7 @@ local function PostProcessUnit(unit)
         -- so add the builder footprint and a minimal 1 skirt size to the overlay radius.
         local footprintSize
         local footprint = unit.Footprint
-        if footprint then
+        if footprint and footprint.SizeX and footprint.SizeZ then
             footprintSize = MathMax(MathFloor(footprint.SizeX), MathFloor(footprint.SizeZ))
         else
             footprintSize = MATH_IRound(MathMax(unit.SizeX or 0, unit.SizeZ or 0))
