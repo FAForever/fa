@@ -1,3 +1,5 @@
+-- unused; see `/lua/sim/VictoryCondition/`
+
 gameOver = false
 
 local victoryCategories = {

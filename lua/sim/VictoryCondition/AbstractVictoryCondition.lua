@@ -404,4 +404,22 @@ AbstractVictoryCondition = Class(DebugComponent) {
         SyncGameResult({ brainIndex, "defeat -10" })
     end,
 
+    --- Processes the army as if it was recalled.
+    ---@param self AbstractVictoryCondition
+    ---@param aiBrain AIBrain
+    RecallForArmy = function(self, aiBrain)
+        local aiBrainName = aiBrain.Name
+
+        if self.EnabledSpewing then
+            SPEW("Army is recalled: ", aiBrainName)
+        end
+
+        self:FlagBrainAsProcessed(aiBrain)
+        self:ToObserver(aiBrain)
+        aiBrain:OnRecalled()
+
+        local brainIndex = aiBrain.Army
+        SyncGameResult({ brainIndex, "recall -10" })
+    end,
+
 }

@@ -77,7 +77,11 @@ DecapitationCondition = Class(AbstractVictoryCondition) {
         -- process all defeated brains. At this stage, it is an entire team that is defeated at once
         for k = 1, TableGetn(decapitatedBrains) do
             local defeatedBrain = decapitatedBrains[k]
-            self:DefeatForArmy(defeatedBrain)
+            if defeatedBrain.Status == "Recall" then
+                self:RecallForArmy(defeatedBrain)
+            else
+                self:DefeatForArmy(defeatedBrain)
+            end
         end
 
         -- check if all remaining players want to forfeit
