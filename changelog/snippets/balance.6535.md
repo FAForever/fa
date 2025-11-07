@@ -12,3 +12,7 @@
       It can also be argued that this is just simplifying the micro of multiple bombers when you want to maximize DPS. There will of course still be micro against AA or to have good bombing paths that make use of the reload, both of which are far more engaging than figuring out when to turn multiple bombers just to bomb a single target on reload with multiple passes.
       - `BreakOffDistance`: 60 -> 50
       - `RandomBreakOffDistanceMult`: 1.5 -> 1
+
+- (#6535) Reduce the veterancy requirement for Strategic Bombers to match their mass cost reductions in previous patches.
+  - Strategic Bombers (UAA0304, UEA0304, URA0304, XSA0304):
+    - Mass killed required per veterancy level: 4200 -> 2x of own mass cost (3500)
