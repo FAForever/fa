@@ -2,7 +2,7 @@
   - Maneuverability: 
     - Increase turn speed: 0.8 -> 1.5
       This lets it effectively micro against flak damage, and leaves less time/opportunities for ASF/SAMs to deal damage.
-    - Increase Lift Factor: 7 -> 17
+    - Increase Lift Factor: 7 -> 10
       This improves the speed of the bomber lifting off, complementing the new turn speed.
   - Reliability:
     - Bomb drop threshold: 3.5 -> 10
