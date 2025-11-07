@@ -1235,7 +1235,7 @@
 ---@field ClassGenericUpTo? integer
 --- how many external docking slots available for air staging platforms
 ---@field DockingSlots? number
---- Doesn't seem to work. "repairs units attached to me at this % of max health per second"
+--- Seemingly non-functional. Original description: "repairs units attached to me at this % of max health per second"
 ---@field RepairRate number
 --- Maximum number of large units this transport can carry. If larger than the number of large slots
 --- calculated from the number hooks, that smaller number is used instead.
