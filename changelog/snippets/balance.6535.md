@@ -2,11 +2,11 @@
   
   **Strategic Bombers (UAA0304, UEA0304, URA0304, XSA0304):**
     - Maneuverability: 
-      - Increase turn speed: 0.8 -> 1.2
+      - Turn speed: 0.8 -> 1.2
 
         Lets strats micro to more effectively avoid flak damage and leaves less opportunities for ASF/SAMs to deal damage.
 
-      - Increase Lift Factor: 7 -> 10
+      - Lift Factor: 7 -> 10
 
         Complements the new turn speed by improving how quickly strats lift off and navigate up/down terrain.
 
