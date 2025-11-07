@@ -24,6 +24,10 @@
 
         This only affects bombers automatically attacking from an idle state or from an attack, attack move, or patrol order. Previously strats would drop bombs every ~13 seconds, and now they drop every ~10 seconds.
 
+      - Auto-attack range: 90 -> 64
+
+        Strats will no longer automatically fly off to attack very distant targets. The 64 range matches strats' radar range.
+
 - (#6535) Reduce the veterancy requirement for Strategic Bombers to match their mass cost reductions in previous patches.
 
   **Strategic Bombers (UAA0304, UEA0304, URA0304, XSA0304):**
