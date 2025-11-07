@@ -33,8 +33,8 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Structure",
         EconomyThreatLevel = 208,
-        Health = 6400,
-        MaxHealth = 6400,
+        Health = 6600,
+        MaxHealth = 6600,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },

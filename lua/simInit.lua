@@ -284,6 +284,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         ScenarioInfo.GameHasAIs = true
         SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality")
     end
+
+    -- feature: enable or disable sharing of excess resources through the lobby
+    if ScenarioInfo.Options.TeamShareOverflow == "enabled" then
+        ArmyBrains[index]:SetResourceSharing(true)
+    elseif ScenarioInfo.Options.TeamShareOverflow == "disabled" then
+        ArmyBrains[index]:SetResourceSharing(false)
+    end
 end
 
 function InitializePrebuiltUnits(name)

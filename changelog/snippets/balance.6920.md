@@ -1,0 +1,1 @@
+- (#6920) Automatically start rebuilding the Novax Satellite at the base station if the satellite is destroyed by artillery fire, nuclear missiles, or any other means.

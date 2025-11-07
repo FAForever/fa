@@ -1326,11 +1326,10 @@ function GetReplayId()
         id = GetFrontEndData('syncreplayid')
     elseif HasCommandLineArg("/savereplay") then
         -- /savereplay format is gpgnet://local_ip:port/replay_id/USERNAME.SCFAreplay
-        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java--L192
+        -- see https://github.com/FAForever/downlords-faf-client/blob/d44f97dd40c011f391c8d97f122b54bb61a23c80/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java#L260
         local url = GetCommandLineArg("/savereplay", 1)[1]
-        local fistpos = string.find(url, "/", 10) + 1
-        local lastpos = string.find(url, "/", fistpos) - 1
-        id = string.sub(url, fistpos, lastpos)
+        url = string.gsub(tostring(url), "\\", "/")
+        id = string.match(url, ".*/([0-9]+)/[^/]*$") -- number between last two "/" "/"
     elseif HasCommandLineArg("/replayid") then
         id =  GetCommandLineArg("/replayid", 1)[1]
     end
@@ -1491,4 +1490,61 @@ function CreateHorzFillGroup(parent, filename)
     group._middle = middle
     group._right = right
     return group
+end
+
+--- Creates a thick white border with large metal corners.
+--- Used for disconnect and connectivity dialogs.
+---@param parent Control
+---@return SCXMenuPanelBorderTable
+function CreateSCXMenuPanelBorder(parent)
+    ---@class SCXMenuPanelBorderTable
+    local tbl = {
+        tl = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_ul.dds')),
+        tm = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_horz_um.dds')),
+        tr = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_ur.dds')),
+        l = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_vert_l.dds')),
+        r = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_vert_r.dds')),
+        bl = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_ll.dds')),
+        bm = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_lm.dds')),
+        br = Bitmap(parent, UIFile('/scx_menu/panel-brd/panel_brd_lr.dds')),
+    }
+
+    tbl.tl.Bottom:Set(parent.Top)
+    tbl.tl.Right:Set(parent.Left)
+
+    tbl.tr.Bottom:Set(parent.Top)
+    tbl.tr.Left:Set(parent.Right)
+
+    tbl.tm.Bottom:Set(parent.Top)
+    tbl.tm.Right:Set(parent.Right)
+    tbl.tm.Left:Set(parent.Left)
+
+    tbl.l.Bottom:Set(parent.Bottom)
+    tbl.l.Top:Set(parent.Top)
+    tbl.l.Right:Set(parent.Left)
+
+    tbl.r.Bottom:Set(parent.Bottom)
+    tbl.r.Top:Set(parent.Top)
+    tbl.r.Left:Set(parent.Right)
+
+    tbl.bl.Top:Set(parent.Bottom)
+    tbl.bl.Right:Set(parent.Left)
+
+    tbl.br.Top:Set(parent.Bottom)
+    tbl.br.Left:Set(parent.Right)
+
+    tbl.bm.Top:Set(parent.Bottom)
+    tbl.bm.Right:Set(parent.Right)
+    tbl.bm.Left:Set(parent.Left)
+
+    tbl.tl.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.tm.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.tr.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.l.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.r.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.bl.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.bm.Depth:Set(function() return parent.Depth() - 1 end)
+    tbl.br.Depth:Set(function() return parent.Depth() - 1 end)
+
+    return tbl
 end

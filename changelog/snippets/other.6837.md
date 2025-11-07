@@ -1,1 +1,0 @@
-- (#6837) Improve annotations related to Buffs.
