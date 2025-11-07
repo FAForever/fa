@@ -172,6 +172,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.Trash:Add(ForkThread(self.HideUnit, self))
+        self:SetMaintenanceConsumptionActive()
     end,
 
     ---@param self XRL0302
