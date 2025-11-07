@@ -243,11 +243,11 @@
 ---@field MinAirspeed? number
 --- time to predict ahead for moving targets
 ---@field PredictAheadForBombDrop? number
---- random multiplier applied to break off distance for winged aircrafts. Defaults to 1.5
+--- random multiplier applied to break off distance for winged aircraft. Defaults to 1.5
 ---@field RandomBreakOffDistanceMult? number
---- random max time to switch combat state in seconds for winged aircrafts. Defaults to 6
+--- random max time to switch combat state in seconds for winged aircraft. Defaults to 6
 ---@field RandomMaxChangeCombatStateTime? number
---- random min time to switch combat state in seconds for winged aircrafts. Defaults to 3
+--- random min time to switch combat state in seconds for winged aircraft. Defaults to 3
 ---@field RandomMinChangeCombatStateTime? number
 --- distance from target at which to start turning to align with it
 ---@field StartTurnDistance number
