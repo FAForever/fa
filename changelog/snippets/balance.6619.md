@@ -1,0 +1,1 @@
+- (#6619) Make Aeon TMD (static and naval) launch the flare to the height of the missile being intercepted. This fixes the issue where Aeon TMD cannot intercept UEF TMLs due to them flying too high.
