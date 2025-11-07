@@ -10,5 +10,5 @@
     - Smaller loops on auto attack to maximize DPS: 
       This only increases DPS when bombing a single target with multiple passes, so I wouldn't put it exactly under the HP/DPS buff restriction. Previously bombs would drop only every ~13 seconds, and with the turn speed and breakoff distance reduction they drop every ~8 seconds.
       It can also be argued that this is just simplifying the micro of multiple bombers when you want to maximize DPS. There will of course still be micro against AA or to have good bombing paths that make use of the reload, both of which are far more engaging than figuring out when to turn multiple bombers just to bomb a single target on reload with multiple passes.
-      - `BreakOffDistance`: 60 -> 40
+      - `BreakOffDistance`: 60 -> 50
       - `RandomBreakOffDistanceMult`: 1.5 -> 1
