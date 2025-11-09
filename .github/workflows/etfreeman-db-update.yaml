@@ -28,4 +28,4 @@ on:
 
 jobs:
   deploy:
-    uses: FAForever/etfreeman-db/.github/workflows/deploy.yml@master
+    uses: FAForever/etfreeman-db/.github/workflows/deploy.yml@main
