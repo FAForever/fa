@@ -23,8 +23,8 @@ name: ETFreeman DB - update unit information
 on:
   workflow_dispatch:
   push:
-    branches:
-      - deploy/faf
+    # branches:
+    #   - deploy/faf
 
 jobs:
   deploy:
