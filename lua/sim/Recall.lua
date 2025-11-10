@@ -14,10 +14,10 @@ local SyncAnnouncement = import("/lua/simdiplomacy.lua").SyncAnnouncement
 ---| "active"
 ---| "ai"
 ---| "gate"
+---| "observer"
 ---| "request"
 ---| "scenario"
 ---| "vote"
----| "observer"
 
 function init()
     -- setup sim recall state in the brains
@@ -51,7 +51,7 @@ function OnArmyDefeat(army)
     end
 end
 
----@param data {From: number, To: number}
+---@param data {From: integer, To: integer}
 function OnAllianceChange(data)
     local armyFrom, armyTo = data.From, data.To
     local oldTeamSize = 0
@@ -147,7 +147,7 @@ function ArmyRecallRequestCooldown(army)
     return RecallRequestCooldown(lastTeamVote, lastPlayerRequest)
 end
 
----@param requestingArmy number
+---@param requestingArmy integer
 local function RecallVotingThread(requestingArmy)
     local requestingBrain = GetArmyBrain(requestingArmy)
 
@@ -211,7 +211,7 @@ local function RecallVotingThread(requestingArmy)
     if recallPassed then
         SPEW("Recalling team " .. listTeam .. " at the request of " .. requestingBrain.Nickname .. " (vote passed " .. msgEnding)
         for _, brain in team do
-            brain:RecallAllCommanders()
+            brain:OnRecall()
         end
     else
         SPEW("Not recalling team " .. listTeam .. " (vote failed " .. msgEnding)
@@ -226,7 +226,7 @@ local function RecallVotingThread(requestingArmy)
     requestingBrain.recallVotingThread = nil
 end
 
----@param army number
+---@param army integer
 ---@param vote boolean
 ---@param lastVote boolean
 ---@return boolean # if further user sync should happen
@@ -259,8 +259,8 @@ local function ArmyVoteRecall(army, vote, lastVote)
     return true
 end
 
----@param army number
----@param teammates number
+---@param army integer
+---@param teammates integer
 local function ArmyRequestRecall(army, teammates)
     local brain = GetArmyBrain(army)
     if teammates > 0 then
@@ -271,11 +271,11 @@ local function ArmyRequestRecall(army, teammates)
         end
     else
         -- it's just us; recall our army
-        brain:RecallAllCommanders()
+        brain:OnRecall()
     end
 end
 
----@param data {From: number, Vote: boolean}
+---@param data {From: integer, Vote: boolean}
 function SetRecallVote(data)
     local army = data.From
     if not OkayToMessWithArmy(army) then

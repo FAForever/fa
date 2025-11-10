@@ -74,20 +74,20 @@ AbstractVictoryCondition = Class(DebugComponent) {
         -- this can happen occasionally, note that we explicitly do **not** use the `.Dead` property! The
         -- use of that property depends on the execution order in Lua. It is deterministic, but it will
         -- generate strange results when for example two ACUs die in the same tick. Using `.Dead` will
-        -- re-introduce the 'draw bug' that bugged the community for years.
-
+        -- re-introduce the 'draw bug' that plagued the community for years.
         if IsDestroyed(unit) then
             return false
         end
 
         -- only units that are finished are taken into account.
-
         if unit:GetFractionComplete() < 1.0 then
             return false
         end
 
-        -- only units that are not recalling are taken into account.
-
+        -- Only units that are not recalling are taken into account.
+        -- This happens when a player disconnects with the game option 
+        -- `DisconnectShareCommanders == "RecallDelayed"`, where the ACU briefly
+        -- stays on a timer.
         if unit.RecallingAfterDefeat then
             return false
         end
@@ -275,7 +275,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
         -- stop checking the game state
-        if (self.ProcessGameStateThreadInstance) then
+        if self.ProcessGameStateThreadInstance then
             KillThread(self.ProcessGameStateThreadInstance)
             self.ProcessGameStateThreadInstance = nil
         end
@@ -286,14 +286,20 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- Ends the game.
     ---@param self AbstractVictoryCondition
     EndGameThread = function(self)
-        WaitSeconds(3)
+        if self.DelayBeforeVictory < self.DelayBeforeGameEnds then
+            SPEW("Victory is scheduled to occur before game has ended!")
+        end
+        WaitSeconds(self.DelayBeforeGameEnds)
 
         for _, v in GameOverListeners do
             pcall(v)
         end
 
         Sync.GameEnded = true
-        WaitTicks(2)
+        if self.DelayBeforeVictory > self.DelayBeforeGameEnds then
+            WaitTicks(self.DelayBeforeVictory - self.DelayBeforeGameEnds)
+        end
+
         EndGame()
     end,
 
@@ -348,6 +354,23 @@ AbstractVictoryCondition = Class(DebugComponent) {
         end
 
         self.ProcessedBrains[aiBrainName] = true
+    end,
+
+    --- Processes the callbacks for defeated brains
+    ---@param self AbstractVictoryCondition
+    ---@param defeatedBrains AIBrain[]
+    ProcessDefeatedBrains = function(self, defeatedBrains)
+        for k = 1, TableGetn(defeatedBrains) do
+            local defeatedBrain = defeatedBrains[k]
+
+            if defeatedBrain.Status == "Defeat" then
+                self:DefeatForArmy(defeatedBrain)
+            elseif defeatedBrain.Status == "Recalled" then
+                self:RecallForArmy(defeatedBrain)
+            else
+                SPEW("Unknown defeated state '" .. defeatedBrain.Status .. "'")
+            end
+        end
     end,
 
     --- Processes the army as if it forfeit/drew.
@@ -416,7 +439,9 @@ AbstractVictoryCondition = Class(DebugComponent) {
 
         self:FlagBrainAsProcessed(aiBrain)
         self:ToObserver(aiBrain)
-        aiBrain:OnRecalled()
+        -- note that, normally, the only way to get here is for this method to have
+        -- already been called
+        aiBrain:OnRecall()
 
         local brainIndex = aiBrain.Army
         SyncGameResult({ brainIndex, "recall -10" })

@@ -470,6 +470,16 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
     end,
 
+    --- Starts the recall sequence of the army. Note that the `Status` isn't
+    --- changed until the command units have actually gated out.
+    ---@param self AIBrain
+    OnRecall = function(self)
+        if self.Status == "Recalled" then
+            return
+        end
+        self:RecallAllCommanders()
+    end,
+
     --- Called by the engine when a player disconnects.
     ---@param self AIBrain
     AbandonedByPlayer = function(self)
@@ -557,8 +567,13 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     RecallAllCommanders = function(self)
+        -- already in progress, we didn't catch it because the `Status` isn't set yet
+        if self.ThreadRecallingArmy then
+            return
+        end
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        ForkThread(self.RecallArmyThread, self, self:GetListOfUnits(commandCat, false))
+        local units = self:GetListOfUnits(commandCat, false)
+        self.ThreadRecallingArmy = ForkThread(self.RecallArmyThread, self, units)
     end,
 
     ---@param self AIBrain
@@ -568,6 +583,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
             FakeTeleportUnits(recallingUnits, true)
         end
         self:OnRecalled()
+
+        self.ThreadRecallingArmy = nil
     end,
 
     OnRecalled = function(self)

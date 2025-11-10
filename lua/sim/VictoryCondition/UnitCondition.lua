@@ -57,14 +57,7 @@ UnitCondition = Class(AbstractVictoryCondition) {
         end
 
         -- process all defeated brains
-        for k = 1, TableGetn(defeatedBrains) do
-            local defeatedBrain = defeatedBrains[k]
-            if defeatedBrain.Status == "Recall" then
-                self:RecallForArmy(defeatedBrain)
-            else
-                self:DefeatForArmy(defeatedBrain)
-            end
-        end
+        self:ProcessDefeatedBrains(defeatedBrains)
 
         -- check if all remaining players want to forfeit
         if self:RemainingBrainsForfeit(aliveBrains) then
