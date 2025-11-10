@@ -369,6 +369,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
                 self:RecallForArmy(defeatedBrain)
             else
                 SPEW("Unknown defeated state '" .. defeatedBrain.Status .. "'")
+                self:DefeatForArmy(defeatedBrain)
             end
         end
     end,
