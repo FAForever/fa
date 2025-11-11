@@ -166,7 +166,7 @@ function FloatingEntityText(entityId, text)
 end
 
 function StartCountdown(entityId, duration)
-    cdDuration = duration or 5
+    local cdDuration = duration or 5
     if not entityId then
         WARN('Trying to start countdown text with no entityId.')
         return false

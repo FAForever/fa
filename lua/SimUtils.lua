@@ -649,7 +649,7 @@ function TryRebuildUnits(trackers, army)
 
     WaitTicks(3) -- wait some ticks (3 is minimum), IssueBuildMobile() is not instant
 
-    for k, rebuilder in rebuilders do
+    for _, rebuilder in rebuilders do
         rebuilder:SetBuildRate(rebuilder.TargetBuildTime * 10) -- set crazy build rate and consumption = 0
         rebuilder:SetConsumptionPerSecondMass(0)
         rebuilder:SetConsumptionPerSecondEnergy(0)
@@ -819,7 +819,7 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
 
         local totalNewUnits = {}
 
-        for k, brain in brains do
+        for _, brain in brains do
             if categoriesToTransfer then
                 units = self:GetListOfUnits(categoriesToTransfer, false)
             else
@@ -903,7 +903,7 @@ end
 local function KillWalls(self)
     local tokill = self:GetListOfUnits(categories.WALL, false)
     if tokill and not table.empty(tokill) then
-        for index, unit in tokill do
+        for _, unit in tokill do
             unit:Kill()
         end
     end
@@ -913,7 +913,7 @@ end
 ---@param brains AIBrain[] Usually our allies
 ---@param selfIndex number
 local function TransferOwnershipOfBorrowedUnits(brains, selfIndex)
-    for index, brain in brains do
+    for _, brain in brains do
         local units = brain:GetListOfUnits(categories.ALLUNITS, false)
         if units and not table.empty(units) then
             for _, unit in units do
@@ -930,7 +930,7 @@ end
 local function ReturnBorrowedUnits(self)
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
     local borrowed = {}
-    for index, unit in units do
+    for _, unit in units do
         local oldowner = unit.oldowner
         if oldowner and oldowner ~= self:GetArmyIndex() and not GetArmyBrain(oldowner):IsDefeated() then
             if not borrowed[oldowner] then
@@ -952,7 +952,7 @@ end
 ---@param brains AIBrain[]
 local function GetBackUnits(selfIndex, brains)
     local given = {}
-    for index, brain in brains do
+    for _, brain in brains do
         local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
         if units and not table.empty(units) then
             for _, unit in units do
@@ -1011,7 +1011,7 @@ end
 
 --- Kills my army according to the given share condition.
 ---@param self AIBrain
----@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@param shareOption ShareOption
 function KillArmy(self, shareOption)
 
     -- Kill all walls while the ACU is blowing up
@@ -1055,22 +1055,54 @@ function KillArmy(self, shareOption)
     -- Kill all units left over
     local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
     if tokill and not table.empty(tokill) then
-        for index, unit in tokill do
+        for _, unit in tokill do
             unit:Kill()
         end
     end
 end
 
+--- Kills my army after the command units has done their fake recall sequence,
+--- according to the given share condition.
+---@param self AIBrain
+---@param shareOption ShareOption
+function KillRecalledArmy(self, shareOption)
+
+    local BrainCategories = GetAllegianceCategories(self.Army)
+
+    -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
+    -- Recalling recalls all SACU, so they shouldn't be transferred.
+    local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+    if shareOption == 'CivilianDeserter' then
+        TransferUnitsToBrain(self, BrainCategories.Civilians, false, recallCat, "CivilianDeserter")
+    elseif shareOption == 'Defectors' then
+        TransferUnitsToHighestBrain(self, BrainCategories.Enemies, false, recallCat, "Defectors")
+    end
+
+    -- let the average team vs team game end first so we can see the end state
+    -- after the game without all of the units being gone
+    WaitSeconds(10)
+
+    -- Kill all units left over
+    local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+    if tokill then
+        for _, unit in tokill do
+            if not IsDestroyed(unit) then
+                unit:Kill()
+            end
+        end
+    end
+end
+
+
 local StartCountdown = StartCountdown -- as defined in SymSync.lua
 
 -- The time in ticks after taking damage that commanders are considered safe and not abusing disconnect rules
----@see aibrain.lua:AbandonedByPlayer
 CommanderSafeTime = 1200
 
 --- Shares all units including ACUs. When the shared ACUs die or recall after `shareTime`, kills my army according to the given share condition.
 ---@param self AIBrain
----@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@param shareTime number Game time in ticks
+---@param shareOption ShareOption
+---@param shareTime integer Game time in ticks
 function KillArmyOnDelayedRecall(self, shareOption, shareTime)
     -- Share units including ACUs and walls and keep track of ACUs
     local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
@@ -1130,7 +1162,7 @@ end
 
 --- Shares all units including ACUs. When the shared ACUs die, kills my army according to the given share condition.
 ---@param self AIBrain
----@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@param shareOption ShareOption
 function KillArmyOnACUDeath(self, shareOption)
     -- Share units including ACUs and walls and keep track of ACUs
     local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
@@ -1163,6 +1195,72 @@ function KillArmyOnACUDeath(self, shareOption)
     KillArmy(self, shareOption)
 end
 
+---@param self AIBrain
+---@param shareOption DisconnectShareOption
+---@param shareAcuOption DisconnectShareCommandersOption
+---@param victoryOption VictoryCondition
+function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
+    if shareOption == 'SameAsShare' then
+        shareOption = ScenarioInfo.Options.Share
+    end
+
+    -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
+    -- and might have intentionally disconnected.
+    if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
+        local safeCommanders = {}
+
+        local commanders = self:GetListOfUnits(categories.COMMAND, false)
+        if shareAcuOption == 'Recall' then
+            local gameTick = GetGameTick()
+            for _, com in commanders do
+                if com.LastTickDamaged <= gameTick - CommanderSafeTime then
+                    table.insert(safeCommanders, com)
+                else
+                    -- explode unsafe ACUs because KillArmy might not
+                    com:Kill()
+                end
+            end
+        else
+            -- explode all the ACUs so they don't get shared
+            for _, com in commanders do
+                com:Kill()
+            end
+        end
+
+        -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
+        if victoryOption == 'demoralization' and table.empty(safeCommanders) then
+            shareOption = ScenarioInfo.Options.Share
+        end
+
+        -- non-assassination modes can have armies abandon without commanders
+        if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
+            -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
+            FakeTeleportUnits(safeCommanders, true)
+        end
+
+        KillArmy(self, shareOption)
+
+    elseif shareAcuOption == 'RecallDelayed' or shareAcuOption == 'Permanent' then
+
+        if victoryOption ~= 'demoralization' then
+            shareOption = 'FullShare'
+        end
+
+        if shareAcuOption == 'RecallDelayed' then
+            local shareTime = GetGameTick() + CommanderSafeTime
+            if shareTime < 3000 then
+                shareTime = 3000
+            end
+            KillArmyOnDelayedRecall(self, shareOption, shareTime)
+        else
+            KillArmyOnACUDeath(self, shareOption)
+        end
+    else
+        WARN('Invalid disconnection ACU share condition was used for this game: `' .. (shareAcuOption or 'nil') .. '` Defaulting to exploding ACU.')
+        KillArmy(self, shareOption)
+    end
+end
+
 --#endregion
 
 local SorianUtils = import("/lua/ai/sorianutilities.lua")
@@ -1170,7 +1268,6 @@ local SorianUtils = import("/lua/ai/sorianutilities.lua")
 --- Disables the AI for non-player armies.
 ---@param self BaseAIBrain
 function DisableAI(self)
-    local army = self.Army
     -- print AI "ilost" text to chat
     SorianUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
     -- remove PlatoonHandle from all AI units before we kill / transfer the army
