@@ -1,0 +1,1 @@
+- (#6961) Fix the Beetle's energy maintenance consumption.
