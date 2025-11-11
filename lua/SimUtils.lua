@@ -1093,9 +1093,9 @@ function KillRecalledArmy(self, shareOption)
     -- so they additionally shouldn't be transferred.
     local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
     if shareOption == 'CivilianDeserter' then
-        TransferUnitsToBrain(self, BrainCategories.Civilians, false, recallCat, "CivilianDeserter")
+        TransferUnitsToBrain(self, BrainCategories.Civilians, true, recallCat, "CivilianDeserter")
     elseif shareOption == 'Defectors' then
-        TransferUnitsToHighestBrain(self, BrainCategories.Enemies, false, recallCat, "Defectors")
+        TransferUnitsToHighestBrain(self, BrainCategories.Enemies, true, recallCat, "Defectors")
     end
 
     KillRemaining(self)
