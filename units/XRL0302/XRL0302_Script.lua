@@ -117,6 +117,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     ---@param self XRL0302
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
+        self:SetMaintenanceConsumptionActive()
         self.EffectsBagXRL = TrashBag()
         self.AmbientExhaustEffectsBagXRL = TrashBag()
         self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.EffectsBag)
