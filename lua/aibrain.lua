@@ -65,7 +65,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
 ---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
----@field Army Army # Cached `GetArmyIndex` engine call
+---@field Army integer # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
     EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
