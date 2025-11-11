@@ -45,6 +45,7 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
     end
     -- wait for buildpower to apply then return the factories to normal and pause them
     WaitTicks(1)
+
     for k, factories in pairs(factoryRebuildDataTable) do
         for i, factory in pairs(factories) do
             if factory.Dead then
@@ -108,8 +109,8 @@ end
 
 -- used to make more expensive units transfer first, in case there's a unit cap issue
 local function TransferUnitsOwnershipComparator(a, b)
-    a = a.Blueprint or a.Blueprint
-    b = b.Blueprint or b.Blueprint
+    a = a.Blueprint or a:GetBlueprint()
+    b = b.Blueprint or b:GetBlueprint()
     return a.Economy.BuildCostMass > b.Economy.BuildCostMass
 end
 
@@ -994,8 +995,7 @@ local function TransferUnitsToKiller(self)
                     end
                 end
             end
-            KillerIndex = ArmyBrains[lastKilledAllyIndex].CommanderKilledBy or selfIndex
-            TransferUnitsOwnership(units, KillerIndex)
+            killerIndex = ArmyBrains[lastKilledAllyIndex].CommanderKilledBy or selfIndex
         else
             killerIndex = self.LastUnitKilledBy
         end
@@ -1021,7 +1021,7 @@ function KillArmy(self, shareOption)
 
     WaitSeconds(10) -- Wait for commander explosion, then transfer units.
 
-    local selfIndex = self:GetArmyIndex()
+    local selfIndex = self.Army
 
     local BrainCategories = GetAllegianceCategories(selfIndex)
 
@@ -1094,7 +1094,7 @@ function KillRecalledArmy(self, shareOption)
 end
 
 
-local StartCountdown = StartCountdown -- as defined in SymSync.lua
+local StartCountdown = StartCountdown -- as defined in SimSync.lua
 
 -- The time in ticks after taking damage that commanders are considered safe and not abusing disconnect rules
 CommanderSafeTime = 1200

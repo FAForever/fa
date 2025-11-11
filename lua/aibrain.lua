@@ -8,16 +8,10 @@
 -- AIBrain Lua Module
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
-local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local KillAbandonedArmy = import("/lua/simutils.lua").KillAbandonedArmy
 local KillArmy = import("/lua/simutils.lua").KillArmy
-local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
-local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
 local KillRecalledArmy = import("/lua/simutils.lua").KillRecalledArmy
 local DisableAI = import("/lua/simutils.lua").DisableAI
-local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
-local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
 local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
@@ -1169,5 +1163,11 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 ---#region backwards compatibility
 
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
+local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
+local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
+local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
+local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
+local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
 
 --#endregion
