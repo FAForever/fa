@@ -42,12 +42,6 @@ function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damage
     local accum = 0
 
     for i = 1, pulses do
-        if target and not EntityBeenDestroyed(target) then
-            position[1], position[2], position[3] = EntityGetPositionXYZ(target)
-            Damage(instigator, position, target, damage, damageType)
-        else
-            break
-        end
         accum = accum + pulseInterval
         if accum > 1 then
             -- final accumulator value may be #.999 which needs to be rounded
@@ -57,6 +51,13 @@ function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damage
                 WaitTicks(accum)
                 accum = MathMod(accum, 1)
             end
+        end
+
+        if target and not EntityBeenDestroyed(target) then
+            position[1], position[2], position[3] = EntityGetPositionXYZ(target)
+            Damage(instigator, position, target, damage, damageType)
+        else
+            break
         end
     end
 end
