@@ -29,6 +29,8 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param damage number
 ---@param damageType DamageType
 function UnitDoTThread(instigator, target, pulses, pulseInterval, damage, damageType)
+    if not target or EntityBeenDestroyed(target) then return end
+
     -- localize for performance
     local position = VectorCache
     local Damage = Damage
