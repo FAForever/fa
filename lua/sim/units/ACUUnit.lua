@@ -108,7 +108,7 @@ ACUUnit = ClassUnit(CommandUnit) {
             local instigatorBrain = ArmyBrains[instigator.Army]
 
             Sync.EnforceRating = true
-            WARN('ACU kill detected. Rating for ranked games is now enforced.')
+            WARN("ACU kill detected. Time requirement for rating games will now be removed.")
 
             -- If we are teamkilled, filter out death explostions of allied units that were not coused by player's self destruct order
             -- Damage types:

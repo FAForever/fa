@@ -574,6 +574,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
+        Sync.EnforceRating = true
+        WARN("Recall detected. Time requirement for rating games will now be removed.")
+
         local selfIndex = self:GetArmyIndex()
         UpdateUnitCap(selfIndex)
         SimPingOnArmyDefeat(selfIndex)
