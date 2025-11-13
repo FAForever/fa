@@ -7,12 +7,12 @@
 ---@field targetId? EntityId
 ---@field blueprintId? UnitId
 ---@field commandType number
+---@field commandId integer
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
 ---|  0  # unknown
 ---|  1  # not submerged
-
 
 ---@alias FireState
 ---| 0 # Return fire
