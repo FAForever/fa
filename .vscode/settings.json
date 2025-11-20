@@ -27,6 +27,9 @@
   "Lua.format.defaultConfig": {
     "max_line_length": "unset",
   },
+  "[markdown]": {
+    "editor.tabSize": 2,
+  },
 
   // used for grammar checks of changelog
   "grammarly.files.include": [
