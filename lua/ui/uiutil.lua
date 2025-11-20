@@ -66,7 +66,7 @@ consoleDepth = false  -- in order to get the console to always be on top, assign
 networkBool = LazyVar.Create()    -- boolean whether the game is local or networked
 
 -- Default scenario for skirmishes / MP Lobby
-defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'
+defaultScenario = '/maps/scmp_009/scmp_009_scenario.lua'
 requiredType = 'skirmish'
 
 --* These values MUST NOT CHANGE! They syncronize with values in UIManager.h and are used to
