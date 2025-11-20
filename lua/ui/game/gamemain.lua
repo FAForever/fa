@@ -42,6 +42,11 @@ function SetIgnoreSelection(ignore)
     import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
 end
 
+---@return boolean
+function IsIgnoredSelection()
+    return ignoreSelection
+end
+
 -- generating hotbuild modifier shortcuts on the fly
 modifiersKeys = import("/lua/keymap/keymapper.lua").GenerateHotbuildModifiers()
 IN_AddKeyMapTable(modifiersKeys)
@@ -611,7 +616,7 @@ local upgradeTab = false
 ---@param removed UserUnit[]      Which units where removed from the old selection
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
-    if ignoreSelection then
+    if IsIgnoredSelection() then
         return
     end
 
