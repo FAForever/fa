@@ -1,1 +1,0 @@
-- (#6915) Fix weapons with fire rate modifiers getting stuck waiting for energy drain.
