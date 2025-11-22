@@ -1,1 +1,0 @@
-- (#6883) Update blueprint modding documentation in the game repository (MODS.LUA).

@@ -1,1 +1,0 @@
-- (#6842) Make land scouts prioritize radar structures over mobile units and remove their PD/static AA target priority.

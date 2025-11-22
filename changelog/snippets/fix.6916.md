@@ -1,1 +1,0 @@
-- (#6916) Fix not being able to queue the upgrade for the Aeon T2 shield before it is built.

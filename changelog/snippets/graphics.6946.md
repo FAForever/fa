@@ -1,1 +1,0 @@
-- (#6946) Increase the `StrategicIconSize` of the Obsidian's Quantum Cannon and the Wagner's Meson Rocket from `1` to `2`, to better align their visual representation with their overall power. Furthermore, this change makes it easier to distinguish between the Wagner's high-damage and low-damage weapons.
