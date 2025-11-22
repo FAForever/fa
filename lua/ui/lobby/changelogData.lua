@@ -9,9 +9,9 @@ gamePatches = {
         hasPrettyGithubRelease = true,
         hasPrettyPatchnotes = true,
         description = {
-            "# Game version 3829 (15th of November 2025)",
+            "# Game version 3829 (22nd of November 2025)",
             "",
-            "Three months have passed and it is time for another scheduled release, whoop whoop!",
+            "Two months have passed and it is time for another scheduled release, whoop whoop!",
             "You can find the complete changelog on github by clicking the button below.",
             "",
             "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
