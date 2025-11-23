@@ -49,7 +49,14 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
-
+-- TODO: remove these console commands before release
+-- The following is enabled on non-production branches to assist with debugging for ICE/WebRTC issues
+local versionNumber, versionType, versionCommit = import("/lua/version.lua").GetVersionData()
+if versionType != "FAF" then
+    WARN("Enabling network debug console commands")
+    ConExecute("net_LogPackets")
+    ConExecute("net_DebugLevel 10")
+end
 
 function GetAITypes()
     AIKeys = {}
@@ -5641,7 +5648,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     ---@param self UILobbyCommunication
     ---@param data UILobbyReceivedMessage
     lobbyComm.DataReceived = function(self, data)
-
+        -- make it more convenient to debug malicious traffic
+        SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.

@@ -4872,12 +4872,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param location Vector
+    ---@param destination Vector
     ---@param orientation Quaternion
     ---@param teleDelay? number
-    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+    PlayTeleportChargeEffects = function(self, destination, orientation, teleDelay)
         self.TeleportFxBag = self.TeleportFxBag or TrashBag()
-        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
+        EffectUtilities.PlayTeleportChargingEffects(self, destination, self.TeleportFxBag, teleDelay)
     end,
 
     ---@param self Unit

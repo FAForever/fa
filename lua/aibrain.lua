@@ -558,7 +558,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param self AIBrain
     RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
-        self:ForkThread(self.RecallArmyThread, self:GetListOfUnits(commandCat, false))
+        ForkThread(self.RecallArmyThread, self, self:GetListOfUnits(commandCat, false))
     end,
 
     ---@param self AIBrain
@@ -573,6 +573,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     OnRecalled = function(self)
         -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
+
+        Sync.EnforceRating = true
+        WARN("Recall detected. Time requirement for rating games will now be removed.")
 
         local selfIndex = self:GetArmyIndex()
         UpdateUnitCap(selfIndex)

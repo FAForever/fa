@@ -78,3 +78,6 @@ elseif trace:find("userinit.lua") then
         )
     )
 end
+
+-- Can be misused to damage user's files.
+_G.LuaDumpBinary = nil

@@ -1240,6 +1240,11 @@ end
 
 ---@param data {Army: integer, Value: boolean}
 function SetResourceSharing(data)
+    -- feature: resource sharing can only be changed when teams are unlocked
+    if ScenarioInfo.Options.TeamLock == "locked" then
+        return
+    end
+
     local army = data.Army
     if not OkayToMessWithArmy(army) then
         return

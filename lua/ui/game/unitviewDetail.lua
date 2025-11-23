@@ -593,7 +593,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails1 = weaponDetails1..LOC('<LOC uvd_ManualFire>')
                         end
                         local weaponDetails2
-                        if info.NukeInnerRingDamage then
+                        -- matches the requirements in weapon.lua for a projectile to have nuke damage
+                        if info.NukeOuterRingDamage and info.NukeOuterRingRadius and info.NukeOuterRingTicks and info.NukeOuterRingTotalTime
+                            and info.NukeInnerRingDamage and info.NukeInnerRingRadius and info.NukeInnerRingTicks and info.NukeInnerRingTotalTime
+                        then
                             weaponDetails2 = string.format(LOC('<LOC uvd_0014>Damage: %.8g - %.8g, Splash: %.3g - %.3g')..', '..LOC('<LOC uvd_Range>'),
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius, info.MinRadius, info.MaxRadius)
