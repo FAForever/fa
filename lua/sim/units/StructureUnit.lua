@@ -867,9 +867,9 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
             for k, adjacentUnit in self.AdjacentUnits do
                 for k, v in AdjacencyBuffs[adjBuffs] do
                     Buff.ApplyBuff(adjacentUnit, v, self)
-                    adjacentUnit:OnReceiveAdjacencyBuffTo(self)
-                    adjacentUnit:RequestRefreshUI()
                 end
+                adjacentUnit:OnReceiveAdjacencyBuffTo(self)
+                adjacentUnit:RequestRefreshUI()
             end
             self:RequestRefreshUI()
         end
@@ -910,10 +910,10 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 for key, v in AdjacencyBuffs[adjBuffs] do
                     if Buff.HasBuff(adjacentUnit, v) then
                         Buff.RemoveBuff(adjacentUnit, v, false, self)
-                        adjacentUnit:OnLostAdjacencyBuffTo(self)
-                        adjacentUnit:RequestRefreshUI()
                     end
                 end
+                adjacentUnit:OnLostAdjacencyBuffTo(self)
+                adjacentUnit:RequestRefreshUI()
             end
             self:RequestRefreshUI()
         end
