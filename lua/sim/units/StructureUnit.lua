@@ -802,7 +802,6 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- fix edge cases when buffs are applied
         if buffApplied then
-            LOG("OnAdjacentTo adj buff application", debug.traceback())
             adjacentUnit:OnReceiveAdjacencyBuffTo(self)
         end
 
@@ -872,10 +871,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
                 adjacentUnit:OnReceiveAdjacencyBuffTo(self)
                 adjacentUnit:RequestRefreshUI()
             end
-            LOG("ApplyAdjacencyBuffs", debug.traceback())
             self:RequestRefreshUI()
-        else
-            LOG("Applying adjacency but have no adjacent units", debug.traceback())
         end
     end,
 
