@@ -35,7 +35,6 @@ UnitBlueprint{
     },
     Display = {
         AnimationOpen = "/units/xrl0003/xrl0003_aopen.sca",
-        BuildAttachBone = "AttachPoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -78,7 +77,7 @@ UnitBlueprint{
             LAYER_Seabed = true,
         },
         DragCoefficient = 0.2,
-        FlattenSkirt = true,
+        AlwaysAlignToTerrain = true,
         MotionType = "RULEUMT_None",
         SkirtSizeX = 1,
         SkirtSizeZ = 1,

@@ -16,6 +16,7 @@
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---@field TeamShareOverflow "enabled" | "disabled"
 ---
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
@@ -192,6 +193,25 @@ teamOptions =
                 key = 'Common'
             }
         }
+    },
+
+    {
+        default = 1,
+        label = "<LOC lobui_resource_sharing_label>Overflow",
+        help = "<LOC lobui_resource_sharing_help>Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked.",
+        key = 'TeamShareOverflow',
+        values = {
+            {
+                text = "<LOC lobui_resource_sharing_enabled_text>Enabled",
+                help = "<LOC lobui_resource_sharing_enabled_help>Excess resources are shared with allies by default.",
+                key = 'enabled',
+            },
+            {
+                text = "<LOC lobui_resource_sharing_disabled_text>Disabled",
+                help = "<LOC lobui_resource_sharing_disabled_help>Excess resources are spilled by default.",
+                key = 'disabled',
+            },
+        },
     },
 }
 

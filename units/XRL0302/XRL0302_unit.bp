@@ -92,6 +92,7 @@ UnitBlueprint{
         BuildCostEnergy = 1300,
         BuildCostMass = 190,
         BuildTime = 550,
+        MaintenanceConsumptionPerSecondEnergy = 10,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -116,7 +117,10 @@ UnitBlueprint{
                 helpText = "Detonate",
             },
         },
-        ToggleCaps = { RULEUTC_ProductionToggle = true },
+        ToggleCaps = {
+            RULEUTC_ProductionToggle = true,
+            RULEUTC_CloakToggle = true,
+        },
         UnitName = "<LOC xrl0302_name>Fire Beetle",
     },
     Intel = {

@@ -66,7 +66,7 @@ consoleDepth = false  -- in order to get the console to always be on top, assign
 networkBool = LazyVar.Create()    -- boolean whether the game is local or networked
 
 -- Default scenario for skirmishes / MP Lobby
-defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'
+defaultScenario = '/maps/scmp_009/scmp_009_scenario.lua'
 requiredType = 'skirmish'
 
 --* These values MUST NOT CHANGE! They syncronize with values in UIManager.h and are used to
@@ -1326,11 +1326,10 @@ function GetReplayId()
         id = GetFrontEndData('syncreplayid')
     elseif HasCommandLineArg("/savereplay") then
         -- /savereplay format is gpgnet://local_ip:port/replay_id/USERNAME.SCFAreplay
-        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java--L192
+        -- see https://github.com/FAForever/downlords-faf-client/blob/d44f97dd40c011f391c8d97f122b54bb61a23c80/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java#L260
         local url = GetCommandLineArg("/savereplay", 1)[1]
-        local fistpos = string.find(url, "/", 10) + 1
-        local lastpos = string.find(url, "/", fistpos) - 1
-        id = string.sub(url, fistpos, lastpos)
+        url = string.gsub(tostring(url), "\\", "/")
+        id = string.match(url, ".*/([0-9]+)/[^/]*$") -- number between last two "/" "/"
     elseif HasCommandLineArg("/replayid") then
         id =  GetCommandLineArg("/replayid", 1)[1]
     end

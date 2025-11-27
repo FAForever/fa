@@ -1,0 +1,1 @@
+- (#6973) Fix mass fabricators not updating their adjacency bonus for silos when toggled off or on.

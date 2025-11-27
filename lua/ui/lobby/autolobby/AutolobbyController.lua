@@ -212,6 +212,7 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
             DisconnectionDelay02 = '90',
             DisconnectShare = 'SameAsShare',
             DisconnectShareCommanders = 'Explode',
+            TeamShareOverflow = "enabled",
 
             -- yep, great
             Ranked = true,
@@ -993,7 +994,8 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
     ---@param self UIAutolobbyCommunications
     ---@param data UILobbyReceivedMessage
     DataReceived = function(self, data)
-        self:DebugSpew("DataReceived", data.Type, data.SenderID, data.SenderName)
+        -- make it more convenient to debug malicious traffic
+        SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
         -- signal UI that we received something
         local peerIndex = self:PeerIdToIndex(self.PlayerOptions, data.SenderID)

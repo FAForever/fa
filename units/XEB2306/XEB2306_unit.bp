@@ -18,7 +18,7 @@ UnitBlueprint{
         "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
-        "SIZE12",
+        "SIZE4",
         "SNIPEMODE",
         "SORTDEFENSE",
         "STRUCTURE",
