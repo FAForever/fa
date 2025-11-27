@@ -10,6 +10,10 @@ local StructureUnitOnConsumptionInActive = StructureUnit.OnConsumptionInActive
 ---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = ClassUnit(StructureUnit) {
 
+    -- Disabled so the base class's `OnAdjacentTo` doesn't apply adjacency buffs when the unit is spawned in.
+    -- Consumption activation and adjacency application will happen through `OnStopBeingBuilt`.
+    ConsumptionActive = false,
+
     ---@param self MassFabricationUnit
     ---@param bit number
     OnScriptBitSet = function(self, bit)
