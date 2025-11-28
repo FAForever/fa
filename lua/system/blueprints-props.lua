@@ -114,8 +114,8 @@ local function ProcessLOD(prop)
         local sz = prop.SizeZ or 1
 
         -- give more emphasis to the x / z value as that is easier to see in the average camera angle
-        local weightedLodSize = MathSqrt(sx + 0.5 * sy + sz)
-        local maxLod = 130 * weightedLodSize
+        local weightedLodSize = MathSqrt(sx * sx + 0.5 * sy * sy + sz * sz)
+        local maxLod = 180 * weightedLodSize
 
         if (prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup')
           then
