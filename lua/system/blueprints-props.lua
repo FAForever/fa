@@ -115,13 +115,13 @@ local function ProcessLOD(prop)
 
         -- give more emphasis to the x / z value as that is easier to see in the average camera angle
         local weightedLodSize = MathSqrt(sx * sx + 0.5 * sy * sy + sz * sz)
-        local maxLod = 180 * weightedLodSize
+        local maxLod = 200 * weightedLodSize
 
         if (prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup')
           then
             if TableGetn(prop.Display.Mesh.LODs) == 3 then
                 prop.Display.Mesh.LODs[1].LODCutoff = 40
-                prop.Display.Mesh.LODs[2].LODCutoff = 150
+                prop.Display.Mesh.LODs[2].LODCutoff = 180
                 prop.Display.Mesh.LODs[3].LODCutoff = 640
                 return
             else
