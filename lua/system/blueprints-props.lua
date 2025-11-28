@@ -117,18 +117,16 @@ local function ProcessLOD(prop)
         local weightedLodSize = MathSqrt(sx * sx + 0.5 * sy * sy + sz * sz)
         local maxLod = 180 * weightedLodSize
 
-        if (prop.ScriptClass == 'Tree' and TableGetn(prop.Display.Mesh.LODs) == 3) then
-            prop.Display.Mesh.LODs[1].LODCutoff = 40
-            prop.Display.Mesh.LODs[2].LODCutoff = 200
-            prop.Display.Mesh.LODs[3].LODCutoff = 640
-            return
-        elseif (prop.ScriptClass == 'TreeGroup' and TableGetn(prop.Display.Mesh.LODs) == 3) then
-            prop.Display.Mesh.LODs[1].LODCutoff = 200
-            prop.Display.Mesh.LODs[2].LODCutoff = 200
-            prop.Display.Mesh.LODs[3].LODCutoff = 640
-            return
-        elseif (prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup') then
-            maxLod = 640
+        if (prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup')
+          then
+            if TableGetn(prop.Display.Mesh.LODs) == 3 then
+                prop.Display.Mesh.LODs[1].LODCutoff = 40
+                prop.Display.Mesh.LODs[2].LODCutoff = 150
+                prop.Display.Mesh.LODs[3].LODCutoff = 640
+                return
+            else
+                maxLod = 640
+            end
         end
 
         local levels = TableGetn(prop.Display.Mesh.LODs)
