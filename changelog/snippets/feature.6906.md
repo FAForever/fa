@@ -1,1 +1,1 @@
-- (#6906) Add support for props to skip the automatic computation of LODs via the `USEBLUEPRINTLOD` category.
+- (#6906) Tweak the formula used to calculate the level of detail (LOD) for props.
