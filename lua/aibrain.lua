@@ -511,7 +511,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         if self.Status == "Recalled" then
             return
         end
-    
+
         Sync.EnforceRating = true
         WARN("Recall detected. Time requirement for rating games will now be removed.")
 
