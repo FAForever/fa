@@ -1,1 +1,0 @@
-- (#6945) Add Terrain301 shader again. It is used by the sunset biome in older map generator versions. Regenerating a map like this on the current FAF patch would create an error on loading the map, because the shader had been removed in the meantime. 
