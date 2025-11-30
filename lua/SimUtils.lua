@@ -28,8 +28,8 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
     -- wait for build order to start and then rebuild the units for free
     WaitTicks(1)
 
-    for k, factories in pairs(factoryRebuildDataTable) do
-        for i, factory in pairs(factories) do
+    for k, factories in factoryRebuildDataTable do
+        for i, factory in factories do
             if factory.Dead then
                 factories[i] = nil
                 if table.empty(factories) then
@@ -47,8 +47,8 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
     -- wait for buildpower to apply then return the factories to normal and pause them
     WaitTicks(1)
 
-    for k, factories in pairs(factoryRebuildDataTable) do
-        for i, factory in pairs(factories) do
+    for k, factories in factoryRebuildDataTable do
+        for i, factory in factories do
             if factory.Dead then
                 factories[i] = nil
                 if table.empty(factories) then
@@ -395,16 +395,16 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
     end
 
     if not captured then
-        if upgradeUnits[1] then
+        if not table.empty(upgradeUnits) then
             ForkThread(UpgradeUnits, upgradeUnits)
         end
-        if pauseKennels[1] then
+        if not table.empty(pauseKennels) then
             ForkThread(PauseTransferredKennels, pauseKennels)
         end
-        if upgradeKennels[1] then
+        if not table.empty(upgradeKennels) then
             ForkThread(UpgradeTransferredKennels, upgradeKennels)
         end
-        if next(factoryRebuildDataTable) then
+        if not table.empty(factoryRebuildDataTable) then
             ForkThread(FactoryRebuildUnits, factoryRebuildDataTable)
         end
     end
@@ -541,7 +541,7 @@ end
 ---@param armies Army[]
 function RebuildUnits(units, armies)
     local trackers, blockingEntities = StartRebuildUnits(units)
-    for _, army in ipairs(armies) do
+    for _, army in armies do
         TryRebuildUnits(trackers, army)
     end
     FinalizeRebuiltUnits(trackers, blockingEntities)
@@ -627,7 +627,7 @@ end
 function StartRebuildUnits(units, trackers, blockingEntities)
     trackers = trackers or {}
     blockingEntities = blockingEntities or {}
-    for i, unit in ipairs(units) do
+    for i, unit in units do
         trackers[i] = CreateRebuildTracker(unit, blockingEntities)
     end
     return trackers, blockingEntities
@@ -740,8 +740,12 @@ end
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 
----@param owner number
--- categoriesToKill is an optional input (it defaults to all categories)
+local defaultTransferCategory = categories.ALLUNITS - categories.WALL - categories.COMMAND
+-- only units in this category will be shared during a partial share
+local partialShareCategory = categories.STRUCTURE + categories.ENGINEER
+
+---@param owner integer
+---@param categoriesToKill? EntityCategory defaults to all categories
 function KillSharedUnits(owner, categoriesToKill)
     local sharedUnitOwner = sharedUnits[owner]
     if table.empty(sharedUnitOwner) then
@@ -750,19 +754,14 @@ function KillSharedUnits(owner, categoriesToKill)
 
     for i = table.getn(sharedUnitOwner), 1, -1 do
         local unit = sharedUnitOwner[i]
-        if not unit.Dead and unit.oldowner == owner then
-            if categoriesToKill then
-                if EntityCategoryContains(categoriesToKill, unit) then
-                    table.remove(sharedUnits[owner], i)
-                    unit:Kill()
-                end
-            else
-                unit:Kill()
-            end
+        if unit.Dead then
+            table.remove(sharedUnitOwner, i) -- don't let them keep clogging our list!
+        elseif unit.oldowner == owner and
+            (not categoriesToKill or EntityCategoryContains(categoriesToKill, unit))
+        then
+            table.remove(sharedUnitOwner, i)
+            unit:Kill()
         end
-    end
-    if not categoriesToKill then
-        sharedUnits[owner] = {}
     end
 end
 
@@ -770,32 +769,38 @@ end
 ---@param deadArmy integer
 function UpdateUnitCap(deadArmy)
     -- If we are asked to share out unit cap for the defeated army, do the following...
-    local options = ScenarioInfo.Options
-    local mode = options.ShareUnitCap
+    local mode = ScenarioInfo.Options.ShareUnitCap
     if not mode or mode == 'none' then
         return
+    end
+    if not GetArmyBrain(deadArmy):IsDefeated() then
+        -- this is gonna give everyone some unit cap
+        WARN("Error while updating unit cap: dead army isn't defeated")
+    end
+    local modeAll = false
+    if mode == "all" then
+        modeAll = true
+    elseif mode ~= "allies" then
+        WARN("Unknown share unit cap mode: " .. tostring(mode))
     end
 
     local aliveCount = 0
     ---@type AIBrain[]
     local alive = {}
-    local caps = {}
 
     for index, brain in ArmyBrains do
-        if (mode == 'all' or (mode == 'allies' and IsAlly(deadArmy, index))) and not ArmyIsCivilian(index) then
-            if not brain:IsDefeated() then
-                aliveCount = aliveCount + 1
-                alive[aliveCount] = brain
-                local cap = GetArmyUnitCap(index)
-                caps[aliveCount] = cap
-            end
+        if not ArmyIsCivilian(index) and not brain:IsDefeated() and
+            (modeAll or IsAlly(deadArmy, index))
+        then
+            aliveCount = aliveCount + 1
+            alive[aliveCount] = brain
         end
     end
 
     if aliveCount > 0 then
         local capChng = GetArmyUnitCap(deadArmy) / aliveCount
-        for i, brain in alive do
-            SetArmyUnitCap(brain.Army, caps[i] + capChng)
+        for _, brain in alive do
+            SetArmyUnitCap(brain.Army, GetArmyUnitCap(brain.Army) + capChng)
         end
     end
 end
@@ -811,7 +816,7 @@ function TransferUnitsToBrain(self, brains, transferUnfinishedUnits, categoriesT
     if table.empty(brains) then
         return
     end
-    categoriesToTransfer = categoriesToTransfer or categories.ALLUNITS - categories.WALL - categories.COMMAND
+    categoriesToTransfer = categoriesToTransfer or defaultTransferCategory
 
     if transferUnfinishedUnits then
         local indexes = {}
@@ -850,23 +855,23 @@ end
 
 --- Returns a table of the allies and enemies of a brain, and civilians.
 ---@param armyIndex integer
----@return { Civilians: AIBrain[], Enemies: AIBrain[], Allies: AIBrain[] } BrainCategories
+---@return { Civilians: AIBrain[], Enemies: AIBrain[], Allies: AIBrain[] } brainCategories
 function GetAllegianceCategories(armyIndex)
-    local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
+    local brainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
 
     for index, brain in ArmyBrains do
         if not brain:IsDefeated() and armyIndex ~= index then
             if ArmyIsCivilian(index) then
-                table.insert(BrainCategories.Civilians, brain)
+                table.insert(brainCategories.Civilians, brain)
             elseif IsEnemy(armyIndex, brain.Army) then
-                table.insert(BrainCategories.Enemies, brain)
+                table.insert(brainCategories.Enemies, brain)
             else
-                table.insert(BrainCategories.Allies, brain)
+                table.insert(brainCategories.Allies, brain)
             end
         end
     end
 
-    return BrainCategories
+    return brainCategories
 end
 
 --- Transfer a brain's units to other brains, sorted by positive rating and then score.
@@ -990,8 +995,9 @@ end
 
 --- Transfer units to the player who killed me
 ---@param self AIBrain
-local function TransferUnitsToKiller(self)
-    local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+---@param category? EntityCategory
+local function TransferUnitsToKiller(self, category)
+    local units = self:GetListOfUnits(category or defaultTransferCategory, false)
 
     if not table.empty(units) then
         local victoryOption = ScenarioInfo.Options.Victory
@@ -1052,9 +1058,9 @@ function KillArmy(self, shareOption)
         TransferUnitsToHighestBrain(self, brainCategories.Allies, true, nil, "FullShare")
         TransferOwnershipOfBorrowedUnits(brainCategories.Allies, selfIndex)
     elseif shareOption == 'PartialShare' then
-        KillSharedUnits(selfIndex, categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER)
+        KillSharedUnits(selfIndex, categories.ALLUNITS - partialShareCategory)
         ReturnBorrowedUnits(self)
-        TransferUnitsToHighestBrain(self, brainCategories.Allies, true, categories.STRUCTURE + categories.ENGINEER - categories.COMMAND, "PartialShare")
+        TransferUnitsToHighestBrain(self, brainCategories.Allies, true, partialShareCategory - categories.COMMAND, "PartialShare")
         TransferOwnershipOfBorrowedUnits(brainCategories.Allies, selfIndex)
     else
         GetBackUnits(selfIndex, brainCategories.Allies)
@@ -1087,7 +1093,7 @@ function KillRecalledArmy(self, shareOption)
     -- Since the entire team recalls simultaneously, the things to look out
     -- for are greatly simplified. Note that recalling also recalls all SACU's,
     -- so they additionally shouldn't be transferred.
-    local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+    local recallCat = defaultTransferCategory - categories.SUBCOMMANDER
     if shareOption == 'CivilianDeserter' then
         TransferUnitsToBrain(self, brainCategories.Civilians, true, recallCat, "CivilianDeserter")
     elseif shareOption == 'Defectors' then
@@ -1098,9 +1104,9 @@ function KillRecalledArmy(self, shareOption)
 end
 
 --- Blocks the current thread until all units in a list are dead, or until an
---- optional timeout. Returns total ticks elapsed, or the original timeout (which
---- could have been negative or fractional) if it was reached after checking the units.
---- If all units are dead upon calling, returns `0`.
+--- optional timeout. Returns total ticks elapsed, or the original timeout
+--- (which could have been negative or fractional) if it was reached after
+--- checking the units. If all units are dead upon calling, returns `0`.
 ---@param units Entity[]
 ---@param timeout? integer in ticks
 ---@return integer|false elapsed
@@ -1252,7 +1258,6 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
     -- and might have intentionally disconnected.
     if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
         local safeCommanders
-
         local commanders = self:GetListOfUnits(categories.COMMAND, false)
         if shareAcuOption == 'Recall' then
             safeCommanders = KillUnsafeCommanders(commanders)
@@ -1281,10 +1286,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
         end
 
         if shareAcuOption == 'RecallDelayed' then
-            local shareTime = GetGameTick() + CommanderSafeTime
-            if shareTime < MinimumShareTime then
-                shareTime = MinimumShareTime
-            end
+            local shareTime = math.max(MinimumShareTime, GetGameTick() + CommanderSafeTime)
             KillArmyOnDelayedRecall(self, shareOption, shareTime)
         else
             KillArmyOnACUDeath(self, shareOption)
