@@ -124,9 +124,8 @@ local function ProcessLOD(prop)
                 prop.Display.Mesh.LODs[2].LODCutoff = 180
                 prop.Display.Mesh.LODs[3].LODCutoff = 640
                 return
-            else
-                maxLod = 640
             end
+            maxLod = 640
         end
 
         local levels = TableGetn(prop.Display.Mesh.LODs)
