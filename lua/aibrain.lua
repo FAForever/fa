@@ -482,7 +482,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         self:SetDefeatStatus("Defeat")
 
         local opt = ScenarioInfo.Options
-        ForkThread(KillAbandonedArmy, opt.DisconnectShare, opt.DisconnectShareCommanders, opt.Victory)
+        ForkThread(KillAbandonedArmy, self, opt.DisconnectShare, opt.DisconnectShareCommanders, opt.Victory)
 
         if self.Trash then
             self.Trash:Destroy()

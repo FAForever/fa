@@ -1109,7 +1109,7 @@ end
 --- checking the units. If all units are dead upon calling, returns `0`.
 ---@param units Entity[]
 ---@param timeout? integer in ticks
----@return integer|false elapsed
+---@return integer elapsed
 function ThreadSuspendUntilUnitsDead(units, timeout)
     if table.empty(units) then
         return 0
@@ -1133,6 +1133,7 @@ function ThreadSuspendUntilUnitsDead(units, timeout)
             return elapsed
         end
         if timeout and elapsed >= timeout then
+            -- return `timeout` instead of `elapsed` in case it was fractional
             return timeout
         end
         WaitTicks(1)
@@ -1171,7 +1172,8 @@ function KillUnsafeCommanders(commanders, tick)
     return safeCommanders
 end
 
---- Shares all units including ACUs. When the shared ACUs die or recall after `shareTime`, kills my army according to the given share condition.
+--- Shares all units including ACUs. When the shared ACUs die or recall after
+--- `shareTime`, kills my army according to the given share condition.
 ---@param self AIBrain
 ---@param shareOption ShareOption
 ---@param shareTime integer Game time in ticks
