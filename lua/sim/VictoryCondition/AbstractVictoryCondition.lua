@@ -184,7 +184,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
 
         for k = 1, TableGetn(aiBrains) do
             local brain = aiBrains[k]
-            if not brain.OfferingDraw then
+            if not brain:WantsToDraw() then
                 return false
             end
         end
