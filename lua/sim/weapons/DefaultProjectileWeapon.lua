@@ -540,13 +540,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Deal with owner's audio cues
         local unitBP = self.unit:GetBlueprint()
         local unitBPAudio = unitBP.Audio
-        local activate = unitBPAudio.Activate
-        if activate then
-            self:PlaySound(activate)
-        end
-        local open = unitBPAudio.Open
-        if open then
-            self:PlaySound(open)
+        if unitBPAudio then
+            local activate = unitBPAudio.Activate
+            if activate then
+                self:PlaySound(activate)
+            end
+            local open = unitBPAudio.Open
+            if open then
+                self:PlaySound(open)
+            end
         end
 
         -- Deal with the Weapon's audio and animations
