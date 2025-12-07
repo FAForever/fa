@@ -48,7 +48,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Called when the weapon is created, almost always when the owning unit is created
     ---@param self DefaultProjectileWeapon
-    ---@return boolean
     OnCreate = function(self)
         Weapon.OnCreate(self)
 
@@ -100,7 +99,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: '
                 .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
-            return false
+            return
         end
 
         -- Ensure firing cycle is compatible internally
@@ -117,7 +116,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: '
                 .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
-            return false
+            return
         end
 
         if bp.EnergyChargeForFirstShot == false then
