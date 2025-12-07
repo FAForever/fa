@@ -723,6 +723,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Weapon States
 
     -- Idle state is when the weapon has no target and is done with any animations or unpacking
+    ---@class DefaultProjectileWeapon_IdleState : DefaultProjectileWeapon, State
     IdleState = State {
 
         StateName = 'IdleState',
@@ -730,6 +731,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_IdleState
         Main = function(self)
             local unit = self.unit
             if unit.Dead then return end
@@ -755,6 +757,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_IdleState
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
@@ -784,6 +787,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_IdleState
         OnFire = function(self)
 
             local bp = self.Blueprint
@@ -804,6 +808,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is for when the weapon is charging before firing
+    ---@class DefaultProjectileWeapon_RackSalvoChargeState : DefaultProjectileWeapon, State
     RackSalvoChargeState = State {
 
         StateName = 'RackSalvoChargeState',
@@ -811,6 +816,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoChargeState
         Main = function(self)
             local unit = self.unit
             local bp = self.Blueprint
@@ -834,11 +840,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoChargeState
         OnFire = function(self)
         end,
     },
 
     -- This state is for when the weapon is ready to fire
+    ---@class DefaultProjectileWeapon_RackSalvoFireReadyState : DefaultProjectileWeapon, State
     RackSalvoFireReadyState = State {
 
         StateName = 'RackSalvoFireReadyState',
@@ -846,6 +854,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFireReadyState
         Main = function(self)
 
             -- We change the state on counted projectiles because we won't get another OnFire call.
@@ -913,6 +922,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFireReadyState
         OnFire = function(self)
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
@@ -921,6 +931,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is for when the weapon is actually in the process of firing
+    ---@class DefaultProjectileWeapon_RackSalvoFiringState : DefaultProjectileWeapon, State
     RackSalvoFiringState = State {
 
         StateName = 'RackSalvoFiringState',
@@ -929,7 +940,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         -- Render the fire recharge bar
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         ---@param rateOfFire number
         RenderClockThread = function(self, rateOfFire)
             local unit = self.unit
@@ -944,7 +955,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         ---@param rateOfFire number
         DisabledWhileReloadingThread = function(self, rateOfFire)
 
@@ -970,6 +981,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1151,6 +1163,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         OnLostTarget = function(self)
             -- Override the default OnLostTarget but not inherited ones
             -- the inherited ones are needed for beam weapons to stop firing: https://github.com/FAForever/fa/pull/4863
@@ -1188,12 +1201,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
+        ---@param self DefaultProjectileWeapon_RackSalvoFiringState
         OnHaltFire = function(self)
             self.HaltFireOrdered = true
         end,
     },
 
     -- This state is for when the weapon is reloading
+    ---@class DefaultProjectileWeapon_RackSalvoReloadState : DefaultProjectileWeapon, State
     RackSalvoReloadState = State {
 
         StateName = 'RackSalvoReloadState',
@@ -1201,6 +1216,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1234,9 +1250,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         OnFire = function(self)
         end,
 
+        ---@param self DefaultProjectileWeapon_RackSalvoReloadState
         OnLostTarget = function(self)
             -- Override default OnLostTarget to prevent bypassing reload time by switching to idle state immediately
             local unit = self.unit
@@ -1249,6 +1267,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is for weapons which have to unpack before firing
+    ---@class DefaultProjectileWeapon_WeaponUnpackingState : DefaultProjectileWeapon, State
     WeaponUnpackingState = State {
 
         StateName = 'WeaponUnpackingState',
@@ -1256,6 +1275,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
 
+        ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1274,11 +1294,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon_WeaponUnpackingState
         OnFire = function(self)
         end,
     },
 
     -- This state is for weapons which have to pack up before moving or whatever
+    ---@class DefaultProjectileWeapon_WeaponPackingState : DefaultProjectileWeapon, State
     WeaponPackingState = State {
 
         StateName = 'WeaponPackingState',
@@ -1286,7 +1308,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_WeaponPackingState
         Main = function(self)
             local unit = self.unit
 
@@ -1305,7 +1327,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             ChangeState(self, self.IdleState)
         end,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_WeaponPackingState
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
@@ -1319,7 +1341,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
-        ---@param self DefaultProjectileWeapon
+        ---@param self DefaultProjectileWeapon_WeaponPackingState
         OnFire = function(self)
             local bp = self.Blueprint
             if -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
@@ -1335,13 +1357,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     },
 
     -- This state is entered only when the owner of the weapon is dead
+    ---@class DefaultProjectileWeapon_DeadState : DefaultProjectileWeapon, State
     DeadState = State {
 
         StateName = 'DeadState',
 
+        ---@param self DefaultProjectileWeapon_DeadState
         OnEnterState = function(self)
         end,
 
+        ---@param self DefaultProjectileWeapon_DeadState
         Main = function(self)
         end,
     },
