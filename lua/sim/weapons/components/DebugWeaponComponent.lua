@@ -59,7 +59,7 @@ DebugWeaponComponent = Class(DebugComponent) {
             self:DebugDraw('white')
         end
 
-        _ALERT(owner.UnitId, owner.EntityId, self.Label, unpack(arg))
+        _ALERT(string.format("%s %s %s", owner.UnitId, owner.EntityId, self.Label), unpack(arg))
     end,
 
     ---@param self DebugWeaponComponent | Weapon
