@@ -203,6 +203,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@return number
     CalculateBallisticAcceleration = function(self, projectile)
         local launcher = projectile:GetLauncher()
+        ---@cast launcher -Entity
         if not launcher then -- fail-fast
             return 4.9 -- Return the default gravity value if some calculations fail
         end
@@ -232,7 +233,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local target = UnitGetTargetEntity(launcher)
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
-                if not target.IsProp then
+                if target.IsUnit then
+                    ---@cast target Unit
                     targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
             else -- target is a position i.e. attack ground
@@ -245,7 +247,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if not targetPos then
                     return 4.9
                 end
-                if target and not target.IsProp then
+                if target and target.IsUnit then
+                    ---@cast target Unit
                     targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
@@ -286,7 +289,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     data.target = nil
                     targetPos = data.targetPos
                 else
-                    if not target.IsProp then
+                    if target.IsUnit then
+                        ---@cast target Unit
                         targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
