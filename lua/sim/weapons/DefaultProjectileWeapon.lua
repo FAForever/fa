@@ -2,7 +2,7 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 -- upvalue globals for performance
 local GetSurfaceHeight = GetSurfaceHeight
-local VDist2 = VDist2
+local GetDistPoints2D = import("/lua/utilities.lua").GetDistanceBetweenTwoPoints2
 
 local EntityMethods = moho.entity_methods
 local EntityGetPosition = EntityMethods.GetPosition
@@ -208,7 +208,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end
 
         local UnitGetVelocity = UnitGetVelocity
-        local VDist2 = VDist2
+        local GetDistPoints2D = GetDistPoints2D
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
@@ -249,11 +249,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
-                local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+                local distVel = GetDistPoints2D(projVelX, projVelZ, targetVelX, targetVelZ)
                 if distVel == 0 then
                     return 4.9
                 end
-                local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+                local distPos = GetDistPoints2D(projPosX, projPosZ, targetPosX, targetPosZ)
                 do
                     local dropShort = self.DropBombShortRatio
                     if dropShort then
@@ -319,14 +319,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
-        local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
+        local distVel = GetDistPoints2D(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
             return 4.9
         end
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         -- calculate the distance for this particular bomb
-        local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
+        local distPos = GetDistPoints2D(projPosX, projPosZ, targetPosX, targetPosZ)
         do
             local dropShort = self.DropBombShortRatio
             if dropShort then
@@ -1033,7 +1033,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if bp.FixedSpreadRadius then
                     local weaponPos = unit:GetPosition()
                     local targetPos = self:GetCurrentTargetPos()
-                    local distance = VDist2(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
+                    local distance = GetDistPoints2D(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
 
                     -- This formula was obtained empirically and somehow it works :)
                     local randomness = 12 * bp.FixedSpreadRadius / distance
