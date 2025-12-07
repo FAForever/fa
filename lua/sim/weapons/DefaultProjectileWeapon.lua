@@ -21,7 +21,7 @@ local MathSqrt = math.sqrt
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
----@field RecoilManipulators? TrashBag
+---@field RecoilManipulators? TrashBag | Slider[]
 ---@field CurrentSalvoNumber number
 ---@field CurrentRackSalvoNumber number
 ---@field CurrentSalvoData? WeaponSalvoData
@@ -32,6 +32,14 @@ local MathSqrt = math.sqrt
 ---@field EconDrain? moho.EconomyEvent
 ---@field AdjEnergyMod number? # Energy drain multiplier from buffs
 ---@field AdjRoFMod number? # Firerate multiplier from buffs
+---@field WeaponCanFire boolean
+---@field UnpackAnimator Animator?
+---@field RackRecoilReturnSpeed number?
+---@field NumMuzzles number
+---@field NumRackBones number
+---@field StateName string?
+---@field WeaponWantEnabled boolean?
+---@field WeaponAimWantEnabled boolean?
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
