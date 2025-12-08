@@ -855,7 +855,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
             local unit = self.unit
             local bp = self.Blueprint
-            if bp.CountedProjectile and bp.WeaponUnpacks then
+            if bp.CountedProjectile and (bp.WeaponUnpacks or bp.MuzzleChargeDelay) then
                 unit:SetBusy(true)
             else
                 unit:SetBusy(false)
