@@ -1059,7 +1059,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         break
                     end
 
-                    local proj = self:CreateProjectileAtMuzzle(muzzle)
+                    local proj
+                    if not countedProjectile or
+                        (bp.NukeWeapon and self.unit:GetNukeSiloAmmoCount() > 0
+                        or self.unit:GetTacticalSiloAmmoCount() > 0)
+                    then
+                        proj = self:CreateProjectileAtMuzzle(muzzle)
+                    end
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
