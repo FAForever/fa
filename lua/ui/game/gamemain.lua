@@ -605,6 +605,7 @@ local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 
 ---This function is called whenever the set of currently selected units changes
+--- **Note:** When called by the engine, `GetSelectedUnits` always results in `nil` within this function.
 ---@param oldSelection UserUnit[] What the selection was before
 ---@param newSelection UserUnit[] What the selection is now
 ---@param added UserUnit[]        Which units were added to the old selection
