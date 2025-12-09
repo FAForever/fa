@@ -3561,8 +3561,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnMotionTurnEventChange = function() end,
 
     ---@param self Unit
-    ---@param new string
-    ---@param old string
+    ---@param new TerrainType
+    ---@param old TerrainType
     OnTerrainTypeChange = function(self, new, old)
         self.TerrainType = new
         if self.MovementEffectsExist then
@@ -3729,13 +3729,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param effectsBag? TrashBag
     ---@param terrainType? TerrainType
     CreateTerrainTypeEffects = function(self, effectTypeGroups, fxBlockType, layer, typeSuffix, effectsBag, terrainType)
-        local effects, terrainFX, GetTerrainTypeEffects
+        local GetTerrainTypeEffects = self.GetTerrainTypeEffects
         local pos = self:GetPosition()
         local army = self.Army
+
+        local terrainFX
         if terrainType then
             terrainFX = terrainType[fxBlockType][layer]
-        else
-            GetTerrainTypeEffects = self.GetTerrainTypeEffects
         end
 
         for _, typeGroup in effectTypeGroups do
@@ -3745,11 +3745,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 continue
             end
 
-            if terrainType then
-                effects = terrainFX[typeGroup.Type]
-            else
-                effects = GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
-            end
+            -- Use TerrainType specific effects or fallback to 'Default' TerrainType effects
+            local effects = terrainType and terrainFX[typeGroup.Type] or GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
             if table.empty(effects) then
                 continue
             end
