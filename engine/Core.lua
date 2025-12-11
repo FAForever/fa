@@ -121,7 +121,7 @@ end
 ---@overload fun (category: EntityCategory, unit: Projectile): boolean
 ---@overload fun (category: EntityCategory, unit: Blip): boolean
 ---@overload fun (category: EntityCategory, unit: Prop): boolean
----Returns true iff the entity or blueprint id is of the given category.
+---Returns true if the entity or blueprint id is of the given category.
 ---@param category EntityCategory
 ---@param unit Unit
 ---@return boolean
