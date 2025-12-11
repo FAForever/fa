@@ -1,0 +1,1 @@
+- (#6956) Fix error when the UEF submarine fires its missiles with a muzzle charge delay of 0 in the blueprint.
