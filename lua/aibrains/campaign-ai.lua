@@ -1711,7 +1711,7 @@ AIBrain = Class(StandardBrain) {
         for k, platoon in platoonList do
             for j, type in squadTypes do
                 local squadUnits = platoon:GetSquadUnits(type)
-                local formation = 'GrowthFormation'
+                local formation = 'AttackFormation'
                 if squadUnits then
                     self:AssignUnitsToPlatoon(returnPlatoon, squadUnits, type, formation)
                 end
