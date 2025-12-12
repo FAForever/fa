@@ -1697,8 +1697,8 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self CampaignAIBrain
     ---@param platoonList Platoon[]
-    ---@param ai BaseAIBrain
-    ---@return nil|Platoon
+    ---@param ai? string
+    ---@return Platoon
     CombinePlatoons = function(self, platoonList, ai)
         local squadTypes = {'Unassigned', 'Attack', 'Artillery', 'Support', 'Scout', 'Guard'}
         local returnPlatoon

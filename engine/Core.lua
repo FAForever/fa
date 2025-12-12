@@ -10,8 +10,8 @@
 ---@class VectorBase
 ---@field [1] number    # x
 ---@field [2] number    # y
----@field x number
----@field y number
+---@field x number Read only value. Changing it has no effect on the vector. Set `[1]` instead.
+---@field y number Read only value. Changing it has no effect on the vector. Set `[2]` instead.
 
 ---@class Quaternion : VectorBase
 ---@operator mul(Quaternion): Quaternion
@@ -28,7 +28,7 @@
 ---@operator mul(number): Vector
 ---@operator unm: Vector
 ---@field [3] number    # z
----@field z number
+---@field z number Read only value. Changing it has no effect on the vector. Set `[3]` instead.
 
 ---@class Vector2 : VectorBase
 ---@operator add(Vector2): Vector2

@@ -58,9 +58,9 @@ end
 
 --- Filteres factories that can build the platoon and returns them.
 -- Usually passed table with only one factory as AI picks the highest tech factory as a primary and others are assisting.
----@param template table # Platoon's template.
----@param factories table # containing units-factories.
----@return table tblUnits # containing units-factories.
+---@param template PlatoonTemplate # Platoon's template.
+---@param factories FactoryUnit[] # containing units-factories.
+---@return FactoryUnit[] tblUnits # containing units-factories.
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 

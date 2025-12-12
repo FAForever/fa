@@ -453,8 +453,8 @@ end
 ---
 ---@param callback InstigatorTriggerCallback
 ---@param unit Unit
----@param amount? number defaults to `-1`
----@param repeatNum? number defaults to `1`
+---@param amount? number Defaults to `-1` - any amount of damage
+---@param repeatNum? integer Defaults to `1` - Triggered only once
 function CreateUnitDamagedTrigger(callback, unit, amount, repeatNum)
     unit:AddOnDamagedCallback(callback, amount, repeatNum)
 end

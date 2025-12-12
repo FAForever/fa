@@ -861,11 +861,12 @@ function IssueFormMove(units, position, formation, degrees)
 end
 
 --- Orders a group of units to patrol to a position in formation
+---
+--- Does NOT return `SimCommand`
 --- @param units Unit[]
 --- @param position Vector
 --- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
 --- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
---- @return SimCommand
 function IssueFormPatrol(units, position, formation, degrees)
 end
 
