@@ -38,7 +38,6 @@ local AIChatBrainComponent = import("/lua/aibrains/components/ChatBrainComponent
 ---@field Position Vector
 ---@field TaggedBy Unit
 
----@class PlatoonTable
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias BrainState "Defeat" | "Draw" | "InProgress" | "Recalled" | "Victory"
 ---@alias BrainType "AI" | "Human"

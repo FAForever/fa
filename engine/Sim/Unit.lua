@@ -235,6 +235,7 @@ end
 
 --- Returns number of factory/engineer build orders that fit in the specified category
 ---@param category EntityCategory
+---@return integer
 function Unit:GetNumBuildOrders(category)
 end
 

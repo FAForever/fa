@@ -4296,8 +4296,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param cbOldUnit Unit
-    ---@param cbNewUnit Unit
+    ---@param cbOldUnit InstigatorTriggerCallback | nil
+    ---@param cbNewUnit InstigatorTriggerCallback | nil
     AddOnCapturedCallback = function(self, cbOldUnit, cbNewUnit)
         if cbOldUnit then
             self:AddUnitCallback(cbOldUnit, 'OnCaptured')
@@ -4362,8 +4362,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     ---@param fn function
-    ---@param amount number
-    ---@param repeatNum number
+    ---@param amount? number Fraction of HP lost. Defaults to `-1` - any amount of damage
+    ---@param repeatNum? integer Defaults to `1` - Triggered only once
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
         local num = amount or -1
         repeatNum = repeatNum or 1

@@ -27,15 +27,15 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 ---@class PlatoonSquadTemplate
 ---@field [1] UnitId
----@field [2] number Min
----@field [3] number Max
+---@field [2] integer Min, negative number will set it to `Min` * NumAvailableFactories, each time the platoon is set to build
+---@field [3] integer Max
 ---@field [4] PlatoonSquads
 ---@field [5] UnitFormations
 
 ---@class PlatoonTemplate
 ---@field [1] string Platoon name
 ---@field [2] string Plan name
----@field ... PlatoonSquadTemplate
+---@field [integer] PlatoonSquadTemplate
 
 ---@class Platoon : moho.platoon_methods
 ---@field PlatoonData table
@@ -145,7 +145,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     ---@param self Platoon
-    ---@param callbackFunction function
+    ---@param callbackFunction fun(brain: AIBrain, platoon: Platoon)
     AddDestroyCallback = function(self, callbackFunction)
         if not callbackFunction then
             error('*ERROR: Tried to add an OnDestroy on a platoon callback with a nil function')
@@ -213,7 +213,7 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
     ---@param self Platoon
-    ---@return string|nil
+    ---@return string?
     GetPlan = function(self)
         if self.PlanName then
             return self.PlanName
@@ -361,12 +361,12 @@ Platoon = Class(moho.platoon_methods) {
 
     ---@param self Platoon
     ---@param category EntityCategory
-    ---@param position Vector
-    ---@param radius number
+    ---@param position? Vector Requires `radius`
+    ---@param radius? number Requires `position`
     ---@return number
     GetNumCategoryUnits = function(self, category, position, radius)
         local numUnits = 0
-        if position then
+        if position and radius then
             numUnits = self:PlatoonCategoryCountAroundPosition(category, position, radius)
         else
             numUnits = self:PlatoonCategoryCount(category)
@@ -377,7 +377,7 @@ Platoon = Class(moho.platoon_methods) {
     -- ===== AI THREADS ===== --
     ---@param self Platoon
     BuildOnceAI = function(self)
-        local aiBrain = self:GetBrain()
+        local aiBrain = self:GetBrain() --[[@as CampaignAIBrain]]
         for k,v in self:GetPlatoonUnits() do
             if not v.Dead then
                 v.PreviousPriority = aiBrain:PBMGetPriority(self)

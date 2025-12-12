@@ -9,7 +9,7 @@
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---NeedAnyStructure = BuildCondition
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function NeedAnyStructure(aiBrain, baseName)
@@ -56,7 +56,7 @@ function NeedAnyStructure(aiBrain, baseName)
 end
 
 ---NumUnitsLessNearBase = BuildCondition
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@param category EntityCategory
 ---@param varName string
@@ -90,7 +90,7 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
     end
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BaseManagerNeedsEngineers(aiBrain, baseName)
@@ -98,7 +98,7 @@ function BaseManagerNeedsEngineers(aiBrain, baseName)
 	return bManager and bManager.EngineerQuantity > bManager.CurrentEngineerCount
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function ExpansionBasesNeedEngineers(aiBrain, baseName)
@@ -124,7 +124,7 @@ function ExpansionBasesNeedEngineers(aiBrain, baseName)
 end
 
 --- Check if specific expansion base needs engineers
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@param eBaseName string
 ---@return boolean
@@ -151,7 +151,7 @@ function NumEngiesInExpansionBase(aiBrain, baseName, eBaseName)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function CDRInPoolNeedAnyStructure(aiBrain, baseName)
@@ -199,7 +199,7 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
@@ -250,7 +250,7 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@param catTable string
 ---@return boolean
@@ -305,7 +305,7 @@ function HighestFactoryLevel(aiBrain, level, baseName)
     return true
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param techLevel number
 ---@param engQuantity number
 ---@param pType string
@@ -343,13 +343,13 @@ function FactoryCountAndNeed(aiBrain, techLevel, engQuantity, pType, baseName)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param platoonData PlatoonData
 function BaseManagerEngineersStarted(aiBrain, platoonData)
     aiBrain.BaseManagers[platoonData.BaseName]:SetEngineersBuilding(platoonData.NumBuilding)
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function UnfinishedBuildingsCheck(aiBrain, baseName)
@@ -381,7 +381,7 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
     return false
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param level number
 ---@param baseName string
 ---@param type string
@@ -411,7 +411,7 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
     return true
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BaseActive(aiBrain, baseName)
@@ -420,7 +420,7 @@ function BaseActive(aiBrain, baseName)
 end
 
 --- Deprecated, it was supposed to be a condition for an unfinished reclaim function/thread
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BaseReclaimEnabled(aiBrain, baseName)
@@ -428,7 +428,7 @@ function BaseReclaimEnabled(aiBrain, baseName)
     return bManager and bManager.FunctionalityStates.EngineerReclaiming
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BasePatrollingEnabled(aiBrain, baseName)
@@ -436,7 +436,7 @@ function BasePatrollingEnabled(aiBrain, baseName)
     return bManager and bManager.FunctionalityStates.Patrolling
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BaseBuildingEngineers(aiBrain, baseName)
@@ -444,7 +444,7 @@ function BaseBuildingEngineers(aiBrain, baseName)
 	return bManager and bManager.FunctionalityStates.BuildEngineers
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function BaseEngineersEnabled(aiBrain, baseName)
@@ -452,7 +452,7 @@ function BaseEngineersEnabled(aiBrain, baseName)
 	return bManager and bManager.FunctionalityStates.Engineers
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function LandScoutingEnabled(aiBrain, baseName)
@@ -460,7 +460,7 @@ function LandScoutingEnabled(aiBrain, baseName)
 	return bManager and bManager.FunctionalityStates.LandScouting
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function AirScoutingEnabled(aiBrain, baseName)
@@ -468,7 +468,7 @@ function AirScoutingEnabled(aiBrain, baseName)
 	return bManager and bManager.FunctionalityStates.AirScouting
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function ExpansionBasesEnabled(aiBrain, baseName)
@@ -476,7 +476,7 @@ function ExpansionBasesEnabled(aiBrain, baseName)
 	return bManager and bManager.FunctionalityStates.ExpansionBases
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function TMLsEnabled(aiBrain, baseName)
@@ -484,7 +484,7 @@ function TMLsEnabled(aiBrain, baseName)
     return bManager and bManager.FunctionalityStates.TMLs
 end
 
----@param aiBrain AIBrain
+---@param aiBrain CampaignAIBrain
 ---@param baseName string
 ---@return boolean
 function NukesEnabled(aiBrain, baseName)
