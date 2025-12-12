@@ -616,6 +616,15 @@ function table.random(array)
     return array[Random(1, TableGetn(array))]
 end
 
+---Removes all elements from the table
+---@param t table
+function table.clear(t)
+    if not t then return end
+    for k, _ in t do
+        t[k] = nil
+    end
+end
+
 
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match
