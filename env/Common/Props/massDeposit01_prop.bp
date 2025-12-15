@@ -25,7 +25,7 @@ PropBlueprint{
     Physics = { BlockPath = false },
     ScriptClass = "PropInvulnerable",
     ScriptModule = "/lua/sim/prop.lua",
-    SizeX = 0.1,
+    SizeX = 0.9,
     SizeY = 0.1,
-    SizeZ = 0.1,
+    SizeZ = 0.9,
 }
