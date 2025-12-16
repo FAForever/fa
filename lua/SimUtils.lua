@@ -741,7 +741,7 @@ local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 
 local defaultTransferCategory = categories.ALLUNITS - categories.WALL - categories.COMMAND
--- only units in this category will be shared during a partial share
+-- only units in this category will be shared under partial share rules
 local partialShareCategory = categories.STRUCTURE + categories.ENGINEER
 
 ---@param owner integer
