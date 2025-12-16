@@ -769,19 +769,19 @@ end
 ---@param deadArmy integer
 function UpdateUnitCap(deadArmy)
     -- If we are asked to share out unit cap for the defeated army, do the following...
-    local mode = ScenarioInfo.Options.ShareUnitCap
-    if not mode or mode == 'none' then
+    local shareCapOption = ScenarioInfo.Options.ShareUnitCap
+    if not shareCapOption or shareCapOption == 'none' then
         return
     end
     if not GetArmyBrain(deadArmy):IsDefeated() then
         -- this is gonna give everyone some unit cap
         WARN("Error while updating unit cap: dead army isn't defeated")
     end
-    local modeAll = false
-    if mode == "all" then
-        modeAll = true
-    elseif mode ~= "allies" then
-        WARN("Unknown share unit cap mode: " .. tostring(mode))
+    local shareToAll = false
+    if shareCapOption == "all" then
+        shareToAll = true
+    elseif shareCapOption ~= "allies" then
+        WARN("Unknown share unit cap mode: " .. tostring(shareCapOption))
     end
 
     local aliveCount = 0
@@ -790,7 +790,7 @@ function UpdateUnitCap(deadArmy)
 
     for index, brain in ArmyBrains do
         if not ArmyIsCivilian(index) and not brain:IsDefeated() and
-            (modeAll or IsAlly(deadArmy, index))
+            (shareToAll or IsAlly(deadArmy, index))
         then
             aliveCount = aliveCount + 1
             alive[aliveCount] = brain
