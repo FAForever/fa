@@ -471,7 +471,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if FacRebuild_UnitId then
-            local newFactoryUnit = newUnit.ExternalFactory or newUnit
+            local newFactoryUnit = newUnit--[[@as Unit | ExternalFactoryComponent]].ExternalFactory or newUnit
             local data = factoryRebuildDataTable[FacRebuild_UnitId]
             if not data then
                 factoryRebuildDataTable[FacRebuild_UnitId] = { newFactoryUnit }
