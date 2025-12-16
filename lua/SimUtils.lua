@@ -911,7 +911,7 @@ end
 -- game ends shortly thereafter due to the army being defeated (as is common),
 -- we then have an opportunity to see the final game state as observers before
 -- everything would have blown up.
-EndGameGracePeriod = 10 -- 10 seconds
+EndGameGracePeriod = 12 -- 10 seconds
 
 --- Kills all given units, if not already dead
 ---@param toKill Entity[]
