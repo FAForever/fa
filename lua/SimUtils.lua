@@ -108,6 +108,102 @@ Health: %f
     end
 end
 
+--- Pauses all drones in `kennels`
+---@param kennels TPodTowerUnit[]
+function PauseTransferredKennels(kennels)
+    -- wait for drones to spawn
+    WaitTicks(1)
+
+    for _, unit in kennels do
+        unit:SetPaused(true)
+        local podData = unit.PodData
+        if podData then
+            for _, pod in podData do
+                local podHandle = pod.PodHandle
+                if podHandle then
+                    podHandle:SetPaused(true)
+                end
+            end
+        end
+    end
+end
+
+--- Upgrades `kennels` to their `TargetUpgradeBuildTime` value, allowing for drones to spawn and get paused
+---@param kennels TPodTowerUnit[]
+function UpgradeTransferredKennels(kennels)
+    WaitTicks(1) -- spawn drones
+
+    for _, unit in kennels do
+        if not unit:BeenDestroyed() then
+            for _, pod in unit.PodData or {} do -- pause Kennels drones
+                local podHandle = pod.PodHandle
+                if podHandle then
+                    podHandle:SetPaused(true)
+                end
+            end
+
+            IssueUpgrade({ unit }, unit.UpgradesTo)
+        end
+    end
+
+    WaitTicks(3)
+
+    for _, unit in kennels do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.TargetUpgradeBuildTime * 10)
+            unit:SetConsumptionPerSecondMass(0)
+            unit:SetConsumptionPerSecondEnergy(0)
+        end
+    end
+
+    WaitTicks(1)
+
+    for _, unit in kennels do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.DefaultBuildRate)
+            unit:SetPaused(true) -- `SetPaused` updates ConsumptionPerSecond values
+            unit.TargetUpgradeBuildTime = nil
+            unit.DefaultBuildRate = nil
+        end
+    end
+end
+
+--- Upgrades `units` to `UpgradesTo` at their `TargetUpgradeBuildTime` values (defaulting to
+--- `UpgradeBuildTime`, i.e. completion) and resets the build rate to `DefaultBuildRate` (defaulting
+--- to the build rate at the start)
+---@param units Unit[]
+function UpgradeUnits(units)
+    for _, unit in units do
+        IssueUpgrade({ unit }, unit.UpgradesTo)
+        if not unit.DefaultBuildRate then
+            unit.DefaultBuildRate = unit:GetBuildRate()
+        end
+        unit:SetBuildRate(0)
+    end
+
+    WaitTicks(3)
+
+    for _, unit in units do
+        if not unit:BeenDestroyed() then
+            local targetUpgradeBuildTime = unit.TargetUpgradeBuildTime or unit.UpgradeBuildTime
+            unit:SetBuildRate(targetUpgradeBuildTime * 10)
+            unit:SetConsumptionPerSecondMass(0)
+            unit:SetConsumptionPerSecondEnergy(0)
+        end
+    end
+
+    WaitTicks(1)
+
+    for _, unit in units do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.DefaultBuildRate)
+            unit:SetPaused(true) -- `SetPaused` updates ConsumptionPerSecond values
+            unit.TargetUpgradeBuildTime = nil
+            unit.DefaultBuildRate = nil
+        end
+    end
+end
+
 -- used to make more expensive units transfer first, in case there's a unit cap issue
 local function TransferUnitsOwnershipComparator(a, b)
     a = a.Blueprint or a:GetBlueprint()
@@ -412,141 +508,6 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
     return newUnits
 end
 
---- Pauses all drones in `kennels`
----@param kennels TPodTowerUnit[]
-function PauseTransferredKennels(kennels)
-    -- wait for drones to spawn
-    WaitTicks(1)
-
-    for _, unit in kennels do
-        unit:SetPaused(true)
-        local podData = unit.PodData
-        if podData then
-            for _, pod in podData do
-                local podHandle = pod.PodHandle
-                if podHandle then
-                    podHandle:SetPaused(true)
-                end
-            end
-        end
-    end
-end
-
---- Upgrades `kennels` to their `TargetUpgradeBuildTime` value, allowing for drones to spawn and get paused
----@param kennels TPodTowerUnit[]
-function UpgradeTransferredKennels(kennels)
-    WaitTicks(1) -- spawn drones
-
-    for _, unit in kennels do
-        if not unit:BeenDestroyed() then
-            for _, pod in unit.PodData or {} do -- pause Kennels drones
-                local podHandle = pod.PodHandle
-                if podHandle then
-                    podHandle:SetPaused(true)
-                end
-            end
-
-            IssueUpgrade({ unit }, unit.UpgradesTo)
-        end
-    end
-
-    WaitTicks(3)
-
-    for _, unit in kennels do
-        if not unit:BeenDestroyed() then
-            unit:SetBuildRate(unit.TargetUpgradeBuildTime * 10)
-            unit:SetConsumptionPerSecondMass(0)
-            unit:SetConsumptionPerSecondEnergy(0)
-        end
-    end
-
-    WaitTicks(1)
-
-    for _, unit in kennels do
-        if not unit:BeenDestroyed() then
-            unit:SetBuildRate(unit.DefaultBuildRate)
-            unit:SetPaused(true) -- `SetPaused` updates ConsumptionPerSecond values
-            unit.TargetUpgradeBuildTime = nil
-            unit.DefaultBuildRate = nil
-        end
-    end
-end
-
---- Takes the units and tries to rebuild them for each army (in order).
----@param units Unit[]
----@param armies Army[]
-function TransferUnfinishedUnitsAfterDeath(units, armies)
-    local unbuiltUnits = {}
-    local unbuiltUnitCount = 0
-    for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
-        if unit:IsBeingBuilt()
-            -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
-            and not unit.IsUpgrade
-            -- Make sure units are parents of themselves to avoid units being built in factories,
-            -- since they are awkward to finish building and they can even block factories.
-            -- `FactoryRebuildUnits` handles units inside factories correctly.
-            and unit == unit:GetParent()
-        then
-            unbuiltUnitCount = unbuiltUnitCount + 1
-            unbuiltUnits[unbuiltUnitCount] = unit
-        end
-    end
-    if not (unbuiltUnits[1] and armies[1]) then
-        return
-    end
-    RebuildUnits(unbuiltUnits, armies)
-end
-
---- Upgrades `units` to `UpgradesTo` at their `TargetUpgradeBuildTime` values (defaulting to
---- `UpgradeBuildTime`, i.e. completion) and resets the build rate to `DefaultBuildRate` (defaulting
---- to the build rate at the start)
----@param units Unit[]
-function UpgradeUnits(units)
-    for _, unit in units do
-        IssueUpgrade({ unit }, unit.UpgradesTo)
-        if not unit.DefaultBuildRate then
-            unit.DefaultBuildRate = unit:GetBuildRate()
-        end
-        unit:SetBuildRate(0)
-    end
-
-    WaitTicks(3)
-
-    for _, unit in units do
-        if not unit:BeenDestroyed() then
-            local targetUpgradeBuildTime = unit.TargetUpgradeBuildTime or unit.UpgradeBuildTime
-            unit:SetBuildRate(targetUpgradeBuildTime * 10)
-            unit:SetConsumptionPerSecondMass(0)
-            unit:SetConsumptionPerSecondEnergy(0)
-        end
-    end
-
-    WaitTicks(1)
-
-    for _, unit in units do
-        if not unit:BeenDestroyed() then
-            unit:SetBuildRate(unit.DefaultBuildRate)
-            unit:SetPaused(true) -- `SetPaused` updates ConsumptionPerSecond values
-            unit.TargetUpgradeBuildTime = nil
-            unit.DefaultBuildRate = nil
-        end
-    end
-end
-
---- Rebuilds `units`, giving a try for each army (in order) in case they can't for unit cap
---- reasons. If a unit cannot be rebuilt at all, a wreckage is placed instead. Each unit can
---- be tagged with `TargetFractionComplete` to be rebuilt with a different build progress.
----@see AddConstructionProgress # doesn't destroy and rebuild the unit
----@param units Unit[]
----@param armies Army[]
-function RebuildUnits(units, armies)
-    local trackers, blockingEntities = StartRebuildUnits(units)
-    for _, army in armies do
-        TryRebuildUnits(trackers, army)
-    end
-    FinalizeRebuiltUnits(trackers, blockingEntities)
-end
-
 ---@class RebuildTracker
 ---@field CanCreateWreck boolean
 ---@field Success boolean
@@ -703,6 +664,45 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
             end
         end
     end
+end
+
+--- Rebuilds `units`, giving a try for each army (in order) in case they can't for unit cap
+--- reasons. If a unit cannot be rebuilt at all, a wreckage is placed instead. Each unit can
+--- be tagged with `TargetFractionComplete` to be rebuilt with a different build progress.
+---@see AddConstructionProgress # doesn't destroy and rebuild the unit
+---@param units Unit[]
+---@param armies Army[]
+function RebuildUnits(units, armies)
+    local trackers, blockingEntities = StartRebuildUnits(units)
+    for _, army in armies do
+        TryRebuildUnits(trackers, army)
+    end
+    FinalizeRebuiltUnits(trackers, blockingEntities)
+end
+
+--- Takes the units and tries to rebuild them for each army (in order).
+---@param units Unit[]
+---@param armies Army[]
+function TransferUnfinishedUnitsAfterDeath(units, armies)
+    local unbuiltUnits = {}
+    local unbuiltUnitCount = 0
+    for _, unit in EntityCategoryFilterDown(transferUnbuiltCategory, units) do
+        if unit:IsBeingBuilt()
+            -- Check if a unit is an upgrade to prevent duplicating it along with `UpgradeUnits`
+            and not unit.IsUpgrade
+            -- Make sure units are parents of themselves to avoid units being built in factories,
+            -- since they are awkward to finish building and they can even block factories.
+            -- `FactoryRebuildUnits` handles units inside factories correctly.
+            and unit == unit:GetParent()
+        then
+            unbuiltUnitCount = unbuiltUnitCount + 1
+            unbuiltUnits[unbuiltUnitCount] = unit
+        end
+    end
+    if not (unbuiltUnits[1] and armies[1]) then
+        return
+    end
+    RebuildUnits(unbuiltUnits, armies)
 end
 
 ---@param data {To: integer}
