@@ -768,7 +768,6 @@ end
 --- Given that `deadArmy` just died, redistributes their unit cap based on the scenario options
 ---@param deadArmy integer
 function UpdateUnitCap(deadArmy)
-    -- If we are asked to share out unit cap for the defeated army, do the following...
     local shareCapOption = ScenarioInfo.Options.ShareUnitCap
     if not shareCapOption or shareCapOption == 'none' then
         return
