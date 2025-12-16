@@ -255,7 +255,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         -- time has passed, we're all good - call out the victors and end the game
         if self.VictoryDeclaredAt < GetGameTimeSeconds() then
             if self.EnabledSpewing then
-                SPEW(string.format("(%d) Victory declared!", GetGameTick()))
+                SPEW("Victory declared!")
             end
 
             -- call them out as victors
@@ -266,7 +266,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
             self:EndGame()
         else
             if self.EnabledSpewing then
-                SPEW(string.format("(%d) Trying to declare victory...", GetGameTick()))
+                SPEW("Trying to declare victory...")
             end
         end
     end,
@@ -294,9 +294,6 @@ AbstractVictoryCondition = Class(DebugComponent) {
 
         Sync.GameEnded = true
         WaitTicks(2)
-        if self.EnabledSpewing then
-            SPEW(string.format("(%d) Game ended!", GetGameTick()))
-        end
         EndGame()
     end,
 
@@ -360,7 +357,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
-            SPEW(string.format("(%d) Army forfeit the game: ", GetGameTick(), aiBrainName))
+            SPEW("Army forfeit the game: ", aiBrainName)
         end
 
         self:FlagBrainAsProcessed(aiBrain)
@@ -378,7 +375,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
-            SPEW(string.format("(%d) Army is victorious: %s", GetGameTick(), aiBrainName))
+            SPEW("Army is victorious: ", aiBrainName)
         end
 
         self:FlagBrainAsProcessed(aiBrain)
@@ -396,7 +393,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         local aiBrainName = aiBrain.Name
 
         if self.EnabledSpewing then
-            SPEW(string.format("(%d) Army is defeated: %s", GetGameTick(), aiBrainName))
+            SPEW("Army is defeated: ", aiBrainName)
         end
 
         self:FlagBrainAsProcessed(aiBrain)
