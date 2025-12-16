@@ -8,11 +8,12 @@
 -- AIBrain Lua Module
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
-local KillAbandonedArmy = import("/lua/simutils.lua").KillAbandonedArmy
-local KillArmy = import("/lua/simutils.lua").KillArmy
-local KillRecalledArmy = import("/lua/simutils.lua").KillRecalledArmy
-local DisableAI = import("/lua/simutils.lua").DisableAI
-local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
+local SimUtils = import("/lua/simutils.lua")
+local KillAbandonedArmy = SimUtils.KillAbandonedArmy
+local KillArmy = SimUtils.KillArmy
+local KillRecalledArmy = SimUtils.KillRecalledArmy
+local DisableAI = SimUtils.DisableAI
+local UpdateUnitCap = SimUtils.UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
@@ -1164,11 +1165,11 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 ---#region backwards compatibility
 
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
-local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
-local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
-local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
-local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
-local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
+local TransferUnitsOwnership = SimUtils.TransferUnitsOwnership
+local TransferUnfinishedUnitsAfterDeath = SimUtils.TransferUnfinishedUnitsAfterDeath
+local KillArmyOnDelayedRecall = SimUtils.KillArmyOnDelayedRecall
+local KillArmyOnACUDeath = SimUtils.KillArmyOnACUDeath
+local TransferUnitsToBrain = SimUtils.TransferUnitsToBrain
+local TransferUnitsToHighestBrain = SimUtils.TransferUnitsToHighestBrain
 
 --#endregion
