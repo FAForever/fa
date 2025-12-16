@@ -1045,7 +1045,9 @@ function KillArmy(self, shareOption)
         ForkThread(KillWalls, self)
     end
 
+    SPEW(string.format("(%d) Killing army start waiting...", GetGameTick()), debug.traceback())
     WaitSeconds(EndGameGracePeriod)
+    SPEW(string.format("(%d) Killing army done waiting...", GetGameTick()))
 
     local selfIndex = self.Army
     local brainCategories = GetAllegianceCategories(selfIndex)
@@ -1076,7 +1078,8 @@ function KillArmy(self, shareOption)
             ReturnBorrowedUnits(self)
         end
     end
-
+    
+    SPEW(string.format("(%d) Killing army remainder...", GetGameTick()))
     KillRemaining(self)
 end
 
@@ -1265,6 +1268,7 @@ function KillAbandonedArmy(self, shareOption, shareAcuOption, victoryOption)
             safeCommanders = KillUnsafeCommanders(commanders)
         else
             -- explode all the ACUs so they don't get shared
+            SPEW(string.format("(%d) Killing commanders (abandonment)...", GetGameTick()))
             KillUnits(commanders)
         end
 
