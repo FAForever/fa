@@ -1109,7 +1109,7 @@ end
 ---@param units Entity[]
 ---@param timeout? integer in ticks
 ---@return integer elapsed
-function ThreadSuspendUntilUnitsDead(units, timeout)
+function WaitUntilUnitsDeadOrTimeout(units, timeout)
     if table.empty(units) then
         return 0
     end
@@ -1204,7 +1204,7 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
             StartCountdown(com.EntityId, countdown)
         end
 
-        local elapsed = ThreadSuspendUntilUnitsDead(sharedCommanders, timeout)
+        local elapsed = WaitUntilUnitsDeadOrTimeout(sharedCommanders, timeout)
 
         -- if all the commanders die early, assume disconnect abuse and apply standard share condition. Only makes sense in Assassination.
         local scenarioOptions = ScenarioInfo.Options
@@ -1234,7 +1234,7 @@ function KillArmyOnACUDeath(self, shareOption)
     local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits or {})
 
     if not table.empty(sharedCommanders) then
-        local elapsed = ThreadSuspendUntilUnitsDead(sharedCommanders) -- note there's no timeout
+        local elapsed = WaitUntilUnitsDeadOrTimeout(sharedCommanders) -- note there's no timeout
 
         -- if all the commanders die early, assume disconnect abuse and apply standard share condition. Only makes sense in Assassination.
         local scenarioOptions = ScenarioInfo.Options
