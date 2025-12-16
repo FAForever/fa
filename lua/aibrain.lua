@@ -23,8 +23,6 @@ local JammerManagerBrainComponent = import("/lua/aibrains/components/jammermanag
 local StatManagerBrainComponent = import("/lua/aibrains/components/statmanagerbraincomponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanagerbraincomponent.lua").EnergyManagerBrainComponent
 
-local CommanderSafeTime = import("/lua/simutils.lua").CommanderSafeTime
-
 ---@class TriggerSpec
 ---@field Callback function
 ---@field ReconTypes ReconTypes
