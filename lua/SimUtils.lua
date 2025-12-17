@@ -2,6 +2,9 @@
 --
 -- General Sim scripts
 
+-- upvalues for performance
+local ArmyBrains = ArmyBrains
+
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
 
@@ -221,7 +224,7 @@ local sharedUnits = {}
 ---@param noRestrictions? boolean
 ---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
-    local toBrain = GetArmyBrain(toArmy)
+    local toBrain = ArmyBrains[toArmy]
     if not toBrain or (not noRestrictions and toBrain:IsDefeated())
         or table.empty(units)
     then
@@ -772,7 +775,7 @@ function UpdateUnitCap(deadArmy)
     if not shareCapOption or shareCapOption == 'none' then
         return
     end
-    if not GetArmyBrain(deadArmy):IsDefeated() then
+    if not ArmyBrains[deadArmy]:IsDefeated() then
         -- this is gonna give everyone some unit cap
         WARN("Error while updating unit cap: dead army isn't defeated")
     end
@@ -957,7 +960,7 @@ local function ReturnBorrowedUnits(self)
     local borrowed = {}
     for _, unit in units do
         local oldowner = unit.oldowner
-        if oldowner and oldowner ~= self.Army and not GetArmyBrain(oldowner):IsDefeated() then
+        if oldowner and oldowner ~= self.Army and not ArmyBrains[oldowner]:IsDefeated() then
             if not borrowed[oldowner] then
                 borrowed[oldowner] = {}
             end
@@ -1025,7 +1028,7 @@ local function TransferUnitsToKiller(self, category)
         end
 
         if killerIndex then
-            TransferUnitsToBrain(self, { GetArmyBrain(killerIndex) }, true, nil, "TransferToKiller")
+            TransferUnitsToBrain(self, { ArmyBrains[killerIndex] }, true, nil, "TransferToKiller")
         end
         -- if not transferred, units will simply be killed
     end
@@ -1386,7 +1389,7 @@ function SetResourceSharing(data)
     if not OkayToMessWithArmy(army) then
         return
     end
-    local brain = GetArmyBrain(army)
+    local brain = ArmyBrains[army]
     brain:SetResourceSharing(data.Value)
 end
 
@@ -1401,7 +1404,7 @@ function RequestAlliedVictory(data)
     if not OkayToMessWithArmy(army) then
         return
     end
-    local brain = GetArmyBrain(army)
+    local brain = ArmyBrains[army]
     brain.RequestingAlliedVictory = data.Value
 end
 
@@ -1411,7 +1414,7 @@ function SetOfferDraw(data)
     if not OkayToMessWithArmy(army) then
         return
     end
-    local brain = GetArmyBrain(army)
+    local brain = ArmyBrains[army]
     brain.OfferingDraw = data.Value
 end
 
