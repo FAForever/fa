@@ -621,6 +621,9 @@ GetNameFilters = {
     end,
 }
 
+---@param id UnitId
+---@param bitmap Bitmap
+---@param background Bitmap
 function SetUnitFactionIcon(id, bitmap, background)
     local faction = Logic.GetUnitFactionInfo(id)
     if bitmap and faction.icon and faction.color then
