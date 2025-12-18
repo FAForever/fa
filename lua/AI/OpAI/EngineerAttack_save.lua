@@ -114,13 +114,13 @@ Scenario = {
                         BuildConditions =
                         {
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'NeedEngineerTransports',
-                                {'default_brain','default_master','default_location_type'},
-                                {'default_brain','default_master','default_location_type'}
+                                {'default_master','default_location_type'},
+                                {'default_master','default_location_type'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 },
-                                {'default_brain','1'}
+                                { 1 },
+                                {'1'}
                             },
                         },
                         PlatoonData =
@@ -146,13 +146,13 @@ Scenario = {
                         BuildConditions =
                         {
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'NeedEngineerTransports',
-                                {'default_brain','default_master','default_location_type'},
-                                {'default_brain','default_master','default_location_type'}
+                                {'default_master','default_location_type'},
+                                {'default_master','default_location_type'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 2, 3 },
-                                {'default_brain', '1', '2', '3'}
+                                { 1, 2, 3 },
+                                { '1', '2', '3'}
                             },
                         },
                         PlatoonData =
@@ -178,13 +178,13 @@ Scenario = {
                         BuildConditions =
                         {
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'NeedEngineerTransports',
-                                {'default_brain','default_master','default_location_type'},
-                                {'default_brain','default_master','default_location_type'}
+                                {'default_master','default_location_type'},
+                                {'default_master','default_location_type'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4 },
-                                {'default_brain','4'}
+                                { 4 },
+                                {'4'}
                             },
                         },
                         PlatoonData =
@@ -210,8 +210,8 @@ Scenario = {
                         BuildConditions =
                         {
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'NeedEngineerTransports',
-                                {'default_brain','default_master','default_location_type'},
-                                {'default_brain','default_master','default_location_type'}
+                                {'default_master','default_location_type'},
+                                {'default_master','default_location_type'}
                             },
                         },
                         PlatoonData =
@@ -240,17 +240,17 @@ Scenario = {
                         BuildConditions =
                         {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 },
-                                {'default_brain','1'}
+                                { 1 },
+                                {'1'}
                             },
                         },
                         PlatoonData =
@@ -289,17 +289,17 @@ Scenario = {
                         {
                             {
                                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1, 2, 3 },
-                                {'default_brain', '1', '2', '3'}
+                                { 1, 2, 3 },
+                                { '1', '2', '3'}
                             },
                         },
                         PlatoonData =
@@ -338,17 +338,17 @@ Scenario = {
                         {
                             {
                                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 1 },
-                                {'default_brain', '1'}
+                                { 1 },
+                                { '1'}
                             },
                         },
                         PlatoonData =
@@ -387,17 +387,17 @@ Scenario = {
                         {
                             {
                                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4 },
-                                {'default_brain','4'}
+                                { 4 },
+                                {'4'}
                             },
                         },
                         PlatoonData =
@@ -436,12 +436,12 @@ Scenario = {
                         {
                             {
                                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonData =
@@ -480,17 +480,17 @@ Scenario = {
                         {
                             {
                                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackChildCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {
                                 '/lua/editor/miscbuildconditions.lua', 'FactionIndex',
-                                {'default_brain', 4 },
-                                {'default_brain','4'}
+                                { 4 },
+                                {'4'}
                             },
                         },
                         PlatoonData =
@@ -532,19 +532,19 @@ Scenario = {
                         {
                             {
                                 '/lua/editor/amplatoonhelperfunctions.lua', 'AMCheckPlatoonLock',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                             {'/lua/ai/opai/EngineerAttack_save.lua', 'EngineerAttackMasterCount',
-                                {'default_brain','default_master'},
-                                {'default_brain','default_master'}
+                                {'default_master'},
+                                {'default_master'}
                             },
                         },
                         PlatoonBuildCallbacks =
                         {
                             {'/lua/editor/amplatoonhelperfunctions.lua', 'AMUnlockPlatoon',
-                            {'default_brain','default_platoon'},
-                            {'default_brain','default_platoon'}},
+                            {'default_platoon'},
+                            {'default_platoon'}},
                         },
                         PlatoonAddFunctions =
                         {
