@@ -391,6 +391,12 @@ AIBrain = Class(StandardBrain) {
             pltnTable.BuildConditions = {}
         end
 
+        for _, v in pairs(pltnTable.BuildConditions) do
+            if v[3][1] == "default_brain" then
+                TableRemove(v[3], 1)
+            end
+        end
+
         if not pltnTable.BuildTimeOut or pltnTable.BuildTimeOut == 0 then
             pltnTable.GenerateTimeOut = true
         end
@@ -1632,9 +1638,6 @@ AIBrain = Class(StandardBrain) {
         for _, v in bCs do
             if not v.LookupNumber[index] then
                 local found = false
-                if v[3][1] == "default_brain" then
-                    TableRemove(v[3], 1)
-                end
 
                 for num, bcData in self.PBM.BuildConditionsTable do
                     if bcData[1] == v[1] and bcData[2] == v[2] and TableGetn(bcData[3]) == TableGetn(v[3]) then
