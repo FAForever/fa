@@ -56,7 +56,7 @@ ObjectiveArrow = Class(Entity) {
         local bounceTime = 0
         local bounceChng = math.pi * 0.25
         while not self:BeenDestroyed() do
-            vec.y = yOff + math.sin(bounceTime) * 0.25
+            vec[2] = yOff + math.sin(bounceTime) * 0.25
             self:SetParentOffset(vec)
             WaitSeconds(0.1)
 
