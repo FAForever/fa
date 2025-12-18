@@ -78,7 +78,7 @@ if not rawget(table, 'getsize') then
 
     --- Returns actual size of a table, including string keys
     ---@param t table
-    ---@return number
+    ---@return integer
     function table.getsize(t)
         if type(t) ~= 'table' then return 0 end
         local size = 0
@@ -282,7 +282,10 @@ end
 
 --- table.sorted(t, [comp]) is the same as table.sort(t, comp) except it returns
 --- a sorted copy of t, leaving the original unchanged.
---- [comp] is an optional comparison function, defaulting to less-than.
+---@generic T
+---@param t T[]
+---@param comp? fun(v: T): boolean An optional comparison function, defaulting to less-than.
+---@return T[] copy Sorted copy of the original table
 function table.sorted(t, comp)
     local r = table.copy(t)
     TableSort(r, comp)
@@ -474,9 +477,12 @@ function table.hashkeys(t, value)
     return table.keys(r)
 end
 
---- table.map(fn,t) returns a table with the same keys as t but with
---- fn function applied to each value.
-function table.map(fn, t)
+--- table.map(fn,t) returns a table with the same keys as t but with `fn` applied to each value.
+---@generic T
+---@param t T[]
+---@param fn fun(v: T): any
+---@return table
+function table.map(t, fn)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     for k,v in t do
