@@ -2081,7 +2081,7 @@ BaseManager = ClassSimple {
         local template = {
             'LandScoutTemplate',
             'NoPlan',
-            { 'uel0101', 1, 1, 'Scout', 'None' },
+            { 'uel0101', -1, 1, 'Scout', 'None' },
         }
         template = ScenarioUtils.FactionConvert(template, faction)
 
@@ -2096,7 +2096,7 @@ BaseManager = ClassSimple {
         local template = {
             'AirScoutTemplate',
             'NoPlan',
-            { 'uea', 1, 1, 'Scout', 'None' },
+            { 'uea', -1, 1, 'Scout', 'None' },
         }
 
         if techLevel == 3 then
