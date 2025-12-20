@@ -734,7 +734,7 @@ end
 ---@param units? Unit[]
 function GiveUnitsToPlayer(data, units)
     local manualShare = ScenarioInfo.Options.ManualUnitShare
-    if manualShare == 'none' or not units then
+    if manualShare == 'none' or table.empty(units) then
         return
     end
     local toArmy = data.To
