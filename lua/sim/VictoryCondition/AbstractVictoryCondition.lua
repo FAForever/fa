@@ -271,7 +271,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         end
     end,
 
-    --- Ends the game. The monitoring thread is stopped. The game ends three seconds later to give all players a window of opportunity to share the game results with the server. 
+    --- Ends the game. The monitoring thread is stopped. The game ends after DelayBeforeGameEnds seconds to give all players a window of opportunity to share the game results with the server. 
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
         -- stop checking the game state
