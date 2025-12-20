@@ -8,15 +8,12 @@
 -- AIBrain Lua Module
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
-local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
-local KillArmy = import("/lua/simutils.lua").KillArmy
-local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
-local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
-local DisableAI = import("/lua/simutils.lua").DisableAI
-local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
-local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
-local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
+local SimUtils = import("/lua/simutils.lua")
+local KillAbandonedArmy = SimUtils.KillAbandonedArmy
+local KillArmy = SimUtils.KillArmy
+local KillRecalledArmy = SimUtils.KillRecalledArmy
+local DisableAI = SimUtils.DisableAI
+local UpdateUnitCap = SimUtils.UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local RecallOnArmyDefeat = import("/lua/sim/recall.lua").OnArmyDefeat
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
@@ -26,8 +23,6 @@ local FactoryManagerBrainComponent = import("/lua/aibrains/components/factoryman
 local JammerManagerBrainComponent = import("/lua/aibrains/components/jammermanagerbraincomponent.lua").JammerManagerBrainComponent
 local StatManagerBrainComponent = import("/lua/aibrains/components/statmanagerbraincomponent.lua").StatManagerBrainComponent
 local EnergyManagerBrainComponent = import("/lua/aibrains/components/energymanagerbraincomponent.lua").EnergyManagerBrainComponent
-
-local CommanderSafeTime = import("/lua/simutils.lua").CommanderSafeTime
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -69,7 +64,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field CommanderKilledBy Army        # Which army last killed one of our commanders. Used for transfering to killer in `demoralization` (Assassination) and `decapitation` victory.
 ---@field CommanderKilledTick number    # When one of our commanders last died. Used for transfering to killer in `decapitation` victory.
 ---@field LastUnitKilledBy Army         # Which army last killed one of our units. Used for transfering to killer in other victory conditions.
----@field Army Army # Cached `GetArmyIndex` engine call
+---@field Army integer # Cached `GetArmyIndex` engine call
 AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerManagerBrainComponent,
     EnergyManagerBrainComponent, StorageManagerBrainComponent, moho.aibrain_methods) {
 
@@ -169,15 +164,15 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         if resourceStructures then
             -- Place resource structures down
-            for k, v in resourceStructures do
-                local unit = self:CreateResourceBuildingNearest(v, posX, posY)
+            for _, v in resourceStructures do
+                self:CreateResourceBuildingNearest(v, posX, posY)
             end
         end
 
         if initialUnits then
             -- Place initial units down
-            for k, v in initialUnits do
-                local unit = self:CreateUnitNearSpot(v, posX, posY)
+            for _, v in initialUnits do
+                self:CreateUnitNearSpot(v, posX, posY)
             end
         end
 
@@ -436,13 +431,29 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     end,
 
     ---@param self AIBrain
+    ---@param status string
+    SetDefeatStatus = function(self, status)
+        self.Status = status
+
+        UpdateUnitCap(self.Army)
+        SimPingOnArmyDefeat(self.Army)
+        if status ~= "Recalled" then -- the recall logic takes care of itself
+            RecallOnArmyDefeat(self.Army)
+        end
+
+        if self.BrainType == 'AI' then
+            DisableAI(self--[[@as BaseAIBrain]])
+        end
+    end,
+
+    ---@param self AIBrain
     OnDraw = function(self)
-        self.Status = 'Draw'
+        self.Status = "Draw"
     end,
 
     ---@param self AIBrain
     OnVictory = function(self)
-        self.Status = 'Victory'
+        self.Status = "Victory"
     end,
 
     ---@param self AIBrain
@@ -451,17 +462,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         if self.Status == 'Defeat' then
             return
         end
-        self.Status = 'Defeat'
-
-        local selfIndex = self:GetArmyIndex()
-        UpdateUnitCap(selfIndex)
-        SimPingOnArmyDefeat(selfIndex)
-        RecallOnArmyDefeat(selfIndex)
-
-        -- AI
-        if self.BrainType == 'AI' then
-            DisableAI(self--[[@as BaseAIBrain]])
-        end
+        self:SetDefeatStatus("Defeat")
 
         ForkThread(KillArmy, self, ScenarioInfo.Options.Share)
 
@@ -473,85 +474,17 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     --- Called by the engine when a player disconnects.
     ---@param self AIBrain
     AbandonedByPlayer = function(self)
-        if not IsGameOver() then
-            self.Status = 'Defeat'
+        if IsGameOver() then
+            return
+        end
 
-            import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
-            import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
+        self:SetDefeatStatus("Defeat")
 
-            -- AI
-            if self.BrainType == 'AI' then
-                DisableAI(self)
-            end
+        local opt = ScenarioInfo.Options
+        ForkThread(KillAbandonedArmy, self, opt.DisconnectShare, opt.DisconnectShareCommanders, opt.Victory)
 
-            local shareOption = ScenarioInfo.Options.DisconnectShare
-            local shareAcuOption = ScenarioInfo.Options.DisconnectShareCommanders
-            local victoryOption = ScenarioInfo.Options.Victory
-
-            if shareOption == 'SameAsShare' then
-                shareOption = ScenarioInfo.Options.Share
-            end
-
-            -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
-            -- and might have intentionally disconnected.
-            if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
-                local safeCommanders = {}
-
-                local commanders = self:GetListOfUnits(categories.COMMAND, false)
-                if shareAcuOption == 'Recall' then
-                    local gameTick = GetGameTick()
-                    for _, com in commanders do
-                        if com.LastTickDamaged <= gameTick - CommanderSafeTime then
-                            table.insert(safeCommanders, com)
-                        else
-                            -- explode unsafe ACUs because KillArmy might not
-                            com:Kill()
-                        end
-                    end
-                else
-                    -- explode all the ACUs so they don't get shared
-                    for _, com in commanders do
-                        com:Kill()
-                    end
-                end
-
-                -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
-                if victoryOption == 'demoralization' and table.empty(safeCommanders) then
-                    shareOption = ScenarioInfo.Options.Share
-                end
-
-                -- non-assassination modes can have armies abandon without commanders
-                if shareAcuOption == 'Recall' and not table.empty(safeCommanders) then
-                    -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
-                    ForkThread(FakeTeleportUnits, safeCommanders, true)
-                end
-
-                ForkThread(KillArmy, self, shareOption)
-
-            elseif shareAcuOption == 'RecallDelayed' or shareAcuOption == 'Permanent' then
-
-                if victoryOption ~= 'demoralization' then
-                    shareOption = 'FullShare'
-                end
-
-                if shareAcuOption == 'RecallDelayed' then
-                    local shareTime = GetGameTick() + CommanderSafeTime
-                    if shareTime < 3000 then
-                        shareTime = 3000
-                    end
-                    ForkThread(KillArmyOnDelayedRecall, self, shareOption, shareTime)
-                else
-                    ForkThread(KillArmyOnACUDeath, self, shareOption)
-                end
-            else
-                WARN('Invalid disconnection ACU share condition was used for this game: `' .. (shareAcuOption or 'nil') .. '` Defaulting to exploding ACU.')
-                ForkThread(KillArmy, self, shareOption)
-            end
-
-
-            if self.Trash then
-                self.Trash:Destroy()
-            end
+        if self.Trash then
+            self.Trash:Destroy()
         end
     end,
 
@@ -570,63 +503,23 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         self:OnRecalled()
     end,
 
+    --- Handles the final state of the AI brain, after all command units have
+    --- already done their fake recall sequence. To start that process, see `:OnRecall()`
+    ---@param self AIBrain
     OnRecalled = function(self)
-        -- TODO: create a common function for `OnDefeat` and `OnRecall`
-        self.Status = "Recalled"
+        if self.Status == "Recalled" then
+            return
+        end
 
         Sync.EnforceRating = true
         WARN("Recall detected. Time requirement for rating games will now be removed.")
 
-        local selfIndex = self:GetArmyIndex()
-        UpdateUnitCap(selfIndex)
-        SimPingOnArmyDefeat(selfIndex)
+        self:SetDefeatStatus("Recalled")
 
-        -- AI
-        if self.BrainType == "AI" then
-            DisableAI(self)
-        end
+        ForkThread(KillRecalledArmy, self, ScenarioInfo.Options.Share)
 
-        local enemies, civilians = {}, {}
-
-        -- Sort brains out into mutually exclusive categories
-        for index, brain in ArmyBrains do
-            brain.index = index
-
-            if not brain:IsDefeated() and selfIndex ~= index then
-                if ArmyIsCivilian(index) then
-                    table.insert(civilians, brain)
-                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
-                    table.insert(enemies, brain)
-                end
-            end
-        end
-
-        -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
-        -- Recalling recalls all SACU, so they shouldn't be transferred.
-        local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
-        local shareOption = ScenarioInfo.Options.Share
-        if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(self, civilians, false, recallCat, "CivilianDeserter")
-        elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, enemies, false, recallCat, "Defectors")
-        end
-
-        -- let the average, team vs team game end first
-        WaitSeconds(10.0)
-
-        -- Kill all units left over
-        local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-        if tokill then
-            for _, unit in tokill do
-                if not IsDestroyed(unit) then
-                    unit:Kill()
-                end
-            end
-        end
-
-        local trash = self.Trash
-        if trash then
-            trash:Destroy()
+        if self.Trash then
+            self.Trash:Destroy()
         end
     end,
 
@@ -1272,5 +1165,11 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 ---#region backwards compatibility
 
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+local TransferUnitsOwnership = SimUtils.TransferUnitsOwnership
+local TransferUnfinishedUnitsAfterDeath = SimUtils.TransferUnfinishedUnitsAfterDeath
+local KillArmyOnDelayedRecall = SimUtils.KillArmyOnDelayedRecall
+local KillArmyOnACUDeath = SimUtils.KillArmyOnACUDeath
+local TransferUnitsToBrain = SimUtils.TransferUnitsToBrain
+local TransferUnitsToHighestBrain = SimUtils.TransferUnitsToHighestBrain
 
 --#endregion
