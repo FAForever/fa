@@ -44,7 +44,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     DelayBeforeVictory = 5,
 
     --- Once the game is guaranteed to end, it will take this many seconds to end the game.
-    DelayBeforeGameEnds = 3,
+    DelayBeforeGameEnds = 1,
 
     ---@param self AbstractVictoryCondition
     __init = function(self)
