@@ -1509,8 +1509,9 @@ AIBrain = Class(StandardBrain) {
         end
 
         -- Remove any IDs with 0 as a build quantity.
-        for i = 1, TableGetn(retTemplate) do
-            if i >= 3 then
+        local size = TableGetn(retTemplate)
+        if size >= 3 then
+            for i = size, 3, -1 do
                 if retTemplate[i][3] == 0 then
                     TableRemove(retTemplate, i)
                 end
