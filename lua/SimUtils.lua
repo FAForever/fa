@@ -908,12 +908,12 @@ end
 
 --local helper functions for KillArmy
 
--- Amount of time to wait after an army has been defeated before we begin
--- processing what to do with the rest of its units. This is so that, if the
--- game ends shortly thereafter due to the army being defeated (as is common),
--- we then have an opportunity to see the final game state as observers before
--- everything would have blown up.
-EndGameGracePeriod = 12 -- 10 seconds
+-- Seconds to wait after an army has been defeated before we begin processing
+-- what to do with the rest of its units. This is so that, if the game ends
+-- shortly thereafter due to the army being defeated (as is common), we then
+-- have an opportunity to see the final game state as observers before everything
+-- would have blown up.
+EndGameGracePeriod = 12
 
 --- Kills all given units, if not already dead
 ---@param toKill Entity[]
