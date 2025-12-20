@@ -44,7 +44,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     DelayBeforeVictory = 5,
 
     --- Once the game is guaranteed to end, it will take this many seconds to end the game.
-    DelayBeforeGameEnds = 3,
+    DelayBeforeGameEnds = 1,
 
     ---@param self AbstractVictoryCondition
     __init = function(self)
@@ -271,7 +271,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
         end
     end,
 
-    --- Ends the game. The monitoring thread is stopped. The game ends three seconds later to give all players a window of opportunity to share the game results with the server. 
+    --- Ends the game. The monitoring thread is stopped. The game ends after DelayBeforeGameEnds seconds to give all players a window of opportunity to share the game results with the server. 
     ---@param self AbstractVictoryCondition
     EndGame = function(self)
         -- stop checking the game state
@@ -286,7 +286,7 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- Ends the game.
     ---@param self AbstractVictoryCondition
     EndGameThread = function(self)
-        WaitSeconds(3)
+        WaitSeconds(self.DelayBeforeGameEnds)
 
         for _, v in GameOverListeners do
             pcall(v)

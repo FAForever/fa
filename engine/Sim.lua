@@ -620,7 +620,7 @@ end
 
 --- Gets the current game time in ticks.
 --- The game time is the simulation time, that stops when the game is paused.
----@return number
+---@return integer
 function GetGameTick()
 end
 
