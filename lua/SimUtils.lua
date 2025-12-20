@@ -22,15 +22,39 @@ local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categor
 
 ---@alias FactoryRebuildDataTable table<UnitId, (FactoryUnit | FactoryRebuildData)[]>
 
+--- Clear data for a factory so transferring it doesn't try to rebuild units again
+---@param factory FactoryUnit | FactoryRebuildData
+local function clearFactoryRebuildData(factory)
+    factory.FacRebuild_UnitId = nil
+    factory.FacRebuild_Progress = nil
+    factory.FacRebuild_BuildTime = nil
+    factory.FacRebuild_Health = nil
+    factory.FacRebuild_OldBuildRate = nil
+end
+
 ---@param factoryRebuildDataTable FactoryRebuildDataTable
 function FactoryRebuildUnits(factoryRebuildDataTable)
     for buildUnitId, factories in factoryRebuildDataTable do
+        -- Remove support factories that can't build their unit due to lacking an HQ
+        local noFactories = false
+        for i, factory in factories do
+            if not factory:CanBuild(buildUnitId) then
+                clearFactoryRebuildData(factory)
+                factories[i] = nil
+                if table.empty(factories) then
+                    factoryRebuildDataTable[buildUnitId] = nil
+                    noFactories = true
+                end
+                continue
+            end
+        end
+        if noFactories then continue end
+
         IssueClearCommands(factories)
         IssueBuildFactory(factories, buildUnitId, 1)
     end
     -- wait for build order to start and then rebuild the units for free
     WaitTicks(1)
-
     for k, factories in factoryRebuildDataTable do
         for i, factory in factories do
             if factory.Dead then
@@ -49,7 +73,6 @@ function FactoryRebuildUnits(factoryRebuildDataTable)
     end
     -- wait for buildpower to apply then return the factories to normal and pause them
     WaitTicks(1)
-
     for k, factories in factoryRebuildDataTable do
         for i, factory in factories do
             if factory.Dead then
@@ -102,11 +125,103 @@ Health: %f
                 rebuiltUnit:SetHealth(nil, factory.FacRebuild_Health)
             end
 
-            -- clean up after the rebuilding
-            factory.FacRebuild_Progress = nil
-            factory.FacRebuild_BuildTime = nil
-            factory.FacRebuild_Health = nil
-            factory.FacRebuild_OldBuildRate = nil
+            clearFactoryRebuildData(factory)
+        end
+    end
+end
+
+--- Pauses all drones in `kennels`
+---@param kennels TPodTowerUnit[]
+function PauseTransferredKennels(kennels)
+    -- wait for drones to spawn
+    WaitTicks(1)
+
+    for _, unit in kennels do
+        unit:SetPaused(true)
+        local podData = unit.PodData
+        if podData then
+            for _, pod in podData do
+                local podHandle = pod.PodHandle
+                if podHandle then
+                    podHandle:SetPaused(true)
+                end
+            end
+        end
+    end
+end
+
+--- Upgrades `kennels` to their `TargetUpgradeBuildTime` value, allowing for drones to spawn and get paused
+---@param kennels TPodTowerUnit[]
+function UpgradeTransferredKennels(kennels)
+    WaitTicks(1) -- spawn drones
+
+    for _, unit in kennels do
+        if not unit:BeenDestroyed() then
+            for _, pod in unit.PodData or {} do -- pause Kennels drones
+                local podHandle = pod.PodHandle
+                if podHandle then
+                    podHandle:SetPaused(true)
+                end
+            end
+
+            IssueUpgrade({ unit }, unit.UpgradesTo)
+        end
+    end
+
+    WaitTicks(3)
+
+    for _, unit in kennels do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.TargetUpgradeBuildTime * 10)
+            unit:SetConsumptionPerSecondMass(0)
+            unit:SetConsumptionPerSecondEnergy(0)
+        end
+    end
+
+    WaitTicks(1)
+
+    for _, unit in kennels do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.DefaultBuildRate)
+            unit:SetPaused(true) -- `SetPaused` updates ConsumptionPerSecond values
+            unit.TargetUpgradeBuildTime = nil
+            unit.DefaultBuildRate = nil
+        end
+    end
+end
+
+--- Upgrades `units` to `UpgradesTo` at their `TargetUpgradeBuildTime` values (defaulting to
+--- `UpgradeBuildTime`, i.e. completion) and resets the build rate to `DefaultBuildRate` (defaulting
+--- to the build rate at the start)
+---@param units Unit[]
+function UpgradeUnits(units)
+    for _, unit in units do
+        IssueUpgrade({ unit }, unit.UpgradesTo)
+        if not unit.DefaultBuildRate then
+            unit.DefaultBuildRate = unit:GetBuildRate()
+        end
+        unit:SetBuildRate(0)
+    end
+
+    WaitTicks(3)
+
+    for _, unit in units do
+        if not unit:BeenDestroyed() then
+            local targetUpgradeBuildTime = unit.TargetUpgradeBuildTime or unit.UpgradeBuildTime
+            unit:SetBuildRate(targetUpgradeBuildTime * 10)
+            unit:SetConsumptionPerSecondMass(0)
+            unit:SetConsumptionPerSecondEnergy(0)
+        end
+    end
+
+    WaitTicks(1)
+
+    for _, unit in units do
+        if not unit:BeenDestroyed() then
+            unit:SetBuildRate(unit.DefaultBuildRate)
+            unit:SetPaused(true) -- `SetPaused` updates ConsumptionPerSecond values
+            unit.TargetUpgradeBuildTime = nil
+            unit.DefaultBuildRate = nil
         end
     end
 end
@@ -286,10 +401,10 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         local defaultBuildRate
         local upgradeBuildTimeComplete
         local exclude
-        local FacRebuild_UnitId
-        local FacRebuild_Progress
-        local FacRebuild_BuildTime
-        local FacRebuild_Health
+        local FacRebuild_UnitId = unit.FacRebuild_UnitId
+        local FacRebuild_Progress = unit.FacRebuild_Progress
+        local FacRebuild_BuildTime = unit.FacRebuild_BuildTime
+        local FacRebuild_Health = unit.FacRebuild_Health
 
         local shield = unit.MyShield
         if shield then
@@ -481,6 +596,9 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
             else
                 table.insert(data, newFactoryUnit)
             end
+            -- store data for rebuilding
+            -- unit id is not needed during rebuild but is needed if transferred again in the middle of rebuild
+            newFactoryUnit.FacRebuild_UnitId = FacRebuild_UnitId
             newFactoryUnit.FacRebuild_Progress = FacRebuild_Progress
             newFactoryUnit.FacRebuild_BuildTime = FacRebuild_BuildTime
             newFactoryUnit.FacRebuild_Health = FacRebuild_Health
