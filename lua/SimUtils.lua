@@ -1462,8 +1462,8 @@ function GiveResourcesToPlayer(data)
         return
     end
 
-    local fromBrain = GetArmyBrain(data.From)
-    local toBrain = GetArmyBrain(data.To)
+    local fromBrain = ArmyBrains[data.From]
+    local toBrain = ArmyBrains[data.To]
     -- Abort if any of the armies is defeated or if trying to send a negative value
     if fromBrain:IsDefeated() or toBrain:IsDefeated() or data.Mass < 0 or data.Energy < 0 then
         return
