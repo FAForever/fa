@@ -590,14 +590,22 @@ function SerializableDeepCopy(t)
     local st = serializableTypes
     local type_t = type(t)
     if type_t ~= 'table' then
-        return st[type_t] and t or tostring(t)
+        if st[type_t] then
+            return t
+        else
+            return tostring(t)
+        end
     end
 
     local backrefs = {}
     local function CreateSerializableAny(_t)
         local type_t = type(_t)
         if type_t ~= 'table' then
-            return st[type_t] and _t or tostring(_t)
+            if st[type_t] then
+                return _t
+            else
+                return tostring(_t)
+            end
         end
 
         local b = backrefs[_t]
