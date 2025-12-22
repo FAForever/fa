@@ -1230,8 +1230,9 @@ function GetScoutingPath(bManager, unit)
             currX = currX + 48
         end
         -- Determine which poitnts the unit can actually path to
+        local unitPosition = unit:GetPosition()
         for k, v in possiblePoints do
-            if AIUtils.CheckUnitPathingEx(v, unit:GetPosition(), unit) then
+            if AIUtils.CheckUnitPathingEx(v, unitPosition, unit) then
                 TableInsert(pathablePoints, v)
             end
         end
@@ -1252,10 +1253,8 @@ function BaseManagerScoutingAI(platoon)
         local numPoints = TableGetn(pathablePoints)
         if numPoints > 0 then
             platoon:Stop()
-        end
 
-        local count = 0
-        if numPoints > 0 then
+            local count = 0
             while count < 10 do
                 local pickNum = Random(1, numPoints)
                 platoon:MoveToLocation(pathablePoints[pickNum], false)
