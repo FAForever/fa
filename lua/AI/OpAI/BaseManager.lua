@@ -312,14 +312,10 @@ BaseManager = ClassSimple {
         self.Trash = TrashBag()
 
         self.Active = false
-        self.AIBrain = false
-        self.BaseName = false
         self.DefaultEngineerPatrolChain = false
         self.DefaultAirScoutPatrolChain = false
         self.DefaultLandScoutPatrolChain = false
         self.Initialized = false
-        self.Position = false
-        self.Radius = false
         self.ConstructionAssistBool = false
 
         self.FactoryBuildRateBuff = nil
@@ -1798,7 +1794,7 @@ BaseManager = ClassSimple {
         -- The Engineer AI Thread
         for i = 1, 3 do
             defaultBuilder = {
-                BuilderName = 'T' .. i .. 'BaseManaqer_EngineersWork_' .. self.BaseName,
+                BuilderName = 'T' .. i .. 'BaseManager_EngineersWork_' .. self.BaseName,
                 PlatoonTemplate = self:CreateEngineerPlatoonTemplate(i),
                 Priority = 1,
                 PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerEngineerPlatoonSplit' },
@@ -1940,68 +1936,28 @@ BaseManager = ClassSimple {
         }
         self.AIBrain:PBMAddPlatoon(defaultBuilder)
 
-        -- T1 Air Scouts
-        defaultBuilder = {
-            BuilderName = 'BaseManager_T1AirScout_' .. self.BaseName,
-            PlatoonTemplate = self:CreateAirScoutPlatoon(1),
-            Priority = 500,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
-            BuildConditions = {
-                { BMBC, 'HighestFactoryLevelType', { 1, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
-            },
-            PlatoonData = {
-                BaseName = self.BaseName,
-            },
-            PlatoonType = 'Air',
-            RequiresConstruction = true,
-            LocationType = self.BaseName,
-            InstanceCount = 1,
-        }
-        self.AIBrain:PBMAddPlatoon(defaultBuilder)
-
-        -- T2 Air Scouts
-        defaultBuilder = {
-            BuilderName = 'BaseManager_T2AirScout_' .. self.BaseName,
-            PlatoonTemplate = self:CreateAirScoutPlatoon(2),
-            Priority = 750,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
-            BuildConditions = {
-                { BMBC, 'HighestFactoryLevelType', { 2, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
-            },
-            PlatoonData = {
-                BaseName = self.BaseName,
-            },
-            PlatoonType = 'Air',
-            RequiresConstruction = true,
-            LocationType = self.BaseName,
-            InstanceCount = 1,
-        }
-        self.AIBrain:PBMAddPlatoon(defaultBuilder)
-
-        -- T3 Air Scouts
-        defaultBuilder = {
-            BuilderName = 'BaseManager_T3AirScout_' .. self.BaseName,
-            PlatoonTemplate = self:CreateAirScoutPlatoon(3),
-            Priority = 1000,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
-            BuildConditions = {
-                { BMBC, 'HighestFactoryLevelType', { 3, self.BaseName, 'Air' } },
-                { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
-                { BMBC, 'BaseActive', { self.BaseName } },
-            },
-            PlatoonData = {
-                BaseName = self.BaseName,
-            },
-            PlatoonType = 'Air',
-            RequiresConstruction = true,
-            LocationType = self.BaseName,
-            InstanceCount = 1,
-        }
-        self.AIBrain:PBMAddPlatoon(defaultBuilder)
+        -- T1-T3 Air Scouts
+        for i = 1, 3 do
+            defaultBuilder = {
+                BuilderName = 'BaseManager_T' .. i ..'AirScout_' .. self.BaseName,
+                PlatoonTemplate = self:CreateAirScoutPlatoon(i),
+                Priority = 250 + (i * 250), -- 500, 750, 1000 for T1-3
+                PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerScoutingAI' },
+                BuildConditions = {
+                    { BMBC, 'HighestFactoryLevelType', { i, self.BaseName, 'Air' } },
+                    { BMBC, 'AirScoutingEnabled', { self.BaseName, } },
+                    { BMBC, 'BaseActive', { self.BaseName } },
+                },
+                PlatoonData = {
+                    BaseName = self.BaseName,
+                },
+                PlatoonType = 'Air',
+                RequiresConstruction = true,
+                LocationType = self.BaseName,
+                InstanceCount = 1,
+            }
+            self.AIBrain:PBMAddPlatoon(defaultBuilder)
+        end
     end,
 
     ---@param self BaseManager
