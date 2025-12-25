@@ -289,10 +289,6 @@ function CreateChatLines()
     end
 end
 
-function OnNISBegin()
-    CloseChat()
-end
-
 function SetupChatScroll()
     GUI.chatContainer.top = 1
     GUI.chatContainer.scroll = UIUtil.CreateVertScrollbarFor(GUI.chatContainer)
@@ -881,11 +877,13 @@ function ReceiveChatFromSim(sender, msg)
     }
 
     table.insert(chatHistory, entry)
-    if ChatOptions[entry.armyID] then
-        if table.getsize(chatHistory) == 1 then
-            GUI.chatContainer:CalcVisible()
-        else
-            GUI.chatContainer:ScrollToBottom()
+    if not import("/lua/ui/game/gamemain.lua").IsNISMode() then
+        if ChatOptions[entry.armyID] then
+            if table.getsize(chatHistory) == 1 then
+                GUI.chatContainer:CalcVisible()
+            else
+                GUI.chatContainer:ScrollToBottom()
+            end
         end
     end
 end
@@ -1561,5 +1559,16 @@ function CloseChatConfig()
     if GUI.config then
         GUI.config:Destroy()
         GUI.config = nil
+    end
+end
+
+function OnNISBegin()
+    CloseChatConfig()
+    GUI.bg:Hide()
+    GUI.chatEdit.edit:AbandonFocus()
+    GUI.bg:SetNeedsFrameUpdate(false)
+    for i, v in GUI.chatLines do
+        v:SetNeedsFrameUpdate(false)
+        v:Hide()
     end
 end
