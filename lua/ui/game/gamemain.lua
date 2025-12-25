@@ -29,6 +29,16 @@ local ordersControl = false
 local OnDestroyFuncs = {}
 
 local NISActive = false
+
+function IsNISMode()
+    if NISActive == 'on' then
+        return true
+    else
+        return false
+    end
+end
+
+
 local isReplay = false
 local waitingDialog = false
 
@@ -781,7 +791,8 @@ function OnUserPause(pause)
             return
         end
 
-        if not SessionIsReplay() then
+        if not SessionIsReplay() and
+           not IsNISMode() then
             if pause then
                 SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
                     to = 'all',
@@ -1029,14 +1040,6 @@ function ShowNISBars()
                 self.Height:Set(function() return curHeight * 1.25 end)
             end
         end
-    end
-end
-
-function IsNISMode()
-    if NISActive == 'on' then
-        return true
-    else
-        return false
     end
 end
 
