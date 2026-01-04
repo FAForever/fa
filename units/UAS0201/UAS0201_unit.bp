@@ -181,7 +181,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Oblivion Cannon",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
-            FiringRandomness = 0.25,
+            FiringRandomness = 0.2,
             FiringTolerance = 2,
             Label = "FrontTurret",
             MaxRadius = 70,
