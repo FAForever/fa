@@ -624,6 +624,15 @@ AutolobbyCommunications = Class(MohoLobbyMethods, AutolobbyServerCommunicationsC
         -- put the player where it belongs
         self.PlayerOptions[playerOptions.StartSpot] = playerOptions
 
+        -- send all player options to the server, this is necessary to do immediately (for the host) so that the server knows who is (not) connected. 
+        for slot, playerOptions in self.PlayerOptions do
+            local ownerId = playerOptions.OwnerID
+            self:SendPlayerOptionToServer(ownerId, 'Team', playerOptions.Team)
+            self:SendPlayerOptionToServer(ownerId, 'Army', playerOptions.StartSpot)
+            self:SendPlayerOptionToServer(ownerId, 'StartSpot', playerOptions.StartSpot)
+            self:SendPlayerOptionToServer(ownerId, 'Faction', playerOptions.Faction)
+        end
+
         -- sync game options with the connected peer
         self:SendData(data.SenderID, { Type = "UpdateGameOptions", GameOptions = self.GameOptions })
 
