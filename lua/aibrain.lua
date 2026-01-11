@@ -500,7 +500,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
             SetCommandSource(armyIndex  - 1, sourceIndex - 1, true)
 
             -- inform allied players that this happened.
-            SyncAIChat({sender=self.Nickname, group=sourceIndex, text="<LOC _AbandonedByPlayer>has abandoned their army, you can now switch focus army via the scoreboard to take control."})
+            SyncAIChat({sender=self.Nickname, group=sourceIndex, text="<LOC _AbandonedByPlayer>I have abandoned my army, you can now switch focus army via the scoreboard to take control."})
 
             -- inform developers that this happened (we show 1-based index for armies here and a 0-based index for sources)
             SPEW(string.format("Army %d %s control shared with army %d %s (source index %d)", armyIndex, tostring(self.Nickname), i, tostring(brain.Nickname), sourceIndex - 1))
