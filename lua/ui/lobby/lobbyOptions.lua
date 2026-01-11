@@ -186,8 +186,13 @@ teamOptions =
                 key = 'Off'
             },
             {
+                text = "<LOC lobui_CAUponDisconnectTitle>Union control upon disconnect",
+                help = "<LOC lobui_CAUponDisconnectDescription>Initially each player has their own army and their own resources. When a player disconnects the army is not considered defeated and the share condition does not trigger. Instead, allied players can switch focus to the disconnected army to issue commands.",
+                key = 'UnionWhenDisconnected'
+            },
+            {
                 text = "<LOC lobui_CAUnion>Multiple armies, union control",
-                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+            help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
                 key = 'Union'
             },
             {
