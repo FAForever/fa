@@ -1200,6 +1200,14 @@ function RemoveModeText(modeID)
     UpdateModeDisplay()
 end
 
+function ClearModeText()
+    for k, _ in modes do
+        modes[k] = nil
+    end
+
+    UpdateModeDisplay()
+end
+
 function UpdateModeDisplay()
     if controls.modeDisplay then
         controls.modeDisplay:Destroy()
@@ -1259,4 +1267,8 @@ function UpdateModeDisplay()
         controls.modeDisplay.minCap:DisableHitTest()
         controls.modeDisplay.maxCap:DisableHitTest()
     end
+end
+
+focusArmyChanged = function()
+    ClearModeText()
 end
