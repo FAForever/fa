@@ -519,9 +519,8 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
             return
         end
 
-        local armyIndex = self:GetArmyIndex()
-        SPEW("Army " .. tostring(armyIndex) .. " is abandoned by player " .. tostring(self.Nickname))
         self.AbandonedAt = GetGameTick()
+        SPEW(string.format("Army %d %s has been abandoned by all players with command control", self:GetArmyIndex(), tostring(self.Nickname)))
 
         if  ScenarioInfo.Options.CommonArmy == "UnionWhenDisconnected" and
 
