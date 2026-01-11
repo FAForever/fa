@@ -457,12 +457,16 @@ end
 
 --- Setup for union army, where all teams can control the units of its allies
 function BeginSessionUnionArmy(teams)
+    SPEW("Initialing session with union army control...")
+
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
         for i2, _ in ArmyBrains do
             if not IsAlly(i, i2) then continue end
             SetCommandSource(i2 - 1, humanIndex, true)
+
+            SPEW("Army " .. tostring(i2) .. " control shared with army " .. tostring(i) .. " (source index " .. tostring(humanIndex) .. ")")
         end
         humanIndex = humanIndex + 1
     end
@@ -471,6 +475,8 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy(teams)
+    SPEW("Initialing session with common army control...")
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
