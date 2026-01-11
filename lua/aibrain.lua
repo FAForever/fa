@@ -471,6 +471,47 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
     end,
 
+    --- Attempts to share the control of this (abandoned) army with the remaining allied players. 
+    ---@param self AIBrain
+    ---@return boolean          # A flag indicating whether the control was successfully shared with any allied player.
+    ShareControlWithAllies = function(self)
+        local SyncAIChat = import('/lua/simsyncutils.lua').SyncAIChat
+
+        -- An option to share control with allied human players when this army is abandoned, instead of
+        -- defeating the army straight away. The usual army defeat conditions still apply. This enables
+        -- previously defeated players to join back into the game by taking control of the abandoned army.
+
+        -- The source index is the index in the UI function 'GetSessionClients' we mimic this index here 
+        -- by skipping all non-human brains in the loop below.
+        local sourceIndex = 0
+        local armyIndex = self:GetArmyIndex()
+        local sharedSuccessfully = false
+
+        for i, brain in ArmyBrains do
+            if brain.BrainType ~= 'Human' then continue end
+            sourceIndex = sourceIndex + 1
+
+            -- only take into account allied players are also abandoned
+            if i == armyIndex then continue end                 -- do not share with ourselves
+            if brain.AbandonedAt then continue end              -- do not share with other abandoned army (sources)
+            if not IsAlly(i, armyIndex) then continue end       -- do not share with enemies or neutrals
+
+            -- These indices in the function 'SetCommandSource' is 0-based instead of 1-based, hence we manually subtract 1 here
+            SetCommandSource(armyIndex  - 1, sourceIndex - 1, true)
+
+            -- inform allied players that this happened.
+            SyncAIChat({sender=self.Nickname, group=sourceIndex, text="<LOC _AbandonedByPlayer>has abandoned their army, you can now switch focus army via the scoreboard to take control."})
+
+            -- inform developers that this happened (we show 1-based index for armies here and a 0-based index for sources)
+            SPEW(string.format("Army %d %s control shared with army %d %s (source index %d)", armyIndex, tostring(self.Nickname), i, tostring(brain.Nickname), sourceIndex - 1))
+
+            -- keep track that we successfully applied union control
+            sharedSuccessfully = true
+        end
+
+        return sharedSuccessfully
+    end,
+
     --- Called by the engine when all remaining players that has command control of this army left the game. Command control can be adjusted with `SetCommandSource` and verified with `OkayToMessWithArmy`.
     ---@param self AIBrain
     AbandonedByPlayer = function(self)
@@ -487,42 +528,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
             -- do not trigger this behavior when this army is already defeated
             (not self:IsDefeated())
         then
-
-            local SyncAIChat = import('/lua/simsyncutils.lua').SyncAIChat
-
-            -- An option to share control with allied human players when this army is abandoned, instead of
-            -- defeating the army straight away. The usual army defeat conditions still apply. This enables
-            -- previously defeated players to join back into the game by taking control of the abandoned army.
-
-            -- The source index is the index in the UI function 'GetSessionClients' we mimic this index here 
-            -- by skipping all non-human brains in the loop below.
-            local sourceIndex = 0
-            local unionControlApplied = false
-
-            for i, brain in ArmyBrains do
-                if brain.BrainType ~= 'Human' then continue end
-                sourceIndex = sourceIndex + 1
-
-                -- only take into account allied players are also abandoned
-                if i == armyIndex then continue end                 -- do not share with ourselves
-                if brain.AbandonedAt then continue end              -- do not share with other abandoned army (sources)
-                if not IsAlly(i, armyIndex) then continue end       -- do not share with enemies or neutrals
-
-                -- These indices in the function 'SetCommandSource' is 0-based instead of 1-based, hence we manually subtract 1 here
-                SetCommandSource(armyIndex  - 1, sourceIndex - 1, true)
-
-                -- inform allied players that this happened.
-                SyncAIChat({sender=self.Nickname, group=sourceIndex, text="<LOC _AbandonedByPlayer>has abandoned their army, you can now switch focus army via the scoreboard to take control."})
-
-                -- inform developers that this happened (we show 1-based index for armies here and a 0-based index for sources)
-                SPEW("Army " .. tostring(armyIndex) .. " control shared with army " .. tostring(i) .. " (source index " .. tostring(sourceIndex - 1) .. ")")
-
-                -- keep track that we successfully applied union control
-                unionControlApplied = true
-            end
-
-            -- check if we actually applied union control, if not then this army is defeated as usual
-            if unionControlApplied then
+            -- attempt to share control of this army with remaining allied players
+            local succeeded = self:ShareControlWithAllies()
+            if succeeded then
                 return
             end
         end
