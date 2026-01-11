@@ -482,7 +482,11 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         SPEW("Army " .. tostring(armyIndex) .. " is abandoned by player " .. tostring(self.Nickname))
         self.AbandonedAt = GetGameTick()
 
-        if ScenarioInfo.Options.CommonArmy == "UnionWhenDisconnected" then
+        if  ScenarioInfo.Options.CommonArmy == "UnionWhenDisconnected" and
+
+            -- do not trigger this behavior when this army is already defeated
+            (not self:IsDefeated())
+        then
 
             local SyncAIChat = import('/lua/simsyncutils.lua').SyncAIChat
 
