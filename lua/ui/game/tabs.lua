@@ -1201,8 +1201,9 @@ function RemoveModeText(modeID)
 end
 
 function ClearModeText()
-    for k, _ in modes do
-        modes[k] = nil
+    local keys = table.keys(modes, false)
+    for k = 1, table.getn(keys) do
+        modes[keys[k]] = nil
     end
 
     UpdateModeDisplay()
@@ -1269,6 +1270,6 @@ function UpdateModeDisplay()
     end
 end
 
-focusArmyChanged = function()
+FocusArmyChanged = function()
     ClearModeText()
 end

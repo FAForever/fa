@@ -296,7 +296,7 @@ function OnSync()
         import("/lua/ui/game/avatars.lua").FocusArmyChanged()
         import("/lua/ui/game/multifunction.lua").FocusArmyChanged()
         import("/lua/ui/notify/notify.lua").focusArmyChanged()
-        import("/lua/ui/game/tabs.lua").focusArmyChanged()
+        import("/lua/ui/game/tabs.lua").FocusArmyChanged()
     end
 
     if Sync.CampaignMode then
