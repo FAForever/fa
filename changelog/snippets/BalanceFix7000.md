@@ -1,1 +1,1 @@
-﻿- (#7000) GuardScanRadius from 26->8. Sparkies will not stop reclaiming to persue enemy units from such a large range anymore.
+﻿- (#7000) GuardScanRadius from 26->8. Sparkies will not stop reclaiming to pursue enemy units from such a large range anymore.
