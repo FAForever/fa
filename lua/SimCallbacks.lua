@@ -826,6 +826,38 @@ do
 
 end
 
+do
+
+    ---@param data { Enable: boolean, ShowMsg: boolean }
+    ---@param selection Unit[]
+    Callbacks.ForceReclaim = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+        
+        -- verify we have engineers
+        local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+        if TableEmpty(engineers) then
+            return
+        end
+        
+        for k, unit in engineers do
+            unit:ForceReclaim(data.Enable)
+        end
+
+        if data.ShowMsg then
+            if data.Enable == true then
+                print(string.format("Force reclaim ENABLED for %d engineers", table.getn(engineers)))
+            else
+                print(string.format("Force reclaim DISABLED for %d engineers", table.getn(engineers)))
+            end
+        end
+    end
+end
+
+
 --#endregion
 
 

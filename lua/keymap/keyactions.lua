@@ -1653,7 +1653,23 @@ local keyActionsOrdersAdvanced = {
     ['shift_discharge'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
         category = 'ordersAdvanced',
-    }
+    },
+    ['enable_force_reclaim'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SetForceReclaim(true)',
+        category = 'ordersAdvanced',
+    },
+    ['shift_enable_force_reclaim'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SetForceReclaim(true)',
+        category = 'ordersAdvanced',
+    },
+    ['disable_force_reclaim'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SetForceReclaim(false)',
+        category = 'ordersAdvanced',
+    },
+    ['shift_disable_force_reclaim'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SetForceReclaim(false)',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {
