@@ -559,8 +559,8 @@ keyDescriptions = {
     ['shift_load_transports_clear'] = '<LOC key_desc_shift_load_transports_clear>Load into transports. Applies immediately',
     ['copy_orders'] = '<LOC key_desc_copy_orders>Copy orders of the unit the mouse is on top of',
     ['shift_copy_orders'] = '<LOC key_desc_shift_copy_orders>Copy orders of the unit the mouse is on top of',
-    ['reverse_move'] = '<LOC key_desc_reverse_move>Reverse move.',
-    ['shift_reverse_move'] = '<LOC key_desc_shift_reverse_move>Reverse move.',
+    ['reverse_move'] = '<LOC key_desc_reverse_move>Reverse move',
+    ['shift_reverse_move'] = '<LOC key_desc_shift_reverse_move>Reverse move',
 
     ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Normal)',
     ['select_torpedo_bombers'] = '<LOC key_desc_0408>Select all Bombers (Torpedo)',
