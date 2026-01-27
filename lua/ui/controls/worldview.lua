@@ -201,6 +201,9 @@ local orderToCursorCallback = {
     RULEUCC_Script = 'OnCursorScript',
     RULEUCC_Invalid = 'OnCursorInvalid',
     RULEUCC_CallTransport = 'OnCursorCallTransport',
+    
+    -- A fake RULEUCC for cursor rendering. Actual CM in commandmode.lua is still RULEUCC_Move
+    RULEUCC_ReverseMove = 'OnCursorReverseMove',   
 
     -- misc
     CommandHighlight = 'OnCursorCommandHover',
@@ -392,6 +395,10 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
                 if order == 'RULEUCC_Attack' then
                     order = 'RULEUCC_AttackGround'
                 end
+                
+                if command_data.isReverseMove then
+                    order = 'RULEUCC_ReverseMove'
+                end
             -- 2. then command highlighting
             elseif self:HasHighlightCommand() then
                 order = 'CommandHighlight'
@@ -524,6 +531,21 @@ WorldView = ClassUI(moho.UIWorldView, Control, WorldViewShapeComponent, WorldVie
             end
         else
             self:EnableIgnoreMode(false)
+        end
+    end,
+    
+    --- Called when the order `RULEUCC_ReverseMove` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_ReverseMove'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorReverseMove = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
         end
     end,
 

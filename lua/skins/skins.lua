@@ -201,6 +201,7 @@ skins = {
             RULEUCC_Teleport = {'/textures/ui/common/game/cursors/transport.dds', 15, 15},
             RULEUCC_Script = {'/textures/ui/common/game/cursors/attack.dds', 15, 15},
             RULEUCC_Invalid = {'/textures/ui/common/game/cursors/attack-invalid.dds', 15, 15},
+            RULEUCC_ReverseMove = {'/textures/ui/common/game/cursors/reverse_move-.dds', 15, 15, 12, 12},
             COORDINATED_ATTACK = {'/textures/ui/common/game/cursors/attack_coordinated.dds', 15, 15},
             MESSAGE = {'/textures/ui/common/game/cursors/message-.dds', 15, 15, 11, 12},
             BUILD = {'/textures/ui/common/game/cursors/selectable-.dds', 2, 2, 7, 12},
