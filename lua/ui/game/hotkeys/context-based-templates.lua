@@ -42,44 +42,77 @@ local TableHash = table.hash
 local StringFormat = string.format
 
 -------------------------------------------------------------------------------
---#region Debugging
-
----@type boolean
-local Debug = true
-
-local oldSpew = _G.SPEW
-local SPEW = function(msg)
-    if Debug then
-        oldSpew(StringFormat("Context based templates: %s", tostring(msg)))
-    end
-end
-
---#endregion
-
--------------------------------------------------------------------------------
 --#region Template discovery
-
--- convert all known templates
-
----@type table
-local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
 ---@type ContextBasedTemplate[]
 local Templates = {}
 
-for k, template in RawTemplates do
+--- Utility function to register a (new) template.
+---@param template ContextBasedTemplate
+RegisterTemplate = function(template)
     if type(template) == "table" then
         if template.TriggersOnUnit or template.TriggersOnLand or template.TriggersOnMassDeposit or
             template.TriggersOnHydroDeposit or template.TriggersOnWater or template.TriggersOnBuilding then
             if template.TemplateSortingOrder then
                 TableInsert(Templates, template)
-                SPEW(StringFormat("Found template: %s with name %s", tostring(k), tostring(template.Name)))
+                SPEW(StringFormat("Found template with name %s", tostring(template.Name)))
             end
         end
+    else
+        WARN("Failed to add template: \r\n" .. reprs(template))
     end
 end
 
-SPEW(StringFormat("Found %d templates", table.getn(Templates)))
+--- Utility function to remove a template by reference.
+RemoveTemplateByReference = function(template)
+    local index = table.find(Templates, template)
+    if index then
+        table.remove(Templates, index)
+        SPEW(StringFormat("Removed template with name %s", tostring(template.Name)))
+    end
+end
+
+--- Automatically loads in all the default templates.
+LoadDefaultTemplates = function()
+    -- backwards compatibility for automatic discovery
+    local templates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
+    for k, template in templates do
+        if type(template) == "table" then
+            RegisterTemplate(template)
+        end
+    end
+
+    -- context by mouse
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/pointdefense.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/airdefenseland.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/airdefensewater.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/torpedodefense.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/t3extractor.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/t3extractorwithstorages.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/t3extractorwithstoragesandfabs.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/t1hydrocarbon.lua").Template)
+
+    -- context by unit id
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendextractorwithstorages.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendextractorwithfabs.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendradarwithpower.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendopticswithpower.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendt2artillerywithpower.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendt3fabricatorwithstorages.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendt2artillerywithpower.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendt3artillerywithpower.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendsalvationwithpower.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendpowergeneratorstot2artillery.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendpowergeneratorstot3artillery.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendpowergeneratorstosalvation.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendpowergeneratorstoenergystorage.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendpowergeneratorstotml.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendwallstopointdefense.lua").Template)
+    RegisterTemplate(import("/lua/ui/game/hotkeys/context-based-templates-data/appendairgrid.lua").Template)
+
+
+    SPEW(StringFormat("Found %d templates", table.getn(Templates)))
+end
 
 --#endregion
 
@@ -117,7 +150,7 @@ end
 ---@return BlueprintId?
 local function FindBuildableBlueprintId(blueprintId, buildableUnits, prefix)
     local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
-    -- This is where we check and validate the 
+    -- This is where we check and validate the
 
     local blueprint = __blueprints[convertedBlueprintId]
     if blueprint then
@@ -158,7 +191,7 @@ local Cachedtemplate = { 0, 0 }
 
 --- Cached template to avoid (de)allocating memory
 ---@type UIBuildTemplateBuilding[]
-local TemplateEntries = { }
+local TemplateEntries = {}
 
 ---@param index number
 ---@return UIBuildTemplateBuilding
@@ -267,7 +300,7 @@ CommandMode.AddEndBehavior(
             TableSetn(ContextBasedTemplates, 0)
             ContextBasedTemplateStep = 0
 
-            -- We can't clear the build templates here as the majority of UI mods do not properly 
+            -- We can't clear the build templates here as the majority of UI mods do not properly
             -- restore the build template when manipulating the selection and/or command mode.
             --
             -- Sadly though, this means that the build template will be visible when the player
@@ -494,3 +527,25 @@ Cycle = function()
 
     SPEW("Time taken: " .. GetSystemTimeSeconds() - start)
 end
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+--- Called by the module manager when this module becomes dirty
+function __moduleinfo.OnDirty()
+    print("Disk changes detected for context based templates module...")
+
+    -- force a reload
+    ForkThread(
+        function()
+            local newModule = import("/lua/ui/game/hotkeys/context-based-templates.lua")
+
+            -- re-register the templates in the new module
+            for k = 1, TableGetn(Templates) do
+                newModule.RegisterTemplate(Templates[k])
+            end
+        end
+    )
+end
+
+--#endregionGetSingleton

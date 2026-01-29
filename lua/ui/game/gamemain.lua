@@ -164,6 +164,12 @@ function CreateUI(isReplay)
     import("/lua/system/performance.lua")
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
+    pcall(
+        function()
+            -- may be hooked and what not, in order to prevent complete UI failures I encapsulate it into a pcall
+            import("/lua/ui/game/hotkeys/context-based-templates.lua").LoadDefaultTemplates()
+        end
+    )
 
     -- casting tools
 
@@ -187,9 +193,9 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')
 
     -- tweak decal properties
-    ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
-    ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
-    ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
+    ConExecute("ren_ViewError 0.004") -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
+    ConExecute("ren_ClipDecalLevel 4") -- standard value of 2, causes a lot of clipping
+    ConExecute("ren_DecalFadeFraction 0.25") -- standard value of 0.5, causes decals to suddenly pop into screen
 
     local focusArmy = GetFocusArmy()
 
@@ -481,6 +487,7 @@ function CreateWldUIProvider()
             WaitSeconds(.15)
             HideGameUI('off')
         end
+
         local loadingPref = Prefs.GetFromCurrentProfile('LoadingFaction')
         local factions = import("/lua/factions.lua").Factions
         local texture = '/UEF_load.dds'
@@ -498,7 +505,7 @@ function CreateWldUIProvider()
         background.OnFrame = function(self, delta)
             self.time = self.time + delta
             if self.time > 1.5 then
-                local newAlpha = self:GetAlpha() - (delta/2)
+                local newAlpha = self:GetAlpha() - (delta / 2)
                 if newAlpha < 0 then
                     newAlpha = 0
                     self:Destroy()
@@ -592,10 +599,10 @@ end
 
 --- A cache used with ObserveSelection to prevent continuous table allocations
 local cachedSelection = {
-    oldSelection = { },
-    newSelection = { },
-    added = { },
-    removed = { },
+    oldSelection = {},
+    newSelection = {},
+    added = {},
+    removed = {},
 }
 
 --- Observable to allow mods to do something with a new selection
@@ -650,7 +657,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         -- documentation
         local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
-        local potentialUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        local potentialUpgrades = upgradeTab[bp.BlueprintId] or { bp.General.UpgradesTo }
         if potentialUpgrades then
             local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
             for _, upgr in potentialUpgrades do
@@ -690,7 +697,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             import("/lua/ui/game/orders.lua").SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
         -- TODO change the current command mode if no longer available? or set to nil?
-        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories,newSelection,isOldSelection)
+        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories, newSelection, isOldSelection)
     end
 
     if not isOldSelection then
@@ -700,7 +707,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
             for _, factory in factories do
                 if not factory.HasBeenSelected then
-                    factory:ProcessInfo('SetRepeatQueue','true')
+                    factory:ProcessInfo('SetRepeatQueue', 'true')
                     factory.HasBeenSelected = true
                 end
             end
@@ -741,9 +748,9 @@ end
 function OnPause(pausedBy, timeoutsRemaining)
     import("/lua/ui/game/pause.lua").OnPause(pausedBy, timeoutsRemaining)
 
-    PauseSound("World",true)
-    PauseSound("Music",true)
-    PauseVoice("VO",true)
+    PauseSound("World", true)
+    PauseSound("Music", true)
+    PauseVoice("VO", true)
     import("/lua/ui/game/tabs.lua").OnPause(true, pausedBy, timeoutsRemaining)
     import("/lua/ui/game/missiontext.lua").OnGamePause(true)
 end
@@ -751,8 +758,8 @@ end
 -- Called after the Sim has confirmed that the game has resumed.
 local ResumedBy = nil
 
---- Transmitted via a Chat command by another user to inform Lua who sent the resume command. 
----@param sender string # The name of the player that resumed the game. 
+--- Transmitted via a Chat command by another user to inform Lua who sent the resume command.
+---@param sender string # The name of the player that resumed the game.
 function SendResumedBy(sender)
     if not ResumedBy then ResumedBy = sender end
 end
@@ -761,9 +768,9 @@ end
 function OnResume()
     import("/lua/ui/game/pause.lua").OnResume()
 
-    PauseSound("World",false)
-    PauseSound("Music",false)
-    PauseVoice("VO",false)
+    PauseSound("World", false)
+    PauseSound("Music", false)
+    PauseVoice("VO", false)
     import("/lua/ui/game/tabs.lua").OnPause(false, ResumedBy)
     import("/lua/ui/game/missiontext.lua").OnGamePause(false)
     ResumedBy = nil
@@ -813,14 +820,14 @@ local _beatFunctions = {}
 --                   to reduce UI load when speeding up sim / replay
 -- @param key      - specifies optional key used later for removing callbacks by a key
 function AddBeatFunction(fn, throttle, key)
-    table.insert(_beatFunctions, {fn = fn, throttle = throttle == true, key = key})
+    table.insert(_beatFunctions, { fn = fn, throttle = throttle == true, key = key })
 end
 
 -- Removes a function callback from calling on sim beats
 -- @param fn  - specifies function callback
 -- @param key - specifies optional key associated with function callback
 function RemoveBeatFunction(fn, key)
-    for i,v in _beatFunctions do
+    for i, v in _beatFunctions do
         if v.fn == fn then
             table.remove(_beatFunctions, i)
             break
@@ -846,7 +853,7 @@ function OnBeat()
         end
     end
 
-    for i,v in _beatFunctions do
+    for i, v in _beatFunctions do
         if v.throttle and throttle then continue end
         if v.fn then v.fn() end
     end
@@ -959,7 +966,7 @@ function NISMode(state)
         ConExecute('UI_NisRenderIcons false')
         ConExecute('ren_SelectBoxes false')
         for i, v in rangePrefs do
-            ConExecute(i..' false')
+            ConExecute(i .. ' false')
         end
         preNISSettings.gameSpeed = GetGameSpeed()
         if preNISSettings.gameSpeed ~= 0 then
@@ -984,9 +991,9 @@ function NISMode(state)
         ConExecute('ren_SelectBoxes true')
         for i, v in rangePrefs do
             if Prefs.GetFromCurrentProfile(i) == nil then
-                ConExecute(i..' true')
+                ConExecute(i .. ' true')
             else
-                ConExecute(i..' '..tostring(Prefs.GetFromCurrentProfile(i)))
+                ConExecute(i .. ' ' .. tostring(Prefs.GetFromCurrentProfile(i)))
             end
         end
         if GetGameSpeed() ~= preNISSettings.gameSpeed then
@@ -1044,7 +1051,7 @@ function HideNISBars()
     NISControls.barTop:SetNeedsFrameUpdate(true)
     NISControls.barTop.OnFrame = function(self, delta)
         if delta then
-            local newAlpha = self:GetAlpha()*.8
+            local newAlpha = self:GetAlpha() * .8
             if newAlpha < .1 then
                 NISControls.barBot:Destroy()
                 NISControls.barBot = false
@@ -1069,7 +1076,7 @@ end
 
 --- Called by the engine as (chat) messages are received.
 ---@param sender string     # username
----@param data table        
+---@param data table
 function ReceiveChat(sender, data)
     if data.Identifier then
 
@@ -1108,12 +1115,12 @@ function QuickSave(filename)
         local statusStr = "<LOC saveload_0002>Quick Save in progress..."
         local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
         InternalSaveGame(path, filename, function(worked, errmsg)
-                         status:Destroy()
-                         if not worked then
-                             infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
-                             UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
-                         end
-                     end)
+            status:Destroy()
+            if not worked then
+                infoStr = LOC("<LOC uisaveload_0008>Save failed! ") .. errmsg
+                UIUtil.ShowInfoDialog(GetFrame(0), infoStr, "<LOC _Ok>")
+            end
+        end)
     end
 end
 
@@ -1143,7 +1150,7 @@ function UiBeat()
         import("/lua/ui/game/economy.lua").ToggleEconPanel(not observing)
     end
     if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
-        GpgNetSend("BEAT",GameTick(),GetGameSpeed())
+        GpgNetSend("BEAT", GameTick(), GetGameSpeed())
     end
 end
 
