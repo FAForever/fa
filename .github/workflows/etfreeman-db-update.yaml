@@ -61,7 +61,7 @@ jobs:
       - name: Copy
         run: |
           # remove old files that have a hash in the name
-          rm -r gh-pages/assets/*
+          rm -r -f gh-pages/assets/*
 
           # copy over new files
           cp -r dist/* gh-pages/
@@ -74,7 +74,7 @@ jobs:
         working-directory: gh-pages
         run: |
           # Check for any differences between the working directory and the latest commit
-          if git diff --quiet; then
+          if git status --porcelain; then
             echo "No changes to deploy"
             exit 0
           fi
