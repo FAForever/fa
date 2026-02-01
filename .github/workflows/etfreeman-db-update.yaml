@@ -23,9 +23,67 @@ name: ETFreeman DB - update unit information
 on:
   workflow_dispatch:
   push:
-    branches:
-      - deploy/faf
+    # branches:
+    #   - deploy/faf
+
+permissions:
+  contents: read
 
 jobs:
+  build:
+    uses: FAForever/etfreeman-db/.github/workflows/build.yaml@main
+
   deploy:
-    uses: FAForever/etfreeman-db/.github/workflows/deploy.yml@main
+    name: Deploy the ETFreeman DB
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout/tree/v4/
+      - name: Checkout etfreeman-db code
+        uses: actions/checkout@v4
+        with:
+          repository: FAForever/etfreeman-db
+          path: gh-pages
+          ref: gh-pages
+          ssh-key: ${{ secrets.ETFREEMAN_DB_DEPLOYMENT_KEY }}
+
+      # https://github.com/actions/download-artifact/tree/v4/
+      - name: Download recent build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: etfreeman-db-dist
+          path: dist
+
+      # Each file is given a (random) hash pre-pended to the filename to prevent caching
+      # issues. Because of that we first need to remove all existing hashed files as otherwise
+      # they will keep accumulating forever. As much as this fits the narrative of the community
+      # (Forged Alliance >Forever<) it's not what we want here.
+      - name: Copy
+        run: |
+          # remove old files that have a hash in the name
+          rm -r gh-pages/assets/*
+
+          # copy over new files
+          cp -r dist/* gh-pages/
+
+      # By pushing the changes to the gh-pages branch, the changes will be deployed to the
+      # website. The website is hosted on GitHub Pages and is (at the moment of writing)
+      # available at:
+      # - https://faforever.github.io/etfreeman-db/
+      - name: Deploy
+        working-directory: gh-pages
+        run: |
+          # Check for any differences between the working directory and the latest commit
+          if git diff --quiet; then
+            echo "No changes to deploy"
+            exit 0
+          fi
+
+          # Configure git
+          git config user.email "administrator@faforever.com"
+          git config user.name "FAForever"
+
+          # Stage, commit and push the changes
+          git stage .
+          git commit -m 'Automated deployment of etfreeman db'
+          git push origin HEAD:gh-pages
