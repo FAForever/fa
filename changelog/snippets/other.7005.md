@@ -1,0 +1,1 @@
+- (#7005) Add support for automatically updating the new unit database by ETFreeman
