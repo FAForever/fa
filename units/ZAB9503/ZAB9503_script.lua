@@ -13,4 +13,3 @@ local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
 ZAB9503 = ClassUnit(ASeaFactoryUnit) {}
 
 TypeClass = ZAB9503
-

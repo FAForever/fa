@@ -4,6 +4,7 @@ UnitBlueprint{
         TargetBones = {
             "B01",
             "B08",
+			"URB0102",
         },
     },
     Audio = {
@@ -46,16 +47,16 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationBuild = "/units/urb0102/urb0102_abuild.sca",
+        AnimationBuild = "/units/urb0102/urb0102_abuild.sca",			
         AnimationFinishBuildLand = "/units/urb0102/urb0102_aplatform.sca",
         AnimationUpgrade = "/units/urb0102/urb0102_aupgrade.sca",
         AnimationUpgradeTable = {
             urb0202 = "/units/urb0102/URB0102_aupgrade.sca",
-            zrb9502 = "/units/urb0102/URB0102_aupgrade_sup.sca",
-        },
-        BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.4,   BLOffsetZ = -1.9,  BLScale = 1 },
+            zrb9502 = "/units/urb0102/URB0102_aupgrade2.sca",
+        },        
+		BlinkingLights = {
+            { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.1,  BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -69,12 +70,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Insect",
+                    AlbedoName = "/units/urb0102/URB0102_Albedo.dds",
+                    NormalsName = "/units/urb0102/URB0102_NormalsTS.dds",
+                    SpecularName = "/units/urb0102/URB0102_SpecTeam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Insect",
-                    AlbedoName = "urb0102_lod1_albedo.dds",
-                    SpecularName = "urb0102_lod1_specteam.dds",
+                    AlbedoName = "/units/urb0102/URB0102_lod1_Albedo.dds",
+                    NormalsName = "/units/urb0102/URB0102_lod1_NormalsTS.dds",
+                    SpecularName = "/units/urb0102/URB0102_lod1_SpecTeam.dds",
                 },
             },
         },

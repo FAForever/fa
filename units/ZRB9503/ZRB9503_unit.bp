@@ -50,7 +50,7 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationBuild = "/units/urb0203/urb0203_aBuild.sca",
+        AnimationBuild = "/units/zrb9503/zrb9503_aBuild.sca",
         AnimationUpgrade = "/units/zrb9503/zrb9503_aupgrade.sca",
         BlinkingLights = {
             { BLBone = "B03", BLOffsetX = -0.7,  BLOffsetY = 0.2,   BLOffsetZ = 0.08,  BLScale = 2 },
@@ -151,7 +151,7 @@ UnitBlueprint{
         SkirtOffsetX = -6,
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionMeshUseTopAmount = 0.15,
     SelectionSizeX = 2.6,
@@ -160,7 +160,7 @@ UnitBlueprint{
     CollisionOffsetX = -0.25,
     CollisionOffsetY = -1,
     CollisionOffsetZ = -1,
-    SizeX = 3.0,
+    SizeX = 4,
     SizeY = 3,
     SizeZ = 13,
     StrategicIconName = "icon_factory2_naval",

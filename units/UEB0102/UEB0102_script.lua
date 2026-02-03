@@ -1,3 +1,4 @@
+
 --****************************************************************************
 --**
 --**  File     :  /cdimage/units/UEB0102/UEB0102_script.lua
@@ -5,7 +6,7 @@
 --**
 --**  Summary  :  UEF T1 Air Factory Script
 --**
---**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 

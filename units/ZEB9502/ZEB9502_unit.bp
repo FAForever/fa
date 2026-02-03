@@ -50,7 +50,7 @@ UnitBlueprint{
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationFinishBuildLand = "/units/ueb0202/ueb0202_aplatform.sca",
-        AnimationUpgrade = "/units/ueb0202/ueb0202_aupgrade.sca",
+        AnimationUpgrade = "/units/zeb9502/zeb9502_aupgrade.sca",
         BlinkingLights = {
             { BLBone = "Tower04", BLOffsetX = 0.25,  BLOffsetY = 0.07,  BLOffsetZ = 0.6,   BLScale = 2 },
         },
@@ -66,12 +66,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Unit",
+                    AlbedoName = "/units/ueb0102/ueb0102_albedo.dds",
+                    NormalsName = "/units/ueb0102/ueb0102_normalsts.dds",
+                    SpecularName = "/units/ueb0102/ueb0102_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Unit",
-                    AlbedoName = "zeb9502_lod1_albedo.dds",
-                    SpecularName = "zeb9502_lod1_specteam.dds",
+                    AlbedoName = "/units/ueb0102/ueb0102_lod1_Albedo.dds",
+                    NormalsName = "/units/ueb0102/ueb0102_lod1_NormalsTS.dds",
+                    SpecularName = "/units/ueb0102/ueb0102_lod1_SpecTeam.dds",
                 },
             },
         },

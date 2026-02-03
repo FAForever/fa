@@ -38,10 +38,10 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationUpgrade = "/units/uab0203/uab0203_aopen.sca",
+        AnimationUpgrade = "/units/uab0203/UAB0203_Aopen.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0.45,  BLOffsetY = 4.6,   BLOffsetZ = 0.8,   BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 3.5,   BLOffsetY = 3.3,   BLOffsetZ = -0.25, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,  BLOffsetY = 4.6,   BLOffsetZ = 0.4,   BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,   BLOffsetY = 3.3,   BLOffsetZ = 3.45, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -138,10 +138,10 @@ UnitBlueprint{
             { UnitSpin = 180,   X = -6,    Y = 0,     Z = -8 },
             { UnitSpin = 0,     X = -6,    Y = 0,     Z = 8 },
         },
-        SkirtOffsetX = -6,
-        SkirtOffsetZ = -2,
+        SkirtOffsetX = -7,
+        SkirtOffsetZ = -1,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionSizeX = 2.5,
     SelectionSizeZ = 7.5,
@@ -150,7 +150,7 @@ UnitBlueprint{
     CollisionOffsetZ = 1,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 12,
+    SizeZ = 13,
     StrategicIconName = "icon_factoryhq2_naval",
     StrategicIconSortPriority = 215,
     Wreckage = {

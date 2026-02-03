@@ -45,10 +45,10 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = -1.68, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.15,  BLOffsetZ = 1.77,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.76, BLOffsetY = 0.35,  BLOffsetZ = -1.68, BLScale = 1.4 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.35,  BLOffsetZ = -1.68, BLScale = 1.4 },
+            { BLBone = 0,     BLOffsetX = -1.75, BLOffsetY = 0.35,  BLOffsetZ = 1.77,  BLScale = 1.4 },
+            { BLBone = 0,     BLOffsetX = 1.74,  BLOffsetY = 0.35,  BLOffsetZ = 1.77,  BLScale = 1.4 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -146,15 +146,30 @@ UnitBlueprint{
         RaisedPlatforms = {
             --X,     Z,     height -- Offsets from center
 
-            -0.8,  -0.5,  0.15,    --Top left
-            0.8,   -0.5,  0.15,    --Top right
-            -0.8,  1.1,   0.15,    --Bottom left
-            0.8,   1.1,   0.15,    --Bottom right
+            -1.1,  -1.6,  0.5,     --Top left
+            1.1,   -1.6,  0.5,     --Top right
+            -1.1,  1.9,   0.5,     --Bottom left
+            1.1,   1.9,   0.5,     --Bottom right
 
-            -2.25, -2.25, 0.05,    --Top left
-            2.25,  -2.25, 0.05,    --Top right
-            -2.25, 2.25,  0.05,    --Bottom left
-            2.25,  2.25,  0.05,    --Bottom right
+            -1.7,  -1.6,  0.45,    --Top left
+            -1.1,  -1.6,  0.45,    --Top right
+            -1.7,  1.9,   0.45,    --Bottom left
+            -1.1,  1.9,   0.45,    --Bottom right
+
+            1.1,   -1.6,  0.45,    --Top left
+            1.7,   -1.6,  0.45,    --Top right
+            1.1,   1.9,   0.45,    --Bottom left
+            1.7,   1.9,   0.45,    --Bottom right
+
+            -2.5,  -1.6,  0,       --Top left
+            -1.7,  -1.6,  0.45,    --Top right
+            -2.5,  1.9,   0,       --Bottom left
+            -1.7,  1.9,   0.45,    --Bottom right
+
+            1.7,   -1.6,  0.45,    --Top left
+            2.5,   -1.6,  0,       --Top right
+            1.7,   1.9,   0.45,    --Bottom left
+            2.5,   1.9,   0,       --Bottom right
         },
         RollOffPoints = {
             { UnitSpin = 90,    X = 2.75,  Y = 0,     Z = 0.35 },

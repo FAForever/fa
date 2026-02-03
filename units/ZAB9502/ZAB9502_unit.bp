@@ -43,8 +43,8 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/zab9502/zab9502_aupgrade.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 2.75,  BLOffsetZ = -1.45, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -2.26, BLOffsetY = 2.4,   BLOffsetZ = -1.28, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 2.7,  BLOffsetZ = -1.45, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -1.9, BLOffsetY = 2.4,   BLOffsetZ = -1.0, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -57,11 +57,10 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    Scrolling = true,
                     ShaderName = "Aeon",
-                    AlbedoName = "/units/uab0102/UAB0102_Albedo.dds",
-                    NormalsName = "/units/uab0102/UAB0102_NormalsTS.dds",
-                    SpecularName = "/units/uab0102/UAB0102_SpecTeam.dds",
+                    AlbedoName = "/units/uab0102/uab0102_albedo.dds",
+                    NormalsName = "/units/uab0102/uab0102_normalsts.dds",
+                    SpecularName = "/units/uab0102/uab0102_specteam.dds",
                 },
                 {
                     LODCutoff = 500,

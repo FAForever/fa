@@ -1,7 +1,7 @@
 -- File     :  /cdimage/units/UAB0303/UAB0303_script.lua
 -- Author(s):  John Comes, David Tomandl, Gordon Duclos
 -- Summary  :  Aeon Tier 3 Naval Factory Script
--- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
 
@@ -23,4 +23,3 @@ UAB0303 = ClassUnit(ASeaFactoryUnit) {
 }
 
 TypeClass = UAB0303
-

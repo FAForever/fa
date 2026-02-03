@@ -147,7 +147,7 @@ UnitBlueprint{
         SkirtOffsetX = -6,
         SkirtOffsetZ = -2,
         SkirtSizeX = 12,
-        SkirtSizeZ = 14,
+        SkirtSizeZ = 15,
     },
     SelectionCenterOffsetX = -0.57,
     SelectionMeshUseTopAmount = 0.15,

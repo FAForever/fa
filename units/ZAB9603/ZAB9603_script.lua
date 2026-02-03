@@ -14,4 +14,3 @@ ZAB9603 = ClassUnit(ASeaFactoryUnit) {
 }
 
 TypeClass = ZAB9603
-

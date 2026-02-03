@@ -40,10 +40,10 @@ UnitBlueprint{
         RegenRate = 20,
     },
     Display = {
-        AnimationBuild = "/units/zrb9601/zrb9601_abuild.sca",
+        AnimationBuild = "/units/zrb9601/ZRB9601_Abuilt.sca",
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 2.05,  BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -2.05, BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.74,  BLOffsetY = 2.42,   BLOffsetZ = -1.15, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -0.74, BLOffsetY = 2.42,   BLOffsetZ = -1.15, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",

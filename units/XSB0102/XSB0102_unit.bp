@@ -54,8 +54,12 @@ UnitBlueprint{
             },
         },
         AnimationUpgrade = "/units/xsb0102/xsb0102_aupgrade.sca",
+        AnimationUpgradeTable = {
+            xsb0202 = "/units/xsb0102/xsb0102_aupgrade.sca",
+            zsb9502 = "/units/xsb0102/xsb0102_aupgrade_sup.sca",
+        },
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 1.9,   BLOffsetZ = -1.45, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0,    BLOffsetY = 3.8,   BLOffsetZ = -2.3, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -78,12 +82,16 @@ UnitBlueprint{
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     Scrolling = true,
                     ShaderName = "Seraphim",
+                    AlbedoName = "/units/xsb0102/xsb0102_albedo.dds",
+                    NormalsName = "/units/xsb0102/xsb0102_normalsts.dds",
+                    SpecularName = "/units/xsb0102/xsb0102_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Seraphim",
-                    AlbedoName = "xsb0102_lod1_albedo.dds",
-                    SpecularName = "xsb0102_lod1_specteam.dds",
+                    AlbedoName = "/units/xsb0102/xsb0102_lod1_Albedo.dds",
+                    NormalsName = "/units/xsb0102/xsb0102_lod1_NormalsTS.dds",
+                    SpecularName = "/units/xsb0102/xsb0102_lod1_SpecTeam.dds",
                 },
             },
         },

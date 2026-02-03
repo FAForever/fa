@@ -48,8 +48,8 @@ UnitBlueprint{
             zrb9501 = "/units/urb0101/urb0101_aopen_sup.sca",
         },
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 2.05,  BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = -2.05, BLOffsetY = 1.8,   BLOffsetZ = -0.35, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.74,  BLOffsetY = 1.3,   BLOffsetZ = -1.15, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = -0.74, BLOffsetY = 1.3,   BLOffsetZ = -1.15, BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -63,12 +63,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Insect",
+                    AlbedoName = "/units/urb0101/URB0101_Albedo.dds",
+                    NormalsName = "/units/urb0101/URB0101_NormalsTS.dds",
+                    SpecularName = "/units/urb0101/URB0101_SpecTeam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Insect",
-                    AlbedoName = "urb0101_lod1_albedo.dds",
-                    SpecularName = "urb0101_lod1_specteam.dds",
+                    AlbedoName = "/units/urb0101/URB0101_lod1_Albedo.dds",
+                    NormalsName = "/units/urb0101/URB0101_lod1_NormalsTS.dds",
+                    SpecularName = "/units/urb0101/URB0101_lod1_SpecTeam.dds",
                 },
             },
         },
