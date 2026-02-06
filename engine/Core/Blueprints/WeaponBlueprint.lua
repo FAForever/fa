@@ -77,7 +77,8 @@
 ---@field CollideFriendly boolean
 --- beams fire without stopping - overrides `RateOfFire`
 ---@field ContinuousBeam boolean
---- this projectile needs to be built and stored before the weapon can fire
+--- This projectile needs to be built and stored before the weapon can fire.
+--- Makes the engine check if the weapon has silo ammo before being allowed to fire.
 ---@field CountedProjectile? boolean
 --- damage value of the projectile fired from the weapon
 ---@field Damage number
