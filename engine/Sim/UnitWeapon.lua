@@ -13,6 +13,8 @@
 -- State 4: Finished firing
 -- If unit not busy, end the task, otherwise wait 3 ticks.
 
+-- Only weapons with `ManualFire = true` in their blueprint can be used for tactical/nuke fire orders.
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
