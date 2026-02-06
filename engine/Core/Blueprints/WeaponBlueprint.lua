@@ -237,7 +237,7 @@
 --- The total time in seconds it takes the outer damage ring to apply its damage from the epicenter
 --- of the nuke to its outer ring radius. If `0` or `1`, this behaves as a damage area.
 ---@field NukeOuterRingTotalTime? number
---- nuke weapon flag
+--- Flag that makes weapons valid for nuke orders and makes them use nuke silo ammo.
 ---@field NukeWeapon? boolean
 ---@field Overcharge? WeaponBlueprintOvercharge
 --- overcharge weapon flag
