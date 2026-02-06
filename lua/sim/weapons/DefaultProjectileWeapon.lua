@@ -757,6 +757,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnGotTarget = function(self)
+            self:DebugLog(GetGameTick(), "IdleState.OnGotTarget", "nuke count: " .. self.unit:GetNukeSiloAmmoCount(), debug.traceback())
             Weapon.OnGotTarget(self)
 
             local unit = self.unit
@@ -916,6 +917,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
+            self:DebugLog(GetGameTick(), self.StateName .. ".OnFire; nuke count:", self.unit:GetNukeSiloAmmoCount())
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
             end
@@ -1065,6 +1067,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         or self.unit:GetTacticalSiloAmmoCount() > 0)
                     then
                         proj = self:CreateProjectileAtMuzzle(muzzle)
+                    else
+                        self:DebugWarn("Tried to fire without having any ammo.")
                     end
 
                     -- Decrement the ammo if they are a counted projectile
@@ -1072,10 +1076,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         if bp.NukeWeapon then
                             -- Play the "Strategic launch detected" VO to all armies
                             unit:NukeCreatedAtUnit()
-                            LOG(unit:GetNukeSiloAmmoCount())
                             unit:RemoveNukeSiloAmmo(1)
                             self:DebugLog(GetGameTick(), "Firing nuke")
-                            LOG(unit:GetNukeSiloAmmoCount())
 
                             -- Generate UI notification for automatic nuke ping
                             -- Enemies receive the notification without location data to avoid cheats, while still being notified visually instead of only by audio
