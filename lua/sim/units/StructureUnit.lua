@@ -802,31 +802,13 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- fix edge cases when buffs are applied
         if buffApplied then
-
-            -- edge case for missile construction: the buff doesn't apply to the missile under construction
-            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
-                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
-                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
-                    local progress = adjacentUnit:GetWorkProgress()
-                    if progress < 0.99 then
-                        adjacentUnit:StopSiloBuild()
-                        if EntityCategoryContains(categories.STRATEGIC, adjacentUnit) then
-                            IssueSiloBuildNuke({adjacentUnit})
-                        else
-                            IssueSiloBuildTactical({adjacentUnit})
-                        end
-
-                        adjacentUnit:GiveNukeSiloBlocks(progress)
-                        adjacentUnit:SetAutoMode(autoModeEnabled)
-                    end
-                end
-            end
+            adjacentUnit:OnReceiveAdjacencyBuffTo(self)
         end
 
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
-     end,
+    end,
 
     -- Called by the engine when a structure is destroyed for each adjacent unit
     ---@param self StructureUnit
@@ -861,20 +843,7 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- fix edge cases when buffs are removed
         if buffRemoved then
-
-            -- edge case for missile construction: the buff doesn't apply to the missile under construction
-            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
-                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
-                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
-                    local progress = adjacentUnit:GetWorkProgress()
-                    if progress < 0.99 then
-                        adjacentUnit:StopSiloBuild()
-                        IssueSiloBuildTactical({adjacentUnit})
-                        adjacentUnit:GiveNukeSiloBlocks(progress)
-                        adjacentUnit:SetAutoMode(autoModeEnabled)
-                    end
-                end
-            end
+            adjacentUnit:OnLostAdjacencyBuffTo(self)
         end
 
         -- clean up effects
@@ -894,13 +863,38 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
 
         -- There won't be any adjacentUnit if this is a producer just built...
         if self.AdjacentUnits then
+            ---@param adjacentUnit StructureUnit
             for k, adjacentUnit in self.AdjacentUnits do
                 for k, v in AdjacencyBuffs[adjBuffs] do
                     Buff.ApplyBuff(adjacentUnit, v, self)
-                    adjacentUnit:RequestRefreshUI()
                 end
+                adjacentUnit:OnReceiveAdjacencyBuffTo(self)
+                adjacentUnit:RequestRefreshUI()
             end
             self:RequestRefreshUI()
+        end
+    end,
+
+    ---@param self StructureUnit
+    ---@param adjacentUnit StructureUnit
+    OnReceiveAdjacencyBuffTo = function(self, adjacentUnit)
+        -- edge case for missile construction: the buff doesn't apply to the missile under construction
+        if self.Blueprint.CategoriesHash["SILO"] then
+            if self:IsUnitState('SiloBuildingAmmo') then
+                local autoModeEnabled = self.AutoModeEnabled or false
+                local progress = self:GetWorkProgress()
+                if progress < 0.99 then
+                    self:StopSiloBuild()
+                    if EntityCategoryContains(categories.STRATEGIC, self) then
+                        IssueSiloBuildNuke({ self })
+                    else
+                        IssueSiloBuildTactical({ self })
+                    end
+
+                    self:GiveNukeSiloBlocks(progress)
+                    self:SetAutoMode(autoModeEnabled)
+                end
+            end
         end
     end,
 
@@ -911,15 +905,35 @@ StructureUnit = ClassUnit(Unit, BlinkingLightsUnitComponent) {
         if not adjBuffs then return end
 
         if self.AdjacentUnits then
+            ---@param adjacentUnit StructureUnit
             for k, adjacentUnit in self.AdjacentUnits do
                 for key, v in AdjacencyBuffs[adjBuffs] do
                     if Buff.HasBuff(adjacentUnit, v) then
                         Buff.RemoveBuff(adjacentUnit, v, false, self)
-                        adjacentUnit:RequestRefreshUI()
                     end
                 end
+                adjacentUnit:OnLostAdjacencyBuffTo(self)
+                adjacentUnit:RequestRefreshUI()
             end
             self:RequestRefreshUI()
+        end
+    end,
+
+    ---@param self StructureUnit
+    ---@param adjacentUnit StructureUnit
+    OnLostAdjacencyBuffTo = function(self, adjacentUnit)
+        -- edge case for missile construction: the buff doesn't apply to the missile under construction
+        if self.Blueprint.CategoriesHash["SILO"] then
+            if self:IsUnitState('SiloBuildingAmmo') then
+                local autoModeEnabled = self.AutoModeEnabled or false
+                local progress = self:GetWorkProgress()
+                if progress < 0.99 then
+                    self:StopSiloBuild()
+                    IssueSiloBuildTactical({ self })
+                    self:GiveNukeSiloBlocks(progress)
+                    self:SetAutoMode(autoModeEnabled)
+                end
+            end
         end
     end,
 

@@ -1125,18 +1125,21 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.BuildTimeMultiplier = time_mult
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetMassBuildAdjMod = function(self)
         return self.MassBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetEnergyBuildAdjMod = function(self)
         return self.EnergyBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     GetEconomyBuildRate = function(self)
         return self:GetBuildRate()
@@ -3558,8 +3561,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnMotionTurnEventChange = function() end,
 
     ---@param self Unit
-    ---@param new string
-    ---@param old string
+    ---@param new TerrainType
+    ---@param old TerrainType
     OnTerrainTypeChange = function(self, new, old)
         self.TerrainType = new
         if self.MovementEffectsExist then
@@ -3726,13 +3729,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param effectsBag? TrashBag
     ---@param terrainType? TerrainType
     CreateTerrainTypeEffects = function(self, effectTypeGroups, fxBlockType, layer, typeSuffix, effectsBag, terrainType)
-        local effects, terrainFX, GetTerrainTypeEffects
+        local GetTerrainTypeEffects = self.GetTerrainTypeEffects
         local pos = self:GetPosition()
         local army = self.Army
+
+        local terrainFX
         if terrainType then
             terrainFX = terrainType[fxBlockType][layer]
-        else
-            GetTerrainTypeEffects = self.GetTerrainTypeEffects
         end
 
         for _, typeGroup in effectTypeGroups do
@@ -3742,11 +3745,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 continue
             end
 
-            if terrainType then
-                effects = terrainFX[typeGroup.Type]
-            else
-                effects = GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
-            end
+            -- Use TerrainType specific effects or fallback to 'Default' TerrainType effects
+            local effects = terrainType and terrainFX[typeGroup.Type] or GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
             if table.empty(effects) then
                 continue
             end
@@ -5013,12 +5013,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Adds nuclear missiles to the unit.
     ---@param self Unit
     ---@param count number
     GiveNukeSiloAmmo = function(self, count)
         cUnit.GiveNukeSiloAmmo(self, count)
     end,
 
+    --- Sets build progress for nuclear/tactical missile construction.
     ---@param self Unit
     ---@param fraction number
     GiveNukeSiloBlocks = function(self, fraction)
@@ -5026,19 +5028,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local buildRate = self.Blueprint.Economy.BuildRate
+        local buildRate = self:GetEconomyBuildRate()
         if not buildRate then
             return
         end
 
-        local buildTime = self:GetWeapon(1):GetProjectileBlueprint().Economy.BuildTime
-        if not buildTime then
-            return
+        local buildTime
+        for i = 1, self.WeaponCount do
+            local weaponBp = self.WeaponInstances[i].Blueprint
+            if weaponBp.MaxProjectileStorage >= 1 then
+                buildTime = __blueprints[weaponBp.ProjectileId].Economy.BuildTime
+                if buildTime then
+                    break
+                end
+            end
         end
+        if not buildTime then return end
 
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+        -- Engine won't update work progress so we do it manually
+        self:SetWorkProgress(fraction)
     end,
 
     --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`. See `unit:UpdateStat` for an alternative
