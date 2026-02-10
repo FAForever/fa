@@ -208,10 +208,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     EnergyModifier = 0,
     MassModifier = 0,
 
-    SetBusy = function(self, busy)
-        self:DebugLog(GetGameTick(), "Set busy", busy)
-        moho.unit_methods.SetBusy(self, busy)
-    end,
+
 
     ---@param self Unit
     ---@return any

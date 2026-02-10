@@ -695,7 +695,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- I think this is triggered whenever the state changes to anything but DeadState
     ---@param self DefaultProjectileWeapon
     OnEnterState = function(self)
-        self:DebugLog(GetGameTick(), "Entering state" .. (self.StateName or "unknown"), "nuke count: " .. self.unit:GetNukeSiloAmmoCount(), debug.traceback())
 
         local weaponWantEnabled = self.WeaponWantEnabled
         local weaponIsEnabled = self.WeaponIsEnabled
@@ -786,7 +785,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            self:DebugLog(GetGameTick(), "IdleState.OnFire", "nuke count: " .. self.unit:GetNukeSiloAmmoCount(), debug.traceback())
 
             local bp = self.Blueprint
             if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked' then
@@ -1072,10 +1070,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         if bp.NukeWeapon then
                             -- Play the "Strategic launch detected" VO to all armies
                             unit:NukeCreatedAtUnit()
-                            LOG(unit:GetNukeSiloAmmoCount())
                             unit:RemoveNukeSiloAmmo(1)
-                            self:DebugLog(GetGameTick(), "Firing nuke")
-                            LOG(unit:GetNukeSiloAmmoCount())
 
                             -- Generate UI notification for automatic nuke ping
                             -- Enemies receive the notification without location data to avoid cheats, while still being notified visually instead of only by audio
@@ -1170,7 +1165,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if baseOnLostTarget ~= DefaultProjectileWeapon.OnLostTarget then
                 baseOnLostTarget(self)
             else
-                self:DebugLog(GetGameTick(), "RackSalvoFiringState.OnLostTarget", debug.traceback())
                 local unit = self.unit
                 if unit then
                     unit:OnLostTarget(self)
