@@ -26,17 +26,17 @@ local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCr
 --- Used by ues0202
 ---@class TIFMissileCruise04 : TMissileCruiseProjectile
 TIFMissileCruise04 = ClassProjectile(TMissileCruiseProjectile) {
-    FxAirUnitHitScale = 1.5,
-    FxLandHitScale = 1.5,
-    FxNoneHitScale = 1.5,
-    FxPropHitScale = 1.5,
-    FxProjectileHitScale = 1.5,
-    FxProjectileUnderWaterHitScale = 1.5,
-    FxShieldHitScale = 1.5,
-    FxUnderWaterHitScale = 1.5,
-    FxUnitHitScale = 1.5,
-    FxWaterHitScale = 1.5,
-    FxOnKilledScale = 1.5,
+    FxAirUnitHitScale = 2.25,
+    FxLandHitScale = 2.25,
+    FxNoneHitScale = 2.25,
+    FxPropHitScale = 2.25,
+    FxProjectileHitScale = 2.25,
+    FxProjectileUnderWaterHitScale = 2.25,
+    FxShieldHitScale = 2.25,
+    FxUnderWaterHitScale = 2.25,
+    FxUnitHitScale = 2.25,
+    FxWaterHitScale = 2.25,
+    FxOnKilledScale = 2.25,
 }
 TypeClass = TIFMissileCruise04
 
