@@ -169,7 +169,7 @@ UnitBlueprint{
             CountedProjectile = false,
             Damage = 400,
             DamageFriendly = true,
-            DamageRadius = 2,
+            DamageRadius = 2.3,
             DamageType = "Normal",
             DisplayName = "Laanse Tactical Missile Launcher",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
