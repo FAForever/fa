@@ -1,0 +1,1 @@
+- (#6965) Refactored defeat backend so now unit transfering is handled the same in all scenarios.

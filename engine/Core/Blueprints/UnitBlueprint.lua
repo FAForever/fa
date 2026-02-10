@@ -25,7 +25,7 @@
 ---| "RULEUTL_Munition"
 
 ---@alias EnhancementSlot "Back" | "RCH" | "LCH"
----@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL"
+---@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL" | 'SUBCOMMANDER' | 'COMMAND'
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
 ---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
@@ -965,8 +965,8 @@
 --- command capability flags for this unit
 ---@field CommandCaps table<CommandCap, boolean>
 ---@field ExcludeFromVeterancy? boolean
---- faction the unit belongs to. Factions are 'Aeon', 'Cybran' and 'UEF'
----@field FactionName Faction
+--- Faction the unit belongs to.
+---@field FactionName FactionName
 ---@field FractionThreshold? number
 --- indicates the background for the build icon
 ---@field Icon IconBackgroundType

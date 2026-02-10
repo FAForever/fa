@@ -859,7 +859,7 @@ function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
         total = total - 1
         if objective.Active and total < numRequired then
             objective.Active = false
-            objective:OnResult(false)
+            objective:OnResult(false, unit)
             UpdateObjective(Title, 'complete', 'failed', objective.Tag)
             KillThread(watchThread)
         end

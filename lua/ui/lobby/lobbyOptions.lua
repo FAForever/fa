@@ -10,6 +10,9 @@
 ---| '99999' unlimited expansions allowed
 
 ---@alias VictoryCondition 'demoralization' | 'domination' | 'eradication' | 'sandbox' | 'decapitation'
+---@alias ShareOption "CivilianDeserter" | "Defectors" | "FullShare" | "PartialShare" | "ShareUntilDeath" | "TransferToKiller"
+---@alias DisconnectShareOption ShareOption | "SameAsShare"
+---@alias DisconnectShareCommandersOption "Explode" | "Permanent" | "Recall" | "RecallDelayed"
 
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class GameOptions
@@ -31,9 +34,9 @@
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
----@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@field DisconnectShare 'SameAsShare' | 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@field DisconnectShareCommanders 'Explode' | 'Recall' | 'RecallDelayed' | 'Permanent'
+---@field Share ShareOption
+---@field DisconnectShare DisconnectShareOption
+---@field DisconnectShareCommanders DisconnectShareCommandersOption
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1' | -1
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
@@ -183,8 +186,13 @@ teamOptions =
                 key = 'Off'
             },
             {
+                text = "<LOC lobui_CAUponDisconnectTitle>Union control upon disconnect",
+                help = "<LOC lobui_CAUponDisconnectDescription>Initially each player has their own army and their own resources. When a player disconnects the army is not considered defeated and the share condition does not trigger. Instead, allied players can switch focus to the disconnected army to issue commands.",
+                key = 'UnionWhenDisconnected'
+            },
+            {
                 text = "<LOC lobui_CAUnion>Multiple armies, union control",
-                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+            help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
                 key = 'Union'
             },
             {
