@@ -1,0 +1,1 @@
+- (#7010) Fix being able to fire two nuke/tactical missiles using up only 1 ammo and being able to fire at negative ammo.
