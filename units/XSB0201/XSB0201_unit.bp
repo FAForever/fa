@@ -1,5 +1,10 @@
 UnitBlueprint{
     Description = "<LOC xsb0201_desc>Land Factory HQ",
+	AI = {
+        TargetBones = {
+            "Attachpoint",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0201_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0201_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },

@@ -1,11 +1,8 @@
 UnitBlueprint{
     Description = "<LOC uab0301_desc>Land Factory HQ",
-    AI = {
+	AI = {
         TargetBones = {
-            "Foot_Right",
-            "Foot_Left",
-            "Pad_Left",
-            "Pad_Right",
+            "Attachpoint",
         },
     },
     Audio = {

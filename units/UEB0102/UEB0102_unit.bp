@@ -1,10 +1,8 @@
 UnitBlueprint{
     Description = "<LOC ueb0102_desc>Air Factory",
-    AI = {
+	AI = {
         TargetBones = {
-            "Target01",
-            "Target02",
-            "Target03",
+            "Attachpoint",
         },
     },
     Audio = {

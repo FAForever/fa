@@ -1,6 +1,10 @@
 UnitBlueprint{
     Description = "<LOC urb0101_desc>Land Factory",
-    AI = {},
+	AI = {
+        TargetBones = {
+            "Attachpoint",
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0101_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'URB',        Cue = 'URB0101_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
