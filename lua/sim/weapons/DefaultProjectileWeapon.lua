@@ -152,6 +152,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
+        if self.lastT then
+            LOG(GetGameTick() - self.lastT)
+        end
+        self.lastT = GetGameTick() 
         local proj = self:CreateProjectileForWeapon(muzzle)
         if not proj or proj:BeenDestroyed() then
             return proj
