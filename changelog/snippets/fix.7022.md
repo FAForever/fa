@@ -1,0 +1,1 @@
+- (#7022) Fix bombers do not auto attack nearby enemies.

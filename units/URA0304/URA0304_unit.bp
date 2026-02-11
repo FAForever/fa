@@ -64,6 +64,7 @@ UnitBlueprint{
         "TECH3",
         "VISIBLETORECON",
         "WEAKANTIAIR",
+        "COMPUTEBOMBDROP",
     },
     Defense = {
         AirThreatLevel = 3,

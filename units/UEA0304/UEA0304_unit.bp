@@ -61,6 +61,7 @@ UnitBlueprint{
         "UEF",
         "VISIBLETORECON",
         "WEAKANTIAIR",
+        "COMPUTEBOMBDROP",
     },
     Defense = {
         AirThreatLevel = 5,

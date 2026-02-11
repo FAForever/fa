@@ -3509,6 +3509,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         elseif new == 'Bottom' or new == 'Hover' then
             -- Play the "landed" sound
             self:PlayUnitSound('Landed')
+            
+            -- fix bombers do not auto attack nearby enemies
+            if self.Blueprint.CategoriesHash.COMPUTEBOMBDROP then
+                for k,wep in self.WeaponInstances do 
+                    if wep:GetCurrentTarget() ~= nil then
+                        wep:ResetTarget()
+                        break
+                    end
+                end
+            end
         elseif new == 'Up' or (new == 'Top' and (old == 'Down' or old == 'Bottom')) then
             -- Play the "takeoff" sound
             self:PlayUnitSound('TakeOff')

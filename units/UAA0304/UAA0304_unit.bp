@@ -59,6 +59,7 @@ UnitBlueprint{
         "STRATEGICBOMBER",
         "TECH3",
         "VISIBLETORECON",
+        "COMPUTEBOMBDROP",
     },
     Defense = {
         ArmorType = "Light",
