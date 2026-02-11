@@ -1,8 +1,24 @@
 ---@type number
-last_version = 3829
+last_version = 3830
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3830,
+        name = "Game patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "# Game version 3830 (14th of February 2026)",
+            "",
+            "It's the first patch of 2026! I hope you all made it into the new year in one piece.",
+            "You can find the complete changelog on github by clicking the button below.",
+            "",
+            "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3829,
         name = "Game patch",
