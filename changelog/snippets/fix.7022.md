@@ -1,1 +1,1 @@
-- (#7022) Fix bombers do not auto attack nearby enemies.
+- (#7022) Fix bombers not automatically attacking nearby enemies.
