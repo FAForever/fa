@@ -4,6 +4,7 @@
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 ---@class SyncTable: table
 ---@field EnhanceRestrict table<Enhancement, true>
+---@field Ping SyncPingData[]
 Sync = { }
 
 local SyncDefaults = {
@@ -19,6 +20,7 @@ end
 
 ---@class UnitSyncData
 ---@field WepPriority? UnitSyncWepPriority
+---@field Buffs? BuffName[] # Buffs affecting this unit
 
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.
@@ -165,7 +167,7 @@ function FloatingEntityText(entityId, text)
 end
 
 function StartCountdown(entityId, duration)
-    cdDuration = duration or 5
+    local cdDuration = duration or 5
     if not entityId then
         WARN('Trying to start countdown text with no entityId.')
         return false

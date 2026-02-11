@@ -103,6 +103,7 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
+
     ---@type AIBrain[]
     ArmyBrains = {}
 
@@ -283,6 +284,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         ScenarioInfo.GameHasAIs = true
         SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality")
     end
+
+    -- feature: enable or disable sharing of excess resources through the lobby
+    if ScenarioInfo.Options.TeamShareOverflow == "enabled" then
+        ArmyBrains[index]:SetResourceSharing(true)
+    elseif ScenarioInfo.Options.TeamShareOverflow == "disabled" then
+        ArmyBrains[index]:SetResourceSharing(false)
+    end
 end
 
 function InitializePrebuiltUnits(name)
@@ -295,7 +303,6 @@ end
 function BeginSession()
 
     -- imported for side effects
-    import("/lua/sim/matchstate.lua").Setup()
     import("/lua/sim/markerutilities.lua").Setup()
 
     BeginSessionAI()
@@ -310,6 +317,9 @@ function BeginSession()
     import("/lua/sim/recall.lua").init()
 
     -- other logic at the start of the game --
+
+    local victoryCondition = import("/lua/sim/victorycondition/VictoryConditionSingleton.lua").GetSingleton()
+    victoryCondition:StartMonitoring()
 
     Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
     Sync.Restrictions = import("/lua/game.lua").GetRestrictions()
@@ -447,12 +457,16 @@ end
 
 --- Setup for union army, where all teams can control the units of its allies
 function BeginSessionUnionArmy(teams)
+    SPEW("Initialing session with union army control...")
+
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
         for i2, _ in ArmyBrains do
             if not IsAlly(i, i2) then continue end
             SetCommandSource(i2 - 1, humanIndex, true)
+
+            SPEW("Army " .. tostring(i2) .. " control shared with army " .. tostring(i) .. " (source index " .. tostring(humanIndex) .. ")")
         end
         humanIndex = humanIndex + 1
     end
@@ -461,6 +475,8 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy(teams)
+    SPEW("Initialing session with common army control...")
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do

@@ -1,1 +1,0 @@
-- (#6653) Close a loophole that allowed UI lua to issue attack move orders.

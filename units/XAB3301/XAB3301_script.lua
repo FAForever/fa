@@ -21,28 +21,52 @@ AStructureUnit = RemoteViewing(AStructureUnit)
 ---@field Animator moho.AnimationManipulator
 ---@field RotatorBot moho.RotateManipulator
 ---@field RotatorTop moho.RotateManipulator
+---@field RotatorOrbX moho.RotateManipulator
+---@field RotatorOrbY moho.RotateManipulator
+---@field RotatorOrbZ moho.RotateManipulator
 ---@field TrashAmbientEffects TrashBag
 ---@field ScryEnabled boolean
 XAB3301 = ClassUnit(AStructureUnit) {
+    ---@param self XAB3301
+    OnCreate = function(self)
+        AStructureUnit.OnCreate(self)
+
+        local animator = self.Trash:Add(CreateAnimator(self))
+        animator:PlayAnim("/units/xab3301/XAB3301_activate.sca"):SetRate(0):Disable()
+        self.Animator = animator
+
+        local rotatorOrbX = self.Trash:Add(CreateRotator(self, 'spin02', 'x', nil, 0, 15, 60 + Random(0, 20)))
+        local rotatorOrbY = self.Trash:Add(CreateRotator(self, 'spin02', 'y', nil, 0, 15, 60 + Random(0, 20)))
+        local rotatorOrbZ = self.Trash:Add(CreateRotator(self, 'spin02', 'z', nil, 0, 15, 60 + Random(0, 20)))
+        rotatorOrbX:Disable()
+        rotatorOrbY:Disable()
+        rotatorOrbZ:Disable()
+        self.RotatorOrbX = rotatorOrbX
+        self.RotatorOrbY = rotatorOrbY
+        self.RotatorOrbZ = rotatorOrbZ
+
+        local rotatorBot = CreateRotator(self, 'spin01', 'y', nil, 0, 3, 6)
+        local rotatorTop = CreateRotator(self, 'spin03', '-y', nil, 0, 2, 4)
+        rotatorBot:Disable()
+        rotatorTop:Disable()
+        self.RotatorBot = rotatorBot
+        self.RotatorTop = rotatorTop
+
+        self.TrashAmbientEffects = TrashBag()
+    end,
+
     ---@param self XAB3301
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
-        self.Trash:Add(CreateRotator(self, 'spin02', 'x', nil, 0, 15, 60 + Random(0, 20)))
-        self.Trash:Add(CreateRotator(self, 'spin02', 'y', nil, 0, 15, 60 + Random(0, 20)))
-        self.Trash:Add(CreateRotator(self, 'spin02', 'z', nil, 0, 15, 60 + Random(0, 20)))
-
-        self.Animator = CreateAnimator(self)
-        self.Animator:PlayAnim("/units/xab3301/XAB3301_activate.sca")
-        self.Animator:SetRate(0)
-        self.Trash:Add(self.Animator)
-
-        self.RotatorBot = CreateRotator(self, 'spin01', 'y', nil, 0, 3, 6)
-        self.RotatorTop = CreateRotator(self, 'spin03', 'y', nil, 0, -2, -4)
-
-        self.TrashAmbientEffects = TrashBag()
+        self.Animator:Enable()
+        self.RotatorOrbX:Enable()
+        self.RotatorOrbY:Enable()
+        self.RotatorOrbZ:Enable()
+        self.RotatorBot:Enable()
+        self.RotatorTop:Enable()
     end,
 
     ---@param self XAB3301
@@ -62,7 +86,7 @@ XAB3301 = ClassUnit(AStructureUnit) {
 
                 self.Animator:SetRate(1)
                 self.RotatorBot:SetTargetSpeed(12)
-                self.RotatorTop:SetTargetSpeed(-8)
+                self.RotatorTop:SetTargetSpeed(8)
 
                 for k, v in AQuantumGateAmbient do
                     self.TrashAmbientEffects:Add(CreateAttachedEmitter(self, 'spin02', self.Army, v):ScaleEmitter(0.6))
@@ -78,7 +102,7 @@ XAB3301 = ClassUnit(AStructureUnit) {
 
         self.Animator:SetRate(-1)
         self.RotatorBot:SetTargetSpeed(6)
-        self.RotatorTop:SetTargetSpeed(-4)
+        self.RotatorTop:SetTargetSpeed(4)
 
         self.TrashAmbientEffects:Destroy()
         self.ScryEnabled = false

@@ -25,7 +25,7 @@
 ---| "RULEUTL_Munition"
 
 ---@alias EnhancementSlot "Back" | "RCH" | "LCH"
----@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL"
+---@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL" | 'SUBCOMMANDER' | 'COMMAND'
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
 ---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
@@ -145,7 +145,17 @@
 ---@field GuardRadius number
 --- maximum range from the guarded unit before initiating return
 ---@field GuardReturnRadius number
---- guard range for the unit, automatically added if absent
+--- Guard scan range for the unit. The guard scan radius is used by attack move and patrol orders. Through this scanning mechanic the patrolling (or attack moving) unit can find a target to chase. The scanning behavior includes neutral units.
+---
+--- Through a binary patch the guard scan radius is reset to 0 when the unit is not patrolling and/or attack moving:
+--- - https://faforever.zulipchat.com/#narrow/channel/203495-game-development/topic/Guard.20scan.20radius/with/285967051
+--- - https://github.com/FAForever/FA-Binary-Patches/blob/master/section/GuardFix.cpp
+---
+--- Large values can be computationally expensive. This value was partially responsible for games slowing down during large ASF battles. For more information:
+--- - https://github.com/FAForever/fa/pull/3891
+--- - https://github.com/FAForever/fa/pull/3892
+---
+--- The value is automatically populated during blueprint loading to a sensible default if it is not set in the blueprint.
 ---@field GuardScanRadius number
 --- initial toggle of automatic behaviors (silo building and auto-assist)
 ---@see SetAutoMode
@@ -153,13 +163,13 @@
 --- unit should unpack before firing weapon
 --- Engine sets tracking radius to 1x, calls OnLostTarget when given a move order, and OnGotTarget only when not moving
 ---@field NeedUnpack boolean
---- this muliplier is applied when a staging platform is refueling an air unit
+--- this muliplier is applied to an air unit's refuel rate when the staging platform is refueling it
 ---@field RefuelingMultiplier number
---- shis amount of repair per second offered to refueling air units
+--- this amount of repair per **second** is offered to refueling air units
 ---@field RefuelingRepairAmount number
---- this amount of energy per second is required to repair the air unit
+--- this amount of energy per **tick** is required to repair the air unit
 ---@field RepairConsumeEnergy? number
---- this amount of mass per second is required to repair the air unit
+--- this amount of mass per **tick** is required to repair the air unit
 ---@field RepairConsumeMass? number
 --- if the assist range for the unit is shown if it's selected
 ---@field ShowAssistRangeOnSelect? boolean
@@ -176,8 +186,6 @@
 ---@field BankFactor? number
 --- true if aircraft banks forward/back as well as sideways
 ---@field BankForward? boolean
---- distance from the target unit will start firing bombs
----@field BombDropThreshold? number
 --- distance to break off before turning around for another attack run
 ---@field BreakOffDistance? number
 --- if the air unit's new target is close-by, it will break off first to increase
@@ -235,14 +243,16 @@
 ---@field MinAirspeed? number
 --- time to predict ahead for moving targets
 ---@field PredictAheadForBombDrop? number
---- random multiplier applied to break off distance for winged aircrafts
+--- random multiplier applied to break off distance for winged aircraft. Defaults to 1.5
 ---@field RandomBreakOffDistanceMult? number
---- random max time to switch combat state in seconds for winged aircrafts
+--- random max time to switch combat state in seconds for winged aircraft. Defaults to 6
 ---@field RandomMaxChangeCombatStateTime? number
---- random min time to switch combat state in seconds for winged aircrafts
+--- random min time to switch combat state in seconds for winged aircraft. Defaults to 3
 ---@field RandomMinChangeCombatStateTime? number
 --- distance from target at which to start turning to align with it
 ---@field StartTurnDistance number
+--- Length of time in seconds allowed for sustained turn before we re-try a different approach. Defaults to 10
+---@field SustainedTurnThreshold? number
 --- additional turning multiplier ability during a tight turn maneuver
 ---@field TightTurnMultiplier? number
 --- how heigh the transport will stay when picking up and dropping off units
@@ -955,8 +965,8 @@
 --- command capability flags for this unit
 ---@field CommandCaps table<CommandCap, boolean>
 ---@field ExcludeFromVeterancy? boolean
---- faction the unit belongs to. Factions are 'Aeon', 'Cybran' and 'UEF'
----@field FactionName Faction
+--- Faction the unit belongs to.
+---@field FactionName FactionName
 ---@field FractionThreshold? number
 --- indicates the background for the build icon
 ---@field Icon IconBackgroundType
@@ -1109,9 +1119,9 @@
 --- if true, terrain under building's skirt will be flattened
 ---@field FlattenSkirt boolean
 ---@field Footprint FootprintBlueprint
---- unit fuels up at this rate per second
+--- unit fuels up at this rate per second. Required for air staging to undock automatically.
 ---@field FuelRechargeRate number
---- unit has fuel for this number of seconds
+--- unit has fuel for this number of seconds. Required for air staging to undock automatically.
 ---@field FuelUseTime number
 --- How much the collision model is offset from the ground. Used to make aircraft land properly.
 ---@field GroundCollisionOffset? number
@@ -1225,7 +1235,7 @@
 ---@field ClassGenericUpTo? integer
 --- how many external docking slots available for air staging platforms
 ---@field DockingSlots? number
---- repairs units attached to me at this % of max health per second
+--- Seemingly non-functional. Original description: "repairs units attached to me at this % of max health per second"
 ---@field RepairRate number
 --- Maximum number of large units this transport can carry. If larger than the number of large slots
 --- calculated from the number hooks, that smaller number is used instead.

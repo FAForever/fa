@@ -1,0 +1,1 @@
+- (#6881) Fix tread splats spawning for units that are attached to a transport

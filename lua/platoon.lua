@@ -4553,13 +4553,13 @@ Platoon = Class(moho.platoon_methods) {
         -- a build location that causes it to move from its spawn position. But there are maps where it wont quite work and he'll move.
         if factionIndex < 5 then
             templateKey = 'ACUBaseTemplate'
-            baseTmplFile = import(self.PlatoonData.Construction.BaseTemplateFile or '/lua/BaseTemplates.lua')
+            baseTmplFile = import(self.PlatoonData.Construction.BaseTemplateFile or '/lua/basetemplates.lua')
         else
             templateKey = 'BaseTemplates'
-            baseTmplFile = import('/lua/BaseTemplates.lua')
+            baseTmplFile = import('/lua/basetemplates.lua')
         end
-        baseTmplDefault = import('/lua/BaseTemplates.lua')
-        buildingTmplFile = import(self.PlatoonData.Construction.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
+        baseTmplDefault = import('/lua/basetemplates.lua')
+        buildingTmplFile = import(self.PlatoonData.Construction.BuildingTemplateFile or '/lua/buildingtemplates.lua')
         buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
         -- This is where we would want to have personality modifiers being setup.
         -- Putting the acu into a statemachine after this would allow some interesting personality based long term build outs.

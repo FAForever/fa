@@ -1,0 +1,1 @@
+- (#6985) Fix profiler benchmarking potentially sending unserializable data from Sim to UI.

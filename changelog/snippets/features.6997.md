@@ -1,0 +1,1 @@
+- (#6997) Add lobby option under "Common Control" that enables union control of armies of players that disconnect.

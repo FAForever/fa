@@ -57,7 +57,7 @@ InputDialog = ClassUI(Popup) {
         nameEdit.OnEnterPressed = dialogComplete
 
         -- Exit button
-        local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Cancel")
+        local ExitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>Cancel")
         LayoutHelpers.AtLeftIn(ExitButton, dialogContent, -5)
         LayoutHelpers.AtBottomIn(ExitButton, dialogContent, 10)
         local dialogCancelled = function()
@@ -68,7 +68,7 @@ InputDialog = ClassUI(Popup) {
         ExitButton.OnClick = dialogCancelled
 
         -- Ok button
-        local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+        local OKButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Ok>Ok")
         LayoutHelpers.AtRightIn(OKButton, dialogContent, -5)
         LayoutHelpers.AtBottomIn(OKButton, dialogContent, 10)
         OKButton.OnClick = dialogComplete

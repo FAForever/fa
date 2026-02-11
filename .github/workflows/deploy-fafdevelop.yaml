@@ -46,7 +46,7 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           repository: FAForever/fa
-          ref: develop
+          ref: staging/fafdevelop
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references

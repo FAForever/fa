@@ -23,9 +23,10 @@ local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
-local DebugUnitComponent = import("/lua/sim/units/components/DebugUnitComponent.lua").DebugUnitComponent
+local DebugUnitComponent = import("/lua/sim/units/components/debugunitcomponent.lua").DebugUnitComponent
+local FastDecayComponent = import("/lua/sim/units/components/fastdecayunitcomponent.lua").FastDecayComponent
 
-local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
+local GetBlueprintCaptureCost = import('/lua/shared/capturecost.lua').GetBlueprintCaptureCost
 
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
@@ -119,7 +120,11 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent
+---@class UnitBuffsTable
+---@field Affects table<BuffAffectName, table<BuffName, BlueprintBuffAffectState>>
+---@field BuffTable table<BuffType, table<BuffName, BuffData>>
+
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CampaignAIUnitProperties, UnitBuffFields, DebugUnitComponent, FastDecayComponent
 ---@field CDRHome? LocationType
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -135,7 +140,7 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
----@field Buffs {Affects: table<BuffEffectName, BlueprintBuff.Effect>, buffTable: table<string, table>}
+---@field Buffs UnitBuffsTable
 ---@field EngineFlags? table<string, any>
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
@@ -159,7 +164,18 @@ local cUnitGetBuildRate = cUnit.GetBuildRate
 ---@field Weapons table<string, Weapon> # string is weapon Label
 ---@field WeaponInstances Weapon[]
 ---@field WeaponCount number
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent) {
+---@field CaptureProgress? number # Keeps track of capture progress to prevent sharing units being captured and to sync capture work progress bars
+---@field oldowner? Army # After a unit is transferred, keeps track of the original Army to kill shared units when needed.
+---@field TransferUpgradeProgress? boolean # Keeps track of upgrades for unit transfer
+---@field UpgradeBuildTime? number # Keeps track of upgrades for unit transfer
+---@field UpgradesTo? UnitId # Keeps track of upgrades for unit transfer
+---@field TargetUpgradeBuildTime? number # Keeps track of upgrades *during* unit transfer
+---@field TargetFractionComplete? number # When an unbuilt unit is rebuilt during unit transfer, this overrides what fraction it is rebuilt to.
+---@field isFinishedUnit? boolean # set to true in `OnStopBeingBuilt`
+---@field ImmuneToStun? boolean
+---@field Anims? Animator[] # Animators that get stopped when a unit is stunned. Not used in FAF.
+---@field IsBeingTransferred? boolean
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUnitComponent, FastDecayComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -948,6 +964,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     ---@param self Unit
     OnDecayed = function(self)
+        if self.Dead then return end
         self:Destroy()
     end,
 
@@ -1009,13 +1026,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
-    --- Enables weapon after waiting its fire rate interval
+    --- Enables weapon after waiting a given delay (typically the fire rate interval)
     ---@param weapon Weapon
-    OnGivenDisableWeaponsThread = function(weapon)
+    ---@param delay number # Must be >= 0
+    OnGivenDisableWeaponsThread = function(weapon, delay)
         if not weapon:BeenDestroyed() then
-            -- compute delay
-            local bp = weapon.Blueprint
-            local delay = 1 / bp.RateOfFire
             WaitSeconds(delay)
 
             -- enable the weapon again if it still exists
@@ -1029,14 +1044,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param newUnit Unit
     OnGivenDisableWeapons = function(newUnit)
         -- disable all weapons and enable after a delay
-        local disableWeaponsThread = newUnit.OnGivenDisableWeaponsThread
         for i = 1, newUnit.WeaponCount do
             local weapon = newUnit.WeaponInstances[i]
-            -- Weapons disabled by enhancement shouldn't be re-enabled unless the enhancement is built
-            local enablingEnhancement = weapon.Blueprint.EnabledByEnhancement
-            if not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement) then
+            local bp = weapon.Blueprint
+            local enablingEnhancement = bp.EnabledByEnhancement
+            local rateOfFire = bp.RateOfFire
+            -- Dummy weapons with 0 fire rate shouldn't be disabled
+            if rateOfFire > 0
+                -- Weapons disabled by enhancement shouldn't be disabled unless the enhancement is built
+                and (not enablingEnhancement or newUnit:HasEnhancement(enablingEnhancement))
+            then
                 weapon:SetEnabled(false)
-                weapon:ForkThread(disableWeaponsThread)
+                weapon:ForkThread(newUnit.OnGivenDisableWeaponsThread, 1 / rateOfFire)
             end
         end
     end,
@@ -1106,18 +1125,21 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.BuildTimeMultiplier = time_mult
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetMassBuildAdjMod = function(self)
         return self.MassBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     ---@return integer
     GetEnergyBuildAdjMod = function(self)
         return self.EnergyBuildAdjMod or 1
     end,
 
+    --- Used by the engine in silo build calculations.
     ---@param self Unit
     GetEconomyBuildRate = function(self)
         return self:GetBuildRate()
@@ -2339,6 +2361,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- for AI events
         self.Brain:OnUnitStartBeingBuilt(self, builder, layer)
+
+        if self.Blueprint.CategoriesHash["FASTDECAY"] then
+            self:StartFastDecayThread()
+        end
     end,
 
     ---@param self Unit
@@ -2516,6 +2542,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnFailedToBeBuilt = function(self)
         self:ForkThread(function()
             WaitTicks(1)
+            if self.Dead then return end
             self:Destroy()
         end)
 
@@ -3534,8 +3561,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     OnMotionTurnEventChange = function() end,
 
     ---@param self Unit
-    ---@param new string
-    ---@param old string
+    ---@param new TerrainType
+    ---@param old TerrainType
     OnTerrainTypeChange = function(self, new, old)
         self.TerrainType = new
         if self.MovementEffectsExist then
@@ -3702,13 +3729,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param effectsBag? TrashBag
     ---@param terrainType? TerrainType
     CreateTerrainTypeEffects = function(self, effectTypeGroups, fxBlockType, layer, typeSuffix, effectsBag, terrainType)
-        local effects, terrainFX, GetTerrainTypeEffects
+        local GetTerrainTypeEffects = self.GetTerrainTypeEffects
         local pos = self:GetPosition()
         local army = self.Army
+
+        local terrainFX
         if terrainType then
             terrainFX = terrainType[fxBlockType][layer]
-        else
-            GetTerrainTypeEffects = self.GetTerrainTypeEffects
         end
 
         for _, typeGroup in effectTypeGroups do
@@ -3718,11 +3745,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
                 continue
             end
 
-            if terrainType then
-                effects = terrainFX[typeGroup.Type]
-            else
-                effects = GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
-            end
+            -- Use TerrainType specific effects or fallback to 'Default' TerrainType effects
+            local effects = terrainType and terrainFX[typeGroup.Type] or GetTerrainTypeEffects(fxBlockType, layer, pos, typeGroup.Type, typeSuffix)
             if table.empty(effects) then
                 continue
             end
@@ -4848,12 +4872,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
-    ---@param location Vector
+    ---@param destination Vector
     ---@param orientation Quaternion
     ---@param teleDelay? number
-    PlayTeleportChargeEffects = function(self, location, orientation, teleDelay)
+    PlayTeleportChargeEffects = function(self, destination, orientation, teleDelay)
         self.TeleportFxBag = self.TeleportFxBag or TrashBag()
-        EffectUtilities.PlayTeleportChargingEffects(self, location, self.TeleportFxBag, teleDelay)
+        EffectUtilities.PlayTeleportChargingEffects(self, destination, self.TeleportFxBag, teleDelay)
     end,
 
     ---@param self Unit
@@ -4989,12 +5013,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         end
     end,
 
+    --- Adds nuclear missiles to the unit.
     ---@param self Unit
     ---@param count number
     GiveNukeSiloAmmo = function(self, count)
         cUnit.GiveNukeSiloAmmo(self, count)
     end,
 
+    --- Sets build progress for nuclear/tactical missile construction.
     ---@param self Unit
     ---@param fraction number
     GiveNukeSiloBlocks = function(self, fraction)
@@ -5002,19 +5028,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             return
         end
 
-        local buildRate = self.Blueprint.Economy.BuildRate
+        local buildRate = self:GetEconomyBuildRate()
         if not buildRate then
             return
         end
 
-        local buildTime = self:GetWeapon(1):GetProjectileBlueprint().Economy.BuildTime
-        if not buildTime then
-            return
+        local buildTime
+        for i = 1, self.WeaponCount do
+            local weaponBp = self.WeaponInstances[i].Blueprint
+            if weaponBp.MaxProjectileStorage >= 1 then
+                buildTime = __blueprints[weaponBp.ProjectileId].Economy.BuildTime
+                if buildTime then
+                    break
+                end
+            end
         end
+        if not buildTime then return end
 
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+        -- Engine won't update work progress so we do it manually
+        self:SetWorkProgress(fraction)
     end,
 
     --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`. See `unit:UpdateStat` for an alternative
@@ -5143,7 +5178,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param target Vector
     ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
-    ---@param self Unit
     OnMissileIntercepted = function(self, target, defense, position, projectile)
         -- try and run callbacks
         if self.EventCallbacks['OnMissileIntercepted'] then
@@ -5202,7 +5236,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Add a callback when a missile launched by this unit is intercepted
     ---@param self Unit
-    ---@param callback function<Vector, Unit, Vector>
+    ---@param callback fun(target: Vector, defense: Unit, position: Vector)
     AddMissileInterceptedCallback = function(self, callback)
         self.EventCallbacks['OnMissileIntercepted'] = self.EventCallbacks['OnMissileIntercepted'] or { }
         table.insert(self.EventCallbacks['OnMissileIntercepted'], callback)
@@ -5210,7 +5244,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Add a callback when a missile launched by this unit hits a shield
     ---@param self Unit
-    ---@param callback function<Vector, Unit, Vector>
+    ---@param callback fun(target: Vector, shield: Unit, position: Vector)
     AddMissileImpactShieldCallback = function(self, callback)
         self.EventCallbacks['OnMissileImpactShield'] = self.EventCallbacks['OnMissileImpactShield'] or { }
         table.insert(self.EventCallbacks['OnMissileImpactShield'], callback)
@@ -5218,7 +5252,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
     --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
-    ---@param callback function<Vector, Vector>
+    ---@param callback fun(self: Unit, target: Unit, position: Vector)
     AddMissileImpactTerrainCallback = function(self, callback)
         self.EventCallbacks['OnMissileImpactTerrain'] = self.EventCallbacks['OnMissileImpactTerrain'] or { }
         table.insert(self.EventCallbacks['OnMissileImpactTerrain'], callback)

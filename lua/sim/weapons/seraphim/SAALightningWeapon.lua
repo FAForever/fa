@@ -1,6 +1,6 @@
 local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
-local LightningSmallCollisionBeam = import("/lua/sim/collisionBeams/LightningSmallCollisionBeam.lua").LightningSmallCollisionBeam
+local LightningSmallCollisionBeam = import("/lua/sim/collisionbeams/lightningsmallcollisionbeam.lua").LightningSmallCollisionBeam
 
 --- Used by DSLK004
 ---@class SAALightningWeapon : DefaultProjectileWeapon

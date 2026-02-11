@@ -1,0 +1,1 @@
+- (#6981) Fix disappearing terrain effects (Mainly ship wake effects, but other effects might be affected as well).

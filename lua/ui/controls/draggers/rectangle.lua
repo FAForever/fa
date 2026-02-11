@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local UIRenderableCircle = import('/lua/ui/game/renderable/circle.lua').UIRenderableCircle
+local CircleShape = import('/lua/ui/game/shapes/circleshape.lua')
 
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local DraggerInit = Dragger.__init
@@ -28,12 +28,12 @@ local DraggerInit = Dragger.__init
 ---@class UIRectangleDragger : Dragger
 ---@field Origin Vector
 ---@field Destination Vector
----@field ShapeStart UIRenderableCircle
----@field ShapeEnd UIRenderableCircle
----@field ShapeStart1 UIRenderableCircle
----@field ShapeStart2 UIRenderableCircle
----@field ShapeEnd1 UIRenderableCircle
----@field ShapeEnd2 UIRenderableCircle
+---@field ShapeStart UICircleShape
+---@field ShapeEnd UICircleShape
+---@field ShapeStart1 UICircleShape
+---@field ShapeStart2 UICircleShape
+---@field ShapeEnd1 UICircleShape
+---@field ShapeEnd2 UICircleShape
 ---@field MinimumDistance number
 ---@field MaximumDistance number
 ---@field Width number
@@ -68,18 +68,12 @@ RectangleDragger = Class(Dragger) {
         local size = self.Size
         local trash = self.Trash
         local thickness = self.Thickness
-        self.ShapeStart = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-start', mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
-        self.ShapeEnd = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-start-01', mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
-        self.ShapeStart1 = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-start-02', mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
-        self.ShapeStart2 = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-end', mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
-        self.ShapeEnd1 = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-end-01', mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
-        self.ShapeEnd2 = trash:Add(UIRenderableCircle(view, 'rectangle-dragger-end-02', mouseWorldPosition[1],
-            mouseWorldPosition[2], mouseWorldPosition[3], size, 'ffffff', thickness))
+        self.ShapeStart = trash:Add(CircleShape.CreateCircleShape(view, mouseWorldPosition, size, 'ffffff', thickness))
+        self.ShapeEnd = trash:Add(CircleShape.CreateCircleShape(view, mouseWorldPosition, size, 'ffffff', thickness))
+        self.ShapeStart1 = trash:Add(CircleShape.CreateCircleShape(view, mouseWorldPosition, size, 'ffffff', thickness))
+        self.ShapeStart2 = trash:Add(CircleShape.CreateCircleShape(view, mouseWorldPosition, size, 'ffffff', thickness))
+        self.ShapeEnd1 = trash:Add(CircleShape.CreateCircleShape(view, mouseWorldPosition, size, 'ffffff', thickness))
+        self.ShapeEnd2 = trash:Add(CircleShape.CreateCircleShape(view,  mouseWorldPosition, size, 'ffffff', thickness))
 
         self.Origin = mouseWorldPosition
 

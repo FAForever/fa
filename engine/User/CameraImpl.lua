@@ -94,7 +94,8 @@ function CameraImpl:SetAccMode(accTypeName)
 end
 
 --- Sets zoom scale to allow zooming past or before the point where map fills control
-function CameraImpl:SetMaxZoomMult()
+---@param max number
+function CameraImpl:SetMaxZoomMult(max)
 end
 
 --- 

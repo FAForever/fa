@@ -306,8 +306,10 @@ end
 -------------------------------------------------------------------------------
 --#region General orders
 
+--- Instant self destruct that only works on the selection.
+--- Alternative, simplified implementation that is unused.
 ---@param data { }
----@param selection Unit[]
+---@param selection? Unit[]
 Callbacks.SelfDestruct = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
@@ -320,7 +322,7 @@ Callbacks.SelfDestruct = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+    import("/lua/sim/commands/self-destruct.lua").SelfDestruct(selection, true)
 end
 
 --#endregion
@@ -738,7 +740,7 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
+        do -- feature: area commands
             return
         end
 
@@ -826,27 +828,60 @@ end
 
 --#endregion
 
+
+--#region UI related functionality
+
+do
+    local OriginalFocusArmy = GetFocusArmy()
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    local SyncPainting = function(data)
+        -- used to determine the color of the painting
+        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSource()).Nickname
+
+        Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
+        table.insert(Sync.SharePaintingBrushStroke, data)
+    end
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    Callbacks.SharePaintingBrushStroke = function(data)
+        local focusArmy = GetFocusArmy()
+        local currentCommandSource = GetCurrentCommandSource()
+
+        -- spectators are able to see all paintings. We take into account
+        -- the original focus army because spectators can change focus army
+        if OriginalFocusArmy == -1 or focusArmy == -1 then
+            SyncPainting(data)
+            return
+        end
+
+        -- allies are able to see each others paintings
+        if IsAlly(focusArmy, currentCommandSource) then
+            SyncPainting(data)
+            return
+        end
+    end
+end
+
+--#endregion
+
+
 -------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
---- An anti cheat check that passes when there is only 1 player or cheats are enabled
+
+--- An anti-cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
-local PassesAntiCheatCheck = function()
-    -- allow when cheats are enabled
+local function PassesAntiCheatCheck()
     return CheatsEnabled()
 end
 
---- A simplified check that also passes when the game has AIs
+--- An anti-cheat check that also passes when the game has AIs
 ---@return boolean
-local PassesAIAntiCheatCheck = function()
-    -- allow when there are AIs
-    if ScenarioInfo.GameHasAIs then
-        return true
-    end
-
-    -- allow when cheats are enabled
-    return PassesAntiCheatCheck()
+local function PassesAIAntiCheatCheck()
+    return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
+
 
 local SpawnedMeshes = {}
 
@@ -855,7 +890,7 @@ local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
     local bpD = bp.Display
     if __blueprints[bpD.MeshBlueprint] then
         SPEW("Spawning mesh of " .. id)
-        local entity = import('/lua/sim/Entity.lua').Entity()
+        local entity = import('/lua/sim/entity.lua').Entity()
         if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
             y = y - bp.CollisionOffsetY
         end
@@ -903,7 +938,7 @@ local function ShowRaisedPlatforms(self)
     for i = 1, (table.getn(plats) / 12) do
         entities[i] = {}
         for b = 1, 4 do
-            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
+            entities[i][b] = import('/lua/sim/entity.lua').Entity { Owner = self }
             self.Trash:Add(entities[i][b])
             entities[i][b]:SetPosition(Vector(
                 pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
@@ -1000,29 +1035,43 @@ end
 
 --- Toggles the profiler on / off
 Callbacks.ToggleProfiler = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.ForceEnable or false)
 end
 
 -- Allows searching for benchmarks
 Callbacks.FindBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+    import("/lua/sim/profiler.lua").FindBenchmarks()
+end
+Callbacks.LoadBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
 end
 
 -- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+Callbacks.RunBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+end
+Callbacks.StopBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").StopBenchmark()
 end
 
 Callbacks.ToggleDebugMarkersByType = function(data, units)
