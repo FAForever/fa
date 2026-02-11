@@ -60,7 +60,6 @@ UnitBlueprint{
         "SNIPEMODE",
         "TECH1",
         "VISIBLETORECON",
-        "COMPUTEBOMBDROP",
     },
     Defense = {
         ArmorType = "Light",

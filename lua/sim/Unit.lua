@@ -3511,11 +3511,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
             self:PlayUnitSound('Landed')
             
             -- fix bombers do not auto attack nearby enemies
-            if self.Blueprint.CategoriesHash.COMPUTEBOMBDROP then
+            -- the root cause is weapon.AlwaysRecheckTarget = false in blueprints-weapons.lua
+            -- but fixing it there will reintroduce the bug when
+            -- bombers suddenly retarget and don't drop their bomb
+            if self.Blueprint.CategoriesHash.BOMBER then
                 for k,wep in self.WeaponInstances do 
-                    if wep:GetCurrentTarget() ~= nil then
-                        wep:ResetTarget()
-                        break
+                    if wep.Blueprint.NeedToComputeBombDrop then
+                        if wep:GetCurrentTarget() ~= nil then
+                            wep:ResetTarget()
+                            break
+                        end
                     end
                 end
             end

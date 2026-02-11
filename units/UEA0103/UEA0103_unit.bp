@@ -60,7 +60,6 @@ UnitBlueprint{
         "TECH1",
         "UEF",
         "VISIBLETORECON",
-        "COMPUTEBOMBDROP",
     },
     Defense = {
         ArmorType = "Light",

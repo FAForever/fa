@@ -72,7 +72,6 @@ UnitBlueprint{
         "SHOWATTACKRETICLE",
         "SNIPEMODE",
         "VISIBLETORECON",
-        "COMPUTEBOMBDROP",
     },
     Defense = {
         AirThreatLevel = 180,

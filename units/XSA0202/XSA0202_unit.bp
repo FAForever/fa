@@ -60,7 +60,6 @@ UnitBlueprint{
         "SNIPEMODE",
         "TECH2",
         "VISIBLETORECON",
-        "COMPUTEBOMBDROP",
     },
     Defense = {
         AirThreatLevel = 15,
