@@ -131,9 +131,9 @@ local function ProcessWeapon(unit, weapon, projectile)
 
     -- # sanitize values
 
-    -- do not allow the 'bomb weapon' of bombers to suddenly retarget, as then they won't drop their bomb when they do
+    -- bombers should always have AlwaysRecheckTarget = true otherwise they don't auto attack units
     if weapon.NeedToComputeBombDrop then
-        weapon.AlwaysRecheckTarget = false
+        weapon.AlwaysRecheckTarget = true
     end
 
     -- Floor target check interval to ticks

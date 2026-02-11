@@ -3509,21 +3509,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         elseif new == 'Bottom' or new == 'Hover' then
             -- Play the "landed" sound
             self:PlayUnitSound('Landed')
-            
-            -- fix bombers do not auto attack nearby enemies
-            -- the root cause is weapon.AlwaysRecheckTarget = false in blueprints-weapons.lua
-            -- but fixing it there will reintroduce the bug when
-            -- bombers suddenly retarget and don't drop their bomb
-            if self.Blueprint.CategoriesHash.BOMBER then
-                for k,wep in self.WeaponInstances do 
-                    if wep.Blueprint.NeedToComputeBombDrop then
-                        if wep:GetCurrentTarget() ~= nil then
-                            wep:ResetTarget()
-                            break
-                        end
-                    end
-                end
-            end
         elseif new == 'Up' or (new == 'Top' and (old == 'Down' or old == 'Bottom')) then
             -- Play the "takeoff" sound
             self:PlayUnitSound('TakeOff')
