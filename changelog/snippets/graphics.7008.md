@@ -1,0 +1,1 @@
+- (#7008) Fix the left/right side of the Fatboy's tread's textures moving in reverse of the rest of the tread's textures.
