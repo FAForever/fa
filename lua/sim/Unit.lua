@@ -2389,6 +2389,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     ---@param layer Layer
     ---@return boolean
     OnStopBeingBuilt = function(self, builder, layer)
+        self:DebugLog('OnStopBeingBuilt', GetGameTick(), debug.traceback())
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
             return false
@@ -2538,8 +2539,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.OnBeingBuiltEffectsBag:Destroy()
     end,
 
+    --- Called by the engine when the unit's factory's build order is cancelled.
     ---@param self Unit
     OnFailedToBeBuilt = function(self)
+        self:DebugLog('OnFailedToBeBuilt', GetGameTick(), debug.traceback())
         self:ForkThread(function()
             WaitTicks(1)
             if self.Dead then return end
@@ -2913,10 +2916,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         return true
     end,
 
+    --- Called by the engine when the unit finishes a build order or cancels a mobile build order.
     ---@param self Unit
     ---@param built Unit
-    ---@param order string
+    ---@param order BuildOrderType
     OnStopBuild = function(self, built, order)
+        self:DebugLog('OnStopBuild')
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
@@ -2933,8 +2938,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.Brain:OnUnitStopBuild(self, built, order)
     end,
 
+    --- Called by the engine when a build order is cancelled.
     ---@param self Unit
     OnFailedToBuild = function(self)
+        self:DebugLog('OnFailedToBuild')
         self:DoOnFailedToBuildCallbacks()
         self:StopUnitAmbientSound('ConstructLoop')
     end,
