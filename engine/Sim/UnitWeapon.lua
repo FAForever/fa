@@ -1,5 +1,20 @@
 ---@meta
 
+-- Engine internal states for Tactical/Nuke fire tasks:
+-- State 0: Check range
+-- Move the unit within min/max range.
+-- Then go to State 1 if we need ammo or State 2 if we don't.
+-- State 1: Building ammo
+-- Checks every 10 ticks if ammo is loaded, afterwards transitioning to State 2.
+-- State 2: Waiting to fire
+-- If unit not busy, give a fire command and increment State. Always waits 3 ticks afterwards.
+-- State 3: Firing
+-- Check if unit busy, in which case increment State. Always waits 3 ticks afterwards.
+-- State 4: Finished firing
+-- If unit not busy, end the task, otherwise wait 3 ticks.
+
+-- Only weapons with `ManualFire = true` and `OverchargeWeapon = false` in their blueprint can be used for tactical/nuke fire orders.
+
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
