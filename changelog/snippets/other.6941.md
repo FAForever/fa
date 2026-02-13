@@ -1,1 +1,0 @@
-- (#6941) Annotate remainder of the `ping.lua` file.

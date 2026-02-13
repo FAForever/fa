@@ -1,1 +1,0 @@
-- (#6987) Fix the "Show Player Names" option crashing the game on startup when the option in the game.prefs file does not exist.
