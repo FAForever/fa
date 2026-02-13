@@ -1059,8 +1059,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                     local proj
                     if not countedProjectile or
-                        (bp.NukeWeapon and self.unit:GetNukeSiloAmmoCount() > 0
-                        or self.unit:GetTacticalSiloAmmoCount() > 0)
+                        (bp.NukeWeapon and self.unit:GetNukeSiloAmmoCount() > 0) or
+                        (not bp.NukeWeapon and self.unit:GetTacticalSiloAmmoCount() > 0)
                     then
                         proj = self:CreateProjectileAtMuzzle(muzzle)
                     end
