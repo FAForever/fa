@@ -1,0 +1,1 @@
+- (#7029) Fix nil value error in `FactoryUnit` `OnStopBuild`.
