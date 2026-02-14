@@ -1,1 +1,0 @@
-- (#6993) Increase the `StrategicIconSize` of the Exodus's Oblivion Cannon from `2` to `3` to better align the weapon's visual representation with its overall power.
