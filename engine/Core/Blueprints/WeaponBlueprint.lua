@@ -242,7 +242,7 @@
 ---@field NukeWeapon? boolean
 ---@field Overcharge? WeaponBlueprintOvercharge
 --- overcharge weapon flag
----@field OverchargeWeapon? boolean
+---@field OverChargeWeapon? boolean
 --- flag that specifies if the weapon prefers to target what the primary weapon is currently
 --- targeting
 ---@field PrefersPrimaryWeaponTarget? boolean
