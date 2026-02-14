@@ -1,1 +1,0 @@
-- (#6957) Fix the ravager blueprint size category

@@ -1,1 +1,0 @@
-- (#7013) Re-add reload animation for the Seraphim T2 Mobile Missile Launcher.

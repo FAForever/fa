@@ -1,2 +1,0 @@
-- (#6911) Add annotations to OpAI
-- (#6911) Add missing platoon templates for coop, Sera base in 6th FA mission is now properly sending T3 tanks and Arty
