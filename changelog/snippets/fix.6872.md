@@ -1,1 +1,0 @@
-- (#6872) Fix Nomads faction icon and inconsistent tooltip colors in the cheat spawn menu.

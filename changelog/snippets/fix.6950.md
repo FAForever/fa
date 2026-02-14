@@ -1,1 +1,0 @@
-- (#6950) Fix the rollover unit view not showing shield HP for units with non-back slot shield upgrades.
