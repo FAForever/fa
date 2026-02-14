@@ -853,7 +853,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
             local unit = self.unit
             local bp = self.Blueprint
-            if bp.ManualFire and not bp.OverchargeWeapon then
+            if bp.ManualFire and not bp.OverChargeWeapon then
                 unit:SetBusy(true)
             else
                 unit:SetBusy(false)
