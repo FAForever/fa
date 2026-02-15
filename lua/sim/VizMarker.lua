@@ -9,24 +9,24 @@
 
 local Entity = import("/lua/sim/entity.lua").Entity
 
----@class VizMarkerSpec
+---@class VizMarkerSpec : EntitySpec
 ---@field X number
 ---@field Z number
----@field LifeTime number
+---@field LifeTime number in seconds
 ---@field Radius number
----@field Army number
+---@field Army integer
 ---@field Omni boolean
 ---@field Radar boolean
 ---@field Vision boolean
 ---@field WaterVision boolean
 
----@class VizMarker : Entity
+---@class VizMarker : Entity, VizMarkerSpec
+---@field LifeTimeThread? thread
 ---@deprecated
 VizMarker = Class(Entity) {
     ---@param self VizMarker
     ---@param spec VizMarkerSpec
     __init = function(self, spec)
-        --LOG('__VizMarker')
         Entity.__init(self, spec)
         self.X = spec.X
         self.Z = spec.Z
@@ -42,21 +42,20 @@ VizMarker = Class(Entity) {
     ---@param self VizMarker
     OnCreate = function(self)
         Entity.OnCreate(self)
-        --LOG('VizMarker OnCreate')
         Warp(self, Vector(self.X, 0, self.Z))
-        if self.Omni != false then
+        if self.Omni ~= false then
             self:InitIntel(self.Army, 'Omni', self.Radius)
             self:EnableIntel('Omni')
         end
-        if self.Radar != false then
+        if self.Radar ~= false then
             self:InitIntel(self.Army, 'Radar', self.Radius)
             self:EnableIntel('Radar')
-        end        
-        if self.Vision != false then
+        end
+        if self.Vision ~= false then
             self:InitIntel(self.Army, 'Vision', self.Radius)
             self:EnableIntel('Vision')
         end
-        if self.WaterVision != false then
+        if self.WaterVision ~= false then
             self:InitIntel(self.Army, 'WaterVision', self.Radius)
             self:EnableIntel('WaterVision')
         end
@@ -69,6 +68,7 @@ VizMarker = Class(Entity) {
     VisibleLifeTimeThread = function(self)
         WaitSeconds(self.LifeTime)
         self:Destroy()
+        self.LifeTimeThread = nil
     end,
 
     ---@param self VizMarker
@@ -76,21 +76,38 @@ VizMarker = Class(Entity) {
         Entity.OnDestroy(self)
         if self.LifeTimeThread then
             self.LifeTimeThread:Destroy()
+            self.LifeTimeThread = nil
         end
     end
 }
-local PositionCache = { 0, 0, 0 }
+
+
+local PositionCache = {0, 0, 0}
 
 --- Performance-wise a better alternative to the regular vision marker. 
 ---@class VisionMarkerOpti : Entity
+---@field Thread? thread
+---@field InitializedIntel table<string, boolean>
 VisionMarkerOpti = Class(Entity) {
+
+    ---@param self VisionMarkerOpti
+    ---@param spec EntitySpec
+    __init = function(self, spec)
+        Entity.__init(self, spec)
+
+        -- We need to keep track of this ourselves, as we have no other will to
+        -- know if we should call `InitIntel` or `SetIntelRadius`. It used to be
+        -- that it didn't matter, but now that vision radii are interpolated, it
+        -- shows that the intel handle is being constantly recreated.
+        self.InitializedIntel = {}
+    end,
 
     --- Update all intel types
     ---@see `UpdateIntel` if you intend to apply only one intel type
     ---@see `UpdatePosition`and `UpdateDuration` for additional functionality
     ---@param self VisionMarkerOpti
-    ---@param lifetime number       # Duration of the intel, if set to -1 it lasts indefinitely
-    ---@param army number           # Army that we're creating intel for
+    ---@param lifetime number       # unused
+    ---@param army integer          # Army that we're creating intel for
     ---@param radius number         # Radius of the intel type(s)
     ---@param vision? boolean       # Intel type is enabled when true, disabled when false and left alone when nil
     ---@param waterVision? boolean  # Intel type is enabled when true, disabled when false and left alone when nil
@@ -99,37 +116,62 @@ VisionMarkerOpti = Class(Entity) {
     ---@param omni? boolean         # Intel type is enabled when true, disabled when false and left alone when nil
     UpdateAllIntel = function(self, army, lifetime, radius, vision, waterVision, radar, sonar, omni)
         if vision then
-            self:InitIntel(army, 'Vision', radius)
+            if self.InitializedIntel.Vision then
+                self:SetIntelRadius('Vision', radius)
+            else
+                self:InitIntel(army, "Vision", radius)
+                self.InitializedIntel.Vision = true
+            end
             self:EnableIntel('Vision')
         elseif vision == false then
             self:DisableIntel('Vision')
         end
 
         if waterVision then
-            self:InitIntel(army, 'WaterVision', radius)
+            if self.InitializedIntel.WaterVision then
+                self:SetIntelRadius('WaterVision', radius)
+            else
+                self:InitIntel(army, "WaterVision", radius)
+                self.InitializedIntel.WaterVision = true
+            end
             self:EnableIntel('WaterVision')
-        elseif waterVision == false then 
+        elseif waterVision == false then
             self:DisableIntel('WaterVision')
         end
 
         if radar then
-            self:InitIntel(army, 'Radar', radius)
+            if self.InitializedIntel.Radar then
+                self:SetIntelRadius('Radar', radius)
+            else
+                self:InitIntel(army, "Radar", radius)
+                self.InitializedIntel.Radar = true
+            end
             self:EnableIntel('Radar')
-        elseif radar == false then 
+        elseif radar == false then
             self:DisableIntel('Radar')
         end
 
         if sonar then
-            self:InitIntel(army, 'Sonar', radius)
+            if self.InitializedIntel.Sonar then
+                self:SetIntelRadius('Sonar', radius)
+            else
+                self:InitIntel(army, "Sonar", radius)
+                self.InitializedIntel.Sonar = true
+            end
             self:EnableIntel('Sonar')
-        elseif sonar == false then 
+        elseif sonar == false then
             self:DisableIntel('Sonar')
         end
 
         if omni then
-            self:InitIntel(army, 'Omni', radius)
+            if self.InitializedIntel.Omni then
+                self:SetIntelRadius('Omni', radius)
+            else
+                self:InitIntel(army, "Omni", radius)
+                self.InitializedIntel.Omni = true
+            end
             self:EnableIntel('Omni')
-        elseif omni == false then 
+        elseif omni == false then
             self:DisableIntel('Omni')
         end
     end,
@@ -147,13 +189,18 @@ VisionMarkerOpti = Class(Entity) {
 
     --- Update one specific intel type
     ---@param self VisionMarkerOpti
-    ---@param army number
+    ---@param army integer unused
     ---@param radius number
     ---@param type IntelType
     ---@param enable boolean Intel type is enabled when true and disabled otherwise
     UpdateIntel = function(self, army, radius, type, enable)
         if enable then
-            self:InitIntel(army, type, radius)
+            if self.InitializedIntel[type] then
+                self:SetIntelRadius(type, radius)
+            else
+                self:InitIntel(army, type, radius)
+                self.InitializedIntel[type] = true
+            end
             self:EnableIntel(type)
         else
             self:DisableIntel(type)
@@ -176,7 +223,17 @@ VisionMarkerOpti = Class(Entity) {
     ---@param self VisionMarkerOpti
     ---@param duration number
     LifetimeThread = function(self, duration)
-        WaitTicks(10 * duration + 1)
+        for type in self.InitializedIntel do
+            self:SetIntelRadius(type, self:GetIntelRadius(type))
+        end
+        WaitSeconds(duration)
+
+        for type in self.InitializedIntel do
+            self:SetIntelRadius(type, 0.0)
+        end
+        WaitTicks(1)
+
         self:Destroy()
+        self.Thread = nil
     end,
 }

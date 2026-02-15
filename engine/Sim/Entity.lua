@@ -261,6 +261,8 @@ end
 
 --- Initializes the entity to provide intelligence of a partiuclar type for an army.
 --- This lets the other intel methods work with this entity for that type of intel.
+--- Note that this only needs to be called for basic entities, as units automatically
+--- intialize their C-side intel manager.
 ---@param army Army
 ---@param type IntelType
 ---@param radius? number

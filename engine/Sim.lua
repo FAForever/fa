@@ -34,6 +34,12 @@
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
 ---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
+--- A table of specification fields for an entity, as used by `_c_CreateEntity`. It is only
+--- used to determine the owner's army index of the entity, or else it defaults to -1
+---@class EntitySpec
+---@field Owner? integer | Entity army index or entity to retreive army index from
+---@field Army? integer cannot be negative; `Owner` has precedence if both are specified
+
 ---@type AIBrain[]
 ArmyBrains = {}
 
@@ -1257,12 +1263,17 @@ end
 function Warp(object, location, orientation)
 end
 
----@param entity Entity
----@param spec EntitySpec
+--- Constructs the C-side object for an entity. Note that it is uncommon to
+--- create just a basic entity, and not one of the other objects such as an
+--- unit, prop, or projectile (which have their own functions), but it is done
+--- for vision markers, flares, effects, etc.
+---@param entity Entity Lua object to be used in the C object
+---@param spec EntitySpec specification table to resolve the owner's army index from
 function _c_CreateEntity(entity, spec)
 end
 
----@param shield Shield
----@param spec UnitBlueprintDefenseShield
+--- Constructs the C-side object for a shield.
+---@param shield Shield Lua object to be used in the C object
+---@param spec EntitySpec specification table to resolve the owner's army index from
 function _c_CreateShield(shield, spec)
 end
