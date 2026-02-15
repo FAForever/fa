@@ -73,8 +73,8 @@ jobs:
       - name: Deploy
         working-directory: gh-pages
         run: |
-          # Check for any differences between the working directory and the latest commit
-          if git status --porcelain; then
+          # Check if there are any changes
+          if [ -z "$(git status --porcelain)" ]; then
             echo "No changes to deploy"
             exit 0
           fi
