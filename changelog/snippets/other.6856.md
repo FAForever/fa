@@ -1,1 +1,1 @@
-- (#6856) Add ability to launch custom lobby to launch script with `-toLobby` arg.
+- (#6856) Add `-toLobby` arg to the developer local multiplayer launch script which launches the instances into the lobby.
