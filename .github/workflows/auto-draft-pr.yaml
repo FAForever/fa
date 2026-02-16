@@ -20,6 +20,9 @@
 
 name: Convert PRs to Draft on Opening
 
+permissions:
+  contents: write
+
 on:
   pull_request:
     types: [opened]

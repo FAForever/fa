@@ -155,7 +155,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
         local engineerGuards = EntityCategoryFilterDown(categories.ENGINEER, self:GetGuards())
         IssueClearCommands(engineerGuards)
         if self.guardCache then
-            LOG('We have a guard cache')
             self.guardCache.command(engineerGuards, self.guardCache.target)
         end
         IssueGuard(engineerGuards, self)
@@ -177,9 +176,6 @@ TConstructionPodUnit = ClassUnit(TConstructionUnit) {
                     count = count + 1
                 end
             end
-        end
-        if count > 0 then
-            print(string.format('Found %d cached guards', count))
         end
         return guards
     end,

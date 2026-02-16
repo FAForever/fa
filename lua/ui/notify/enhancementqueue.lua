@@ -125,37 +125,39 @@ function ModifyBuildablesForACU(originalBuildables, selection)
             end
         end
 
-        local factionCategory = ParseEntityCategory(faction)
         SetIgnoreSelection(true)
+        UISelectionByCategory("RESEARCH " .. faction, false, false, false, false)
+        local hqs = GetSelectedUnits()
+        if table.empty(hqs) then
+            newBuildableCategories = newBuildableCategories - categories.SUPPORTFACTORY
+        else
+            local categories = categories
+            local factionCategory = categories[faction]
+            local supportFactories = newBuildableCategories - categories.SUPPORTFACTORY
 
-        -- LAND
-        UISelectionByCategory('LAND RESEARCH TECH3 ' .. faction, false, false, false, false)
-        if not GetSelectedUnits() then
-            newBuildableCategories = newBuildableCategories - (categories.LAND * categories.SUPPORTFACTORY * categories.TECH3 * factionCategory)
-            UISelectionByCategory('LAND RESEARCH TECH2 ' .. faction, false, false, false, false)
-            if not GetSelectedUnits() then
-                newBuildableCategories = newBuildableCategories - (categories.LAND * categories.SUPPORTFACTORY * categories.TECH2 * factionCategory)
-            end
-        end
+            ---@param hq UserUnit
+            for _, hq in hqs do
+                local bp = hq:GetBlueprint()
+                local hashedCategories = bp.CategoriesHash
+                local supportCategory = categories.SUPPORTFACTORY * factionCategory
 
-        -- AIR
-        UISelectionByCategory('AIR RESEARCH TECH3 ' .. faction, false, false, false, false)
-        if not GetSelectedUnits() then
-            newBuildableCategories = newBuildableCategories - (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3 * factionCategory)
-            UISelectionByCategory('AIR RESEARCH TECH2 ' .. faction, false, false, false, false)
-            if not GetSelectedUnits() then
-                newBuildableCategories = newBuildableCategories - (categories.AIR * categories.SUPPORTFACTORY * categories.TECH2 * factionCategory)
-            end
-        end
+                if hashedCategories["TECH3"] then
+                    supportCategory = supportCategory * (categories.TECH3 + categories.TECH2)
+                elseif hashedCategories["TECH2"] then
+                    supportCategory = supportCategory * categories.TECH2
+                end
 
-        -- Naval
-        UISelectionByCategory('NAVAL RESEARCH TECH3 ' .. faction, false, false, false, false)
-        if not GetSelectedUnits() then
-            newBuildableCategories = newBuildableCategories - (categories.NAVAL * categories.SUPPORTFACTORY * categories.TECH3 * factionCategory)
-            UISelectionByCategory('NAVAL RESEARCH TECH2 ' .. faction, false, false, false, false)
-            if not GetSelectedUnits() then
-                newBuildableCategories = newBuildableCategories - (categories.NAVAL * categories.SUPPORTFACTORY * categories.TECH2 * factionCategory)
+                if hashedCategories["LAND"] then
+                    supportFactories = supportFactories + supportCategory * categories.LAND
+                end
+                if hashedCategories["AIR"] then
+                    supportFactories = supportFactories + supportCategory * categories.AIR
+                end
+                if hashedCategories["NAVAL"] then
+                    supportFactories = supportFactories + supportCategory * categories.NAVAL
+                end
             end
+            newBuildableCategories = newBuildableCategories * supportFactories
         end
 
         SelectUnits(selection)
