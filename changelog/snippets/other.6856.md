@@ -1,0 +1,1 @@
+- (#6856) Add `-toLobby` arg to the developer local multiplayer launch script which launches the instances into the lobby.
