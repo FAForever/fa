@@ -89,11 +89,11 @@ _Этот шаг является необязательным и требует
 Благодаря KionX у нас есть [отладчик](https://github.com/FAForever/FADeepProbe). Когда возникает исключение, он может отследить его до строки кода Lua. Скомпилированный исполняемый файл доступен в каждом [релизе](https://github.com/FAForever/FADeepProbe/releases). Сохраните исполняемый файл в папке `bin`. Это та же самая папка `bin`, как определено ранее. Нам нужно адаптировать файлы bat/bash для использования отладчика. В качестве примера мы меняем bat-файл с:
 
 ```bat
-ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
+ForgedAlliance.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /log "dev.log"
 ```
 На:
 ```bat
-FADeepProbe.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
+FADeepProbe.exe /init "init_local_development.lua" /EnableDiskWatch /showlog /log "dev.log"
 ```
 
 Аргументы передаются отладчиком. Изменения в сценарии bash аналогичны. Когда игра вылетает, отладчик попытается сообщить вам в журнале, что произошло.
