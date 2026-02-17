@@ -1429,8 +1429,14 @@ end
 ---@param data CallbackModeratorEventData
 Callbacks.ModeratorEvent = function(data)
     -- show up in the game logs
-    local brain = GetArmyBrain(GetCurrentCommandSourceArmy())
-    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
+    local commandSourceNickname
+    local commandSourceArmy = GetCurrentCommandSourceArmy()
+    if commandSourceArmy then
+        commandSourceNickname = tostring(GetArmyBrain(commandSourceArmy).Nickname)
+    else
+        commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+    end
+    SPEW(string.format("Moderator event for %s: %s", commandSourceNickname, tostring(data.Message)))
 end
 
 --#endregion
