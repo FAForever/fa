@@ -1544,7 +1544,7 @@ function DrawBone(entity, bone, length)
 end
 
 local CommandSourceToArmyMap
---- Retrieves the army index corresponding to the command source index.
+--- Retrieves the army index corresponding to the given command source index.
 ---@param source integer
 ---@return integer
 function GetArmyOfCommandSource(source)
@@ -1562,6 +1562,7 @@ function GetArmyOfCommandSource(source)
     return CommandSourceToArmyMap[source]
 end
 
+--- Retrieves the army index corresponding to the current command source.
 ---@return integer
 function GetCurrentCommandSourceArmy()
     return GetArmyOfCommandSource(GetCurrentCommandSource())
