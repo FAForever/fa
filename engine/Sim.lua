@@ -602,6 +602,9 @@ end
 
 --- Returns the currently active command source in the sim state. This is the n-th **human** army
 --- that sent the command.
+---
+--- Use `GetCurrentCommandSourceArmy` from `SimUtils.lua` to reliably get the army index of the 
+--- current command source.
 ---@return number
 function GetCurrentCommandSource()
 end
