@@ -900,7 +900,6 @@ local function PassesAIAntiCheatCheck()
     return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
 
-
 local SpawnedMeshes = {}
 
 local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
