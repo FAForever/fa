@@ -1,0 +1,1 @@
+- (#7039) Salem Class (URS0201): fix Nanite Torpedoes reducing main cannon ROF.
