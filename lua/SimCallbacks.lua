@@ -848,7 +848,7 @@ do
     ---@param data UIShareableBrushStrokeCallbackMessage
     Callbacks.SharePaintingBrushStroke = function(data)
         local focusArmy = GetFocusArmy()
-        local currentCommandSource = GetCurrentCommandSourceArmy()
+        local currentCommandSourceArmy = GetCurrentCommandSourceArmy()
 
         -- spectators are able to see all paintings. We take into account
         -- the original focus army because spectators can change focus army
@@ -858,7 +858,7 @@ do
         end
 
         -- allies are able to see each others paintings
-        if IsAlly(focusArmy, currentCommandSource) then
+        if IsAlly(focusArmy, currentCommandSourceArmy) then
             SyncPainting(data)
             return
         end
