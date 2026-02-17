@@ -835,7 +835,6 @@ end
 
 do
     local OriginalFocusArmy = GetFocusArmy()
-    LOG("ORIGINAL FOCUS ARMY:", OriginalFocusArmy, OriginalFocusArmy == -1 and "Observer" or (ArmyBrains[OriginalFocusArmy].Nickname or "nil"))
 
     ---@param data UIShareableBrushStrokeCallbackMessage
     local SyncPainting = function(data)
@@ -850,33 +849,16 @@ do
     Callbacks.SharePaintingBrushStroke = function(data)
         local focusArmy = GetFocusArmy()
         local currentCommandSource = GetCurrentCommandSourceArmy()
-        LOG(string.format("Received painting callback. Focus: %d (%s), Source: %d (%s)"
-            , focusArmy
-            , ArmyBrains[focusArmy].Nickname
-            , currentCommandSource
-            , ArmyBrains[currentCommandSource].Nickname
-        ))
 
         -- spectators are able to see all paintings. We take into account
         -- the original focus army because spectators can change focus army
         if OriginalFocusArmy == -1 or focusArmy == -1 then
-            if OriginalFocusArmy == -1 then
-                LOG("Original focus is obs")
-            elseif focusArmy == -1 then
-                LOG("Focus army is obs")
-            end
             SyncPainting(data)
             return
         end
 
         -- allies are able to see each others paintings
         if IsAlly(focusArmy, currentCommandSource) then
-            LOG(string.format("Focus %d (%s) and source %d (%s) are allies"
-                , focusArmy
-                , ArmyBrains[focusArmy].Nickname
-                , currentCommandSource
-                , ArmyBrains[currentCommandSource].Nickname
-            ))
             SyncPainting(data)
             return
         end
