@@ -66,7 +66,18 @@ function DoCallback(name, data, units)
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
     if (timeTaken > 0.005) then
-        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSourceArmy() or -2))
+        local commandSourceNickname
+        local commandSourceArmy = GetCurrentCommandSourceArmy()
+        if commandSourceArmy then
+            commandSourceNickname = tostring(ArmyBrains[commandSourceArmy].Nickname)
+        else
+            commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+        end
+        SPEW(string.format("Time to process \"%s\" from %s: %f"
+            , name
+            , commandSourceNickname
+            , timeTaken
+        ))
     end
 end
 
