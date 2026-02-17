@@ -600,8 +600,8 @@ end
 function GetArmyUnitCostTotal(army)
 end
 
---- Returns the currently active command source in the sim state. This number is the army index
---- of the army that sent the command.
+--- Returns the currently active command source in the sim state. This is the n-th **human** army
+--- that sent the command.
 ---@return number
 function GetCurrentCommandSource()
 end
