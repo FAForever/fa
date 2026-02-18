@@ -1,0 +1,1 @@
+- (#7032, #7033) Fix spooky and etfreeman unit databases not being updated.
