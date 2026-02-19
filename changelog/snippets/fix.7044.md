@@ -1,1 +1,1 @@
-- (#7044) Add a missing tooltip for the invert middle mouse pan option.
+- (#7044) Options: add missing tooltips.
