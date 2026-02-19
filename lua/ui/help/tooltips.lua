@@ -606,7 +606,7 @@ Tooltips = {
         title = "<LOC OPTIONS_0314>Replay Selection Threshold",
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
-    options_reclaim_batching_distance_threshold = {
+    options_reclaim_batching_distance_treshold = {
         title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
         description = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE_DESCRIPTION>Adjusts the distance threshold for batching reclaim commands. Higher values group more props together.",
     },

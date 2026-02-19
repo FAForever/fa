@@ -1074,7 +1074,7 @@ options = {
 
             {
                 title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
-                key = 'reclaim_batching_distance_threshold',
+                key = 'reclaim_batching_distance_treshold',
                 type = 'slider',
                 default = 150,
                 custom = {
