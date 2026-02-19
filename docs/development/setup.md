@@ -64,7 +64,7 @@ For Linux users you can use the following bash script file instead:
 
 # Change this to the location of your run proton run script
 RunProton="$HOME/Applications/FAF/downlords-faf-client-1.6.0/run"
-$RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_dev.lua /showlog /log "dev.log" /EnableDiskWatch /nomovie
+$RunProton $HOME/.faforever/bin/ForgedAlliance.exe /init init_local_development.lua /showlog /log "dev.log" /EnableDiskWatch /nomovie
 
 # /init               Define what initialisation file to use
 # /EnableDiskWatch    Allows the game to reload files when it sees they're changed on disk
