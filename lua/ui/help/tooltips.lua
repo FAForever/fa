@@ -586,6 +586,11 @@ Tooltips = {
     -- ** Options Strings
     -- **********************
 
+    options_invert_middle_mouse_button = {
+        title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
+        description = "<LOC INVERT_MOUSE_PAN_DESC>When enabled, dragging with the middle mouse button moves the camera in the opposite direction.",
+    },
+
     options_commands_ignore_mode = {
         title = "<LOC OPTIONS_0319>Ignore Mode",
         description = "<LOC OPTIONS_0320>When enabled, ignores any other command but move commands when you hold {i properkeyname_0123}. This can help to guarantee that you issue a move command, instead of (accidentally) starting a reclaim or attack command.\r\n\r\nThis is disabled when holding {i properkeyname_0009}.",
