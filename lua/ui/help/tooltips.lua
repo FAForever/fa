@@ -611,6 +611,11 @@ Tooltips = {
         description = "<LOC OPTIONS_0318>The higher the value, the easier it becomes to select and target units or props. The value is in (screen) pixels. This threshold is specifically used when watching a replay, it makes it easier to hover over units.\r\n\r\nInteraction with units take precedence over props.\r\n\r\nWhen multiple entities are in range, the one nearest to the mouse location has precedence.",
     },
 
+    options_reclaim_batching_distance_treshold = {
+        title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE>Reclaim Batching Distance Threshold",
+        description = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE_DESCRIPTION>Adjusts the distance threshold for batching reclaim commands. Higher values group more props together.",
+    },
+
     options_painting = {
         title = "<LOC options_painting_title>Painting",
         description = "<LOC options_painting_description>When enabled, you can send and receive brush strokes to or from other players.\r\nYou can create a brush stroke using the right mouse button. Painting is disabled when you have a unit selection or when you hold shift. You can delete a brush stroke by holding ALT while drawing. You can mute a player by holding CTRL and ALT while drawing.",
@@ -619,6 +624,11 @@ Tooltips = {
     options_painting_duration = {
         title = "<LOC options_painting_duration_title>Duration of paintings",
         description = "<LOC options_painting_duration_description>The higher the value, the longer it takes for a painting to decay and be removed.",
+    },
+
+    options_painting_duration_observing = {
+        title = "<LOC options_painting_duration_observing_title>Duration of paintings when observing",
+        description = "<LOC options_painting_duration_observing_description>Sets the duration (in seconds) that painting visualizations remain visible while observing.",
     },
 
     options_wheel_sensitivity = {
