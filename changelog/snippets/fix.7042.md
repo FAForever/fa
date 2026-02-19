@@ -1,0 +1,1 @@
+- (#7042) Fix the score screen button not appearing at the end of a game.
