@@ -1,1 +1,0 @@
-- (#6959) Add the Salvation to Notify's default messages.
