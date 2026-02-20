@@ -36,13 +36,15 @@ Prop = Class(moho.prop_methods) {
         self.CachePosition = self:GetPosition()
 
         -- set reclaim values
-        local economy = self.Blueprint.Economy
-        local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
-        self:SetMaxReclaimValues(
-            economy.ReclaimTimeMultiplier or 1,
-            (economy.ReclaimMassMax * modifier),
-            (economy.ReclaimEnergyMax * modifier)
-        )
+        if self.Blueprint.CategoriesHash["RECLAIMABLE"] then
+            local economy = self.Blueprint.Economy
+            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
+            self:SetMaxReclaimValues(
+                economy.ReclaimTimeMultiplier or 1,
+                (economy.ReclaimMassMax * modifier),
+                (economy.ReclaimEnergyMax * modifier)
+            )
+        end
 
         -- terrain correction
         local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
@@ -342,7 +344,9 @@ Prop = Class(moho.prop_methods) {
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
             if ok then
-                out:SetMaxReclaimValues(time, mass, energy)
+                if out.Blueprint.CategoriesHash["RECLAIMABLE"] then
+                    out:SetMaxReclaimValues(time, mass, energy)
+                end
                 props[ibone] = out
             else
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
