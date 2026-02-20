@@ -1,0 +1,1 @@
+- (#7038) Fix various sim callbacks detecting the incorrect army as the source of the callback in games with AI or observers. This fixes the issue where paintings were displayed to the incorrect players in AI games.

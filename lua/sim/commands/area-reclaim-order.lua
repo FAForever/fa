@@ -31,6 +31,8 @@ local StringFormat = string.format
 
 local IssueReclaim = IssueReclaim
 
+local GetCurrentCommandSourceArmy = import("/lua/SimUtils.lua").GetCurrentCommandSourceArmy
+
 ---@type table<EntityId, boolean>
 local distances = { }
 
@@ -86,7 +88,7 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
         end
     end
 
-    if doPrint and processed > 0 and (GetFocusArmy() == GetCurrentCommandSource()) then
+    if doPrint and processed > 0 and (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
         print(StringFormat("Reclaiming %d adjacent units", processed))
     end
 end
@@ -197,7 +199,7 @@ function AreaReclaimProps(units, ps, pe, width, doPrint)
         end
     end
 
-    if doPrint and (GetFocusArmy() == GetCurrentCommandSource()) then
+    if doPrint and (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
         if processed > 0 then
             print(StringFormat("Reclaiming %d additional props", processed))
         end
