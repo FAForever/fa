@@ -23,7 +23,26 @@ local UnitWeapon = {}
 function UnitWeapon:BeenDestroyed()
 end
 
---- Returns true if the weapon is aiming at the target as allowed by the FiringTolerance blueprint value and the target is within the weapon's range
+--- `UnitWeapon:CanFire` calls this engine `CanFire` function that is used in the firing cycle, alongside
+--- the self-explanatory `HasTarget`, `HasSiloAmmo`, and `TargetSolutionStatusGun() == TRS_Available` calls.
+---
+--- Here is the list of conditions for the engine `CanFire`, written in pseudo-lua with underscores ("_") for engine fields.
+--- It can return early in the list, as indicated by the return statements. If no return is reached, it returns false.
+--- !unit:IsStunned()
+--- !unit:IsUnitState("Busy")
+--- !unit.Blueprint.Air.CanFly or unit.Layer == "Air"
+--- !unit.Blueprint.AI.NeedUnpack or unit:IsUnitState("Immobile")
+--- Check if the weapon's below/above water firing restrictions.
+--- if !unit.Blueprint.Air.Winged then return weapon._AimOnTarget end -- aim on target in terms of firing tolerance
+--- !weapon.Blueprint.AutoInitiateAttackCommand or unit:_GetSpeed() >= 0.25 * unit.Blueprint.MaxAirSpeed * unit._SpeedMult
+--- if !weapon.Blueprint.NeedToComputeBombDrop or !weapon:_HasTarget() then return weapon._AimOnTarget end
+--- unit.IsUnitState("MakingAttackRun")
+--- if weapon:_UnitIsInBombDropZone() then reutrn weapon._AimOnTarget end --Involves weapon BombDropThreshold and unit PredictAheadForBombDrop
+
+--- Returns true if the weapon has a target and it can fire at it, identical to the engine's firing conditions.
+---
+--- This includes having a target, ammo, a firing solution for the target, aiming within firing tolerance, unit
+--- not being busy or stunned, and a list of other conditions based on blueprint values.
 ---@return boolean
 function UnitWeapon:CanFire()
 end
