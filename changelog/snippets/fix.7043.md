@@ -1,1 +1,0 @@
-- (#7043) Fix missing hotkey label for the 'Minus' key by mapping it to the '-' symbol.
