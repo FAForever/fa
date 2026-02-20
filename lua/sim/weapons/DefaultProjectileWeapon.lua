@@ -733,15 +733,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         Main = function(self)
             local unit = self.unit
             if unit.Dead then return end
-            local bp = self.Blueprint
-            if not bp.NotExclusive then
-                unit:SetBusy(false)
-            end
+            unit:SetBusy(false)
 
             -- at this point salvo is always done so reset the data in case firing was interrupted
             self.CurrentSalvoData = nil
 
             self:WaitForAndDestroyManips()
+            local bp = self.Blueprint
             for _, rack in bp.RackBones do
                 if rack.HideMuzzle then
                     for _, muzzle in rack.MuzzleBones do
@@ -817,14 +815,17 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             local bp = self.Blueprint
             local notExclusive = bp.NotExclusive
-            if not notExclusive then
-                unit:SetBusy(true)
-            end
+            unit:SetBusy(true)
             self:PlayFxRackSalvoChargeSequence()
 
+            if notExclusive then
+                unit:SetBusy(false)
+            end
             WaitSeconds(bp.RackSalvoChargeTime)
 
-            unit:SetBusy(false)
+            if notExclusive then
+                unit:SetBusy(true)
+            end
 
             if bp.RackSalvoFiresAfterCharge then
                 ChangeState(self, self.RackSalvoFiringState)
@@ -855,9 +856,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if bp.ManualFire and not bp.OverChargeWeapon then
                 unit:SetBusy(true)
             else
-                if not bp.NotExclusive then
-                    unit:SetBusy(false)
-                end
+                unit:SetBusy(false)
             end
 
             self.WeaponCanFire = true
@@ -973,6 +972,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         Main = function(self)
             local unit = self.unit
+            unit:SetBusy(true)
             self:DestroyRecoilManips()
             local bp = self.Blueprint
             local rof = self:GetWeaponRoF()
@@ -997,10 +997,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if bp.RenderFireClock and rof > 0 then
                     self:ForkThread(self.RenderClockThread, 1 / rof)
                 end
-            end
-
-            if not notExclusive then
-                unit:SetBusy(true)
             end
 
             -- Most of the time this will only run once, the only time it doesn't is when racks fire together
@@ -1044,9 +1040,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                             self:PlaySound(muzzleCharge)
                         end
                         self:PlayFxMuzzleChargeSequence(muzzle)
-
+                        if notExclusive then
+                            unit:SetBusy(false)
+                        end
                         WaitSeconds(chargeDelay)
 
+                        if notExclusive then
+                            unit:SetBusy(true)
+                        end
                     end
                     self:PlayFxMuzzleSequence(muzzle)
                     if rackHideMuzzle then
@@ -1098,9 +1099,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         muzzleIndex = 1
                     end
                     if salvoDelay > 0 then
-
+                        if notExclusive then
+                            unit:SetBusy(false)
+                        end
                         WaitSeconds(salvoDelay)
 
+                        if notExclusive then
+                            unit:SetBusy(true)
+                        end
                     end
                 end
 
@@ -1203,20 +1209,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         Main = function(self)
             local unit = self.unit
+            unit:SetBusy(true)
+            self:PlayFxRackSalvoReloadSequence()
+
             local bp = self.Blueprint
             local notExclusive = bp.NotExclusive
 
-            if not notExclusive then
-                unit:SetBusy(true)
+            if notExclusive then
+                unit:SetBusy(false)
             end
-
-            self:PlayFxRackSalvoReloadSequence()
 
             WaitSeconds(bp.RackSalvoReloadTime)
 
             self:WaitForAndDestroyManips()
-
-            unit:SetBusy(false)
 
             local hasTarget = self:WeaponHasTarget()
 

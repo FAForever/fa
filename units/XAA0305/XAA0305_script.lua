@@ -19,11 +19,6 @@ XAA0305 = ClassUnit(AAirUnit) {
         AAGun01 = ClassWeapon(AAAZealot02MissileWeapon) {},
         AAGun02 = ClassWeapon(AAAZealot02MissileWeapon) {},
     },
-
-    SetBusy = function(self, busy, ...)
-        AAirUnit.SetBusy(self, busy, unpack(arg))
-        LOG('XAA0305 set busy ', busy, debug.traceback())
-    end
 }
 
 TypeClass = XAA0305
