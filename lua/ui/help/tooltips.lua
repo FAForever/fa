@@ -588,7 +588,7 @@ Tooltips = {
     
     options_invert_middle_mouse_button = {
         title = "<LOC INVERT_MOUSE_PAN>Invert pan direction with middle mouse button",
-        description = "<LOC INVERT_MOUSE_PAN_DESC>When enabled, dragging with the middle mouse button moves the camera in the opposite direction.",
+        description = "<LOC INVERT_MOUSE_PAN_DESCRIPTION>When enabled, dragging with the middle mouse button moves the camera in the opposite direction.",
     },
     options_commands_ignore_mode = {
         title = "<LOC OPTIONS_0319>Ignore Mode",
