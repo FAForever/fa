@@ -1,1 +1,0 @@
-- (#7034) Don't show reclaim labels for unreclaimable props.
