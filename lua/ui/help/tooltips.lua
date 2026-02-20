@@ -680,7 +680,7 @@ Tooltips = {
     },
     options_show_player_names = {
         title = "<LOC options_show_player_names_title>Show Player Names",
-        description = "<LOC options_show_player_names_description>Controls the display of player names. You can choose to show all player names, or only your allies. This setting is purely client-side.",
+        description = "<LOC options_show_player_names_description>Controls the display of player names in the UI. You can choose to show all player names, or only your allies.",
     },
     options_area_commands_button = {
         title = "<LOC area_commands_button_title>Button to trigger area commands",
