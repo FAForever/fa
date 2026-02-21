@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Unit Script
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
@@ -13,3 +13,4 @@ local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
 UAB0203 = ClassUnit(ASeaFactoryUnit) {}
 
 TypeClass = UAB0203
+

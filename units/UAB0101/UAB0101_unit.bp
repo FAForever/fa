@@ -44,10 +44,10 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationUpgrade = "/units/uab0101/UAB0101_Aopen.sca",
+        AnimationUpgrade = "/units/uab0101/uab0101_aopen.sca",
         AnimationUpgradeTable = {
-            uab0201 = "/units/uab0101/UAB0101_Aopen.sca",
-            zab9501 = "/units/uab0101/uab0101_Aopen2.sca",
+            uab0201 = "/units/uab0101/uab0101_aopen.sca",
+            zab9501 = "/units/uab0101/uab0101_aopen2.sca",
         },
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = -1.76, BLOffsetY = 0.35,  BLOffsetZ = -1.68, BLScale = 1.4 },
