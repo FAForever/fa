@@ -935,10 +935,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             local clockTime = math.round(10 * rateOfFire)
             local totalTime = clockTime
-            while clockTime >= 0 and
-                not self:BeenDestroyed() and
-                not unit.Dead do
-                unit:SetWorkProgress(1 - clockTime / totalTime)
+            while clockTime >= 0
+                and not self:BeenDestroyed()
+                and not unit.Dead
+            do
+                -- do not override work progress that is used for replenishing silo ammo upon unit transfer
+                if not unit:IsUnitState("SiloBuildingAmmo") then
+                    unit:SetWorkProgress(1 - clockTime / totalTime)
+                end
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
             end
