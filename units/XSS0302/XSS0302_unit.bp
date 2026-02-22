@@ -234,7 +234,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/40, --10/integer interval in ticks
-            RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {
@@ -298,7 +297,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/40, --10/integer interval in ticks
-            RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {
@@ -362,7 +360,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/40, --10/integer interval in ticks
-            RenderFireClock = true,
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetPriorities = {

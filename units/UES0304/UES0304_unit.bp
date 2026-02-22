@@ -277,7 +277,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 10/100, --10/integer interval in ticks
-            RenderFireClock = true,
             TargetPriorities = {
                 "TECH3 STRUCTURE",
                 "TECH2 STRUCTURE",
