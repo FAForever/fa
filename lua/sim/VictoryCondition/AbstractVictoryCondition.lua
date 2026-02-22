@@ -43,8 +43,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- An attempt to end the game. The monitoring thread continues to catch draws. It will take this many seconds to declare victory and start the end game procedure.
     DelayBeforeVictory = 5,
 
-    --- Once the game is guaranteed to end, it will take this many seconds to end the game.
-    DelayBeforeGameEnds = 1,
+    --- Once the game is guaranteed to end, it will take this many seconds to end the game. This needs
+    --- to be at least three seconds for campaign/coop to end gracefully. It takes three seconds for 
+    --- an operation (campaign/coop) to end via `ScenarioFramework.EndOperation`.
+    DelayBeforeGameEnds = 3,
 
     ---@param self AbstractVictoryCondition
     __init = function(self)
