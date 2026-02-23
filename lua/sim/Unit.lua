@@ -2551,6 +2551,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     end,
 
     ---@param self Unit
+    ---@param progress number
+    SetWorkProgress = function(self, progress)
+        -- self:DebugLog(string.format("%d - Engine progress: %f Lua Progress: %f", GetGameTick(), self:GetWorkProgress(), progress), debug.traceback())
+        moho.unit_methods.SetWorkProgress(self, progress)
+    end,
+
+    ---@param self Unit
     ---@param weapon Weapon
     OnSiloBuildStart = function(self, weapon)
         self.SiloWeapon = weapon
@@ -2563,6 +2570,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- for AI events
         self.Brain:OnUnitSiloBuildStart(self, weapon)
+
+        self:DebugLog("Start silo build")
     end,
 
     ---@param self Unit
@@ -2573,6 +2582,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
 
         -- for AI events
         self.Brain:OnUnitSiloBuildEnd(self, weapon)
+        self:DebugLog("Ended silo build")
     end,
 
     -------------------------------------------------------------------------------------------
