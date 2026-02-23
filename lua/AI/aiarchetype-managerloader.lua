@@ -85,40 +85,46 @@ function SetupMainBase(aiBrain)
 end
 
 ---@class UnitCapCullEntry
----@field categories any  -- Typically a category expression used by the AI
----@field compare boolean -- Whether this entry compares with another category
----@field compareTo any?  -- The category to compare against, if compare is true
+---@field Label string -- Identifier for the cull group (e.g., 'Walls')
+---@field categories any -- Typically a category expression used by the AI
+---@field compareTo any? -- The category to compare against. If nil, culls based on cullRatio alone.
 ---@field cullRatio number -- The ratio (0.0 to 1.0) of units to cull under pressure
 ---@field checkAttached boolean -- Whether attached units should be considered
 
----@type table<string, UnitCapCullEntry>
+---@type UnitCapCullEntry[]
 local UnitCapCullTable = {
-    Walls = {
+    {
+        Label = 'Walls',
         categories = categories.WALL * categories.STRUCTURE * categories.DEFENSE - categories.CIVILIAN,
         cullRatio = 0.4,
         checkAttached = false
     },
-    T1DefensiveUnits = {
+    {
+        Label = 'T1DefensiveUnits',
         categories = categories.TECH1 * categories.DEFENSE * categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE),
         cullRatio = 0.3,
         checkAttached = true
     },
-    T1AirUnits = {
+    {
+        Label = 'T1AirUnits',
         categories = categories.MOBILE * categories.TECH1 * categories.AIR - categories.TRANSPORTFOCUS - categories.ENGINEER,
         cullRatio = 0.2,
         checkAttached = true
     },
-    T1NavalUnits = {
+    {
+        Label = 'T1NavalUnits',
         categories = categories.MOBILE * categories.TECH1 * categories.NAVAL - categories.ENGINEER,
         cullRatio = 0.2,
         checkAttached = true
     },
-    T1LandUnits = {
+    {
+        Label = 'T1LandUnits',
         categories = categories.MOBILE * categories.TECH1 * categories.LAND - categories.ENGINEER,
         cullRatio = 0.2,
         checkAttached = true
     },
-    T1LandEngineer = {
+    {
+        Label = 'T1LandEngineer',
         categories = categories.MOBILE * categories.TECH1 * categories.LAND * categories.ENGINEER - categories.COMMAND,
         compareTo = categories.MOBILE * categories.LAND * categories.ENGINEER * (categories.TECH2 + categories.TECH3)- categories.COMMAND - categories.SUBCOMMANDER - categories.POD - categories.FIELDENGINEER,
         cullRatio = 0.2,
@@ -134,9 +140,9 @@ function UnitCapWatchThread(aiBrain, unitCapDesiredRatio, maxCullNumber)
     -- Remember that this table will run in order, so we want the most deisred to cull first
     -- There is also two configurable settings
     -- cullPressure - Indicates how many units we want to cull per pass. The closer we are to the unit cap the more units we will cull.
+    --                0.8 is the percentage towards the cap we want to aim for.
     -- dynamicRatioThreshold - What sort of ratio we want when performing compares. So that we dont instantly cull lots of units just because 
-    -- one of the next tier is available
-
+    -- one of the next tier is available. 9 is the multiplier for aggresive unit culling.
 
     while true do
         WaitSeconds(30)
@@ -144,35 +150,25 @@ function UnitCapWatchThread(aiBrain, unitCapDesiredRatio, maxCullNumber)
         local currentCount = GetArmyUnitCostTotal(brainIndex)
         local cap = GetArmyUnitCap(brainIndex)
         local capRatio = currentCount / cap
+        LOG('Current cap ratio '..tostring(capRatio))
         if capRatio > unitCapDesiredRatio then
-            local cullPressure = math.min((capRatio - 0.80) / 0.2, 1)
-            local dynamicRatioThreshold = 2.0 - (capRatio - 0.80) * 9
+            LOG('Cull initialized current cap ratio is '..tostring(capRatio))
+            local cullPressure = math.max(0, math.min((capRatio - 0.80) / 0.2, 1))
+            local dynamicRatioThreshold = math.max(0.1, 2.0 - (capRatio - 0.80) * 9)
             local culledUnitCount = 0
-            for k, cullType in UnitCapCullTable do
+            for _, cullType in UnitCapCullTable do
+                local currentUnits = aiBrain:GetCurrentUnits(cullType.categories)
+                local targetRatio = 1.0 -- Default for non-comparison types
                 if cullType.compareTo then
-                    local compareFrom = aiBrain:GetCurrentUnits(cullType.categories)
-                    local compareTo = aiBrain:GetCurrentUnits(cullType.compareTo)
-                    if compareTo > 0 and compareFrom > 0 then
-                        local ratio = compareFrom / compareTo
-                        if ratio > dynamicRatioThreshold then
-                            local toCull = math.min(compareTo, math.ceil(compareTo * ratio * cullType.cullRatio * cullPressure))
-                            if toCull > 0 then
-                                culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
-                            end
-                        end
-                    end
-                else
-                    local units = aiBrain:GetCurrentUnits(cullType.categories)
-                    if units > 0 then
-                        local toCull = math.min(units, math.ceil(units * cullType.cullRatio * cullPressure))
-                        if toCull > 0 then
-                            culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
-                        end
-                    end
+                    local higherTierUnits = aiBrain:GetCurrentUnits(cullType.compareTo)
+                    targetRatio = (higherTierUnits > 0) and (currentUnits / higherTierUnits) or 0
                 end
-                if culledUnitCount >= maxCullNumber then
-                    break
+
+                if currentUnits > 0 and targetRatio > (cullType.compareTo and dynamicRatioThreshold or 0) then
+                    local toCull = math.min(currentUnits, math.ceil(currentUnits * cullType.cullRatio * cullPressure))
+                    culledUnitCount = culledUnitCount + CullUnitsOfCategory(aiBrain, cullType.categories, toCull, cullType.checkAttached)
                 end
+                if culledUnitCount >= maxCullNumber then break end
             end
         end
     end
@@ -187,6 +183,7 @@ function CullUnitsOfCategory(aiBrain, category, toCull, checkAttached)
             if checkAttached and v:IsUnitState('Attached') then
                 continue
             end
+            LOG('Culling init '..tostring(v.UnitId))
             culledUnitCount = culledUnitCount + 1
             v:Kill()
             if culledUnitCount >= toCull then
@@ -197,6 +194,7 @@ function CullUnitsOfCategory(aiBrain, category, toCull, checkAttached)
     return culledUnitCount
 end
 
+---@deprecated Kept for mod support
 ---@param aiBrain AIBrain
 ---@param num number
 ---@param checkCat any
