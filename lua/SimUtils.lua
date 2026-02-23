@@ -290,7 +290,6 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         -- B E F O R E
         local orientation = unit:GetOrientation()
         local siloWorkProgress = unit:IsUnitState("SiloBuildingAmmo") and unit:GetWorkProgress() or 0
-        unit:DebugLog("Transfer progress:", siloWorkProgress)
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
