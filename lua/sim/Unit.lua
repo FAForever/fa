@@ -2556,6 +2556,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         self.SiloWeapon = weapon
         self.SiloProjectile = weapon:GetProjectileBlueprint()
 
+        -- Prevent work progress set by weapons using `RenderFireClock` from
+        -- turning into silo progress after ownership transfer of a unit paused
+        -- in the silo build state without having updated progress by the engine.
+        self:SetWorkProgress(0)
+
         -- for AI events
         self.Brain:OnUnitSiloBuildStart(self, weapon)
     end,
