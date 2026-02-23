@@ -289,7 +289,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
 
         -- B E F O R E
         local orientation = unit:GetOrientation()
-        local workprogress = unit:GetWorkProgress()
+        local siloWorkProgress = unit:IsUnitState("SiloBuildingAmmo") and unit:GetWorkProgress() or 0
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
@@ -448,7 +448,7 @@ function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
         end
 
         if newUnit.Blueprint.CategoriesHash["SILO"] then
-            newUnit:GiveNukeSiloBlocks(workprogress)
+            newUnit:GiveNukeSiloBlocks(siloWorkProgress)
         end
 
         local newShield = newUnit.MyShield
