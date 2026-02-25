@@ -26,6 +26,10 @@ local selectionOverlay = {
     Tooltip = "overlay_selection",
 }
 
+--- Gets rollover information for the given unit. 
+--- This replicates `GetRolloverInfo` but for any unit.
+---@param unit UserUnit
+---@return RolloverInfo
 function GetUnitRolloverInfo(unit, skipFocus)
     local info = {}
 
