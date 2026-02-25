@@ -14,18 +14,6 @@
 ---@field userUnit? UserUnit
 ---@field workProgress number
 
-
-local Prefs = import("/lua/user/prefs.lua")
-local options = Prefs.GetFromCurrentProfile('options')
-
-local selectionOverlay = {
-    key = 'selection',
-    Label = "<LOC map_options_0006>Selection",
-    Pref = 'range_RenderSelected',
-    Type = 3,
-    Tooltip = "overlay_selection",
-}
-
 --- Gets rollover information for the given unit. 
 --- This replicates `GetRolloverInfo` but for any unit.
 ---@param unit UserUnit
@@ -87,3 +75,16 @@ function GetUnitRolloverInfo(unit, skipFocus)
 
     return info
 end
+
+--#region Backwards compatibility
+local Prefs = import("/lua/user/prefs.lua")
+local options = Prefs.GetFromCurrentProfile('options')
+
+local selectionOverlay = {
+    key = 'selection',
+    Label = "<LOC map_options_0006>Selection",
+    Pref = 'range_RenderSelected',
+    Type = 3,
+    Tooltip = "overlay_selection",
+}
+--#endregion
