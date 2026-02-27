@@ -16,6 +16,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB0303_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 14000,
     BuildIconSortPriority = 61,
     Categories = {
         "BUILTBYTIER2SUPPORTFACTORY",
@@ -48,7 +49,7 @@ UnitBlueprint{
     Display = {
         AnimationDeath = {
             {
-                Animation = "/units/zsb9603/zsb9603_ADeath.sca",
+                Animation = "/units/zsb9603/zsb9603_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
@@ -83,17 +84,17 @@ UnitBlueprint{
                     LODCutoff = 200,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "SeraphimNavy",
-		            AlbedoName = "/units/xsb0103/XSB0103_Albedo.dds",
-                    NormalsName = "/units/xsb0103/XSB0103_NormalsTS.dds",
-                    SpecularName = "/units/xsb0103/XSB0103_SpecTeam.dds",
+                    AlbedoName = "/units/xsb0103/xsb0103_albedo.dds",
+                    NormalsName = "/units/xsb0103/xsb0103_normalsts.dds",
+                    SpecularName = "/units/xsb0103/xsb0103_specteam.dds",
                 },
                 {
                     LODCutoff = 600,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
                     ShaderName = "SeraphimNavy",
-                    AlbedoName = "/units/xsb0103/XSB0103_lod1_Albedo.dds",
-                    NormalsName = "/units/xsb0103/XSB0103_lod1_NormalsTS.dds",
-                    SpecularName = "/units/xsb0103/XSB0103_lod1_SpecTeam.dds",					
+                    AlbedoName = "/units/xsb0103/xsb0103_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0103/xsb0103_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0103/xsb0103_lod1_specteam.dds",
                 },
             },
         },

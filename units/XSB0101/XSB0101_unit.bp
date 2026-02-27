@@ -46,7 +46,7 @@ UnitBlueprint{
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = "/units/xsb0101/xsb0101_ADeath.sca",
+                Animation = "/units/xsb0101/xsb0101_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
@@ -94,9 +94,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Seraphim",
-                    AlbedoName = "/units/xsb0101/xsb0101_lod1_Albedo.dds",
-                    NormalsName = "/units/xsb0101/xsb0101_lod1_NormalsTS.dds",
-                    SpecularName = "/units/xsb0101/xsb0101_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/xsb0101/xsb0101_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0101/xsb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0101/xsb0101_lod1_specteam.dds",
                 },
             },
         },

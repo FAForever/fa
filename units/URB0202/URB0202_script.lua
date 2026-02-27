@@ -6,5 +6,6 @@
 local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 
 ---@class URB0202 : CAirFactoryUnit
-URB0202 = Class(CAirFactoryUnit) { }
+URB0202 = Class(CAirFactoryUnit) {}
+
 TypeClass = URB0202

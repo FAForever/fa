@@ -23,4 +23,3 @@ UAB0303 = ClassUnit(ASeaFactoryUnit) {
 }
 
 TypeClass = UAB0303
-

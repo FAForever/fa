@@ -1,4 +1,3 @@
-
 --****************************************************************************
 --**
 --**  File     :  /cdimage/units/UEB0201/UEB0201_script.lua
@@ -13,4 +12,5 @@ local TLandFactoryUnit = import("/lua/terranunits.lua").TLandFactoryUnit
 
 ---@class UEB0201 : TLandFactoryUnit
 UEB0201 = ClassUnit(TLandFactoryUnit) {}
+
 TypeClass = UEB0201

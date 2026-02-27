@@ -13,6 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB0301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 5500,
     BuildIconSortPriority = 41,
     Categories = {
         "BUILTBYTIER2SUPPORTFACTORY",
@@ -44,7 +45,7 @@ UnitBlueprint{
         RegenRate = 20,
     },
     Display = {
-        AnimationBuild = "/units/zrb9601/ZRB9601_Abuilt.sca",
+        AnimationBuild = "/units/zrb9601/zrb9601_abuild.sca",
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = 0.74,  BLOffsetY = 2.42,   BLOffsetZ = -1.15, BLScale = 1 },
             { BLBone = 0,     BLOffsetX = -0.74, BLOffsetY = 2.42,   BLOffsetZ = -1.15, BLScale = 1 },
@@ -61,16 +62,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Insect",
-                    AlbedoName = "/units/urb0101/URB0101_Albedo.dds",
-                    NormalsName = "/units/urb0101/URB0101_NormalsTS.dds",
-                    SpecularName = "/units/urb0101/URB0101_SpecTeam.dds",
+                    AlbedoName = "/units/urb0101/urb0101_albedo.dds",
+                    NormalsName = "/units/urb0101/urb0101_normalsts.dds",
+                    SpecularName = "/units/urb0101/urb0101_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Insect",
-                    AlbedoName = "/units/urb0101/URB0101_lod1_Albedo.dds",
-                    NormalsName = "/units/urb0101/URB0101_lod1_NormalsTS.dds",
-                    SpecularName = "/units/urb0101/URB0101_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/urb0101/urb0101_lod1_albedo.dds",
+                    NormalsName = "/units/urb0101/urb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/urb0101/urb0101_lod1_specteam.dds",
                 },
             },
         },

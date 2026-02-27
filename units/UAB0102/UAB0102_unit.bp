@@ -70,6 +70,7 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
+					Scrolling = true,
                     ShaderName = "Aeon",
                     AlbedoName = "/units/uab0102/uab0102_albedo.dds",
                     NormalsName = "/units/uab0102/uab0102_normalsts.dds",

@@ -13,6 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 8000,
     BuildIconSortPriority = 41,
     Categories = {
         "BUILTBYTIER2SUPPORTFACTORY",
@@ -44,8 +45,8 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            { BLBone = "Foot_Right", BLOffsetX = -0.4,  BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
-            { BLBone = "Foot_Left", BLOffsetX = 0.4,   BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
+            { BLBone = "Foot_Right",    BLOffsetX = -0.4,  BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
+            { BLBone = "Foot_Left",     BLOffsetX = 0.4,   BLOffsetY = 0.8,   BLOffsetZ = -0.35, BLScale = 1.5 },
             { BLBone = "Control_Tower", BLOffsetX = 0,     BLOffsetY = 0,     BLOffsetZ = 0.5,   BLScale = 1.5 },
         },
         BlinkingLightsFx = {
@@ -67,9 +68,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Unit",
-                    AlbedoName = "/units/ueb0101/UeB0101_lod1_Albedo.dds",
-                    NormalsName = "/units/ueb0101/UeB0101_lod1_NormalsTS.dds",
-                    SpecularName = "/units/ueb0101/UeB0101_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/ueb0101/ueb0101_lod1_albedo.dds",
+                    NormalsName = "/units/ueb0101/ueb0101_lod1_normalsts.dds",
+                    SpecularName = "/units/ueb0101/ueb0101_lod1_specteam.dds",
                 },
             },
         },

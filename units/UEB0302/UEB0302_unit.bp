@@ -65,9 +65,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Unit",
-                    AlbedoName = "/units/ueb0102/ueb0102_lod1_Albedo.dds",
-                    NormalsName = "/units/ueb0102/ueb0102_lod1_NormalsTS.dds",
-                    SpecularName = "/units/ueb0102/ueb0102_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/ueb0102/ueb0102_lod1_albedo.dds",
+                    NormalsName = "/units/ueb0102/ueb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/ueb0102/ueb0102_lod1_specteam.dds",
                 },
             },
         },
@@ -141,12 +141,24 @@ UnitBlueprint{
         RaisedPlatforms = {
             --X,     Z,     height -- Offsets from center
 
+            -1.6,  -2,    0.18,    --Top left
+            2,     -2,    0.18,    --Top right
+            -1.6,  1.6,   0.18,    --Bottom left
+            2,     1.6,   0.18,    --Bottom right
 
+            -1.75, -2,    0,       --Top left
+            -1.6,  -2,    0.18,    --Top right
+            -1.75, 1.6,   0,       --Bottom left
+            -1.6,  1.6,   0.18,    --Bottom right
+
+            -2,    1.6,   0.18,    --Top left
+            2,     1.6,   0.18,    --Top right
+            -2,    1.75,  0,       --Bottom left
+            2,     1.75,  0,       --Bottom right
         },
         RollOffPoints = {
             { UnitSpin = 0,     X = 0,     Y = 0,     Z = 3 },
             { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
-			{ UnitSpin = 45,    X = 1.5,   Y = 0,     Z = 1.5 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

@@ -45,10 +45,16 @@ UnitBlueprint{
     Display = {
         AnimationDeath = {
             {
-                Animation = "/units/xsb0302/xsb0302_ADeath.sca",
+                Animation = "/units/xsb0302/xsb0302_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
-                Weight = 100,
+                Weight = 50,
+            },
+            {
+                Animation = "/units/xsb0302/xsb0302_adeathv1.sca",
+                AnimationRateMax = 1,
+                AnimationRateMin = 1,
+                Weight = 50,
             },
         },
         BlinkingLights = {
@@ -77,9 +83,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Seraphim",
-                    AlbedoName = "/units/xsb0102/xsb0102_lod1_Albedo.dds",
-                    NormalsName = "/units/xsb0102/xsb0102_lod1_NormalsTS.dds",
-                    SpecularName = "/units/xsb0102/xsb0102_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/xsb0102/xsb0102_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0102/xsb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0102/xsb0102_lod1_specteam.dds",
                 },
             },
         },

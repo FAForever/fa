@@ -13,6 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0302_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 8000,
     BuildIconSortPriority = 51,
     Categories = {
         "AIR",
@@ -66,9 +67,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Unit",
-                    AlbedoName = "/units/ueb0102/ueb0102_lod1_Albedo.dds",
-                    NormalsName = "/units/ueb0102/ueb0102_lod1_NormalsTS.dds",
-                    SpecularName = "/units/ueb0102/ueb0102_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/ueb0102/ueb0102_lod1_albedo.dds",
+                    NormalsName = "/units/ueb0102/ueb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/ueb0102/ueb0102_lod1_specteam.dds",
                 },
             },
         },

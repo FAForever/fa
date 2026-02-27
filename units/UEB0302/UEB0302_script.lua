@@ -10,7 +10,6 @@
 
 local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
-
 ---@class UEB0302 : TAirFactoryUnit
 UEB0302 = ClassUnit(TAirFactoryUnit) {
 

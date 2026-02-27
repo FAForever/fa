@@ -24,8 +24,8 @@ ZSB9603 = ClassUnit(SSeaFactoryUnit) {
         self.Rotator3:SetSpeed(0)
         SSeaFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-	
-	PlayAnimationThread = function(self, anim, rate)
+
+    PlayAnimationThread = function(self, anim, rate)
         local bp = self.Blueprint.Display[anim]
         if bp then
             local animBlock = self:ChooseAnimBlock(bp)

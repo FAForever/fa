@@ -14,6 +14,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB0302_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory',    LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 7000,
     BuildIconSortPriority = 51,
     Categories = {
         "AIR",
@@ -46,7 +47,7 @@ UnitBlueprint{
     Display = {
         AnimationDeath = {
             {
-                Animation = "/units/zsb9602/zsb9602_ADeath.sca",
+                Animation = "/units/zsb9602/zsb9602_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
@@ -78,9 +79,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Seraphim",
-                    AlbedoName = "/units/xsb0102/xsb0102_lod1_Albedo.dds",
-                    NormalsName = "/units/xsb0102/xsb0102_lod1_NormalsTS.dds",
-                    SpecularName = "/units/xsb0102/xsb0102_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/xsb0102/xsb0102_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0102/xsb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0102/xsb0102_lod1_specteam.dds",
                 },
             },
         },

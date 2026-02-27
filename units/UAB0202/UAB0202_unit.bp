@@ -13,7 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB0202_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Factory',        LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 6400,
+    AverageDensity = 6600,
     BuildIconSortPriority = 60,
     Categories = {
         "AEON",
@@ -43,7 +43,7 @@ UnitBlueprint{
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
-        AnimationUpgrade = "/units/uab0202/UAB0202_Aupgrade.sca",
+        AnimationUpgrade = "/units/uab0202/uab0202_aupgrade.sca",
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = 0,     BLOffsetY = 2.7,  BLOffsetZ = -1.45, BLScale = 1 },
             { BLBone = 0,     BLOffsetX = -2.0, BLOffsetY = 2.4,   BLOffsetZ = -1.1, BLScale = 1 },
@@ -60,6 +60,7 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Aeon",
+					Scrolling = true,
                     AlbedoName = "/units/uab0102/uab0102_albedo.dds",
                     NormalsName = "/units/uab0102/uab0102_normalsts.dds",
                     SpecularName = "/units/uab0102/uab0102_specteam.dds",

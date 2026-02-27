@@ -8,6 +8,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB0303_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Factory',        LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 12800,
     BuildIconSortPriority = 61,
     Categories = {
         "AEON",
@@ -39,9 +40,9 @@ UnitBlueprint{
     },
     Display = {
         BlinkingLights = {
-            { BLBone = 0,     BLOffsetX = 0.45,  BLOffsetY = 5.7,   BLOffsetZ = 0.4,   BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 0.45,   BLOffsetY = 3.3,   BLOffsetZ = 3.45, BLScale = 1 },
-            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 3.3,   BLOffsetZ = -3.5, BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 5.7,   BLOffsetZ = 0.4,   BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 3.3,   BLOffsetZ = 3.45,  BLScale = 1 },
+            { BLBone = 0,     BLOffsetX = 0.45,    BLOffsetY = 3.3,   BLOffsetZ = -3.5,  BLScale = 1 },
         },
         BlinkingLightsFx = {
             Green = "/effects/emitters/light_green_03_emit.bp",
@@ -66,16 +67,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "AeonNavy",
-                    AlbedoName = "/units/uab0103/UAB0103_Albedo.dds",
-                    NormalsName = "/units/uab0103/UAB0103_NormalsTS.dds",
-                    SpecularName = "/units/uab0103/UAB0103_SpecTeam.dds",
+                    AlbedoName = "/units/uab0103/uab0103_albedo.dds",
+                    NormalsName = "/units/uab0103/uab0103_normalsts.dds",
+                    SpecularName = "/units/uab0103/uab0103_specteam.dds",
                 },
                 {
                     LODCutoff = 600,
                     ShaderName = "AeonNavy",
-                    AlbedoName = "/units/uab0103/UAB0103_lod1_Albedo.dds",
-                    NormalsName = "/units/uab0103/UAB0103_lod1_NormalsTS.dds",
-                    SpecularName = "/units/uab0103/UAB0103_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/uab0103/uab0103_lod1_albedo.dds",
+                    NormalsName = "/units/uab0103/uab0103_lod1_normalsts.dds",
+                    SpecularName = "/units/uab0103/uab0103_lod1_specteam.dds",
                 },
             },
         },

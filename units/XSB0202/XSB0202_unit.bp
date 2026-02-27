@@ -14,7 +14,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'XSB',            Cue = 'XSB0202_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'SeraphimSelect', Cue = 'Seraphim_Select_Factory',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    AverageDensity = 7000,
+    AverageDensity = 7200,
     BuildIconSortPriority = 60,
     Categories = {
         "AIR",
@@ -39,20 +39,20 @@ UnitBlueprint{
     Defense = {
         ArmorType = "Structure",
         EconomyThreatLevel = 220,
-        Health = 7000,
-        MaxHealth = 7000,
+        Health = 7200,
+        MaxHealth = 7200,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationDeath = {
             {
-                Animation = "/units/xsb0202/xsb0202_ADeath.sca",
+                Animation = "/units/xsb0202/xsb0202_adeath.sca",
                 AnimationRateMax = 1,
                 AnimationRateMin = 1,
                 Weight = 100,
             },
         },
-        AnimationUpgrade = "/units/XSB0202/XSB0202_Aupgrade.sca",
+        AnimationUpgrade = "/units/xsb0202/xsb0202_aupgrade.sca",
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = 0,    BLOffsetY = 3.8,   BLOffsetZ = -2.3, BLScale = 1 },
             { BLBone = 0,     BLOffsetX = -1.5, BLOffsetY = 1.9,   BLOffsetZ = -1.2, BLScale = 1 },
@@ -79,9 +79,9 @@ UnitBlueprint{
                 {
                     LODCutoff = 500,
                     ShaderName = "Seraphim",
-                    AlbedoName = "/units/xsb0102/xsb0102_lod1_Albedo.dds",
-                    NormalsName = "/units/xsb0102/xsb0102_lod1_NormalsTS.dds",
-                    SpecularName = "/units/xsb0102/xsb0102_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/xsb0102/xsb0102_lod1_albedo.dds",
+                    NormalsName = "/units/xsb0102/xsb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/xsb0102/xsb0102_lod1_specteam.dds",
                 },
             },
         },

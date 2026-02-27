@@ -7,4 +7,5 @@ local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 
 ---@class ZRB9602 : CAirFactoryUnit
 ZRB9602 = Class(CAirFactoryUnit) {}
+
 TypeClass = ZRB9602

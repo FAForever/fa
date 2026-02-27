@@ -13,6 +13,7 @@ UnitBlueprint{
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB0302_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
         UISelection    = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Factory',      LodCutoff = 'UnitMove_LodCutoff' },
     },
+    AverageDensity = 5500,
     BuildIconSortPriority = 51,
     Categories = {
         "AIR",
@@ -44,7 +45,7 @@ UnitBlueprint{
         RegenRate = 20,
     },
     Display = {
-        AnimationBuild = "/units/zrb9602/zrb9602_abuild.sca",	
+        AnimationBuild = "/units/zrb9602/zrb9602_abuild.sca",
         AnimationFinishBuildLand = "/units/zrb9602/zrb9602_aplatform.sca",
         BlinkingLights = {
             { BLBone = 0,     BLOffsetX = 1.1,   BLOffsetY = 1.42,   BLOffsetZ = -1.9,  BLScale = 1 },
@@ -62,16 +63,16 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     ShaderName = "Insect",
-                    AlbedoName = "/units/urb0102/URB0102_Albedo.dds",
-                    NormalsName = "/units/urb0102/URB0102_NormalsTS.dds",
-                    SpecularName = "/units/urb0102/URB0102_SpecTeam.dds",
+                    AlbedoName = "/units/urb0102/urb0102_albedo.dds",
+                    NormalsName = "/units/urb0102/urb0102_normalsts.dds",
+                    SpecularName = "/units/urb0102/urb0102_specteam.dds",
                 },
                 {
                     LODCutoff = 500,
                     ShaderName = "Insect",
-                    AlbedoName = "/units/urb0102/URB0102_lod1_Albedo.dds",
-                    NormalsName = "/units/urb0102/URB0102_lod1_NormalsTS.dds",
-                    SpecularName = "/units/urb0102/URB0102_lod1_SpecTeam.dds",
+                    AlbedoName = "/units/urb0102/urb0102_lod1_albedo.dds",
+                    NormalsName = "/units/urb0102/urb0102_lod1_normalsts.dds",
+                    SpecularName = "/units/urb0102/urb0102_lod1_specteam.dds",
                 },
             },
         },
