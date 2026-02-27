@@ -177,9 +177,9 @@ UnitBlueprint{
     SelectionSizeX = 3.25,
     SelectionSizeZ = 3,
     SelectionThickness = 0.3,
-    SizeX = 2.9,
+    SizeX = 4.3,
     SizeY = 1,
-    SizeZ = 4.2,
+    SizeZ = 4.3,
     StrategicIconName = "icon_factory2_land",
     StrategicIconSortPriority = 215,
     Wreckage = {

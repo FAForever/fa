@@ -180,9 +180,9 @@ UnitBlueprint{
     SelectionSizeX = 2.85,
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.35,
-    SizeX = 3,
+    SizeX = 3.5,
     SizeY = 0.7,
-    SizeZ = 3,
+    SizeZ = 3.5,
     StrategicIconName = "icon_factory1_air",
     StrategicIconSortPriority = 220,
     Wreckage = {
