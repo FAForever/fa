@@ -948,6 +948,26 @@ options = {
             },
 
             {
+                title = "<LOC Show_Allied_Intel>Show intel of allies in strategic overlay",
+                key = 'intel_overlay_allies',
+                type = 'toggle',
+                default = true,
+                set = function(key, value, startup)
+                    ConExecute("ui_IntelRangeBehavior " .. tostring(value))
+                end,
+                update = function(control, value)
+                    ConExecute("ui_IntelRangeBehavior " .. tostring(value))
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 0, },
+                        { text = "<LOC _JustStructures>Only allied structures", key = 1, },
+                        { text = "<LOC _On>", key = 2, },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0215>Show Waypoint ETAs",
                 key = 'display_eta',
                 type = 'toggle',
