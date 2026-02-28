@@ -951,12 +951,12 @@ options = {
                 title = "<LOC Show_Allied_Intel>Show intel of allies in strategic overlay",
                 key = 'intel_overlay_allies',
                 type = 'toggle',
-                default = true,
+                default = 1,
                 set = function(key, value, startup)
-                    ConExecute("ui_IntelRangeBehavior " .. tostring(value))
+                    ConExecute("ren_IntelRangeBehavior " .. tostring(value))
                 end,
                 update = function(control, value)
-                    ConExecute("ui_IntelRangeBehavior " .. tostring(value))
+                    ConExecute("ren_IntelRangeBehavior " .. tostring(value))
                 end,
                 custom = {
                     states = {
