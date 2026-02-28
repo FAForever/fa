@@ -204,7 +204,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 187.5,
+            Damage = 150,
             DamageType = "Normal",
             DisplayName = "Angler Torpedo",
             FireTargetLayerCapsTable = {
@@ -219,7 +219,7 @@ UnitBlueprint{
             MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.2,
-            MuzzleSalvoSize = 4,
+            MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/TANAnglerTorpedo06/TANAnglerTorpedo06_proj.bp",
             ProjectileLifetime = 20,
