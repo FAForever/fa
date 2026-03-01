@@ -1,0 +1,1 @@
+- (#7056) Uashavoh - T2 Destroyer (XSL0201): add a target bone that moves the aim point from near the top of the hitbox to the center of the above-water part of the hitbox. This should reduce how often projectiles randomly fly over the top of the destroyer.
