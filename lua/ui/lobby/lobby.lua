@@ -134,9 +134,9 @@ function ImportModAIOptions()
                 end
                 if not alreadyStored then
                     table.insert(AIOpts, t)
-                    -- Track that this option came from this mod
-                    ModOptionMapping[ModData.name][t.key] = true
                 end
+                -- Track that this option came from this mod
+                ModOptionMapping[ModData.name][t.key] = true
             end
         end
     end
