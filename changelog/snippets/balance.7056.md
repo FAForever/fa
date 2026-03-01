@@ -1,1 +1,4 @@
-- (#7056) Uashavoh - T2 Destroyer (XSL0201): add a target bone that moves the aim point from near the top of the hitbox to the center of the above-water part of the hitbox. This should reduce how often projectiles randomly fly over the top of the destroyer.
+- (#7056) Reduce how often shots fly over the top of the Seraphim destroyer by lowering how high units aim at the destroyer.
+
+  **Uashavoh: T2 Destroyer (XSL0201)**
+  - Aim point above-water elevation: 0.65 (0.25 height of hitbox above) -> 0.45 (0.45 height of hitbox above)
