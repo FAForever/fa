@@ -175,7 +175,8 @@
 ---@field ShowAssistRangeOnSelect? boolean
 --- range for staging platforms to look for planes to repair and refuel when they are on patrol
 ---@field StagingPlatformScanRadius? number
---- some target bones setup for other units to aim at instead of the default center pos
+--- Names of bones for other units to try to aim at instead of the default center pos.
+--- The center pos is calculated using Size values but doesn't use CollisionOffset values.
 ---@field TargetBones string[]
 
 
