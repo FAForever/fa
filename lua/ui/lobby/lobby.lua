@@ -5,6 +5,14 @@
 --*
 --* Copyright © 2005 Gas Powered Games, Inc. All rights reserved.
 --*****************************************************************************
+
+-- This file implements the main lobby screen
+-- To see the options/map selection screen, see mapselect.lua
+-- For mods, modsmanager.lua
+-- For unit restrictions, unitsmanager.lua
+-- For "patchnotes" screen, changelog.lua
+-- For load game screen, saveload.lua CreateLoadDialog
+
 local GameVersion = import("/lua/version.lua").GetVersion
 local UIUtil = import("/lua/ui/uiutil.lua")
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
