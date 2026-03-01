@@ -58,6 +58,8 @@ if versionType != "FAF" then
     ConExecute("net_DebugLevel 10")
 end
 
+local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
+
 function GetAITypes()
     AIKeys = {}
     AIStrings = {}
@@ -119,6 +121,13 @@ function ImportModAIOptions()
                 alreadyStored = false
                 for k, v in AIOpts do
                     if v.key == t.key then
+                        if DebugComponent.EnabledLogging then
+                            LOG(string.format(
+                                'Found duplicate mod option "%s" in mod "%s"'
+                                , t.key
+                                , ModData.name
+                            ))
+                        end
                         alreadyStored = true
                         break
                     end
@@ -2342,8 +2351,17 @@ local function TryLaunch(skipNoObserversCheck)
                 -- If from a mod and that mod is NOT enabled, mark for removal
                 if modSource and not enabledModNames[modSource] then
                     table.insert(keysToRemove, optionKey)
+                    if DebugComponent.EnabledSpewing then
+                        SPEW(string.format('Option "%s" from disabled mod "%s" marked for removal'
+                            , optionKey
+                            , modSource
+                        ))
+                    end
                 end
             end
+        end
+        if DebugComponent.EnabledLogging then
+            LOG(string.format("%d options marked for removal", table.getsize(keysToRemove)))
         end
 
         -- Remove the marked keys from GameOptions
