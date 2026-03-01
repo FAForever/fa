@@ -87,6 +87,21 @@ local teamOpts = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
 local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
 
+-- Table mapping mod names to option keys they provide
+-- Format: { [modName] = { optionKey1 = true, optionKey2 = true, ... } }
+---@type table<string, table<string, true>>
+local ModOptionMapping = {}
+
+-- Set of option keys from the original/default lobbyOptions.lua AIOpts
+-- Used to distinguish default options from mod-added options
+---@type table<string, true>
+local DefaultAIOptionKeys = {}
+
+-- Initialize DefaultOptionKeys with the original lobbyOptions.lua AIOpts options
+for _, option in AIOpts do
+    DefaultAIOptionKeys[option.key] = true
+end
+
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Add lobby options from AI mods
@@ -97,6 +112,8 @@ function ImportModAIOptions()
     for Index, ModData in simMods do
         if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
             OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
+            -- Initialize the mod's option set if it doesn't exist
+            ModOptionMapping[ModData.name] = ModOptionMapping[ModData.name] or {}
             for s, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
@@ -108,6 +125,8 @@ function ImportModAIOptions()
                 end
                 if not alreadyStored then
                     table.insert(AIOpts, t)
+                    -- Track that this option came from this mod
+                    ModOptionMapping[ModData.name][t.key] = true
                 end
             end
         end
@@ -117,6 +136,25 @@ ImportModAIOptions()
 
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
+
+--- Helper function: Returns true if the given option key exists in the default `lobbyOptions.lua` `AIOpts`
+---@param optionKey string
+---@return boolean
+local function IsDefaultAIOption(optionKey)
+    return DefaultAIOptionKeys[optionKey] ~= nil
+end
+
+--- Helper function: Returns the mod name that provides the given option key, or nil if not from a mod
+---@param optionKey string
+---@return string?
+local function GetModSourceForAIOption(optionKey)
+    for modName, optionKeys in ModOptionMapping do
+        if optionKeys[optionKey] then
+            return modName
+        end
+    end
+    return nil
+end
 
 local rehostPlayerOptions = {} -- Player options loaded from preset, used for rehosting
 
@@ -2284,6 +2322,35 @@ local function TryLaunch(skipNoObserversCheck)
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
+
+        --#region Filter GameOptions to remove options from disabled mods
+        -- Build set of enabled mod names for quick lookup
+        local enabledModNames = {}
+        for _, modInfo in gameInfo.GameMods do
+            enabledModNames[modInfo.name] = true
+        end
+
+        -- Remove options from disabled mods
+        -- Only remove options that are not in the default lobbyOptions.lua
+        local keysToRemove = {}
+        for optionKey, _ in gameInfo.GameOptions do
+            -- Skip if this is a default option (always keep default options)
+            if not IsDefaultAIOption(optionKey) then
+                -- Check if this option came from a mod
+                local modSource = GetModSourceForAIOption(optionKey)
+
+                -- If from a mod and that mod is NOT enabled, mark for removal
+                if modSource and not enabledModNames[modSource] then
+                    table.insert(keysToRemove, optionKey)
+                end
+            end
+        end
+
+        -- Remove the marked keys from GameOptions
+        for _, key in keysToRemove do
+            gameInfo.GameOptions[key] = nil
+        end
+        --#endregion
 
         SetWindowedLobby(false)
 
