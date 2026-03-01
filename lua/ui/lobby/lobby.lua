@@ -90,8 +90,8 @@ local teamOpts = lobbyOptions.teamOptions
 local AIOpts = lobbyOptions.AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
 
--- Table mapping mod names to option keys they provide
--- Format: { [modName] = { optionKey1 = true, optionKey2 = true, ... } }
+-- Table mapping option keys to mods that use them
+-- Format: { [optionKey] = { modName1 = true, modName2 = true, ... } }
 ---@type table<string, table<string, true>>
 local ModOptionMapping = {}
 
@@ -120,8 +120,6 @@ function ImportModAIOptions()
     for Index, ModData in simMods do
         if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
             OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            -- Initialize the mod's option set if it doesn't exist
-            ModOptionMapping[ModData.name] = ModOptionMapping[ModData.name] or {}
             for s, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
@@ -141,8 +139,11 @@ function ImportModAIOptions()
                 if not alreadyStored then
                     table.insert(AIOpts, t)
                 end
-                -- Track that this option came from this mod
-                ModOptionMapping[ModData.name][t.key] = true
+
+                -- Initialize the option's mod set
+                ModOptionMapping[t.key] = ModOptionMapping[t.key] or {}
+                -- Track that this option is used by this mod
+                ModOptionMapping[t.key][ModData.name] = true
             end
         end
     end
@@ -159,16 +160,19 @@ local function IsDefaultOption(optionKey)
     return DefaultOptionKeys[optionKey] ~= nil
 end
 
---- Helper function: Returns the mod name that provides the given option key, or nil if not from a mod
+--- Helper function: Returns true if the given option is used by any of the given mods
 ---@param optionKey string
----@return string?
-local function GetModSourceForOption(optionKey)
-    for modName, optionKeys in ModOptionMapping do
-        if optionKeys[optionKey] then
-            return modName
+---@param enabledModNames table<string, true>
+---@return boolean
+local function IsOptionUsedByGivenMods(optionKey, enabledModNames)
+    local modNamesUsingOpt = ModOptionMapping[optionKey]
+    if not modNamesUsingOpt then return false end
+    for modName, _ in modNamesUsingOpt do
+        if enabledModNames[modName] then
+            return true
         end
     end
-    return nil
+    return false
 end
 
 local rehostPlayerOptions = {} -- Player options loaded from preset, used for rehosting
@@ -2350,17 +2354,17 @@ local function TryLaunch(skipNoObserversCheck)
         local keysToRemove = {}
         for optionKey, _ in gameInfo.GameOptions do
             -- Skip if this is a default option (always keep default options)
-            if not IsDefaultOption(optionKey) then
-                -- Check if this option came from a mod
-                local modSource = GetModSourceForOption(optionKey)
+            if not IsDefaultOption(optionKey) and ModOptionMapping[optionKey] then
+                -- Check if this option is used by an enabled mod
+                local isUsed = IsOptionUsedByGivenMods(optionKey, enabledModNames)
 
-                -- If from a mod and that mod is NOT enabled, mark for removal
-                if modSource and not enabledModNames[modSource] then
+                -- If NOT used, mark for removal
+                if not isUsed then
                     table.insert(keysToRemove, optionKey)
                     if DebugComponent.EnabledSpewing then
-                        SPEW(string.format('Option "%s" from disabled mod "%s" marked for removal'
+                        SPEW(string.format('Option "%s" marked for removal because none of these mods are enabled: "%s"'
                             , optionKey
-                            , modSource
+                            , table.concatkeys(ModOptionMapping[optionKey], '", "')
                         ))
                     end
                 end
