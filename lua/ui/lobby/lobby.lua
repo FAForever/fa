@@ -84,9 +84,10 @@ if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
 
-local globalOpts = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
-local teamOpts = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
-local AIOpts = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts
+local lobbyOptions = import("/lua/ui/lobby/lobbyoptions.lua")
+local globalOpts = lobbyOptions.globalOpts
+local teamOpts = lobbyOptions.teamOptions
+local AIOpts = lobbyOptions.AIOpts
 local gameColors = import("/lua/gamecolors.lua").GameColors
 
 -- Table mapping mod names to option keys they provide
@@ -94,15 +95,20 @@ local gameColors = import("/lua/gamecolors.lua").GameColors
 ---@type table<string, table<string, true>>
 local ModOptionMapping = {}
 
--- Set of option keys from the original/default lobbyOptions.lua AIOpts
+-- Set of option keys from the original/default lobbyOptions.lua
 -- Used to distinguish default options from mod-added options
 ---@type table<string, true>
-local DefaultAIOptionKeys = {}
+local DefaultOptionKeys = {}
 
--- Initialize DefaultOptionKeys with the original lobbyOptions.lua AIOpts options
-for _, option in AIOpts do
-    DefaultAIOptionKeys[option.key] = true
+-- Initialize DefaultOptionKeys with the original lobbyOptions.lua options
+local function initOptionKeys(...)
+    for _, optionTable in ipairs(arg) do
+        for _, option in optionTable do
+            DefaultOptionKeys[option.key] = true
+        end
+    end
 end
+initOptionKeys(globalOpts, teamOpts, AIOpts)
 
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
@@ -146,17 +152,17 @@ ImportModAIOptions()
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
 
---- Helper function: Returns true if the given option key exists in the default `lobbyOptions.lua` `AIOpts`
+--- Helper function: Returns true if the given option key exists in the default lobbyOptions.lua
 ---@param optionKey string
 ---@return boolean
-local function IsDefaultAIOption(optionKey)
-    return DefaultAIOptionKeys[optionKey] ~= nil
+local function IsDefaultOption(optionKey)
+    return DefaultOptionKeys[optionKey] ~= nil
 end
 
 --- Helper function: Returns the mod name that provides the given option key, or nil if not from a mod
 ---@param optionKey string
 ---@return string?
-local function GetModSourceForAIOption(optionKey)
+local function GetModSourceForOption(optionKey)
     for modName, optionKeys in ModOptionMapping do
         if optionKeys[optionKey] then
             return modName
@@ -2344,9 +2350,9 @@ local function TryLaunch(skipNoObserversCheck)
         local keysToRemove = {}
         for optionKey, _ in gameInfo.GameOptions do
             -- Skip if this is a default option (always keep default options)
-            if not IsDefaultAIOption(optionKey) then
+            if not IsDefaultOption(optionKey) then
                 -- Check if this option came from a mod
-                local modSource = GetModSourceForAIOption(optionKey)
+                local modSource = GetModSourceForOption(optionKey)
 
                 -- If from a mod and that mod is NOT enabled, mark for removal
                 if modSource and not enabledModNames[modSource] then
