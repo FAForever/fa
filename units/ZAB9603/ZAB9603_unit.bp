@@ -1,5 +1,14 @@
 UnitBlueprint{
     Description = "<LOC zab9603_desc>Naval Factory",
+    AI = {
+        TargetBones = {
+            "Slider_02",
+            "Slider_05",
+            "B06",
+            "B05",
+
+        },
+    },
     Audio = {
         Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0303_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0303_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
