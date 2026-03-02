@@ -1,8 +1,11 @@
 UnitBlueprint{
     Description = "<LOC zab9502_desc>Air Factory",
-	AI = {
+    AI = {
         TargetBones = {
             "Attachpoint",
+            "Right_Slider",
+            "Left_Arm_Slider",
+            "Left_Arm_Slider01",
         },
     },
     Audio = {

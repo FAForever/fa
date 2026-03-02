@@ -3,6 +3,10 @@ UnitBlueprint{
     AI = {
         TargetBones = {
             "Attachpoint",
+            "Right_Hardpoint01",
+            "Right_Hardpoint02",
+            "Left_Hardpoint01",
+            "Left_Hardpoint02",
         },
     },
     Audio = {

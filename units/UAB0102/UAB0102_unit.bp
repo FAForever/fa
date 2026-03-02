@@ -3,6 +3,8 @@ UnitBlueprint{
 	AI = {
         TargetBones = {
             "Attachpoint",
+            "Right_Slider2",
+            "Front_Slider",
         },
     },
     Audio = {
