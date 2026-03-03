@@ -1,8 +1,12 @@
 UnitBlueprint{
     Description = "<LOC zrb9502_desc>Air Factory",
-	AI = {
+    AI = {
         TargetBones = {
-            "Attachpoint",
+            "B01",
+            "B08",
+            "B15",
+            "B05",
+            "B07",
         },
     },
     Audio = {
@@ -180,7 +184,7 @@ UnitBlueprint{
     SelectionSizeZ = 3,
     SelectionThickness = 0.33,
     SizeX = 3.5,
-    SizeY = 0.75,
+    SizeY = 1,
     SizeZ = 3.5,
     StrategicIconName = "icon_factory2_air",
     StrategicIconSortPriority = 215,
