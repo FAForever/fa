@@ -67,7 +67,7 @@ UnitBlueprint{
                 Effects = {
                     {
                         Bones = { "UAB0103" },
-                        Scale = 3,
+                        Scale = 2.0,
                         Type = "SeaIdle01",
                     },
                 },
