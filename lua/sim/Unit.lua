@@ -1811,7 +1811,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local overkillMultiplier = 1 - (overkillRatio or 1)
         mass = mass * overkillMultiplier * self:GetFractionComplete()
         energy = energy * overkillMultiplier * self:GetFractionComplete()
-        time = time * overkillMultiplier
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
         local time  = time * 2
