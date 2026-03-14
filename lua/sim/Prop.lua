@@ -186,13 +186,13 @@ Prop = Class(moho.prop_methods) {
     --- that determine how quickly it can be reclaimed. These values are used to set the real reclaim
     --- values as fractions of the health as the wreck takes damage.
     ---@param self Prop
-    ---@param time number
+    ---@param timeMult number
     ---@param mass number
     ---@param energy number
-    SetMaxReclaimValues = function(self, time, mass, energy)
+    SetMaxReclaimValues = function(self, timeMult, mass, energy)
         self.MaxMassReclaim = mass
         self.MaxEnergyReclaim = energy
-        self.TimeReclaim = time
+        self.TimeReclaim = timeMult
         self:UpdateReclaimLeft()
 
         if self.MaxMassReclaim * self.ReclaimLeft >= 10 then
