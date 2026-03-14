@@ -1767,7 +1767,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         local mass, energy = self:GetTotalResourceCosts()
         mass = mass * (bp.Wreckage.MassMult or 0)
         energy = energy * (bp.Wreckage.EnergyMult or 0)
-        local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
+        local reclaimRateDiv = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
         local wasOutside = false
         local layer = self.Layer
@@ -1813,9 +1813,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
         energy = energy * overkillMultiplier * self:GetFractionComplete()
 
         -- Now we adjust the global multiplier. This is used for balance purposes to adjust global reclaim rate.
-        time  = time * 2
+        reclaimRateDiv  = reclaimRateDiv * 2
 
-        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, time, self.DeathHitBox)
+        local prop = Wreckage.CreateWreckage(bp, pos, self:GetOrientation(), mass, energy, reclaimRateDiv, self.DeathHitBox)
 
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
