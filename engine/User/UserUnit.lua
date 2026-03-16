@@ -138,8 +138,9 @@ function UserUnit:GetCreator()
 end
 
 --- Returns the current custom name, `nil` if none
+---@param unit UserUnit
 ---@return string | nil
-function UserUnit:GetCustomName()
+function UserUnit:GetCustomName(unit)
 end
 
 --- Returns a table of economy data

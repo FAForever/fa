@@ -69,7 +69,7 @@ function GetUnitRolloverInfo(unit, skipFocus)
     info.tacticalSiloMaxStorageCount = missileInfo.tacticalSiloMaxStorageCount
     info.tacticalSiloStorageCount = missileInfo.tacticalSiloStorageCount
 
-    info.customName = unit:GetCustomName()
+    info.customName = unit:GetCustomName(unit)
     info.userUnit = unit
     info.armyIndex = unit:GetArmy() - 1
 
