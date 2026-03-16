@@ -675,8 +675,8 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
             -- Don't refund energy because it would be counterintuitive for wreckage
             local energy = 0
             -- global 2x time multiplier for unit wrecks, see `Unit:CreateWreckageProp`
-            local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
-            CreateWreckage(bp, pos, orientation, mass, energy, time)
+            local timeMult = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
+            CreateWreckage(bp, pos, orientation, mass, energy, timeMult)
         end
     end
 
