@@ -4,6 +4,7 @@
 
 -- upvalues for performance
 local ArmyBrains = ArmyBrains
+local GetCurrentCommandSource = GetCurrentCommandSource
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region General Unit Transfer Scripts
@@ -674,8 +675,8 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
             -- Don't refund energy because it would be counterintuitive for wreckage
             local energy = 0
             -- global 2x time multiplier for unit wrecks, see `Unit:CreateWreckageProp`
-            local time = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
-            CreateWreckage(bp, pos, orientation, mass, energy, time)
+            local timeMult = (bp.Wreckage.ReclaimTimeMultiplier or 1) * 2
+            CreateWreckage(bp, pos, orientation, mass, energy, timeMult)
         end
     end
 
@@ -1541,3 +1542,30 @@ function DrawBone(entity, bone, length)
     -- Z axis
     DrawLine(pos, pos + forward * length, '0000ff')
 end
+
+local CommandSourceToArmyMap
+--- Retrieves the army index corresponding to the given command source index.
+---@param source integer
+---@return integer
+function GetArmyOfCommandSource(source)
+    if not CommandSourceToArmyMap then
+        CommandSourceToArmyMap = {}
+        local commandSourceIndex = 1
+        for index, army in ArmyBrains do
+            if army.Human then
+                CommandSourceToArmyMap[commandSourceIndex] = index
+                commandSourceIndex = commandSourceIndex + 1
+            end
+        end
+    end
+
+    return CommandSourceToArmyMap[source]
+end
+
+--- Retrieves the army index corresponding to the current command source.
+---@return integer
+function GetCurrentCommandSourceArmy()
+    return GetArmyOfCommandSource(GetCurrentCommandSource())
+end
+
+

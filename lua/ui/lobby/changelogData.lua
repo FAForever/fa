@@ -1,8 +1,42 @@
 ---@type number
-last_version = 3829
+last_version = 3831
+-- hasPrettyGithubRelease enables the button that links to the github release.
+-- hasPrettyPatchnotes enables the button that links to the patchnotes website. Hotfixes generally do not get an entry there.
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3831,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3831 (20th of February 2026)",
+            "",
+            "We had to fix some important bugs. Most notably manual OC works again now.",
+            "You can find the complete changelog on GitHub by clicking the button below.",
+            "",
+            "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
+            "",
+            "BlackYps",
+        }
+    },
+    {
+        version = 3830,
+        name = "Game patch",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = true,
+        description = {
+            "# Game version 3830 (14th of February 2026)",
+            "",
+            "It's the first patch of 2026! I hope you all made it into the new year in one piece.",
+            "You can find the complete changelog on github by clicking the button below.",
+            "",
+            "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3829,
         name = "Game patch",

@@ -112,10 +112,10 @@ Wreckage = Class(Prop) {
 ---@param orientation Quaternion
 ---@param mass number
 ---@param energy number
----@param time number
+---@param timeMult number
 ---@param deathHitBox? table
 ---@return Wreckage
-function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitBox)
+function CreateWreckage(bp, position, orientation, mass, energy, timeMult, deathHitBox)
     local prop = CreateProp(position, bp.Wreckage.Blueprint)
     prop:SetOrientation(orientation, true)
     prop:SetScale(bp.Display.UniformScale)
@@ -150,7 +150,7 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
 
     -- set collision box and reclaim values, the latter depends on the health of the wreck
     prop:SetPropCollision('Box', cx, cy, cz, sx, sy, sz)
-    prop:SetMaxReclaimValues(time, mass, energy)
+    prop:SetMaxReclaimValues(timeMult, mass, energy)
 
     --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
     -- under the fog. However the engine has a bug with prop intel that makes the wreckage

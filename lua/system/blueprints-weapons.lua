@@ -127,14 +127,14 @@ local function ProcessWeapon(unit, weapon, projectile)
         if isExperimental then
             weapon.AlwaysRecheckTarget = true
         end
+
+        -- bombers should always have AlwaysRecheckTarget = true otherwise they don't auto attack units
+        if weapon.NeedToComputeBombDrop then
+            weapon.AlwaysRecheckTarget = true
+        end
     end
 
     -- # sanitize values
-
-    -- do not allow the 'bomb weapon' of bombers to suddenly retarget, as then they won't drop their bomb when they do
-    if weapon.NeedToComputeBombDrop then
-        weapon.AlwaysRecheckTarget = false
-    end
 
     -- Floor target check interval to ticks
     weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
