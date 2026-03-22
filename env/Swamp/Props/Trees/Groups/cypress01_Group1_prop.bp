@@ -18,13 +18,13 @@ PropBlueprint{
                     NormalsName = "../cypress01_s1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 150,
+                    LODCutoff = 165,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "../cypress01_s1_albedo.dds",
                     NormalsName = "../cypress01_s1_normalsTS.dds",
                 },
                 {
-                    LODCutoff = 330,
+                    LODCutoff = 640,
                     ShaderName = "VertexNormal",
                     AlbedoName = "cypress01_Group1_LOD2_albedo.dds",
                 },

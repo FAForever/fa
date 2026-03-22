@@ -14,7 +14,7 @@ PropBlueprint{
             IconFadeInZoom = 4,
             LODs = {
                 {
-                    LODCutoff = 170,
+                    LODCutoff = 200,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "sw_fern01_albedo.dds",
                 },
