@@ -28,6 +28,8 @@ local ordersControl = false
 
 local OnDestroyFuncs = {}
 
+ --- game's "Non-Interactive Sequence" state as synced from Sim
+ ---@type 'on' | 'off' | false
 local NISActive = false
 local isReplay = false
 local waitingDialog = false
@@ -932,6 +934,9 @@ local rangePrefs = {
 }
 
 local preNISSettings = {}
+
+--- Called by user sync to set the NIS mode state and do callbacks for the states
+---@param state 'on' | 'off'
 function NISMode(state)
     NISActive = state
     local worldView = import("/lua/ui/game/worldview.lua")
@@ -1032,6 +1037,8 @@ function ShowNISBars()
     end
 end
 
+--- Returns true if the game is in a "Non-Interactive Sequence"
+---@return boolean
 function IsNISMode()
     if NISActive == 'on' then
         return true
