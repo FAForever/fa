@@ -1117,6 +1117,61 @@ function QuickSave(filename)
     end
 end
 
+--- Called by key action to load a special quick save file.
+---@param filename string
+function QuickLoad(filename)
+    if not SessionIsActive()
+        or (
+            WorldIsPlaying()
+            and not SessionIsGameOver()
+            and not SessionIsMultiplayer()
+            and not SessionIsReplay()
+            and not IsNISMode()
+        )
+    then
+        --#region Duplicate code from QuickSave
+        local saveType
+        if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
+            saveType = "CampaignSave"
+        else
+            saveType = "SaveGame"
+        end
+        local path = GetSpecialFilePath(Prefs.GetCurrentProfile().Name, filename, saveType)
+        --#endregion
+
+        local statusStr = "Loading Quick Save..."
+        local status = UIUtil.ShowInfoDialog(GetFrame(0), statusStr)
+
+        --#region Duplicate of `/lua/ui/dialogs/saveload.lua` `CreateLoadDialog` `DoLoad`
+        SetFrontEndData('NextOpBriefing', nil)
+        local SaveErrors = {
+            WrongVersion = '<LOC uisaveload_0005>Wrong version for savegame "%s"',
+            CantOpen = '<LOC uisaveload_0004>Couldn\'t open savegame "%s"',
+            InvalidFormat = '<LOC uisaveload_0006>"%s" is not a valid savegame',
+            InternalError = '<LOC uisaveload_0007>Internal error loading savegame "%s": %s',
+        }
+        local InternalErrors = {
+            ['eof'] = "<LOC Engine0027>EOF reached during serialization.",
+            ['noread'] = "<LOC Engine0028>Error reading file stream during serialization.",
+            ['nowrite'] = "<LOC Engine0026>Error writing data during serialization. Possibly out of disk space.",
+        }
+
+        local worked, error, detail = LoadSavedGame(path)
+        if not worked then
+            UIUtil.ShowInfoDialog(GetFrame(0),
+                -- note - the 'Unknown error...' string below is intentionally not localized because
+                -- it should never show up.  If it does, add the error string to SaveErrors.
+                LOCF(SaveErrors[error] or ('Unknown error ' .. repr(error) .. 'loading savegame %s: %s'),
+                    Basename(path, true),
+                    InternalErrors[detail] or detail),
+                "<LOC _Ok>")
+        end
+        --#endregion
+
+        status:Destroy()
+    end
+end
+
 defaultZoom = 1.4
 function SimChangeCameraZoom(newMult)
     if SessionIsActive() and
