@@ -8197,7 +8197,7 @@ loadingtip_0094="Vermeide den Bau zu vieler Energiegeneratoren – sie kosten Re
 loadingtip_0095="Wenn du zu wenig Masse hast, kann es hilfreich sein, mehr deiner Techniker sammeln zu lassen."
 loadingtip_0096="Es ist generell eine gute Idee, früh im Spiel die Karte zu erweitern, um Massenlager, Rückgewinnung und Kartenkontrolle zu erhalten."
 loadingtip_0097="Wenn alle Spieler einem Unentschieden zustimmen, kannst du ein langsames oder unfaires Spiel mit einem Unentschieden beenden."
-loadingtip_0098="Wenn du deine Ressourcen nicht ausgeben kannst, hast du möglicherweise nicht genug Bauleistung (Ingenieure, Fabriken, Konstruktionsstationen oder SACUs)."
+loadingtip_0098="Wenn du deine Ressourcen nicht ausgeben kannst, hast du möglicherweise nicht genug Bauleistung (Techniker, Fabriken, Konstruktionsstationen oder SACUs)."
 loadingtip_0099="Wenn du denkst, dass dein Team nicht mehr gewinnen kann, kannst du sie bitten, sich zurückzuziehen, während du weiterkämpfst."
 loadingtip_0100="Du kannst andere Spieler zum gemeinsamen Spielen oder zum Austausch über Forged Alliance Forever auf dem FAF-Discord finden."
 
