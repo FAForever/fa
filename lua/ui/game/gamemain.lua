@@ -1128,13 +1128,7 @@ end
 ---@param filename string
 function QuickLoad(filename)
     if not SessionIsActive()
-        or (
-            WorldIsPlaying()
-            and not SessionIsGameOver()
-            and not SessionIsMultiplayer()
-            and not SessionIsReplay()
-            and not IsNISMode()
-        )
+        or not SessionIsMultiplayer()
     then
         --#region Duplicate code from QuickSave
         local saveType
