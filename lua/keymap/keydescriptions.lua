@@ -219,6 +219,7 @@ keyDescriptions = {
     ['cam_free'] = "<LOC key_desc_0104>Toggles camera free mode",
 
     ['quick_save'] = "<LOC key_desc_0130>Save the game to a special quick save file",
+    ['quick_load'] = "<LOC key_desc_quick_load>Load the game from the special quick save file",
     ['mouse_help'] = "<LOC key_desc_0132>Turn the mouse button help icon on/off",
 
     ['create_build_template'] = "<LOC key_desc_0181>Create a build template based on the current selection",

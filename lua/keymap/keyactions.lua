@@ -1834,6 +1834,10 @@ local keyActionsGame = {
         action = 'UI_Lua import("/lua/ui/game/gamemain.lua").QuickSave(LOC("<LOC QuickSave>QuickSave"))',
         category = 'ui',
     },
+    ['quick_load'] = {
+        action = 'UI_Lua import("/lua/ui/game/gamemain.lua").QuickLoad(LOC("<LOC QuickSave>QuickSave"))',
+        category = 'ui',
+    },
     ['toggle_key_bindings'] = {
         action = 'UI_Lua import("/lua/ui/dialogs/keybindings.lua").CreateUI()',
         category = 'ui',
