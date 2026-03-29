@@ -22,6 +22,7 @@
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
+local SimUtils = import("/lua/simutils.lua")
 
 -- upvalue for performance
 local TableGetn = table.getn
@@ -281,6 +282,8 @@ AbstractVictoryCondition = Class(DebugComponent) {
             KillThread(self.ProcessGameStateThreadInstance)
             self.ProcessGameStateThreadInstance = nil
         end
+
+        SimUtils.GameIsEnding = true
 
         self.Trash:Add(ForkThread(self.EndGameThread, self))
     end,

@@ -938,6 +938,10 @@ end
 -- would have blown up.
 EndGameGracePeriod = 10
 
+-- Set to true in `AbstractVictoryCondition.EndGame` to prevent killing units after a
+-- team is victorious but before the sim is stopped.
+GameIsEnding = false
+
 --- Kills all given units, if not already dead
 ---@param toKill Entity[]
 local function KillUnits(toKill)
@@ -1072,6 +1076,8 @@ function KillArmy(self, shareOption)
 
     WaitSeconds(EndGameGracePeriod)
 
+    if GameIsEnding then return end
+
     local selfIndex = self.Army
     local brainCategories = GetAllegianceCategories(selfIndex)
 
@@ -1112,6 +1118,8 @@ end
 function KillRecalledArmy(self, shareOption)
 
     WaitSeconds(EndGameGracePeriod)
+
+    if GameIsEnding then return end
 
     local brainCategories = GetAllegianceCategories(self.Army)
 
