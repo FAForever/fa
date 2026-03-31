@@ -2,7 +2,7 @@ MeshBlueprint {
     IconFadeInZoom = 130,
     LODs = {
         {
-            MeshName = '/mods/WIDE_ACUs/meshes/seraphim/Sera1.scm',
+            MeshName = '/meshes/seraphim/Sera1.scm',
             AlbedoName = '/units/XSL0001/XSL0001_Albedo.dds',
             NormalsName = '/units/XSL0001/XSL0001_NormalsTS.dds',
             SpecularName = '/units/XSL0001/XSL0001_SpecTeam.dds',

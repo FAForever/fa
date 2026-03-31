@@ -57,8 +57,6 @@ ADFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
 
         ALaserBotProjectileOnCreate(self)
         OverchargeProjectileOnCreate(self)
-        -- engine doesn't play this automagically for us
-        self:PlaySound(self.Blueprint.Audio.ExistLoop)
     end,
 
     ---@param self ADFOverCharge01

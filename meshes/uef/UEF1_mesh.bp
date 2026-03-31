@@ -2,7 +2,7 @@ MeshBlueprint {
     IconFadeInZoom = 130,
     LODs = {
         {
-            MeshName = '/mods/WIDE_ACUs/meshes/uef/UEF1.scm',
+            MeshName = '/meshes/uef/UEF1.scm',
             AlbedoName = '/units/UEL0001/UEL0001_Albedo.dds',
             NormalsName = '/units/UEL0001/UEL0001_NormalsTS.dds',
             SpecularName = '/units/UEL0001/UEL0001_SpecTeam.dds',

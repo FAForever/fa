@@ -35,16 +35,17 @@ UnitBlueprint{
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 100,
-                    ShaderName = "Insect",
-                },
-                {
                     MeshName = '/meshes/cube01_lod0.scm',
                     AlbedoName = '/textures/grass.dds',
                     NormalsName = '/textures/FlatNormal.dds',
                     SpecularName = '/textures/cube01_specteam.dds',
                     ShaderName = 'Unit',
                     LODCutoff = 300,
+                },
+                {
+                    MeshName = '/meshes/cube01_lod0.scm',
+                    LODCutoff = 100,
+                    ShaderName = "Insect",
                 },
             },
         },

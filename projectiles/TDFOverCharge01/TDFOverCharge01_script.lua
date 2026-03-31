@@ -32,8 +32,6 @@ TDFOverCharge01 = ClassProjectile(TLaserBotProjectile, OverchargeProjectile) {
 
         TLaserBotProjectile.OnCreate(self)
         OverchargeProjectile.OnCreate(self)
-        -- engine doesn't play this automagically for us
-        self:PlaySound(self.Blueprint.Audio.ExistLoop)
     end,
 
     ---@param self TDFOverCharge01

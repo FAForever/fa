@@ -2,7 +2,7 @@ MeshBlueprint {
     IconFadeInZoom = 130,
     LODs = {
         {
-            MeshName = '/mods/WIDE_ACUs/meshes/cybran/Cybran4.scm',
+            MeshName = '/meshes/cybran/Cybran4.scm',
             AlbedoName = '/units/URL0001/URL0001_Albedo.dds',
             NormalsName = '/units/URL0001/URL0001_NormalsTS.dds',
             SpecularName = '/units/URL0001/URL0001_SpecTeam.dds',

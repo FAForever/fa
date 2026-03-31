@@ -30,8 +30,6 @@ SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeP
 
         SChronatronCannonOverCharge.OnCreate(self)
         OverchargeProjectile.OnCreate(self)
-        -- engine doesn't play this automagically for us
-        self:PlaySound(self.Blueprint.Audio.ExistLoop)
     end,
 
     ---@param self SDFChronatronCannon02

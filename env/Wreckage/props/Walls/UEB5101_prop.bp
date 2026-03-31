@@ -14,7 +14,7 @@ PropBlueprint{
                 {
                     LODCutoff = 250,
                     ShaderName = "Unit",
-                    MeshName = "/env/Wreckage/props/Walls/Wall01_lod0.scm",
+                    MeshName = '/meshes/cube01_lod0.scm',
                     AlbedoName = "/env/Wreckage/props/Walls/Wall01_Albedo.dds",
                     NormalsName = "/env/Wreckage/props/Walls/Wall01_normalsTS.dds",
                     SpecularName = "/env/Wreckage/props/Walls/Wall01_Specteam.dds",

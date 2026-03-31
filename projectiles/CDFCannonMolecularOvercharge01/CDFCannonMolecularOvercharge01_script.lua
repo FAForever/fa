@@ -1,5 +1,4 @@
-Same pattern, straightforward merge:
-lualocal CMolecularCannonProjectile = import("/lua/cybranprojectiles.lua").CMolecularCannonProjectile
+local CMolecularCannonProjectile = import("/lua/cybranprojectiles.lua").CMolecularCannonProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
@@ -32,8 +31,6 @@ CDFCannonMolecular01 = ClassProjectile(CMolecularCannonProjectile, OverchargePro
 
         CMolecularCannonProjectile.OnCreate(self)
         OverchargeProjectile.OnCreate(self)
-        -- engine doesn't play this automagically for us
-        self:PlaySound(self.Blueprint.Audio.ExistLoop)
     end,
 
     ---@param self CDFCannonMolecular01
