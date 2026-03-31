@@ -1,10 +1,27 @@
 ---@type number
-last_version = 3831
+last_version = 3832
 -- hasPrettyGithubRelease enables the button that links to the github release.
 -- hasPrettyPatchnotes enables the button that links to the patchnotes website. Hotfixes generally do not get an entry there.
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3832,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3832 (1st of April 2026)",
+            "",
+            "This hotfix most notably fixes the bug where a campaign mission no longer shows the 'Operation Complete/Failed' dialog.",
+            "We also release some more bugfixes and balance changes that were made in the meantime as a bonus.",
+            "You can find the complete changelog on GitHub by clicking the button below.",
+            "",
+            "With gratitude to all those who contributed to this patch and/or took the time to report issues,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3831,
         name = "Hotfix",
