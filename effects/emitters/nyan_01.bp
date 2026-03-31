@@ -23,7 +23,7 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/mods/NyanOC/textures/particles/NyanMini.dds]],
+	Texture = [[/textures/particles/NyanMini.dds]],
 	RampTexture = [[/textures/particles/ramp_white_premod_01.dds]],
 	XDirectionCurve = {
 		XRange = 11.00,
