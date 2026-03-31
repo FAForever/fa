@@ -573,7 +573,7 @@ XSL0001 = ClassUnit(ACUUnit) {
     ---@param self UEL0001
     AddVetLevel = function(self)
         ACUUnit.AddVetLevel(self)
-        local temp = string.format('/meshes/uef/UEF%d_mesh', self.VetLevel)
+        local temp = string.format('/meshes/seraphim/Sera%d_mesh', self.VetLevel)
         self:SetMesh(temp, true)
     end,
 }
