@@ -118,6 +118,7 @@ jobs:
           git checkout -b "${{ steps.meta.outputs.branch }}"
 
       - name: Create changelog post
+        continue-on-error: true
         working-directory: changelog/snippets
         run: |
           FILE="${{ github.workspace }}/docs/_posts/${{ steps.meta.outputs.date }}-${{ steps.version.outputs.version }}.md"
