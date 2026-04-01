@@ -483,6 +483,16 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         self.Impacted = false
+        self.Trash:Add(ForkThread(self.FailsafeDestroyThread, self))
+    end,
+
+    --- Destroys the projectile only in rare failure cases where no impact callback happens.
+    ---@param self CNeutronClusterBombProjectile
+    FailsafeDestroyThread = function(self)
+        WaitTicks(120)
+        if not self:BeenDestroyed() then
+            self:Destroy()
+        end
     end,
 
     --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
@@ -491,16 +501,28 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     ---@param targetType string
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        if self.Impacted == false and targetType ~= 'Air' then
+        if self.Impacted == false then
             self.Impacted = true
-            local Random = Random 
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),-Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1.5,3),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),-Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1.5,2.5),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),Random(2,4))
+
+            if targetType ~= 'Air' then
+                local Random = Random
+
+                local SpawnFragment = function(vx, vy, vz)
+                    local fragment = self:CreateChildProjectile(self.ChildProjectile)
+                    if fragment then
+                        fragment:SetVelocity(vx, vy, vz)
+                    end
+                end
+
+                SpawnFragment(0, Random(1,3), Random(1.5,3))
+                SpawnFragment(Random(1,2), Random(1,3), Random(1,2))
+                SpawnFragment(0, Random(1,3), -Random(1.5,3))
+                SpawnFragment(Random(1.5,3), Random(1,3), 0)
+                SpawnFragment(-Random(1,2), Random(1,3), -Random(1,2))
+                SpawnFragment(-Random(1.5,2.5), Random(1,3), 0)
+                SpawnFragment(-Random(1,2), Random(1,3), Random(2,4))
+            end
+
             SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
         end
     end,
