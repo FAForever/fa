@@ -21,6 +21,20 @@ SDFLightChronatronCannon02 = ClassProjectile(SLightChronatronCannonOverCharge, O
 
     ---@param self SDFLightChronatronCannon02
     OnCreate = function(self)
+        -- Nyan cat seasonal event
+        local vx, vy, vz, w = unpack(self:GetOrientation())
+        if vz >= 0 then
+            self.FxTrails = {
+                '/effects/emitters/nyan_trail.bp',
+                '/effects/emitters/nyan_01.bp'
+            }
+        else
+            self.FxTrails = {
+                '/effects/emitters/nyan_trail.bp',
+                '/effects/emitters/nyan_02.bp'
+            }
+        end
+
         SLightChronatronCannonOverCharge.OnCreate(self)
         OverchargeProjectile.OnCreate(self)
     end,
