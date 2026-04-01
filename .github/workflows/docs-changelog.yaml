@@ -85,31 +85,23 @@ jobs:
   # During the bundling process we combine the templates, the sections and the snippets
   # into a single changelog.
 
-  bundle:
-    name: Bundle snippets
+  release-preparation:
+    name: Prepare patch changelog
     runs-on: ubuntu-latest
     needs: verify
     steps:
 
-      # We check out the scripts separate because the branch that we use to
-      # generate the changelog may not contain the scripts that we want to work with.
-      - name: Checkout scripts
+      - name: Checkout FA repository
         uses: actions/checkout@v4
         with:
-          path: scripts
-          sparse-checkout: |
-            .github/workflows/scripts/bash
-
-      - name: Checkout snippets
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.reference }}
-          path: fa
-          sparse-checkout: |
-            changelog/snippets
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          repository: FAForever/fa
+          ref: develop
 
       - name: Update environment path
-        run: echo "${{ github.workspace }}/scripts/.github/workflows/scripts/bash" >> $GITHUB_PATH
+        run: |
+          ls
+          echo "${{ github.workspace }}/fa/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
       - name: Determine next patch version
         id: version
