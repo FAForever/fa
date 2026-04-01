@@ -120,8 +120,8 @@ jobs:
       - name: Create changelog post
         working-directory: changelog/snippets
         run: |
-          FILE="${{ github.workspace }}/fa/docs/_posts/${{ steps.meta.outputs.date }}-${{ steps.version.outputs.version }}.md"
-          ${{ github.workspace }}/fa/.github/workflows/scripts/bash/changelog-combine.sh $FILE
+          FILE="${{ github.workspace }}/docs/_posts/${{ steps.meta.outputs.date }}-${{ steps.version.outputs.version }}.md"
+          ${{ github.workspace }}/.github/workflows/scripts/bash/changelog-combine.sh $FILE
           sed -i "s/XYZW/${{ steps.version.outputs.version }}/g" $FILE
 
       - name: Update changelogData.lua
