@@ -100,15 +100,14 @@ jobs:
 
       - name: Update environment path
         run: |
-          ls
           echo "${{ github.workspace }}/fa/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
       - name: Determine next patch version
         id: version
         run: |
-          CURRENT_VERSION=$(grep -oP 'version\s*=\s*"\K[0-9]+' mod_info.lua)
+          CURRENT_VERSION=$(grep 'Version' lua/version.lua | grep -o '[0-9]\+')
           NEXT_VERSION=$((CURRENT_VERSION + 1))
-          echo "old_version=CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "old_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
 
       - name: Metadata
