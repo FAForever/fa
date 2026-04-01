@@ -82,8 +82,6 @@ jobs:
         working-directory: fa/changelog/snippets # script assumes it is in this directory
         run: changelog-verify.sh
 
-  # During the bundling process we combine the templates, the sections and the snippets
-  # into a single changelog.
 
   release-preparation:
     name: Prepare patch changelog
@@ -97,10 +95,6 @@ jobs:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           repository: FAForever/fa
           ref: develop
-
-      - name: Update environment path
-        run: |
-          echo "${{ github.workspace }}/fa/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
       - name: Determine next patch version
         id: version
@@ -124,9 +118,10 @@ jobs:
           git checkout -b "${{ steps.meta.outputs.branch }}"
 
       - name: Create changelog post
+        working-directory: changelog/snippets
         run: |
-          FILE="docs/_posts/${{ steps.meta.outputs.date }}-${{ steps.version.outputs.version }}.md"
-          changelog-combine.sh $FILE
+          FILE="${{ github.workspace }}/fa/docs/_posts/${{ steps.meta.outputs.date }}-${{ steps.version.outputs.version }}.md"
+          ${{ github.workspace }}/fa/.github/workflows/scripts/bash/changelog-combine.sh $FILE
           sed -i "s/XYZW/${{ steps.version.outputs.version }}/g" $FILE
 
       - name: Update changelogData.lua
