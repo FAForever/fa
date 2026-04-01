@@ -120,7 +120,7 @@ process_snippets() {
 # Output file name
 output="changelog.md"
 if [ "$1" ]; then
-    output="$1.md"
+    output="$1"
 fi
 
 echo "Writing output to: $output"
