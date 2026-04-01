@@ -26,7 +26,7 @@ on:
       reference:
         required: true
         type: choice
-        description: The reference (branch or tag) to use to compile the changelog snippets from
+        description: The reference (branch or tag) to use
         options:
           - develop
           - deploy/fafbeta
@@ -37,11 +37,11 @@ on:
       reference:
         required: true
         type: string
-        description: The reference (branch or tag) to use to compile the changelog snippets from
 
   pull_request:
     paths:
       - "changelog/snippets/*.md"
+
   push:
     branches:
       - deploy/fafdevelop
@@ -80,8 +80,7 @@ jobs:
 
       - name: Verify the changelog snippets
         working-directory: fa/changelog/snippets # script assumes it is in this directory
-        run: |
-          changelog-verify.sh
+        run: changelog-verify.sh
 
   # During the bundling process we combine the templates, the sections and the snippets
   # into a single changelog.
@@ -89,7 +88,7 @@ jobs:
   bundle:
     name: Bundle snippets
     runs-on: ubuntu-latest
-    needs: [verify]
+    needs: verify
     steps:
 
       # We check out the scripts separate because the branch that we use to
@@ -110,26 +109,62 @@ jobs:
             changelog/snippets
 
       - name: Update environment path
-        run: |
-          echo "${{ github.workspace }}/scripts/.github/workflows/scripts/bash" >> $GITHUB_PATH
+        run: echo "${{ github.workspace }}/scripts/.github/workflows/scripts/bash" >> $GITHUB_PATH
 
-      # We need to do this to remove `deploy/` from the reference. Specifically the `/` is problematic
-      - name: Update reference
+      - name: Determine next patch version
+        id: version
         run: |
-          REFERENCE="${{ inputs.reference }}"
-          NAME="${REFERENCE#deploy/}"
-          echo "NAME=$NAME" >> $GITHUB_ENV
+          CURRENT_VERSION=$(grep -oP 'version\s*=\s*"\K[0-9]+' mod_info.lua)
+          NEXT_VERSION=$((CURRENT_VERSION + 1))
+          echo "old_version=CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create the changelog
-        working-directory: fa/changelog/snippets # script assumes it is in this directory
+      - name: Metadata
+        id: meta
         run: |
-          echo $NAME
-          echo ${{ env.NAME }}
-          changelog-combine.sh ${{ env.NAME }}
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="changelog${{ steps.version.outputs.version }}"
+          
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
-      - name: Add the changelog as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: changelog-${{ env.NAME }}
-          path: |
-            fa/changelog/snippets/${{ env.NAME }}.md
+      - name: Create branch
+        run: |
+          git checkout -b "${{ steps.meta.outputs.branch }}"
+
+      - name: Create changelog post
+        run: |
+          FILE="docs/_posts/${{ steps.meta.outputs.date }}-${{ steps.version.outputs.version }}.md"
+          changelog-combine.sh $FILE
+          sed -i "s/XYZW/${{ steps.version.outputs.version }}/g" $FILE
+
+      - name: Update changelogData.lua
+        run: |
+          sed -i -E "s/(last_version = )[0-9]+/\1${{ steps.version.outputs.version }}/" \
+          lua/ui/lobby/changelogData.lua
+
+      - name: Commit changelog
+        run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+          
+          git add lua/ui/lobby/changelogData.lua docs/_posts
+          git commit -m "Add changelog for version ${{ steps.version.outputs.version }}"
+
+      - name: Remove snippets
+        run: |
+          rm -f changelog/snippets/*.md
+          git add changelog/snippets
+          git commit -m "Delete changelog snippets"
+
+      - name: Update version number
+        run: |
+          sed -i "s/${{ steps.version.outputs.old_version }}/${{ steps.version.outputs.version }}/g" lua/version.lua
+          sed -i "s/${{ steps.version.outputs.old_version }}/${{ steps.version.outputs.version }}/g" mod_info.lua
+
+          git add lua/version.lua mod_info.lua
+          git commit -m "Bump game version to ${{ steps.version.outputs.version }}"
+
+      - name: Push branch
+        run: |
+          git push origin "${{ steps.meta.outputs.branch }}"
