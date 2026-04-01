@@ -14,6 +14,11 @@ SDFLightChronatronCannon02 = ClassProjectile(SLightChronatronCannonOverCharge, O
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
+        -- Nyan cat seasonal event
+        if self.Loop then
+            StopLoop(self.Loop)
+        end
+
         -- we need to run this the overcharge logic before running the usual on impact because that is where the damage is determined
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         SLightChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
@@ -33,6 +38,9 @@ SDFLightChronatronCannon02 = ClassProjectile(SLightChronatronCannonOverCharge, O
                 '/effects/emitters/nyan_trail.bp',
                 '/effects/emitters/nyan_02.bp'
             }
+        end
+        if self.Blueprint.Audio.ExistLoop then
+            self.Loop = PlayLoop(self.Blueprint.Audio.ExistLoop)
         end
 
         SLightChronatronCannonOverCharge.OnCreate(self)

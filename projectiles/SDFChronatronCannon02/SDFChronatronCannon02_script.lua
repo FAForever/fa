@@ -27,6 +27,9 @@ SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeP
                 '/effects/emitters/nyan_02.bp'
             }
         end
+        if self.Blueprint.Audio.ExistLoop then
+            self.Loop = PlayLoop(self.Blueprint.Audio.ExistLoop)
+        end
 
         SChronatronCannonOverCharge.OnCreate(self)
         OverchargeProjectile.OnCreate(self)
@@ -36,6 +39,11 @@ SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeP
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
+        -- Nyan cat seasonal event
+        if self.Loop then
+            StopLoop(self.Loop)
+        end
+
         OverchargeProjectile.OnImpact(self, targetType, targetEntity)
         SChronatronCannonOverCharge.OnImpact(self, targetType, targetEntity)
     end,

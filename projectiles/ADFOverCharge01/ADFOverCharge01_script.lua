@@ -54,6 +54,9 @@ ADFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
                 '/effects/emitters/nyan_02.bp'
             }
         end
+        if self.Blueprint.Audio.ExistLoop then
+            self.Loop = PlayLoop(self.Blueprint.Audio.ExistLoop)
+        end
 
         ALaserBotProjectileOnCreate(self)
         OverchargeProjectileOnCreate(self)
@@ -63,6 +66,11 @@ ADFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
+        -- Nyan cat seasonal event
+        if self.Loop then
+            StopLoop(self.Loop)
+        end
+
         OverchargeProjectileOnImpact(self, targetType, targetEntity)
         ALaserBotProjectileOnImpact(self, targetType, targetEntity)
     
