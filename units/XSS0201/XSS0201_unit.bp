@@ -3,6 +3,10 @@ UnitBlueprint{
     AI = {
         AttackAngle = 70,
         GuardReturnRadius = 30,
+        TargetBones = {
+            "XSS0201",
+            "Center_Target",
+        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'XSS',            Cue = 'XSS0201_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },

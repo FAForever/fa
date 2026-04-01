@@ -19,12 +19,12 @@ PropBlueprint{
                     AlbedoName = "Brch01_albedo.dds",
                 },
                 {
-                    LODCutoff = 150,
+                    LODCutoff = 165,
                     ShaderName = "TMeshAlpha",
                     AlbedoName = "Brch01_albedo.dds",
                 },
                 {
-                    LODCutoff = 330,
+                    LODCutoff = 640,
                     ShaderName = "VertexNormal",
                     AlbedoName = "Brch01_LOD2_albedo.dds",
                 },

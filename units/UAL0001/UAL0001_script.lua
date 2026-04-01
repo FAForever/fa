@@ -67,6 +67,14 @@ UAL0001 = ClassUnit(ACUUnit) {
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
+    -- Wide ACUs seasonal event
+    --- Called when the unit gains a level of veterancy
+    ---@param self UAL0001
+    AddVetLevel = function(self)
+        ACUUnit.AddVetLevel(self)
+        local temp = string.format('/meshes/aeon/Aeon%d_mesh', self.VetLevel)
+        self:SetMesh(temp, true)
+    end,
 
     ---------------------------------------------------------------------------
     --#region Enhancements

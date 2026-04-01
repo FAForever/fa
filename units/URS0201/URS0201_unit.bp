@@ -428,6 +428,7 @@ UnitBlueprint{
             MuzzleSalvoDelay = 0.8,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
+            NotExclusive = true,
             ProjectileId = "/projectiles/CANTorpedoNanite02/CANTorpedoNanite02_proj.bp",
             ProjectileLifetime = 7,
             ProjectilesPerOnFire = 1,

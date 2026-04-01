@@ -23,7 +23,7 @@ UnitBlueprint{
         EnhanceStart                  = Sound { Bank = 'UnitsGlobal', Cue = 'GLB_Enhance_Start',       LodCutoff = 'UnitMove_LodCutoff' },
         FootFallGeneric               = Sound { Bank = 'UAL',         Cue = 'UAL0001_Move_Step',       LodCutoff = 'UnitMove_LodCutoff' },
         FootFallGenericSeabed         = Sound { Bank = 'UAL',         Cue = 'UAL0001_Move_UW_Step',    LodCutoff = 'UnitMove_LodCutoff' },
-        Killed                        = Sound { Bank = 'Explosions',  Cue = 'Aeon_Nuke_Impact',        LodCutoff = 'UnitMove_LodCutoff' },
+        Killed                        = Sound { Bank = 'Wilhelm_Scream', Cue = 'Wilhelm_Cue',          LodCutoff = 'UnitMove_LodCutoff' },
         ReclaimLoop                   = Sound { Bank = 'UAL',         Cue = 'UAL0001_Reclaim_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         StartCapture                  = Sound { Bank = 'UAL',         Cue = 'UAL0001_Capture_Start',   LodCutoff = 'UnitMove_LodCutoff' },
         StartMove                     = Sound { Bank = 'UAL',         Cue = 'UAL0001_Move_Start',      LodCutoff = 'UnitMove_LodCutoff' },
