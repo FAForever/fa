@@ -1,10 +1,25 @@
 ---@type number
-last_version = 3832
+last_version = 3833
 -- hasPrettyGithubRelease enables the button that links to the github release.
 -- hasPrettyPatchnotes enables the button that links to the patchnotes website. Hotfixes generally do not get an entry there.
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3833,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3833 (1st of April 2026)",
+            "",
+            "Two files snuck into the patch that should not be there, leading to desyncs.",
+            "",
+            "With special thanks to Nomander for reacting quickly and investigating the cause,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3832,
         name = "Hotfix",
