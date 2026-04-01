@@ -154,3 +154,19 @@ jobs:
       - name: Push branch
         run: |
           git push origin "${{ steps.meta.outputs.branch }}"
+
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = "${{ steps.version.outputs.version }}";
+            const branch = "${{ steps.meta.outputs.branch }}";
+            
+            await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Changelog ${version}`,
+              head: branch,
+              base: "develop",
+              body: `Automated changelog and version bump for game version ${version}.`
+            });
