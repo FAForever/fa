@@ -486,7 +486,7 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
         self.Trash:Add(ForkThread(self.FailsafeDestroyThread, self))
     end,
 
-    --- Destroys the projectile only in rare failure cases where no impact callback happens.
+    --- Destroys the projectile in rare cases where no impact callback happens
     ---@param self CNeutronClusterBombProjectile
     FailsafeDestroyThread = function(self)
         WaitTicks(120)
