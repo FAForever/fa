@@ -6,6 +6,21 @@ last_version = 3833
 ---@type PatchNotes[]
 gamePatches = {
     {
+        version = 3833,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3833 (1st of April 2026)",
+            "",
+            "Two files snuck into the patch that should not be there, leading to desyncs.",
+            "",
+            "With special thanks to Nomander for reacting quickly and investigating the cause,",
+            "",
+            "BlackYps",
+        }
+    },
+    {
         version = 3832,
         name = "Hotfix",
         hasPrettyGithubRelease = true,
