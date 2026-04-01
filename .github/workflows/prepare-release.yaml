@@ -91,7 +91,7 @@ jobs:
 
       - name: Create branch
         run: |
-          if git ls-remote --heads origin "${{ steps.meta.outputs.branch }}" | grep -q ."; then
+          if git ls-remote --heads origin "${{ steps.meta.outputs.branch }}" | grep -q .; then
             echo "Branch '${{ steps.meta.outputs.branch }}' already exists. Aborting workflow."
             exit 1
           fi
