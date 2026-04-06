@@ -33,7 +33,7 @@ __module_metatable = {
 ---@field OnReload? fun(newmod: Module)
 
 -- these values can be adjusted by hooking into this file
-local informDevOfLoad = true
+local informDevOfLoad = false
 
 ---Load a module
 ---@param module Module
