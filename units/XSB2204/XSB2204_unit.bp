@@ -208,7 +208,7 @@ UnitBlueprint{
             TurretBoneYaw = "Turret",
             TurretDualManipulators = false,
             TurretPitch = 35,
-            TurretPitchRange = 45,
+            TurretPitchRange = 55,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,

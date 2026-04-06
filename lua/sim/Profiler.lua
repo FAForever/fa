@@ -7,6 +7,8 @@
 -- - https://www.lua.org/pil/23.1.html
 
 
+local SerializableDeepCopy = import("/lua/utilities.lua").SerializableDeepCopy
+
 local CollapseDebugInfo = import("/lua/shared/debugfunction.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/profiler.lua").CreateEmptyProfilerTable
 local GetDebugFunctionInfo = import("/lua/shared/debugfunction.lua").GetDebugFunctionInfo
@@ -41,40 +43,6 @@ local benchmarkTargetTime = 0.5
 -- A list of functions that set the baseline loop time for function's that have the same number of
 -- parameters as the index 
 local benchmarkBaselines
-
-
---- Toggles the profiler on / off
----@param army number
----@param forceEnable? boolean
-function ToggleProfiler(forceEnable)
-    if forceEnable and isProfiling then -- let the profiler be on if we are trying to force it on 
-        return
-    end
-
-    if not isProfiling then
-        -- Inform us in case of abuse
-        SPEW("Profiler has been toggled on by army: " .. tostring(GetFocusArmy()))
-        isProfiling = true
-
-        -- Thread to sync information gathered to the UI
-        if not profilingThread then
-            profilingThread = ForkThread(SyncThread)
-        end
-
-        -- Add a function to track
-        sethook(FunctionHook, "c") -- only track on function calls
-    else
-        isProfiling = false
-        if profilingThread then
-            profilingThread = KillThread(profilingThread)
-        end
-
-        -- Inform us in case of abuse
-        SPEW("Profiler has been toggled off by army: " .. tostring(GetFocusArmy()))
-
-        sethook(nil) -- remove tracking
-    end
-end
 
 ---@param event any
 function FunctionHook(event)
@@ -115,24 +83,36 @@ function SyncThread()
     end
 end
 
----@param army Army
-function FindBenchmarks()
-    local loader = BenchmarkModuleLoader("/lua/benchmarks")
-
-    -- add benchmarks from base game
-    loader:FindBenchmarkModules()
-
-    -- add benchmarks from mods
-    for _, mod in __active_mods do
-        loader:FindBenchmarkModules(mod.location)
+--- Toggles the profiler on / off
+---@param forceEnable? boolean
+function ToggleProfiler(forceEnable)
+    if forceEnable and isProfiling then -- let the profiler be on if we are trying to force it on
+        return
     end
 
-    loader:SortModules()
+    if not isProfiling then
+        -- Inform us in case of abuse
+        SPEW("Profiler has been toggled on by army: " .. tostring(GetFocusArmy()))
+        isProfiling = true
 
-    -- sync it over
-    Sync.BenchmarkModules = loader.modulesUser
-    benchmarkModules = loader.modulesSim
-    benchmarkBaselines = loader.loopBaseline
+        -- Thread to sync information gathered to the UI
+        if not profilingThread then
+            profilingThread = ForkThread(SyncThread)
+        end
+
+        -- Add a function to track
+        sethook(FunctionHook, "c") -- only track on function calls
+    else
+        isProfiling = false
+        if profilingThread then
+            profilingThread = KillThread(profilingThread)
+        end
+
+        -- Inform us in case of abuse
+        SPEW("Profiler has been toggled off by army: " .. tostring(GetFocusArmy()))
+
+        sethook() -- remove tracking
+    end
 end
 
 --- Sends benchmark info back to the UI
@@ -142,20 +122,6 @@ function LoadBenchmark(moduleIndex, benchmarkIndex)
     local info = benchmarkModules[moduleIndex].benchmarks[benchmarkIndex].info
     if info then
         Sync.BenchmarkInfo = info
-    end
-end
-
---- Starts the benchmark running thread
----@param moduleIndex number
----@param benchmarkIndex number
----@param parameters any[]
-function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
-    if not benchmarkThread then
-        local moduleData = benchmarkModules[moduleIndex]
-        LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
-        benchmarkThread = ForkThread(RunBenchmarkThread, moduleIndex, benchmarkIndex, parameters)
-    else
-        SPEW("Already running benchmark")
     end
 end
 
@@ -189,7 +155,7 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     -- baseline loop adjustment
     local baselineLoop = benchmarkBaselines[parameterCount]
-    if baselineLoop == test or parameters.rawtime then -- don't test ourself!
+    if baselineLoop == test then -- don't test ourself!
         baselineLoop = nil
     end
 
@@ -280,6 +246,20 @@ function RunBenchmarkThread(moduleIndex, benchmarkIndex, parameters)
 
     benchmarkThread = false
     SPEW("Done with benchmark")
+end
+
+--- Starts the benchmark running thread
+---@param moduleIndex number
+---@param benchmarkIndex number
+---@param parameters any[]
+function RunBenchmark(moduleIndex, benchmarkIndex, parameters)
+    if not benchmarkThread then
+        local moduleData = benchmarkModules[moduleIndex]
+        LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
+        benchmarkThread = ForkThread(RunBenchmarkThread, moduleIndex, benchmarkIndex, parameters)
+    else
+        SPEW("Already running benchmark")
+    end
 end
 
 ---@class UserBenchmarkModule
@@ -421,13 +401,7 @@ BenchmarkModuleLoader = Class() {
 
         -- can't serialize functions
         info.info.func = nil
-        for k, v in info.upvalues do
-            if type(v) == "function" then
-                info.upvalues[k] = "<func>"
-            elseif type(v) == "cfunction" then
-                info.upvalues[k] = "<cfunc>"
-            end
-        end
+        info.upvalues = SerializableDeepCopy(info.upvalues)
 
         return {
             name = funName,
@@ -441,9 +415,9 @@ BenchmarkModuleLoader = Class() {
         }
     end,
 
-    ---@overload fun(self: BenchmarkModuleLoader, module: Module, metadata: BenchmarkModuleMetadata, error: string)
-    ---@param self BenchmarkModuleLoader
-    ---@param module Module
+    ---@overload fun(self: BenchmarkModuleLoader?, module: Module?, metadata: BenchmarkModuleMetadata, error: string)
+    ---@param self? BenchmarkModuleLoader # unused
+    ---@param module? Module # unused
     ---@param metadata BenchmarkModuleMetadata
     ---@param benchmarksUser table
     ---@param benchmarksSim table
@@ -667,3 +641,22 @@ BenchmarkModuleLoader = Class() {
         table.sort(self.modulesSim, self.moduleSorter)
     end,
 }
+
+function FindBenchmarks()
+    local loader = BenchmarkModuleLoader("/lua/benchmarks")
+
+    -- add benchmarks from base game
+    loader:FindBenchmarkModules()
+
+    -- add benchmarks from mods
+    for _, mod in __active_mods do
+        loader:FindBenchmarkModules(mod.location)
+    end
+
+    loader:SortModules()
+
+    -- sync it over
+    Sync.BenchmarkModules = loader.modulesUser
+    benchmarkModules = loader.modulesSim
+    benchmarkBaselines = loader.loopBaseline
+end

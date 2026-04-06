@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local Shape = import("/lua/ui/game/shapes/Shape.lua").Shape
+local Shape = import("/lua/ui/game/shapes/shape.lua").Shape
 
 ---@class UICircleShape : UIShape
 ---@field Position Vector

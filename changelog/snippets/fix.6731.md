@@ -1,1 +1,0 @@
-- (#6731) Fix blueprint loading crash when a unit has `nil` for its death animation. This fixes DDDX's "Survival Mayhem&BO balance" mod crashing the game on start.

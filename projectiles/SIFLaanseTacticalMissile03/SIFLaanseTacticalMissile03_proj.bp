@@ -22,7 +22,7 @@ ProjectileBlueprint{
         CameraFollowsProjectile = true,
         ImpactEffects = { Type = "Medium01" },
         MeshBlueprint = "/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp",
-        StrategicIconSize = 2,
+        StrategicIconSize = 3,
         UniformScale = 0.05,
     },
     General = {

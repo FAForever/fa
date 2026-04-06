@@ -1,4 +1,4 @@
-local SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
+local SCCollisionBeam = import("/lua/sim/collisionbeams/sccollisionbeam.lua").SCCollisionBeam
 
 LightningSmallCollisionBeam = Class(SCCollisionBeam) {
     FxBeamStartPoint = {

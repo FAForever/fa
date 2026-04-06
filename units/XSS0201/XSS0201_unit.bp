@@ -3,6 +3,10 @@ UnitBlueprint{
     AI = {
         AttackAngle = 70,
         GuardReturnRadius = 30,
+        TargetBones = {
+            "XSS0201",
+            "Center_Target",
+        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'XSS',            Cue = 'XSS0201_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -320,7 +324,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 95,
+            Damage = 126,
             DamageType = "Normal",
             DisplayName = "Ana-it Torpedo Launcher",
             FireTargetLayerCapsTable = {
@@ -331,8 +335,8 @@ UnitBlueprint{
             FiringTolerance = 2,
             Label = "Torpedo1",
             MaxRadius = 45,
-            MuzzleSalvoDelay = 0.9,
-            MuzzleSalvoSize = 4,
+            MuzzleSalvoDelay = 0.8,
+            MuzzleSalvoSize = 3,
             MuzzleVelocity = 5,
             ProjectileId = "/projectiles/SANAnaitTorpedo01/SANAnaitTorpedo01_proj.bp",
             ProjectileLifetime = 7,

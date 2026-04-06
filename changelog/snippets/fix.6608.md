@@ -1,1 +1,0 @@
-- (#6608) Fix text in fixed width tooltips (such as some of the tooltips in the mod manager) overflowing when UI scaling is used.

@@ -94,13 +94,13 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
-        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
+        self.GridPresence = import("/lua/ai/gridpresence.lua").Setup(self)
     end,
 
     ---@param self EasyAIBrain
@@ -952,17 +952,27 @@ AIBrain = Class(StandardBrain) {
         self.PBM.NeedSort[platoonType] = false
     end,
 
+    ---Sets how often will the thread with building and forming platoons run.
+    ---
+    ---**Do NOT change this value unless you really know why you're changing it.**
+    ---
+    ---Set this value lower (2) to to nudge the AI into starting building the base in intro cinematics,
+    ---but don't forget to reset it later to not cause lags running too often on large bases.
     ---@param self CampaignAIBrain
-    ---@param interval number
-    PBMSetCheckInterval = function(self, interval)
-        self.PBM.BuildCheckInterval = interval
+    ---@param seconds number Defaults is 10 seconds.
+    PBMSetCheckInterval = function(self, seconds)
+        self.PBM.BuildCheckInterval = seconds
     end,
 
+    ---A random platoon will be picked from all platoons that have the same (highest) priority and are passing build conditions.
+    ---@see CampaignAIBrain:PBMDisableRandomSamePriority()
     ---@param self CampaignAIBrain
     PBMEnableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = true
     end,
 
+    ---First highest priority platoon with passing build conditions will be built.
+    ---@see CampaignAIBrain:PBMEnableRandomSamePriority()
     ---@param self CampaignAIBrain
     PBMDisableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = false

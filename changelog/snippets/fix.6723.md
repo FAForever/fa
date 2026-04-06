@@ -1,1 +1,0 @@
-- (#6723) Fix Seraphim T1 transport attempting to load more T3 units than it has slots with the "load into transports" command.

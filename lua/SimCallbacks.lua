@@ -43,6 +43,8 @@ local IssueAggressiveMove = IssueAggressiveMove
 local IssueGuard = IssueGuard
 local IssueFerry = IssueFerry
 
+local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
+
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
 
@@ -64,7 +66,18 @@ function DoCallback(name, data, units)
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
     if (timeTaken > 0.005) then
-        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
+        local commandSourceNickname
+        local commandSourceArmy = GetCurrentCommandSourceArmy()
+        if commandSourceArmy then
+            commandSourceNickname = tostring(ArmyBrains[commandSourceArmy].Nickname)
+        else
+            commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+        end
+        SPEW(string.format("Time to process \"%s\" from %s: %f"
+            , name
+            , commandSourceNickname
+            , timeTaken
+        ))
     end
 end
 
@@ -306,8 +319,10 @@ end
 -------------------------------------------------------------------------------
 --#region General orders
 
+--- Instant self destruct that only works on the selection.
+--- Alternative, simplified implementation that is unused.
 ---@param data { }
----@param selection Unit[]
+---@param selection? Unit[]
 Callbacks.SelfDestruct = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
@@ -320,7 +335,7 @@ Callbacks.SelfDestruct = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+    import("/lua/sim/commands/self-destruct.lua").SelfDestruct(selection, true)
 end
 
 --#endregion
@@ -638,7 +653,7 @@ do
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -648,7 +663,7 @@ do
         -- only apply this to engineers
         local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
         if table.empty(engineers) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -661,7 +676,7 @@ do
         local commandSourceGuard = CommandSourceGuards[commandSource]
 
         if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -684,7 +699,7 @@ do
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -703,7 +718,7 @@ do
         end
 
         if table.empty(unitsWithShields) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -716,7 +731,7 @@ do
         local commandSourceGuard = CommandSourceGuards[commandSource]
 
         if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -738,7 +753,7 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
+        do -- feature: area commands
             return
         end
 
@@ -827,6 +842,43 @@ end
 --#endregion
 
 
+--#region UI related functionality
+
+do
+    local OriginalFocusArmy = GetFocusArmy()
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    local SyncPainting = function(data)
+        -- used to determine the color of the painting
+        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSourceArmy()).Nickname
+
+        Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
+        table.insert(Sync.SharePaintingBrushStroke, data)
+    end
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    Callbacks.SharePaintingBrushStroke = function(data)
+        local focusArmy = GetFocusArmy()
+        local currentCommandSourceArmy = GetCurrentCommandSourceArmy()
+
+        -- spectators are able to see all paintings. We take into account
+        -- the original focus army because spectators can change focus army
+        if OriginalFocusArmy == -1 or focusArmy == -1 then
+            SyncPainting(data)
+            return
+        end
+
+        -- allies are able to see each others paintings
+        if IsAlly(focusArmy, currentCommandSourceArmy) then
+            SyncPainting(data)
+            return
+        end
+    end
+end
+
+--#endregion
+
+
 -------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
@@ -843,7 +895,6 @@ local function PassesAIAntiCheatCheck()
     return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
 
-
 local SpawnedMeshes = {}
 
 local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
@@ -851,7 +902,7 @@ local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
     local bpD = bp.Display
     if __blueprints[bpD.MeshBlueprint] then
         SPEW("Spawning mesh of " .. id)
-        local entity = import('/lua/sim/Entity.lua').Entity()
+        local entity = import('/lua/sim/entity.lua').Entity()
         if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
             y = y - bp.CollisionOffsetY
         end
@@ -899,7 +950,7 @@ local function ShowRaisedPlatforms(self)
     for i = 1, (table.getn(plats) / 12) do
         entities[i] = {}
         for b = 1, 4 do
-            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
+            entities[i][b] = import('/lua/sim/entity.lua').Entity { Owner = self }
             self.Trash:Add(entities[i][b])
             entities[i][b]:SetPosition(Vector(
                 pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
@@ -1378,8 +1429,14 @@ end
 ---@param data CallbackModeratorEventData
 Callbacks.ModeratorEvent = function(data)
     -- show up in the game logs
-    local brain = GetArmyBrain(GetCurrentCommandSource())
-    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
+    local commandSourceNickname
+    local commandSourceArmy = GetCurrentCommandSourceArmy()
+    if commandSourceArmy then
+        commandSourceNickname = tostring(GetArmyBrain(commandSourceArmy).Nickname)
+    else
+        commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+    end
+    SPEW(string.format("Moderator event for %s: %s", commandSourceNickname, tostring(data.Message)))
 end
 
 --#endregion

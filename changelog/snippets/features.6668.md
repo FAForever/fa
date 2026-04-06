@@ -1,1 +1,0 @@
-- (#6668) Add dependency tracking for blueprints, so that reloading a blueprint file reloads all files that edited that blueprint. This fixes a variety of issues with reloading merge blueprints.

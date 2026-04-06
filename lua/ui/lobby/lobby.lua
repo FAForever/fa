@@ -49,7 +49,14 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
-
+-- TODO: remove these console commands before release
+-- The following is enabled on non-production branches to assist with debugging for ICE/WebRTC issues
+local versionNumber, versionType, versionCommit = import("/lua/version.lua").GetVersionData()
+if versionType != "FAF" then
+    WARN("Enabling network debug console commands")
+    ConExecute("net_LogPackets")
+    ConExecute("net_DebugLevel 10")
+end
 
 function GetAITypes()
     AIKeys = {}
@@ -183,6 +190,7 @@ local function parseCommandlineArguments()
         playerMean = tonumber(GetCommandLineArgOrDefault("/mean", 1500)),
         playerClan = tostring(GetCommandLineArgOrDefault("/clan", "")),
         playerDeviation = tonumber(GetCommandLineArgOrDefault("/deviation", 500)),
+        debugLobby = HasCommandLineArg("/debugLobby"), -- Used by LaunchFAInstances script to set players as ready by default
     }
 end
 local argv = parseCommandlineArguments()
@@ -344,12 +352,12 @@ local function GetSlotMenuTables(stateKey, hostKey, slotNum)
     local tooltips = {}
 
     if not GetSlotMenuData()[stateKey] then
-        WARN("Invalid slot menu state selected: " .. stateKey)
+        WARN("Invalid slot menu state selected: " .. tostring(stateKey))
         return nil
     end
 
     if not GetSlotMenuData()[stateKey][hostKey] then
-        WARN("Invalid slot menu host key selected: " .. hostKey)
+        WARN("Invalid slot menu host key selected: " .. tostring(hostKey))
         return nil
     end
 
@@ -444,6 +452,7 @@ function GetLocalPlayerData()
             GameType = gametype,
             Commit = commit,
 
+            Ready = argv.debugLobby,
         }
 )
 end
@@ -2261,6 +2270,9 @@ local function TryLaunch(skipNoObserversCheck)
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
+        if gameInfo.GameOptions["CheatsEnabled"] == "true" and singlePlayer then
+            gameInfo.GameOptions["GameSpeed"] = "adjustable"
+        end
 
         HostUtils.SendArmySettingsToServer()
 
@@ -2393,7 +2405,7 @@ local function UpdateGame()
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed
                     else
-                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN("Unable to load icons from mod '" .. tostring(mod.name) .. "' with uid '" .. tostring(uid) .. "'. Please inform the author: " .. tostring(mod.author))
                         WARN(msg)
                     end
                 end
@@ -4428,7 +4440,7 @@ function CreateUI(maxPlayers)
         end
     end)
     if false then
-        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
+        import("/lua/ui/events/snowflake.lua"). CreateSnowFlakes(GUI)
     end
 end
 
@@ -5640,13 +5652,19 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         CreateUI(LobbyComm.maxPlayerSlots)
     end
 
+    --- Called by the engine when we receive data from other players. There is no checking to see if the data is legitimate, these need to be done in Lua.
+    ---
+    --- Data can be sent via `BroadcastData` and/or `SendData`.
+    ---@param self UILobbyCommunication
+    ---@param data UILobbyReceivedMessage
     lobbyComm.DataReceived = function(self, data)
+        -- make it more convenient to debug malicious traffic
+        SPEW(string.format("Received data of type %s from %s (%s)", tostring(data.Type), tostring(data.SenderID), tostring(data.SenderName)))
 
-        
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
-            WARN("Unknown message type: " .. data.Type)
+            WARN("Unknown message type: " .. tostring(data.Type))
             return
         end
 
@@ -5656,7 +5674,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         elseif MessageHandlers[data.Type].Reject then
             MessageHandlers[data.Type].Reject(data)
         else
-            WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
+            WARN("Rejected message of type " .. tostring(data.Type) .. " from " .. tostring(FindNameForID(data.SenderID)))
         end
     end
 
@@ -6588,8 +6606,8 @@ function ShowLobbyOptionsDialog()
             local sliderValue = math.floor(newValue)
             slider_SnowFlakes_Count_TEXT:SetText(LOC("<LOC lobui_0447>Snowflakes count").. sliderValue)
             Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
-            import("/lua/ui/events/SnowFlake.lua").Clear()
-            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+            import("/lua/ui/events/snowflake.lua").Clear()
+            import("/lua/ui/events/snowflake.lua").CreateSnowFlakes(GUI, sliderValue)
         end
     end
 

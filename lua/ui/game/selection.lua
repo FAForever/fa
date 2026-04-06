@@ -57,7 +57,7 @@ function Hidden(callback)
 end
 
 --- Registers a callback that is called when a selection is set (flag set to false) and when it is used (flag set to true)
----@param func function<UserUnit[], boolean>
+---@param func fun(units: UserUnit[], applied: boolean)
 function RegisterSelectionSetCallback(func)
     -- see if this function is already in here
     for i, v in selectionSetCallbacks do
@@ -70,7 +70,7 @@ function RegisterSelectionSetCallback(func)
 end
 
 --- Removes a callback that is called when a selection is set
----@param func function<UserUnit[], boolean>
+---@param func fun(units: UserUnit[], applied: boolean)
 function WithdrawSelectionSetCallback(func)
     for i, v in selectionSetCallbacks do
         if v == func then

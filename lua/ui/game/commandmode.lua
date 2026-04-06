@@ -249,11 +249,16 @@ function RestoreCommandMode(ignorePreviousCommands)
     end
 end
 
+---@class CommandModeTable
+---@field [1] CommandMode
+---@field [2] CommandModeData
+
 -- allocate the table once for performance
+---@type CommandModeTable
 local commandModeTable = {}
 
 --- Retrieves the current command mode information.
----@return { [1]: CommandModeDataOrder, [2]: CommandModeData }
+---@return CommandModeTable
 function GetCommandMode()
     commandModeTable[1] = commandMode
     commandModeTable[2] = modeData
@@ -378,7 +383,7 @@ local function UpgradeUnit(unit)
     print("Upgrade unit")
 
     -- wait one tick for the upgrade to start
-    WaitTicks(1)
+    WaitTicks(5)
 
     if IsDestroyed(unit) then
         return

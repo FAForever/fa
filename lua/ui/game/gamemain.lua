@@ -168,7 +168,6 @@ function CreateUI(isReplay)
     -- casting tools
 
     import("/lua/ui/game/casting/mouse.lua")
-    import("/lua/ui/game/casting/painting.lua")
 
     -- overwrite some globals for performance / safety
 
@@ -191,16 +190,6 @@ function CreateUI(isReplay)
     ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
     ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
-
-    -- always try and render shadows
-    ConExecute("ren_ShadowLOD 20000")
-
-    -- enable experimental graphics
-    if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
-        Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
-    then
-        ForkThread(ExperimentalGraphicsSettingsThread)
-    end
 
     local focusArmy = GetFocusArmy()
 
@@ -354,18 +343,6 @@ function CreateUI(isReplay)
     import("/lua/keymap/hotkeylabels.lua").init()
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
-end
-
-function ExperimentalGraphicsSettingsThread()
-    WaitSeconds(1.0)
-
-    if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-        ConExecute("cam_SetLOD WorldCamera 0.70")
-    end
-
-    if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-        ConExecute("ren_ShadowSize 2048")
-    end
 end
 
 --- Find out the max Hz capability of the adapter so we don't render unnecessary frames, reducing the load on the render thread.
@@ -628,6 +605,7 @@ local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 
 ---This function is called whenever the set of currently selected units changes
+--- **Note:** When called by the engine, `GetSelectedUnits` always results in `nil` within this function.
 ---@param oldSelection UserUnit[] What the selection was before
 ---@param newSelection UserUnit[] What the selection is now
 ---@param added UserUnit[]        Which units were added to the old selection
@@ -951,7 +929,6 @@ local NISControls = {
 local rangePrefs = {
     range_RenderHighlighted = false,
     range_RenderSelected = false,
-    range_RenderHighlighted = false
 }
 
 local preNISSettings = {}

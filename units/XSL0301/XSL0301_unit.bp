@@ -528,8 +528,8 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 15,
-        TeleportFlatEnergyCost = 75000,
+        TeleportDelay = 20,
+        TeleportFlatEnergyCost = 100000,
     },
     Intel = {
         FreeIntel = true,

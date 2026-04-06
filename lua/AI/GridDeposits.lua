@@ -277,7 +277,7 @@ Setup = function()
     if not GridDepositsInstance then
         GridDepositsInstance = GridDeposits() --[[@as AIGridDeposits]]
 
-        local markerUtilities = import("/lua/sim/MarkerUtilities.lua")
+        local markerUtilities = import("/lua/sim/markerutilities.lua")
 
         local extractors, extractorCount = markerUtilities.GetMarkersByType('Mass')
         for k = 1, extractorCount do

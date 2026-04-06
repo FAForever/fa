@@ -7,12 +7,12 @@
 ---@field targetId? EntityId
 ---@field blueprintId? UnitId
 ---@field commandType number
+---@field commandId integer
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
 ---|  0  # unknown
 ---|  1  # not submerged
-
 
 ---@alias FireState
 ---| 0 # Return fire
@@ -361,7 +361,7 @@ end
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
----@return string[] | false
+---@return (string | number | integer)[] | false
 function GetCommandLineArg(option, maxArgs)
 end
 
@@ -493,9 +493,9 @@ end
 function GetNumRootFrames()
 end
 
----
+--- Retrieves the value of a game option from the preference file. The value is retrieved from the 'option' table in the preference file.
 ---@param key string
----@return string[]
+---@return any
 function GetOptions(key)
 end
 
@@ -818,7 +818,7 @@ end
 function IsKeyDown(keyCode)
 end
 
----Returns whether current focus army is an observer.
+---@param playerId? string  # if not provided, will return whether the local player is an observer
 ---@return boolean
 function IsObserver()
 end
@@ -1054,7 +1054,7 @@ end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
 --- Unlike other engine functions that return tables, this function returns the same table each time it is called.
----@return UISessionSenarioInfo
+---@return UISessionScenarioInfo
 function SessionGetScenarioInfo()
 end
 
@@ -1096,10 +1096,10 @@ end
 function SessionResume()
 end
 
---- Sends a message to one, more or all other connected clients. This message is sent separately from the simulation. But it is sent in order.
+--- Sends a message to one, more or all other connected clients. This message is sent separately from the simulation. The message is not recorded in the replay. The message is transmit and received in order.
 ---@overload fun(message: table | number | string)
 ---@param client? number | number[]         # client or clients
----@param message table | number | string   # 
+---@param message table | number | string   # Can not be larger than 1024 bytes
 function SessionSendChatMessage(client, message)
 end
 
@@ -1327,6 +1327,14 @@ function UI_DrawLine(position1, position2, color, thickness)
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/111
   -- - https://github.com/FAForever/FA-Binary-Patches/pull/112
 
+end
+
+--- Draws a line in world. Must be called within `WorldView:OnRenderWorld`
+---@param position1 Vector
+---@param position2 Vector
+---@param color Color
+---@param thickness? number
+function UI_DrawLine(position1, position2, color, thickness)
 end
 
 ---

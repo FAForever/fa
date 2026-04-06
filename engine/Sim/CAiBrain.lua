@@ -175,7 +175,7 @@ end
 ---@return number
 
 --- Returns the army index
----@return number
+---@return integer
 function CAiBrain:GetArmyIndex()
 end
 

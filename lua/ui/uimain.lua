@@ -189,8 +189,18 @@ function NoteGameOver()
     end
 end
 
+---@alias ClickType "ButtonPress" | "ButtonDClick"
+
+---@class MouseButtonEvent
+---@field Type ClickType
+---@field x number
+---@field y number
+
+---@type fun(event: MouseButtonEvent)[]
 local mouseClickFuncs = {}
 
+--- Called by the engine when the left, right, or middle mouse buttons are pressed.
+---@param event MouseButtonEvent
 function OnMouseButtonPress(event)
     if mouseClickFuncs and table.getsize(mouseClickFuncs) > 0 then
         for _, func in mouseClickFuncs do
@@ -199,10 +209,12 @@ function OnMouseButtonPress(event)
     end
 end
 
+---@param func fun(event: MouseButtonEvent)
 function AddOnMouseClickedFunc(func)
     table.insert(mouseClickFuncs, func)
 end
 
+---@param func fun(event: MouseButtonEvent)
 function RemoveOnMouseClickedFunc(func)
     local i = 1
     local found = false

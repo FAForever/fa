@@ -27,7 +27,7 @@ local SingleCompositeEmitterProjectileOnKilled = SingleCompositeEmitterProjectil
 local SingleCompositeEmitterProjectileOnImpact = SingleCompositeEmitterProjectile.OnImpact
 local SingleCompositeEmitterProjectileOnExitwater = SingleCompositeEmitterProjectile.OnExitWater
 
-local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
+local DebrisComponent = import('/lua/sim/projectiles/components/debriscomponent.lua').DebrisComponent
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
 --- AEON SERPENTINE MISSILE PROJECTILES
@@ -67,7 +67,7 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
     OnCreate = function(self)
         SingleCompositeEmitterProjectileOnCreate(self)
         local blueprintPhysics = self.Blueprint.Physics
-        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        local radius = 0.11 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,

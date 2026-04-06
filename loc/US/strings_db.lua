@@ -1509,8 +1509,8 @@ Unit_Description_0072="Stationary Heavy Artillery with excellent range and damag
 Unit_Description_0073="Strategic Missile Launcher. Automatically constructs expensive and extremely destructive strategic missiles. Toggleable missile construction."
 Unit_Description_0075="Strategic Assassination Artillery. Can hit any target on the map regardless of motion, range, or protection. Rate of fire increased when adjacent to energy production buildings."
 Unit_Description_0313="Heavy surface defense turret."
-Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite."
-Unit_Description_0316="Satellite is untargetable by any weapon, but can attack enemy units and structures with very high precision. It can be destroyed only if its control center is destroyed."
+Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite. Automatically starts rebuilding the Satellite if it is destroyed."
+Unit_Description_0316="Satellite is untargetable by any weapon, and can attack enemy units and structures with very high precision. Is destroyed if its control center is destroyed. Auto-rebuilds at the control center if destroyed by other means."
 
 -- UEF -- Defensive Structures
 Unit_Description_0060="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
@@ -1596,7 +1596,7 @@ Unit_Description_0111="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0112="Doubles the main cannon's rate of fire, and increases its range and that of Overcharge. Increases the range of the Microwave Laser if present.\n\n+100% Main cannon rate of fire\n+8 Main cannon range\n+8 Microwave Laser range"
 Unit_Description_0113="Enhances the ACU with a Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 225\nNanite Torpedo range = 60\n+34 Sonar Radius"
-Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
+Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour as well as providing an HP boost.\n\n+1500 Health\n+50 Regen"
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
@@ -1752,7 +1752,7 @@ Unit_Description_0305="The Armored Command Unit (ACU) is a combination of barrac
 Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within the ACU's main cannon range. Multiple Quantum Stasis Fields interfere with each other, having a limited effect.\n\n+3000 Health"
 Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge.\n\n+8 Main cannon range"
-Unit_Description_0159="Grants the ACU a long range omni Sensor and increased optical range.\n\n+54 Vision Radius\n+54 Omni Radius"
+Unit_Description_0159="Grants the ACU a medium range omni Sensor and increased optical range.\n\n+54 Vision Radius\n+12 Omni Radius"
 Unit_Description_0160="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1000 Health\n+10 Regen"
 Unit_Description_0161="Doubles the main cannon's rate of fire.\n\n+100% Rate of fire"
 Unit_Description_0162="Increases ACU's resource generation to 19 mass per second and 1720 energy per second."
@@ -4533,6 +4533,8 @@ lobui_0126="Annihilation"
 lobui_0127="Game ends when all units are destroyed"
 lobui_0128="Sandbox"
 lobui_0129="Game never ends"
+lobui_0152="Decapitation"
+lobui_0153="Game ends when all allied commanders are destroyed"
 lobui_0164="Advanced"
 lobui_0166="Are you sure?"
 lobui_0167="Kick Player"
@@ -4711,6 +4713,8 @@ lobui_CAUnion="Multiple armies, union control"
 lobui_CAUDesc="Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands."
 lobui_CACommon="Single army, union control"
 lobui_CACDesc="Each team is one army. All units and resources are shared, all team members can issue commands."
+lobui_CAUponDisconnectTitle="Union control upon disconnect"
+lobui_CAUponDisconnectDescription="Initially each player has their own army and their own resources. When a player disconnects the army is not considered defeated and the share condition does not trigger. Instead, allied players can switch focus to the disconnected army to issue commands."
 
 lobui_666="Game version missmatch detected with %s. \r\n - host: %s (@%s)\r\n - %s: %s (@%s). \r\n\r\nTo prevent desyncs, %s is ejected automatically. It is possible that a new game version is released. If this keeps happening then it is better to rehost."
 
@@ -6748,10 +6752,17 @@ urs0304_name="Plan B"
 urs0305_desc="Sonar Platform"
 urs0305_help="Sonar Platform"
 urs0305_name="Flood XR"
+
 usersync_0001="%s wins!"
 usersync_0002="%s has been defeated!"
 usersync_0003="%s receives a draw."
 usersync_0004="Game Over."
+usersync_0005="Disconnect Temporary Share"
+usersync_0006="Disconnect Share"
+usersync_0007="%s\'s units and ACU transferred to you until ACU dies/recalls"
+usersync_0008="%s\'s units and ACU transferred to you until ACU dies"
+usersync_0009="\nShare Condition after: %s"
+
 uvd_0000="Build Cost (Rate)"
 uvd_0002="Yield"
 uvd_0003="Description"
@@ -7735,6 +7746,7 @@ lobui_0781="Teams will be balanced with up to 5%% tolerance of best setup to mak
 lobui_0782="Optimal balance (Mirrored)"
 lobui_0783="Teams will be optimally balanced, mirrored start locations"
 
+-- Share Options
 lobui_0790="Manual Unit Sharing"
 lobui_0791="Are players allowed to manually give units?"
 lobui_0792="Manual unit sharing are allowed"
@@ -7743,6 +7755,40 @@ lobui_0794="No manual sharing of builder/factory"
 lobui_0795="No manual sharing of units"
 lobui_0796="Partial Share"
 lobui_0797="Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy."
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
+
+lobui_0808="Disconnection delay"
+lobui_0809="Sets the disconnect delay when a player has trouble connecting."
+lobui_0810="Tournament"
+lobui_0811="The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically."
+lobui_0812="Quick"
+lobui_0813="The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically."
+lobui_0814="Regular"
+lobui_0815="The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically."
+
+-- On-disconnect share options
+lobui_dc_share_01="DC Share Conditions"
+lobui_dc_share_02="Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU has not been damaged in the last 2 minutes."
+lobui_dc_share_03="Same as Share Condition"
+lobui_dc_share_04="Treat disconnecting players the same as defeated players."
+
+lobui_dc_share_05="DC ACU Share Conditions"
+lobui_dc_share_06="Set what happens to a player's ACU when they disconnect. In Assassination, the DC share condition is *not* applied if the ACU was damaged 2 minutes ago or dies within 2 minutes."
+lobui_dc_share_07="Explode"
+lobui_dc_share_08="ACUs explode when their player disconnects."
+lobui_dc_share_09="Recall"
+lobui_dc_share_10="ACUs not damaged in the last 2 minutes are recalled when their player disconnects."
+lobui_dc_share_11="Delayed Recall"
+lobui_dc_share_12="Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls."
+lobui_dc_share_13="Permanent"
+lobui_dc_share_14="Disconnected ACUs are permanently shared to allies."
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
@@ -8194,16 +8240,9 @@ aireplace_0004="A disconnected player will cause the destruction of their units 
 chat_send_type_title="Default recipient: allies"
 chat_send_type_description="When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed."
 
--- unranked lobby option
-lobui_0802="Unrate"
-lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
-lobui_0804="No"
-lobui_0805="This game will be rated if all the criteria for a rated game are met."
-lobui_0806="Yes"
-lobui_0807="This game will not be rated."
-
 replay_id="Replay id"
 map_version="Map version"
+fullshare_announcement="%s\'s units have been transferred to you"
 
 ChangelogDescriptionIdentifier="description"
 
@@ -8251,3 +8290,10 @@ profiler_0039="Name"
 profiler_0040="Count"
 profiler_0041="Clear stats"
 profiler_0042="Clear all samples for this benchmark"
+
+lobui_resource_sharing_label="Overflow"
+lobui_resource_sharing_help="Set whether distribution of excess resources to allies is initially enabled or disabled. Players can toggle it through the diplomacy menu when teams are unlocked."
+lobui_resource_sharing_enabled_text="Enabled"
+lobui_resource_sharing_enabled_help="Excess resources are shared with allies by default."
+lobui_resource_sharing_disabled_text="Disabled"
+lobui_resource_sharing_disabled_help="Excess resources are spilled by default."

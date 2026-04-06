@@ -1,16 +1,28 @@
 ---@meta
 
+---@alias TrailBlendMode
+---| 0 # Alpha blend
+---| 1 # Modulate Inverse
+---| 2 # Modulate2X Inverse
+---| 3 # Add
+---| 4 # Premodulated Alpha
+
 ---@class TrailBlueprint : EmitterBlueprint
----@field Lifetime number            Lifetime of emitter
----@field TrailLength number         Trail Length
----@field Size number
----@field Startsize number
----@field SortOrder number           Sort Order
----@field BlendMode number           unlike emitters, mode is uppercase
----@field TextureRepeatRate number   Texture repeat rate in units
----@field LODCutoff number           cutoff distance
----@field EmitIfVisible boolean      Emit particles ONLY if this is emitter is visible
----@field CatchupEmit boolean        catchup particles for the ticks that we weren't visible
----@field RepeatTexture string       name of texture that repeats
----@field RampTexture string
----@field RampTextureName string
+---@field Lifetime number           # Lifetime of the trail emitter. If set to -1 the emitter will create a trail indefinitely.
+---@field TrailLength number        # Length of the trail in ogrids. A single ogrid is equivalent to the size of a wall.
+---@field Size number               # The 'width' of the trail.
+---@field StartSize number          # Behavior is undocumented.
+---@field SortOrder number          # Sort order of rendering the trail in comparison to other trails and effects. This allows you to control the order that renders the effects. As an example, if you want a laser (a trail) to always render on top of condense (a regular emitter) that originates from the laser.
+---@field BlendMode TrailBlendMode  # Blending mode determines how the trail is blended with the background.
+---@field TextureRepeatRate number  # How often the texture is repeated. The lower the value, the less the texture is repeated.
+---@field LODCutoff number          # The distance from the camera at which the trail will stop being rendered.
+---@field EmitIfVisible boolean     # If true, only emits when visible to the user.
+---@field CatchupEmit boolean       # If true, once visible to the user, it catches up missing parts of the trail. This appears to malfunction: the trail always catches up even when set to false.
+---@field RepeatTexture string      # The texture to use for the trail.
+---@field RampTexture string        # The texture to use as a ramp to influence transparency and color. The position in the trail with respect to its length is mapped to the ramp texture for sampling. The left side of the ramp texture is when the particle is just created. The right side of the ramp texture is when the particle is at the tail of the trail.
+---@field RampTextureName string    # Behavior is undocumented.
+---@field UShift number             # Shifts the U component of the UV coordinates when looking up the texture.
+---@field VShift number             # Shifts the V component of the UV coordinates when looking up the texture.
+---@field LowFidelity boolean       # Defaults to true. If true, the emitter will show up in low fidelity mode.
+---@field MedFidelity boolean       # Defaults to true. If true, the emitter will show up in medium fidelity mode.
+---@field HighFidelity boolean      # Defaults to true. If true, the emitter will show up in high fidelity mode.

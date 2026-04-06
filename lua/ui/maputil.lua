@@ -123,7 +123,7 @@
 ---@field hasBriefing boolean       # flag whether the _strings.lua file has briefing data in it
 
 --- The scenario information with additional fields, as defined once in a session
----@class UISessionSenarioInfo : UIScenarioInfoFile
+---@class UISessionScenarioInfo : UIScenarioInfoFile
 --- These are the actual `<key, value>` pairs that the lobby defines, not the option-factory type
 --- objects the lobby uses
 ---@field Options? GameOptions
@@ -325,7 +325,7 @@ function EnumerateSkirmishScenarios(nameFilter, sortFunc)
         end
     end
     
-    for id, mod in import("/lua/MODS.LUA").AllSelectableMods() do
+    for id, mod in import("/lua/mods.lua").AllSelectableMods() do
         scenFiles = DiskFindFiles(mod.location .. '/maps', nameFilter .. '_scenario.lua')
         for index, fileName in scenFiles do
             local scen = LoadScenario(fileName)

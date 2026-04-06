@@ -4,7 +4,7 @@
 --- A library dedicated to investigating the bytecode of functions.
 --- At a minimum, it can be used like
 ---
----   import("/lua/shared/DebugFunction.lua").PrintOut(<your fn>)
+---   import("/lua/shared/debugfunction.lua").PrintOut(<your fn>)
 ---
 --- The majority of the code is to pretty-up the output of the default
 --- `debug.listcode` function.
@@ -35,12 +35,13 @@ function CollapseDebugInfo(info)
 end
 
 
----@class RawFunctionDebugInfo : debuginfo
+---@class RawFunctionDebugInfo
 ---@field bytecode Bytecode
 ---@field constants any[]
 -- @field prototypes nil -- we don't have access to these!
 ---@field upvalueNames string[]
 ---@field upvalues any[]
+---@field info debuginfo
 
 ---@param f function | integer
 ---@return RawFunctionDebugInfo
