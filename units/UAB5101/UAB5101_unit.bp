@@ -38,21 +38,18 @@ UnitBlueprint{
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    MeshName = '/meshes/cube01_lod0.scm',
-                    AlbedoName = '/textures/grass.dds',
-                    NormalsName = '/textures/FlatNormal.dds',
-                    SpecularName = '/textures/cube01_specteam.dds',
-                    ShaderName = 'Unit',
-                    LODCutoff = 300,
-                },
-                {
-                    MeshName = '/meshes/cube01_lod0.scm',
                     LODCutoff = 100,
                     ShaderName = "Aeon",
                 },
+                {
+                    LODCutoff = 215,
+                    ShaderName = "Aeon",
+                    AlbedoName = "uab5101_lod1_albedo.dds",
+                    SpecularName = "uab5101_lod1_specteam.dds",
+                },
             },
         },
-        UniformScale = 1,
+        UniformScale = 0.122,
     },
     Economy = {
         BuildCostEnergy = 20,

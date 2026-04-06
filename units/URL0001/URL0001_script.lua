@@ -581,14 +581,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange or 22)
         end
     end,
-
-    -- Wide ACUs seasonal event
-    ---@param self UEL0001
-    AddVetLevel = function(self)
-        ACUUnit.AddVetLevel(self)
-        local temp = string.format('/meshes/cybran/Cybran%d_mesh', self.VetLevel)
-        self:SetMesh(temp, true)
-    end,
 }
 
 TypeClass = URL0001
