@@ -1,10 +1,25 @@
 ---@type number
-last_version = 3834
+last_version = 3835
 -- hasPrettyGithubRelease enables the button that links to the github release.
 -- hasPrettyPatchnotes enables the button that links to the patchnotes website. Hotfixes generally do not get an entry there.
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3835,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        hasPrettyPatchnotes = false,
+        description = {
+            "# Game version 3835 (7th of April 2026)",
+            "",
+            "A leftover change from April fools made the overcharge projectile invisible. This is now fixed.",
+            "",
+            "Kind regards,",
+            "",
+            "BlackYps",
+        }
+    },
     {
         version = 3834,
         name = "Hotfix",
