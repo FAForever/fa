@@ -18,6 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+# This workflow automates the generation, building, and deployment of the project's
+# documentation to GitHub Pages (https://faforever.github.io/fa/).
+#
+# The process includes:
+# - Generating current changelogs for FAF Develop and FAF Beta
+# - Adding links to pull request references in all changelogs
+# - Building the static site using Jekyll
+# - Uploading and deploying the final site to GitHub Pages
+
 name: Documentation - Build and deploy
 
 on:
@@ -91,13 +101,13 @@ jobs:
           cat generated/fafdevelop.md >> changelog/fafdevelop.md
           cat generated/fafbeta.md >> changelog/fafbeta.md
 
-      # Update the posts directory contents
+      # Add links to the files in the posts directory
       - name: Update changelog posts directory
         shell: bash
         run: |
           changelog-links.sh _posts FAForever fa github.com
 
-      # Update the changelog directory contents
+      # Add links to the files in the changelog directory
       - name: Update changelog directory
         shell: bash
         run: |
