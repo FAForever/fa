@@ -32,7 +32,7 @@ local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local ChangelogOverview = import("/lua/ui/lobby/changelog/generated/overview.lua")
 
 local PreferenceKeys = {
-    GameVersion = "ChangelogGameVersion",
+    SeenChangelog = "LobbyChangelog",
 }
 
 ---@class UIChangelogOverview
@@ -48,11 +48,6 @@ local PreferenceKeys = {
 ---@field Version string
 ---@field Name string
 ---@field Description string[]
-
---- A set of preference keys that are used.
-PreferenceKeys = {
-    GameVersion = "ChangelogGameVersion",
-}
 
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false
@@ -317,7 +312,7 @@ local ChangelogDialog = ClassUI(Group) {
         local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
         -- prevent the dialog from popping up again
-        Prefs.SetToCurrentProfile(PreferenceKeys.GameVersion, version)
+        Prefs.SetToCurrentProfile(PreferenceKeys.SeenChangelog, toNumber(version))
 
         EscapeHandler.PopEscapeHandler()
 
@@ -366,8 +361,8 @@ end
 function ShouldOpenChangelog()
     local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
-    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.GameVersion) or 0
-    return LastChangelogVersion < version
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.SeenChangelog) or 0
+    return LastChangelogVersion < toNumber(version)
 end
 
 -------------------------------------------------------------------------------
