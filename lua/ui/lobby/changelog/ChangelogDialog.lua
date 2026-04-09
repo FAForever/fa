@@ -39,14 +39,15 @@ local PreferenceKeys = {
 ---@field Changelogs UIChangelogMetadata[]
 
 ---@class UIChangelogMetadata
----@field Version string
----@field Path string
----@field URL string
+---@field Version number
 ---@field Name string
+---@field Date string
+---@field URL string
+---@field Path FileName
 
 ---@class UIChangelogData
----@field Version string
----@field Name string
+---@field Version number
+---@field Title string
 ---@field Description string[]
 
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
@@ -68,7 +69,7 @@ local ModuleTrash = TrashBag()
 ---@field HeaderSubtitle Text
 ---@field Footer Group
 ---@field FooterDebug Bitmap
----@field FooterOnlineButton Button
+---@field FooterWebsiteButton Button
 ---@field FooterDiscordButton Button
 ---@field Content Group
 ---@field ContentDebug Bitmap
@@ -163,21 +164,12 @@ local ChangelogDialog = ClassUI(Group) {
         self.FooterDebug:SetSolidColor("ff00ff00")
         LayoutHelpers.FillParent(self.FooterDebug, self.Footer)
 
-        self.FooterOnlineButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Online")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterOnlineButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterOnlineButton, self.Footer, 5)
-        self.FooterOnlineButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
-        self.FooterOnlineButton.OnClick = function()
+        self.FooterWebsiteButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0004>View Online")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterWebsiteButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterWebsiteButton, self.Footer, 5)
+        self.FooterWebsiteButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
+        self.FooterWebsiteButton.OnClick = function()
             OpenURL('http://github.com/FAForever/fa/releases')
-        end
-
-        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0005>Patchnotes")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
-        LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
-        self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
-        self.FooterPatchNotesButton:Disable()
-        self.FooterPatchNotesButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com')
         end
 
         self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "<LOC uilobby_0006>Report a bug")
@@ -275,16 +267,16 @@ local ChangelogDialog = ClassUI(Group) {
         if patch then
 
             if changelog.URL then
-                self.FooterOnlineButton:Enable()
-                self.FooterOnlineButton.OnClick = function()
+                self.FooterWebsiteButton:Enable()
+                self.FooterWebsiteButton.OnClick = function()
                     OpenURL(changelog.URL)
                 end
             else
-                self.FooterOnlineButton:Disable()
+                self.FooterWebsiteButton:Disable()
             end
 
             self.ContentPatchesList:SetSelection(index)
-            self.HeaderSubtitle:SetText(patch.Name or "Unknown name")
+            self.HeaderSubtitle:SetText(patch.Title or "Unknown title")
             self.ContentNotesList:DeleteAllItems()
 
             local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
@@ -292,7 +284,7 @@ local ChangelogDialog = ClassUI(Group) {
                 self.ContentNotesList:AddItem(line)
             end
         else
-            self.FooterOnlineButton:Disable()
+            self.FooterWebsiteButton:Disable()
         end
     end,
 
@@ -300,8 +292,8 @@ local ChangelogDialog = ClassUI(Group) {
     ---@param self UIChangelogDialog
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
-        for _, patch in pairs(ChangelogOverview.Overview.Changelogs) do
-            self.ContentPatchesList:AddItem(patch.Name)
+        for _, changelog in pairs(ChangelogOverview.Overview.Changelogs) do
+            self.ContentPatchesList:AddItem(changelog.Name)
         end
     end,
 

@@ -1,6 +1,6 @@
 
 Changelog = {
-    Name = "Balance patch",
+    Title = "Balance patch",
     Version = 3001,
     Description = {
         "# XYZ (Month Day, Year)",
