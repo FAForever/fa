@@ -41,7 +41,6 @@ local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local CountryTooltips = import("/lua/ui/help/tooltips-country.lua").tooltip
 local SetUtils = import("/lua/system/setutils.lua")
 local JSON = import("/lua/system/dkson.lua").json
-local UnitsAnalyzer = import("/lua/ui/lobby/unitsanalyzer.lua")
 local UTF =  import("/lua/utf.lua")
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
