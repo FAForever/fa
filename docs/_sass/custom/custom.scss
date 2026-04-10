@@ -1,0 +1,31 @@
+.unit-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.unit-icon {
+  width: 64px;
+  height: 64px;
+}
+
+.unit-name {
+  display: inline-block;
+}
+
+.unit-header + ul > li {
+  font-weight: 600;
+}
+
+.old {
+  color: #d73a49;
+  text-decoration: line-through;
+}
+
+.new {
+  color: #2da44e;
+  font-weight: 600;
+}
