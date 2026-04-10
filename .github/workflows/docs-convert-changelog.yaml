@@ -22,6 +22,7 @@ name: Convert Markdown changelog to Lua
 
 on:
   push:
+    paths: ["docs/_posts/**"]
   workflow_dispatch:
   workflow_call:
     inputs:
