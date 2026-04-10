@@ -17,8 +17,9 @@ MAX_LINE_LENGTH = 140
 
 LUA_DESC_LINE = '        "{line}"'
 LUA_FILE = """Changelog = {{
-    version = "{version}",
-    description = {{
+    Version = {version},
+    Title = "{title}",
+    Description = {{
 {description}
     }}
 }}
@@ -51,7 +52,8 @@ def get_parser():
 
 def convert_changelog(markdown: Path, lua: Path):
     """Converts a single markdown file to a Lua file."""
-    version = markdown.stem
+    file_name_parts = markdown.stem.split('-')
+    version = file_name_parts[3]
 
     source_info = f"Source: {markdown}"
     header = HEADER.format(source=source_info)
@@ -78,8 +80,7 @@ def markdown2lua(version: str, content: str) -> str:
     yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
     return LUA_FILE.format(
-        name = yaml_data.get('title', 'Open changes'),
-        patch = yaml_data.get('patch', 'Unknown'),
+        title = yaml_data.get('title').split('-')[-1],
         version=version,
         description=lua_description,
     )
