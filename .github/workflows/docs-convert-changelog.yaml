@@ -41,10 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            ${{ env.SCRIPTS }}
-            changelog
-            docs
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
 
       - name: Download develop artifact
         if: inputs.artifact == 'fafdevelop'
@@ -74,15 +71,24 @@ jobs:
 
       - name: Convert changelog to Lua
         run: |
-          out_dir=lua_changelog
-          mkdir -p $out_dir
+          rm lua/ui/lobby/changelog/generated/*
+          out_dir=lua/ui/lobby/changelog/generated
           python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
 
       - name: Create changelog overview in Lua
         run: |
-          out_dir=lua_changelog
-          mkdir -p $out_dir
+          out_dir=lua/ui/lobby/changelog/generated
           python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
+
+      - name: Commit the generated files
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git add .
+          git commit -m "Update lobby changelogs"
+          git push
 
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
