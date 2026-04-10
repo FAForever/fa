@@ -12,7 +12,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Optional, Tuple
 
-MAX_LINE_LENGTH = 150
+MAX_LINE_LENGTH = 140
 
 HEADER_SEPARATOR = "--" * (MAX_LINE_LENGTH // len("--"))
 HEADER_LINE_CENTER = MAX_LINE_LENGTH - 2 * len("--")
@@ -60,7 +60,6 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
         name = yaml_data.get('title', 'Open changes')
-        patch = yaml_data.get('patch', 'Unknown')
 
         logging.info(f"Metadata - Version: {version}, Title: {name}, Date: {date_str}")
 
