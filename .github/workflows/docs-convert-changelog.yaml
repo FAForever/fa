@@ -96,7 +96,7 @@ jobs:
         with:
           name: lua_changelog
           path: |
-            lua_changelog
+            lua/ui/lobby/changelog/generated
 
   # It's a bit awkward to validate after committing, but doing it in a unified
   # pipeline would either require making all other steps work in this container
