@@ -10,6 +10,7 @@ import yaml
 
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Tuple
 
 SCRIPT_NAME = Path(__file__).name
 
@@ -76,17 +77,16 @@ def markdown2lua(version: str, content: str) -> str:
         LUA_DESC_LINE.format(line=line) for line in escaped_md.splitlines()
     )
 
-    # YAML content is read and available here, but not added to the output yet.
     yaml_data = yaml.safe_load(yaml_content) if yaml_content else {}
 
     return LUA_FILE.format(
-        title = yaml_data.get('title').split('-')[-1],
         version=version,
+        title = yaml_data.get('title').split('-')[-1],
         description=lua_description,
     )
 
 
-def extract_yaml_front_matter(content: str) -> (str, str):
+def extract_yaml_front_matter(content: str) -> Tuple[str, str]:
     """Extracts YAML front matter from markdown content."""
     if content.startswith('---'):
         end = content.find('---', 3)

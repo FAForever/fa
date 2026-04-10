@@ -1,3 +1,11 @@
+"""
+This script generates an overview Lua file listing all changelogs with metadata.
+
+The script processes a directory of markdown files, extracting metadata from the file names and
+YAML front matter to create an overview file listing all converted changelogs with their version,
+name, date, URL, and path.
+"""
+
 import yaml
 import logging
 from datetime import date, datetime
@@ -19,7 +27,7 @@ OVERVIEW_HEADER = f"""{HEADER_SEPARATOR}
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 
-def extract_yaml_front_matter(content: str) -> (str, str):
+def extract_yaml_front_matter(content: str) -> Tuple[str, str]:
     """Extracts YAML front matter from markdown content."""
     if content.startswith('---'):
         end = content.find('---', 3)
