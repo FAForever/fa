@@ -66,8 +66,7 @@ def process_markdown_file(markdown_file: Path) -> Optional[Tuple[str, date]]:
         return entry, parsed_date
 
     except Exception as e:
-        logging.error(f"Failed to process {markdown_file.name}: {e}")
-        return None
+        raise RuntimeError(f"Failed to process {markdown_file.name}") from e
 
 def create_overview_file(input_dir: Path, output_file: Path):
     """Creates an overview Lua file listing all changelogs with metadata."""
