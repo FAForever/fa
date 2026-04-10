@@ -81,6 +81,7 @@ jobs:
           python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
 
       - name: Commit the generated files
+        continue-on-error: true  # there might be nothing to commit
         run: |
           # Configure git
           git config user.email "github@faforever.com"
@@ -97,6 +98,11 @@ jobs:
           path: |
             lua_changelog
 
+  # It's a bit awkward to validate after committing, but doing it in a unified
+  # pipeline would either require making all other steps work in this container
+  # or manually installing https://github.com/FAForever/lua-lang and I don't want
+  # to do either of those.
+  # The failing CI should still alert the user that something went wrong.
   validate_lua_changelog:
     name: Validate Lua changelog
     runs-on: ubuntu-latest
