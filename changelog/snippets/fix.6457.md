@@ -1,3 +1,0 @@
-- (#6457) Fix weapon projectiles dealing damage over time over a shorter duration than given by the `DoTTime` stat.
-  - `DoTTime` for FAF units is adjusted to the old actual DoT duration, so balance is not changed. 
-  - Unit databases will now show the actual damage over time duration.

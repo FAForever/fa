@@ -3,7 +3,7 @@
 --**************************************************************************************************
 
 -- collect recall parameters (note it is not imported)
-doscript "/lua/shared/RecallParams.lua"
+doscript "/lua/shared/recallparams.lua"
 
 -- TODO: generalize to abstract voting system, decoupled from recall
 
@@ -150,7 +150,7 @@ end
 ---@param requestingArmy number
 local function RecallVotingThread(requestingArmy)
     local requestingBrain = GetArmyBrain(requestingArmy)
-    requestingBrain.RecallVoteStartTime = GetGameTick()
+
     WaitTicks(VoteTime) -- may be interrupted if the vote closes or is canceled by an alliance break
 
     local focus = GetFocusArmy()
@@ -265,6 +265,7 @@ local function ArmyRequestRecall(army, teammates)
     local brain = GetArmyBrain(army)
     if teammates > 0 then
         brain.recallVotingThread = ForkThread(RecallVotingThread, army)
+        brain.RecallVoteStartTime = GetGameTick()
         if ArmyVoteRecall(army, true, false) then
             SyncOpenRecallVote(teammates + 1, army)
         end

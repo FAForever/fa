@@ -48,7 +48,7 @@ ReactiveAI = Class(OpAI) {
 
     ---@param self OpAI
     ---@param brain AIBrain
-    ---@param location Vector
+    ---@param location string
     ---@param triggeringEventType any
     ---@param reactionType any
     ---@param name string
@@ -207,7 +207,7 @@ ReactiveAI = Class(OpAI) {
 }
 
 ---@param brain AIBrain
----@param location Vector
+---@param location string
 ---@param triggeringEventType any
 ---@param reactionType any
 ---@param name string

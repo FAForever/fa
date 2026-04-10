@@ -1,7 +1,7 @@
 UnitBlueprint{
     Description = "<LOC xsl0301_desc>Support Armored Command Unit",
     AI = {
-        GuardScanRadius = 26,
+        GuardScanRadius = 39,
         InitialAutoMode = true,
     },
     Audio = {
@@ -528,8 +528,8 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 15,
-        TeleportFlatEnergyCost = 75000,
+        TeleportDelay = 20,
+        TeleportFlatEnergyCost = 100000,
     },
     Intel = {
         FreeIntel = true,

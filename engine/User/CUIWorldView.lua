@@ -1,6 +1,7 @@
 ---@meta
 
 ---@class moho.UIWorldView : moho.control_methods
+---@overload fun(parentControl: Control, cameraName: string, depth: number, isMiniMap: boolean, trackCamera: boolean?): WorldView
 local CUIWorldView = {}
 
 ---
@@ -8,15 +9,17 @@ local CUIWorldView = {}
 ---@param cameraName string
 ---@param depth number
 ---@param isMiniMap boolean
----@param trackCamera boolean
+---@param trackCamera boolean?
 function CUIWorldView:__init(parentControl, cameraName, depth, isMiniMap, trackCamera)
 end
 
----
+--- Resets the camera that is attached to the worldview.
 function CUIWorldView:CameraReset()
 end
 
----Enables/Disables custom world rendering for worldview
+--- If true, enables the rendering of custom world shapes. See also all shapes at /lua/ui/game/shapes.
+--- 
+--- This is introduced via an assembly patch. For more information: https://github.com/FAForever/FA-Binary-Patches/pull/47
 ---@param bool boolean
 function CUIWorldView:SetCustomRender(bool)
 end
@@ -28,48 +31,64 @@ end
 function CUIWorldView:ProjectMultiple(positions)
 end
 
----
+--- If true, enables the rendering of resources. Note that resources can **never** be rendered when the camera is in free mode.
 ---@param enable boolean
 function CUIWorldView:EnableResourceRendering(enable)
 end
 
----
----@return string
+--- Is set when our mouse is over a hostile unit, reclaim, etc. and returns nil if we're in command mode.
+---@return 
+---| 'RULEUCC_Reclaim' 
+---| 'RULEUCC_Attack' 
+---| 'RULEUCC_Move' 
+---| 'RULEUCC_Guard' 
+---| 'RULEUCC_Repair' 
+---| 'RULEUCC_Capture'
+---| 'RULEUCC_CallTransport'
+---| 'RULEUCC_Transport'
+---| nil
 function CUIWorldView:GetRightMouseButtonOrder()
 end
 
----
+--- Translates the world position of the unit to screen space.
 ---@param unit Unit
 ---@return Vector2 | nil
 function CUIWorldView:GetScreenPos(unit)
 end
 
----
+--- Flag to determine what camera should receive the global camera commands such as moving with the arrow keys.
 ---@param getsCommands boolean
 function CUIWorldView:GetsGlobalCameraCommands(getsCommands)
 end
 
----
+--- Returns true if the cursor is highlighting a command.
 ---@return boolean
 function CUIWorldView:HasHighlightCommand()
 end
 
----
+--- Returns true if the cartographic shared is applied.
+---@see CUIWorldView:SetCartographic
 ---@return boolean
 function CUIWorldView:IsCartographic()
 end
 
+--- Unlocks the input for the camera that is attached to this worldview. Used for cinematics.
 ---
----@param camera Camera
+--- See also `LockInput` to lock the input and `UnlockInput` to unlock the input.
+---@param camera? Camera
 function CUIWorldView:IsInputLocked(camera)
 end
 
+--- Returns true if the rendering of resources is enabled.
 ---
+--- See also `EnableResourceRendering` to enable or disable the resource rendering.
 ---@return boolean
 function CUIWorldView:IsResourceRenderingEnabled()
 end
 
+--- Unlocks the input for the camera that is attached to this worldview. Used for cinematics.
 ---
+--- See also `UnlockInput` to unlock the input and `IsInputLocked` to determine the current state.
 ---@param camera Camera
 function CUIWorldView:LockInput(camera)
 end
@@ -80,12 +99,12 @@ end
 function CUIWorldView:Project(position)
 end
 
----
+--- If true, enables the cartographic shader.
 ---@param cartographic boolean
 function CUIWorldView:SetCartographic(cartographic)
 end
 
----
+--- If true, enables the highlighting of commands.
 ---@param enabled boolean
 function CUIWorldView:SetHighlightEnabled(enabled)
 end
@@ -95,7 +114,9 @@ end
 function CUIWorldView:ShowConvertToPatrolCursor()
 end
 
+--- Unlocks the input for the camera that is attached to this worldview. Used for cinematics.
 ---
+--- See also `LockInput` to lock the input and `IsInputLocked` to determine the current state.
 ---@param camera Camera
 function CUIWorldView:UnlockInput(camera)
 end

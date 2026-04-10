@@ -1,5 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
-local Entity = import("/lua/sim/Entity.lua").Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -417,14 +417,27 @@ TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
+        -- early exit: do not create treads if we do not have the blueprint
         local treads = self.TreadBlueprint
         if not treads then
+            return
+        end
+
+        -- early exit: do not create treads if we're in the air or on water
+        local layer = self.Layer
+        if layer == "Air" or layer == "Water" then
+            return
+        end
+
+        -- early exit: do not create treads if we are attached to something (like a transport)
+        if self:IsUnitState("Attached") then
             return
         end
 
         if treads.ScrollTreads then
             self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
         end
+
         local treadMarks = treads.TreadMarks
         local treadType = self.TerrainType.Treads
         if treadMarks and treadType and treadType ~= 'None' then
@@ -917,14 +930,15 @@ ExternalFactoryComponent = ClassSimple {
     end,
 
     ---@param self Unit | ExternalFactoryComponent
-    ---@param instigator Unit unused
-    ---@param type string unused
-    ---@param overkillRatio number unused
+    ---@param instigator Unit
+    ---@param type DamageType
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
             self.ExternalFactory:SetBlockCommandQueue(true)
-            self.ExternalFactory:Kill()
+            self.ExternalFactory:KillUnitBeingBuilt(instigator, type, overkillRatio)
+            self.ExternalFactory:Destroy()
         end
     end,
 
@@ -940,18 +954,22 @@ ExternalFactoryComponent = ClassSimple {
     ---@param self Unit | ExternalFactoryComponent
     ---@param unitBeingBuilt Unit
     OnStopBuildWithStorage = function(self, unitBeingBuilt)
-        --local unitBeingBuilt = self.UnitBeingBuilt
-        unitBeingBuilt:DetachFrom(true)
-        self:DetachAll(self.BuildAttachBone)
-
-        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
-            unitBeingBuilt:ShowBone(0, true)
+        -- Unbuilt units can be in `OnStopBuild` when a `BuildMobile` order gets cancelled. They shouldn't be put into storage.
+        if unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
         else
-            self:AddUnitToStorage(unitBeingBuilt)
-            ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
-        end
+            unitBeingBuilt:DetachFrom(true)
+            self:DetachAll(self.BuildAttachBone)
 
-        self:RequestRefreshUI()
+            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+                unitBeingBuilt:ShowBone(0, true)
+            else
+                self:AddUnitToStorage(unitBeingBuilt)
+                ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
+            end
+
+            self:RequestRefreshUI()
+        end
         ChangeState(self, self.IdleState)
     end,
 

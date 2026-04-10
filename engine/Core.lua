@@ -1,8 +1,11 @@
 ---@meta
 ---@diagnostic disable: lowercase-global
 
----@class FileName: string, stringlib
----@operator concat(FileName | string): FileName
+---@class string : stringlib
+---@operator concat(FileName): FileName
+
+---@class FileName: string
+---@operator concat(string): FileName
 
 ---@class VectorBase
 ---@field [1] number    # x
@@ -41,7 +44,7 @@
 
 ---@alias Color string `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 ---@alias Bone string | number
----@alias Army string | number
+---@alias Army string | integer
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
 -- note that these object span both the sim and user states
@@ -113,9 +116,14 @@ end
 function EndLoggingStats(exit)
 end
 
---- returns true if a unit category contains this unit
+---@overload fun (category: EntityCategory, unit: UserUnit): boolean
+---@overload fun (category: EntityCategory, unit: UnitId): boolean
+---@overload fun (category: EntityCategory, unit: Projectile): boolean
+---@overload fun (category: EntityCategory, unit: Blip): boolean
+---@overload fun (category: EntityCategory, unit: Prop): boolean
+---Returns true if the entity or blueprint id is of the given category.
 ---@param category EntityCategory
----@param unit Unit | UserUnit | UnitId | Projectile | Blip | Prop
+---@param unit Unit
 ---@return boolean
 function EntityCategoryContains(category, unit)
 end
@@ -126,17 +134,18 @@ end
 function EntityCategoryEmpty(category)
 end
 
----@overload fun(units: UserUnit[]): UserUnit[]
---- filters a list of units to only those found in the category
+---@overload fun(category: EntityCategory, units: UserUnit[]): UserUnit[]
+---@overload fun(category: EntityCategory, unitIds: UnitId[]): UnitId[]       
+--- filters a list of (user) units or unit ids to only those that match the given category.
 ---@param category EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
 function EntityCategoryFilterDown(category, units)
 end
 
---- computes a list of unit blueprint names that match the categories
+--- Computes a list of unit blueprint names that match the categories. As an example: `EntityCategoryGetUnitList(categories.COMMAND * categories.UEF)` returns `{ "uel0001" }`
 ---@param category EntityCategory
----@return string[]
+---@return UnitId[]
 function EntityCategoryGetUnitList(category)
 end
 
@@ -193,7 +202,7 @@ function GetCueBank(sound)
 end
 
 --- The current army number that the player has focused, or `-1` for none (i.e. observer)
----@return number
+---@return integer
 function GetFocusArmy()
 end
 
@@ -250,6 +259,10 @@ end
 ---@param thread thread
 function KillThread(thread)
 end
+
+---@class thread
+local thread = {}
+thread.Destroy = KillThread -- Set in /lua/system/config.lua
 
 --- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
 --- This means that it returns the closest integer and tie-breaks towards even numbers

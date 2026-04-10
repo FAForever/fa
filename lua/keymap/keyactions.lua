@@ -1464,7 +1464,7 @@ local keyActionsOrders = {
         category = 'orders',
     },
     ['shift_stop'] = {
-        action = 'IssueCommand Stop',
+        action = 'UI_Lua import("/lua/ui/game/orders.lua").Stop()',
         category = 'orders',
     },
     ['shift_dive'] = {
@@ -1591,8 +1591,16 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(true)',
         category = 'orders',
     },
+    ['dock_damaged'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9, true)',
+        category = 'orders',
+    },
     ['shift_dock'] = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
+        category = 'orders',
+    },
+    ['shift_dock_damaged'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/dock-damaged.lua").DockDamaged(0.9, false)',
         category = 'orders',
     },
 }

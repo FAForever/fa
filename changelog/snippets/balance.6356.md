@@ -1,3 +1,0 @@
-- (#6356) Reduce the speed of hover flak on water to be the same as on land. This makes it less oppressive supporting hover raids and more exposed when supporting naval fleets.
-    - Aeon T2 mobile flak: water speed multiplier 1.35 -> 1 (water speed 3.65 -> 2.7)
-    - Seraphim T2 mobile flak: water speed multiplier 1.4 -> 1 (water speed 3.64 -> 2.6)

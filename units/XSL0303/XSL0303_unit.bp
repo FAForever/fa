@@ -191,9 +191,10 @@ UnitBlueprint{
     SelectionSizeX = 0.7,
     SelectionSizeZ = 1.4,
     SelectionThickness = 0.3,
+    CollisionOffsetZ = 0.2,
     SizeX = 0.8,
     SizeY = 0.6,
-    SizeZ = 2.3,
+    SizeZ = 2.0,
     StrategicIconName = "icon_land3_directfire",
     StrategicIconSortPriority = 115,
     Transport = {
@@ -215,7 +216,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 64,
+            Damage = 57,
             DamageType = "Normal",
             DisplayName = "Aire-au Bolter",
             FireTargetLayerCapsTable = {
@@ -248,6 +249,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 44,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -276,7 +279,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 64,
+            Damage = 57,
             DamageType = "Normal",
             DisplayName = "Aire-au Bolter",
             FireTargetLayerCapsTable = {
@@ -310,6 +313,8 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 44,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -353,7 +358,7 @@ UnitBlueprint{
             MaxRadius = 28,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 36,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/SDFTauCannon01/SDFTauCannon01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
@@ -372,7 +377,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
-            RateOfFire = 10/40, --10/integer interval in ticks
+            RateOfFire = 10/34, --10/integer interval in ticks
             SlavedToBody = true,
             SlavedToBodyArcRange = 175,
             TargetPriorities = {

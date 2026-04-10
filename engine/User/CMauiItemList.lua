@@ -3,7 +3,7 @@
 ---@class moho.item_list_methods : moho.control_methods
 local CMauiItemList = {}
 
----@param text LocalizedString
+---@param text LocalizedString | number
 function CMauiItemList:AddItem(text)
 end
 
@@ -23,9 +23,9 @@ end
 function CMauiItemList:Empty()
 end
 
----
+--- Get an item from the list, using 0-based indexing.
 ---@param index number
----@return number
+---@return LocalizedString | number
 function CMauiItemList:GetItem(index)
 end
 
@@ -70,12 +70,21 @@ end
 function CMauiItemList:ScrollToTop()
 end
 
+--- Sets the alpha of a given item list's background, if children is true, also set children's alpha
+---@param alpha number
+---@param children? boolean
+---@see itemlist.lua:SetAlphaOfColors Lua implementation that can set the alpha of the text in an item list.
+function CMauiItemList:SetAlpha(alpha, children)
+end
+
 ---
 ---@param foreground Color
 ---@param background Color
 ---@param selectedForeground Color
 ---@param selectedBackground Color
-function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground)
+---@param mouseoverForeground Color
+---@param mouseoverBackground Color
+function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground, mouseoverForeground, mouseoverBackground)
 end
 
 --- Sets the font to use in this ItemList control

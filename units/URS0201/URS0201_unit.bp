@@ -428,6 +428,7 @@ UnitBlueprint{
             MuzzleSalvoDelay = 0.8,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 5,
+            NotExclusive = true,
             ProjectileId = "/projectiles/CANTorpedoNanite02/CANTorpedoNanite02_proj.bp",
             ProjectileLifetime = 7,
             ProjectilesPerOnFire = 1,
@@ -504,7 +505,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 10/38, --10/integer interval in ticks
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

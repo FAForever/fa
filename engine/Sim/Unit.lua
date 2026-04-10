@@ -297,6 +297,7 @@ end
 function Unit:GetUnitId()
 end
 
+--- Returns unit velocity in ogrids/tick
 ---@return number x
 ---@return number y
 ---@return number z
@@ -320,8 +321,12 @@ end
 function Unit:GetWorkProgress()
 end
 
---- Adds nuclear missiles to the unit.
---- This is the method to call for both SML's and SMD's.
+--- With [FA-Binary-Patches#15](https://github.com/FAForever/FA-Binary-Patches/pull/15),
+--- `InBlocks` makes `amount` set the number of "blocks" for the in-progress tactical or nuclear missile.
+--- A projectile is built out of `10 * (buildTime / buildRate)` blocks.
+--- Use `Unit:GiveNukeSiloBlocks()` to use this feature.
+
+--- Adds nuclear missiles to the unit
 ---@see GiveTacticalSiloAmmo() # for tactical missiles
 ---@param amount number
 ---@param inBlocks? boolean
@@ -617,9 +622,9 @@ end
 function Unit:SetRegenRate(rate)
 end
 
---- sets the script bit
----@param bit number|string
----@param state boolean
+--- sets the script bit, which calls `OnScriptBitSet` or `OnScriptBitClear` for the Sim Unit and `OnSelectionChanged` on the User side if the bit is toggled
+---@param bit ToggleCap
+---@param state boolean # `true` -> `OnScriptBitSet`; `false` -> `OnScriptBitClear`
 function Unit:SetScriptBit(bit, state)
 end
 
@@ -700,6 +705,7 @@ end
 --- Tests if the unit has this toggle cap specified in the blueprint spec.
 --- May not always work.
 ---@param capName ToggleCap
+---@return boolean
 function Unit:TestToggleCaps(capName)
 end
 

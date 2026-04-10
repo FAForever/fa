@@ -1,6 +1,7 @@
 local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
+---@field LastTickDamaged? number
 ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
@@ -64,6 +65,19 @@ ACUUnit = ClassUnit(CommandUnit) {
     ---@param amount number
     ---@param vector Vector
     ---@param damageType DamageType
+    OnDamage = function(self, instigator, amount, vector, damageType)
+        if self.CanTakeDamage and damageType ~= "TreeForce" and damageType ~= "TreeFire" then
+            self.LastTickDamaged = GetGameTick()
+        end
+
+        CommandUnit.OnDamage(self, instigator, amount, vector, damageType)
+    end,
+
+    ---@param self ACUUnit
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Handle incoming OC damage
         if damageType == 'Overcharge' then
@@ -94,7 +108,7 @@ ACUUnit = ClassUnit(CommandUnit) {
             local instigatorBrain = ArmyBrains[instigator.Army]
 
             Sync.EnforceRating = true
-            WARN('ACU kill detected. Rating for ranked games is now enforced.')
+            WARN("ACU kill detected. Time requirement for rating games will now be removed.")
 
             -- If we are teamkilled, filter out death explostions of allied units that were not coused by player's self destruct order
             -- Damage types:
@@ -123,7 +137,8 @@ ACUUnit = ClassUnit(CommandUnit) {
             })
 
         end
-        ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
+        self.Brain.CommanderKilledBy = (instigator or self).Army
+        self.Brain.CommanderKilledTick = GetGameTick()
     end,
 
     ---@param self ACUUnit

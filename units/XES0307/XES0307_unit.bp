@@ -391,15 +391,15 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Phalanx Anti-Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
-            FiringTolerance = 5,
+            FiringTolerance = 0,
             Label = "PhalanxGun",
             MaxRadius = 31,
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 100,
+            MuzzleVelocity = 120,
             ProjectileId = "/projectiles/TDPhalanx01/TDPhalanx01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.1,
+            ProjectileLifetimeUsesMultiplier = 1.5,
             RackBones = {
                 {
                     MuzzleBones = { "Front_Turret01_Muzzle01" },

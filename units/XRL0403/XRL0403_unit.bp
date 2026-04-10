@@ -40,7 +40,6 @@ UnitBlueprint{
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "LAND",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -58,6 +57,8 @@ UnitBlueprint{
         "SNIPER",
         "SONAR",
         "VISIBLETORECON",
+        "REPAIR",
+        "RECLAIM",
     },
     Defense = {
         AirThreatLevel = 3,
@@ -187,7 +188,7 @@ UnitBlueprint{
             "xrl0005",
             "drlk005",
         },
-        MaxBuildDistance = 1,
+        MaxBuildDistance = 2,
     },
     General = {
         CommandCaps = {
@@ -197,6 +198,9 @@ UnitBlueprint{
             RULEUCC_Patrol = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Reclaim = true,
+            RULEUCC_Repair = true,
+            RULEUCC_Pause = true,
         },
         FactionName = "Cybran",
         FractionThreshold = 0.99,
@@ -484,6 +488,7 @@ UnitBlueprint{
             FiringTolerance = 2,
             Label = "AntiTorpedo",
             MaxRadius = 25,
+            MinRadius = 5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,

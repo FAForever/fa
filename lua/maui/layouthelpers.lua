@@ -1733,8 +1733,61 @@ local LayouterAttributeControl = ClassSimple {
 
 
     ----------
-    -- Outside edge positioning methods
+    -- Outside 8-way positioning methods
     ----------
+
+    --- Lock bottom right corner of the control to the top left corner of a parent.
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@param parent Layoutable
+    ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
+    ---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+    ---@return T
+    TopLeftOf = function(self, parent, bottomOffset, rightOffset)
+        AnchorToTop(self.layoutControl, GetLayoutControl(parent), bottomOffset)
+        AnchorToLeft(self.layoutControl, GetLayoutControl(parent), rightOffset)
+        return self
+    end;
+
+    --- Lock bottom left corner of the control to the top right corner of a parent.
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@param parent Layoutable
+    ---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
+    ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+    ---@return T
+    TopRightOf = function(self, parent, bottomOffset, leftOffset)
+        AnchorToTop(self.layoutControl, GetLayoutControl(parent), bottomOffset)
+        AnchorToRight(self.layoutControl, GetLayoutControl(parent), leftOffset)
+        return self
+    end;
+
+    --- Lock bottom right corner of the control to the bottom left corner of a parent.
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@param parent Layoutable
+    ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
+    ---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+    ---@return T
+    BottomLeftOf = function(self, parent, topOffset, rightOffset)
+        AnchorToBottom(self.layoutControl, GetLayoutControl(parent), topOffset)
+        AnchorToLeft(self.layoutControl, GetLayoutControl(parent), rightOffset)
+        return self
+    end;
+
+    --- Lock top left corner of the control to the bottom right corner of a parent.
+    ---@generic T : LayouterAttributeControl
+    ---@param self T
+    ---@param parent Layoutable
+    ---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
+    ---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+    ---@return T
+    BottomRightOf = function(self, parent, topOffset, leftOffset)
+        AnchorToBottom(self.layoutControl, GetLayoutControl(parent), topOffset)
+        AnchorToRight(self.layoutControl, GetLayoutControl(parent), leftOffset)
+        return self
+    end;
+
 
     --- Lock right edge of the control to the left edge of a parent, centered vertically.
     --- This sets the control's right and top edges.

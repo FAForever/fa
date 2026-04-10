@@ -25,6 +25,8 @@ local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
+local podBpEco = __blueprints['uea0001']--[[@as UnitBlueprint]].Economy
+
 ---@class UEL0001 : ACUUnit
 ---@field LeftPod TConstructionPodUnit
 ---@field HasLeftPod boolean
@@ -234,7 +236,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 WaitFor(self.RebuildingPod2)
             end
             if self.HasLeftPod == true then
-                self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+                self.RebuildingPod = CreateEconomyEvent(self, podBpEco.BuildCostEnergy, podBpEco.BuildCostMass, podBpEco.BuildTime / self:GetBuildRate(), self.SetWorkProgress)
                 self:RequestRefreshUI()
                 WaitFor(self.RebuildingPod)
                 self:SetWorkProgress(0.0)
@@ -255,7 +257,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 WaitFor(self.RebuildingPod)
             end
             if self.HasRightPod == true then
-                self.RebuildingPod2 = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
+                self.RebuildingPod2 = CreateEconomyEvent(self, podBpEco.BuildCostEnergy, podBpEco.BuildCostMass, podBpEco.BuildTime / self:GetBuildRate(), self.SetWorkProgress)
                 self:RequestRefreshUI()
                 WaitFor(self.RebuildingPod2)
                 self:SetWorkProgress(0.0)

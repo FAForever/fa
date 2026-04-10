@@ -1,2 +1,0 @@
-- (#6530) Remove ASF's armor against Ahwassa bomb, as it is no longer necessary with the new delayed explosion.
-  - Air superiority fighters: Damage taken from Ahwassa bomb 10% -> 100%

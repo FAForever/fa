@@ -487,13 +487,32 @@ end
 ---@param dz number
 ---@return Quaternion
 function QuatFromXZDirection(dx, dz)
-    -- ang = atan2(dx, dz) -- `dz` is adjacent
-    -- {0, sin(ang/2), 0, cos(ang/2)}
+    -- division by zero case
+    if dx == 0 and dz == 0 then
+        return UnsafeQuaternion(0, 0, 0, 1)
+    end
+
+    -- q = (0, sin(ang/2), 0, cos(ang/2))       -- definition of our y-axis rotation quaternion we want to get for angle `ang`
+
+    -- sin(ang/2) = +/-sqrt((1-cos(ang))/2)     -- half angle formula for sin. +/- is sign of sin(ang/2)
+    --            = +/-sqrt( 0.5 - cos(ang)/2 )
+    --            = +/-sqrt( 0.5 - a/2h )       -- cos(ang) = adjacent/hypotenuse
+    -- similar is repeated for cos(ang/2)
+
     local hypot = MathSqrt(dx*dx + dz*dz)
-    -- use the half-angle formulas
     local halfCosA = dz / (2 * hypot)
     local sinHalfA = MathSqrt(0.5 - halfCosA)
     local cosHalfA = MathSqrt(0.5 + halfCosA)
+
+    -- Resolve the +/- part of our result:
+    -- sign of sin(ang/2) is + for ang in (0, 2pi)
+    -- sign of cos(ang/2) is + for ang in (0, pi) and - for ang in (pi, 2pi)
+    -- ang in (pi, 2pi) is when dx is negative, so negate cosHalfA in that case
+
+    if dx < 0 then
+        return UnsafeQuaternion(0, sinHalfA, 0, -cosHalfA)
+    end
+
     return UnsafeQuaternion(0, sinHalfA, 0, cosHalfA)
 end
 
@@ -549,4 +568,64 @@ function RotateVectorXYZByQuat(vX, vY, vZ, q)
     return  vX * qW + vW * qX - vZ * qY + vY * qZ,
             vY * qW + vZ * qX + vW * qY - vX * qZ,
             vZ * qW - vY * qX + vX * qY + vW * qZ
+end
+
+--- These are the types that the engine can send across the ui-sim boundary.
+--- Tables have to be handled for loops and unserializable keys/values.
+SERIALIZABLE_TYPES = {
+    number = true,
+    string = true,
+    boolean = true,
+    ["nil"] = true,
+}
+local serializableTypes = SERIALIZABLE_TYPES
+
+--- Returns a deep copy with unserializable values converted using `tostring` 
+--- and cyclic references converted to strings referencing the `_seenTableId` key.
+--- The result can be sent across the ui-sim boundary.
+---@generic T
+---@param t T
+---@return T
+function SerializableDeepCopy(t)
+    local st = serializableTypes
+    local type_t = type(t)
+    if type_t ~= 'table' then
+        if st[type_t] then
+            return t
+        else
+            return tostring(t)
+        end
+    end
+
+    local backrefs = {}
+    local function CreateSerializableAny(_t)
+        local type_t = type(_t)
+        if type_t ~= 'table' then
+            if st[type_t] then
+                return _t
+            else
+                return tostring(_t)
+            end
+        end
+
+        local b = backrefs[_t]
+        if b then
+            -- store table id since table `tostring` uses memory location which won't be the same between Sim and UI
+            if not b._seenTableId then
+                b._seenTableId = tostring(_t)
+            end
+            -- format makes it easy to find in repr output
+            return '_seenTableId = "' .. b._seenTableId .. '"'
+        end
+
+        local r = {}
+        backrefs[_t] = r
+        for k, v in _t do
+            r[CreateSerializableAny(k)] = CreateSerializableAny(v)
+        end
+
+        return r
+    end
+
+    return CreateSerializableAny(t)
 end

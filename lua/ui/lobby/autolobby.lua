@@ -42,16 +42,17 @@ local AutolobbyCommunicationsInstance = false
 ---@param natTraversalProvider any
 ---@return UIAutolobbyCommunications
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
+    -- we intentionally do not log the 'natTraversalProvider' parameter as it can cause issues due to being an uninitialized C object
+    LOG("CreateLobby", protocol, localPort, desiredPlayerName, localPlayerUID)
 
     -- create the interface, needs to be done before the lobby is
     local playerCount = tonumber(GetCommandLineArg("/players", 1)[1]) or 8
-    local interface = import("/lua/ui/lobby/autolobby/AutolobbyInterface.lua").SetupSingleton(playerCount)
+    local interface = import("/lua/ui/lobby/autolobby/autolobbyinterface.lua").SetupSingleton(playerCount)
 
     -- create the lobby
     local maxConnections = 16
     AutolobbyCommunicationsInstance = InternalCreateLobby(
-        import("/lua/ui/lobby/autolobby/AutolobbyController.lua").AutolobbyCommunications,
+        import("/lua/ui/lobby/autolobby/autolobbycontroller.lua").AutolobbyCommunications,
         protocol, localPort, maxConnections, desiredPlayerName,
         localPlayerUID, natTraversalProvider
     )
@@ -63,8 +64,6 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     AutolobbyCommunicationsInstance.LobbyParameters.DesiredPlayerName = desiredPlayerName
     AutolobbyCommunicationsInstance.LobbyParameters.LocalPlayerPeerId = localPlayerUID
     AutolobbyCommunicationsInstance.LobbyParameters.NatTraversalProvider = natTraversalProvider
-
-    AutolobbyCommunicationsInstance:SendGameStateToServer('Idle')
 
     return AutolobbyCommunicationsInstance
 end

@@ -1,4 +1,3 @@
-
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 local StructureUnitOnScriptBitSet = StructureUnit.OnScriptBitSet
 local StructureUnitOnScriptBitClear = StructureUnit.OnScriptBitClear
@@ -10,6 +9,10 @@ local StructureUnitOnConsumptionInActive = StructureUnit.OnConsumptionInActive
 
 ---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = ClassUnit(StructureUnit) {
+
+    -- Disabled so the base class's `OnAdjacentTo` doesn't apply adjacency buffs when the unit is spawned in.
+    -- Consumption activation and adjacency application will happen through `OnStopBeingBuilt`.
+    ConsumptionActive = false,
 
     ---@param self MassFabricationUnit
     ---@param bit number
@@ -27,7 +30,7 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     ---@param bit number
-    OnScriptBitClear = function (self, bit)
+    OnScriptBitClear = function(self, bit)
         if bit == 4 then
             -- make brain track us to enable / disable accordingly
             self.Brain:AddDisabledEnergyExcessUnit(self)
@@ -46,6 +49,12 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
 
         -- make brain track us to enable / disable accordingly
         self.Brain:AddEnabledEnergyExcessUnit(self)
+    end,
+
+    ---@param self MassFabricationUnit
+    OnDestroy = function(self)
+        self.Brain:RemoveEnergyExcessUnit(self)
+        StructureUnit.OnDestroy(self)
     end,
 
     ---@param self MassFabricationUnit
@@ -87,5 +96,4 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
     OnNoExcessEnergy = function(self)
         self:OnProductionPaused()
     end,
-
 }

@@ -1,1 +1,0 @@
-- (#6504) Improve the selection boxes of various air units. Alleviate the issue of terrain partially obstructing the selection boxes of most transports when they are grounded. Slightly improve the visuals of the Vulthoo's (Seraphim T2 Gunship's) selection box.

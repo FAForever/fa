@@ -248,6 +248,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "NAVAL MOBILE",
                 "ALLUNITS",
@@ -310,6 +312,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",
@@ -377,6 +381,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",
@@ -444,6 +450,8 @@ UnitBlueprint{
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 10/5, --10/integer interval in ticks
+            SlavedToBody = true,
+            SlavedToBodyArcRange = 27,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",
@@ -477,8 +485,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             Label = "RedirectMissile",
-            MaxHeightDiff = 10,
-            MaxRadius = 26,
+            MaxRadius = 44,
             MinRadius = 8,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -496,7 +503,8 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 10/25, --10/integer interval in ticks
+            RateOfFire = 10/19, --10/integer interval in ticks
+            TargetCheckInterval = 0.1,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",
@@ -505,7 +513,7 @@ UnitBlueprint{
             TurretBoneYaw = "Zapper_Turret",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 70,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,

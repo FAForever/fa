@@ -1,1 +1,0 @@
-- (#6416) Fix Salvation's reload time not increasing from 2.5 to 2.6 when missing T1 power generator adjacency and only having T3 power generators.

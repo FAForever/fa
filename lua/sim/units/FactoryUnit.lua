@@ -137,12 +137,28 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self.DisabledAssist = nil
         end
 
+        -- Factory can stop building but still have an unbuilt unit if a mobile build order is issued and the order is cancelled
+        if not IsDestroyed(unitBeingBuilt) and unitBeingBuilt:GetFractionComplete() < 1 then
+            unitBeingBuilt:Destroy()
+        end
+
         if not (self.FactoryBuildFailed or IsDestroyed(self)) then
-            if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
-                self:RollOffUnit()
-            end
             self:StopBuildFx()
-            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order)
+
+            -- Moving off factory has to be issued this tick so that rally points are issued after it
+            -- Air units don't need the move order since they fly off the factory by themselves
+            -- Pass the spin up so that engineers can be rotated towards the rolloff point after the "build finished" animation
+
+            local spin = nil
+            if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
+                local rollOffPoint = self.RollOffPoint
+                local x, y, z
+                spin, x, y, z = self:CalculateRollOffPoint()
+                rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
+                IssueToUnitMoveOffFactory(unitBeingBuilt, rollOffPoint)
+            end
+
+            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order, spin)
         end
 
     end,
@@ -188,30 +204,61 @@ FactoryUnit = ClassUnit(StructureUnit) {
         ChangeState(self, self.IdleState)
     end,
 
+    --- When the factory is killed, kills the unit being built, with veterancy dispersal and credit to the instigator.
+    ---@param self FactoryUnit
+    ---@param instigator Unit | Projectile
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        self:KillUnitBeingBuilt(instigator, type, overkillRatio)
+        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
     --#endregion
 
     ---------------------------------------------------------------------------
     --#region Lua functionality
 
+    --- Kills the unit being built, with veterancy dispersal and credit to the instigator.
+    ---@param self FactoryUnit
+    ---@param instigator Unit | Projectile
+    ---@param type string
+    ---@param overkillRatio number
+    KillUnitBeingBuilt = function(self, instigator, type, overkillRatio)
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and not unitBeingBuilt.Dead and not unitBeingBuilt.isFinishedUnit then
+            -- Detach the unit to allow things like sinking
+            unitBeingBuilt:DetachFrom(true)
+            -- Disperse the unit's veterancy to our killers
+            -- only take remaining HP so we don't double count
+            -- Identical logic is used for cargo of transports, so this vet behavior is consistent.
+            self:VeterancyDispersal(unitBeingBuilt:GetTotalMassCost() * unitBeingBuilt:GetHealth() / unitBeingBuilt:GetMaxHealth())
+            if instigator then
+                unitBeingBuilt:Kill(instigator, type, 0)
+            else
+                unitBeingBuilt:Kill()
+            end
+        end
+    end,
+
+    --- Destroys the unit being built if it isn't already dead/destroyed, this fixes cases
+    --- where the factory is reclaimed or transferred and the unit being built still exists.
     ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
-        if (not IsDestroyed(unitBeingBuilt)) then
-            local fraction = unitBeingBuilt:GetFractionComplete()
-            if fraction < 1.0 then
-                if fraction > 0.5 then
-                    unitBeingBuilt:Kill()
-                else
-                    unitBeingBuilt:Destroy()
-                end
-            end
+        -- unit is dead, so it should destroy itself
+        if not unitBeingBuilt.Dead and not IsDestroyed(unitBeingBuilt)
+            and not unitBeingBuilt.isFinishedUnit
+        then
+            unitBeingBuilt:Destroy()
         end
     end,
 
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order boolean
-    FinishBuildThread = function(self, unitBeingBuilt, order)
+    ---@param rollOffPointSpin number?
+    FinishBuildThread = function(self, unitBeingBuilt, order, rollOffPointSpin)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
         local bp = self.Blueprint
@@ -222,6 +269,12 @@ FactoryUnit = ClassUnit(StructureUnit) {
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
         end
+
+        -- engineers can only be rotated during rolloff after the "build finished" animation ends
+        if rollOffPointSpin and unitBeingBuilt and EntityCategoryContains(categoriesENGINEER, unitBeingBuilt) then
+            unitBeingBuilt:SetRotation(rollOffPointSpin)
+        end
+
         if unitBeingBuilt and not unitBeingBuilt.Dead then
             unitBeingBuilt:DetachFrom(true)
         end
@@ -247,19 +300,6 @@ FactoryUnit = ClassUnit(StructureUnit) {
         -- Note: We check for the primary category, since e.g. AircraftCarriers have the FACTORY category.
         -- TODO: This is a hotfix for --1043, remove when engymod design is properly fixed
         return target_bp.General.Category ~= 'Factory'
-    end,
-
-    ---@param self FactoryUnit
-    RollOffUnit = function(self)
-        local rollOffPoint = self.RollOffPoint
-        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
-        if unitBeingBuilt and EntityCategoryContains(categoriesENGINEER, unitBeingBuilt) then
-            local spin, x, y, z = self:CalculateRollOffPoint()
-            unitBeingBuilt:SetRotation(spin)
-            rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
-        end
-
-        IssueToUnitMoveOffFactory(unitBeingBuilt, rollOffPoint)
     end,
 
     ---@param self FactoryUnit

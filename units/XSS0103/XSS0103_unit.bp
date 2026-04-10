@@ -253,8 +253,6 @@ UnitBlueprint{
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringRandomness = 0,
             FiringTolerance = 1,
-            HeadingArcCenter = 0,
-            HeadingArcRange = 360,
             Label = "AntiAir",
             MaxRadius = 48,
             MuzzleSalvoDelay = 0,

@@ -33,15 +33,15 @@
 ---| "RULEUCC_Invalid"
 
 ---@alias EngineToggleCap
----| "RULEUTC_ShieldToggle"
----| "RULEUTC_WeaponToggle"
----| "RULEUTC_JammingToggle"
----| "RULEUTC_IntelToggle"
----| "RULEUTC_ProductionToggle"
----| "RULEUTC_StealthToggle"
----| "RULEUTC_GenericToggle"
----| "RULEUTC_SpecialToggle"
----| "RULEUTC_CloakToggle"
+---| "RULEUTC_ShieldToggle"     # Bit 0
+---| "RULEUTC_WeaponToggle"     # Bit 1
+---| "RULEUTC_JammingToggle"    # Bit 2
+---| "RULEUTC_IntelToggle"      # Bit 3
+---| "RULEUTC_ProductionToggle" # Bit 4
+---| "RULEUTC_StealthToggle"    # Bit 5
+---| "RULEUTC_GenericToggle"    # Bit 6
+---| "RULEUTC_SpecialToggle"    # Bit 7
+---| "RULEUTC_CloakToggle"      # Bit 8
 
 ---@alias UnitMotionType
 ---| "RULEUMT_None"
@@ -294,3 +294,9 @@
 ---| "Yellow"               #FFFF00
 ---| "YellowGreen"          #9CCF31
 ---| "transparent"          #00000000
+
+---@alias BuildOrderType
+---| "Repair"
+---| "MobileBuild"
+---| "FactoryBuild"
+---| "Upgrade"

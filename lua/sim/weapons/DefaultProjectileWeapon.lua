@@ -13,11 +13,11 @@ local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local MathClamp = math.clamp
+local MathSqrt = math.sqrt
 
 ---@class WeaponSalvoData
 ---@field target? Unit | Prop   if absent, will use `targetPos` instead
 ---@field targetPos Vector      stores the last location upon which we dropped bombs for a target, or the ground fire location
----@field lastAccel number      stores the last acceleration that was used
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
@@ -29,6 +29,9 @@ local MathClamp = math.clamp
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 ---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
+---@field EconDrain? moho.EconomyEvent
+---@field AdjEnergyMod number? # Energy drain multiplier from buffs
+---@field AdjRoFMod number? # Firerate multiplier from buffs
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -60,19 +63,19 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Make certain the weapon has essential aspects defined
         if not rackBones then
             local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoSize then
             local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
         if not muzzleSalvoDelay then
             local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' ..
-                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+                (bp.Label or bp.DisplayName or 'Unlabelled') .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return
         end
@@ -202,10 +205,17 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
-        local projVelX, _, projVelZ = UnitGetVelocity(launcher)
+        local projVelX, projVelY, projVelZ = UnitGetVelocity(launcher)
+
+        -- The projectile will have velocity in the horizontal plane equal to the unit's 3 dimensional speed
+        -- Multiply the XZ components by the ratio of the XYZ to XZ speeds to get the correct XZ components
+        local projVelXZSquareSum = projVelX * projVelX + projVelZ * projVelZ
+        local multiplier = MathSqrt((projVelXZSquareSum + projVelY * projVelY) / (projVelXZSquareSum))
+        projVelX = projVelX * multiplier
+        projVelZ = projVelZ * multiplier
 
         local targetPos
-        local targetVelX, targetVelZ = 0, 0
+        local targetVelX, targetVelY, targetVelZ = 0, 0, 0
 
         local data = self.CurrentSalvoData
 
@@ -216,7 +226,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
                 if not target.IsProp then
-                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
             else -- target is a position i.e. attack ground
                 targetPos = self:GetCurrentTargetPos()
@@ -229,7 +239,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     return 4.9
                 end
                 if target and not target.IsProp then
-                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                 end
                 local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
@@ -251,7 +261,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 return 200 * projPosY / (time * time)
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
-                    lastAccel = 4.9,
                     targetPos = targetPos,
                 }
                 if target then
@@ -271,7 +280,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     targetPos = data.targetPos
                 else
                     if not target.IsProp then
-                        targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                        targetVelX, targetVelY, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
                 end
@@ -282,7 +291,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         if not targetPos then
             -- put the bomb cluster in free-fall
             local GetSurfaceHeight = GetSurfaceHeight
-            local MathSqrt = math.sqrt
             local spread = self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
             -- default gravitational acceleration is 4.9; however, bomb clusters adjust the time it takes to land
             -- so we convert the acceleration to time to add the spread and convert back:
@@ -299,16 +307,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if halfHeight < 0.01 then return 4.9 end
             time = MathSqrt(0.816326530612 * halfHeight) + spread
 
-            local acc = halfHeight / (time * time)
-            data.lastAccel = acc
-            return acc
+            return halfHeight / (time * time)
         end
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
         local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
-            data.lastAccel = 4.9
             return 4.9
         end
         local targetPosX, targetPosZ = targetPos[1], targetPos[3]
@@ -326,7 +331,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local time = distPos / distVel
         local adjustedTime = time + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
         if adjustedTime == 0 then
-            data.lastAccel = 4.9
             return 4.9
         end
 
@@ -351,10 +355,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- a = 2 * h / t^2
 
         -- also convert time from ticks to seconds (multiply by 10, twice)
-        local acc = 200 * projPosY / (adjustedTime * adjustedTime)
-
-        data.lastAccel = acc
-        return acc
+        return 200 * projPosY / (adjustedTime * adjustedTime)
     end,
 
     -- Triggers when the weapon is moved horizontally, usually by owner's motion
@@ -417,7 +418,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Determine how much Energy is required to fire
     ---@param self DefaultProjectileWeapon
-    ---@return integer
+    ---@return number
     GetWeaponEnergyRequired = function(self)
         local weapNRG = (self.EnergyRequired or 0) * (self.AdjEnergyMod or 1)
         if weapNRG < 0 then
@@ -428,9 +429,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Determine how much Energy should be drained per second
     ---@param self DefaultProjectileWeapon
-    ---@return integer
+    ---@return number
     GetWeaponEnergyDrain = function(self)
-        local weapNRG = (self.EnergyDrainPerSecond or 0) * (self.AdjEnergyMod or 1)
+        local weapNRG = (self.EnergyDrainPerSecond or 0) / (self.AdjRoFMod or 1) * (self.AdjEnergyMod or 1)
         return weapNRG
     end,
 
@@ -772,7 +773,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.WeaponUnpackingState)
                 else
                     if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
-                        ChangeState(self, self.RackSalvoChargeState)
+                        -- don't charge and then possibly fire while unaimed
+                        if not bp.RackSalvoFiresAfterCharge then
+                            ChangeState(self, self.RackSalvoChargeState)
+                        end
                     else
                         ChangeState(self, self.RackSalvoFireReadyState)
                     end
@@ -849,7 +853,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
             local unit = self.unit
             local bp = self.Blueprint
-            if bp.CountedProjectile and bp.WeaponUnpacks then
+            if bp.ManualFire and not bp.OverChargeWeapon then
                 unit:SetBusy(true)
             else
                 unit:SetBusy(false)
@@ -1053,23 +1057,37 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         break
                     end
 
-                    local proj = self:CreateProjectileAtMuzzle(muzzle)
+                    local proj
+                    if not countedProjectile or
+                        (bp.NukeWeapon and self.unit:GetNukeSiloAmmoCount() > 0) or
+                        (not bp.NukeWeapon and self.unit:GetTacticalSiloAmmoCount() > 0)
+                    then
+                        proj = self:CreateProjectileAtMuzzle(muzzle)
+                    end
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
+                            -- Play the "Strategic launch detected" VO to all armies
                             unit:NukeCreatedAtUnit()
                             unit:RemoveNukeSiloAmmo(1)
+
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = {
-                                army = self.Army - 1,
-                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and
-                                    self:GetCurrentTargetPos() or nil
-                            }
-                            if not Sync.NukeLaunchData then
-                                Sync.NukeLaunchData = {}
+                            -- Enemies receive the notification without location data to avoid cheats, while still being notified visually instead of only by audio
+
+                            local isObsOrAlly = GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())
+
+                            -- the global VO plays only when the audio exists, so notify enemies if it exists
+                            if isObsOrAlly or unit.Blueprint.Audio.NuclearLaunchDetected ~= nil then
+                                local launchData = {
+                                    army = self.Army - 1,
+                                    location = isObsOrAlly and self:GetCurrentTargetPos() or nil
+                                }
+                                if not Sync.NukeLaunchData then
+                                    Sync.NukeLaunchData = {}
+                                end
+                                table.insert(Sync.NukeLaunchData, launchData)
                             end
-                            table.insert(Sync.NukeLaunchData, launchData)
                         else
                             unit:RemoveTacticalSiloAmmo(1)
                         end

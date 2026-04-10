@@ -506,16 +506,21 @@ function CommonLogic()
                 end
             end
             tab.OnCheck = function(self, checked)
-                if checked then
+                if not SessionIsPaused() then
                     if not CanUserPause() then
                         return
                     end
+
                     SessionRequestPause()
                     self:SetGlowState(checked)
                 else
-                    SessionSendChatMessage({SendResumedBy=true})
-                    SessionResume()
-                    self:SetGlowState(checked)
+                    local status = SessionResume()
+                    if status == 'Accepted' then
+                        self:SetGlowState(checked)
+                    else
+                        -- reset the check since the resume was declined
+                        self:SetCheck(not checked, true)
+                    end
                 end
             end
             tab.OnClick = function(self, modifiers)
@@ -1195,6 +1200,15 @@ function RemoveModeText(modeID)
     UpdateModeDisplay()
 end
 
+function ClearModeText()
+    local keys = table.keys(modes, false)
+    for k = 1, table.getn(keys) do
+        modes[keys[k]] = nil
+    end
+
+    UpdateModeDisplay()
+end
+
 function UpdateModeDisplay()
     if controls.modeDisplay then
         controls.modeDisplay:Destroy()
@@ -1253,5 +1267,12 @@ function UpdateModeDisplay()
         controls.modeDisplay:DisableHitTest()
         controls.modeDisplay.minCap:DisableHitTest()
         controls.modeDisplay.maxCap:DisableHitTest()
+    end
+end
+
+FocusArmyChanged = function()
+    -- Avoid clearing the score screen button at the end of the game due to being switched to observer.
+    if not SessionIsGameOver() then
+        ClearModeText()
     end
 end

@@ -20,12 +20,53 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+---@alias DistributeOrderInfoCommandName
+---| "Stop"                         # 1
+---| "Move"                         # 2
+---| "Dive"                         # 3
+---| "FormMove"                     # 4
+---| "BuildSiloTactical"            # 5
+---| "BuildSiloNuke"                # 6
+---| "BuildFactory"                 # 7
+---| "BuildMobile"                  # 8
+---| "BuildAssist"                  # 9
+---| "Attack"                       # 10
+---| "FormAttack"                   # 11
+---| "Nuke"                         # 12
+---| "Tactical"                     # 13
+---| "Teleport"                     # 14
+---| "Guard"                        # 15
+---| "Patrol"                       # 16
+---| "Ferry"                        # 17
+---| "FormPatrol"                   # 18
+---| "Reclaim"                      # 19
+---| "Repair"                       # 20
+---| "Capture"                      # 21
+---| "TransportLoadUnits"           # 22
+---| "TransportReverseLoadUnits"    # 23
+---| "TransportUnloadUnits"         # 24
+---| "TransportUnloadSpecificUnits" # 25
+---| "DetachFromTransport"          # 26
+---| "Upgrade"                      # 27
+---| "Script"                       # 28
+---| "AssistCommander"              # 29
+---| "KillSelf"                     # 30
+---| "DestroySelf"                  # 31
+---| "Sacrifice"                    # 32
+---| "Pause"                        # 33
+---| "OverCharge"                   # 34
+---| "AggressiveMove"               # 35
+---| "FormAggressiveMove"           # 36
+---| "AssistMove"                   # 37
+---| "SpecialAction"                # 38
+---| "Dock"                         # 39
+
 ---@class DistributeOrderInfo
 ---@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any): boolean
----@field Type string                   # Describes the intended order, useful for debugging
----@field BatchOrders boolean           # When set, assigns orders to groups of units
----@field FullRedundancy boolean        # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
----@field Redundancy number             # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
+---@field Type DistributeOrderInfoCommandName   # Describes the intended order, useful for debugging
+---@field BatchOrders boolean                   # When set, assigns orders to groups of units
+---@field FullRedundancy boolean                # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
+---@field Redundancy number                     # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
 
 -- upvalue scope for performance
 local IssueNuke = IssueNuke

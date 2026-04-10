@@ -17,6 +17,7 @@ local SimPing = import("/lua/simping.lua")
 local SimTriggers = import("/lua/scenariotriggers.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -26,6 +27,7 @@ local TableMerged = table.merged
 
 -- upvalue scope for performance
 local type = type
+local TableGetn = table.getn
 local Vector = Vector
 local IsEntity = IsEntity
 local GetEntityById = GetEntityById
@@ -40,6 +42,8 @@ local IssueBuildMobile = IssueBuildMobile
 local IssueAggressiveMove = IssueAggressiveMove
 local IssueGuard = IssueGuard
 local IssueFerry = IssueFerry
+
+local GetCurrentCommandSourceArmy = SimUtils.GetCurrentCommandSourceArmy
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
@@ -62,7 +66,18 @@ function DoCallback(name, data, units)
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
     if (timeTaken > 0.005) then
-        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
+        local commandSourceNickname
+        local commandSourceArmy = GetCurrentCommandSourceArmy()
+        if commandSourceArmy then
+            commandSourceNickname = tostring(ArmyBrains[commandSourceArmy].Nickname)
+        else
+            commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+        end
+        SPEW(string.format("Time to process \"%s\" from %s: %f"
+            , name
+            , commandSourceNickname
+            , timeTaken
+        ))
     end
 end
 
@@ -264,14 +279,27 @@ Callbacks.ValidateAssist = function(data, units)
     end
 end
 
+--- Attack move doesn't exist as a command mode, so this callback substitutes that.
+---@param data { Clear: boolean }
+---@param units Unit[]
 Callbacks.AttackMove = function(data, units)
-    -- exclude structures as it makes no sense to apply a move command to them
+    -- exclude structures as they can't move and there is no sim command to issue attack move rally points for factories
     local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
+
+    -- Verify that the user manually clicked to issue the command, and use that position.
+    -- assume all units in the selection were given the same order, so we only need to check one unit
+    local commandQueue = allNonStructures[1]:GetCommandQueue()
+    local lastcommand = commandQueue[TableGetn(commandQueue)]
+    -- dummy script task should be used, although we can't check the script task's type
+    if UnitQueueDataToCommand[lastcommand.commandType].Type ~= "Script" then return end
+    -- script tasks issued without a target have x,y,z = 0
+    local x, y, z = lastcommand.x, lastcommand.y, lastcommand.z
+    if x == 0 and y == 0 and z == 0 then return end
 
     if data.Clear then
         IssueClearCommands(allNonStructures)
     end
-    IssueAggressiveMove(allNonStructures, data.Target)
+    IssueAggressiveMove(allNonStructures, { x, y, z })
 end
 
 --tells a unit to toggle its pointer
@@ -291,8 +319,10 @@ end
 -------------------------------------------------------------------------------
 --#region General orders
 
+--- Instant self destruct that only works on the selection.
+--- Alternative, simplified implementation that is unused.
 ---@param data { }
----@param selection Unit[]
+---@param selection? Unit[]
 Callbacks.SelfDestruct = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
@@ -305,7 +335,7 @@ Callbacks.SelfDestruct = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+    import("/lua/sim/commands/self-destruct.lua").SelfDestruct(selection, true)
 end
 
 --#endregion
@@ -623,7 +653,7 @@ do
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -633,7 +663,7 @@ do
         -- only apply this to engineers
         local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
         if table.empty(engineers) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -646,7 +676,7 @@ do
         local commandSourceGuard = CommandSourceGuards[commandSource]
 
         if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to interrupt path finding")
             end
 
@@ -669,7 +699,7 @@ do
         -- verify selection
         selection = SecureUnits(selection)
         if (not selection) or TableEmpty(selection) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -688,7 +718,7 @@ do
         end
 
         if table.empty(unitsWithShields) then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -701,7 +731,7 @@ do
         local commandSourceGuard = CommandSourceGuards[commandSource]
 
         if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
-            if (GetFocusArmy() == GetCurrentCommandSource()) then
+            if (GetFocusArmy() == GetCurrentCommandSourceArmy()) then
                 print("Unable to discharge")
             end
 
@@ -723,7 +753,7 @@ do
     ---@param data { Origin: number, Destination: Vector}
     ---@param selection Unit[]
     Callbacks.ExtendReclaimOrder = function(data, selection)
-        do  -- feature: area commands
+        do -- feature: area commands
             return
         end
 
@@ -811,26 +841,58 @@ end
 
 --#endregion
 
+
+--#region UI related functionality
+
+do
+    local OriginalFocusArmy = GetFocusArmy()
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    local SyncPainting = function(data)
+        -- used to determine the color of the painting
+        data.ShareablePainting.PeerName = GetArmyBrain(GetCurrentCommandSourceArmy()).Nickname
+
+        Sync.SharePaintingBrushStroke = Sync.SharePaintingBrushStroke or {}
+        table.insert(Sync.SharePaintingBrushStroke, data)
+    end
+
+    ---@param data UIShareableBrushStrokeCallbackMessage
+    Callbacks.SharePaintingBrushStroke = function(data)
+        local focusArmy = GetFocusArmy()
+        local currentCommandSourceArmy = GetCurrentCommandSourceArmy()
+
+        -- spectators are able to see all paintings. We take into account
+        -- the original focus army because spectators can change focus army
+        if OriginalFocusArmy == -1 or focusArmy == -1 then
+            SyncPainting(data)
+            return
+        end
+
+        -- allies are able to see each others paintings
+        if IsAlly(focusArmy, currentCommandSourceArmy) then
+            SyncPainting(data)
+            return
+        end
+    end
+end
+
+--#endregion
+
+
 -------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
---- An anti cheat check that passes when there is only 1 player or cheats are enabled
+
+--- An anti-cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
-local PassesAntiCheatCheck = function()
-    -- allow when cheats are enabled
+local function PassesAntiCheatCheck()
     return CheatsEnabled()
 end
 
---- A simplified check that also passes when the game has AIs
+--- An anti-cheat check that also passes when the game has AIs
 ---@return boolean
-local PassesAIAntiCheatCheck = function()
-    -- allow when there are AIs
-    if ScenarioInfo.GameHasAIs then
-        return true
-    end
-
-    -- allow when cheats are enabled
-    return PassesAntiCheatCheck()
+local function PassesAIAntiCheatCheck()
+    return ScenarioInfo.GameHasAIs or PassesAntiCheatCheck()
 end
 
 local SpawnedMeshes = {}
@@ -840,7 +902,7 @@ local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
     local bpD = bp.Display
     if __blueprints[bpD.MeshBlueprint] then
         SPEW("Spawning mesh of " .. id)
-        local entity = import('/lua/sim/Entity.lua').Entity()
+        local entity = import('/lua/sim/entity.lua').Entity()
         if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
             y = y - bp.CollisionOffsetY
         end
@@ -888,7 +950,7 @@ local function ShowRaisedPlatforms(self)
     for i = 1, (table.getn(plats) / 12) do
         entities[i] = {}
         for b = 1, 4 do
-            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
+            entities[i][b] = import('/lua/sim/entity.lua').Entity { Owner = self }
             self.Trash:Add(entities[i][b])
             entities[i][b]:SetPosition(Vector(
                 pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
@@ -985,29 +1047,43 @@ end
 
 --- Toggles the profiler on / off
 Callbacks.ToggleProfiler = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.ForceEnable or false)
 end
 
 -- Allows searching for benchmarks
 Callbacks.FindBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+    import("/lua/sim/profiler.lua").FindBenchmarks()
+end
+Callbacks.LoadBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
 end
 
 -- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmarks = function(data)
-    if not PassesAIAntiCheatCheck() then
+Callbacks.RunBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+end
+Callbacks.StopBenchmark = function(data)
+    if not PassesAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/profiler.lua").StopBenchmark()
 end
 
 Callbacks.ToggleDebugMarkersByType = function(data, units)
@@ -1353,8 +1429,14 @@ end
 ---@param data CallbackModeratorEventData
 Callbacks.ModeratorEvent = function(data)
     -- show up in the game logs
-    local brain = GetArmyBrain(GetCurrentCommandSource())
-    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), tostring(data.Message)))
+    local commandSourceNickname
+    local commandSourceArmy = GetCurrentCommandSourceArmy()
+    if commandSourceArmy then
+        commandSourceNickname = tostring(GetArmyBrain(commandSourceArmy).Nickname)
+    else
+        commandSourceNickname = string.format("Observer (source %d)", GetCurrentCommandSource())
+    end
+    SPEW(string.format("Moderator event for %s: %s", commandSourceNickname, tostring(data.Message)))
 end
 
 --#endregion

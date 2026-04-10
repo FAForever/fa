@@ -1,1 +1,0 @@
-- (#6430) Fix an `OnImpact` error caused by CZAR's depth charges.
