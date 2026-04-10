@@ -208,6 +208,7 @@ categories = {
     TACTICAL = categoryValue,
     TACTICALMISSILEPLATFORM = categoryValue,
     TANK = categoryValue,
+    -- Unit does not mantain any formation when on attack task
     TARGETCHASER = categoryValue,
     TECH1 = categoryValue,
     TECH2 = categoryValue,
