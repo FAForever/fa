@@ -1,0 +1,1 @@
+- (#7065) Scale some textures with 518 pixel size to 512.
