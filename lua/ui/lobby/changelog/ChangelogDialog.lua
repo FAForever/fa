@@ -304,7 +304,7 @@ local ChangelogDialog = ClassUI(Group) {
         local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
         -- prevent the dialog from popping up again
-        Prefs.SetToCurrentProfile(PreferenceKeys.SeenChangelog, toNumber(version))
+        Prefs.SetToCurrentProfile(PreferenceKeys.SeenChangelog, tonumber(version))
 
         EscapeHandler.PopEscapeHandler()
 
@@ -354,7 +354,7 @@ function ShouldOpenChangelog()
     local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
     local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.SeenChangelog) or 0
-    return LastChangelogVersion < toNumber(version)
+    return LastChangelogVersion < tonumber(version)
 end
 
 -------------------------------------------------------------------------------
