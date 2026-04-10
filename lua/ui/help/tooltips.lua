@@ -951,6 +951,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
         description = "<LOC OPTIONS_0219>Toggles the visibility of lifebars of on screen units (lifebars will still show in tooltip information)",
     },
+    options_gui_lifebar_only_damaged = {
+        title = "<LOC OPTIONS_0287>Show Lifebars Only When Damaged",
+        description = "<LOC OPTIONS_0288>When on, lifebars only appear once a unit takes damage. Hides them on full-HP units. Provides an FPS gain in dense crowds.",
+    },
     options_skin_change_on_start = {
         title = "<LOC OPTIONS_0211>Use Factional UI Skin",
         description = "<LOC OPTIONS_0220>When on, the UI skin will change to match the faction you are playing",

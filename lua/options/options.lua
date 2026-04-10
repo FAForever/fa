@@ -991,6 +991,22 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_0287>Show Lifebars Only When Damaged",
+                key = 'gui_lifebar_only_damaged',
+                type = 'toggle',
+                default = 0,
+                set = function(key, value, startup)
+                    ConExecute("ui_LifebarOnlyDamaged " .. tostring(value))
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC options_show_player_names_title>Show Player Names",
                 key = 'options_show_player_names',
                 type = 'toggle',
