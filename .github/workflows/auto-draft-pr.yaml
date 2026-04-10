@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-name: Convert PRs to Draft on Opening
+name: Pull Request preparation
 
 permissions:
   contents: write
@@ -31,7 +31,22 @@ jobs:
   convert_to_draft:
     runs-on: ubuntu-latest
     steps:
-      - run: gh pr ready --undo ${{ github.event.pull_request.number }}
+      - name: Add snippet
+        working-directory: fa/changelog/snippets
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+          
+          FILE=category.${{ github.event.pull_request.number }}.md
+          cp sections/template-snippet.md $FILE
+          sed -i "s/XYZW/${{ github.event.pull_request.number }}/g" $FILE
+          
+          git add .
+          git commit -m "Add snippet template"
+
+      - name: Convert PR to draft
+        run: gh pr ready --undo ${{ github.event.pull_request.number }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
