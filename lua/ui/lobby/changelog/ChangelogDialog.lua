@@ -79,6 +79,7 @@ local ModuleTrash = TrashBag()
 ---@field ContentPatchesDebug Bitmap
 ---@field ContentDivider Bitmap
 ---@field ContentPatchesList ItemList
+---@field ContentNotesList ItemList
 local ChangelogDialog = ClassUI(Group) {
 
     ---@param self UIChangelogDialog
