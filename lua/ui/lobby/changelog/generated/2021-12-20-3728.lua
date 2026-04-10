@@ -4,9 +4,14 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
 Changelog = {
     Version = 3728,
-    Title = "Game version 3728",
+    Title = " Game Patch",
     Description = {
         "# Patch 3728 (20th of December, 2021)",
+        "",
+        "These changes bring us one step closer to a better performing, more feature-rich and stable Supreme Commander: Forged Alliance. We hope you",
+        "enjoy the APM loss when the game used to slow down but no longer does.,",
+        "",
+        "The game team",
         "",
         "### Features",
         "",
