@@ -16,7 +16,7 @@ All changelogs can be found in the [changelog folder](https://github.com/FAForev
 
 ## Changelog snippets
 
-We use snippets to reduce the burden on maintainers to write an accurate changelog and at the same time enable contributors to describe the changes of a pull request. A contributor is required to create a snippet before a pull request is merged. Remember that the target audience of the changelog are the players, so try to make the changelog easily understandable. All snippets reside in the [snippets folder](https://github.com/FAForever/fa/blob/develop/changelog/snippets/). We use a [workflow](https://github.com/FAForever/fa/blob/develop/.github/workflows/docs-changelog.yaml) to compile the snippets into a typical changelog file. This changelog file can then be tweaked, spell checked and be used as (intermediate) release notes.
+We use snippets to reduce the burden on maintainers to write an accurate changelog and at the same time enable contributors to describe the changes of a pull request. A contributor is required to create a snippet before a pull request is merged. Remember that the target audience of the changelog are the players, so try to make the changelog easily understandable. All snippets reside in the [snippets folder](https://github.com/FAForever/fa/blob/develop/changelog/snippets/). We use a [workflow](https://github.com/FAForever/fa/blob/develop/.github/workflows/docs-generate-changelog.yaml) to compile the snippets into a typical changelog file. This changelog file can then be tweaked, spell checked and be used as (intermediate) release notes.
 
 ### Format of a snippet
 
