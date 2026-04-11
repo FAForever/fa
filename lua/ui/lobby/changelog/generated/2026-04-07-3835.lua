@@ -4,10 +4,8 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
 Changelog = {
     Version = 3835,
-    Title = " Hotfix",
+    Title = "Hotfix",
     Description = {
-        "# Game version 3835 (7th of April 2026)",
-        "",
         "A leftover change from April fools made the overcharge projectile invisible. This is now fixed.",
         "",
         "Kind regards,",
