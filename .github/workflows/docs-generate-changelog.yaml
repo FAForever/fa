@@ -80,13 +80,14 @@ jobs:
 
       - name: Create the changelog file
         working-directory: fa/changelog/snippets # script assumes it is in this directory
+        env:
+          REFERENCE: ${{ inputs.branch || github.head_ref || github.ref_name }}
         # We need to remove the `/` any anything in front of it from the branch name.
         # Specifically the `/` is problematic in a file name.
         run: |
-          REFERENCE="${{ inputs.branch || github.head_ref || github.ref_name}}"
           NAME="changelog-${REFERENCE##*/}"
           echo "NAME=$NAME" >> $GITHUB_ENV
-          changelog-combine.sh $NAME
+          changelog-combine.sh "$NAME"
 
       - name: Add the changelog as an artifact
         uses: actions/upload-artifact@v4
