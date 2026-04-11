@@ -81,7 +81,7 @@ def markdown2lua(version: str, content: str) -> str:
 
     return LUA_FILE.format(
         version=version,
-        title = yaml_data.get('title').split('-')[-1],
+        title = yaml_data.get('title').split(' - ')[-1],
         description=lua_description,
     )
 
