@@ -24,10 +24,6 @@ on:
   push:
     paths: ["docs/_posts/**", ".github/workflows/scripts/python/**"]
   workflow_call:
-    inputs:
-      artifact:
-        type: string # fafdevelop or fafbeta
-        description: The reference (branch or tag) to use to compile the changelog snippets from
 
 jobs:
   convert_changelog:
@@ -42,22 +38,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-
-      - name: Download develop artifact
-        if: inputs.artifact == 'fafdevelop'
-        uses: actions/download-artifact@v4
-        with:
-          name: changelog-fafdevelop
-          path: docs/_posts
-          merge-multiple: true
-
-      - name: Download balance artifact
-        if: inputs.artifact == 'fafbeta'
-        uses: actions/download-artifact@v4
-        with:
-          name: changelog-fafbeta
-          path: docs/_posts
-          merge-multiple: true
 
       - name: Setup python
         uses: actions/setup-python@v5

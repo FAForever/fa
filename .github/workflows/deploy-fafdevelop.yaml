@@ -92,8 +92,6 @@ jobs:
 
       - name: Convert changelog to Lua
         uses: ./.github/workflows/docs-convert-changelog.yaml
-        with:
-          artifact: fafdevelop
 
       - name: Commit the new changelog
         run: |
