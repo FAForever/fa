@@ -59,9 +59,11 @@ jobs:
       - name: Checkout snippets
         uses: actions/checkout@v4
         with:
+          # We need to check out the fork repo when the PR branch is on a fork.
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           path: fa
           # Make sure that we run from the correct branch when triggered in a pull request.
-          ref: ${{ inputs.branch || github.head_ref || github.ref_name}}
+          ref: ${{ inputs.branch || github.head_ref || github.ref_name }}
           sparse-checkout: |
             changelog/snippets
 
