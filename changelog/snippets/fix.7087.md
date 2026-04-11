@@ -1,0 +1,1 @@
+- (#7087) Fix torpedoes having difficulties hitting the Cybran Frigate when it is turning.
