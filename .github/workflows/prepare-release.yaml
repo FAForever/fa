@@ -30,6 +30,8 @@ on:
       date:
         type: string
         description: The date of the patch (yyyy-mm-dd). Leave empty to use today's date.
+        required: false
+        default: ""
   push:
 
 jobs:
@@ -71,7 +73,10 @@ jobs:
       - name: Create changelog post
         working-directory: changelog/snippets
         run: |
-          PATCHDATE = ${{ inputs.reference || date }}
+          PATCHDATE = ${{ inputs.reference }}
+          if [ -z "$PATCHDATE" ]; then
+            PATCHDATE=$(date +%Y-%m-%d)
+          fi
           DATE=$(date $PATCHDATE +%Y-%m-%d)
           DAY=$(date $PATCHDATE +%d)
           MONTH=$(date $PATCHDATE +%B)
