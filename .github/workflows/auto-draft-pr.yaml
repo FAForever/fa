@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add snippet
-        working-directory: fa/changelog/snippets
+        working-directory: changelog/snippets
         run: |
           # Configure git
           git config user.email "github@faforever.com"
