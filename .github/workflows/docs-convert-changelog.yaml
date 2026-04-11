@@ -21,22 +21,12 @@
 name: Convert Markdown changelog to Lua
 
 on:
-  workflow_dispatch:
-    inputs:
-      reference:
-        required: true
-        type: choice
-        description: The reference (branch or tag) to use to compile the changelog snippets from
-        options:
-          - develop
-          - deploy/fafbeta
-          - deploy/fafdevelop
-
+  push:
+    paths: ["docs/_posts/**", ".github/workflows/scripts/python/**"]
   workflow_call:
     inputs:
-      reference:
-        required: true
-        type: string
+      artifact:
+        type: string # fafdevelop or fafbeta
         description: The reference (branch or tag) to use to compile the changelog snippets from
 
 jobs:
@@ -51,9 +41,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            ${{ env.SCRIPTS }}
-            changelog
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+
+      - name: Download develop artifact
+        if: inputs.artifact == 'fafdevelop'
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafdevelop
+          path: docs/_posts
+          merge-multiple: true
+
+      - name: Download balance artifact
+        if: inputs.artifact == 'fafbeta'
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-fafbeta
+          path: docs/_posts
+          merge-multiple: true
 
       - name: Setup python
         uses: actions/setup-python@v5
@@ -67,20 +71,38 @@ jobs:
 
       - name: Convert changelog to Lua
         run: |
-          out_dir=lua_changelog
-          mkdir $out_dir
-          for file in changelog/*.md; do
-            out_file=$(basename ${file%.md}.lua)
-            python3 $SCRIPTS/changelog_markdown2lua.py "${file}" "${out_dir}/${out_file}"
-          done
+          rm lua/ui/lobby/changelog/generated/*
+          out_dir=lua/ui/lobby/changelog/generated
+          python3 $SCRIPTS/changelog_markdown2lua.py "docs/_posts" "${out_dir}"
+
+      - name: Create changelog overview in Lua
+        run: |
+          out_dir=lua/ui/lobby/changelog/generated
+          python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
+
+      - name: Commit the generated files
+        continue-on-error: true  # there might be nothing to commit
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git add .
+          git commit -m "Update lobby changelogs"
+          git push
 
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
           name: lua_changelog
           path: |
-            lua_changelog
+            lua/ui/lobby/changelog/generated
 
+  # It's a bit awkward to validate after committing, but doing it in a unified
+  # pipeline would either require making all other steps work in this container
+  # or manually installing https://github.com/FAForever/lua-lang and I don't want
+  # to do either of those.
+  # The failing CI should still alert the user that something went wrong.
   validate_lua_changelog:
     name: Validate Lua changelog
     runs-on: ubuntu-latest
