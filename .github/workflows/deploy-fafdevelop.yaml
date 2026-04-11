@@ -36,21 +36,9 @@ jobs:
   test:
     uses: ./.github/workflows/tests.yaml
 
-  changelog:
-    name: Create changelog of FAF Develop
-    uses: ./.github/workflows/docs-changelog.yaml
-    with:
-      reference: staging/fafdevelop
-
-  changelog-lua:
-    name: Convert changelogs to Lua
-    needs: [changelog]
-    uses: ./.github/workflows/docs-convert-changelog.yaml
-    with:
-      artifact: fafdevelop
-  update:
+  deploy:
     name: Update FAF Develop
-    needs: [test, changelog-lua]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       # https://github.com/actions/checkout/tree/v4/
@@ -76,14 +64,7 @@ jobs:
           # debugging
           cat lua/version.lua
 
-      - name: Commit embedding version information
-        continue-on-error: true
-        run: |
-          git stage .
-          git commit -m "Embed version information"
-
       # Disable debugging statements
-      #
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Overwrite debug references
         run: |
@@ -92,32 +73,32 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      - name: Commit the update to debug references
-        continue-on-error: true
+      - name: Commit the changes
         run: |
           git stage .
-          git commit -m "Update debug references"
+          git commit -m "Post-process deployment"
 
-      # Retrieve the generated changelogs
-      - name: Download lua changelogs
-        uses: actions/download-artifact@v4
+      - name: Create changelog of FAF Develop
+        uses: ./.github/workflows/docs-generate-changelog.yaml
         with:
-          name: lua_changelog
-          path: lua/ui/lobby/changelog/generated
+          branch: staging/fafdevelop
 
-      - name: Commit the new changelogs
-        continue-on-error: true
+      - name: Create changelog post
+        working-directory: changelog/snippets
         run: |
-          git status
-          git stage .
-          git commit -m "Add changelogs"
+          FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
+          cat sections/template-header-fafdevelop.md >> $FILE
+          cat changelog-fafdevelop.md >> $FILE
 
-      - name: Add the changelog as an artifact
-        uses: actions/upload-artifact@v4
+      - name: Convert changelog to Lua
+        uses: ./.github/workflows/docs-convert-changelog.yaml
         with:
-          name: lua
-          path: |
-            lua/ui/lobby
+          artifact: fafdevelop
+
+      - name: Commit the new changelog
+        run: |
+          git stage lua/ui/lobby/changelog/generated
+          git commit -m "Add changelog"
 
       # Update the deploy/fafdevelop branch, we force push here because
       # we're not interested in fixing conflicts
