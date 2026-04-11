@@ -18,6 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+# This workflow creates a pull request with all the necessary changes to deploy a new patch
+# The changelog gets generated based on the staging/faf branch
+
 name: Prepare release
 
 on:
@@ -29,14 +33,6 @@ on:
   push:
 
 jobs:
-
-  changelog-develop:
-    name: Create changelog of develop branch
-    uses: ./.github/workflows/docs-generate-changelog.yaml
-    with:
-      reference: develop
-
-
   release-preparation:
     name: Prepare files for patch
     runs-on: ubuntu-latest
@@ -67,11 +63,10 @@ jobs:
           fi
           git checkout -b "${{ steps.meta.outputs.branch }}"
 
-      - name: Download changelog artifact
-        uses: actions/download-artifact@v4
+      - name: Create changelog based on staging/faf
+        uses: ./.github/workflows/docs-generate-changelog.yaml
         with:
-          name: changelog-develop
-          path: changelog/snippets
+          branch: staging/faf
 
       - name: Create changelog post
         working-directory: changelog/snippets
@@ -87,10 +82,10 @@ jobs:
           sed -i "s/Day/$DAY/g" $FILE
           sed -i "s/Month/$MONTH/g" $FILE
           sed -i "s/Year/$YEAR/g" $FILE
-          cat changelog-develop.md >> $FILE
+          cat changelog-faf.md >> $FILE
           cat sections/template-footer.md >> $FILE
 
-      - name: Update lua changelog
+      - name: Convert changelog to Lua
         uses: ./.github/workflows/docs-convert-changelog.yaml
 
       - name: Commit changelog
