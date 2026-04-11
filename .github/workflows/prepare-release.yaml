@@ -55,14 +55,15 @@ jobs:
           echo "version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create branch
+        id: branch
         run: |
           BRANCH="changelog${{ steps.version.outputs.version }}"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
-          if git ls-remote --heads origin "${{ steps.meta.outputs.branch }}" | grep -q .; then
-            echo "Branch '${{ steps.meta.outputs.branch }}' already exists. Aborting workflow."
+          if git ls-remote --heads origin "$BRANCH" | grep -q .; then
+            echo "Branch '$BRANCH' already exists. Aborting workflow."
             exit 1
           fi
-          git checkout -b "${{ steps.meta.outputs.branch }}"
+          git checkout -b "$BRANCH"
 
       - name: Create changelog based on staging/faf
         uses: ./.github/workflows/docs-generate-changelog.yaml
@@ -116,14 +117,14 @@ jobs:
 
       - name: Push branch
         run: |
-          git push origin "${{ steps.meta.outputs.branch }}"
+          git push origin "${{ steps.branch.outputs.branch }}"
 
       - name: Create Pull Request
         uses: actions/github-script@v7
         with:
           script: |
             const version = "${{ steps.version.outputs.version }}";
-            const branch = "${{ steps.meta.outputs.branch }}";
+            const branch = "${{ steps.branch.outputs.branch }}";
             
             await github.rest.pulls.create({
               owner: context.repo.owner,
