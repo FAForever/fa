@@ -31,9 +31,7 @@ local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
 local ChangelogOverview = import("/lua/ui/lobby/changelog/generated/overview.lua")
 
-local PreferenceKeys = {
-    SeenChangelog = "LobbyChangelog",
-}
+local SeenChangelog = "LobbyChangelog"
 
 ---@class UIChangelogOverview
 ---@field Changelogs UIChangelogMetadata[]
@@ -305,7 +303,7 @@ local ChangelogDialog = ClassUI(Group) {
         local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
         -- prevent the dialog from popping up again
-        Prefs.SetToCurrentProfile(PreferenceKeys.SeenChangelog, tonumber(version))
+        Prefs.SetToCurrentProfile(SeenChangelog, tonumber(version))
 
         EscapeHandler.PopEscapeHandler()
 
@@ -354,7 +352,7 @@ end
 function ShouldOpenChangelog()
     local version, gametype, commit = import("/lua/version.lua").GetVersionData()
 
-    local LastChangelogVersion = Prefs.GetFromCurrentProfile(PreferenceKeys.SeenChangelog) or 0
+    local LastChangelogVersion = Prefs.GetFromCurrentProfile(SeenChangelog) or 0
     return LastChangelogVersion < tonumber(version)
 end
 
