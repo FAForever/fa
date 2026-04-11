@@ -35,7 +35,8 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/tests.yaml
-  update:
+
+  deploy:
     name: Update FAF Beta Balance
     needs: [test]
     runs-on: ubuntu-latest
@@ -45,8 +46,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
-          repository: FAForever/fa
           ref: staging/fafbeta
+
+      - name: Setup Git configuration
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
 
       # Allows us to better understand the game version and the specific commit hash when we receive a log
       - name: Update version references
@@ -59,7 +65,6 @@ jobs:
           cat lua/version.lua
 
       # Disable debugging statements
-      #
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Overwrite debug references
         run: |
@@ -68,15 +73,30 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      # Create a commit with the changes of the workflow in it
-      - name: Create a commit
+      - name: Commit the changes
         run: |
-          # Configure git
-          git config user.email "github@faforever.com"
-          git config user.name "FAForever Machine User"
-
-          git add .
+          git stage .
           git commit -m "Post-process deployment"
+
+      - name: Create changelog of FAF beta
+        uses: ./.github/workflows/docs-generate-changelog.yaml
+        with:
+          branch: staging/fafbeta
+
+      - name: Create changelog post
+        working-directory: changelog/snippets
+        run: |
+          FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
+          cat sections/template-header-fafbeta.md >> $FILE
+          cat changelog-fafbeta.md >> $FILE
+
+      - name: Convert changelog to Lua
+        uses: ./.github/workflows/docs-convert-changelog.yaml
+
+      - name: Commit the new changelog
+        run: |
+          git stage lua/ui/lobby/changelog/generated
+          git commit -m "Add changelog"
 
       # Update the deploy/fafbeta branch, we force push here because
       # we're not interested in fixing conflicts
