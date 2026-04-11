@@ -22,8 +22,7 @@ name: Convert Markdown changelog to Lua
 
 on:
   push:
-    paths: ["docs/_posts/**"]
-  workflow_dispatch:
+    paths: ["docs/_posts/**", ".github/workflows/scripts/python/**"]
   workflow_call:
     inputs:
       artifact:
