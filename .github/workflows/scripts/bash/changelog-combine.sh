@@ -28,18 +28,6 @@
 # The primary check is whether we launched the script from the correct 
 # directory. The active directory should always be '(...)/fa/changelog/snippets'
 
-templateHeader="sections/template-header.md"
-if ! [ -e "$templateHeader" ]; then
-    echo "No markdown template for the header found. Are you starting the script from the wrong directory?"
-    exit 1
-fi
-
-templateFooter="sections/template-footer.md"
-if ! [ -e "$templateFooter" ]; then
-    echo "No markdown template for the footer found. Are you starting the script from the wrong directory?"
-    exit 1
-fi
-
 templateFix="sections/template-fix.md"
 if ! [ -e "$templateFix" ]; then
     echo "No markdown template for bug fixes found. Are you starting the script from the wrong directory?"
