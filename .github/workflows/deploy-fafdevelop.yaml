@@ -43,12 +43,14 @@ jobs:
       reference: staging/fafdevelop
 
   changelog-lua:
-    name: Convert changelogs to Lua
+    name: Convert changelog to Lua
     needs: [changelog]
     uses: ./.github/workflows/docs-convert-changelog.yaml
     with:
-      artifact: fafdevelop
-  update:
+      branch: staging/fafdevelop
+      additional-changelog: fafdevelop
+
+  deploy:
     name: Update FAF Develop
     needs: [test, changelog-lua]
     runs-on: ubuntu-latest
@@ -76,14 +78,7 @@ jobs:
           # debugging
           cat lua/version.lua
 
-      - name: Commit embedding version information
-        continue-on-error: true
-        run: |
-          git stage .
-          git commit -m "Embed version information"
-
       # Disable debugging statements
-      #
       # You can overwrite these adjustments by setting up a `Debug` folder
       - name: Overwrite debug references
         run: |
@@ -92,32 +87,25 @@ jobs:
           # debugging
           cat lua/shared/components/DebugComponent.lua
 
-      - name: Commit the update to debug references
-        continue-on-error: true
+      - name: Commit the changes
         run: |
           git stage .
-          git commit -m "Update debug references"
+          git commit -m "Post-process deployment"
 
-      # Retrieve the generated changelogs
-      - name: Download lua changelogs
+      - name: Delete old lua changelogs
+        run: rm lua/ui/lobby/changelog/generated/*
+
+      - name: Retrieve generated lua changelog
         uses: actions/download-artifact@v4
         with:
           name: lua_changelog
           path: lua/ui/lobby/changelog/generated
 
-      - name: Commit the new changelogs
-        continue-on-error: true
+      - name: Commit lua changelog
         run: |
           git status
-          git stage .
-          git commit -m "Add changelogs"
-
-      - name: Add the changelog as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lua
-          path: |
-            lua/ui/lobby
+          git stage lua/ui/lobby/changelog/generated
+          git commit -m "Add changelog"
 
       # Update the deploy/fafdevelop branch, we force push here because
       # we're not interested in fixing conflicts
