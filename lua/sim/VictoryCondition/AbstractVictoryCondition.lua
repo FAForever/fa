@@ -22,6 +22,7 @@
 
 local DebugComponent = import("/lua/shared/components/DebugComponent.lua").DebugComponent
 local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
+local SimUtils = import("/lua/simutils.lua")
 
 -- upvalue for performance
 local TableGetn = table.getn
@@ -43,8 +44,10 @@ AbstractVictoryCondition = Class(DebugComponent) {
     --- An attempt to end the game. The monitoring thread continues to catch draws. It will take this many seconds to declare victory and start the end game procedure.
     DelayBeforeVictory = 5,
 
-    --- Once the game is guaranteed to end, it will take this many seconds to end the game.
-    DelayBeforeGameEnds = 1,
+    --- Once the game is guaranteed to end, it will take this many seconds to end the game. This needs
+    --- to be three or more seconds for campaign/coop to end gracefully. It takes three seconds for 
+    --- an operation (campaign/coop) to end via `ScenarioFramework.EndOperation`.
+    DelayBeforeGameEnds = 3,
 
     ---@param self AbstractVictoryCondition
     __init = function(self)
@@ -279,6 +282,8 @@ AbstractVictoryCondition = Class(DebugComponent) {
             KillThread(self.ProcessGameStateThreadInstance)
             self.ProcessGameStateThreadInstance = nil
         end
+
+        SimUtils.GameIsEnding = true
 
         self.Trash:Add(ForkThread(self.EndGameThread, self))
     end,

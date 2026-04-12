@@ -301,6 +301,8 @@ BuffEffects = {
         local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
         local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
 
+        val = math.round(val)
+
         local oldmax = unit:GetMaxHealth()
         local difference = oldmax - unit:GetHealth()
 

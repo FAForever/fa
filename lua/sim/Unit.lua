@@ -3148,6 +3148,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, DebugUni
     -- GENERIC WORK
     -------------------------------------------------------------------------------------------
 
+    --- Called by the engine when a unit starts repairing a unit in the enhancing state.
     ---@param self Unit
     ---@param target Unit
     InheritWork = function(self, target)

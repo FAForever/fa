@@ -1,1 +1,0 @@
-- (#6529) Update German localization of loading tips.
