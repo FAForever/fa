@@ -78,10 +78,10 @@ jobs:
           if [ -z "$PATCHDATE" ]; then
             PATCHDATE=$(date +%Y-%m-%d)
           fi
-          DATE=$(date $PATCHDATE +%Y-%m-%d)
-          DAY=$(date $PATCHDATE +%d)
-          MONTH=$(date $PATCHDATE +%B)
-          YEAR=$(date $PATCHDATE +%Y)
+          DATE=$(date -d $PATCHDATE +%Y-%m-%d)
+          DAY=$(date -d $PATCHDATE +%d)
+          MONTH=$(date -d $PATCHDATE +%B)
+          YEAR=$(date -d $PATCHDATE +%Y)
           FILE="${{ github.workspace }}/docs/_posts/$DATE-${{ steps.version.outputs.version }}.md"
           cat sections/template-header-patch.md >> $FILE
           sed -i "s/XYZW/${{ steps.version.outputs.version }}/g" $FILE
