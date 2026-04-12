@@ -1,3 +1,7 @@
+---
+title: Upcoming changes
+---
+
 # Upcoming changes
 
 This is the preliminary changelog for the next game patch.

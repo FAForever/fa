@@ -37,10 +37,10 @@ jobs:
     uses: ./.github/workflows/tests.yaml
 
   changelog:
-    name: Create changelog of FAF Develop
-    uses: ./.github/workflows/docs-changelog.yaml
+    name: Create changelog of FAF Beta
+    uses: ./.github/workflows/docs-generate-changelog.yaml
     with:
-      reference: staging/fafbeta
+      branch: staging/fafbeta
 
   changelog-lua:
     name: Convert changelog to Lua

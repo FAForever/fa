@@ -45,6 +45,11 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
           ref: ${{ inputs.branch }}
+          sparse-checkout: |
+            changelog/snippets
+            docs/_posts
+            lua/ui/lobby
+            .github/workflows
 
       - name: Download develop changelog
         if: inputs.additional-changelog == 'fafdevelop'
@@ -56,7 +61,7 @@ jobs:
         if: inputs.additional-changelog == 'fafdevelop'
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafdevelop.md"
-          cat sections/template-header-fafdevelop.md >> $FILE
+          cat changelog/snippets/sections/template-header-fafdevelop.md >> $FILE
           cat changelog-fafdevelop.md >> $FILE
 
       - name: Download beta changelog
@@ -69,7 +74,7 @@ jobs:
         if: inputs.additional-changelog == 'fafbeta'
         run: |
           FILE="${{ github.workspace }}/docs/_posts/fafbeta.md"
-          cat sections/template-header-fafbeta.md >> $FILE
+          cat changelog/snippets/sections/template-header-fafbeta.md >> $FILE
           cat changelog-fafbeta.md >> $FILE
 
       - name: Setup python

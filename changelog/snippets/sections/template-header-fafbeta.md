@@ -1,3 +1,7 @@
+---
+title: Experimental changes
+---
+
 # Experimental changes
 
 This game mode is for testing new features or balance changes.
