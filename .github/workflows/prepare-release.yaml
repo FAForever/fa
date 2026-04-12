@@ -74,7 +74,7 @@ jobs:
       - name: Create changelog post
         working-directory: changelog/snippets
         run: |
-          PATCHDATE = ${{ inputs.reference }}
+          PATCHDATE=${{ inputs.reference }}
           if [ -z "$PATCHDATE" ]; then
             PATCHDATE=$(date +%Y-%m-%d)
           fi
