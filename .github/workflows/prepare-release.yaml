@@ -68,8 +68,8 @@ jobs:
       - name: Create changelog based on staging/faf
         working-directory: changelog/snippets
         run: |
-          .github/workflows/scripts/bash/changelog-verify.sh
-          .github/workflows/scripts/bash/changelog-combine.sh
+          ${{ github.workspace }}/.github/workflows/scripts/bash/changelog-verify.sh
+          ${{ github.workspace }}/.github/workflows/scripts/bash/changelog-combine.sh
 
       - name: Create changelog post
         working-directory: changelog/snippets
