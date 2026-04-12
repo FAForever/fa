@@ -1,0 +1,80 @@
+# Copyright (c) 2026 FAForever
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+# This workflow ensures that the changelogs available in the game lobby stay in
+# sync with the changelogs on the website.
+
+name: Synchronize game changelogs
+
+on:
+  push:
+    paths: ["docs/_posts/**", ".github/workflows/scripts/python/**"]
+    branches-ignore:
+      - 'staging/faf'
+      - 'staging/fafbeta'
+      - 'staging/fafdevelop'
+      - 'deploy/faf'
+      - 'deploy/fafbeta'
+      - 'deploy/fafdevelop'
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: true
+        description: The branch to check out
+jobs:
+  convert-changelog:
+    name: Convert changelog to Lua
+    uses: ./.github/workflows/docs-convert-changelog.yaml
+    with:
+      branch: ${{ inputs.branch || github.head_ref || github.ref_name }}
+
+  commit_changelog:
+    name: Commit lua changelog changes
+    runs-on: ubuntu-latest
+    needs: [convert-changelog]
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+          ref: ${{ inputs.branch || github.head_ref || github.ref_name }}
+
+      - name: Delete old lua changelogs
+        run: rm lua/ui/lobby/changelog/generated/*
+
+      - name: Retrieve generated lua changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: lua_changelog
+          path: lua/ui/lobby/changelog/generated
+
+      - name: Commit the generated files
+        continue-on-error: true  # there might be nothing to commit
+        run: |
+          # Configure git
+          git config user.email "github@faforever.com"
+          git config user.name "FAForever Machine User"
+
+          git add .
+          git commit -m "Update lobby changelogs"
+          git push

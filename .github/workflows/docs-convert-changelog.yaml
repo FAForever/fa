@@ -21,8 +21,6 @@
 name: Convert all Markdown changelogs to Lua
 
 on:
-  push:
-    paths: ["docs/_posts/**", ".github/workflows/scripts/python/**"]
   workflow_call:
     inputs:
       branch:
@@ -95,17 +93,6 @@ jobs:
           out_dir=lua/ui/lobby/changelog/generated
           python3 $SCRIPTS/changelog_overview.py "docs/_posts" "${out_dir}/overview.lua"
 
-      - name: Commit the generated files
-        continue-on-error: true  # there might be nothing to commit
-        run: |
-          # Configure git
-          git config user.email "github@faforever.com"
-          git config user.name "FAForever Machine User"
-
-          git add .
-          git commit -m "Update lobby changelogs"
-          git push
-
       - name: Add the Lua changelog as an artifact
         uses: actions/upload-artifact@v4
         with:
@@ -113,11 +100,6 @@ jobs:
           path: |
             lua/ui/lobby/changelog/generated
 
-  # It's a bit awkward to validate after committing, but doing it in a unified
-  # pipeline would either require making all other steps work in this container
-  # or manually installing https://github.com/FAForever/lua-lang and I don't want
-  # to do either of those.
-  # The failing CI should still alert the user that something went wrong.
   validate_lua_changelog:
     name: Validate Lua changelog
     runs-on: ubuntu-latest
