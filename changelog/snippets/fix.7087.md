@@ -1,1 +1,1 @@
-- (#7087) Fix torpedoes having difficulties hitting the Cybran Frigate when it is turning.
+- (#7087) Fix torpedoes having difficulties hitting the Cybran Frigate (URS0103) when it is turning.
