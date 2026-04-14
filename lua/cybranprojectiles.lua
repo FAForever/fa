@@ -498,7 +498,7 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     --- Note: Damage is done once in AOE by main projectile. Secondary projectiles
     --- are just visual.
     ---@param self CNeutronClusterBombProjectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         if self.Impacted == false then
@@ -523,7 +523,7 @@ CNeutronClusterBombProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
     --- Overiding Destruction
     ---@param self CNeutronClusterBombProjectile
-    ---@param targetType string
+    ---@param targetType ImpactType
     ---@param targetEntity Unit
     OnImpactDestroy = function(self, targetType, targetEntity)
         self.Trash:Add(ForkThread(self.DelayedDestroyThread, self))
