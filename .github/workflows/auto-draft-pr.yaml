@@ -28,9 +28,15 @@ on:
     types: [opened]
 
 jobs:
-  convert_to_draft:
+  prepare_pr:
+    name: Prepare pull request
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ssh-key: ${{ secrets.SSH_FAFOREVER_MACHINE_USER }}
+
       - name: Add snippet
         working-directory: changelog/snippets
         run: |
@@ -44,6 +50,7 @@ jobs:
           
           git add .
           git commit -m "Add snippet template"
+          git push
 
       - name: Convert PR to draft
         run: gh pr ready --undo ${{ github.event.pull_request.number }}
