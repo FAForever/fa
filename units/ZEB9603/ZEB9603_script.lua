@@ -11,7 +11,7 @@
 local TSeaFactoryUnit = import("/lua/terranunits.lua").TSeaFactoryUnit
 
 ---@class UEB0303 : TSeaFactoryUnit
-ZEB0303 = ClassUnit(TSeaFactoryUnit) {
+ZEB9603 = ClassUnit(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -15, 0, 0, -1)
@@ -77,4 +77,4 @@ ZEB0303 = ClassUnit(TSeaFactoryUnit) {
     end,
 }
 
-TypeClass = ZEB0303
+TypeClass = ZEB9603
