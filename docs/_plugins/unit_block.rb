@@ -9,10 +9,17 @@ module Jekyll
     def render(context)
       name = super.strip
 
+      icon_name =
+        if @unit_id.start_with?("enhancements")
+          "#{@unit_id}.png"
+        else
+          "#{@unit_id.upcase}_icon.png"
+        end
+
       <<~HTML
-      <div class="unit-header" data-unit="#{@unit_id}">
+      <div class="unit-header">
         <img class="unit-icon"
-             src="/assets/icons/#{@unit_id}.png">
+             src="/assets/icons/#{icon_name}">
         <span class="unit-name">#{name}</span>
       </div>
       HTML

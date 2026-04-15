@@ -16,8 +16,12 @@
   display: inline-block;
 }
 
-.unit-header + ul > li {
+.change-category {
   font-weight: 600;
+}
+
+.change {
+  font-weight: 300;
 }
 
 .old {
@@ -27,5 +31,4 @@
 
 .new {
   color: #2da44e;
-  font-weight: 600;
 }

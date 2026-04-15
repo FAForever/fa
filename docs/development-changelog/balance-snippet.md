@@ -15,7 +15,7 @@ The snippet file should be named `balance.<PR Number>.md`.
 {% endunit %}
 <Description> (#<PR Number>)
 - <Category>:
-  - <Parameter Name>: <value before> --> <value after>
+  - <Parameter Name>: <value before> -> <value after>
 ```
 
 - PR Number: The number of the pull request on GitHub.
@@ -37,9 +37,9 @@ Salem Class: T2 Destroyer
 {% endunit %}
 Reduced Salem’s anti-torpedo flare target check interval from 1.0s to 0.4s—the standard for anti-projectile weapons. This improves torpedo detection and flare response, especially against torpedo bombers. In turn the movement speed has been tuned down (#6339).
 - Anti Torpedo:
-    - Target Check Interval: 1s --> 0.4s
+    - Target Check Interval: 1s -> 0.4s
 - Movement:
-    - Max speed : 5 --> 4
+    - Max speed : 5 -> 4
 ```
 ```md
 {% unit UEA0102 %}
@@ -47,7 +47,7 @@ All T1 Interceptors
 {% endunit %} 
 Reduce the distance at which T1 Interceptors hover instead of turning when given a move order (#6342).
 - Air Movement:
-    - Start Turn Distance: 10 --> 5
+    - Start Turn Distance: 10 -> 5
 ```
 ```md
 {% unit enhancements/cybran/torp %}
@@ -55,6 +55,6 @@ Nanite Torpedo Launcher
 {% endunit %}
 Further increase the MuzzleSalvoSize of the Cybran ACU's Nanite Torpedo upgrade to 4, as it still had difficulties penetrating torpedo defenses after (#6476) increased it to 3. Its DPS remains unchanged (#6542).
 - Torpedo weapon:
-    - Damage (DPS): 60 (225) --> 45 (225)
-    - Muzzle Salvo Size: 3 --> 4
+    - Damage (DPS): 60 (225) -> 45 (225)
+    - Muzzle Salvo Size: 3 -> 4
 ```
