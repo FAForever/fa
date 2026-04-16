@@ -41,7 +41,7 @@ AirUnit = ClassUnit(MobileUnit) {
         end
     end,
 
-    --@paranm self AirUnit
+    --@param self AirUnit
     RandomiseElevation = function(self)
         local maxElevationDelta = 5
         local maxElevationPercentageIncrease = 5
