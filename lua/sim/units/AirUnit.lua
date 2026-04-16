@@ -47,12 +47,12 @@ AirUnit = ClassUnit(MobileUnit) {
         local maxElevationPercentageIncrease = 5
         local maxElevationPercentageDecrease = 5
 
-+        local blueprint = self.Blueprint
-+        local blueprintPhysics = blueprint and blueprint.Physics
-+        local originalElevation = blueprintPhysics and blueprintPhysics.Elevation
-+        if type(originalElevation) ~= 'number' then
-+            return
-+        end
+        local blueprint = self.Blueprint
+        local blueprintPhysics = blueprint and blueprint.Physics
+        local originalElevation = blueprintPhysics and blueprintPhysics.Elevation
+        if type(originalElevation) ~= 'number' then
+            return
+        end
 
         local elevationMultiplier = Random(100-maxElevationPercentageDecrease, 100+maxElevationPercentageIncrease) * 0.01
 
