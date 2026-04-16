@@ -25,6 +25,7 @@ AirUnit = ClassUnit(MobileUnit) {
         MobileUnitOnCreate(self)
         self.HasFuel = true
         self:AddPingPong()
+        self:RandomiseElevation()
     end,
 
     ---@param self AirUnit
@@ -38,6 +39,27 @@ AirUnit = ClassUnit(MobileUnit) {
                     bp.Ping2, bp.Ping2Speed, bp.Pong2, bp.Pong2Speed)
             end
         end
+    end,
+
+    --@paranm self AirUnit
+    RandomiseElevation = function(self)
+        local maxElevationDelta = 5
+        local maxElevationPercentageIncrease = 5
+        local maxElevationPercentageDecrease = 5
+
+        local blueprintPhysics = self.Blueprint.Physics
+        local originalElevation = blueprintPhysics.Elevation
+        local elevationMultiplier = math.random(100-maxElevationPercentageDecrease, 100+maxElevationPercentageIncrease) * 0.01
+
+        local newElevation
+
+        if elevationMultiplier > 1 then
+            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + 5)
+        else
+            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - 5)
+        end
+
+        self:SetElevation(newElevation)
     end,
 
     ---@param self AirUnit
