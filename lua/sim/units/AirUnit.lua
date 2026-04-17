@@ -48,6 +48,13 @@ AirUnit = ClassUnit(MobileUnit) {
         local maxElevationPercentageDecrease = 5
 
         local blueprint = self.Blueprint
+
+        local blueprintCategoriesHash = blueprint.CategoriesHash
+
+        if (blueprintCategoriesHash["NORANDOMELEVATION"]) then
+            return
+        end
+
         local blueprintPhysics = blueprint and blueprint.Physics
         local originalElevation = blueprintPhysics and blueprintPhysics.Elevation
         if type(originalElevation) ~= 'number' then
@@ -59,9 +66,9 @@ AirUnit = ClassUnit(MobileUnit) {
         local newElevation
 
         if elevationMultiplier > 1 then
-            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + 5)
+            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + maxElevationDelta)
         else
-            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - 5)
+            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - maxElevationDelta)
         end
 
         self:SetElevation(newElevation)

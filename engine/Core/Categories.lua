@@ -129,6 +129,8 @@ categories = {
     --- Allows this unit to be built by engineers
     NEEDMOBILEBUILD = categoryValue,
     NOFORMATION = categoryValue,
+    --- Prevents the elevation of the unit being randomised
+    NORANDOMELEVATION = categoryValue,
     --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
@@ -371,6 +373,7 @@ categories = {
 ---| "NAVAL"
 ---| "NEEDMOBILEBUILD"
 ---| "NOFORMATION"
+---| "NORANDOMELEVATION"
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
