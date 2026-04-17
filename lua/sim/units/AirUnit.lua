@@ -20,12 +20,17 @@ AirUnit = ClassUnit(MobileUnit) {
     DestructionExplosionWaitDelayMax = 0,
     DestroyNoFallRandomChance = 0.5,
 
+    -- ELEVATION PARAMS
+    MaxElevationDelta = 5,
+    MaxElevationPercentageIncrease = 0.05,
+    MaxElevationPercentageDecrease = 0.05,
+
     ---@param self AirUnit
     OnCreate = function(self)
         MobileUnitOnCreate(self)
         self.HasFuel = true
         self:AddPingPong()
-        self:RandomiseElevation()
+        self:RandomizeElevation()
     end,
 
     ---@param self AirUnit
@@ -43,10 +48,6 @@ AirUnit = ClassUnit(MobileUnit) {
 
     ---@param self AirUnit
     RandomizeElevation = function(self)
-        local maxElevationDelta = 5
-        local maxElevationPercentageIncrease = 5
-        local maxElevationPercentageDecrease = 5
-
         local blueprint = self.Blueprint
 
         local blueprintCategoriesHash = blueprint.CategoriesHash
@@ -61,14 +62,16 @@ AirUnit = ClassUnit(MobileUnit) {
             return
         end
 
-        local elevationMultiplier = Random(100-maxElevationPercentageDecrease, 100+maxElevationPercentageIncrease) * 0.01
+        local minVal = 1.00 - self.MaxElevationPercentageDecrease
+        local maxVal = 1.00 + self.MaxElevationPercentageIncrease
+        local elevationMultiplier = Random() * (maxVal - minVal) + minVal
 
         local newElevation
 
         if elevationMultiplier > 1 then
-            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + maxElevationDelta)
+            newElevation = math.min(originalElevation * elevationMultiplier, originalElevation + self.MaxElevationDelta)
         else
-            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - maxElevationDelta)
+            newElevation = math.max(originalElevation * elevationMultiplier, originalElevation - self.MaxElevationDelta)
         end
 
         self:SetElevation(newElevation)
