@@ -41,8 +41,8 @@ AirUnit = ClassUnit(MobileUnit) {
         end
     end,
 
-    --@param self AirUnit
-    RandomiseElevation = function(self)
+    ---@param self AirUnit
+    RandomizeElevation = function(self)
         local maxElevationDelta = 5
         local maxElevationPercentageIncrease = 5
         local maxElevationPercentageDecrease = 5
@@ -55,9 +55,9 @@ AirUnit = ClassUnit(MobileUnit) {
             return
         end
 
-        local blueprintPhysics = blueprint and blueprint.Physics
+        local blueprintPhysics = blueprint.Physics
         local originalElevation = blueprintPhysics and blueprintPhysics.Elevation
-        if type(originalElevation) ~= 'number' then
+        if originalElevation == nil then
             return
         end
 
