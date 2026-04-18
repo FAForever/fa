@@ -135,6 +135,83 @@ end
 
 ---
 
+## Standalone Invocation
+
+Every complete UI component in this system (chat window, config dialog, edit view) **must be callable directly from a hotkey** with no prior context. This serves two purposes:
+
+1. **Debugging** — any component can be opened in isolation without launching the full game flow.
+2. **Separation of concerns** — if a component requires another component to exist before it can be opened, that is a design smell indicating hidden coupling.
+
+### How hotkeys work in this codebase
+
+`keyactions.lua` defines an action table. Each entry's `action` string is evaluated by the engine:
+
+```lua
+-- keyactions.lua
+local keyActionsChat = {
+    ['chat_toggle'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatView.lua").Toggle()',
+        category = 'chat',
+    },
+    ['chat_config'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/ChatConfigView.lua").Toggle()',
+        category = 'chat',
+    },
+}
+```
+
+`keydescriptions.lua` provides the display name shown in the key-binding settings UI:
+
+```lua
+['chat_toggle'] = '<LOC key_desc_chat_0001>Toggle chat window',
+['chat_config'] = '<LOC key_desc_chat_0002>Toggle chat options',
+```
+
+### Convention for every view module
+
+Each view file must export a `Toggle()` function (and optionally `Open()` / `Close()`) at module level. The function must be safe to call at any time:
+
+```lua
+-- ChatConfigView.lua
+
+local instance = nil
+
+function Toggle()
+    if instance then
+        instance:Destroy()
+        instance = nil
+    else
+        Open()
+    end
+end
+
+function Open()
+    if instance then return end
+    -- obtain or create the model singleton, then build the view
+    local model = import("/lua/ui/game/chat/ChatModel.lua").GetSingleton()
+    instance = CreateConfigWindow(GetFrame(0), model)
+end
+
+function Close()
+    if instance then
+        instance:Destroy()
+        instance = nil
+    end
+end
+```
+
+`GetFrame(0)` is always available in a UI context, so no parent reference needs to be threaded in. A component that cannot be opened this way is not truly standalone.
+
+### No default key bindings required
+
+You do not need to assign a default key to every component — the binding table entry is enough to make it available in the key-binding UI and invocable from the console during development:
+
+```
+UI_Lua import("/lua/ui/game/chat/ChatConfigView.lua").Toggle()
+```
+
+---
+
 ## View
 
 Defined in `ChatView.lua` (window + feed) and `ChatEditView.lua` (input area). Views receive the model at construction and subscribe via `OnDirty`. They never import the controller.
