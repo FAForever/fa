@@ -291,6 +291,53 @@ Each chat line (`GUI.chatLines[i]`) contains:
 
 ---
 
+## Class Field Annotations
+
+Every field assigned to `self` inside `__init` must have a matching `---@field` annotation on the class definition. This gives the language server full type information across the whole file and makes the class self-documenting at a glance.
+
+### Rule
+
+Annotate the class immediately above the `ClassUI(...)` call. List every `self.X` field in the order it appears in `__init`. For fields whose type is an array of a named struct, define that struct as its own `---@class` above the main class.
+
+### Example
+
+```lua
+---@class UIChatConfigColorRow
+---@field label Text
+---@field combo BitmapCombo
+---@field key   string
+
+---@class UIChatConfigInterface : Window
+---@field LabelColors    Text
+---@field ColorRows      UIChatConfigColorRow[]
+---@field LabelFontSize  Text
+---@field SliderFontSize IntegerSlider
+---@field LabelBehavior  Text
+---@field Checkboxes     Checkbox[]
+---@field BtnApply       Button
+---@field BtnOk          Button
+local ChatConfigInterface = ClassUI(Window) {
+    __init = function(self, parent, ...)
+        self.LabelColors    = UIUtil.CreateText(...)
+        self.ColorRows      = {}
+        self.LabelFontSize  = UIUtil.CreateText(...)
+        self.SliderFontSize = IntegerSlider(...)
+        self.LabelBehavior  = UIUtil.CreateText(...)
+        self.Checkboxes     = {}
+        self.BtnApply       = UIUtil.CreateButtonStd(...)
+        self.BtnOk          = UIUtil.CreateButtonStd(...)
+    end,
+}
+```
+
+### What counts as a field
+
+- Every `self.Foo` written in `__init` or `__post_init`.
+- Fields inherited from the parent class (e.g. `Window`) do **not** need repeating — the `: Window` in the class declaration inherits them.
+- Temporary locals inside a method are not fields and need no annotation.
+
+---
+
 ## What Not To Do
 
 - **Do not store UI references in the model.** The model must be constructable with no UI present.

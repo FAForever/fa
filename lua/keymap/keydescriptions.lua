@@ -197,6 +197,7 @@ keyDescriptions = {
     ['chat_page_down'] = '<LOC key_desc_0088>Chat page down',
     ['chat_line_up'] = '<LOC key_desc_0089>Chat line up',
     ['chat_line_down'] = '<LOC key_desc_0090>Chat line down',
+    ['chat_config'] = '<LOC key_desc_chat_config>Toggle chat options',
 
     ['switch_skin_up'] = '<LOC key_desc_0091>Rotate skins up',
     ['switch_skin_down'] = '<LOC key_desc_0092>Rotate skins down',

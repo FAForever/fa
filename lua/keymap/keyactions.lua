@@ -1878,6 +1878,10 @@ local keyActionsChat = {
         action = 'UI_Lua import("/lua/ui/game/chat.lua").ChatPageDown(1)',
         category = 'chat',
     },
+    ['chat_config'] = {
+        action = 'UI_Lua import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()',
+        category = 'chat',
+    },
 }
 
 ---@type table<string, UIKeyAction>
