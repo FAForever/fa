@@ -109,6 +109,11 @@ function SyncUnitEnhancements()
     Sync.UserUnitEnhancements = sync
 end
 
+--- Called by the engine when using the console command `DebugMoveCamera`
+---@param x0 number
+---@param y0 number
+---@param x1 number
+---@param y1 number
 function DebugMoveCamera(x0,y0,x1,y1)
     local Camera = import("/lua/simcamera.lua").SimCamera
     local cam = Camera("WorldCamera")
