@@ -164,14 +164,23 @@ end
 ---@field Shift? true
 ---@field Middle? true
 
+---@alias KeyEventType
+---| "ButtonPress"
+---| "ButtonDClick"
+---| "ButtonRelease"
+---| "MouseMotion"
+---| "MouseEnter"
+---| "MouseExit"
+---| "WheelRotation"
+
 ---@class KeyEvent
 ---@field Control Control
----@field KeyCode number
+---@field KeyCode number # 0 = nothing, 1 = left click, 2 = middle click, 3 = right click
 ---@field Modifiers EventModifiers
 ---@field MouseX number
 ---@field MouseY number
 ---@field RawKeyCode number
----@field Type string
+---@field Type KeyEventType
 ---@field WheelDelta number
 ---@field WheelRotation number
 

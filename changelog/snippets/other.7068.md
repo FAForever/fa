@@ -1,0 +1,1 @@
+- (#7068) Annotate `LoggingStats`, `DebugMoveCamera`, and `KeyEvent`.
