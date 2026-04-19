@@ -5,6 +5,9 @@ local Window = import("/lua/maui/window.lua").Window
 local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 
+local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
+local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
+
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- 8 ARGB solid colors selectable as message color swatches.
@@ -52,9 +55,7 @@ local ChatConfigInterface = ClassUI(Window) {
 
     ---@param self UIChatConfigInterface
     ---@param parent Control
-    ---@param model UIChatConfigModel
-    ---@param callbacks { onApply: function, onReset: function, onCancel: function, onClose: function, onOptionChange: fun(key: string, value: any) }
-    __init = function(self, parent, model, callbacks)
+    __init = function(self, parent)
         Window.__init(self, parent, "Chat Configuration", false, false, false, true, false, "chat_config_v7", {
             Left = 200, Top = 200, Right = 524, Bottom = 640,
         })
@@ -73,7 +74,7 @@ local ChatConfigInterface = ClassUI(Window) {
             }
             local key = def.key
             row.combo.OnClick = function(_, index)
-                callbacks.onOptionChange(key, index)
+                ChatConfigController.SetOption(key, index)
             end
             self.ColorRows[i] = row
         end
@@ -89,7 +90,7 @@ local ChatConfigInterface = ClassUI(Window) {
         self.LabelFontSize = UIUtil.CreateText(client, "Font Size: 14", 10, UIUtil.bodyFont)
         self.SliderFontSize = IntegerSlider(client, false, 12, 18, 1, unpack(sliderBitmaps))
         self.SliderFontSize.OnValueSet = function(_, value)
-            callbacks.onOptionChange('font_size', value)
+            ChatConfigController.SetOption('font_size', value)
         end
         self.SliderFontSize.OnValueChanged = function(_, value)
             self.LabelFontSize:SetText(string.format("Font Size: %d", value))
@@ -98,7 +99,7 @@ local ChatConfigInterface = ClassUI(Window) {
         self.LabelFadeTime = UIUtil.CreateText(client, "Fade Time: 15s", 10, UIUtil.bodyFont)
         self.SliderFadeTime = IntegerSlider(client, false, 5, 30, 1, unpack(sliderBitmaps))
         self.SliderFadeTime.OnValueSet = function(_, value)
-            callbacks.onOptionChange('fade_time', value)
+            ChatConfigController.SetOption('fade_time', value)
         end
         self.SliderFadeTime.OnValueChanged = function(_, value)
             self.LabelFadeTime:SetText(string.format("Fade Time: %ds", value))
@@ -107,7 +108,7 @@ local ChatConfigInterface = ClassUI(Window) {
         self.LabelWinAlpha = UIUtil.CreateText(client, "Window Alpha: 100%", 10, UIUtil.bodyFont)
         self.SliderWinAlpha = IntegerSlider(client, false, 20, 100, 1, unpack(sliderBitmaps))
         self.SliderWinAlpha.OnValueSet = function(_, value)
-            callbacks.onOptionChange('win_alpha', value / 100)
+            ChatConfigController.SetOption('win_alpha', value / 100)
         end
         self.SliderWinAlpha.OnValueChanged = function(_, value)
             self.LabelWinAlpha:SetText(string.format("Window Alpha: %d%%", value))
@@ -121,31 +122,32 @@ local ChatConfigInterface = ClassUI(Window) {
             local cb = UIUtil.CreateCheckbox(client, '/dialogs/check-box_btn/', def.text, true)
             local key = def.key
             cb.OnCheck = function(_, checked)
-                callbacks.onOptionChange(key, checked)
+                ChatConfigController.SetOption(key, checked)
             end
             self.Checkboxes[i] = cb
         end
 
         -- ---- Buttons ----
         self.BtnApply = UIUtil.CreateButtonStd(client, '/widgets02/small', "Apply", 14)
-        self.BtnApply.OnClick = function() callbacks.onApply() end
+        self.BtnApply.OnClick = function() ChatConfigController.Apply() end
 
         self.BtnReset = UIUtil.CreateButtonStd(client, '/widgets02/small', "Reset", 14)
-        self.BtnReset.OnClick = function() callbacks.onReset() end
+        self.BtnReset.OnClick = function() ChatConfigController.Reset() end
 
         self.BtnOk = UIUtil.CreateButtonStd(client, '/widgets02/small', "OK", 14)
         self.BtnOk.OnClick = function()
-            callbacks.onApply()
-            callbacks.onClose()
+            ChatConfigController.Apply()
+            import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
         end
 
         self.BtnCancel = UIUtil.CreateButtonStd(client, '/widgets02/small', "Cancel", 14)
         self.BtnCancel.OnClick = function()
-            callbacks.onCancel()
-            callbacks.onClose()
+            ChatConfigController.Cancel()
+            import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
         end
 
         -- ---- Reactive: sync all controls whenever pending options change ----
+        local model = ChatConfigModel.GetSingleton()
         model.Pending.OnDirty = function(lv)
             self:RefreshFromOptions(lv())
         end
@@ -154,9 +156,7 @@ local ChatConfigInterface = ClassUI(Window) {
 
     ---@param self UIChatConfigInterface
     ---@param parent Control
-    ---@param model UIChatConfigModel
-    ---@param callbacks table
-    __post_init = function(self, parent, model, callbacks)
+    __post_init = function(self, parent)
         local client = self:GetClientGroup()
         local pad = 8
 
@@ -302,24 +302,14 @@ function Open()
         return
     end
 
-    local model = import("/lua/ui/game/chat/config/ChatConfigModel.lua").GetSingleton()
-    local controller = import("/lua/ui/game/chat/config/ChatConfigController.lua")
-
-    Instance = ChatConfigInterface(GetFrame(0), model, {
-        onOptionChange = function(key, value) controller.SetOption(key, value) end,
-        onApply        = function() controller.Apply() end,
-        onReset        = function() controller.Reset() end,
-        onCancel       = function() controller.Cancel() end,
-        onClose        = function() Close() end,
-    })
+    Instance = ChatConfigInterface(GetFrame(0))
 end
 
 --- Closes and destroys the config dialog.
 function Close()
     if Instance then
         -- Remove the reactive subscription before destroying to avoid stale callbacks.
-        local model = import("/lua/ui/game/chat/config/ChatConfigModel.lua").GetSingleton()
-        model.Pending.OnDirty = nil
+        ChatConfigModel.GetSingleton().Pending.OnDirty = nil
 
         Instance:Destroy()
         Instance = nil

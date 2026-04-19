@@ -233,17 +233,29 @@ Owns internally:
 Observes:
 - `model.recipient.OnDirty` → update the "To Allies:" label
 
-Emits (to controller, via a callback registered at construction):
-- `onSend(text, cameraState?)` — user pressed Enter
-- `onRecipientChange(target)` — user picked from the dropdown or clicked a name in the feed
+Calls directly:
+- `ChatController.Send(text, cameraState?)` — user pressed Enter
+- `ChatController.SetRecipient(target)` — user picked from the dropdown or clicked a name in the feed
 
 ### ChatConfigView
 
 Observes:
-- `model.options.OnDirty` → sync control states
+- `model.Pending.OnDirty` → sync control states
 
-Writes (to model via controller callback):
-- `onOptionsApply(newOptions)`
+Calls directly:
+- `ChatConfigController.SetOption(key, value)` — user changed a control
+- `ChatConfigController.Apply / Reset / Cancel` — user clicked the corresponding button
+
+### Imports vs callbacks
+
+Views import the model and controller modules directly at the top of the file rather than receiving callback tables in their constructor:
+
+```lua
+local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
+local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
+```
+
+This keeps dependencies visible at the top of the file and avoids the boilerplate of threading callback tables through constructors. The MVC discipline is preserved by convention: views still only **read** from the model and **call** the controller — they never write to the model directly.
 
 ---
 
@@ -341,7 +353,6 @@ local ChatConfigInterface = ClassUI(Window) {
 ## What Not To Do
 
 - **Do not store UI references in the model.** The model must be constructable with no UI present.
-- **Do not write to the model from a view.** User actions fire a controller callback; the controller writes.
-- **Do not pass the controller into views.** Pass narrow callbacks (`onSend`, `onRecipientChange`) instead.
+- **Do not write to the model from a view.** Views call into the controller; the controller writes.
 - **Do not mutate a LazyVar's held table in place.** Create a new table and `Set` it; otherwise dependents never go dirty.
 - **Do not replicate the autolobby's drilling pattern.** State is on the model; views subscribe — no parent needs to push updates into children.
