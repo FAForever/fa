@@ -514,6 +514,7 @@ function CreateDialog(over, exitBehavior)
             end
         end
 
+        Tooltip.DestroyMouseoverDisplay()
         optionGrid:DeleteAndDestroyAll(true)
         optionGrid:AppendCols(1, true)
         optionKeyToControlMap = {}
@@ -531,6 +532,7 @@ function CreateDialog(over, exitBehavior)
             for index, option in tData.items do
                 if isSearching then
                     local titleStr = LOC(option.title)
+                    -- Note: string.lower does not fully handle Unicode case matching
                     if not string.find(string.lower(titleStr), string.lower(searchString), 1, true) then
                         continue
                     end
