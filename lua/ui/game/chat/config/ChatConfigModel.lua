@@ -34,6 +34,44 @@ local DefaultOptions = {
     links           = true,
 }
 
+
+-------------------------------------------------------------------------------
+-- Option keys exported as module globals so views and controllers can address
+-- fields without magic strings. Each constant's value matches the field name
+-- on `UIChatOptions`.
+
+KeyAllColor       = 'all_color'
+KeyAlliesColor    = 'allies_color'
+KeyPrivColor      = 'priv_color'
+KeyLinkColor      = 'link_color'
+KeyNotifyColor    = 'notify_color'
+KeyFontSize       = 'font_size'
+KeyFadeTime       = 'fade_time'
+KeyWinAlpha       = 'win_alpha'
+KeyFeedBackground = 'feed_background'
+KeyFeedPersist    = 'feed_persist'
+KeySendType       = 'send_type'
+KeyLinks          = 'links'
+
+-------------------------------------------------------------------------------
+-- Value ranges for numeric options. Exported as module globals so the view
+-- can construct sliders without duplicating the limits.
+
+---@class UIChatSliderRange
+---@field min number
+---@field max number
+---@field inc number
+
+---@type UIChatSliderRange
+FontSizeRange = { min = 12, max = 18, inc = 1 }
+
+---@type UIChatSliderRange
+FadeTimeRange = { min = 5, max = 30, inc = 1 }
+
+--- Window alpha is stored as 0.0-1.0 but edited via an integer percent slider.
+---@type UIChatSliderRange
+WinAlphaSliderRange = { min = 20, max = 100, inc = 1 }
+
 ---@class UIChatConfigModel
 ---@field Committed LazyVar<UIChatOptions>   # the active, saved options observed by the chat feed
 ---@field Pending   LazyVar<UIChatOptions>   # the draft being edited in the config dialog

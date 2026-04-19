@@ -14,18 +14,18 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local Colors = { 'ffffffff', 'ffff4242', 'ffefff42', 'ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42' }
 
 local ColorDefs = {
-    { key = 'all_color', text = "All" },
-    { key = 'allies_color', text = "Allies" },
-    { key = 'priv_color', text = "Private" },
-    { key = 'link_color', text = "Links" },
-    { key = 'notify_color', text = "Notify" },
+    { key = ChatConfigModel.KeyAllColor,    text = "All" },
+    { key = ChatConfigModel.KeyAlliesColor, text = "Allies" },
+    { key = ChatConfigModel.KeyPrivColor,   text = "Private" },
+    { key = ChatConfigModel.KeyLinkColor,   text = "Links" },
+    { key = ChatConfigModel.KeyNotifyColor, text = "Notify" },
 }
 
 local CheckboxDefs = {
-    { key = 'send_type', text = "Default recipient: allies" },
-    { key = 'feed_background', text = "Show feed background" },
-    { key = 'feed_persist', text = "Persist feed timeout" },
-    { key = 'links', text = "Show camera links" },
+    { key = ChatConfigModel.KeySendType,       text = "Default recipient: allies" },
+    { key = ChatConfigModel.KeyFeedBackground, text = "Show feed background" },
+    { key = ChatConfigModel.KeyFeedPersist,    text = "Persist feed timeout" },
+    { key = ChatConfigModel.KeyLinks,          text = "Show camera links" },
 }
 
 -------------------------------------------------------------------------------
@@ -88,27 +88,39 @@ local ChatConfigInterface = ClassUI(Window) {
         }
 
         self.LabelFontSize = UIUtil.CreateText(client, "Font Size: 14", 10, UIUtil.bodyFont)
-        self.SliderFontSize = IntegerSlider(client, false, 12, 18, 1, unpack(sliderBitmaps))
+        self.SliderFontSize = IntegerSlider(client, false,
+            ChatConfigModel.FontSizeRange.min,
+            ChatConfigModel.FontSizeRange.max,
+            ChatConfigModel.FontSizeRange.inc,
+            unpack(sliderBitmaps))
         self.SliderFontSize.OnValueSet = function(_, value)
-            ChatConfigController.SetOption('font_size', value)
+            ChatConfigController.SetOption(ChatConfigModel.KeyFontSize, value)
         end
         self.SliderFontSize.OnValueChanged = function(_, value)
             self.LabelFontSize:SetText(string.format("Font Size: %d", value))
         end
 
         self.LabelFadeTime = UIUtil.CreateText(client, "Fade Time: 15s", 10, UIUtil.bodyFont)
-        self.SliderFadeTime = IntegerSlider(client, false, 5, 30, 1, unpack(sliderBitmaps))
+        self.SliderFadeTime = IntegerSlider(client, false,
+            ChatConfigModel.FadeTimeRange.min,
+            ChatConfigModel.FadeTimeRange.max,
+            ChatConfigModel.FadeTimeRange.inc,
+            unpack(sliderBitmaps))
         self.SliderFadeTime.OnValueSet = function(_, value)
-            ChatConfigController.SetOption('fade_time', value)
+            ChatConfigController.SetOption(ChatConfigModel.KeyFadeTime, value)
         end
         self.SliderFadeTime.OnValueChanged = function(_, value)
             self.LabelFadeTime:SetText(string.format("Fade Time: %ds", value))
         end
 
         self.LabelWinAlpha = UIUtil.CreateText(client, "Window Alpha: 100%", 10, UIUtil.bodyFont)
-        self.SliderWinAlpha = IntegerSlider(client, false, 20, 100, 1, unpack(sliderBitmaps))
+        self.SliderWinAlpha = IntegerSlider(client, false,
+            ChatConfigModel.WinAlphaSliderRange.min,
+            ChatConfigModel.WinAlphaSliderRange.max,
+            ChatConfigModel.WinAlphaSliderRange.inc,
+            unpack(sliderBitmaps))
         self.SliderWinAlpha.OnValueSet = function(_, value)
-            ChatConfigController.SetOption('win_alpha', value / 100)
+            ChatConfigController.SetOption(ChatConfigModel.KeyWinAlpha, value / 100)
         end
         self.SliderWinAlpha.OnValueChanged = function(_, value)
             self.LabelWinAlpha:SetText(string.format("Window Alpha: %d%%", value))
@@ -266,19 +278,20 @@ local ChatConfigInterface = ClassUI(Window) {
     ---@param self UIChatConfigInterface
     ---@param options UIChatOptions
     RefreshFromOptions = function(self, options)
+        local defaults = ChatConfigModel.GetDefaults()
+
         for _, row in ipairs(self.ColorRows) do
-            row.combo:SetItem(options[row.key] or 1)
+            row.combo:SetItem(options[row.key] or defaults[row.key])
         end
 
-        self.SliderFontSize:SetValue(options.font_size or 14)
-        self.SliderFadeTime:SetValue(options.fade_time or 15)
-        self.SliderWinAlpha:SetValue(math.floor((options.win_alpha or 1.0) * 100))
+        self.SliderFontSize:SetValue(options.font_size or defaults.font_size)
+        self.SliderFadeTime:SetValue(options.fade_time or defaults.fade_time)
+        self.SliderWinAlpha:SetValue(math.floor((options.win_alpha or defaults.win_alpha) * 100))
 
         for i, def in ipairs(CheckboxDefs) do
-            -- treat absent value as the default (send_type/feed_background default false, the rest true)
             local value = options[def.key]
             if value == nil then
-                value = (def.key == 'feed_persist' or def.key == 'links')
+                value = defaults[def.key]
             end
             self.Checkboxes[i]:SetCheck(value, true)
         end
