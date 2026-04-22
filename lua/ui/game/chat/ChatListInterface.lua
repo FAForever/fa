@@ -18,9 +18,12 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 ---@field target UIChatRecipient
 
 -------------------------------------------------------------------------------
--- A popup recipient picker. Lists "All", "Allies", and every non-focus,
--- non-civilian army. Clicking an entry calls `ChatController.SetRecipient`
--- and destroys the popup. Clicking anywhere outside also destroys the popup.
+-- A popup recipient picker. Lists "All", "Allies", and one entry per
+-- connected non-local human player (sourced from `GetSessionClients`, so
+-- bots and disconnected players are excluded). Clicking an entry calls
+-- `ChatController.SetRecipient` and destroys the popup. Clicking anywhere
+-- outside also destroys the popup — every open of the list rebuilds from
+-- fresh session state.
 
 ---@class UIChatListInterface : Group
 ---@field Entries UIChatListEntry[]
@@ -47,16 +50,26 @@ ChatListInterface = ClassUI(Group) {
         LayoutHelpers.DepthOverParent(self, parent, 100)
 
         -- Build the list of selectable targets: All, Allies, then one entry
-        -- per non-focus, non-civilian army.
-        local armies = GetArmiesTable()
-        local focusArmy = armies.focusArmy
+        -- per connected human player. `GetSessionClients` naturally excludes
+        -- bots (they are not session clients); we additionally skip the
+        -- local client (you can't privately message yourself) and any
+        -- disconnected player. A client's army is found by matching
+        -- nickname — the target stays an army ID so the send path continues
+        -- to work unchanged.
         local defs = {
             { nickname = "All",    target = ChatModel.RecipientAll },
             { nickname = "Allies", target = ChatModel.RecipientAllies },
         }
-        for armyID, armyData in armies.armiesTable do
-            if armyID ~= focusArmy and not armyData.civilian then
-                table.insert(defs, { nickname = armyData.nickname, target = armyID })
+
+        local armies = GetArmiesTable().armiesTable
+        for _, client in GetSessionClients() do
+            if client.connected and not client['local'] then
+                for armyID, armyData in armies do
+                    if not armyData.civilian and armyData.nickname == client.name then
+                        table.insert(defs, { nickname = client.name, target = armyID })
+                        break
+                    end
+                end
             end
         end
 
