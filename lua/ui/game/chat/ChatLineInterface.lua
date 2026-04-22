@@ -18,11 +18,14 @@ end
 table.insert(FactionIcons, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
 -------------------------------------------------------------------------------
--- A single chat row: team-coloured faction icon, sender name, message text,
--- and a semi-transparent background that shows in feed mode.
+-- A single chat row: team-coloured faction icon, sender name and message text.
+--
+-- The semi-transparent "feed mode" background (shown when the window chrome
+-- is hidden) will be added back together with the feed-mode implementation —
+-- having it here while `line:Show()` cascades to children caused it to double
+-- up over the chat-window background.
 
 ---@class UIChatLineInterface : Group
----@field StickyBg    Bitmap
 ---@field TeamColor   Bitmap
 ---@field FactionIcon Bitmap
 ---@field Name        Text
@@ -33,11 +36,6 @@ ChatLineInterface = ClassUI(Group) {
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent, "ChatLineInterface")
-
-        self.StickyBg = Bitmap(self)
-        self.StickyBg:SetSolidColor('aa000000')
-        self.StickyBg:DisableHitTest()
-        self.StickyBg:Hide()
 
         self.TeamColor = Bitmap(self)
         self.TeamColor:SetSolidColor('00000000')
@@ -60,9 +58,6 @@ ChatLineInterface = ClassUI(Group) {
     ---@param self UIChatLineInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        LayoutHelpers.FillParent(self.StickyBg, self)
-        LayoutHelpers.DepthUnderParent(self.StickyBg, self)
-
         Layouter(self.TeamColor)
             :AtLeftTopIn(self)
             :Width(self.Height)

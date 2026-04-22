@@ -30,6 +30,19 @@ ChatEditInterface = ClassUI(Group) {
         self.RecipientLabel:SetDropShadow(true)
 
         self.EditBox = Edit(self)
+
+        -- Placeholder bounds so that `SetupEditStd` below, which internally
+        -- calls `SetFont` and reads the control's Left/Right, can evaluate
+        -- the layout without tripping the default circular Left/Right/Width
+        -- chain set up by `Control.ResetLayout`. `__post_init` replaces these
+        -- with the real layout.
+        Layouter(self.EditBox)
+            :Left(0)
+            :Top(0)
+            :Width(200)
+            :Height(20)
+            :End()
+
         UIUtil.SetupEditStd(self.EditBox,
             "ff00ff00", nil, "ffffffff",
             UIUtil.highlightColor, UIUtil.bodyFont, 14, MaxChars)
@@ -56,15 +69,22 @@ ChatEditInterface = ClassUI(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         Layouter(self.RecipientLabel)
-            :AtLeftIn(self, 8)
+            :AtLeftIn(self, 2)
             :AtVerticalCenterIn(self)
             :End()
 
         Layouter(self.EditBox)
-            :AnchorToRight(self.RecipientLabel, 8)
-            :AtRightIn(self, 8)
+            :AnchorToRight(self.RecipientLabel, 4)
+            :AtRightIn(self, 2)
             :AtVerticalCenterIn(self)
             :Height(function() return self.EditBox:GetFontHeight() end)
+            :End()
+
+        -- The group sizes itself to the edit's font height; the parent
+        -- positions it (Left/Right/Bottom) and leaves Height alone. This
+        -- mirrors the original `group.Height:Set(function() return group.edit.Height() end)`.
+        Layouter(self)
+            :Height(function() return self.EditBox.Height() end)
             :End()
     end,
 

@@ -18,6 +18,22 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local LineHeight = 18
 local LineCount  = 12
 
+--- Skin textures for the chat window frame. Mirrors the layout that
+--- `/lua/ui/game/layouts/chat_layout.lua` applies to the legacy chat Window
+--- so the new window matches the original visual style.
+local WindowTextures = {
+    tl = UIUtil.UIFile('/game/chat_brd/chat_brd_ul.dds'),
+    tr = UIUtil.UIFile('/game/chat_brd/chat_brd_ur.dds'),
+    tm = UIUtil.UIFile('/game/chat_brd/chat_brd_horz_um.dds'),
+    ml = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_l.dds'),
+    m  = UIUtil.UIFile('/game/chat_brd/chat_brd_m.dds'),
+    mr = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_r.dds'),
+    bl = UIUtil.UIFile('/game/chat_brd/chat_brd_ll.dds'),
+    bm = UIUtil.UIFile('/game/chat_brd/chat_brd_lm.dds'),
+    br = UIUtil.UIFile('/game/chat_brd/chat_brd_lr.dds'),
+    borderColor = 'ff415055',
+}
+
 -------------------------------------------------------------------------------
 -- The main chat window: the draggable frame that hosts the line pool and the
 -- edit area. Subscribes to the model for history and visibility changes.
@@ -31,9 +47,9 @@ local ChatInterface = ClassUI(Window) {
     ---@param self UIChatInterface
     ---@param parent Control
     __init = function(self, parent)
-        Window.__init(self, parent, "Chat", false, true, true, false, false, "chat_window_v2", {
+        Window.__init(self, parent, "", false, true, true, false, false, "chat_window_v2", {
             Left = 8, Top = 460, Right = 430, Bottom = 720,
-        })
+        }, WindowTextures)
 
         local client = self:GetClientGroup()
 
@@ -78,11 +94,13 @@ local ChatInterface = ClassUI(Window) {
         local client = self:GetClientGroup()
         local pad = 4
 
+        -- Full width, flush with the bottom of the client area. The edit
+        -- group derives its own height (see ChatEditInterface.__post_init).
         Layouter(self.Edit)
-            :AtLeftIn(client, pad)
-            :AtRightIn(client, pad)
-            :AtBottomIn(client, pad)
-            :Height(24)
+            :AtLeftIn(client, 30)
+            :AtRightIn(client)
+            :AtBottomIn(client)
+            :Over(client, 200)
             :End()
 
         Layouter(self.LinesContainer)
