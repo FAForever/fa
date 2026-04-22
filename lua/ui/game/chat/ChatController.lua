@@ -42,10 +42,35 @@ function AppendEntry(entry)
     model.History:Set(history)
 end
 
+--- Appends a synthetic, local-only system line to the history. Used by the
+--- slash-command dispatcher to surface parse/accept errors in the chat feed
+--- without sending anything over the network.
+---@param text string
+function AppendLocalSystemMessage(text)
+    AppendEntry {
+        name      = "System:",
+        text      = text,
+        color     = 'ffff6666',
+        armyID    = 0,
+        recipient = ChatModel.RecipientAll,
+    }
+end
+
 --- Sends a message to the current recipient.
 --- Stubbed — the network layer will be wired up in a follow-up step.
 ---@param text string
 function Send(text)
+    if text and string.sub(text, 1, 1) == '/' then
+        local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
+        local handled, err = Registry.Dispatch(text)
+        if handled then return end
+        if err then
+            AppendLocalSystemMessage(err)
+            return
+        end
+        -- Lone '/' or whitespace-only body falls through to the normal path.
+    end
+
     WARN("ChatController.Send not yet implemented: " .. tostring(text))
 end
 
