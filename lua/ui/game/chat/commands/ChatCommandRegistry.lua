@@ -32,8 +32,6 @@ local Commands = {}
 ---@type table<string, string>
 local Aliases = {}
 
-local BuiltinsLoaded = false
-
 -------------------------------------------------------------------------------
 -- Registration
 
@@ -182,11 +180,6 @@ function Dispatch(text)
         return false, nil
     end
 
-    if not BuiltinsLoaded then
-        BuiltinsLoaded = true
-        import("/lua/ui/game/chat/commands/BuiltinCommands.lua")
-    end
-
     local body = string.sub(text, 2)
     local name, tokens = Tokenize(body)
     if not name then
@@ -199,7 +192,7 @@ function Dispatch(text)
     end
 
     local args, parseErr = ParseArgs(cmd, tokens)
-    if parseErr then
+    if not args then
         return false, parseErr
     end
 

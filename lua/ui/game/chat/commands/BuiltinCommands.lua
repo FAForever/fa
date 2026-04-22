@@ -1,11 +1,18 @@
 
-local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
+
+-------------------------------------------------------------------------------
+-- Built-in chat commands.
+--
+-- Each command is exported as a top-level `UIChatCommand` table. Importing
+-- this module has no side effects; `ChatController.RegisterBuiltinCommands`
+-- is responsible for handing these off to the registry.
 
 -------------------------------------------------------------------------------
 -- Recipient switching
 
-Registry.Register {
+---@type UIChatCommand
+All = {
     name = 'all',
     description = 'Send to all players and observers.',
     execute = function(_, ctx)
@@ -13,7 +20,8 @@ Registry.Register {
     end,
 }
 
-Registry.Register {
+---@type UIChatCommand
+Allies = {
     name = 'allies',
     aliases = { 'team' },
     description = 'Send to allies only.',
@@ -22,7 +30,8 @@ Registry.Register {
     end,
 }
 
-Registry.Register {
+---@type UIChatCommand
+Whisper = {
     name = 'whisper',
     aliases = { 'w', 'pm' },
     description = 'Whisper to a specific player (by nickname or army ID).',
@@ -44,12 +53,15 @@ Registry.Register {
 -------------------------------------------------------------------------------
 -- Introspection
 
-Registry.Register {
+---@type UIChatCommand
+Help = {
     name = 'help',
     aliases = { '?' },
     description = 'Lists available chat commands.',
     execute = function(_, ctx)
         local controller = ctx.controller
+        local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
+
         controller.AppendLocalSystemMessage("Available chat commands:")
 
         for _, cmd in ipairs(Registry.GetAll()) do

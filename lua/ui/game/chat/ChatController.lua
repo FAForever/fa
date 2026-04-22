@@ -56,11 +56,35 @@ function AppendLocalSystemMessage(text)
     }
 end
 
+-------------------------------------------------------------------------------
+-- Slash commands
+
+local BuiltinsRegistered = false
+
+--- Registers every built-in chat command with the registry. Idempotent, so
+--- it is safe to call from multiple init paths. External callers that want
+--- their own commands registered alongside the built-ins should call this
+--- once at startup before the first message is sent.
+function RegisterBuiltinCommands()
+    if BuiltinsRegistered then return end
+    BuiltinsRegistered = true
+
+    local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
+    local Builtins = import("/lua/ui/game/chat/commands/BuiltinCommands.lua")
+
+    Registry.Register(Builtins.All)
+    Registry.Register(Builtins.Allies)
+    Registry.Register(Builtins.Whisper)
+    Registry.Register(Builtins.Help)
+end
+
 --- Sends a message to the current recipient.
 --- Stubbed — the network layer will be wired up in a follow-up step.
 ---@param text string
 function Send(text)
     if text and string.sub(text, 1, 1) == '/' then
+        RegisterBuiltinCommands()
+
         local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
         local handled, err = Registry.Dispatch(text)
         if handled then return end

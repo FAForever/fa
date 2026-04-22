@@ -134,9 +134,11 @@ Splitting `accept` out keeps the failure path uniform (always surfaces as a syst
 
 ## 8. Bootstrap
 
-`BuiltinCommands.lua` is imported lazily by `ChatCommandRegistry.Dispatch` on first call. External modules (notify, mods, future subsystems) call `Registry.Register` directly from their own init.
+`BuiltinCommands.lua` has no side effects on import — it just exports each command as a named `UIChatCommand` table (`All`, `Allies`, `Whisper`, `Help`). Importing the module does not register anything.
 
-`lua/ui/notify/commands.lua` remains as a thin backwards-compatibility shim that maps the old positional `AddChatCommand(name, fn)` call onto `Registry.Register`, reconstructing the legacy `{name, arg1, ...}` args shape before calling `fn`. Existing `notify`/`notifyoverlay` registrations keep working unchanged.
+`ChatController.RegisterBuiltinCommands()` is the single registration site: it pulls the named exports from `BuiltinCommands` and hands them to `ChatCommandRegistry.Register`. It is idempotent, so it can be called from multiple init paths without harm. `ChatController.Send` invokes it lazily on the first slash-prefixed message so the feature works without an explicit init hook; once a proper `ChatController:Init` exists (see `CLAUDE.md §Init`), the call should move there.
+
+External modules (notify, mods, future subsystems) register their own commands by calling `Registry.Register` directly, independent of the builtins.
 
 ## 9. Integration with `ChatController.Send`
 
