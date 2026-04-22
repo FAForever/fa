@@ -57,6 +57,7 @@ local WindowTextures = {
 ---@field LinesContainer Group
 ---@field Lines          UIChatLineInterface[]
 ---@field Edit           UIChatEditInterface
+---@field Scrollbar      Scrollbar
 ---@field ScrollTop      number    # 1-based virtual position of the top visible row
 ---@field VirtualSize    number    # total wrapped lines across valid entries
 local ChatInterface = ClassUI(Window) {
@@ -77,6 +78,15 @@ local ChatInterface = ClassUI(Window) {
         self.Lines       = {}
         self.ScrollTop   = 1
         self.VirtualSize = 0
+
+        -- Expose the scrollable interface on the container so
+        -- `UIUtil.CreateVertScrollbarFor(LinesContainer)` binds correctly.
+        -- The logic and state live on `self`; the container just delegates.
+        self.LinesContainer.GetScrollValues = function(_, axis) return self:GetScrollValues(axis) end
+        self.LinesContainer.ScrollLines     = function(_, axis, delta) self:ScrollLines(axis, delta) end
+        self.LinesContainer.ScrollPages     = function(_, axis, delta) self:ScrollPages(axis, delta) end
+        self.LinesContainer.ScrollSetTop    = function(_, axis, top) self:ScrollSetTop(axis, top) end
+        self.LinesContainer.IsScrollable    = function(_, axis) return self:IsScrollable(axis) end
 
         -- The edit area sits at the bottom of the client region.
         self.Edit = ChatEditInterface(client)
@@ -122,12 +132,20 @@ local ChatInterface = ClassUI(Window) {
             :Over(client)
             :End()
 
+        -- Leave a ~20px gap on the right for the scrollbar, which sits
+        -- anchored to the container's right edge (see below).
         Layouter(self.LinesContainer)
             :AtLeftIn(client, pad)
-            :AtRightIn(client, pad)
+            :AtRightIn(client, 36)
             :AtTopIn(client, pad)
-            :AnchorToTop(self.Edit, pad)
+            :AnchorToTop(self.Edit, 12)
             :End()
+
+        -- Create the vertical scrollbar. `CreateVertScrollbarFor` calls
+        -- `Scrollbar:SetScrollable(control)` on the passed control, so the
+        -- scrollable interface has to live on `LinesContainer` (as
+        -- delegates to self — see __init).
+        self.Scrollbar = UIUtil.CreateVertScrollbarFor(self.LinesContainer)
 
         -- Now that the container has a real size, build the pool and do
         -- a first wrap + render pass.
@@ -275,7 +293,7 @@ local ChatInterface = ClassUI(Window) {
     ---@param axis string
     ---@param delta number
     ScrollLines = function(self, axis, delta)
-        self:SetScrollTop(self.ScrollTop + math.floor(delta))
+        self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta))
     end,
 
     --- Scrolls by a page (pool-size worth of rows).
@@ -283,13 +301,16 @@ local ChatInterface = ClassUI(Window) {
     ---@param axis string
     ---@param delta number
     ScrollPages = function(self, axis, delta)
-        self:SetScrollTop(self.ScrollTop + math.floor(delta) * table.getn(self.Lines))
+        self:ScrollSetTop(axis, self.ScrollTop + math.floor(delta) * table.getn(self.Lines))
     end,
 
     --- Jumps to an absolute virtual position, clamped to the valid range.
+    --- Name and signature match the engine's `ScrollSetTop(axis, top)` contract
+    --- so `Scrollbar:SetScrollable` can call it directly.
     ---@param self UIChatInterface
+    ---@param axis string
     ---@param top number
-    SetScrollTop = function(self, top)
+    ScrollSetTop = function(self, axis, top)
         top = math.floor(top or 1)
         local poolSize = table.getn(self.Lines)
         local maxTop = math.max(1, self.VirtualSize - poolSize + 1)
@@ -311,8 +332,8 @@ local ChatInterface = ClassUI(Window) {
     --- Snaps to the bottom of the virtual list.
     ---@param self UIChatInterface
     ScrollToBottom = function(self)
-        self:SetScrollTop(self.VirtualSize)
-        -- SetScrollTop short-circuits when the position doesn't change, but
+        self:ScrollSetTop(nil, self.VirtualSize)
+        -- ScrollSetTop short-circuits when the position doesn't change, but
         -- the pool still needs a render pass after a rebuild / rewrap.
         self:CalcVisible()
     end,
