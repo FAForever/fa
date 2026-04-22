@@ -97,10 +97,10 @@ local ChatInterface = ClassUI(Window) {
         -- Full width, flush with the bottom of the client area. The edit
         -- group derives its own height (see ChatEditInterface.__post_init).
         Layouter(self.Edit)
-            :AtLeftIn(client, 30)
+            :AtLeftIn(client)
             :AtRightIn(client)
             :AtBottomIn(client)
-            :Over(client, 200)
+            :Over(client)
             :End()
 
         Layouter(self.LinesContainer)

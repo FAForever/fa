@@ -4,21 +4,26 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Edit = import("/lua/maui/edit.lua").Edit
+local Button = import("/lua/maui/button.lua").Button
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
+local ChatListInterface = import("/lua/ui/game/chat/ChatListInterface.lua").ChatListInterface
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local MaxChars = 200
 
 -------------------------------------------------------------------------------
--- The chat input area: a recipient label followed by an edit box. Pressing
--- Enter dispatches the text to the controller.
+-- The chat input area: a chat-bubble button, a recipient label, and an edit
+-- box. Pressing Enter dispatches the text to the controller. Clicking the
+-- chat-bubble button or the label opens the recipient picker (ChatListInterface).
 
 ---@class UIChatEditInterface : Group
+---@field ChatBubble     Button
 ---@field RecipientLabel Text
 ---@field EditBox        Edit
+---@field ChatList       UIChatListInterface | nil
 ChatEditInterface = ClassUI(Group) {
 
     ---@param self UIChatEditInterface
@@ -26,8 +31,24 @@ ChatEditInterface = ClassUI(Group) {
     __init = function(self, parent)
         Group.__init(self, parent, "ChatEditInterface")
 
+        self.ChatBubble = Button(self,
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_up.dds'),
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_down.dds'),
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_over.dds'),
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_dis.dds'))
+        self.ChatBubble.OnClick = function()
+            self:ToggleList()
+        end
+
         self.RecipientLabel = UIUtil.CreateText(self, "To All:", 14, 'Arial')
         self.RecipientLabel:SetDropShadow(true)
+
+        -- Clicking the label also opens the recipient picker.
+        self.RecipientLabel.HandleEvent = function(_, event)
+            if event.Type == 'ButtonPress' then
+                self:ToggleList()
+            end
+        end
 
         self.EditBox = Edit(self)
 
@@ -68,8 +89,13 @@ ChatEditInterface = ClassUI(Group) {
     ---@param self UIChatEditInterface
     ---@param parent Control
     __post_init = function(self, parent)
+        Layouter(self.ChatBubble)
+            :AtLeftIn(self, 3)
+            :AtVerticalCenterIn(self)
+            :End()
+
         Layouter(self.RecipientLabel)
-            :AtLeftIn(self, 2)
+            :AnchorToRight(self.ChatBubble, 2)
             :AtVerticalCenterIn(self)
             :End()
 
@@ -86,6 +112,28 @@ ChatEditInterface = ClassUI(Group) {
         Layouter(self)
             :Height(function() return self.EditBox.Height() end)
             :End()
+    end,
+
+    --- Opens the recipient picker popup, or closes it if it is already open.
+    ---@param self UIChatEditInterface
+    ToggleList = function(self)
+        if self.ChatList then
+            local list = self.ChatList --[[@as UIChatListInterface]]
+            self.ChatList = nil
+            list:Destroy()
+            self:AcquireFocus()
+        else
+            local list = ChatListInterface(self)
+            self.ChatList = list
+            -- Position the popup above-left of the chat-bubble button.
+            -- Depth is handled by the list itself (see ChatListInterface.__init).
+            LayoutHelpers.Above(list, self.ChatBubble, 15)
+            LayoutHelpers.AtLeftIn(list, self.ChatBubble, 15)
+            list:SetOnClosed(function()
+                self.ChatList = nil
+                self:AcquireFocus()
+            end)
+        end
     end,
 
     --- Updates the label from the current recipient value.
