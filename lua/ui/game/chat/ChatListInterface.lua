@@ -5,6 +5,8 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
+local ChatFactionBadge = import("/lua/ui/game/chat/ChatFactionBadge.lua").ChatFactionBadge
+
 local UIMain = import("/lua/ui/uimain.lua")
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
@@ -15,15 +17,17 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 ---@class UIChatListEntry
 ---@field text   Text
 ---@field bg     Bitmap
+---@field badge? ChatFactionBadge      # only present on player entries
 ---@field target UIChatRecipient
 
 -------------------------------------------------------------------------------
 -- A popup recipient picker. Lists "All", "Allies", and one entry per
 -- connected non-local human player (sourced from `GetSessionClients`, so
--- bots and disconnected players are excluded). Clicking an entry calls
--- `ChatController.SetRecipient` and destroys the popup. Clicking anywhere
--- outside also destroys the popup — every open of the list rebuilds from
--- fresh session state.
+-- bots and disconnected players are excluded). Player rows show a small
+-- faction + team-colour badge next to the name so the right recipient is
+-- easy to spot. Clicking an entry calls `ChatController.SetRecipient` and
+-- destroys the popup. Clicking anywhere outside also destroys the popup —
+-- every open of the list rebuilds from fresh session state.
 
 ---@class UIChatListInterface : Group
 ---@field Entries UIChatListEntry[]
@@ -66,7 +70,12 @@ ChatListInterface = ClassUI(Group) {
             if client.connected and not client['local'] then
                 for armyID, armyData in armies do
                     if not armyData.civilian and armyData.nickname == client.name then
-                        table.insert(defs, { nickname = client.name, target = armyID })
+                        table.insert(defs, {
+                            nickname = client.name,
+                            target   = armyID,
+                            faction  = armyData.faction,
+                            color    = armyData.color,
+                        })
                         break
                     end
                 end
@@ -84,6 +93,13 @@ ChatListInterface = ClassUI(Group) {
 
             entry.bg = Bitmap(entry.text)
             entry.bg:SetSolidColor('ff000000')
+
+            -- Player entries get a faction+colour badge to the left of the
+            -- name; All / Allies rows have no badge but share the same text
+            -- indent (applied in `__post_init`) so the column stays aligned.
+            if def.color then
+                entry.badge = ChatFactionBadge(self, def.faction, def.color)
+            end
 
             -- Capture target in a local so each entry closes over its own value.
             local target = def.target
@@ -150,30 +166,46 @@ ChatListInterface = ClassUI(Group) {
             :Height(totalHeight)
             :End()
 
+        -- Left indent that reserves room for the faction badge on player
+        -- rows and keeps All / Allies text aligned with the player names.
+        local textIndent = 20
+
         -- Stack entries bottom-up: first entry at the bottom-left, each
-        -- subsequent entry above the previous.
+        -- subsequent entry above the previous. Text is indented to leave
+        -- room for the badge.
         for i, entry in ipairs(self.Entries) do
             if i == 1 then
                 Layouter(entry.text)
-                    :AtLeftBottomIn(self)
+                    :AtBottomIn(self)
+                    :AtLeftIn(self, textIndent)
                     :Over(self, 1)
                     :End()
             else
                 Layouter(entry.text)
                     :Above(self.Entries[i-1].text)
-                    :AtLeftIn(self)
+                    :AtLeftIn(self, textIndent)
                     :Over(self, 1)
                     :End()
             end
 
-            -- The highlight bar extends slightly past the text in every
-            -- direction and sits behind it in the depth order. Direct
+            -- Badge (player rows only) sits in the reserved indent, centred
+            -- vertically on the text row.
+            if entry.badge then
+                Layouter(entry.badge)
+                    :AtLeftIn(self, 3)
+                    :AtVerticalCenterIn(entry.text)
+                    :Over(self, 2)
+                    :End()
+            end
+
+            -- The highlight bar spans the full row (including the badge
+            -- area) and sits behind everything in the depth order. Direct
             -- LazyVar `:SetFunction` calls match the original `chat.lua`
             -- pattern and avoid Layouter's reused-state quirks.
             local text = entry.text
             ---@diagnostic disable: undefined-field
             entry.bg.Depth:SetFunction(function() return text.Depth() - 1 end)
-            entry.bg.Left:SetFunction(function() return text.Left() - 6 end)
+            entry.bg.Left:SetFunction(function() return self.Left() - 6 end)
             entry.bg.Top:SetFunction(function() return text.Top() - 1 end)
             entry.bg.Width:SetFunction(function() return self.Width() + 8 end)
             entry.bg.Bottom:SetFunction(function() return text.Bottom() + 1 end)
