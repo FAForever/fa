@@ -95,6 +95,38 @@ function Lookup(name)
     return nil
 end
 
+--- Returns every registered command whose canonical name or any alias begins
+--- with the given prefix (case-insensitive). Each command appears at most
+--- once even if multiple of its aliases match. Results are sorted by name.
+---@param prefix string
+---@return UIChatCommand[]
+function FindMatching(prefix)
+    local lower = string.lower(prefix or '')
+    local len = string.len(lower)
+    local seen = {}
+    local result = {}
+
+    for name, cmd in Commands do
+        if string.sub(name, 1, len) == lower then
+            seen[cmd] = true
+            table.insert(result, cmd)
+        end
+    end
+
+    for alias, canonical in Aliases do
+        if string.sub(alias, 1, len) == lower then
+            local cmd = Commands[canonical]
+            if cmd and not seen[cmd] then
+                seen[cmd] = true
+                table.insert(result, cmd)
+            end
+        end
+    end
+
+    table.sort(result, function(a, b) return a.name < b.name end)
+    return result
+end
+
 -------------------------------------------------------------------------------
 -- Parsing
 
@@ -120,6 +152,7 @@ end
 ---@param tokens string[]
 ---@return table?, string?
 local function ParseArgs(cmd, tokens)
+    ---@type table<string, any>
     local args = { _raw = tokens }
     if not cmd.params then return args, nil end
 

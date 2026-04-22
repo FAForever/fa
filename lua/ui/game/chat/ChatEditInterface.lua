@@ -9,6 +9,7 @@ local Button = import("/lua/maui/button.lua").Button
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local ChatListInterface = import("/lua/ui/game/chat/ChatListInterface.lua").ChatListInterface
+local ChatCommandHintInterface = import("/lua/ui/game/chat/ChatCommandHintInterface.lua").ChatCommandHintInterface
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
@@ -24,6 +25,8 @@ local MaxChars = 200
 ---@field RecipientLabel Text
 ---@field EditBox        Edit
 ---@field ChatList       UIChatListInterface | nil
+---@field CommandHint    UIChatCommandHintInterface | nil
+---@field LastEditText   string
 ChatEditInterface = ClassUI(Group) {
 
     ---@param self UIChatEditInterface
@@ -76,6 +79,7 @@ ChatEditInterface = ClassUI(Group) {
                 ChatController.Send(text)
                 edit:SetText('')
             end
+            self:CloseCommandHint()
         end
 
         -- Keep the label in sync with the model.
@@ -84,6 +88,58 @@ ChatEditInterface = ClassUI(Group) {
             self:RefreshRecipient(lv())
         end
         self:RefreshRecipient(model.Recipient())
+
+        -- Drive the command-hint popup from the edit-box contents. We poll
+        -- once per frame because MAUI's Edit has no "text changed" callback
+        -- that fires reliably after both typed chars and backspaces.
+        self.LastEditText = ''
+        self:SetNeedsFrameUpdate(true)
+    end,
+
+    ---@param self UIChatEditInterface
+    OnFrame = function(self)
+        local text = self.EditBox:GetText() or ''
+        if text == self.LastEditText then return end
+        self.LastEditText = text
+
+        if string.sub(text, 1, 1) == '/' then
+            if not self.CommandHint then
+                self:OpenCommandHint()
+            end
+            local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
+            hint:Refresh(text)
+        else
+            self:CloseCommandHint()
+        end
+    end,
+
+    --- Creates the hint popup and anchors it directly above the edit box.
+    ---@param self UIChatEditInterface
+    OpenCommandHint = function(self)
+        if self.CommandHint then return end
+
+        -- Ensure the built-ins exist before the hint queries the registry;
+        -- otherwise we'd only see the footer fallback on the first open.
+        ChatController.RegisterBuiltinCommands()
+
+        local hint = ChatCommandHintInterface(self, self.EditBox)
+        self.CommandHint = hint
+        LayoutHelpers.Above(hint, self.EditBox, 4)
+        LayoutHelpers.AtLeftIn(hint, self.EditBox)
+        hint:SetOnSelect(function(cmd)
+            self.EditBox:SetText('/' .. cmd.name .. ' ')
+            self:AcquireFocus()
+        end)
+    end,
+
+    --- Tears down the hint popup if it exists. Called when the user sends a
+    --- message, clears the prefix, or otherwise leaves command-entry mode.
+    ---@param self UIChatEditInterface
+    CloseCommandHint = function(self)
+        if not self.CommandHint then return end
+        local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
+        self.CommandHint = nil
+        hint:Destroy()
     end,
 
     ---@param self UIChatEditInterface

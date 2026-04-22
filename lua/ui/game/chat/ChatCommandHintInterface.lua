@@ -1,0 +1,302 @@
+
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Create = import("/lua/lazyvar.lua").Create
+
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+
+local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
+
+local Layouter = LayoutHelpers.ReusedLayoutFor
+
+local RowFontSize = 12
+local RowFontName = 'Arial'
+local HorizontalPadding = 12
+local VerticalPadding  = 2
+local DividerHeight    = 2
+
+--- Renders a command the same way `/help` does: name, params, aliases, description.
+---@param cmd UIChatCommand
+---@return string
+local function FormatCommand(cmd)
+    local params = ''
+    if cmd.params then
+        for _, p in ipairs(cmd.params) do
+            local fmt = p.optional and ' [%s]' or ' <%s>'
+            params = params .. string.format(fmt, p.name)
+        end
+    end
+
+    local aliases = ''
+    if cmd.aliases and table.getn(cmd.aliases) > 0 then
+        aliases = ' (aka /' .. table.concat(cmd.aliases, ', /') .. ')'
+    end
+
+    return string.format("/%s%s%s — %s", cmd.name, params, aliases, cmd.description or '')
+end
+
+-------------------------------------------------------------------------------
+-- Command-hint popup. Shows commands whose name or aliases prefix-match the
+-- user's input. Reuses a pool of row controls across refreshes — entries are
+-- shown/hidden and re-positioned via a per-row `ordinal` LazyVar rather than
+-- rebuilt from scratch.
+--
+-- A pinned `/help` footer is always visible at the bottom.
+
+---@class UIChatHintRow
+---@field text    Text
+---@field bg      Bitmap
+---@field ordinal LazyVar<number>            # 0 = hidden, 1 = row closest to footer, etc.
+---@field target  UIChatCommand | nil
+
+---@class UIChatCommandHintInterface : Group
+---@field Edit         Edit
+---@field OnSelect?    fun(cmd: UIChatCommand)
+---@field Rows         UIChatHintRow[]        # reusable pool, indexed by ordinal
+---@field Footer       UIChatHintRow          # always-visible /help row
+---@field Divider      Bitmap
+---@field RowHeight    LazyVar<number>
+---@field VisibleCount LazyVar<number>
+---@field LastText     string
+---@field LTBG Bitmap
+---@field RTBG Bitmap
+---@field RBBG Bitmap
+---@field RLBG Bitmap
+---@field LBG  Bitmap
+---@field RBG  Bitmap
+---@field TBG  Bitmap
+---@field BBG  Bitmap
+ChatCommandHintInterface = ClassUI(Group) {
+
+    ---@param self UIChatCommandHintInterface
+    ---@param parent Control
+    ---@param edit Edit
+    __init = function(self, parent, edit)
+        Group.__init(self, parent, "ChatCommandHintInterface")
+        self:DisableHitTest()
+        LayoutHelpers.DepthOverParent(self, parent, 100)
+
+        self.Edit = edit
+        self.Rows = {}
+        self.LastText = ''
+        self.VisibleCount = Create(0)
+
+        -- Sample the row height from a throwaway Text.
+        ---@diagnostic disable-next-line: param-type-mismatch
+        local probe = UIUtil.CreateText(self, '/sample', RowFontSize, RowFontName)
+        ---@diagnostic disable-next-line: undefined-field
+        self.RowHeight = Create(probe.Height() + VerticalPadding)
+        probe:Destroy()
+
+        -- Footer (always-visible /help row).
+        self.Footer = self:BuildRow()
+        local help = Registry.Lookup('help')
+        self.Footer.target = help
+        self.Footer.text:SetText(help and FormatCommand(help) or '/help')
+        self.Footer.text:SetColor('ffbbbbbb')
+
+        self.Divider = Bitmap(self)
+        self.Divider:SetSolidColor('ff444444')
+        self.Divider:DisableHitTest()
+
+        -- Decorative borders (same skin as ChatListInterface).
+        self.LTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
+        self.LTBG:DisableHitTest()
+        self.RTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ur.dds'))
+        self.RTBG:DisableHitTest()
+        self.RBBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lr.dds'))
+        self.RBBG:DisableHitTest()
+        self.RLBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ll.dds'))
+        self.RLBG:DisableHitTest()
+        self.LBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_vert_l.dds'))
+        self.LBG:DisableHitTest()
+        self.RBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_vert_r.dds'))
+        self.RBG:DisableHitTest()
+        self.TBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_horz_um.dds'))
+        self.TBG:DisableHitTest()
+        self.BBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lm.dds'))
+        self.BBG:DisableHitTest()
+    end,
+
+    ---@param self UIChatCommandHintInterface
+    ---@param parent Control
+    __post_init = function(self, parent)
+        -- Width: fit the widest fully-formatted row (/name <params> (aka …) — desc)
+        -- so the popup doesn't reflow horizontally as rows change.
+        local probeText = '/help'
+        for _, cmd in ipairs(Registry.GetAll()) do
+            local candidate = FormatCommand(cmd)
+            if string.len(candidate) > string.len(probeText) then
+                probeText = candidate
+            end
+        end
+        ---@diagnostic disable-next-line: param-type-mismatch
+        local probe = UIUtil.CreateText(self, probeText, RowFontSize, RowFontName)
+        ---@diagnostic disable-next-line: undefined-field
+        local textWidth = probe.Width()
+        probe:Destroy()
+
+        Layouter(self)
+            :Width(textWidth + HorizontalPadding * 2)
+            :End()
+
+        ---@diagnostic disable: undefined-field
+        self.Height:SetFunction(function()
+            return (self.VisibleCount() + 1) * self.RowHeight() + DividerHeight
+        end)
+
+        -- Footer pinned to the bottom of self.
+        self.Footer.text.Left:SetFunction(function()   return self.Left() + HorizontalPadding end)
+        self.Footer.text.Bottom:SetFunction(function() return self.Bottom() end)
+        self:LayoutRowBackground(self.Footer)
+
+        -- Divider sits directly above the footer.
+        self.Divider.Left:SetFunction(function()   return self.Left() end)
+        self.Divider.Right:SetFunction(function()  return self.Right() end)
+        self.Divider.Bottom:SetFunction(function() return self.Footer.text.Top() end)
+        self.Divider.Height:SetFunction(function() return DividerHeight end)
+
+        -- Borders hug the outside of self on all eight sides.
+        Layouter(self.LTBG):Right(self.Left):Bottom(self.Top):End()
+        Layouter(self.RTBG):Left(self.Right):Bottom(self.Top):End()
+        Layouter(self.RBBG):Left(self.Right):Top(self.Bottom):End()
+        Layouter(self.RLBG):Right(self.Left):Top(self.Bottom):End()
+        Layouter(self.LBG):Right(self.Left):Top(self.Top):Bottom(self.Bottom):End()
+        Layouter(self.RBG):Left(self.Right):Top(self.Top):Bottom(self.Bottom):End()
+        Layouter(self.TBG):Left(self.Left):Right(self.Right):Bottom(self.Top):End()
+        Layouter(self.BBG):Left(self.Left):Right(self.Right):Top(self.Bottom):End()
+        ---@diagnostic enable: undefined-field
+    end,
+
+    --- Builds a reusable row (text + highlight bitmap + hover handler).
+    --- The row is laid out lazily by `LayoutRow` / `LayoutRowBackground`.
+    ---@param self UIChatCommandHintInterface
+    ---@return UIChatHintRow
+    BuildRow = function(self)
+        ---@type UIChatHintRow
+        local row = {
+            ordinal = Create(0),
+            target  = nil,
+        }
+        ---@diagnostic disable-next-line: param-type-mismatch
+        row.text = UIUtil.CreateText(self, '', RowFontSize, RowFontName)
+        row.text:SetColor('ffffffff')
+        row.text:SetDropShadow(true)
+        row.text:DisableHitTest()
+
+        row.bg = Bitmap(row.text)
+        row.bg:SetSolidColor('ff000000')
+
+        local owner = self
+        row.bg.HandleEvent = function(bg, event)
+            if event.Type == 'MouseEnter' then
+                bg:SetSolidColor('ff666666')
+            elseif event.Type == 'MouseExit' then
+                bg:SetSolidColor('ff000000')
+            elseif event.Type == 'ButtonPress' then
+                if row.target and owner.OnSelect then
+                    owner.OnSelect(row.target)
+                end
+            end
+        end
+
+        return row
+    end,
+
+    --- Lazily pulls a dynamic row out of the pool, creating it if needed and
+    --- wiring its position binding to its own ordinal LazyVar.
+    ---@param self UIChatCommandHintInterface
+    ---@param idx number
+    ---@return UIChatHintRow
+    GetOrCreateRow = function(self, idx)
+        local existing = self.Rows[idx]
+        if existing then return existing end
+
+        local row = self:BuildRow()
+        self.Rows[idx] = row
+
+        ---@diagnostic disable: undefined-field
+        row.text.Left:SetFunction(function() return self.Left() + HorizontalPadding end)
+        row.text.Bottom:SetFunction(function()
+            local ord = row.ordinal()
+            if ord <= 0 then return self.Top() end
+            return self.Divider.Top() - (ord - 1) * self.RowHeight()
+        end)
+        ---@diagnostic enable: undefined-field
+
+        self:LayoutRowBackground(row)
+        return row
+    end,
+
+    --- Binds the row's highlight bitmap to span the popup width at the row's
+    --- vertical position, one depth below the text so clicks hit the bitmap.
+    ---@param self UIChatCommandHintInterface
+    ---@param row UIChatHintRow
+    LayoutRowBackground = function(self, row)
+        ---@diagnostic disable: undefined-field
+        row.bg.Left:SetFunction(function()   return self.Left() end)
+        row.bg.Right:SetFunction(function()  return self.Right() end)
+        row.bg.Top:SetFunction(function()    return row.text.Top() - 1 end)
+        row.bg.Bottom:SetFunction(function() return row.text.Bottom() + 1 end)
+        row.bg.Depth:SetFunction(function()  return row.text.Depth() - 1 end)
+        ---@diagnostic enable: undefined-field
+    end,
+
+    --- Updates the popup to reflect the current edit-box text. Reuses existing
+    --- rows: each matching command is assigned to the row at its ordinal, and
+    --- rows beyond the match count are hidden (ordinal = 0).
+    ---@param self UIChatCommandHintInterface
+    ---@param text string
+    Refresh = function(self, text)
+        local matches = {}
+        if text and string.sub(text, 1, 1) == '/' then
+            local prefix = string.sub(text, 2)
+            -- Only the first word is the command name.
+            local space = string.find(prefix, '%s')
+            if space then prefix = string.sub(prefix, 1, space - 1) end
+
+            for _, cmd in ipairs(Registry.FindMatching(prefix)) do
+                if cmd.name ~= 'help' then  -- help lives in the footer
+                    table.insert(matches, cmd)
+                end
+            end
+        end
+
+        ---@diagnostic disable: undefined-field
+        for i, cmd in ipairs(matches) do
+            local row = self:GetOrCreateRow(i)
+            row.target = cmd
+            row.text:SetText(FormatCommand(cmd))
+            row.text:Show()
+            row.bg:Show()
+            row.ordinal:Set(i)
+        end
+        for i = table.getn(matches) + 1, table.getn(self.Rows) do
+            local row = self.Rows[i]
+            row.target = nil
+            row.text:Hide()
+            row.bg:Hide()
+            row.ordinal:Set(0)
+        end
+
+        self.VisibleCount:Set(table.getn(matches))
+        ---@diagnostic enable: undefined-field
+    end,
+
+    --- Registers the callback invoked when the user clicks a hint row.
+    ---@param self UIChatCommandHintInterface
+    ---@param callback fun(cmd: UIChatCommand)
+    SetOnSelect = function(self, callback)
+        self.OnSelect = callback
+    end,
+}
+
+-------------------------------------------------------------------------------
+--#region Debugging
+
+function __moduleinfo.OnDirty()
+    import(__moduleinfo.name)
+end
+
+--#endregion
