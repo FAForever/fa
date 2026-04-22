@@ -461,6 +461,12 @@ local ChatInterface = ClassUI(Window) {
     OnClose = function(self)
         ChatController.CloseWindow()
     end,
+
+    --- Engine-invoked when the user clicks the config button on the window
+    --- frame. Opens (or closes, if already open) the chat options dialog.
+    OnConfigClick = function(self)
+        import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
+    end,
 }
 
 -------------------------------------------------------------------------------
