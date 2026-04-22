@@ -58,6 +58,12 @@ ChatLineInterface = ClassUI(Group) {
     ---@param self UIChatLineInterface
     ---@param parent Control
     __post_init = function(self, parent)
+        -- Derive the row's height from the name font so pool sizing and
+        -- scroll positions scale automatically with `ChatOptions.font_size`.
+        Layouter(self)
+            :Height(function() return self.Name.Height() + 2 end)
+            :End()
+
         Layouter(self.TeamColor)
             :AtLeftTopIn(self)
             :Width(self.Height)
@@ -81,16 +87,33 @@ ChatLineInterface = ClassUI(Group) {
             :End()
     end,
 
-    --- Populates the line from a history entry.
+    --- Populates the row as the FIRST wrapped line of an entry: shows the
+    --- team-colour square, faction icon, the name prefix, and the first
+    --- wrapped chunk of message text.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
-    SetEntry = function(self, entry)
+    ---@param wrappedText string    # the first wrapped chunk of `entry.text`
+    SetHeader = function(self, entry, wrappedText)
         self.Name:SetText(entry.name or '')
-        self.Text:SetText(entry.text or '')
+        self.Text:SetText(wrappedText or entry.text or '')
         self.TeamColor:SetSolidColor(entry.color or '00000000')
 
         local iconIndex = entry.faction or table.getn(FactionIcons)
         self.FactionIcon:SetTexture(UIUtil.UIFile(FactionIcons[iconIndex]))
+    end,
+
+    --- Populates the row as a CONTINUATION of a wrapped entry: the name slot
+    --- and team-colour square stay empty, only the wrapped text is shown.
+    --- The text control remains anchored to `Name.Right + 2`; with an empty
+    --- name that resolves to the left of the row, so continuation lines
+    --- naturally line up under the first wrapped chunk.
+    ---@param self UIChatLineInterface
+    ---@param wrappedText string
+    SetContinuation = function(self, wrappedText)
+        self.Name:SetText('')
+        self.Text:SetText(wrappedText or '')
+        self.TeamColor:SetSolidColor('00000000')
+        self.FactionIcon:SetSolidColor('00000000')
     end,
 
     --- Clears all content so the row can stand empty.

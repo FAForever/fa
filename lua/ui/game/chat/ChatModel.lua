@@ -16,13 +16,14 @@ RecipientAllies = 'allies'
 -- History entry.
 
 ---@class UIChatEntry
----@field name      string             # formatted prefix, e.g. "Sender to allies:"
----@field text      string             # raw message body
----@field color     string             # ARGB hex of the sender's team color
----@field armyID    number             # sender's army index
----@field faction   number             # faction icon index (1-based)
----@field recipient UIChatRecipient    # the target this message was directed to
----@field camera?   table              # camera state when the message is a ping link
+---@field name        string             # formatted prefix, e.g. "Sender to allies:"
+---@field text        string             # raw message body
+---@field color       string             # ARGB hex of the sender's team color
+---@field armyID      number             # sender's army index
+---@field faction     number             # faction icon index (1-based)
+---@field recipient   UIChatRecipient    # the target this message was directed to
+---@field camera?     table              # camera state when the message is a ping link
+---@field wrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
 
 -------------------------------------------------------------------------------
 -- Model.
@@ -35,15 +36,6 @@ RecipientAllies = 'allies'
 ---@type UIChatModel | nil
 local ModelInstance = nil
 
---- Returns the model singleton, creating it if it does not exist yet.
----@return UIChatModel
-function GetSingleton()
-    if not ModelInstance then
-        SetupSingleton()
-    end
-    return ModelInstance
-end
-
 --- Creates and initializes the model singleton.
 ---@return UIChatModel
 function SetupSingleton()
@@ -53,6 +45,15 @@ function SetupSingleton()
         WindowVisible = Create(false),
     }
     return ModelInstance
+end
+
+--- Returns the model singleton, creating it if it does not exist yet.
+---@return UIChatModel
+function GetSingleton()
+    if not ModelInstance then
+        SetupSingleton()
+    end
+    return ModelInstance --[[@as UIChatModel]]
 end
 
 -------------------------------------------------------------------------------
