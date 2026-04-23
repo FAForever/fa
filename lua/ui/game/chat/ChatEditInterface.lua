@@ -97,6 +97,20 @@ ChatEditInterface = ClassUI(Group) {
             self:RefreshCommandHint(newText or '')
         end
 
+        -- Escape priorities: (1) close an open command hint, (2) clear any
+        -- text, (3) close the chat window.
+        self.EditBox.OnEscPressed = function(_, text)
+            if self.CommandHint then
+                self:CloseCommandHint()
+                return true
+            end
+            if text and text ~= '' then
+                return false  -- let the engine clear the text box
+            end
+            ChatController.CloseWindow()
+            return true
+        end
+
         -- Keep the label in sync with the model. `LazyVarDerive` gives us a
         -- fresh per-subscriber LazyVar so we don't stomp any other observer
         -- of `model.Recipient` (see the chat CLAUDE.md for the pattern).
@@ -107,17 +121,22 @@ ChatEditInterface = ClassUI(Group) {
     end,
 
     --- Shows or hides the command hint based on the current edit-box text.
+    --- Only opens when the text transitions to exactly `/` — so closing the
+    --- hint via Escape leaves it closed while the user keeps typing past the
+    --- slash. An already-open hint keeps refreshing as long as text starts
+    --- with `/`.
     ---@param self UIChatEditInterface
     ---@param text string
     RefreshCommandHint = function(self, text)
-        if string.sub(text, 1, 1) == '/' then
-            if not self.CommandHint then
-                self:OpenCommandHint()
+        if self.CommandHint then
+            if string.sub(text, 1, 1) == '/' then
+                self.CommandHint:Refresh(text)
+            else
+                self:CloseCommandHint()
             end
-            local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
-            hint:Refresh(text)
-        else
-            self:CloseCommandHint()
+        elseif text == '/' then
+            self:OpenCommandHint()
+            self.CommandHint:Refresh(text)
         end
     end,
 
