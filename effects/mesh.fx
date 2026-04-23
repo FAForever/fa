@@ -2094,68 +2094,6 @@ VERTEXNORMAL_VERTEX EffectVertexNormalLoFiVS(
     return vertex;
 }
 
-/// FourUVTexShiftScaleVS
-///
-/// Vertex normal lighting only
-EFFECT_VERTEX FourUVTexShiftScaleVS(
-    float3 position : POSITION0,
-    float3 normal : NORMAL0,
-    float3 UnusedTangent : TANGENT,     // tighten up the linkages for D3D10
-    float3 UnusedBinormal : BINORMAL,
-    float4 texcoord0 : TEXCOORD0,
-    int boneIndex[4] : BLENDINDICES,
-    float3 row0 : TEXCOORD1,
-    float3 row1 : TEXCOORD2,
-    float3 row2 : TEXCOORD3,
-    float3 row3 : TEXCOORD4,
-    anim_t anim : TEXCOORD5,
-    float4 material : TEXCOORD6,
-    float4 color : COLOR0,
-    uniform float texScale0,
-    uniform float texScale1,
-    uniform float texScale2,
-    uniform float texScale3,
-    uniform float texXshift0,
-    uniform float texYshift0,
-    uniform float texXshift1,
-    uniform float texYshift1,
-    uniform float texXshift2,
-    uniform float texYshift2,
-    uniform float texXshift3,
-    uniform float texYshift3
-)
-{
-    EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
-    CompatSwizzle(color);
-
-    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-
-    vertex.position = mul( float4(position,1), worldMatrix);
-    vertex.depth = vertex.position.y - surfaceElevation;
-    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
-    vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
-
-    vertex.texcoord0 = texcoord0;
-    vertex.texcoord1 = texcoord0;
-    vertex.color = color;
-    vertex.material = float4( time - material.x, material.yzw);
-
-    vertex.texcoord0.xy *= texScale0;
-    vertex.texcoord0.zw *= texScale1;
-    vertex.texcoord1.xy *= texScale2;
-    vertex.texcoord1.zw *= texScale3;
-    vertex.texcoord0.x += (vertex.material.x * texXshift0);
-    vertex.texcoord0.y += (vertex.material.x * texYshift0);
-    vertex.texcoord0.z += (vertex.material.x * texXshift1);
-    vertex.texcoord0.w += (vertex.material.x * texYshift1);
-    vertex.texcoord1.x += (vertex.material.x * texXshift2);
-    vertex.texcoord1.y += (vertex.material.x * texYshift2);
-    vertex.texcoord1.z += (vertex.material.x * texXshift3);
-    vertex.texcoord1.w += (vertex.material.x * texYshift3);
-
-    return vertex;
-}
-
 EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
@@ -2196,20 +2134,18 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     vertex.viewDirection = normalize(vertex.viewDirection);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
-    vertex.texcoord0 = texcoord0;
-    vertex.texcoord1 = texcoord0;
-    vertex.color = color;
-    vertex.material = float4( time - material.x, material.yzw);
-
     float3x3 rotationMatrix = (float3x3)worldMatrix;
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
 
-    vertex.texcoord0.xy *= texScale0;
-    vertex.texcoord0.zw *= texScale1;
-    vertex.texcoord1.xy *= texScale2;
-    vertex.texcoord1.zw *= texScale3;
+    vertex.color = color;
+    vertex.material = float4( time - material.x, material.yzw);
+
+    vertex.texcoord0.xy = texcoord0 * texScale0;
+    vertex.texcoord0.zw = texcoord0 * texScale1;
+    vertex.texcoord1.xy = texcoord0 * texScale2;
+    vertex.texcoord1.zw = texcoord0 * texScale3;
     vertex.texcoord0.x += (vertex.material.x * texXshift0);
     vertex.texcoord0.y += (vertex.material.x * texYshift0);
     vertex.texcoord0.z += (vertex.material.x * texXshift1);
@@ -2222,7 +2158,8 @@ EFFECT_NORMALMAPPED_VERTEX ShieldNormalVS(
     return vertex;
 }
 
-EFFECT_VERTEX ShieldPositionNormalOffsetVS(
+// Almost identical to ShieldNormalVS. Should be removed if possible
+EFFECT_NORMALMAPPED_VERTEX ShieldPositionNormalOffsetVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
     float3 UnusedTangent : TANGENT,  // tighten up linkages for D3D10
@@ -2251,7 +2188,7 @@ EFFECT_VERTEX ShieldPositionNormalOffsetVS(
     uniform float texYshift3
 )
 {
-    EFFECT_VERTEX vertex = (EFFECT_VERTEX)0;
+    EFFECT_NORMALMAPPED_VERTEX vertex = (EFFECT_NORMALMAPPED_VERTEX)0;
     CompatSwizzle(color);
 
     int bone = anim.y + boneIndex[0];
@@ -2265,15 +2202,13 @@ EFFECT_VERTEX ShieldPositionNormalOffsetVS(
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
     vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
 
-    vertex.texcoord0 = texcoord0;
-    vertex.texcoord1 = texcoord0;
     vertex.color = color;
     vertex.material = float4( time - material.x, material.yzw);
 
-    vertex.texcoord0.xy *= texScale0;
-    vertex.texcoord0.zw *= texScale1;
-    vertex.texcoord1.xy *= texScale2;
-    vertex.texcoord1.zw *= texScale3;
+    vertex.texcoord0.xy = texcoord0 * texScale0;
+    vertex.texcoord0.zw = texcoord0 * texScale1;
+    vertex.texcoord1.xy = texcoord0 * texScale2;
+    vertex.texcoord1.zw = texcoord0 * texScale3;
     vertex.texcoord0.x += (vertex.material.x * texXshift0);
     vertex.texcoord0.y += (vertex.material.x * texYshift0);
     vertex.texcoord0.z += (vertex.material.x * texXshift1);
@@ -3808,7 +3743,7 @@ float shieldWaterAbsorption(float depth) {
 /// ShieldPS
 ///
 ///
-float4 ShieldPS( EFFECT_VERTEX vertex ) : COLOR
+float4 ShieldPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -3878,7 +3813,7 @@ float4 ShieldLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 /// ShieldCybranPS
 ///
 ///
-float4 ShieldCybranPS( EFFECT_VERTEX vertex, uniform float alpha ) : COLOR
+float4 ShieldCybranPS( EFFECT_NORMALMAPPED_VERTEX vertex, uniform float alpha ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -7598,7 +7533,7 @@ technique ShieldUEF_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1, 3, 32, 6, 0, 0, 0.0003, 0.005, -0.001, -0.005, -0.0003, -0.0008 );
         PixelShader = compile ps_2_0 ShieldPS();
     }
 }
@@ -7643,7 +7578,7 @@ technique ShieldCybran_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
+        VertexShader = compile vs_1_1 ShieldNormalVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
         PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
     }
     pass P1
@@ -8521,7 +8456,7 @@ float4 NomadsPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 
 /// Bubble shield
 ///
-float4 ShieldNomadsPS( EFFECT_VERTEX vertex ) : COLOR
+float4 ShieldNomadsPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip(vertex.depth);
 
@@ -9157,7 +9092,7 @@ technique ShieldNomads_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
+        VertexShader = compile vs_1_1 ShieldNormalVS(
             1,  // ?
             1,  // size and number of albedo's simultaniously
             32,  // ?
@@ -9222,7 +9157,7 @@ technique ShieldNomadsStealth_MedFidelity
         RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
-        VertexShader = compile vs_1_1 FourUVTexShiftScaleVS(
+        VertexShader = compile vs_1_1 ShieldNormalVS(
             1,  // ?
             3,  // size and number of albedo's simultaniously
             32,  // ?
