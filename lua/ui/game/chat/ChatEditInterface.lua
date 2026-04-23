@@ -8,6 +8,7 @@ local Button = import("/lua/maui/button.lua").Button
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
+local ChatCompletion = import("/lua/ui/game/chat/ChatCompletion.lua")
 local ChatListInterface = import("/lua/ui/game/chat/ChatListInterface.lua").ChatListInterface
 local ChatCommandHintInterface = import("/lua/ui/game/chat/ChatCommandHintInterface.lua").ChatCommandHintInterface
 
@@ -29,7 +30,9 @@ local MaxChars = 200
 ---@field EditBox           Edit
 ---@field ChatList          UIChatListInterface | nil
 ---@field CommandHint       UIChatCommandHintInterface | nil
----@field RecipientObserver LazyVar<UIChatRecipient>  # derived from ChatModel.Recipient
+---@field RecipientObserver LazyVar<UIChatRecipient>          # derived from ChatModel.Recipient
+---@field Completion        UIChatCompletion | nil            # active Tab-cycle record, reset on text change
+---@field SuppressCompletionReset boolean                     # true while our own SetText is running
 ChatEditInterface = ClassUI(Group) {
 
     ---@param self UIChatEditInterface
@@ -41,6 +44,9 @@ ChatEditInterface = ClassUI(Group) {
         -- destruction — currently just the derived observer LazyVars.
         -- Emptied in `OnDestroy`.
         self.Trash = TrashBag()
+
+        self.Completion = nil
+        self.SuppressCompletionReset = false
 
         self.ChatBubble = Button(self,
             UIUtil.UIFile('/game/chat-box_btn/radio_btn_up.dds'),
@@ -95,19 +101,24 @@ ChatEditInterface = ClassUI(Group) {
             self:CloseCommandHint()
         end
 
-        -- Drive the command-hint popup from the edit-box contents.
-        -- `OnTextChanged` fires after every insertion, deletion, or `SetText`,
-        -- so we don't need to poll each frame.
+        -- Drive the command-hint popup from the edit-box contents, and drop
+        -- any in-flight Tab-completion cycle whenever the text changes from
+        -- something other than our own `ApplyCompletion` call.
         self.EditBox.OnTextChanged = function(_, newText, _)
             self:RefreshCommandHint(newText or '')
+            if not self.SuppressCompletionReset then
+                self.Completion = nil
+            end
         end
 
-        -- Swallow Tab so focus can't leave the edit box, and ring the error
-        -- cue when the user types against the character cap. `OnCharPressed`
-        -- fires before insertion, so `>=` here matches the already-committed
-        -- length *before* this keystroke — i.e. we beep on the rejected char.
+        -- Tab runs completion (commands when text starts with '/' and the
+        -- caret is in the first token, player nicknames otherwise). Repeat
+        -- presses cycle through candidates; any other keystroke resets the
+        -- cycle via `OnTextChanged`. `OnCharPressed` fires before insertion,
+        -- so the `>=` beep catches the keystroke the cap is about to reject.
         self.EditBox.OnCharPressed = function(edit, charcode)
             if charcode == UIUtil.VK_TAB then
+                self:HandleTabCompletion()
                 return true
             end
             if STR_Utf8Len(edit:GetText()) >= edit:GetMaxChars() then
@@ -149,6 +160,60 @@ ChatEditInterface = ClassUI(Group) {
         self.RecipientObserver = self.Trash:Add(LazyVarDerive(model.Recipient, function(lv)
             self:RefreshRecipient(lv())
         end))
+    end,
+
+    --- Entry point for the Tab key. On the first press, computes a fresh
+    --- completion record; on subsequent presses, cycles to the next
+    --- candidate. Plays the error cue when there is nothing to complete so
+    --- the user isn't left wondering whether the key was handled.
+    ---@param self UIChatEditInterface
+    HandleTabCompletion = function(self)
+        if self.Completion then
+            local c = self.Completion
+            c.Index = math.mod(c.Index, table.getn(c.Candidates)) + 1
+            self:ApplyCompletion()
+            return
+        end
+
+        local text = self.EditBox:GetText() or ''
+        local caret = self.EditBox:GetCaretPosition()
+        local completion = ChatCompletion.Compute(text, caret)
+        if not completion then
+            PlaySound(Sound({ Cue = 'UI_Menu_Error_01', Bank = 'Interface' }))
+            return
+        end
+        self.Completion = completion
+        self:ApplyCompletion()
+    end,
+
+    --- Writes the current candidate into the edit box at the recorded anchor,
+    --- overwriting the consumed word. `SuppressCompletionReset` guards the
+    --- `OnTextChanged` branch that would otherwise clear the cycle state as
+    --- a side-effect of our own edit.
+    ---@param self UIChatEditInterface
+    ApplyCompletion = function(self)
+        if not self.Completion then return end
+        local c = self.Completion --[[@as UIChatCompletion]]
+
+        local text = self.EditBox:GetText() or ''
+        local totalLen = STR_Utf8Len(text)
+        local tailStart = c.Anchor + c.Consume
+        local before = c.Anchor > 0 and STR_Utf8SubString(text, 1, c.Anchor) or ''
+        local after = tailStart < totalLen
+            and STR_Utf8SubString(text, tailStart + 1, totalLen - tailStart)
+            or ''
+        local replacement = c.Candidates[c.Index] .. c.Suffix
+        local replacementLen = STR_Utf8Len(replacement)
+        local newText = before .. replacement .. after
+
+        self.SuppressCompletionReset = true
+        self.EditBox:SetText(newText)
+        self.EditBox:SetCaretPosition(c.Anchor + replacementLen)
+        self.SuppressCompletionReset = false
+
+        -- Advance the consumed span to match what we just wrote so the next
+        -- cycle overwrites exactly this candidate, not the original word.
+        c.Consume = replacementLen
     end,
 
     --- Shows or hides the command hint based on the current edit-box text.
