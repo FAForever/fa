@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(git -C d:/faf-development/fa mv lua/ui/game/chat/commands/Gift.lua lua/ui/game/chat/commands/GiftUnits.lua)"
     ]
   }
 }

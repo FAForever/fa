@@ -85,11 +85,14 @@ end
 function RegisterBuiltinCommands()
     local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
-    Registry.Register(import("/lua/ui/game/chat/commands/All.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/Allies.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/Whisper.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/Gift.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/Help.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/All.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Allies.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Whisper.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/GiftUnits.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/GiftResources.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Recall.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/ToEngineers.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Help.lua").Command)
 end
 
 -------------------------------------------------------------------------------
