@@ -58,12 +58,6 @@ Slash commands in the old dispatcher fell through to `RunChatCommand` in [`/lua/
 
 Legacy kept a `commandHistory` ring and recalled it on `VK_UP` / `VK_DOWN` ([chat.lua:681-701](../chat.lua)). Not ported. The new [`ChatEditInterface.OnNonTextKeyPressed`](ChatEditInterface.lua) only handles `PgUp` / `PgDn`.
 
-## Shift-Enter → allies hotkey
-
-Legacy `ActivateChat(modifiers)` ([chat.lua:924-933](../chat.lua)) opened the window with the recipient forced to allies when Shift was held — the primary way to toggle between `all` and `allies` mid-typing. [`keyactions.lua` `chat_window`](../../../keymap/keyactions.lua) only toggles visibility; the modifier argument is gone.
-
-[`ChatController.ApplyDefaultRecipient`](ChatController.lua) reads the `send_type` preference but ignores any caller-supplied modifier.
-
 ## Drag / resize / window-state
 
 Smaller things still missing on the window itself:
@@ -99,4 +93,4 @@ If any external mod still calls these (no in-tree callers remain), they will bre
 
 ## Already closed (do not re-list)
 
-Send path, receive path, `FindClients`, controller `Init`, external importers, skin-layout orphan, `ConsoleOutput` sim-side logging, empty-text Enter.
+Send path, receive path, `FindClients`, controller `Init`, external importers, skin-layout orphan, `ConsoleOutput` sim-side logging, empty-text Enter, `ActivateChat` (Enter-key hook with Shift → allies), `chat.lua` renamed to `chat.legacy.lua`.

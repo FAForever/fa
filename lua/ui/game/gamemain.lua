@@ -734,6 +734,7 @@ function OnQueueChanged(newQueue)
     end
 end
 
+
 --- Called by the engine after the sim confirmed that the game is indeed paused. This is run on all instances that are connected to the lobby.
 ---@param pausedBy integer   # The index of the client in the clients list (that you get via `GetSessionClients`)
 ---@param timeoutsRemaining number

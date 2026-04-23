@@ -397,6 +397,38 @@ function Send(text)
 end
 
 -------------------------------------------------------------------------------
+-- Engine hotkey entry point
+
+--- Opens the chat window with the recipient forced to `allies` or `all`
+--- based on the `send_type` preference and the Shift modifier. The engine
+--- calls this via a top-level `ActivateChat` shim in `gamemain.lua` when
+--- the user presses Enter outside the edit box.
+---
+--- Truth table (`send_type` reads as "default to allies"):
+--- * `send_type=false`, no Shift → `all`
+--- * `send_type=false`, Shift    → `allies`
+--- * `send_type=true`,  no Shift → `allies`
+--- * `send_type=true`,  Shift    → `all`
+---
+--- If the current recipient is already a specific army ID (mid-private
+--- message), it is left alone — Shift only switches between the two
+--- broadcast channels.
+---@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
+function ActivateChat(modifiers)
+    local model = ChatModel.GetSingleton()
+    if type(model.Recipient()) ~= 'number' then
+        local sendType = ChatConfigModel.GetSingleton().Committed().send_type or false
+        local shift = modifiers and modifiers.Shift or false
+        if (not shift) == sendType then
+            model.Recipient:Set(ChatModel.RecipientAllies)
+        else
+            model.Recipient:Set(ChatModel.RecipientAll)
+        end
+    end
+    import("/lua/ui/game/chat/ChatInterface.lua").Toggle()
+end
+
+-------------------------------------------------------------------------------
 -- Lifecycle
 
 --- One-shot initialisation: registers the receive handler with gamemain and
