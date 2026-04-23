@@ -29,7 +29,6 @@ local MaxChars = 200
 ---@field EditBox           Edit
 ---@field ChatList          UIChatListInterface | nil
 ---@field CommandHint       UIChatCommandHintInterface | nil
----@field LastEditText      string
 ---@field RecipientObserver LazyVar<UIChatRecipient>  # derived from ChatModel.Recipient
 ChatEditInterface = ClassUI(Group) {
 
@@ -91,6 +90,13 @@ ChatEditInterface = ClassUI(Group) {
             self:CloseCommandHint()
         end
 
+        -- Drive the command-hint popup from the edit-box contents.
+        -- `OnTextChanged` fires after every insertion, deletion, or `SetText`,
+        -- so we don't need to poll each frame.
+        self.EditBox.OnTextChanged = function(_, newText, _)
+            self:RefreshCommandHint(newText or '')
+        end
+
         -- Keep the label in sync with the model. `LazyVarDerive` gives us a
         -- fresh per-subscriber LazyVar so we don't stomp any other observer
         -- of `model.Recipient` (see the chat CLAUDE.md for the pattern).
@@ -98,20 +104,12 @@ ChatEditInterface = ClassUI(Group) {
         self.RecipientObserver = self.Trash:Add(LazyVarDerive(model.Recipient, function(lv)
             self:RefreshRecipient(lv())
         end))
-
-        -- Drive the command-hint popup from the edit-box contents. We poll
-        -- once per frame because MAUI's Edit has no "text changed" callback
-        -- that fires reliably after both typed chars and backspaces.
-        self.LastEditText = ''
-        self:SetNeedsFrameUpdate(true)
     end,
 
+    --- Shows or hides the command hint based on the current edit-box text.
     ---@param self UIChatEditInterface
-    OnFrame = function(self)
-        local text = self.EditBox:GetText() or ''
-        if text == self.LastEditText then return end
-        self.LastEditText = text
-
+    ---@param text string
+    RefreshCommandHint = function(self, text)
         if string.sub(text, 1, 1) == '/' then
             if not self.CommandHint then
                 self:OpenCommandHint()
