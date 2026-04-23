@@ -3,6 +3,8 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local Window = import("/lua/maui/window.lua").Window
 local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
 
 local ChatLineInterface = import("/lua/ui/game/chat/ChatLineInterface.lua").ChatLineInterface
 local ChatEditInterface = import("/lua/ui/game/chat/ChatEditInterface.lua").ChatEditInterface
@@ -31,6 +33,21 @@ local WindowTextures = {
     br          = UIUtil.UIFile('/game/chat_brd/chat_brd_lr.dds'),
     borderColor = 'ff415055',
 }
+
+--- Corner grip textures for the four resize handles sticking out of the
+--- window corners. Each handle carries `up` / `over` / `down` states that
+--- the `RolloverHandler` swaps through during hover-and-resize.
+local function DragHandleTextures(corner)
+    return {
+        up   = UIUtil.UIFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_up.dds'),
+        over = UIUtil.UIFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_over.dds'),
+        down = UIUtil.UIFile('/game/drag-handle/drag-handle-' .. corner .. '_btn_down.dds'),
+    }
+end
+
+--- Default window rect, kept as a module local so `ResetPosition` can
+--- restore it after the user has moved the window around.
+local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 
 -------------------------------------------------------------------------------
 -- The main chat window: a draggable, resizable frame hosting a dynamically
@@ -63,6 +80,11 @@ local WindowTextures = {
 ---@field ScrollTop      number    # 1-based virtual position of the top visible row
 ---@field VirtualSize    number    # total wrapped lines across valid entries
 ---@field FontSize              number                       # current font size (from ChatOptions.font_size)
+---@field DragTL               Bitmap                        # top-left corner resize grip
+---@field DragTR               Bitmap                        # top-right corner resize grip
+---@field DragBL               Bitmap                        # bottom-left corner resize grip
+---@field DragBR               Bitmap                        # bottom-right corner resize grip
+---@field ResetPositionBtn     Button                        # titlebar button that restores DefaultRect
 ---@field HistoryObserver       LazyVar<UIChatEntry[]>       # derived from ChatModel.History
 ---@field WindowVisibleObserver LazyVar<boolean>             # derived from ChatModel.WindowVisible
 ---@field OptionsObserver       LazyVar<UIChatOptions>       # derived from ChatConfigModel.Committed
@@ -71,10 +93,78 @@ local ChatInterface = ClassUI(Window) {
     ---@param self UIChatInterface
     ---@param parent Control
     __init = function(self, parent)
-        Window.__init(self, parent, "", false, true, true, false, false, "chat_window_v2", {
-            Left = 8, Top = 460, Right = 430, Bottom = 720,
-        }, WindowTextures)
+        Window.__init(self, parent, "", false, true, true, false, false, "chat_window_v2", DefaultRect, WindowTextures)
         self:SetMinimumResize(400, 160)
+
+        -- Corner grips: Bitmaps overlayed just outside each window corner.
+        -- They are purely cosmetic — hit-test is disabled so resize events
+        -- still flow to the Window's own resize bitmaps (tl/tr/bl/br/…).
+        -- The RolloverHandler swap below is what makes them light up.
+        self.DragTL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
+        self.DragTR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
+        self.DragBL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
+        self.DragBR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
+
+        self.DragTL.textures = DragHandleTextures('ul')
+        self.DragTR.textures = DragHandleTextures('ur')
+        self.DragBL.textures = DragHandleTextures('ll')
+        self.DragBR.textures = DragHandleTextures('lr')
+
+        for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
+            grip:DisableHitTest()
+        end
+
+        -- Replace the Window's default RolloverHandler so our corner grips
+        -- light up during hover / press instead of the base implementation's
+        -- faint resize-group outline.
+        local controlMap = {
+            tl = { self.DragTL },
+            tr = { self.DragTR },
+            bl = { self.DragBL },
+            br = { self.DragBR },
+            mr = { self.DragBR, self.DragTR },
+            ml = { self.DragBL, self.DragTL },
+            tm = { self.DragTL, self.DragTR },
+            bm = { self.DragBL, self.DragBR },
+        }
+        self.RolloverHandler = function(_, event, xControl, yControl, cursor, controlID)
+            if self._lockSize or self._sizeLock then return end
+            local grips = controlMap[controlID]
+            if event.Type == 'MouseEnter' then
+                if grips then
+                    for _, grip in grips do grip:SetTexture(grip.textures.over) end
+                end
+                GetCursor():SetTexture(UIUtil.GetCursor(cursor))
+            elseif event.Type == 'MouseExit' then
+                if grips then
+                    for _, grip in grips do grip:SetTexture(grip.textures.up) end
+                end
+                GetCursor():Reset()
+            elseif event.Type == 'ButtonPress' then
+                if grips then
+                    for _, grip in grips do grip:SetTexture(grip.textures.down) end
+                end
+                self.StartSizing(event, xControl, yControl)
+                self._sizeLock = true
+            end
+        end
+
+        -- Titlebar button that snaps the window back to DefaultRect. Placed
+        -- immediately to the left of the Window's built-in _configBtn.
+        self.ResetPositionBtn = Button(self,
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_down.dds'),
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
+        self.ResetPositionBtn.Depth:Set(function() return self.Depth() + 10 end)
+        self.ResetPositionBtn.OnClick = function()
+            local scaled = LayoutHelpers.ScaleNumber
+            self.Left:Set(scaled(DefaultRect.Left))
+            self.Top:Set(scaled(DefaultRect.Top))
+            self.Right:Set(scaled(DefaultRect.Right))
+            self.Bottom:Set(scaled(DefaultRect.Bottom))
+            self:SaveWindowLocation()
+        end
 
         local client = self:GetClientGroup()
 
@@ -159,6 +249,19 @@ local ChatInterface = ClassUI(Window) {
     __post_init = function(self, parent)
         local client = self:GetClientGroup()
         local pad = 4
+
+        -- Corner grips. Offsets copied from legacy chat.lua so the grips
+        -- overhang the chat border at the same pixels the original did.
+        Layouter(self.DragTL):AtLeftTopIn(self, -26, -8):Over(self, 100):End()
+        Layouter(self.DragTR):AtRightTopIn(self, -22, -8):Over(self, 100):End()
+        Layouter(self.DragBL):AtLeftBottomIn(self, -26, -8):Over(self, 100):End()
+        Layouter(self.DragBR):AtRightBottomIn(self, -22, -8):Over(self, 100):End()
+
+        -- Reset-position button: sits to the left of the Window's built-in
+        -- config button on the title strip.
+        Layouter(self.ResetPositionBtn)
+            :LeftOf(self._configBtn)
+            :End()
 
         -- Full width, flush with the bottom of the client area. The edit
         -- group derives its own height (see ChatEditInterface.__post_init).
@@ -507,11 +610,17 @@ local ChatInterface = ClassUI(Window) {
     end,
 
     --- Fired when a resize drag ends. Rewrapping is expensive, so it only
-    --- happens here rather than on every drag frame.
+    --- happens here rather than on every drag frame. Also snaps the corner
+    --- grips back to their `up` texture — the RolloverHandler leaves them
+    --- on `down` when StartSizing took over.
     OnResizeSet = function(self)
         self:RebuildPool()
         self:RewrapAll()
         self:CalcVisible()
+        self.DragTL:SetTexture(self.DragTL.textures.up)
+        self.DragTR:SetTexture(self.DragTR.textures.up)
+        self.DragBL:SetTexture(self.DragBL.textures.up)
+        self.DragBR:SetTexture(self.DragBR.textures.up)
     end,
 
     --- Mouse wheel over the window scrolls the chat. `rotation` is in wheel
