@@ -97,6 +97,19 @@ ChatEditInterface = ClassUI(Group) {
             self:RefreshCommandHint(newText or '')
         end
 
+        -- Swallow Tab so focus can't leave the edit box, and ring the error
+        -- cue when the user types against the character cap. `OnCharPressed`
+        -- fires before insertion, so `>=` here matches the already-committed
+        -- length *before* this keystroke — i.e. we beep on the rejected char.
+        self.EditBox.OnCharPressed = function(edit, charcode)
+            if charcode == UIUtil.VK_TAB then
+                return true
+            end
+            if STR_Utf8Len(edit:GetText()) >= edit:GetMaxChars() then
+                PlaySound(Sound({ Cue = 'UI_Menu_Error_01', Bank = 'Interface' }))
+            end
+        end
+
         -- Escape priorities: (1) close an open command hint, (2) clear any
         -- text, (3) close the chat window.
         self.EditBox.OnEscPressed = function(_, text)
