@@ -171,9 +171,15 @@ local ChatConfigInterface = ClassUI(Window) {
         -- `LazyVarDerive` gives us a fresh per-subscriber LazyVar so we don't
         -- stomp other subscribers on Pending (see the chat CLAUDE.md).
         local model = ChatConfigModel.GetSingleton()
-        self.PendingObserver = self.Trash:Add(LazyVarDerive(model.Pending, function(lv)
-            self:RefreshFromOptions(lv())
-        end))
+        self.PendingObserver = self.Trash:Add(
+            LazyVarDerive(
+                model.Pending,
+                function(lv)
+                    self:RefreshFromOptions(lv()
+                    )
+                end
+            )
+        )
     end,
 
     ---@param self UIChatConfigInterface

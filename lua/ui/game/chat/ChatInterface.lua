@@ -1,4 +1,3 @@
-
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
@@ -21,15 +20,15 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 --- `/lua/ui/game/layouts/chat_layout.lua` applies to the legacy chat Window
 --- so the new window matches the original visual style.
 local WindowTextures = {
-    tl = UIUtil.UIFile('/game/chat_brd/chat_brd_ul.dds'),
-    tr = UIUtil.UIFile('/game/chat_brd/chat_brd_ur.dds'),
-    tm = UIUtil.UIFile('/game/chat_brd/chat_brd_horz_um.dds'),
-    ml = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_l.dds'),
-    m  = UIUtil.UIFile('/game/chat_brd/chat_brd_m.dds'),
-    mr = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_r.dds'),
-    bl = UIUtil.UIFile('/game/chat_brd/chat_brd_ll.dds'),
-    bm = UIUtil.UIFile('/game/chat_brd/chat_brd_lm.dds'),
-    br = UIUtil.UIFile('/game/chat_brd/chat_brd_lr.dds'),
+    tl          = UIUtil.UIFile('/game/chat_brd/chat_brd_ul.dds'),
+    tr          = UIUtil.UIFile('/game/chat_brd/chat_brd_ur.dds'),
+    tm          = UIUtil.UIFile('/game/chat_brd/chat_brd_horz_um.dds'),
+    ml          = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_l.dds'),
+    m           = UIUtil.UIFile('/game/chat_brd/chat_brd_m.dds'),
+    mr          = UIUtil.UIFile('/game/chat_brd/chat_brd_vert_r.dds'),
+    bl          = UIUtil.UIFile('/game/chat_brd/chat_brd_ll.dds'),
+    bm          = UIUtil.UIFile('/game/chat_brd/chat_brd_lm.dds'),
+    br          = UIUtil.UIFile('/game/chat_brd/chat_brd_lr.dds'),
     borderColor = 'ff415055',
 }
 
@@ -115,26 +114,43 @@ local ChatInterface = ClassUI(Window) {
         -- initial firing happens before __post_init so the wrap call has
         -- no pool to measure against; that's fine — RewrapAll runs once
         -- the pool exists.
-        self.HistoryObserver = self.Trash:Add(LazyVarDerive(model.History, function(lv)
-            self:OnHistoryChanged(lv())
-        end))
+        self.HistoryObserver = self.Trash:Add(
+            LazyVarDerive(
+                model.History,
+                function(lv)
+                    self:OnHistoryChanged(lv()
+                    )
+                end
+            )
+        )
 
         -- Committed chat options → apply font size, rebuild the pool (line
         -- height tracks the font), rewrap all entries (wrap widths depend
         -- on font metrics), and re-render.
-        self.OptionsObserver = self.Trash:Add(LazyVarDerive(configModel.Committed, function(lv)
-            self:ApplyOptions(lv())
-        end))
+        self.OptionsObserver = self.Trash:Add(
+            LazyVarDerive(
+                configModel.Committed,
+                function(lv)
+                    self:ApplyOptions(lv()
+                    )
+                end
+            )
+        )
 
         -- Window visibility → show / hide the frame.
-        self.WindowVisibleObserver = self.Trash:Add(LazyVarDerive(model.WindowVisible, function(lv)
-            if lv() then
-                self:Show()
-                self.Edit:AcquireFocus()
-            else
-                self:Hide()
-            end
-        end))
+        self.WindowVisibleObserver = self.Trash:Add(
+            LazyVarDerive(
+                model.WindowVisible,
+                function(lv)
+                    if lv() then
+                        self:Show()
+                        self.Edit:AcquireFocus()
+                    else
+                        self:Hide()
+                    end
+                end
+            )
+        )
     end,
 
     ---@param self UIChatInterface
@@ -198,7 +214,7 @@ local ChatInterface = ClassUI(Window) {
         end
 
         local rowHeight = self.Lines[1].Height()
-        if rowHeight < 1 then rowHeight = 18 end  -- safety fallback
+        if rowHeight < 1 then rowHeight = 18 end -- safety fallback
 
         local neededLines = math.max(1, math.floor(container.Height() / rowHeight))
         local currentCount = table.getn(self.Lines)
@@ -267,10 +283,10 @@ local ChatInterface = ClassUI(Window) {
             function(lineIndex)
                 if lineIndex == 1 then
                     return measureLine.Right()
-                         - (measureLine.Name.Left() + measureLine.Name:GetStringAdvance(name) + 4)
+                        - (measureLine.Name.Left() + measureLine.Name:GetStringAdvance(name) + 4)
                 else
                     return measureLine.Right()
-                         - (measureLine.Name.Left() + 4)
+                        - (measureLine.Name.Left() + 4)
                 end
             end,
             function(textChunk)
