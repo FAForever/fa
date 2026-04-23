@@ -137,7 +137,7 @@ ChatEditInterface = ClassUI(Group) {
         LayoutHelpers.Above(hint, self.EditBox, 4)
         LayoutHelpers.AtLeftIn(hint, self.EditBox)
         hint:SetOnSelect(function(cmd)
-            self.EditBox:SetText('/' .. cmd.name .. ' ')
+            self.EditBox:SetText('/' .. cmd.Name .. ' ')
             self:AcquireFocus()
         end)
     end,

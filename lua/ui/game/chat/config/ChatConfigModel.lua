@@ -58,19 +58,19 @@ KeyLinks          = 'links'
 -- can construct sliders without duplicating the limits.
 
 ---@class UIChatSliderRange
----@field min number
----@field max number
----@field inc number
+---@field Min number
+---@field Max number
+---@field Inc number
 
 ---@type UIChatSliderRange
-FontSizeRange = { min = 12, max = 18, inc = 1 }
+FontSizeRange = { Min = 12, Max = 18, Inc = 1 }
 
 ---@type UIChatSliderRange
-FadeTimeRange = { min = 5, max = 30, inc = 1 }
+FadeTimeRange = { Min = 5, Max = 30, Inc = 1 }
 
 --- Window alpha is stored as 0.0-1.0 but edited via an integer percent slider.
 ---@type UIChatSliderRange
-WinAlphaSliderRange = { min = 20, max = 100, inc = 1 }
+WinAlphaSliderRange = { Min = 20, Max = 100, Inc = 1 }
 
 ---@class UIChatConfigModel
 ---@field Committed LazyVar<UIChatOptions>   # the active, saved options observed by the chat feed

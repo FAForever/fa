@@ -37,14 +37,14 @@ local function ResolveArmy(token)
     return false, string.format("no player named '%s'.", token)
 end
 
----@alias UIChatCommandParamType 'recipient' | 'player' | 'int' | 'string' | 'rest'
+---@alias UIChatCommandParamType 'Recipient' | 'Player' | 'Int' | 'String' | 'Rest'
 
 ---@type table<UIChatCommandParamType, fun(token: string): boolean, any>
 Resolvers = {}
 
 --- Accepts "all", "allies"/"team", a nickname, or an army ID.
 --- Resolves to a `UIChatRecipient` (the same type the model stores).
-Resolvers.recipient = function(token)
+Resolvers.Recipient = function(token)
     local lower = string.lower(token)
     if lower == 'all' then
         return true, 'all'
@@ -56,12 +56,12 @@ end
 
 --- Accepts a nickname or army ID. Rejects "all"/"allies".
 --- Resolves to a numeric army ID.
-Resolvers.player = function(token)
+Resolvers.Player = function(token)
     return ResolveArmy(token)
 end
 
 --- Integer literal.
-Resolvers.int = function(token)
+Resolvers.Int = function(token)
     local n = tonumber(token)
     if not n or math.floor(n) ~= n then
         return false, string.format("'%s' is not an integer.", token)
@@ -70,7 +70,7 @@ Resolvers.int = function(token)
 end
 
 --- Single whitespace-delimited token.
-Resolvers.string = function(token)
+Resolvers.String = function(token)
     return true, token
 end
 

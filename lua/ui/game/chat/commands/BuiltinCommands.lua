@@ -13,40 +13,40 @@ local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
 ---@type UIChatCommand
 All = {
-    name = 'all',
-    description = 'Send to all players and observers.',
-    execute = function(_, ctx)
-        ctx.controller.SetRecipient(ChatModel.RecipientAll)
+    Name = 'all',
+    Description = 'Send to all players and observers.',
+    Execute = function(_, ctx)
+        ctx.Controller.SetRecipient(ChatModel.RecipientAll)
     end,
 }
 
 ---@type UIChatCommand
 Allies = {
-    name = 'allies',
-    aliases = { 'team' },
-    description = 'Send to allies only.',
-    execute = function(_, ctx)
-        ctx.controller.SetRecipient(ChatModel.RecipientAllies)
+    Name = 'allies',
+    Aliases = { 'team' },
+    Description = 'Send to allies only.',
+    Execute = function(_, ctx)
+        ctx.Controller.SetRecipient(ChatModel.RecipientAllies)
     end,
 }
 
 ---@type UIChatCommand
 Whisper = {
-    name = 'whisper',
-    aliases = { 'w', 'pm' },
-    description = 'Whisper to a specific player (by nickname or army ID).',
-    params = {
-        { name = 'target', type = 'player' },
+    Name = 'whisper',
+    Aliases = { 'w', 'pm' },
+    Description = 'Whisper to a specific player (by nickname or army ID).',
+    Params = {
+        { Name = 'target', Type = 'Player' },
     },
-    accept = function(args)
+    Accept = function(args)
         local armies = GetArmiesTable()
         if armies and args.target == armies.focusArmy then
             return false, "/whisper: can't whisper yourself."
         end
         return true
     end,
-    execute = function(args, ctx)
-        ctx.controller.SetRecipient(args.target)
+    Execute = function(args, ctx)
+        ctx.Controller.SetRecipient(args.target)
     end,
 }
 
@@ -55,31 +55,31 @@ Whisper = {
 
 ---@type UIChatCommand
 Help = {
-    name = 'help',
-    aliases = { '?' },
-    description = 'Lists available chat commands.',
-    execute = function(_, ctx)
-        local controller = ctx.controller
+    Name = 'help',
+    Aliases = { '?' },
+    Description = 'Lists available chat commands.',
+    Execute = function(_, ctx)
+        local controller = ctx.Controller
         local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
         controller.AppendLocalSystemMessage("Available chat commands:")
 
         for _, cmd in ipairs(Registry.GetAll()) do
             local params = ''
-            if cmd.params then
-                for _, p in ipairs(cmd.params) do
-                    local fmt = p.optional and ' [%s]' or ' <%s>'
-                    params = params .. string.format(fmt, p.name)
+            if cmd.Params then
+                for _, p in ipairs(cmd.Params) do
+                    local fmt = p.Optional and ' [%s]' or ' <%s>'
+                    params = params .. string.format(fmt, p.Name)
                 end
             end
 
             local aliases = ''
-            if cmd.aliases and table.getn(cmd.aliases) > 0 then
-                aliases = ' (aka /' .. table.concat(cmd.aliases, ', /') .. ')'
+            if cmd.Aliases and table.getn(cmd.Aliases) > 0 then
+                aliases = ' (aka /' .. table.concat(cmd.Aliases, ', /') .. ')'
             end
 
             controller.AppendLocalSystemMessage(
-                string.format("  /%s%s%s — %s", cmd.name, params, aliases, cmd.description or '')
+                string.format("  /%s%s%s — %s", cmd.Name, params, aliases, cmd.Description or '')
             )
         end
     end,

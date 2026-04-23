@@ -16,27 +16,27 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 local Colors = { 'ffffffff', 'ffff4242', 'ffefff42', 'ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42' }
 
 local ColorDefs = {
-    { key = ChatConfigModel.KeyAllColor,    text = "All" },
-    { key = ChatConfigModel.KeyAlliesColor, text = "Allies" },
-    { key = ChatConfigModel.KeyPrivColor,   text = "Private" },
-    { key = ChatConfigModel.KeyLinkColor,   text = "Links" },
-    { key = ChatConfigModel.KeyNotifyColor, text = "Notify" },
+    { Key = ChatConfigModel.KeyAllColor,    Text = "All" },
+    { Key = ChatConfigModel.KeyAlliesColor, Text = "Allies" },
+    { Key = ChatConfigModel.KeyPrivColor,   Text = "Private" },
+    { Key = ChatConfigModel.KeyLinkColor,   Text = "Links" },
+    { Key = ChatConfigModel.KeyNotifyColor, Text = "Notify" },
 }
 
 local CheckboxDefs = {
-    { key = ChatConfigModel.KeySendType,       text = "Default recipient: allies" },
-    { key = ChatConfigModel.KeyFeedBackground, text = "Show feed background" },
-    { key = ChatConfigModel.KeyFeedPersist,    text = "Persist feed timeout" },
-    { key = ChatConfigModel.KeyLinks,          text = "Show camera links" },
+    { Key = ChatConfigModel.KeySendType,       Text = "Default recipient: allies" },
+    { Key = ChatConfigModel.KeyFeedBackground, Text = "Show feed background" },
+    { Key = ChatConfigModel.KeyFeedPersist,    Text = "Persist feed timeout" },
+    { Key = ChatConfigModel.KeyLinks,          Text = "Show camera links" },
 }
 
 -------------------------------------------------------------------------------
 --  Window class
 
 ---@class UIChatConfigColorRow
----@field label Text
----@field combo BitmapCombo
----@field key   string
+---@field Label Text
+---@field Combo BitmapCombo
+---@field Key   string
 
 ---@class UIChatConfigInterface : Window
 ---@field Trash          TrashBag                          # owns every derived subscription-LazyVar
@@ -77,12 +77,12 @@ local ChatConfigInterface = ClassUI(Window) {
         self.ColorRows = {}
         for i, def in ipairs(ColorDefs) do
             local row = {
-                label = UIUtil.CreateText(client, def.text, 10, UIUtil.bodyFont),
-                combo = BitmapCombo(client, Colors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01"),
-                key   = def.key,
+                Label = UIUtil.CreateText(client, def.Text, 10, UIUtil.bodyFont),
+                Combo = BitmapCombo(client, Colors, 1, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01"),
+                Key   = def.Key,
             }
-            local key = def.key
-            row.combo.OnClick = function(_, index)
+            local key = def.Key
+            row.Combo.OnClick = function(_, index)
                 ChatConfigController.SetOption(key, index)
             end
             self.ColorRows[i] = row
@@ -98,9 +98,9 @@ local ChatConfigInterface = ClassUI(Window) {
 
         self.LabelFontSize = UIUtil.CreateText(client, "Font Size: 14", 10, UIUtil.bodyFont)
         self.SliderFontSize = IntegerSlider(client, false,
-            ChatConfigModel.FontSizeRange.min,
-            ChatConfigModel.FontSizeRange.max,
-            ChatConfigModel.FontSizeRange.inc,
+            ChatConfigModel.FontSizeRange.Min,
+            ChatConfigModel.FontSizeRange.Max,
+            ChatConfigModel.FontSizeRange.Inc,
             unpack(sliderBitmaps))
         self.SliderFontSize.OnValueSet = function(_, value)
             ChatConfigController.SetOption(ChatConfigModel.KeyFontSize, value)
@@ -111,9 +111,9 @@ local ChatConfigInterface = ClassUI(Window) {
 
         self.LabelFadeTime = UIUtil.CreateText(client, "Fade Time: 15s", 10, UIUtil.bodyFont)
         self.SliderFadeTime = IntegerSlider(client, false,
-            ChatConfigModel.FadeTimeRange.min,
-            ChatConfigModel.FadeTimeRange.max,
-            ChatConfigModel.FadeTimeRange.inc,
+            ChatConfigModel.FadeTimeRange.Min,
+            ChatConfigModel.FadeTimeRange.Max,
+            ChatConfigModel.FadeTimeRange.Inc,
             unpack(sliderBitmaps))
         self.SliderFadeTime.OnValueSet = function(_, value)
             ChatConfigController.SetOption(ChatConfigModel.KeyFadeTime, value)
@@ -124,9 +124,9 @@ local ChatConfigInterface = ClassUI(Window) {
 
         self.LabelWinAlpha = UIUtil.CreateText(client, "Window Alpha: 100%", 10, UIUtil.bodyFont)
         self.SliderWinAlpha = IntegerSlider(client, false,
-            ChatConfigModel.WinAlphaSliderRange.min,
-            ChatConfigModel.WinAlphaSliderRange.max,
-            ChatConfigModel.WinAlphaSliderRange.inc,
+            ChatConfigModel.WinAlphaSliderRange.Min,
+            ChatConfigModel.WinAlphaSliderRange.Max,
+            ChatConfigModel.WinAlphaSliderRange.Inc,
             unpack(sliderBitmaps))
         self.SliderWinAlpha.OnValueSet = function(_, value)
             ChatConfigController.SetOption(ChatConfigModel.KeyWinAlpha, value / 100)
@@ -140,8 +140,8 @@ local ChatConfigInterface = ClassUI(Window) {
 
         self.Checkboxes = {}
         for i, def in ipairs(CheckboxDefs) do
-            local cb = UIUtil.CreateCheckbox(client, '/dialogs/check-box_btn/', def.text, true)
-            local key = def.key
+            local cb = UIUtil.CreateCheckbox(client, '/dialogs/check-box_btn/', def.Text, true)
+            local key = def.Key
             cb.OnCheck = function(_, checked)
                 ChatConfigController.SetOption(key, checked)
             end
@@ -197,18 +197,18 @@ local ChatConfigInterface = ClassUI(Window) {
         ---@type Control
         local prev = self.LabelColors
         for _, row in ipairs(self.ColorRows) do
-            Layouter(row.label)
+            Layouter(row.Label)
                 :Below(prev, 6)
                 :AtLeftIn(client, pad)
                 :End()
 
-            Layouter(row.combo)
-                :RightOf(row.label, 8)
-                :AtVerticalCenterIn(row.label)
+            Layouter(row.Combo)
+                :RightOf(row.Label, 8)
+                :AtVerticalCenterIn(row.Label)
                 :Width(60)
                 :End()
 
-            prev = row.label
+            prev = row.Label
         end
 
         -- Sliders
@@ -297,7 +297,7 @@ local ChatConfigInterface = ClassUI(Window) {
         local defaults = ChatConfigModel.GetDefaults()
 
         for _, row in ipairs(self.ColorRows) do
-            row.combo:SetItem(options[row.key] or defaults[row.key])
+            row.Combo:SetItem(options[row.Key] or defaults[row.Key])
         end
 
         self.SliderFontSize:SetValue(options.font_size or defaults.font_size)
@@ -305,9 +305,9 @@ local ChatConfigInterface = ClassUI(Window) {
         self.SliderWinAlpha:SetValue(math.floor((options.win_alpha or defaults.win_alpha) * 100))
 
         for i, def in ipairs(CheckboxDefs) do
-            local value = options[def.key]
+            local value = options[def.Key]
             if value == nil then
-                value = defaults[def.key]
+                value = defaults[def.Key]
             end
             self.Checkboxes[i]:SetCheck(value, true)
         end

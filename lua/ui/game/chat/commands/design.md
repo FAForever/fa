@@ -14,15 +14,15 @@ ChatEditInterface.EditBox:OnEnterPressed(text)
                 ├── Tokenize(text)                  -- "/whisper Jip" → ("whisper", {"Jip"})
                 ├── Lookup(name)                    -- name + aliases
                 ├── ParseArgs(cmd, tokens)          -- typed, coerced, validated
-                ├── cmd.accept(args, ctx)           -- semantic legitimacy check
-                └── cmd.execute(args, ctx)          -- run side effect (usually ctx.controller.*)
+                ├── cmd.Accept(args, ctx)           -- semantic legitimacy check
+                └── cmd.Execute(args, ctx)          -- run side effect (usually ctx.Controller.*)
 ```
 
 - **Registry** — flat `name → command` table plus `alias → name`. Exports `Register`, `Unregister`, `Lookup`, `GetAll`, `Dispatch`.
 - **Types** — a table of `{recipient, player, int, string, rest}` resolvers. Each takes a raw token and returns `(ok, value_or_error)`.
 - **Builtins** — `/all`, `/allies`, `/whisper`, `/help`. Loaded lazily on the first `Dispatch` call.
 
-Commands do not touch the model directly. They call through `ctx.controller`, preserving the MVC rule from `CLAUDE.md`.
+Commands do not touch the model directly. They call through `ctx.Controller`, preserving the MVC rule from `CLAUDE.md`.
 
 ---
 
@@ -30,25 +30,25 @@ Commands do not touch the model directly. They call through `ctx.controller`, pr
 
 ```lua
 ---@class UIChatCommand
----@field name        string                           # canonical name without leading slash
----@field aliases?    string[]                         # alternative names (e.g. {'w','pm'} for whisper)
----@field description string                           # one-line summary shown by /help
----@field params?     UIChatCommandParam[]             # declarative parameter schema
----@field accept?     fun(args, ctx): boolean, string? # runtime legitimacy check
----@field execute     fun(args, ctx)                   # the actual side effect
+---@field Name        string                           # canonical name without leading slash
+---@field Aliases?    string[]                         # alternative names (e.g. {'w','pm'} for whisper)
+---@field Description string                           # one-line summary shown by /help
+---@field Params?     UIChatCommandParam[]             # declarative parameter schema
+---@field Accept?     fun(args, ctx): boolean, string? # runtime legitimacy check
+---@field Execute     fun(args, ctx)                   # the actual side effect
 
 ---@class UIChatCommandParam
----@field name     string
----@field type     'recipient' | 'player' | 'int' | 'string' | 'rest'
----@field optional boolean?
+---@field Name     string
+---@field Type     'Recipient' | 'Player' | 'Int' | 'String' | 'Rest'
+---@field Optional boolean?
 ```
 
 Rules:
 
-- `name` and every entry of `aliases` are case-insensitive.
-- `params` order is the order tokens will be consumed.
-- Only the last param may be `rest`; it greedy-consumes every remaining token, joining them with single spaces.
-- `accept` and `execute` both receive the already-typed `args` table and a shared `ctx`.
+- `Name` and every entry of `Aliases` are case-insensitive.
+- `Params` order is the order tokens will be consumed.
+- Only the last param may be `Rest`; it greedy-consumes every remaining token, joining them with single spaces.
+- `Accept` and `Execute` both receive the already-typed `args` table and a shared `ctx`.
 
 ## 3. Parameter Types
 
@@ -56,11 +56,11 @@ Each resolver is `fun(token: string): ok, value | error`.
 
 | Type | Accepts | Resolves to |
 |------|---------|-------------|
-| `recipient` | `"all"`, `"allies"`, `"team"`, nickname, army ID | `UIChatRecipient` (`'all' \| 'allies' \| number`) |
-| `player` | nickname or army ID | `number` (army ID) — same rules as `recipient` but rejects `all`/`allies` |
-| `int` | integer literal | `number` |
-| `string` | a single whitespace-delimited token | `string` |
-| `rest` | one or more remaining tokens | `string` (tokens joined by single spaces) |
+| `Recipient` | `"all"`, `"allies"`, `"team"`, nickname, army ID | `UIChatRecipient` (`'all' \| 'allies' \| number`) |
+| `Player` | nickname or army ID | `number` (army ID) — same rules as `Recipient` but rejects `all`/`allies` |
+| `Int` | integer literal | `number` |
+| `String` | a single whitespace-delimited token | `string` |
+| `Rest` | one or more remaining tokens | `string` (tokens joined by single spaces) |
 
 Army lookup goes through `GetArmiesTable()`, matching the source `ChatListInterface` already uses for the recipient picker. Civilian armies are excluded.
 
@@ -68,9 +68,9 @@ Army lookup goes through `GetArmiesTable()`, matching the source `ChatListInterf
 
 ```lua
 ---@class UIChatCommandContext
----@field model       UIChatModel
----@field controller  table   -- ChatController module
----@field sourceText  string  -- the original "/whisper Jip" text
+---@field Model       UIChatModel
+---@field Controller  table   -- ChatController module
+---@field SourceText  string  -- the original "/whisper Jip" text
 ```
 
 Passing `ctx` rather than each command importing the controller/model keeps commands decoupled from the chat tree and trivially testable.
@@ -92,7 +92,7 @@ Error strings are produced at a single site in the registry so they stay uniform
 | Unknown name | `Invalid command: /xyz. Type /help for a list.` |
 | Missing arg | `/whisper: missing argument <target>.` |
 | Bad arg | `/whisper: no player named 'bob'.` |
-| Rejected by `accept` | whatever string `accept` returned |
+| Rejected by `Accept` | whatever string `Accept` returned |
 
 Printing goes through `ChatController.AppendLocalSystemMessage(text)`, which appends a synthetic `UIChatEntry` to `model.History`. No network traffic; the line renders through the existing `ChatListInterface` path with no view changes.
 
@@ -103,34 +103,34 @@ local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 
 Registry.Register {
-    name = 'whisper',
-    aliases = { 'w', 'pm' },
-    description = 'Whisper to a specific player.',
-    params = {
-        { name = 'target', type = 'player' },
+    Name = 'whisper',
+    Aliases = { 'w', 'pm' },
+    Description = 'Whisper to a specific player.',
+    Params = {
+        { Name = 'target', Type = 'Player' },
     },
-    accept = function(args)
+    Accept = function(args)
         local armies = GetArmiesTable()
         if armies and args.target == armies.focusArmy then
             return false, "/whisper: can't whisper yourself."
         end
         return true
     end,
-    execute = function(args, ctx)
-        ctx.controller.SetRecipient(args.target)
+    Execute = function(args, ctx)
+        ctx.Controller.SetRecipient(args.target)
     end,
 }
 ```
 
 `/whisper Jip` and `/whisper 3` both route here with `args.target` already normalized to an army ID — one command definition, two user-facing forms.
 
-## 7. `accept` vs. `execute`
+## 7. `Accept` vs. `Execute`
 
 - **Parser** handles *structural* errors: missing args, wrong types, unknown name.
-- **`accept`** handles *semantic* errors that depend on runtime state: whispering yourself, command disabled in replay, target just disconnected.
-- **`execute`** runs the side effect and trusts its inputs.
+- **`Accept`** handles *semantic* errors that depend on runtime state: whispering yourself, command disabled in replay, target just disconnected.
+- **`Execute`** runs the side effect and trusts its inputs.
 
-Splitting `accept` out keeps the failure path uniform (always surfaces as a system feed line with the reason) and leaves room for things like tab-completion previews that call `accept` without `execute`.
+Splitting `Accept` out keeps the failure path uniform (always surfaces as a system feed line with the reason) and leaves room for things like tab-completion previews that call `Accept` without `Execute`.
 
 ## 8. Bootstrap
 
@@ -165,4 +165,4 @@ The slash branch is the first step of the send pipeline, matching `CLAUDE.md §S
 1. **Nicknames with spaces.** Current tokenizer splits on whitespace. If nicknames with spaces are real, we need either quoted strings (`/whisper "Jip E"`) or a smarter `player` resolver that greedy-matches across tokens. Left as future work.
 2. **Localization.** Error strings and command descriptions should go through `<LOC …>` like other chat text; currently hardcoded English.
 3. **Replay/observer gating.** Some commands are meaningless in replay. `accept` can enforce per-command; a shared `ctx.mode` flag (`'live' | 'replay' | 'observer'`) would avoid each command re-deriving it.
-4. **Tab completion / history.** The registry exposes `GetAll()` so an edit-view enhancement can offer completion for command names and (via `params[i].type`) argument suggestions. Not wired up here.
+4. **Tab completion / history.** The registry exposes `GetAll()` so an edit-view enhancement can offer completion for command names and (via `Params[i].Type`) argument suggestions. Not wired up here.

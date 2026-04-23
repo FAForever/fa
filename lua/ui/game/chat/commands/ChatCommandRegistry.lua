@@ -9,22 +9,22 @@ local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 --   Dispatch(text) parses and runs a "/…" line, returning (handled, errorText)
 
 ---@class UIChatCommandParam
----@field name     string
----@field type     UIChatCommandParamType
----@field optional boolean?
+---@field Name     string
+---@field Type     UIChatCommandParamType
+---@field Optional boolean?
 
 ---@class UIChatCommandContext
----@field model      UIChatModel
----@field controller table
----@field sourceText string
+---@field Model      UIChatModel
+---@field Controller table
+---@field SourceText string
 
 ---@class UIChatCommand
----@field name        string
----@field aliases?    string[]
----@field description string
----@field params?     UIChatCommandParam[]
----@field accept?     fun(args: table, ctx: UIChatCommandContext): boolean, string?
----@field execute     fun(args: table, ctx: UIChatCommandContext)
+---@field Name        string
+---@field Aliases?    string[]
+---@field Description string
+---@field Params?     UIChatCommandParam[]
+---@field Accept?     fun(args: table, ctx: UIChatCommandContext): boolean, string?
+---@field Execute     fun(args: table, ctx: UIChatCommandContext)
 
 ---@type table<string, UIChatCommand>
 local Commands = {}
@@ -39,21 +39,21 @@ local Aliases = {}
 --- canonical name; aliases from the previous registration are cleared first.
 ---@param cmd UIChatCommand
 function Register(cmd)
-    assert(cmd and cmd.name, "Chat command requires a name.")
-    assert(cmd.execute, "Chat command requires an execute function.")
+    assert(cmd and cmd.Name, "Chat command requires a name.")
+    assert(cmd.Execute, "Chat command requires an execute function.")
 
-    local key = string.lower(cmd.name)
+    local key = string.lower(cmd.Name)
 
     local previous = Commands[key]
-    if previous and previous.aliases then
-        for _, alias in ipairs(previous.aliases) do
+    if previous and previous.Aliases then
+        for _, alias in ipairs(previous.Aliases) do
             Aliases[string.lower(alias)] = nil
         end
     end
 
     Commands[key] = cmd
-    if cmd.aliases then
-        for _, alias in ipairs(cmd.aliases) do
+    if cmd.Aliases then
+        for _, alias in ipairs(cmd.Aliases) do
             Aliases[string.lower(alias)] = key
         end
     end
@@ -65,8 +65,8 @@ function Unregister(name)
     local key = string.lower(name)
     local cmd = Commands[key]
     if not cmd then return end
-    if cmd.aliases then
-        for _, alias in ipairs(cmd.aliases) do
+    if cmd.Aliases then
+        for _, alias in ipairs(cmd.Aliases) do
             Aliases[string.lower(alias)] = nil
         end
     end
@@ -123,7 +123,7 @@ function FindMatching(prefix)
         end
     end
 
-    table.sort(result, function(a, b) return a.name < b.name end)
+    table.sort(result, function(a, b) return a.Name < b.Name end)
     return result
 end
 
@@ -153,42 +153,42 @@ end
 ---@return table?, string?
 local function ParseArgs(cmd, tokens)
     ---@type table<string, any>
-    local args = { _raw = tokens }
-    if not cmd.params then return args, nil end
+    local args = { _Raw = tokens }
+    if not cmd.Params then return args, nil end
 
     local idx = 1
-    for _, param in ipairs(cmd.params) do
-        if param.type == 'rest' then
+    for _, param in ipairs(cmd.Params) do
+        if param.Type == 'Rest' then
             local remaining = {}
             while tokens[idx] do
                 table.insert(remaining, tokens[idx])
                 idx = idx + 1
             end
             if table.getn(remaining) == 0 then
-                if not param.optional then
-                    return nil, string.format("/%s: missing argument <%s>.", cmd.name, param.name)
+                if not param.Optional then
+                    return nil, string.format("/%s: missing argument <%s>.", cmd.Name, param.Name)
                 end
             else
-                args[param.name] = table.concat(remaining, ' ')
+                args[param.Name] = table.concat(remaining, ' ')
             end
         else
             local token = tokens[idx]
             if not token then
-                if param.optional then
+                if param.Optional then
                     idx = idx + 1
                 else
-                    return nil, string.format("/%s: missing argument <%s>.", cmd.name, param.name)
+                    return nil, string.format("/%s: missing argument <%s>.", cmd.Name, param.Name)
                 end
             else
-                local resolver = Types.Resolvers[param.type]
+                local resolver = Types.Resolvers[param.Type]
                 if not resolver then
-                    return nil, string.format("/%s: unknown parameter type '%s'.", cmd.name, tostring(param.type))
+                    return nil, string.format("/%s: unknown parameter type '%s'.", cmd.Name, tostring(param.Type))
                 end
                 local ok, value = resolver(token)
                 if not ok then
-                    return nil, string.format("/%s: %s", cmd.name, value or ("invalid <" .. param.name .. ">."))
+                    return nil, string.format("/%s: %s", cmd.Name, value or ("invalid <" .. param.Name .. ">."))
                 end
-                args[param.name] = value
+                args[param.Name] = value
                 idx = idx + 1
             end
         end
@@ -232,19 +232,19 @@ function Dispatch(text)
     local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
     local ChatController = import("/lua/ui/game/chat/ChatController.lua")
     local ctx = {
-        model      = ChatModel.GetSingleton(),
-        controller = ChatController,
-        sourceText = text,
+        Model      = ChatModel.GetSingleton(),
+        Controller = ChatController,
+        SourceText = text,
     }
 
-    if cmd.accept then
-        local ok, reason = cmd.accept(args, ctx)
+    if cmd.Accept then
+        local ok, reason = cmd.Accept(args, ctx)
         if not ok then
-            return false, reason or string.format("/%s: command rejected.", cmd.name)
+            return false, reason or string.format("/%s: command rejected.", cmd.Name)
         end
     end
 
-    cmd.execute(args, ctx)
+    cmd.Execute(args, ctx)
     return true, nil
 end
 
