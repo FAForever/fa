@@ -36,15 +36,6 @@ Legacy behaviour: pressing `Enter` on an empty edit box called `ToggleChat()` �
 
 ---
 
-## `ActivateChat` — engine Enter-key hook
-
-The Enter key outside the chat edit box is hard-bound by the engine to a global `ActivateChat(modifiers)` function. The legacy implementation lived at the top of `chat.lua`; the new wiring is:
-
-- [`ChatController.ActivateChat`](ChatController.lua) — holds the logic (resolve recipient from `send_type` + Shift, then toggle the window). Lives in the controller so it can read from the model and config model without going through globals.
-- [`gamemain.ActivateChat`](../gamemain.lua) — a two-line global shim that delegates to the controller. Top-level functions in `gamemain.lua` are discoverable by the engine; modules loaded via `import()` are not, which is why the shim is necessary.
-
-Behaviour matches the old truth table: without Shift, use the `send_type` default; with Shift, flip the default. If a private recipient is already selected, Shift is ignored (the broadcast-channel switch doesn't clobber an in-progress whisper).
-
 ## Legacy `chat.lua` renamed to `chat.legacy.lua`
 
 The original monolithic file is preserved on disk as [`chat.legacy.lua`](../chat.legacy.lua) so its source is still available as a reference while porting the remaining gaps. **No live importer remains** — every caller was repointed before the rename. The file can be deleted outright once [GAPS.md](GAPS.md) is empty.
