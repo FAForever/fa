@@ -80,11 +80,12 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field ScrollTop      number    # 1-based virtual position of the top visible row
 ---@field VirtualSize    number    # total wrapped lines across valid entries
 ---@field FontSize              number                       # current font size (from ChatOptions.font_size)
----@field DragTL               Bitmap                        # top-left corner resize grip
----@field DragTR               Bitmap                        # top-right corner resize grip
----@field DragBL               Bitmap                        # bottom-left corner resize grip
----@field DragBR               Bitmap                        # bottom-right corner resize grip
----@field ResetPositionBtn     Button                        # titlebar button that restores DefaultRect
+---@field DragTL                Bitmap                        # top-left corner resize grip
+---@field DragTR                Bitmap                        # top-right corner resize grip
+---@field DragBL                Bitmap                        # bottom-left corner resize grip
+---@field DragBR                Bitmap                        # bottom-right corner resize grip
+---@field DragHandleControlMap  table<string, Bitmap[]>       # resize-bitmap id → grips to highlight
+---@field ResetPositionBtn      Button                        # titlebar button that restores DefaultRect
 ---@field HistoryObserver       LazyVar<UIChatEntry[]>       # derived from ChatModel.History
 ---@field WindowVisibleObserver LazyVar<boolean>             # derived from ChatModel.WindowVisible
 ---@field OptionsObserver       LazyVar<UIChatOptions>       # derived from ChatConfigModel.Committed
@@ -205,7 +206,7 @@ local ChatInterface = ClassUI(Window) {
         -- Each `controlID` the Window delivers maps to the grip(s) that
         -- visually represent that edge: side edges light both adjacent
         -- corners.
-        local controlMap = {
+        self.DragHandleControlMap = {
             tl = { self.DragTL },
             tr = { self.DragTR },
             bl = { self.DragBL },
@@ -215,26 +216,46 @@ local ChatInterface = ClassUI(Window) {
             tm = { self.DragTL, self.DragTR },
             bm = { self.DragBL, self.DragBR },
         }
+
+        -- Window calls the instance field `self.RolloverHandler(control, ...)`
+        -- as a plain function (no method syntax) — install a thin forwarder
+        -- here that binds `self` and dispatches to `OnRollover`. The class
+        -- method deliberately uses a different name: sharing `RolloverHandler`
+        -- would let the instance field shadow the class method, so
+        -- `self:RolloverHandler(...)` from within the forwarder would recurse.
         self.RolloverHandler = function(_, event, xControl, yControl, cursor, controlID)
-            if self._lockSize or self._sizeLock then return end
-            local grips = controlMap[controlID]
-            if event.Type == 'MouseEnter' then
-                if grips then
-                    for _, grip in grips do grip:SetTexture(grip.textures.over) end
-                end
-                GetCursor():SetTexture(UIUtil.GetCursor(cursor))
-            elseif event.Type == 'MouseExit' then
-                if grips then
-                    for _, grip in grips do grip:SetTexture(grip.textures.up) end
-                end
-                GetCursor():Reset()
-            elseif event.Type == 'ButtonPress' then
-                if grips then
-                    for _, grip in grips do grip:SetTexture(grip.textures.down) end
-                end
-                self.StartSizing(event, xControl, yControl)
-                self._sizeLock = true
+            self:OnRollover(event, xControl, yControl, cursor, controlID)
+        end
+    end,
+
+    --- Handles a rollover / press event delivered through the Window's
+    --- resize bitmaps (tl / tm / tr / ml / mr / bl / bm / br). Lights the
+    --- matching corner grip(s) and hands off to `StartSizing` on press.
+    ---@param self UIChatInterface
+    ---@param event KeyEvent
+    ---@param xControl? LazyVar<number>  # Left or Right LazyVar to drive on drag
+    ---@param yControl? LazyVar<number>  # Top or Bottom LazyVar to drive on drag
+    ---@param cursor string               # cursor-kind id (e.g. 'NW_SE')
+    ---@param controlID string            # id of the resize bitmap (e.g. 'tl')
+    OnRollover = function(self, event, xControl, yControl, cursor, controlID)
+        if self._lockSize or self._sizeLock then return end
+        local grips = self.DragHandleControlMap[controlID]
+        if event.Type == 'MouseEnter' then
+            if grips then
+                for _, grip in grips do grip:SetTexture(grip.textures.over) end
             end
+            GetCursor():SetTexture(UIUtil.GetCursor(cursor))
+        elseif event.Type == 'MouseExit' then
+            if grips then
+                for _, grip in grips do grip:SetTexture(grip.textures.up) end
+            end
+            GetCursor():Reset()
+        elseif event.Type == 'ButtonPress' then
+            if grips then
+                for _, grip in grips do grip:SetTexture(grip.textures.down) end
+            end
+            self.StartSizing(event, xControl, yControl)
+            self._sizeLock = true
         end
     end,
 
