@@ -466,7 +466,7 @@ PaintingCanvasAdapter = Class(DebugComponent) {
         -- samples once it's reached a certain threshold. With normal use,
         -- this guarantees that the brushStroke does not exceed the limit.
 
-        local FindClients = import('/lua/ui/game/chat.lua').FindClients
+        local FindClients = import('/lua/ui/game/chat/ChatController.lua').FindClients
         local clients = FindClients()
 
         local messages = self:SplitBrushStrokes(shareablePainting)

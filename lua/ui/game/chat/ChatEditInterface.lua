@@ -82,10 +82,15 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox:ShowBackground(false)
         self.EditBox:SetText('')
 
+        -- Pressing Enter on an empty edit box closes the window — matches
+        -- the legacy `chat.lua` shortcut where Enter serves as both "send"
+        -- and "dismiss" depending on whether there's anything to send.
         self.EditBox.OnEnterPressed = function(edit, text)
             if text and text ~= '' then
                 ChatController.Send(text)
                 edit:SetText('')
+            else
+                ChatController.CloseWindow()
             end
             self:CloseCommandHint()
         end
