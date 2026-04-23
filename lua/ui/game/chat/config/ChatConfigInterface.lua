@@ -61,7 +61,7 @@ local ChatConfigInterface = ClassUI(Window) {
     ---@param parent Control
     __init = function(self, parent)
         Window.__init(self, parent, "Chat Configuration", false, false, false, true, false, "chat_config_v7", {
-            Left = 200, Top = 200, Right = 524, Bottom = 640,
+            Left = 200, Top = 200, Right = 500, Bottom = 640,
         })
 
         -- Single trash bag for everything we allocate that needs explicit
@@ -282,12 +282,12 @@ local ChatConfigInterface = ClassUI(Window) {
             :AtVerticalCenterIn(self.BtnOk)
             :End()
 
-        -- Fit the window height to its content
+        -- Fit the window height to its content. Width stays driven by
+        -- Left/Right from the default rect — don't pin Width here, or the
+        -- drag handler's Right:Set(Left + Width) will snap the window to
+        -- whatever Width was pinned to (the textures render against Right,
+        -- so a Width/Right mismatch is invisible until the first drag).
         self.Bottom:Set(function() return self.BtnCancel.Bottom() + 16 end)
-
-        Layouter(self)
-            :Width(300)
-            :End()
     end,
 
     --- Syncs every control to reflect the given options table.
