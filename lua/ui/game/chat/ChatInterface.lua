@@ -719,6 +719,16 @@ function ScrollPages(delta)
     end
 end
 
+--- Opens the chat window (creating it on first call) and scrolls the feed
+--- by `delta` rows. Entry point for the global PgUp / PgDn key bindings —
+--- so pressing PgUp with the window hidden both reveals it and starts
+--- scrolling toward older messages.
+---@param delta number
+function OpenAndScrollLines(delta)
+    Open()
+    ScrollLines(delta)
+end
+
 -------------------------------------------------------------------------------
 --#region Debugging
 
