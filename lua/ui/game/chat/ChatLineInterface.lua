@@ -124,6 +124,15 @@ ChatLineInterface = ClassUI(Group) {
         self.TeamColor:SetSolidColor('00000000')
         self.FactionIcon:SetSolidColor('00000000')
     end,
+
+    --- Updates the font size for both name and body text. The row's `Height`
+    --- LazyVar is derived from `Name.Height`, so the row resizes automatically.
+    ---@param self UIChatLineInterface
+    ---@param size number   # point size
+    SetFontSize = function(self, size)
+        self.Name:SetFont('Arial Bold', size)
+        self.Text:SetFont('Arial', size)
+    end,
 }
 
 -------------------------------------------------------------------------------

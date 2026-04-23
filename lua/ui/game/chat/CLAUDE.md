@@ -53,9 +53,42 @@ end
 
 1. **Never cache a LazyVar's value in a local.** Always call it (`lv()`) at the moment you need it so the dependency graph stays correct.
 2. **`OnDirty` is a pull notification, not a push.** It tells you the value *may* have changed; you call `self()` inside `OnDirty` to get the new value.
-3. **One `OnDirty` per LazyVar instance.** Assigning `OnDirty` again overwrites the previous one. If you need multiple observers, derive a second LazyVar that reads the first.
+3. **Never assign `OnDirty` directly on a LazyVar you don't own.** Direct assignment overwrites whatever handler was there before — silently breaking unrelated code. *Always* derive a fresh LazyVar, hang your handler on **that**, and read the upstream LazyVar from its compute. The first read registers your observer in the upstream's `used_by` table, so future changes propagate to your handler without ever touching the upstream's `OnDirty` slot.
+
+Use `Derive(source, onDirty)` from `/lua/lazyvar.lua` — it bundles the three-step dance (create, set OnDirty, `Set` a reader) into one call:
+
+```lua
+-- DON'T — clobbers any other subscriber:
+model.History.OnDirty = function(lv) self:OnHistoryChanged(lv()) end
+
+-- DO — derive a per-subscriber LazyVar:
+self.HistoryObserver = Derive(model.History, function(lv)
+    self:OnHistoryChanged(lv())
+end)
+
+-- And on teardown:
+self.HistoryObserver:Destroy()
+```
+
+**`Create` vs `Derive`** — `Create(value)` makes a LazyVar holding a static initial value. If you pass a function or another LazyVar, it is stored *verbatim* as the cached value — not interpreted as a dependency. `Derive(source, onDirty)` makes a LazyVar that tracks `source` and fires `onDirty` whenever it changes. When you want to observe an existing LazyVar, you want `Derive`; `Create` won't wire up the dependency edge.
+
+This rule applies to every LazyVar in the system — including ones in our own `Model` files. Treat `Foo.OnDirty` as private to whoever creates `Foo`.
 4. **Never write to the model inside an `OnDirty`.** That is controller logic; keep views read-only.
-5. **Destroy LazyVars when the owning control is destroyed** to avoid dangling `OnDirty` callbacks.
+5. **Destroy LazyVars when the owning control is destroyed** to avoid dangling `OnDirty` callbacks. The standard pattern is a `TrashBag` (see `/lua/system/trashbag.lua`): allocate `self.Trash = TrashBag()` in `__init`, hand every derived observer to it via `self.Trash:Add(...)`, and destroy the bag in `OnDestroy`:
+
+    ```lua
+    __init = function(self, ...)
+        self.Trash = TrashBag()
+        self.HistoryObserver = self.Trash:Add(Derive(model.History, function(lv)
+            self:OnHistoryChanged(lv())
+        end))
+    end,
+    OnDestroy = function(self)
+        self.Trash:Destroy()
+    end,
+    ```
+
+    `Trash:Add` returns what you pass it, so the assignment stays a one-liner.
 
 ### What the autolobby got wrong
 

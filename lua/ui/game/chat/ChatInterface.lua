@@ -10,8 +10,10 @@ local ChatEditInterface = import("/lua/ui/game/chat/ChatEditInterface.lua").Chat
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
+local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 
 local MauiWrapText = import("/lua/maui/text.lua").WrapText
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
 
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
@@ -54,12 +56,17 @@ local WindowTextures = {
 -- `ChatConfigModel` is a follow-up step.
 
 ---@class UIChatInterface : Window
+---@field Trash          TrashBag                            # owns every subscription-LazyVar we create
 ---@field LinesContainer Group
 ---@field Lines          UIChatLineInterface[]
 ---@field Edit           UIChatEditInterface
 ---@field Scrollbar      Scrollbar
 ---@field ScrollTop      number    # 1-based virtual position of the top visible row
 ---@field VirtualSize    number    # total wrapped lines across valid entries
+---@field FontSize              number                       # current font size (from ChatOptions.font_size)
+---@field HistoryObserver       LazyVar<UIChatEntry[]>       # derived from ChatModel.History
+---@field WindowVisibleObserver LazyVar<boolean>             # derived from ChatModel.WindowVisible
+---@field OptionsObserver       LazyVar<UIChatOptions>       # derived from ChatConfigModel.Committed
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
@@ -71,6 +78,11 @@ local ChatInterface = ClassUI(Window) {
 
         local client = self:GetClientGroup()
 
+        -- Single trash bag for everything we allocate that needs explicit
+        -- destruction — currently just the derived observer LazyVars.
+        -- Emptied in `OnDestroy`.
+        self.Trash = TrashBag()
+
         -- Container for the line pool. Stays empty until __post_init can
         -- measure its laid-out height and build the pool from that.
         self.LinesContainer = Group(client, "ChatLinesContainer")
@@ -78,6 +90,7 @@ local ChatInterface = ClassUI(Window) {
         self.Lines       = {}
         self.ScrollTop   = 1
         self.VirtualSize = 0
+        self.FontSize    = ChatConfigModel.GetSingleton().Committed().font_size or 14
 
         -- Expose the scrollable interface on the container so
         -- `UIUtil.CreateVertScrollbarFor(LinesContainer)` binds correctly.
@@ -91,30 +104,37 @@ local ChatInterface = ClassUI(Window) {
         -- The edit area sits at the bottom of the client region.
         self.Edit = ChatEditInterface(client)
 
-        -- Reactive: history → wrap new entries, refresh size, stick to
-        -- bottom. The initial firing happens before __post_init so the
-        -- wrap call has no pool to measure against; that's fine —
-        -- RewrapAll runs once the pool exists.
+        -- Reactive subscriptions use `LazyVarDerive` so each observer is a
+        -- fresh LazyVar that reads from an upstream model field — setting
+        -- our handler can never stomp another subscriber's (see the chat
+        -- CLAUDE.md for the pattern).
         local model = ChatModel.GetSingleton()
-        model.History.OnDirty = function(lv)
-            self:OnHistoryChanged(lv())
-        end
-        self:OnHistoryChanged(model.History())
+        local configModel = ChatConfigModel.GetSingleton()
 
-        -- Reactive: window visibility → show / hide the frame.
-        model.WindowVisible.OnDirty = function(lv)
+        -- History → wrap new entries, refresh size, stick to bottom. The
+        -- initial firing happens before __post_init so the wrap call has
+        -- no pool to measure against; that's fine — RewrapAll runs once
+        -- the pool exists.
+        self.HistoryObserver = self.Trash:Add(LazyVarDerive(model.History, function(lv)
+            self:OnHistoryChanged(lv())
+        end))
+
+        -- Committed chat options → apply font size, rebuild the pool (line
+        -- height tracks the font), rewrap all entries (wrap widths depend
+        -- on font metrics), and re-render.
+        self.OptionsObserver = self.Trash:Add(LazyVarDerive(configModel.Committed, function(lv)
+            self:ApplyOptions(lv())
+        end))
+
+        -- Window visibility → show / hide the frame.
+        self.WindowVisibleObserver = self.Trash:Add(LazyVarDerive(model.WindowVisible, function(lv)
             if lv() then
                 self:Show()
                 self.Edit:AcquireFocus()
             else
                 self:Hide()
             end
-        end
-        if model.WindowVisible() then
-            self:Show()
-        else
-            self:Hide()
-        end
+        end))
     end,
 
     ---@param self UIChatInterface
@@ -170,6 +190,7 @@ local ChatInterface = ClassUI(Window) {
         -- lazy function of the name-text font (see ChatLineInterface).
         if not self.Lines[1] then
             self.Lines[1] = ChatLineInterface(container)
+            self.Lines[1]:SetFontSize(self.FontSize)
             Layouter(self.Lines[1])
                 :AtLeftTopIn(container)
                 :Right(container.Right)
@@ -185,6 +206,7 @@ local ChatInterface = ClassUI(Window) {
         -- Grow: append rows below the previous one.
         for i = currentCount + 1, neededLines do
             self.Lines[i] = ChatLineInterface(container)
+            self.Lines[i]:SetFontSize(self.FontSize)
             Layouter(self.Lines[i])
                 :Below(self.Lines[i - 1])
                 :AtLeftIn(container)
@@ -196,6 +218,30 @@ local ChatInterface = ClassUI(Window) {
         for i = currentCount, neededLines + 1, -1 do
             self.Lines[i]:Destroy()
             self.Lines[i] = nil
+        end
+    end,
+
+    ---------------------------------------------------------------------------
+    -- Options application
+    ---------------------------------------------------------------------------
+
+    --- Applies a `UIChatOptions` snapshot to the window. Currently handles
+    --- `font_size`; future options (colours, alpha, feed-mode flags) will
+    --- extend this method.
+    ---@param self UIChatInterface
+    ---@param options UIChatOptions
+    ApplyOptions = function(self, options)
+        local size = options.font_size or 14
+        if size ~= self.FontSize then
+            self.FontSize = size
+            for _, line in ipairs(self.Lines) do
+                line:SetFontSize(size)
+            end
+            -- Row height tracks the font, so the pool may need resizing;
+            -- wrap widths depend on font metrics, so rewrap all entries.
+            self:RebuildPool()
+            self:RewrapAll()
+            self:CalcVisible()
         end
     end,
 
@@ -467,6 +513,12 @@ local ChatInterface = ClassUI(Window) {
     OnConfigClick = function(self)
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Toggle()
     end,
+
+    --- Empties our trash bag so every derived observer we allocated is
+    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    OnDestroy = function(self)
+        self.Trash:Destroy()
+    end,
 }
 
 -------------------------------------------------------------------------------
@@ -510,11 +562,8 @@ end
 --- Called by the module manager when this module becomes dirty.
 function __moduleinfo.OnDirty()
     if Instance then
-        -- Clear subscriptions to avoid dangling callbacks into a destroyed view.
-        local model = ChatModel.GetSingleton()
-        model.History.OnDirty = nil
-        model.WindowVisible.OnDirty = nil
-
+        -- `OnDestroy` empties the trash bag, which in turn destroys every
+        -- derived observer — no more `OnDirty` fires into a dead `self`.
         Instance:Destroy()
         Instance = nil
     end

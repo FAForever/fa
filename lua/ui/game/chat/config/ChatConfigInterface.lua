@@ -8,6 +8,8 @@ local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 local ChatConfigController = import("/lua/ui/game/chat/config/ChatConfigController.lua")
 
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
+
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 -- 8 ARGB solid colors selectable as message color swatches.
@@ -37,6 +39,7 @@ local CheckboxDefs = {
 ---@field key   string
 
 ---@class UIChatConfigInterface : Window
+---@field Trash          TrashBag                          # owns every derived subscription-LazyVar
 ---@field LabelColors    Text
 ---@field ColorRows      UIChatConfigColorRow[]
 ---@field LabelFontSize  Text
@@ -51,6 +54,7 @@ local CheckboxDefs = {
 ---@field BtnReset       Button
 ---@field BtnOk          Button
 ---@field BtnCancel      Button
+---@field PendingObserver LazyVar<UIChatOptions>  # derived from ChatConfigModel.Pending
 local ChatConfigInterface = ClassUI(Window) {
 
     ---@param self UIChatConfigInterface
@@ -59,6 +63,11 @@ local ChatConfigInterface = ClassUI(Window) {
         Window.__init(self, parent, "Chat Configuration", false, false, false, true, false, "chat_config_v7", {
             Left = 200, Top = 200, Right = 524, Bottom = 640,
         })
+
+        -- Single trash bag for everything we allocate that needs explicit
+        -- destruction — currently just the derived observer LazyVars.
+        -- Emptied in `OnDestroy`.
+        self.Trash = TrashBag()
 
         local client = self:GetClientGroup()
 
@@ -159,11 +168,12 @@ local ChatConfigInterface = ClassUI(Window) {
         end
 
         -- ---- Reactive: sync all controls whenever pending options change ----
+        -- `LazyVarDerive` gives us a fresh per-subscriber LazyVar so we don't
+        -- stomp other subscribers on Pending (see the chat CLAUDE.md).
         local model = ChatConfigModel.GetSingleton()
-        model.Pending.OnDirty = function(lv)
+        self.PendingObserver = self.Trash:Add(LazyVarDerive(model.Pending, function(lv)
             self:RefreshFromOptions(lv())
-        end
-        self:RefreshFromOptions(model.Pending())
+        end))
     end,
 
     ---@param self UIChatConfigInterface
@@ -300,6 +310,13 @@ local ChatConfigInterface = ClassUI(Window) {
     OnClose = function(self)
         import("/lua/ui/game/chat/config/ChatConfigInterface.lua").Close()
     end,
+
+    --- Empties our trash bag so every derived observer we allocated is
+    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    ---@param self UIChatConfigInterface
+    OnDestroy = function(self)
+        self.Trash:Destroy()
+    end,
 }
 
 -------------------------------------------------------------------------------
@@ -321,9 +338,8 @@ end
 --- Closes and destroys the config dialog.
 function Close()
     if Instance then
-        -- Remove the reactive subscription before destroying to avoid stale callbacks.
-        ChatConfigModel.GetSingleton().Pending.OnDirty = nil
-
+        -- `OnDestroy` empties the trash bag, which in turn destroys every
+        -- derived observer — no more `OnDirty` fires into a dead `self`.
         Instance:Destroy()
         Instance = nil
     end

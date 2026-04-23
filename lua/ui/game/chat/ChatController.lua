@@ -1,11 +1,26 @@
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
+local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 
 -------------------------------------------------------------------------------
 -- Window visibility
 
+--- Applies the `send_type` default-recipient option when the chat window
+--- opens. If the user has already selected a specific player for a private
+--- message, their choice is left alone.
+local function ApplyDefaultRecipient()
+    local model = ChatModel.GetSingleton()
+    if type(model.Recipient()) == 'number' then
+        return
+    end
+    local options = ChatConfigModel.GetSingleton().Committed()
+    local target = options.send_type and ChatModel.RecipientAllies or ChatModel.RecipientAll
+    model.Recipient:Set(target)
+end
+
 --- Shows the chat window.
 function OpenWindow()
+    ApplyDefaultRecipient()
     ChatModel.GetSingleton().WindowVisible:Set(true)
 end
 
@@ -17,7 +32,11 @@ end
 --- Toggles the chat window open or closed.
 function ToggleWindow()
     local lv = ChatModel.GetSingleton().WindowVisible
-    lv:Set(not lv())
+    local willOpen = not lv()
+    if willOpen then
+        ApplyDefaultRecipient()
+    end
+    lv:Set(willOpen)
 end
 
 -------------------------------------------------------------------------------
@@ -59,16 +78,11 @@ end
 -------------------------------------------------------------------------------
 -- Slash commands
 
-local BuiltinsRegistered = false
-
---- Registers every built-in chat command with the registry. Idempotent, so
---- it is safe to call from multiple init paths. External callers that want
---- their own commands registered alongside the built-ins should call this
---- once at startup before the first message is sent.
+--- (Re-)registers every built-in chat command with the registry. `Register`
+--- overwrites, so calling this repeatedly is safe and cheap — we do so on
+--- every slash-entry path so hot-reloading `ChatCommandRegistry.lua` (which
+--- resets its internal tables) doesn't leave us with an empty registry.
 function RegisterBuiltinCommands()
-    if BuiltinsRegistered then return end
-    BuiltinsRegistered = true
-
     local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
     local Builtins = import("/lua/ui/game/chat/commands/BuiltinCommands.lua")
 
@@ -97,6 +111,12 @@ function Send(text)
 
     WARN("ChatController.Send not yet implemented: " .. tostring(text))
 end
+
+-- Register at load time so the registry is populated before the first hint
+-- opens or the first slash command is sent. The function is idempotent, so
+-- re-imports and the belt-and-suspenders calls from `Send` / `OpenCommandHint`
+-- all converge on the same state.
+RegisterBuiltinCommands()
 
 -------------------------------------------------------------------------------
 --#region Debugging

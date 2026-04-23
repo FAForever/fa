@@ -11,6 +11,8 @@ local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local ChatListInterface = import("/lua/ui/game/chat/ChatListInterface.lua").ChatListInterface
 local ChatCommandHintInterface = import("/lua/ui/game/chat/ChatCommandHintInterface.lua").ChatCommandHintInterface
 
+local LazyVarDerive = import("/lua/lazyvar.lua").Derive
+
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 local MaxChars = 200
@@ -21,18 +23,25 @@ local MaxChars = 200
 -- chat-bubble button or the label opens the recipient picker (ChatListInterface).
 
 ---@class UIChatEditInterface : Group
----@field ChatBubble     Button
----@field RecipientLabel Text
----@field EditBox        Edit
----@field ChatList       UIChatListInterface | nil
----@field CommandHint    UIChatCommandHintInterface | nil
----@field LastEditText   string
+---@field Trash             TrashBag                          # owns every derived subscription-LazyVar
+---@field ChatBubble        Button
+---@field RecipientLabel    Text
+---@field EditBox           Edit
+---@field ChatList          UIChatListInterface | nil
+---@field CommandHint       UIChatCommandHintInterface | nil
+---@field LastEditText      string
+---@field RecipientObserver LazyVar<UIChatRecipient>  # derived from ChatModel.Recipient
 ChatEditInterface = ClassUI(Group) {
 
     ---@param self UIChatEditInterface
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent, "ChatEditInterface")
+
+        -- Single trash bag for everything we allocate that needs explicit
+        -- destruction — currently just the derived observer LazyVars.
+        -- Emptied in `OnDestroy`.
+        self.Trash = TrashBag()
 
         self.ChatBubble = Button(self,
             UIUtil.UIFile('/game/chat-box_btn/radio_btn_up.dds'),
@@ -82,12 +91,13 @@ ChatEditInterface = ClassUI(Group) {
             self:CloseCommandHint()
         end
 
-        -- Keep the label in sync with the model.
+        -- Keep the label in sync with the model. `LazyVarDerive` gives us a
+        -- fresh per-subscriber LazyVar so we don't stomp any other observer
+        -- of `model.Recipient` (see the chat CLAUDE.md for the pattern).
         local model = ChatModel.GetSingleton()
-        model.Recipient.OnDirty = function(lv)
+        self.RecipientObserver = self.Trash:Add(LazyVarDerive(model.Recipient, function(lv)
             self:RefreshRecipient(lv())
-        end
-        self:RefreshRecipient(model.Recipient())
+        end))
 
         -- Drive the command-hint popup from the edit-box contents. We poll
         -- once per frame because MAUI's Edit has no "text changed" callback
@@ -212,6 +222,13 @@ ChatEditInterface = ClassUI(Group) {
     ---@param self UIChatEditInterface
     AcquireFocus = function(self)
         self.EditBox:AcquireFocus()
+    end,
+
+    --- Empties our trash bag so every derived observer we allocated is
+    --- destroyed — no `OnDirty` can fire into a torn-down `self`.
+    ---@param self UIChatEditInterface
+    OnDestroy = function(self)
+        self.Trash:Destroy()
     end,
 }
 
