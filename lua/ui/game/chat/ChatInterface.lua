@@ -266,7 +266,7 @@ local ChatInterface = ClassUI(Window) {
     ---------------------------------------------------------------------------
 
     --- Wraps a single entry's text to fit the current row width. Results are
-    --- cached on the entry itself as `entry.wrappedText`. The first wrapped
+    --- cached on the entry itself as `entry.WrappedText`. The first wrapped
     --- line reserves space for the name prefix; continuation lines span the
     --- wider area to the right of the team-colour column.
     ---@param self UIChatInterface
@@ -274,12 +274,12 @@ local ChatInterface = ClassUI(Window) {
     WrapEntry = function(self, entry)
         local measureLine = self.Lines[1]
         if not measureLine then
-            entry.wrappedText = { entry.text or '' }
+            entry.WrappedText = { entry.Text or '' }
             return
         end
 
-        local name = entry.name or ''
-        local lines = MauiWrapText(entry.text or '',
+        local name = entry.Name or ''
+        local lines = MauiWrapText(entry.Text or '',
             function(lineIndex)
                 if lineIndex == 1 then
                     return measureLine.Right()
@@ -294,7 +294,7 @@ local ChatInterface = ClassUI(Window) {
             end)
 
         if table.empty(lines) then lines = { '' } end
-        entry.wrappedText = lines
+        entry.WrappedText = lines
     end,
 
     --- Re-wraps every entry in the history. Used on resize (width change)
@@ -334,7 +334,7 @@ local ChatInterface = ClassUI(Window) {
         local size = 0
         for _, entry in ipairs(history) do
             if self:IsValidEntry(entry) then
-                size = size + ((entry.wrappedText and table.getn(entry.wrappedText)) or 1)
+                size = size + ((entry.WrappedText and table.getn(entry.WrappedText)) or 1)
             end
         end
         self.VirtualSize = size
@@ -427,7 +427,7 @@ local ChatInterface = ClassUI(Window) {
 
         while entryIdx <= historyCount do
             local entry = history[entryIdx]
-            local wrapCount = (entry.wrappedText and table.getn(entry.wrappedText)) or 1
+            local wrapCount = (entry.WrappedText and table.getn(entry.WrappedText)) or 1
             if virtualPos + wrapCount >= scrollTop then
                 wrappedIdx = scrollTop - virtualPos
                 if wrappedIdx < 1 then wrappedIdx = 1 end
@@ -449,8 +449,8 @@ local ChatInterface = ClassUI(Window) {
                 line:Hide()
             else
                 local entry = history[entryIdx]
-                local wrapped = entry.wrappedText
-                local wrappedText = (wrapped and wrapped[wrappedIdx]) or entry.text or ''
+                local wrapped = entry.WrappedText
+                local wrappedText = (wrapped and wrapped[wrappedIdx]) or entry.Text or ''
 
                 if wrappedIdx == 1 then
                     line:SetHeader(entry, wrappedText)
@@ -484,7 +484,7 @@ local ChatInterface = ClassUI(Window) {
     ---@param history UIChatEntry[]
     OnHistoryChanged = function(self, history)
         for _, entry in ipairs(history) do
-            if not entry.wrappedText then
+            if not entry.WrappedText then
                 self:WrapEntry(entry)
             end
         end

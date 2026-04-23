@@ -21,19 +21,19 @@ local DividerHeight    = 2
 ---@return string
 local function FormatCommand(cmd)
     local params = ''
-    if cmd.params then
-        for _, p in ipairs(cmd.params) do
-            local fmt = p.optional and ' [%s]' or ' <%s>'
-            params = params .. string.format(fmt, p.name)
+    if cmd.Params then
+        for _, p in ipairs(cmd.Params) do
+            local fmt = p.Optional and ' [%s]' or ' <%s>'
+            params = params .. string.format(fmt, p.Name)
         end
     end
 
     local aliases = ''
-    if cmd.aliases and table.getn(cmd.aliases) > 0 then
-        aliases = ' (aka /' .. table.concat(cmd.aliases, ', /') .. ')'
+    if cmd.Aliases and table.getn(cmd.Aliases) > 0 then
+        aliases = ' (aka /' .. table.concat(cmd.Aliases, ', /') .. ')'
     end
 
-    return string.format("/%s%s%s — %s", cmd.name, params, aliases, cmd.description or '')
+    return string.format("/%s%s%s — %s", cmd.Name, params, aliases, cmd.Description or '')
 end
 
 -------------------------------------------------------------------------------
@@ -45,10 +45,10 @@ end
 -- A pinned `/help` footer is always visible at the bottom.
 
 ---@class UIChatHintRow
----@field text    Text
----@field bg      Bitmap
----@field ordinal LazyVar<number>            # 0 = hidden, 1 = row closest to footer, etc.
----@field target  UIChatCommand | nil
+---@field Text    Text
+---@field BG      Bitmap
+---@field Ordinal LazyVar<number>            # 0 = hidden, 1 = row closest to footer, etc.
+---@field Target  UIChatCommand | nil
 
 ---@class UIChatCommandHintInterface : Group
 ---@field Edit         Edit
@@ -92,9 +92,9 @@ ChatCommandHintInterface = ClassUI(Group) {
         -- Footer (always-visible /help row).
         self.Footer = self:BuildRow()
         local help = Registry.Lookup('help')
-        self.Footer.target = help
-        self.Footer.text:SetText(help and FormatCommand(help) or '/help')
-        self.Footer.text:SetColor('ffbbbbbb')
+        self.Footer.Target = help
+        self.Footer.Text:SetText(help and FormatCommand(help) or '/help')
+        self.Footer.Text:SetColor('ffbbbbbb')
 
         self.Divider = Bitmap(self)
         self.Divider:SetSolidColor('ff444444')
@@ -147,14 +147,14 @@ ChatCommandHintInterface = ClassUI(Group) {
         end)
 
         -- Footer pinned to the bottom of self.
-        self.Footer.text.Left:SetFunction(function()   return self.Left() + HorizontalPadding end)
-        self.Footer.text.Bottom:SetFunction(function() return self.Bottom() end)
+        self.Footer.Text.Left:SetFunction(function()   return self.Left() + HorizontalPadding end)
+        self.Footer.Text.Bottom:SetFunction(function() return self.Bottom() end)
         self:LayoutRowBackground(self.Footer)
 
         -- Divider sits directly above the footer.
         self.Divider.Left:SetFunction(function()   return self.Left() end)
         self.Divider.Right:SetFunction(function()  return self.Right() end)
-        self.Divider.Bottom:SetFunction(function() return self.Footer.text.Top() end)
+        self.Divider.Bottom:SetFunction(function() return self.Footer.Text.Top() end)
         self.Divider.Height:SetFunction(function() return DividerHeight end)
 
         -- Borders hug the outside of self on all eight sides.
@@ -176,27 +176,27 @@ ChatCommandHintInterface = ClassUI(Group) {
     BuildRow = function(self)
         ---@type UIChatHintRow
         local row = {
-            ordinal = Create(0),
-            target  = nil,
+            Ordinal = Create(0),
+            Target  = nil,
         }
         ---@diagnostic disable-next-line: param-type-mismatch
-        row.text = UIUtil.CreateText(self, '', RowFontSize, RowFontName)
-        row.text:SetColor('ffffffff')
-        row.text:SetDropShadow(true)
-        row.text:DisableHitTest()
+        row.Text = UIUtil.CreateText(self, '', RowFontSize, RowFontName)
+        row.Text:SetColor('ffffffff')
+        row.Text:SetDropShadow(true)
+        row.Text:DisableHitTest()
 
-        row.bg = Bitmap(row.text)
-        row.bg:SetSolidColor('ff000000')
+        row.BG = Bitmap(row.Text)
+        row.BG:SetSolidColor('ff000000')
 
         local owner = self
-        row.bg.HandleEvent = function(bg, event)
+        row.BG.HandleEvent = function(bg, event)
             if event.Type == 'MouseEnter' then
                 bg:SetSolidColor('ff666666')
             elseif event.Type == 'MouseExit' then
                 bg:SetSolidColor('ff000000')
             elseif event.Type == 'ButtonPress' then
-                if row.target and owner.OnSelect then
-                    owner.OnSelect(row.target)
+                if row.Target and owner.OnSelect then
+                    owner.OnSelect(row.Target)
                 end
             end
         end
@@ -217,9 +217,9 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.Rows[idx] = row
 
         ---@diagnostic disable: undefined-field
-        row.text.Left:SetFunction(function() return self.Left() + HorizontalPadding end)
-        row.text.Bottom:SetFunction(function()
-            local ord = row.ordinal()
+        row.Text.Left:SetFunction(function() return self.Left() + HorizontalPadding end)
+        row.Text.Bottom:SetFunction(function()
+            local ord = row.Ordinal()
             if ord <= 0 then return self.Top() end
             return self.Divider.Top() - (ord - 1) * self.RowHeight()
         end)
@@ -235,11 +235,11 @@ ChatCommandHintInterface = ClassUI(Group) {
     ---@param row UIChatHintRow
     LayoutRowBackground = function(self, row)
         ---@diagnostic disable: undefined-field
-        row.bg.Left:SetFunction(function()   return self.Left() end)
-        row.bg.Right:SetFunction(function()  return self.Right() end)
-        row.bg.Top:SetFunction(function()    return row.text.Top() - 1 end)
-        row.bg.Bottom:SetFunction(function() return row.text.Bottom() + 1 end)
-        row.bg.Depth:SetFunction(function()  return row.text.Depth() - 1 end)
+        row.BG.Left:SetFunction(function()   return self.Left() end)
+        row.BG.Right:SetFunction(function()  return self.Right() end)
+        row.BG.Top:SetFunction(function()    return row.Text.Top() - 1 end)
+        row.BG.Bottom:SetFunction(function() return row.Text.Bottom() + 1 end)
+        row.BG.Depth:SetFunction(function()  return row.Text.Depth() - 1 end)
         ---@diagnostic enable: undefined-field
     end,
 
@@ -257,7 +257,7 @@ ChatCommandHintInterface = ClassUI(Group) {
             if space then prefix = string.sub(prefix, 1, space - 1) end
 
             for _, cmd in ipairs(Registry.FindMatching(prefix)) do
-                if cmd.name ~= 'help' then  -- help lives in the footer
+                if cmd.Name ~= 'help' then  -- help lives in the footer
                     table.insert(matches, cmd)
                 end
             end
@@ -266,18 +266,18 @@ ChatCommandHintInterface = ClassUI(Group) {
         ---@diagnostic disable: undefined-field
         for i, cmd in ipairs(matches) do
             local row = self:GetOrCreateRow(i)
-            row.target = cmd
-            row.text:SetText(FormatCommand(cmd))
-            row.text:Show()
-            row.bg:Show()
-            row.ordinal:Set(i)
+            row.Target = cmd
+            row.Text:SetText(FormatCommand(cmd))
+            row.Text:Show()
+            row.BG:Show()
+            row.Ordinal:Set(i)
         end
         for i = table.getn(matches) + 1, table.getn(self.Rows) do
             local row = self.Rows[i]
-            row.target = nil
-            row.text:Hide()
-            row.bg:Hide()
-            row.ordinal:Set(0)
+            row.Target = nil
+            row.Text:Hide()
+            row.BG:Hide()
+            row.Ordinal:Set(0)
         end
 
         self.VisibleCount:Set(table.getn(matches))

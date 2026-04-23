@@ -67,11 +67,11 @@ end
 ---@param text string
 function AppendLocalSystemMessage(text)
     AppendEntry {
-        name      = "System:",
-        text      = text,
-        color     = 'ffff6666',
-        armyID    = 0,
-        recipient = ChatModel.RecipientAll,
+        Name      = "System:",
+        Text      = text,
+        Color     = 'ffff6666',
+        ArmyID    = 0,
+        Recipient = ChatModel.RecipientAll,
     }
 end
 

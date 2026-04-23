@@ -16,14 +16,14 @@ RecipientAllies = 'allies'
 -- History entry.
 
 ---@class UIChatEntry
----@field name        string             # formatted prefix, e.g. "Sender to allies:"
----@field text        string             # raw message body
----@field color       string             # ARGB hex of the sender's team color
----@field armyID      number             # sender's army index
----@field faction     number             # faction icon index (1-based)
----@field recipient   UIChatRecipient    # the target this message was directed to
----@field camera?     table              # camera state when the message is a ping link
----@field wrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
+---@field Name        string             # formatted prefix, e.g. "Sender to allies:"
+---@field Text        string             # raw message body
+---@field Color       string             # ARGB hex of the sender's team color
+---@field ArmyID      number             # sender's army index
+---@field Faction     number             # faction icon index (1-based)
+---@field Recipient   UIChatRecipient    # the target this message was directed to
+---@field Camera?     table              # camera state when the message is a ping link
+---@field WrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
 
 -------------------------------------------------------------------------------
 -- Model.

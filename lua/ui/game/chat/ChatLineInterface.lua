@@ -92,13 +92,13 @@ ChatLineInterface = ClassUI(Group) {
     --- wrapped chunk of message text.
     ---@param self UIChatLineInterface
     ---@param entry UIChatEntry
-    ---@param wrappedText string    # the first wrapped chunk of `entry.text`
+    ---@param wrappedText string    # the first wrapped chunk of `entry.Text`
     SetHeader = function(self, entry, wrappedText)
-        self.Name:SetText(entry.name or '')
-        self.Text:SetText(wrappedText or entry.text or '')
-        self.TeamColor:SetSolidColor(entry.color or '00000000')
+        self.Name:SetText(entry.Name or '')
+        self.Text:SetText(wrappedText or entry.Text or '')
+        self.TeamColor:SetSolidColor(entry.Color or '00000000')
 
-        local iconIndex = entry.faction or table.getn(FactionIcons)
+        local iconIndex = entry.Faction or table.getn(FactionIcons)
         self.FactionIcon:SetTexture(UIUtil.UIFile(FactionIcons[iconIndex]))
     end,
 

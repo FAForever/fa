@@ -15,10 +15,10 @@ local ChatController = import("/lua/ui/game/chat/ChatController.lua")
 local Layouter = LayoutHelpers.ReusedLayoutFor
 
 ---@class UIChatListEntry
----@field text   Text
----@field bg     Bitmap
----@field badge? ChatFactionBadge      # only present on player entries
----@field target UIChatRecipient
+---@field Text   Text
+---@field BG     Bitmap
+---@field Badge? ChatFactionBadge      # only present on player entries
+---@field Target UIChatRecipient
 
 -------------------------------------------------------------------------------
 -- A popup recipient picker. Lists "All", "Allies", and one entry per
@@ -53,16 +53,39 @@ ChatListInterface = ClassUI(Group) {
         -- matching the list's default depth. +100 gives unambiguous headroom.
         LayoutHelpers.DepthOverParent(self, parent, 100)
 
-        -- Build the list of selectable targets: All, Allies, then one entry
-        -- per connected human player. `GetSessionClients` naturally excludes
-        -- bots (they are not session clients); we additionally skip the
-        -- local client (you can't privately message yourself) and any
-        -- disconnected player. A client's army is found by matching
-        -- nickname — the target stays an army ID so the send path continues
-        -- to work unchanged.
+        self.Entries = {}
+        for _, def in ipairs(self:BuildTargetDefs()) do
+            table.insert(self.Entries, self:CreateEntry(def))
+        end
+
+        self:CreateBorder()
+
+        -- Close on any mouse click outside the popup.
+        local function onOutsideClick() self:Destroy() end
+        UIMain.AddOnMouseClickedFunc(onOutsideClick)
+
+        self.OnDestroy = function(dself)
+            UIMain.RemoveOnMouseClickedFunc(onOutsideClick)
+            if dself._OnClosed then
+                local cb = dself._OnClosed
+                dself._OnClosed = nil
+                cb()
+            end
+        end
+    end,
+
+    --- Builds the list of selectable targets: All, Allies, then one entry
+    --- per connected human player. `GetSessionClients` naturally excludes
+    --- bots (they are not session clients); we additionally skip the local
+    --- client (you can't privately message yourself) and any disconnected
+    --- player. A client's army is found by matching nickname — the target
+    --- stays an army ID so the send path continues to work unchanged.
+    ---@param self UIChatListInterface
+    ---@return table[]
+    BuildTargetDefs = function(self)
         local defs = {
-            { nickname = "All",    target = ChatModel.RecipientAll },
-            { nickname = "Allies", target = ChatModel.RecipientAllies },
+            { Nickname = "All",    Target = ChatModel.RecipientAll },
+            { Nickname = "Allies", Target = ChatModel.RecipientAllies },
         }
 
         local armies = GetArmiesTable().armiesTable
@@ -71,10 +94,10 @@ ChatListInterface = ClassUI(Group) {
                 for armyID, armyData in armies do
                     if not armyData.civilian and armyData.nickname == client.name then
                         table.insert(defs, {
-                            nickname = client.name,
-                            target   = armyID,
-                            faction  = armyData.faction,
-                            color    = armyData.color,
+                            Nickname = client.name,
+                            Target   = armyID,
+                            Faction  = armyData.faction,
+                            Color    = armyData.color,
                         })
                         break
                     end
@@ -82,83 +105,76 @@ ChatListInterface = ClassUI(Group) {
             end
         end
 
-        self.Entries = {}
-        for _, def in ipairs(defs) do
-            local entry = {
-                target = def.target,
-                text   = UIUtil.CreateText(self, def.nickname, 12, "Arial"),
-            }
-            entry.text:SetColor('ffffffff')
-            entry.text:DisableHitTest()
+        return defs
+    end,
 
-            entry.bg = Bitmap(entry.text)
-            entry.bg:SetSolidColor('ff000000')
+    --- Creates a single row: text, highlight bitmap, optional faction badge,
+    --- and a hover/click handler that dispatches to `ChatController` and
+    --- closes the popup. Player rows carry a badge; All / Allies rows don't.
+    ---@param self UIChatListInterface
+    ---@param def table
+    ---@return UIChatListEntry
+    CreateEntry = function(self, def)
+        local entry = {
+            Target = def.Target,
+            Text   = UIUtil.CreateText(self, def.Nickname, 12, "Arial"),
+        }
+        entry.Text:SetColor('ffffffff')
+        entry.Text:DisableHitTest()
 
-            -- Player entries get a faction+colour badge to the left of the
-            -- name; All / Allies rows have no badge but share the same text
-            -- indent (applied in `__post_init`) so the column stays aligned.
-            if def.color then
-                entry.badge = ChatFactionBadge(self, def.faction, def.color)
-            end
+        entry.BG = Bitmap(entry.Text)
+        entry.BG:SetSolidColor('ff000000')
 
-            -- Capture target in a local so each entry closes over its own value.
-            local target = def.target
-            entry.bg.HandleEvent = function(bg, event)
-                if event.Type == 'MouseEnter' then
-                    bg:SetSolidColor('ff666666')
-                elseif event.Type == 'MouseExit' then
-                    bg:SetSolidColor('ff000000')
-                elseif event.Type == 'ButtonPress' then
-                    ChatController.SetRecipient(target)
-                    self:Destroy()
-                end
-            end
-
-            table.insert(self.Entries, entry)
+        if def.Color then
+            entry.Badge = ChatFactionBadge(self, def.Faction, def.Color)
         end
 
-        -- Decorative border bitmaps that sit outside the popup's bounds.
-        self.LTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
-        self.LTBG:DisableHitTest()
-        self.RTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ur.dds'))
-        self.RTBG:DisableHitTest()
-        self.RBBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lr.dds'))
-        self.RBBG:DisableHitTest()
-        self.RLBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ll.dds'))
-        self.RLBG:DisableHitTest()
-        self.LBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_vert_l.dds'))
-        self.LBG:DisableHitTest()
-        self.RBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_vert_r.dds'))
-        self.RBG:DisableHitTest()
-        self.TBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_horz_um.dds'))
-        self.TBG:DisableHitTest()
-        self.BBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lm.dds'))
-        self.BBG:DisableHitTest()
-
-        -- Close on any mouse click outside the popup.
-        local function onOutsideClick() self:Destroy() end
-        UIMain.AddOnMouseClickedFunc(onOutsideClick)
-
-        self.OnDestroy = function(dself)
-            UIMain.RemoveOnMouseClickedFunc(onOutsideClick)
-            if dself._onClosed then
-                local cb = dself._onClosed
-                dself._onClosed = nil
-                cb()
+        -- Capture target in a local so each entry closes over its own value.
+        local target = def.Target
+        entry.BG.HandleEvent = function(bg, event)
+            if event.Type == 'MouseEnter' then
+                bg:SetSolidColor('ff666666')
+            elseif event.Type == 'MouseExit' then
+                bg:SetSolidColor('ff000000')
+            elseif event.Type == 'ButtonPress' then
+                ChatController.SetRecipient(target)
+                self:Destroy()
             end
         end
+
+        return entry
+    end,
+
+    --- Creates the eight decorative border bitmaps that hug the outside of
+    --- the popup. Layout is applied in `LayoutBorder` from `__post_init`.
+    ---@param self UIChatListInterface
+    CreateBorder = function(self)
+        local function makeBitmap(file)
+            local bmp = Bitmap(self, UIUtil.UIFile(file))
+            bmp:DisableHitTest()
+            return bmp
+        end
+
+        self.LTBG = makeBitmap('/game/chat_brd/drop-box_brd_ul.dds')
+        self.RTBG = makeBitmap('/game/chat_brd/drop-box_brd_ur.dds')
+        self.RBBG = makeBitmap('/game/chat_brd/drop-box_brd_lr.dds')
+        self.RLBG = makeBitmap('/game/chat_brd/drop-box_brd_ll.dds')
+        self.LBG  = makeBitmap('/game/chat_brd/drop-box_brd_vert_l.dds')
+        self.RBG  = makeBitmap('/game/chat_brd/drop-box_brd_vert_r.dds')
+        self.TBG  = makeBitmap('/game/chat_brd/drop-box_brd_horz_um.dds')
+        self.BBG  = makeBitmap('/game/chat_brd/drop-box_brd_lm.dds')
     end,
 
     ---@param self UIChatListInterface
     ---@param parent Control
     __post_init = function(self, parent)
-        -- Measure the text entries so we can size ourselves to fit.
+        -- Size self to fit the widest row and the stacked heights.
         local maxWidth = 0
         local totalHeight = 0
         for _, entry in ipairs(self.Entries) do
-            local w = entry.text.Width()
+            local w = entry.Text.Width()
             if w > maxWidth then maxWidth = w end
-            totalHeight = totalHeight + entry.text.Height()
+            totalHeight = totalHeight + entry.Text.Height()
         end
 
         Layouter(self)
@@ -166,53 +182,69 @@ ChatListInterface = ClassUI(Group) {
             :Height(totalHeight)
             :End()
 
-        -- Left indent that reserves room for the faction badge on player
-        -- rows and keeps All / Allies text aligned with the player names.
+        -- Left indent reserves room for the faction badge on player rows
+        -- and keeps All / Allies text aligned with the player names.
         local textIndent = 20
 
-        -- Stack entries bottom-up: first entry at the bottom-left, each
-        -- subsequent entry above the previous. Text is indented to leave
-        -- room for the badge.
+        -- Stack entries bottom-up: first at the bottom, each subsequent
+        -- entry above the previous.
         for i, entry in ipairs(self.Entries) do
-            if i == 1 then
-                Layouter(entry.text)
-                    :AtBottomIn(self)
-                    :AtLeftIn(self, textIndent)
-                    :Over(self, 1)
-                    :End()
-            else
-                Layouter(entry.text)
-                    :Above(self.Entries[i-1].text)
-                    :AtLeftIn(self, textIndent)
-                    :Over(self, 1)
-                    :End()
-            end
-
-            -- Badge (player rows only) sits in the reserved indent, centred
-            -- vertically on the text row.
-            if entry.badge then
-                Layouter(entry.badge)
-                    :AtLeftIn(self, 3)
-                    :AtVerticalCenterIn(entry.text)
-                    :Over(self, 2)
-                    :End()
-            end
-
-            -- The highlight bar spans the full row (including the badge
-            -- area) and sits behind everything in the depth order. Direct
-            -- LazyVar `:SetFunction` calls match the original `chat.lua`
-            -- pattern and avoid Layouter's reused-state quirks.
-            local text = entry.text
-            ---@diagnostic disable: undefined-field
-            entry.bg.Depth:SetFunction(function() return text.Depth() - 1 end)
-            entry.bg.Left:SetFunction(function() return self.Left() - 6 end)
-            entry.bg.Top:SetFunction(function() return text.Top() - 1 end)
-            entry.bg.Width:SetFunction(function() return self.Width() + 8 end)
-            entry.bg.Bottom:SetFunction(function() return text.Bottom() + 1 end)
-            ---@diagnostic enable: undefined-field
+            local below = i > 1 and self.Entries[i - 1] or nil
+            self:LayoutEntry(entry, below, textIndent)
         end
 
-        -- Border bitmaps hug the outside of self on all eight sides.
+        self:LayoutBorder()
+    end,
+
+    --- Lays out one row: the text anchored above `below` (or at the bottom
+    --- if `below` is nil), an optional faction badge in the indent column,
+    --- and a highlight bitmap whose bounds track the text row.
+    ---@param self UIChatListInterface
+    ---@param entry UIChatListEntry
+    ---@param below UIChatListEntry | nil
+    ---@param textIndent number
+    LayoutEntry = function(self, entry, below, textIndent)
+        if below then
+            Layouter(entry.Text)
+                :Above(below.Text)
+                :AtLeftIn(self, textIndent)
+                :Over(self, 1)
+                :End()
+        else
+            Layouter(entry.Text)
+                :AtBottomIn(self)
+                :AtLeftIn(self, textIndent)
+                :Over(self, 1)
+                :End()
+        end
+
+        -- Badge (player rows only) sits in the reserved indent, centred
+        -- vertically on the text row.
+        if entry.Badge then
+            Layouter(entry.Badge)
+                :AtLeftIn(self, 3)
+                :AtVerticalCenterIn(entry.Text)
+                :Over(self, 2)
+                :End()
+        end
+
+        -- The highlight bar spans the full row (including the badge area)
+        -- and sits behind everything in the depth order. Direct LazyVar
+        -- `:SetFunction` calls match the original `chat.lua` pattern and
+        -- avoid Layouter's reused-state quirks.
+        local text = entry.Text
+        ---@diagnostic disable: undefined-field
+        entry.BG.Depth:SetFunction(function() return text.Depth() - 1 end)
+        entry.BG.Left:SetFunction(function() return self.Left() - 6 end)
+        entry.BG.Top:SetFunction(function() return text.Top() - 1 end)
+        entry.BG.Width:SetFunction(function() return self.Width() + 8 end)
+        entry.BG.Bottom:SetFunction(function() return text.Bottom() + 1 end)
+        ---@diagnostic enable: undefined-field
+    end,
+
+    --- Pins the eight decorative border bitmaps to the outside of self.
+    ---@param self UIChatListInterface
+    LayoutBorder = function(self)
         Layouter(self.LTBG):Right(self.Left):Bottom(self.Top):End()
         Layouter(self.RTBG):Left(self.Right):Bottom(self.Top):End()
         Layouter(self.RBBG):Left(self.Right):Top(self.Bottom):End()
@@ -227,7 +259,7 @@ ChatListInterface = ClassUI(Group) {
     ---@param self UIChatListInterface
     ---@param callback function
     SetOnClosed = function(self, callback)
-        self._onClosed = callback
+        self._OnClosed = callback
     end,
 }
 
