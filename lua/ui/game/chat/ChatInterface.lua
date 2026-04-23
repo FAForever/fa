@@ -96,75 +96,8 @@ local ChatInterface = ClassUI(Window) {
         Window.__init(self, parent, "", false, true, true, false, false, "chat_window_v2", DefaultRect, WindowTextures)
         self:SetMinimumResize(400, 160)
 
-        -- Corner grips: Bitmaps overlayed just outside each window corner.
-        -- They are purely cosmetic — hit-test is disabled so resize events
-        -- still flow to the Window's own resize bitmaps (tl/tr/bl/br/…).
-        -- The RolloverHandler swap below is what makes them light up.
-        self.DragTL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
-        self.DragTR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
-        self.DragBL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
-        self.DragBR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
-
-        self.DragTL.textures = DragHandleTextures('ul')
-        self.DragTR.textures = DragHandleTextures('ur')
-        self.DragBL.textures = DragHandleTextures('ll')
-        self.DragBR.textures = DragHandleTextures('lr')
-
-        for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
-            grip:DisableHitTest()
-        end
-
-        -- Replace the Window's default RolloverHandler so our corner grips
-        -- light up during hover / press instead of the base implementation's
-        -- faint resize-group outline.
-        local controlMap = {
-            tl = { self.DragTL },
-            tr = { self.DragTR },
-            bl = { self.DragBL },
-            br = { self.DragBR },
-            mr = { self.DragBR, self.DragTR },
-            ml = { self.DragBL, self.DragTL },
-            tm = { self.DragTL, self.DragTR },
-            bm = { self.DragBL, self.DragBR },
-        }
-        self.RolloverHandler = function(_, event, xControl, yControl, cursor, controlID)
-            if self._lockSize or self._sizeLock then return end
-            local grips = controlMap[controlID]
-            if event.Type == 'MouseEnter' then
-                if grips then
-                    for _, grip in grips do grip:SetTexture(grip.textures.over) end
-                end
-                GetCursor():SetTexture(UIUtil.GetCursor(cursor))
-            elseif event.Type == 'MouseExit' then
-                if grips then
-                    for _, grip in grips do grip:SetTexture(grip.textures.up) end
-                end
-                GetCursor():Reset()
-            elseif event.Type == 'ButtonPress' then
-                if grips then
-                    for _, grip in grips do grip:SetTexture(grip.textures.down) end
-                end
-                self.StartSizing(event, xControl, yControl)
-                self._sizeLock = true
-            end
-        end
-
-        -- Titlebar button that snaps the window back to DefaultRect. Placed
-        -- immediately to the left of the Window's built-in _configBtn.
-        self.ResetPositionBtn = Button(self,
-            UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
-            UIUtil.SkinnableFile('/game/menu-btns/default_btn_down.dds'),
-            UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
-            UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
-        self.ResetPositionBtn.Depth:Set(function() return self.Depth() + 10 end)
-        self.ResetPositionBtn.OnClick = function()
-            local scaled = LayoutHelpers.ScaleNumber
-            self.Left:Set(scaled(DefaultRect.Left))
-            self.Top:Set(scaled(DefaultRect.Top))
-            self.Right:Set(scaled(DefaultRect.Right))
-            self.Bottom:Set(scaled(DefaultRect.Bottom))
-            self:SaveWindowLocation()
-        end
+        self:SetupDragHandles()
+        self:SetupResetPositionButton()
 
         local client = self:GetClientGroup()
 
@@ -244,24 +177,97 @@ local ChatInterface = ClassUI(Window) {
         )
     end,
 
+    --- Creates the four corner resize grips, wires the window's
+    --- `RolloverHandler` to swap their textures on hover / press, and lays
+    --- them out overhanging the window corners. Hit-test is disabled on the
+    --- grips so resize events still reach the Window's own resize bitmaps.
+    ---@param self UIChatInterface
+    SetupDragHandles = function(self)
+        self.DragTL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ul_btn_up.dds'))
+        self.DragTR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ur_btn_up.dds'))
+        self.DragBL = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-ll_btn_up.dds'))
+        self.DragBR = Bitmap(self, UIUtil.UIFile('/game/drag-handle/drag-handle-lr_btn_up.dds'))
+
+        self.DragTL.textures = DragHandleTextures('ul')
+        self.DragTR.textures = DragHandleTextures('ur')
+        self.DragBL.textures = DragHandleTextures('ll')
+        self.DragBR.textures = DragHandleTextures('lr')
+
+        for _, grip in { self.DragTL, self.DragTR, self.DragBL, self.DragBR } do
+            grip:DisableHitTest()
+        end
+
+        Layouter(self.DragTL):AtLeftTopIn(self, -26, -8):Over(self, 5):End()
+        Layouter(self.DragTR):AtRightTopIn(self, -22, -8):Over(self, 5):End()
+        Layouter(self.DragBL):AtLeftBottomIn(self, -26, -8):Over(self, 5):End()
+        Layouter(self.DragBR):AtRightBottomIn(self, -22, -8):Over(self, 5):End()
+
+        -- Each `controlID` the Window delivers maps to the grip(s) that
+        -- visually represent that edge: side edges light both adjacent
+        -- corners.
+        local controlMap = {
+            tl = { self.DragTL },
+            tr = { self.DragTR },
+            bl = { self.DragBL },
+            br = { self.DragBR },
+            mr = { self.DragBR, self.DragTR },
+            ml = { self.DragBL, self.DragTL },
+            tm = { self.DragTL, self.DragTR },
+            bm = { self.DragBL, self.DragBR },
+        }
+        self.RolloverHandler = function(_, event, xControl, yControl, cursor, controlID)
+            if self._lockSize or self._sizeLock then return end
+            local grips = controlMap[controlID]
+            if event.Type == 'MouseEnter' then
+                if grips then
+                    for _, grip in grips do grip:SetTexture(grip.textures.over) end
+                end
+                GetCursor():SetTexture(UIUtil.GetCursor(cursor))
+            elseif event.Type == 'MouseExit' then
+                if grips then
+                    for _, grip in grips do grip:SetTexture(grip.textures.up) end
+                end
+                GetCursor():Reset()
+            elseif event.Type == 'ButtonPress' then
+                if grips then
+                    for _, grip in grips do grip:SetTexture(grip.textures.down) end
+                end
+                self.StartSizing(event, xControl, yControl)
+                self._sizeLock = true
+            end
+        end
+    end,
+
+    --- Creates the reset-position button on the title strip (immediately to
+    --- the left of the Window's built-in `_configBtn`). Clicking it snaps
+    --- every rect edge back to `DefaultRect` and persists the location.
+    ---@param self UIChatInterface
+    SetupResetPositionButton = function(self)
+        self.ResetPositionBtn = Button(self,
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_down.dds'),
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
+            UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
+        self.ResetPositionBtn.Depth:Set(function() return self.Depth() + 10 end)
+        self.ResetPositionBtn.OnClick = function()
+            local scaled = LayoutHelpers.ScaleNumber
+            self.Left:Set(scaled(DefaultRect.Left))
+            self.Top:Set(scaled(DefaultRect.Top))
+            self.Right:Set(scaled(DefaultRect.Right))
+            self.Bottom:Set(scaled(DefaultRect.Bottom))
+            self:SaveWindowLocation()
+        end
+
+        Layouter(self.ResetPositionBtn)
+            :LeftOf(self._configBtn)
+            :End()
+    end,
+
     ---@param self UIChatInterface
     ---@param parent Control
     __post_init = function(self, parent)
         local client = self:GetClientGroup()
         local pad = 4
-
-        -- Corner grips. Offsets copied from legacy chat.lua so the grips
-        -- overhang the chat border at the same pixels the original did.
-        Layouter(self.DragTL):AtLeftTopIn(self, -26, -8):Over(self, 100):End()
-        Layouter(self.DragTR):AtRightTopIn(self, -22, -8):Over(self, 100):End()
-        Layouter(self.DragBL):AtLeftBottomIn(self, -26, -8):Over(self, 100):End()
-        Layouter(self.DragBR):AtRightBottomIn(self, -22, -8):Over(self, 100):End()
-
-        -- Reset-position button: sits to the left of the Window's built-in
-        -- config button on the title strip.
-        Layouter(self.ResetPositionBtn)
-            :LeftOf(self._configBtn)
-            :End()
 
         -- Full width, flush with the bottom of the client area. The edit
         -- group derives its own height (see ChatEditInterface.__post_init).
