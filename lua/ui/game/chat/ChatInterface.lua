@@ -74,6 +74,7 @@ local ChatInterface = ClassUI(Window) {
         Window.__init(self, parent, "", false, true, true, false, false, "chat_window_v2", {
             Left = 8, Top = 460, Right = 430, Bottom = 720,
         }, WindowTextures)
+        self:SetMinimumResize(400, 160)
 
         local client = self:GetClientGroup()
 
