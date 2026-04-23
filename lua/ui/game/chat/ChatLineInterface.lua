@@ -30,6 +30,7 @@ table.insert(FactionIcons, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 ---@field FactionIcon Bitmap
 ---@field Name        Text
 ---@field Text        Text
+---@field Entry       UIChatEntry | nil
 ChatLineInterface = ClassUI(Group) {
 
     ---@param self UIChatLineInterface
@@ -46,13 +47,23 @@ ChatLineInterface = ClassUI(Group) {
         self.Name = UIUtil.CreateText(self, '', 14, 'Arial Bold')
         self.Name:SetColor('ffffffff')
         self.Name:SetDropShadow(true)
-        self.Name:DisableHitTest()
+        -- Empty-name continuation lines have zero width here, so the hit
+        -- rect collapses with them — no need to gate dispatch on row role.
+        self.Name.HandleEvent = function(_, event)
+            if event.Type == 'ButtonPress' and self.Entry then
+                self:OnNameClicked(self.Entry)
+            end
+        end
 
         self.Text = UIUtil.CreateText(self, '', 14, 'Arial')
         self.Text:SetColor('ffc2f6ff')
         self.Text:SetDropShadow(true)
         self.Text:SetClipToWidth(true)
-        self.Text:DisableHitTest()
+        self.Text.HandleEvent = function(_, event)
+            if event.Type == 'ButtonPress' and self.Entry then
+                self:OnBodyClicked(self.Entry)
+            end
+        end
     end,
 
     ---@param self UIChatLineInterface
@@ -94,6 +105,7 @@ ChatLineInterface = ClassUI(Group) {
     ---@param entry UIChatEntry
     ---@param wrappedText string    # the first wrapped chunk of `entry.Text`
     SetHeader = function(self, entry, wrappedText)
+        self.Entry = entry
         self.Name:SetText(entry.Name or '')
         self.Text:SetText(wrappedText or entry.Text or '')
         self.TeamColor:SetSolidColor(entry.Color or '00000000')
@@ -107,9 +119,14 @@ ChatLineInterface = ClassUI(Group) {
     --- The text control remains anchored to `Name.Right + 2`; with an empty
     --- name that resolves to the left of the row, so continuation lines
     --- naturally line up under the first wrapped chunk.
+    ---
+    --- The entry is still tracked so body clicks on wrapped lines dispatch
+    --- against the same message the header belongs to.
     ---@param self UIChatLineInterface
+    ---@param entry UIChatEntry
     ---@param wrappedText string
-    SetContinuation = function(self, wrappedText)
+    SetContinuation = function(self, entry, wrappedText)
+        self.Entry = entry
         self.Name:SetText('')
         self.Text:SetText(wrappedText or '')
         self.TeamColor:SetSolidColor('00000000')
@@ -119,11 +136,28 @@ ChatLineInterface = ClassUI(Group) {
     --- Clears all content so the row can stand empty.
     ---@param self UIChatLineInterface
     Clear = function(self)
+        self.Entry = nil
         self.Name:SetText('')
         self.Text:SetText('')
         self.TeamColor:SetSolidColor('00000000')
         self.FactionIcon:SetSolidColor('00000000')
     end,
+
+    --- Overridable: fires on a click on the sender name. Continuation
+    --- lines have an empty name control so the hit rect collapses — this
+    --- only runs on header rows in practice. Default is a no-op; replace
+    --- the field on an instance to subscribe.
+    ---@param self UIChatLineInterface
+    ---@param entry UIChatEntry
+    OnNameClicked = function(self, entry) end,
+
+    --- Overridable: fires on a click on the message body. Runs for both
+    --- header and continuation rows — they share the same entry — so a
+    --- click anywhere on a wrapped message resolves to the right sender.
+    --- Default is a no-op; replace the field on an instance to subscribe.
+    ---@param self UIChatLineInterface
+    ---@param entry UIChatEntry
+    OnBodyClicked = function(self, entry) end,
 
     --- Updates the font size for both name and body text. The row's `Height`
     --- LazyVar is derived from `Name.Height`, so the row resizes automatically.

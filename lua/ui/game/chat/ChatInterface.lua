@@ -89,6 +89,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field HistoryObserver       LazyVar<UIChatEntry[]>       # derived from ChatModel.History
 ---@field WindowVisibleObserver LazyVar<boolean>             # derived from ChatModel.WindowVisible
 ---@field OptionsObserver       LazyVar<UIChatOptions>       # derived from ChatConfigModel.Committed
+---@field OnLineNameClicked     fun(line: UIChatLineInterface, entry: UIChatEntry)   # shared row-name click handler; captures `self` so pool lines don't allocate per-row closures
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
@@ -127,6 +128,20 @@ local ChatInterface = ClassUI(Window) {
 
         -- The edit area sits at the bottom of the client region.
         self.Edit = ChatEditInterface(client)
+
+        -- Shared row-name click handler. Built once per window so every
+        -- pool line can point `OnNameClicked` at the same reference —
+        -- pool growth never allocates a per-row closure. Captures `self`
+        -- so we can re-focus the edit box after retargeting.
+        self.OnLineNameClicked = function(_, entry)
+            -- Ignore clicks on your own name — whispering yourself is
+            -- pointless and the picker would still route it as a private
+            -- message.
+            if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
+                ChatController.SetRecipient(entry.ArmyID)
+                self.Edit:AcquireFocus()
+            end
+        end
 
         -- Reactive subscriptions use `LazyVarDerive` so each observer is a
         -- fresh LazyVar that reads from an upstream model field — setting
@@ -338,6 +353,7 @@ local ChatInterface = ClassUI(Window) {
         if not self.Lines[1] then
             self.Lines[1] = ChatLineInterface(container)
             self.Lines[1]:SetFontSize(self.FontSize)
+            self.Lines[1].OnNameClicked = self.OnLineNameClicked
             Layouter(self.Lines[1])
                 :AtLeftTopIn(container)
                 :Right(container.Right)
@@ -354,6 +370,7 @@ local ChatInterface = ClassUI(Window) {
         for i = currentCount + 1, neededLines do
             self.Lines[i] = ChatLineInterface(container)
             self.Lines[i]:SetFontSize(self.FontSize)
+            self.Lines[i].OnNameClicked = self.OnLineNameClicked
             Layouter(self.Lines[i])
                 :Below(self.Lines[i - 1])
                 :AtLeftIn(container)
@@ -586,7 +603,7 @@ local ChatInterface = ClassUI(Window) {
                 if wrappedIdx == 1 then
                     line:SetHeader(entry, wrappedText)
                 else
-                    line:SetContinuation(wrappedText)
+                    line:SetContinuation(entry, wrappedText)
                 end
                 line:Show()
 
