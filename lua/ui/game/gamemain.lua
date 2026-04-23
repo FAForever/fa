@@ -298,6 +298,7 @@ function CreateUI(isReplay)
     import("/lua/ui/game/consoleecho.lua").CreateConsoleEcho(mapGroup)
     import("/lua/ui/game/build_templates.lua").Init()
     import("/lua/ui/game/taunt.lua").Init()
+    import("/lua/ui/game/chat/ChatController.lua").Init()
 
     import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
     import("/lua/ui/game/minimap.lua").CreateMinimap(windowGroup)

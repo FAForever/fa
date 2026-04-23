@@ -397,19 +397,21 @@ function Send(text)
 end
 
 -------------------------------------------------------------------------------
--- Engine registration
---
--- Registered at module load. `RegisterChatFunc` keys by identifier and
--- overwrites, so re-imports (hot reload) simply replace the previous handler
--- with the freshly-loaded one — no duplicate dispatches.
+-- Lifecycle
 
-import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
-
--- Slash-command registry also needs to be populated before the first hint
--- opens or the first `/cmd` is typed. `RegisterBuiltinCommands` is
--- idempotent, so re-imports and the belt-and-suspenders calls from `Send` /
--- `OpenCommandHint` all converge on the same state.
-RegisterBuiltinCommands()
+--- One-shot initialisation: registers the receive handler with gamemain and
+--- populates the slash-command registry with the built-ins. Called from
+--- `gamemain.lua` during UI setup — kept out of module-load so mods can hook
+--- the controller (replacing `Init`, `OnReceive`, or `RegisterBuiltinCommands`)
+--- before any wiring happens.
+---
+--- `RegisterChatFunc` keys by identifier and overwrites, so calling `Init`
+--- more than once simply replaces the previous handler — no duplicate
+--- dispatches, safe under hot reload.
+function Init()
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
+    RegisterBuiltinCommands()
+end
 
 -------------------------------------------------------------------------------
 --#region Debugging
