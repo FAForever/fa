@@ -111,6 +111,19 @@ ChatEditInterface = ClassUI(Group) {
             return true
         end
 
+        -- Page Up / Page Down scroll the chat feed. Shift narrows to one row.
+        -- Matches the legacy chat.lua binding so muscle memory carries over.
+        -- Lazy import of ChatInterface avoids the import cycle: ChatInterface
+        -- imports this module at load time, so the reverse edge has to defer.
+        self.EditBox.OnNonTextKeyPressed = function(_, keycode, modifiers)
+            local step = modifiers and modifiers.Shift and 1 or 10
+            if keycode == UIUtil.VK_PRIOR then
+                import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(-step)
+            elseif keycode == UIUtil.VK_NEXT then
+                import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(step)
+            end
+        end
+
         -- Keep the label in sync with the model. `LazyVarDerive` gives us a
         -- fresh per-subscriber LazyVar so we don't stomp any other observer
         -- of `model.Recipient` (see the chat CLAUDE.md for the pattern).

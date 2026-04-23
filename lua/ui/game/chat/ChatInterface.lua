@@ -564,6 +564,24 @@ function Toggle()
     ChatController.ToggleWindow()
 end
 
+--- Scrolls the chat feed by `delta` rows (negative = toward older messages).
+--- No-op if the window has never been opened.
+---@param delta number
+function ScrollLines(delta)
+    if Instance then
+        Instance:ScrollLines(nil, delta)
+    end
+end
+
+--- Scrolls the chat feed by `delta` pages (negative = toward older messages).
+--- No-op if the window has never been opened.
+---@param delta number
+function ScrollPages(delta)
+    if Instance then
+        Instance:ScrollPages(nil, delta)
+    end
+end
+
 -------------------------------------------------------------------------------
 --#region Debugging
 
