@@ -1071,6 +1071,13 @@ end
 ---@param sender string     # username
 ---@param data table        
 function ReceiveChat(sender, data)
+
+    -- early exit for console output
+    if data.ConsoleOutput then
+        print(LOCF("%s %s", sender, data.ConsoleOutput))
+        return
+    end
+
     if data.Identifier then
 
         -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
