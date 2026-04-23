@@ -88,6 +88,7 @@ function RegisterBuiltinCommands()
     Registry.Register(import("/lua/ui/game/chat/commands/All.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/Allies.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/Whisper.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/Gift.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/Help.lua").Command)
 end
 

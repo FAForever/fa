@@ -134,9 +134,9 @@ Splitting `Accept` out keeps the failure path uniform (always surfaces as a syst
 
 ## 8. Bootstrap
 
-`BuiltinCommands.lua` has no side effects on import — it just exports each command as a named `UIChatCommand` table (`All`, `Allies`, `Whisper`, `Help`). Importing the module does not register anything.
+Each built-in command lives in its own file under `commands/` (e.g. `All.lua`, `Allies.lua`, `Whisper.lua`, `Help.lua`) and exports a single top-level `Command` table. Importing a command file has no side effects — a command is inert until the controller registers it. One command per file keeps the diff footprint of adding, removing, or overriding a command local to that file, which is the whole reason builtins were split out of the old monolithic module.
 
-`ChatController.RegisterBuiltinCommands()` is the single registration site: it pulls the named exports from `BuiltinCommands` and hands them to `ChatCommandRegistry.Register`. It is idempotent, so it can be called from multiple init paths without harm. `ChatController.Send` invokes it lazily on the first slash-prefixed message so the feature works without an explicit init hook; once a proper `ChatController:Init` exists (see `CLAUDE.md §Init`), the call should move there.
+`ChatController.RegisterBuiltinCommands()` is the single registration site: it imports each command file and hands its `Command` export to `ChatCommandRegistry.Register`. It is idempotent, so it can be called from multiple init paths without harm. `ChatController.Send` invokes it lazily on the first slash-prefixed message so the feature works without an explicit init hook; `ChatController:Init` also calls it at startup.
 
 External modules (notify, mods, future subsystems) register their own commands by calling `Registry.Register` directly, independent of the builtins.
 
