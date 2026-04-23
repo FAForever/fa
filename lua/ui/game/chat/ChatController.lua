@@ -84,12 +84,11 @@ end
 --- resets its internal tables) doesn't leave us with an empty registry.
 function RegisterBuiltinCommands()
     local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
-    local Builtins = import("/lua/ui/game/chat/commands/BuiltinCommands.lua")
 
-    Registry.Register(Builtins.All)
-    Registry.Register(Builtins.Allies)
-    Registry.Register(Builtins.Whisper)
-    Registry.Register(Builtins.Help)
+    Registry.Register(import("/lua/ui/game/chat/commands/All.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/Allies.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/Whisper.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/Help.lua").Command)
 end
 
 -------------------------------------------------------------------------------
@@ -416,7 +415,17 @@ end
 ---@param modifiers? table  # engine-supplied modifier state ({Shift, Ctrl, ...})
 function ActivateChat(modifiers)
     local model = ChatModel.GetSingleton()
-    if type(model.Recipient()) ~= 'number' then
+    local wasVisible = model.WindowVisible()
+
+    -- Toggle first. On open this runs `ApplyDefaultRecipient`, which picks
+    -- a recipient from `send_type` alone — it doesn't see modifiers. On
+    -- close it just flips visibility and we leave the recipient alone.
+    import("/lua/ui/game/chat/ChatInterface.lua").Toggle()
+
+    -- Layer the Shift modifier on top of the default. Must happen AFTER
+    -- the toggle above — writing to `Recipient` before `ToggleWindow` runs
+    -- gets clobbered by its own `ApplyDefaultRecipient` call.
+    if not wasVisible and type(model.Recipient()) ~= 'number' then
         local sendType = ChatConfigModel.GetSingleton().Committed().send_type or false
         local shift = modifiers and modifiers.Shift or false
         if (not shift) == sendType then
@@ -425,7 +434,6 @@ function ActivateChat(modifiers)
             model.Recipient:Set(ChatModel.RecipientAll)
         end
     end
-    import("/lua/ui/game/chat/ChatInterface.lua").Toggle()
 end
 
 -------------------------------------------------------------------------------
