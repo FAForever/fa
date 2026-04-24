@@ -144,8 +144,10 @@ ChatLineInterface = ClassUI(Group) {
         -- Camera affordance: switch between textured (hit-testable) and
         -- transparent SolidColor (inert) rather than Show/Hide, so the
         -- window-wide `Show()` cascade can't reveal stale icons. Re-applying
-        -- `RightOf` replaces the previous Left binding (no leak).
-        if entry.Camera then
+        -- `RightOf` replaces the previous Left binding (no leak). Shown for
+        -- both full `Camera` snapshots (player attached their view) and
+        -- `Location` hints (AI tagged a point or region).
+        if entry.Camera or entry.Location then
             self.CamIcon:SetTexture(UIUtil.UIFile(CamIconTexture))
             self.CamIcon:EnableHitTest()
             LayoutHelpers.RightOf(self.Text, self.CamIcon, 4)

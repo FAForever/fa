@@ -10,6 +10,52 @@
 
 local SimUtils = import("/lua/simutils.lua")
 
+--- Per-client recipient filter. The sim runs deterministically on every
+--- client, but `Sync` is per-client and `GetFocusArmy()` reads the local
+--- viewer's focus — so every client can independently decide whether to
+--- relay a given message to its own UI, without diverging the shared sim
+--- state. Mirrors the legacy `FindClients` routing policy:
+---
+--- * Observers (`focus == -1`) see everything, matching the legacy replay
+---   and live-spectator behaviour where privates become visible so the
+---   conversation can be attributed.
+--- * `all` broadcasts always pass.
+--- * `allies` broadcasts pass to the sender and to anyone `IsAlly` with
+---   the sender.
+--- * Numeric `to` is a private whisper — only the sender and the named
+---   recipient pass.
+---@param msg {From: integer, to: 'all' | 'allies' | integer}
+---@return boolean
+function IsLocalRecipient(msg)
+    local focus = GetFocusArmy()
+    if focus == -1 then return true end
+
+    local to = msg.to
+    if to == 'all' then return true end
+    if to == 'allies' then
+        return focus == msg.From or IsAlly(focus, msg.From)
+    end
+
+    if type(to) == 'number' then
+        return focus == msg.From or focus == to
+    end
+    return false
+end
+
+--- Writes `msg` onto `Sync.ChatMessages` only if the local client is a
+--- legitimate recipient. Shared entry point for every sim-originated
+--- chat emitter (the `SendChatMessage` callback for UI-sent messages, the
+--- `AIBrainChatComponent` for AI-emitted lines, and any future sim system
+--- that wants to drop a line into the chat feed) so the recipient policy
+--- is enforced sim-side in exactly one place.
+---@param msg table
+function RelayChatMessage(msg)
+    if IsLocalRecipient(msg) then
+        Sync.ChatMessages = Sync.ChatMessages or {}
+        table.insert(Sync.ChatMessages, msg)
+    end
+end
+
 --- Legacy replay hook kept for external callers that may still reference it.
 --- The refactored chat path no longer uses this — chat is now relayed through
 --- `Sync.ChatMessages` (see `SendChatMessage`) and external replay parsers
@@ -67,6 +113,5 @@ function SendChatMessage(data)
 
     msg.From = from
 
-    Sync.ChatMessages = Sync.ChatMessages or {}
-    table.insert(Sync.ChatMessages, msg)
+    RelayChatMessage(msg)
 end

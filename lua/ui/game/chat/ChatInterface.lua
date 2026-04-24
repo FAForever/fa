@@ -145,11 +145,27 @@ local ChatInterface = ClassUI(Window) {
         end
 
         -- Shared cam-icon click handler. Same one-closure-per-window pattern
-        -- as `OnLineNameClicked`. Restores the world camera to the state
-        -- the sender saved when they shipped the message.
+        -- as `OnLineNameClicked`. Two wire formats:
+        --   * `entry.Camera` — a full `SaveSettings` snapshot the sender
+        --     wanted us to adopt verbatim (player attached their view).
+        --   * `entry.Location` — a point or region from a sim-originated
+        --     sender (AI brain, system message). We translate on click so
+        --     the viewer's pitch/heading/zoom are preserved for a point
+        --     move, or the framing is computed by `MoveToRegion` for an
+        --     area. Checked first so a future message carrying both
+        --     prefers the lighter-weight hint.
         self.OnLineCameraClicked = function(_, entry)
-            if entry.Camera then
-                GetCamera('WorldCamera'):RestoreSettings(entry.Camera)
+            local cam = GetCamera('WorldCamera')
+            if entry.Location then
+                if entry.Location.Area then
+                    cam:MoveToRegion(entry.Location.Area, 0.5)
+                elseif entry.Location.Position then
+                    local settings = cam:SaveSettings()
+                    settings.Focus = entry.Location.Position
+                    cam:RestoreSettings(settings)
+                end
+            elseif entry.Camera then
+                cam:RestoreSettings(entry.Camera)
             end
         end
 

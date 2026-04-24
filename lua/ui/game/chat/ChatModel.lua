@@ -15,6 +15,16 @@ RecipientAllies = 'allies'
 -------------------------------------------------------------------------------
 -- History entry.
 
+--- Location hint carried by a message: either a single point or a bounding
+--- rectangle in world space. Sim-originated senders (AI brains, future
+--- system messages) populate this instead of `Camera` — the UI translates
+--- it to an appropriate camera move on click (`Camera:MoveTo` for a point,
+--- `Camera:MoveToRegion` for an area) so the viewer's pitch/heading is not
+--- forced to match the sender's.
+---@class UIChatEntryLocation
+---@field Position? Vector         # world-space focus point
+---@field Area?     Rectangle      # world-space rectangle to frame
+
 ---@class UIChatEntry
 ---@field Name        string             # formatted prefix, e.g. "Sender to allies:"
 ---@field Text        string             # raw message body
@@ -22,7 +32,8 @@ RecipientAllies = 'allies'
 ---@field ArmyID      number             # sender's army index
 ---@field Faction     number             # faction icon index (1-based)
 ---@field Recipient   UIChatRecipient    # the target this message was directed to
----@field Camera?     table              # camera state when the message is a ping link
+---@field Camera?     table              # camera state (`SaveSettings` snapshot) when the sender attached their exact view
+---@field Location?   UIChatEntryLocation # lightweight location hint from a sim-originated sender (AI brain, system message)
 ---@field Id?         string             # near-unique sender-stamped id (`tostring(msg)`); used to dedupe the `Sync.ChatMessages` replay/sim path against the live `SessionSendChatMessage` path
 ---@field WrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
 
