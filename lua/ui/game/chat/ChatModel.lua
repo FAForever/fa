@@ -70,7 +70,12 @@ function __moduleinfo.OnReload(newModule)
 end
 
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(
+        function()
+            WaitFrames(2)
+            import(__moduleinfo.name)
+        end
+    )
 end
 
 --#endregion

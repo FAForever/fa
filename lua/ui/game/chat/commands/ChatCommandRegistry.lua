@@ -247,12 +247,3 @@ function Dispatch(text)
     cmd.Execute(args, ctx)
     return true, nil
 end
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion

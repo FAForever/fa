@@ -83,12 +83,3 @@ end
 Resolvers.String = function(token)
     return true, token
 end
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion

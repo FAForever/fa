@@ -157,12 +157,3 @@ function Compute(text, caret)
         Suffix     = (n == 1 and atEnd) and ' ' or '',
     }
 end
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion

@@ -322,9 +322,12 @@ end
 --- Sends a chat message to the current recipient. Dispatches slash commands,
 --- drops all-whitespace bodies, short-circuits taunts, then routes the
 --- payload to the engine based on the recipient and whether the local player
---- is observing.
+--- is observing. When `attachCamera` is true, snapshots the current world
+--- camera and ships it on the message so recipients can jump to the view
+--- by clicking the line.
 ---@param text string
-function Send(text)
+---@param attachCamera? boolean
+function Send(text, attachCamera)
     if not text or text == '' then return end
 
     if string.sub(text, 1, 1) == '/' then
@@ -357,6 +360,10 @@ function Send(text)
         Identifier = 'Chat',
         text       = text,
     }
+
+    if attachCamera then
+        msg.camera = GetCamera('WorldCamera'):SaveSettings()
+    end
 
     if recipient == ChatModel.RecipientAllies then
         if focusArmy == -1 then msg.Observer = true end
@@ -445,8 +452,31 @@ end
 -------------------------------------------------------------------------------
 --#region Debugging
 
+--- Hot-reload hook: re-runs `Init()` on the freshly imported module so
+--- `gamemain.chatFuncs['Chat']` rebinds to the NEW `OnReceive` closure and
+--- `RegisterBuiltinCommands` repopulates the registry. Without this, edits
+--- to this file leave the old function registered and the new command set
+--- empty — sending continues to "work" but receives keep flowing through
+--- stale code, and slash commands stop dispatching.
+---
+--- The short delay + re-import gives any cascading reloads (command files,
+--- ChatModel, etc.) time to settle before we wire things up — calling
+--- `newModule.Init()` synchronously can capture stale references partway
+--- through the reload pipeline.
+function __moduleinfo.OnReload(newModule)
+    ForkThread(function()
+        WaitFrames(1)
+        newModule.Init()
+    end)
+end
+
 function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
+    ForkThread(
+        function()
+            WaitFrames(2)
+            import(__moduleinfo.name)
+        end
+    )
 end
 
 --#endregion

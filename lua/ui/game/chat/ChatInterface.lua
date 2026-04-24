@@ -90,6 +90,7 @@ local DefaultRect = { Left = 8, Top = 460, Right = 430, Bottom = 720 }
 ---@field WindowVisibleObserver LazyVar<boolean>             # derived from ChatModel.WindowVisible
 ---@field OptionsObserver       LazyVar<UIChatOptions>       # derived from ChatConfigModel.Committed
 ---@field OnLineNameClicked     fun(line: UIChatLineInterface, entry: UIChatEntry)   # shared row-name click handler; captures `self` so pool lines don't allocate per-row closures
+---@field OnLineCameraClicked   fun(line: UIChatLineInterface, entry: UIChatEntry)   # shared cam-icon click handler; captures `self` to restore the saved camera
 local ChatInterface = ClassUI(Window) {
 
     ---@param self UIChatInterface
@@ -140,6 +141,15 @@ local ChatInterface = ClassUI(Window) {
             if entry.ArmyID and entry.ArmyID ~= GetFocusArmy() then
                 ChatController.SetRecipient(entry.ArmyID)
                 self.Edit:AcquireFocus()
+            end
+        end
+
+        -- Shared cam-icon click handler. Same one-closure-per-window pattern
+        -- as `OnLineNameClicked`. Restores the world camera to the state
+        -- the sender saved when they shipped the message.
+        self.OnLineCameraClicked = function(_, entry)
+            if entry.Camera then
+                GetCamera('WorldCamera'):RestoreSettings(entry.Camera)
             end
         end
 
@@ -355,6 +365,7 @@ local ChatInterface = ClassUI(Window) {
             self.Lines[1] = ChatLineInterface(container)
             self.Lines[1]:SetFontSize(self.FontSize)
             self.Lines[1].OnNameClicked = self.OnLineNameClicked
+            self.Lines[1].OnCameraClicked = self.OnLineCameraClicked
             Layouter(self.Lines[1])
                 :AtLeftTopIn(container)
                 :Right(container.Right)
@@ -372,6 +383,7 @@ local ChatInterface = ClassUI(Window) {
             self.Lines[i] = ChatLineInterface(container)
             self.Lines[i]:SetFontSize(self.FontSize)
             self.Lines[i].OnNameClicked = self.OnLineNameClicked
+            self.Lines[i].OnCameraClicked = self.OnLineCameraClicked
             Layouter(self.Lines[i])
                 :Below(self.Lines[i - 1])
                 :AtLeftIn(container)
@@ -763,9 +775,7 @@ end
 --- Called by the module manager when this module is reloaded.
 ---@param newModule any
 function __moduleinfo.OnReload(newModule)
-    if Instance then
-        newModule.Open()
-    end
+    newModule.Open()
 end
 
 --- Called by the module manager when this module becomes dirty.
@@ -776,7 +786,13 @@ function __moduleinfo.OnDirty()
         Instance:Destroy()
         Instance = nil
     end
-    import(__moduleinfo.name)
+
+    ForkThread(
+        function()
+            WaitFrames(2)
+            import(__moduleinfo.name)
+        end
+    )
 end
 
 --#endregion

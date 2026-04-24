@@ -426,10 +426,9 @@ function __moduleinfo.OnDirty()
         Instance = nil
     end
 
-    LOG(__moduleinfo.name .. " is dirty, re-importing...")
     ForkThread(
         function()
-            WaitSeconds(0.1)
+            WaitFrames(2)
             local module = import(__moduleinfo.name)
             module.Open()
         end

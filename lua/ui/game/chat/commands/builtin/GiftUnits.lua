@@ -55,12 +55,3 @@ Command = {
         }, true)
     end,
 }
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion

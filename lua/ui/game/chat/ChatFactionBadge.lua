@@ -69,12 +69,3 @@ ChatFactionBadge = ClassUI(Group) {
         self.Color:SetSolidColor(color or 'ffffffff')
     end,
 }
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion

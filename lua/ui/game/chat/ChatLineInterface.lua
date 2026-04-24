@@ -17,6 +17,8 @@ for _, data in Factions do
 end
 table.insert(FactionIcons, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 
+local CamIconTexture = '/game/camera-btn/pinned_btn_up.dds'
+
 -------------------------------------------------------------------------------
 -- A single chat row: team-coloured faction icon, sender name and message text.
 --
@@ -29,6 +31,7 @@ table.insert(FactionIcons, '/widgets/faction-icons-alpha_bmp/observer_ico.dds')
 ---@field TeamColor   Bitmap
 ---@field FactionIcon Bitmap
 ---@field Name        Text
+---@field CamIcon     Bitmap                # camera-link affordance, hidden unless entry.Camera is set
 ---@field Text        Text
 ---@field Entry       UIChatEntry | nil
 ChatLineInterface = ClassUI(Group) {
@@ -52,6 +55,19 @@ ChatLineInterface = ClassUI(Group) {
         self.Name.HandleEvent = function(_, event)
             if event.Type == 'ButtonPress' and self.Entry then
                 self:OnNameClicked(self.Entry)
+            end
+        end
+
+        -- Camera-link icon. Kept "invisible" when unused by clearing to a
+        -- transparent solid colour and disabling hit-test — calling `Hide()`
+        -- here would be undone when the window's `Show()` cascades to
+        -- descendants (same reason `FactionIcon` cycles via SolidColor).
+        self.CamIcon = Bitmap(self)
+        self.CamIcon:SetSolidColor('00000000')
+        self.CamIcon:DisableHitTest()
+        self.CamIcon.HandleEvent = function(_, event)
+            if event.Type == 'ButtonPress' and self.Entry then
+                self:OnCameraClicked(self.Entry)
             end
         end
 
@@ -90,6 +106,18 @@ ChatLineInterface = ClassUI(Group) {
             :Over(self, 10)
             :End()
 
+        -- Cam icon sits between the name and text on header rows. Fixed
+        -- 20x16 footprint matching the legacy `pinned_btn_up.dds` art.
+        Layouter(self.CamIcon)
+            :RightOf(self.Name, 4)
+            :AtVerticalCenterIn(self.TeamColor)
+            :Width(20)
+            :Height(16)
+            :Over(self, 10)
+            :End()
+
+        -- Text Left jumps over the icon when present; SetHeader rebinds this
+        -- when the entry's camera state changes.
         Layouter(self.Text)
             :Left(function() return self.Name.Right() + 2 end)
             :Right(self.Right)
@@ -112,6 +140,20 @@ ChatLineInterface = ClassUI(Group) {
 
         local iconIndex = entry.Faction or table.getn(FactionIcons)
         self.FactionIcon:SetTexture(UIUtil.UIFile(FactionIcons[iconIndex]))
+
+        -- Camera affordance: switch between textured (hit-testable) and
+        -- transparent SolidColor (inert) rather than Show/Hide, so the
+        -- window-wide `Show()` cascade can't reveal stale icons. Re-applying
+        -- `RightOf` replaces the previous Left binding (no leak).
+        if entry.Camera then
+            self.CamIcon:SetTexture(UIUtil.UIFile(CamIconTexture))
+            self.CamIcon:EnableHitTest()
+            LayoutHelpers.RightOf(self.Text, self.CamIcon, 4)
+        else
+            self.CamIcon:SetSolidColor('00000000')
+            self.CamIcon:DisableHitTest()
+            LayoutHelpers.RightOf(self.Text, self.Name, 2)
+        end
     end,
 
     --- Populates the row as a CONTINUATION of a wrapped entry: the name slot
@@ -131,6 +173,9 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetText(wrappedText or '')
         self.TeamColor:SetSolidColor('00000000')
         self.FactionIcon:SetSolidColor('00000000')
+        self.CamIcon:SetSolidColor('00000000')
+        self.CamIcon:DisableHitTest()
+        LayoutHelpers.RightOf(self.Text, self.Name, 2)
     end,
 
     --- Clears all content so the row can stand empty.
@@ -141,6 +186,9 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetText('')
         self.TeamColor:SetSolidColor('00000000')
         self.FactionIcon:SetSolidColor('00000000')
+        self.CamIcon:SetSolidColor('00000000')
+        self.CamIcon:DisableHitTest()
+        LayoutHelpers.RightOf(self.Text, self.Name, 2)
     end,
 
     --- Overridable: fires on a click on the sender name. Continuation
@@ -159,6 +207,13 @@ ChatLineInterface = ClassUI(Group) {
     ---@param entry UIChatEntry
     OnBodyClicked = function(self, entry) end,
 
+    --- Overridable: fires on a click on the camera icon. Only header rows
+    --- show the icon (continuation rows hide it), so this only runs there.
+    --- Default is a no-op; replace the field on an instance to subscribe.
+    ---@param self UIChatLineInterface
+    ---@param entry UIChatEntry
+    OnCameraClicked = function(self, entry) end,
+
     --- Updates the font size for both name and body text. The row's `Height`
     --- LazyVar is derived from `Name.Height`, so the row resizes automatically.
     ---@param self UIChatLineInterface
@@ -168,12 +223,3 @@ ChatLineInterface = ClassUI(Group) {
         self.Text:SetFont('Arial', size)
     end,
 }
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion

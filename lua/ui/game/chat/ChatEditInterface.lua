@@ -5,6 +5,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Edit = import("/lua/maui/edit.lua").Edit
 local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 
 local ChatModel = import("/lua/ui/game/chat/ChatModel.lua")
 local ChatController = import("/lua/ui/game/chat/ChatController.lua")
@@ -28,6 +29,7 @@ local MaxChars = 200
 ---@field ChatBubble        Button
 ---@field RecipientLabel    Text
 ---@field EditBox           Edit
+---@field CamCheckbox       Checkbox                          # toggle: attach world-camera state to the next message
 ---@field ChatList          UIChatListInterface | nil
 ---@field CommandHint       UIChatCommandHintInterface | nil
 ---@field RecipientObserver LazyVar<UIChatRecipient>          # derived from ChatModel.Recipient
@@ -67,6 +69,17 @@ ChatEditInterface = ClassUI(Group) {
             end
         end
 
+        -- Camera-attach toggle. When checked, the next Send call snapshots
+        -- the world camera and ships it on the message; recipients can click
+        -- the resulting cam-icon on their chat line to jump to the view.
+        self.CamCheckbox = Checkbox(self,
+            UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_up.dds'),
+            UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_down.dds'),
+            UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_over.dds'),
+            UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_over.dds'),
+            UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_dis.dds'),
+            UIUtil.SkinnableFile('/game/camera-btn/pinned_btn_dis.dds'))
+
         self.EditBox = Edit(self)
 
         -- Placeholder bounds so that `SetupEditStd` below, which internally
@@ -93,7 +106,7 @@ ChatEditInterface = ClassUI(Group) {
         -- and "dismiss" depending on whether there's anything to send.
         self.EditBox.OnEnterPressed = function(edit, text)
             if text and text ~= '' then
-                ChatController.Send(text)
+                ChatController.Send(text, self.CamCheckbox:IsChecked())
                 edit:SetText('')
             else
                 ChatController.CloseWindow()
@@ -294,9 +307,16 @@ ChatEditInterface = ClassUI(Group) {
             :AtVerticalCenterIn(self)
             :End()
 
+        -- Camera-attach toggle pinned to the right edge so the edit box can
+        -- claim the remaining width.
+        Layouter(self.CamCheckbox)
+            :AtRightIn(self, 4)
+            :AtVerticalCenterIn(self)
+            :End()
+
         Layouter(self.EditBox)
             :AnchorToRight(self.RecipientLabel, 4)
-            :AtRightIn(self, 2)
+            :AnchorToLeft(self.CamCheckbox, 4)
             :AtVerticalCenterIn(self)
             :Height(function() return self.EditBox:GetFontHeight() end)
             :End()
@@ -366,12 +386,3 @@ ChatEditInterface = ClassUI(Group) {
         self.Trash:Destroy()
     end,
 }
-
--------------------------------------------------------------------------------
---#region Debugging
-
-function __moduleinfo.OnDirty()
-    import(__moduleinfo.name)
-end
-
---#endregion
