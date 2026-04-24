@@ -23,6 +23,7 @@ RecipientAllies = 'allies'
 ---@field Faction     number             # faction icon index (1-based)
 ---@field Recipient   UIChatRecipient    # the target this message was directed to
 ---@field Camera?     table              # camera state when the message is a ping link
+---@field Id?         string             # near-unique sender-stamped id (`tostring(msg)`); used to dedupe the `Sync.ChatMessages` replay/sim path against the live `SessionSendChatMessage` path
 ---@field WrappedText? string[]          # view-side cache: text wrapped to the current row width (populated by ChatInterface)
 
 -------------------------------------------------------------------------------

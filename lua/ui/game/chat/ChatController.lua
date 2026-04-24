@@ -224,7 +224,7 @@ local ToStrings = {
 --- appends it to the model history. Fields with natural defaults (colour,
 --- army ID, faction icon) fall back when the army data is missing or the
 --- sender is an observer.
----@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table }
+---@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table, Id?: string }
 local function AppendChatLine(args)
     local armyData = args.ArmyData or {}
     -- Observers have no `faction`; fall through to the tail icon in
@@ -239,6 +239,7 @@ local function AppendChatLine(args)
         Faction   = (faction or 4) + 1,
         Recipient = args.Recipient,
         Camera    = args.Camera,
+        Id        = args.Id,
     }
 end
 
@@ -288,7 +289,40 @@ function OnReceive(sender, msg)
         IsObserver = msg.Observer,
         Recipient  = to,
         Camera     = msg.camera,
+        Id         = msg.Id,
     }
+end
+
+--- Handler for the `Sync.ChatMessages` category, populated by the sim-side
+--- `SendChatMessage` callback. Each entry in `msgs` is a message table the
+--- sim has stamped with a trusted `From` army index.
+---
+--- In live play the same message also arrives via `SessionSendChatMessage`
+--- (handled by `OnReceive`) — whichever path lands first seeds the entry's
+--- `Id`, and this handler skips any message whose id is already there.
+--- Sim-originated messages have no `SessionSendChatMessage` counterpart, so
+--- they flow straight through.
+---
+--- Replays are the case where `SessionSendChatMessage` never fires: this
+--- handler is the *only* source of chat in a replay.
+---@param msgs table[]
+function OnSyncChatMessages(msgs)
+    if type(msgs) ~= 'table' then return end
+
+    local history = ChatModel.GetSingleton().History()
+    local seen = {}
+    for _, entry in history do
+        if entry.Id then seen[entry.Id] = true end
+    end
+
+    for _, msg in msgs do
+        if not (msg.Id and seen[msg.Id]) then
+            local armyData = GetArmyData(msg.From)
+            local nickname = armyData and armyData.nickname or tostring(msg.From or 'Unknown')
+            OnReceive(nickname, msg)
+            if msg.Id then seen[msg.Id] = true end
+        end
+    end
 end
 
 -------------------------------------------------------------------------------
@@ -313,6 +347,7 @@ local function OnEcho(senderData, recipientData, msg)
         ArmyData  = senderData,
         Recipient = msg.to,
         Camera    = msg.camera,
+        Id        = msg.Id,
     }
 end
 
@@ -361,17 +396,58 @@ function Send(text, attachCamera)
         text       = text,
     }
 
+    -- Observers can't target a private recipient; silently drop (old
+    -- chat.lua did the same — the command simply had no effect). Bail
+    -- before stamping an id or firing sim callbacks so we don't leak
+    -- a message the engine would have refused to deliver anyway.
+    if focusArmy == -1 and type(recipient) == 'number' then return end
+
+    -- Flag observer broadcasts so receivers render "to observers:". Both
+    -- delivery paths (engine-routed and sim-routed) need to see this bit,
+    -- so set it before either fires.
+    if focusArmy == -1 then msg.Observer = true end
+
     if attachCamera then
         msg.camera = GetCamera('WorldCamera'):SaveSettings()
     end
 
+    -- Stamp a near-unique id on the message *before* it leaves this function.
+    -- The same `msg` table travels through two parallel delivery paths — the
+    -- live `SessionSendChatMessage` broadcast and the sim-routed
+    -- `SendChatMessage`→`Sync.ChatMessages` path — and the receiver-side
+    -- dedupe uses this id to tell the two apart. `tostring(msg)` yields the
+    -- table's address, which collides only if the same address is reused for
+    -- another chat message within the dedupe window — vanishingly rare.
+    msg.Id = tostring(msg)
+
+    -- Replay-parser backwards compat: external replay tools scrape chat out
+    -- of recorded `GiveResourcesToPlayer` callback args. We fire one zero-
+    -- resource callback per outgoing message so they keep working, regardless
+    -- of who the real recipient is. `From`/`To` are both the focus army so
+    -- the sim-side ally/self-transfer guard short-circuits without doing
+    -- anything. Observers skip it — no army to ship.
+    if focusArmy ~= -1 then
+        local senderData = GetArmyData(focusArmy)
+        SimCallback({
+            Func = 'GiveResourcesToPlayer',
+            Args = {
+                From = focusArmy, To = focusArmy, Mass = 0, Energy = 0,
+                Sender = senderData and senderData.nickname or tostring(focusArmy),
+                Msg = msg,
+            },
+        }, false)
+    end
+
+    -- Sim-routed path: hand the message to the sim, which validates and
+    -- re-broadcasts it via `Sync.ChatMessages` to every connected UI. In live
+    -- play this runs alongside `SessionSendChatMessage` and our id-based
+    -- dedupe keeps it from double-posting; in replays it is the *only* path
+    -- the viewer sees, which is exactly what we want.
+    SimCallback({ Func = 'SendChatMessage', Args = { Msg = msg } }, false)
+
     if recipient == ChatModel.RecipientAllies then
-        if focusArmy == -1 then msg.Observer = true end
         SessionSendChatMessage(FindClients(), msg)
     elseif type(recipient) == 'number' then
-        -- Observers can't target a private recipient; silently drop (old
-        -- chat.lua did the same — the command simply had no effect).
-        if focusArmy == -1 then return end
         SessionSendChatMessage(FindClients(recipient), msg)
 
         -- The engine does not bounce private messages back to the sender;
@@ -383,7 +459,6 @@ function Send(text, attachCamera)
         end
     else
         if focusArmy == -1 then
-            msg.Observer = true
             SessionSendChatMessage(FindClients(), msg)
         else
             SessionSendChatMessage(msg)
@@ -446,6 +521,7 @@ end
 --- dispatches, safe under hot reload.
 function Init()
     import("/lua/ui/game/gamemain.lua").RegisterChatFunc(OnReceive, 'Chat')
+    AddOnSyncHashedCallback(OnSyncChatMessages, 'ChatMessages', 'Chat')
     RegisterBuiltinCommands()
 end
 

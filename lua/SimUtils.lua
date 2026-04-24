@@ -1449,19 +1449,18 @@ function SetOfferDraw(data)
     brain.OfferingDraw = data.Value
 end
 
----@param data {Sender: integer, Msg: string}
-function SendChatToReplay(data)
-    if data.Sender and data.Msg then
-        if not Sync.UnitData.Chat then
-            Sync.UnitData.Chat = {}
-        end
-        table.insert(Sync.UnitData.Chat, { sender = data.Sender, msg = data.Msg })
-    end
-end
+-- Chat-relay helpers moved to `/lua/ChatUtils.lua`:
+--   * `SendChatToReplay` — legacy `Sync.UnitData.Chat` writer, kept for mods.
+--   * `SendChatMessage`  — trusted sim relay that feeds `Sync.ChatMessages`.
 
----@param data {From: Army, To: Army, Mass: number, Energy: number}
+---@param data {From: Army, To: Army, Mass: number, Energy: number, Sender?: string, Msg?: table}
 function GiveResourcesToPlayer(data)
-    SendChatToReplay(data)
+    -- The refactored chat path (see `ChatUtils.SendChatMessage`) still fires
+    -- this callback once per outgoing chat message with `Sender`/`Msg` set,
+    -- because external replay parsers scrape those fields out of the recorded
+    -- args. The legacy per-receive `SendChatToReplay` write into
+    -- `Sync.UnitData.Chat` is gone — chat now syncs through
+    -- `Sync.ChatMessages`.
 
     -- Ignore observers and players trying to send resources to themselves or to enemies
     if data.From == -1 or data.From == data.To or not IsAlly(data.From, data.To) then
