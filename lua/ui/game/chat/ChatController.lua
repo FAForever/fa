@@ -92,6 +92,8 @@ function RegisterBuiltinCommands()
     Registry.Register(import("/lua/ui/game/chat/commands/builtin/GiftResources.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/builtin/Recall.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/builtin/ToEngineers.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Mute.lua").Command)
+    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Unmute.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/builtin/Clear.lua").Command)
     Registry.Register(import("/lua/ui/game/chat/commands/builtin/Help.lua").Command)
 end
