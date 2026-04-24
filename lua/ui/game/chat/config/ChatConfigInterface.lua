@@ -38,6 +38,10 @@ local CheckboxDefs = {
 ---@field Combo BitmapCombo
 ---@field Key   string
 
+---@class UIChatConfigMuteRow
+---@field Checkbox Checkbox
+---@field ArmyID   number
+
 ---@class UIChatConfigInterface : Window
 ---@field Trash          TrashBag                          # owns every derived subscription-LazyVar
 ---@field LabelColors    Text
@@ -50,6 +54,8 @@ local CheckboxDefs = {
 ---@field SliderWinAlpha IntegerSlider
 ---@field LabelBehavior  Text
 ---@field Checkboxes     Checkbox[]
+---@field LabelMuted     Text
+---@field MuteRows       UIChatConfigMuteRow[]
 ---@field BtnApply       Button
 ---@field BtnReset       Button
 ---@field BtnOk          Button
@@ -146,6 +152,28 @@ local ChatConfigInterface = ClassUI(Window) {
                 ChatConfigController.SetOption(key, checked)
             end
             self.Checkboxes[i] = cb
+        end
+
+        -- ---- Muted players ----
+        -- One checkbox per non-civilian army other than the local player.
+        -- The list is captured at dialog-open time; closing and reopening the
+        -- dialog rebuilds against fresh session state.
+        self.LabelMuted = UIUtil.CreateText(client, "Muted players", 12, UIUtil.titleFont)
+
+        self.MuteRows = {}
+        local armies = GetArmiesTable()
+        local focusArmy = armies and armies.focusArmy or -1
+        if armies and armies.armiesTable then
+            for armyID, army in armies.armiesTable do
+                if not army.civilian and armyID ~= focusArmy and army.nickname then
+                    local id = armyID
+                    local cb = UIUtil.CreateCheckbox(client, '/dialogs/check-box_btn/', army.nickname, true)
+                    cb.OnCheck = function(_, checked)
+                        ChatConfigController.SetMuted(id, checked)
+                    end
+                    table.insert(self.MuteRows, { Checkbox = cb, ArmyID = id })
+                end
+            end
         end
 
         -- ---- Buttons ----
@@ -261,6 +289,21 @@ local ChatConfigInterface = ClassUI(Window) {
             prev = cb
         end
 
+        -- Muted players section
+        Layouter(self.LabelMuted)
+            :Below(prev, 12)
+            :AtLeftIn(client, pad)
+            :End()
+
+        prev = self.LabelMuted
+        for _, row in ipairs(self.MuteRows) do
+            Layouter(row.Checkbox)
+                :Below(prev, 6)
+                :AtLeftIn(client, pad)
+                :End()
+            prev = row.Checkbox
+        end
+
         -- Buttons: Apply | Reset on one row, OK | Cancel on the next
         Layouter(self.BtnApply)
             :Below(prev, 12)
@@ -310,6 +353,11 @@ local ChatConfigInterface = ClassUI(Window) {
                 value = defaults[def.Key]
             end
             self.Checkboxes[i]:SetCheck(value, true)
+        end
+
+        local muted = options.muted or {}
+        for _, row in ipairs(self.MuteRows) do
+            row.Checkbox:SetCheck(muted[row.ArmyID] == true, true)
         end
     end,
 

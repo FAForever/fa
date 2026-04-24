@@ -405,8 +405,13 @@ local ChatInterface = ClassUI(Window) {
             -- wrap widths depend on font metrics, so rewrap all entries.
             self:RebuildPool()
             self:RewrapAll()
-            self:CalcVisible()
         end
+
+        -- Filter-affecting options (muted, links) may have changed without
+        -- touching the font. Recompute what's visible so entries newly
+        -- excluded by `IsValidEntry` drop out of the feed immediately.
+        self:RefreshVirtualSize()
+        self:CalcVisible()
     end,
 
     ---------------------------------------------------------------------------
@@ -461,13 +466,18 @@ local ChatInterface = ClassUI(Window) {
     ---------------------------------------------------------------------------
 
     --- Whether an entry counts toward the virtual scroll size and should
-    --- appear in `CalcVisible`. Stubbed: wiring the per-army filter and
-    --- the camera-link filter to `ChatConfigModel.Committed` is a later step.
+    --- appear in `CalcVisible`. Currently gates on the per-army mute map
+    --- from `ChatConfigModel.Committed`; camera-link filtering is still TODO.
     ---@param self UIChatInterface
     ---@param entry UIChatEntry
     ---@return boolean
     IsValidEntry = function(self, entry)
-        return entry ~= nil
+        if entry == nil then return false end
+        local muted = ChatConfigModel.GetSingleton().Committed().muted
+        if muted and entry.ArmyID and muted[entry.ArmyID] then
+            return false
+        end
+        return true
     end,
 
     ---------------------------------------------------------------------------

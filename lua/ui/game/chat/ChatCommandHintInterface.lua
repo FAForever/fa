@@ -14,7 +14,6 @@ local RowFontSize = 12
 local RowFontName = 'Arial'
 local HorizontalPadding = 12
 local VerticalPadding  = 2
-local DividerHeight    = 2
 
 --- Renders a command the same way `/help` does: name, params, aliases, description.
 ---@param cmd UIChatCommand
@@ -41,23 +40,23 @@ end
 -- user's input. Reuses a pool of row controls across refreshes — entries are
 -- shown/hidden and re-positioned via a per-row `ordinal` LazyVar rather than
 -- rebuilt from scratch.
---
--- A pinned `/help` footer is always visible at the bottom.
 
 ---@class UIChatHintRow
 ---@field Text    Text
 ---@field BG      Bitmap
----@field Ordinal LazyVar<number>            # 0 = hidden, 1 = row closest to footer, etc.
+---@field Ordinal LazyVar<number>            # 0 = hidden, 1 = bottom row, growing upward
 ---@field Target  UIChatCommand | nil
+---@field Hovered boolean
+---@field Paint   fun()                       # re-applies BG solid-colour from Hovered + owner.Selected
 
 ---@class UIChatCommandHintInterface : Group
 ---@field Edit         Edit
 ---@field OnSelect?    fun(cmd: UIChatCommand)
 ---@field Rows         UIChatHintRow[]        # reusable pool, indexed by ordinal
----@field Footer       UIChatHintRow          # always-visible /help row
----@field Divider      Bitmap
+---@field Background   Bitmap                 # solid backdrop covering the whole popup
 ---@field RowHeight    LazyVar<number>
 ---@field VisibleCount LazyVar<number>
+---@field Selected     LazyVar<number>        # 0 = no selection, 1..VisibleCount = row ordinal
 ---@field LastText     string
 ---@field LTBG Bitmap
 ---@field RTBG Bitmap
@@ -81,6 +80,15 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.Rows = {}
         self.LastText = ''
         self.VisibleCount = Create(0)
+        self.Selected = Create(0)
+
+        -- Solid backdrop so the tiny per-row highlight bitmaps (which only
+        -- span Text.Top-1..Text.Bottom+1) don't leave visible gaps between
+        -- rows. The row BGs now sit transparent on top of this for hover /
+        -- selection highlighting.
+        self.Background = Bitmap(self)
+        self.Background:SetSolidColor('ff000000')
+        self.Background:DisableHitTest()
 
         -- Sample the row height from a throwaway Text.
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -88,17 +96,6 @@ ChatCommandHintInterface = ClassUI(Group) {
         ---@diagnostic disable-next-line: undefined-field
         self.RowHeight = Create(probe.Height() + VerticalPadding)
         probe:Destroy()
-
-        -- Footer (always-visible /help row).
-        self.Footer = self:BuildRow()
-        local help = Registry.Lookup('help')
-        self.Footer.Target = help
-        self.Footer.Text:SetText(help and FormatCommand(help) or '/help')
-        self.Footer.Text:SetColor('ffbbbbbb')
-
-        self.Divider = Bitmap(self)
-        self.Divider:SetSolidColor('ff444444')
-        self.Divider:DisableHitTest()
 
         -- Decorative borders (same skin as ChatListInterface).
         self.LTBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
@@ -117,6 +114,10 @@ ChatCommandHintInterface = ClassUI(Group) {
         self.TBG:DisableHitTest()
         self.BBG = Bitmap(self, UIUtil.UIFile('/game/chat_brd/drop-box_brd_lm.dds'))
         self.BBG:DisableHitTest()
+
+        -- Repaint highlighted rows when the selection moves. We own `Selected`
+        -- so binding its OnDirty directly is safe (see CLAUDE.md §LazyVar).
+        self.Selected.OnDirty = function() self:RepaintRows() end
     end,
 
     ---@param self UIChatCommandHintInterface
@@ -143,19 +144,17 @@ ChatCommandHintInterface = ClassUI(Group) {
 
         ---@diagnostic disable: undefined-field
         self.Height:SetFunction(function()
-            return (self.VisibleCount() + 1) * self.RowHeight() + DividerHeight
+            return self.VisibleCount() * self.RowHeight()
         end)
 
-        -- Footer pinned to the bottom of self.
-        self.Footer.Text.Left:SetFunction(function()   return self.Left() + HorizontalPadding end)
-        self.Footer.Text.Bottom:SetFunction(function() return self.Bottom() end)
-        self:LayoutRowBackground(self.Footer)
-
-        -- Divider sits directly above the footer.
-        self.Divider.Left:SetFunction(function()   return self.Left() end)
-        self.Divider.Right:SetFunction(function()  return self.Right() end)
-        self.Divider.Bottom:SetFunction(function() return self.Footer.Text.Top() end)
-        self.Divider.Height:SetFunction(function() return DividerHeight end)
+        -- Unified backdrop covers the entire popup. Rows are transparent by
+        -- default and only paint when hovered or selected, so the backdrop
+        -- fills the slivers between row highlight strips.
+        self.Background.Left:SetFunction(function()   return self.Left() end)
+        self.Background.Right:SetFunction(function()  return self.Right() end)
+        self.Background.Top:SetFunction(function()    return self.Top() end)
+        self.Background.Bottom:SetFunction(function() return self.Bottom() end)
+        self.Background.Depth:SetFunction(function()  return self.Depth() end)
 
         -- Borders hug the outside of self on all eight sides.
         Layouter(self.LTBG):Right(self.Left):Bottom(self.Top):End()
@@ -186,14 +185,26 @@ ChatCommandHintInterface = ClassUI(Group) {
         row.Text:DisableHitTest()
 
         row.BG = Bitmap(row.Text)
-        row.BG:SetSolidColor('ff000000')
+        row.BG:SetSolidColor('00000000')
+        row.Hovered = false
 
         local owner = self
-        row.BG.HandleEvent = function(bg, event)
+        local function paint()
+            if row.Hovered or (row.Ordinal() > 0 and owner.Selected() == row.Ordinal()) then
+                row.BG:SetSolidColor('ff666666')
+            else
+                row.BG:SetSolidColor('00000000')
+            end
+        end
+        row.Paint = paint
+
+        row.BG.HandleEvent = function(_, event)
             if event.Type == 'MouseEnter' then
-                bg:SetSolidColor('ff666666')
+                row.Hovered = true
+                paint()
             elseif event.Type == 'MouseExit' then
-                bg:SetSolidColor('ff000000')
+                row.Hovered = false
+                paint()
             elseif event.Type == 'ButtonPress' then
                 if row.Target and owner.OnSelect then
                     owner.OnSelect(row.Target)
@@ -202,6 +213,45 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
 
         return row
+    end,
+
+    --- Repaints every row to reflect the current `Selected` ordinal. Called
+    --- from the Selected observer and whenever Refresh rebuilds the list.
+    ---@param self UIChatCommandHintInterface
+    RepaintRows = function(self)
+        for _, row in pairs(self.Rows) do
+            if row.Paint then row.Paint() end
+        end
+    end,
+
+    --- Wraps `Selected` to the next visible dynamic row. No-op when there
+    --- are no matches.
+    ---@param self UIChatCommandHintInterface
+    SelectNext = function(self)
+        local n = self.VisibleCount()
+        if n <= 0 then return end
+        local cur = self.Selected()
+        self.Selected:Set(cur >= n and 1 or cur + 1)
+    end,
+
+    --- Wraps `Selected` to the previous visible dynamic row. No-op when
+    --- there are no matches.
+    ---@param self UIChatCommandHintInterface
+    SelectPrev = function(self)
+        local n = self.VisibleCount()
+        if n <= 0 then return end
+        local cur = self.Selected()
+        self.Selected:Set(cur <= 1 and n or cur - 1)
+    end,
+
+    --- Returns the currently-selected command, or nil when nothing matches.
+    ---@param self UIChatCommandHintInterface
+    ---@return UIChatCommand?
+    GetSelected = function(self)
+        local ord = self.Selected()
+        if ord <= 0 then return nil end
+        local row = self.Rows[ord]
+        return row and row.Target or nil
     end,
 
     --- Lazily pulls a dynamic row out of the pool, creating it if needed and
@@ -221,7 +271,7 @@ ChatCommandHintInterface = ClassUI(Group) {
         row.Text.Bottom:SetFunction(function()
             local ord = row.Ordinal()
             if ord <= 0 then return self.Top() end
-            return self.Divider.Top() - (ord - 1) * self.RowHeight()
+            return self.Bottom() - (ord - 1) * self.RowHeight()
         end)
         ---@diagnostic enable: undefined-field
 
@@ -257,9 +307,7 @@ ChatCommandHintInterface = ClassUI(Group) {
             if space then prefix = string.sub(prefix, 1, space - 1) end
 
             for _, cmd in ipairs(Registry.FindMatching(prefix)) do
-                if cmd.Name ~= 'help' then  -- help lives in the footer
-                    table.insert(matches, cmd)
-                end
+                table.insert(matches, cmd)
             end
         end
 
@@ -281,6 +329,20 @@ ChatCommandHintInterface = ClassUI(Group) {
         end
 
         self.VisibleCount:Set(table.getn(matches))
+
+        -- Keep the previously-selected ordinal when possible; otherwise land
+        -- on the first match (or clear the selection when nothing matches).
+        local n = table.getn(matches)
+        local cur = self.Selected()
+        if n == 0 then
+            self.Selected:Set(0)
+        elseif cur < 1 or cur > n then
+            self.Selected:Set(1)
+        else
+            -- Ordinal is unchanged but the target underneath probably isn't —
+            -- force a repaint so colors match the new row assignments.
+            self:RepaintRows()
+        end
         ---@diagnostic enable: undefined-field
     end,
 

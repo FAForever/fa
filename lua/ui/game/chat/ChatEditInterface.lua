@@ -142,6 +142,7 @@ ChatEditInterface = ClassUI(Group) {
 
         -- Page Up / Page Down scroll the chat feed. Shift narrows to one row.
         -- Matches the legacy chat.lua binding so muscle memory carries over.
+        -- Up / Down cycle the command-hint selection while the hint is open.
         -- Lazy import of ChatInterface avoids the import cycle: ChatInterface
         -- imports this module at load time, so the reverse edge has to defer.
         self.EditBox.OnNonTextKeyPressed = function(_, keycode, modifiers)
@@ -150,6 +151,10 @@ ChatEditInterface = ClassUI(Group) {
                 import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(-step)
             elseif keycode == UIUtil.VK_NEXT then
                 import("/lua/ui/game/chat/ChatInterface.lua").ScrollLines(step)
+            elseif keycode == UIUtil.VK_UP and self.CommandHint then
+                self.CommandHint:SelectNext()
+            elseif keycode == UIUtil.VK_DOWN and self.CommandHint then
+                self.CommandHint:SelectPrev()
             end
         end
 
@@ -162,12 +167,23 @@ ChatEditInterface = ClassUI(Group) {
         end))
     end,
 
-    --- Entry point for the Tab key. On the first press, computes a fresh
-    --- completion record; on subsequent presses, cycles to the next
-    --- candidate. Plays the error cue when there is nothing to complete so
-    --- the user isn't left wondering whether the key was handled.
+    --- Entry point for the Tab key. When the command hint is open, Tab
+    --- commits the currently-selected command into the edit box (mirroring
+    --- a click on the hint row). Otherwise it runs the in-box completion
+    --- cycle for nicknames. Plays the error cue when there is nothing to
+    --- complete so the user isn't left wondering whether the key was handled.
     ---@param self UIChatEditInterface
     HandleTabCompletion = function(self)
+        if self.CommandHint then
+            local hint = self.CommandHint --[[@as UIChatCommandHintInterface]]
+            local cmd = hint:GetSelected()
+            if cmd then
+                self.EditBox:SetText('/' .. cmd.Name .. ' ')
+                self:AcquireFocus()
+                return
+            end
+        end
+
         if self.Completion then
             local c = self.Completion
             c.Index = math.mod(c.Index, table.getn(c.Candidates)) + 1
@@ -247,7 +263,7 @@ ChatEditInterface = ClassUI(Group) {
 
         local hint = ChatCommandHintInterface(self, self.EditBox)
         self.CommandHint = hint
-        LayoutHelpers.Above(hint, self.EditBox, 4)
+        LayoutHelpers.Above(hint, self.EditBox, 14)
         LayoutHelpers.AtLeftIn(hint, self.EditBox)
         hint:SetOnSelect(function(cmd)
             self.EditBox:SetText('/' .. cmd.Name .. ' ')

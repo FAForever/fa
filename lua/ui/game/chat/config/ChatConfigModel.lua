@@ -17,6 +17,7 @@ local ProfileKey = "chatoptions"
 ---@field feed_persist   boolean
 ---@field send_type      boolean  # false = all, true = allies
 ---@field links          boolean  # show camera-link messages
+---@field muted          table<number, boolean>   # armyID -> true when muted; absent = not muted
 
 ---@type UIChatOptions
 local DefaultOptions = {
@@ -32,6 +33,7 @@ local DefaultOptions = {
     feed_persist    = true,
     send_type       = false,
     links           = true,
+    muted           = {},
 }
 
 
@@ -52,6 +54,7 @@ KeyFeedBackground = 'feed_background'
 KeyFeedPersist    = 'feed_persist'
 KeySendType       = 'send_type'
 KeyLinks          = 'links'
+KeyMuted          = 'muted'
 
 -------------------------------------------------------------------------------
 -- Value ranges for numeric options. Exported as module globals so the view
@@ -89,10 +92,13 @@ function GetSingleton()
 end
 
 --- Creates and initializes the model singleton from the player profile.
+--- Mutes are deliberately per-game: any `muted` payload read from prefs is
+--- discarded, and `Apply` strips it before saving.
 ---@return UIChatConfigModel
 function SetupSingleton()
     local saved = Prefs.GetFieldFromCurrentProfile(ProfileKey) or {}
     local committed = table.merged(DefaultOptions, saved)
+    committed.muted = {}
 
     ModelInstance = {
         Committed = Create(committed),
