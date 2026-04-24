@@ -23,6 +23,7 @@ local Types = import("/lua/ui/game/chat/commands/ChatCommandTypes.lua")
 ---@field Aliases?    string[]
 ---@field Description string
 ---@field Params?     UIChatCommandParam[]
+---@field ShouldRegister? fun(): boolean                                      # optional gate evaluated at `Register` time; false drops the command from the registry (and the hint / `/help` listing) for this session
 ---@field Accept?     fun(args: table, ctx: UIChatCommandContext): boolean, string?
 ---@field Execute     fun(args: table, ctx: UIChatCommandContext)
 
@@ -35,12 +36,37 @@ local Aliases = {}
 -------------------------------------------------------------------------------
 -- Registration
 
+--- Removes a command and its aliases.
+---@param name string
+function Unregister(name)
+    local key = string.lower(name)
+    local cmd = Commands[key]
+    if not cmd then return end
+    if cmd.Aliases then
+        for _, alias in ipairs(cmd.Aliases) do
+            Aliases[string.lower(alias)] = nil
+        end
+    end
+    Commands[key] = nil
+end
+
 --- Registers a command. Overwrites any previous registration with the same
 --- canonical name; aliases from the previous registration are cleared first.
+---
+--- A command can opt out of registration entirely by returning `false` from
+--- its optional `ShouldRegister` hook — used for session-conditional commands
+--- (observer-only, replay-only, single-player-only, etc.). We still call
+--- `Unregister` first so a reload that newly disqualifies a command can't
+--- leave its previous entry in the registry.
 ---@param cmd UIChatCommand
 function Register(cmd)
     assert(cmd and cmd.Name, "Chat command requires a name.")
     assert(cmd.Execute, "Chat command requires an execute function.")
+
+    -- some commands are game state specific
+    if cmd.ShouldRegister and not cmd.ShouldRegister() then
+        return
+    end
 
     local key = string.lower(cmd.Name)
 
@@ -57,20 +83,6 @@ function Register(cmd)
             Aliases[string.lower(alias)] = key
         end
     end
-end
-
---- Removes a command and its aliases.
----@param name string
-function Unregister(name)
-    local key = string.lower(name)
-    local cmd = Commands[key]
-    if not cmd then return end
-    if cmd.Aliases then
-        for _, alias in ipairs(cmd.Aliases) do
-            Aliases[string.lower(alias)] = nil
-        end
-    end
-    Commands[key] = nil
 end
 
 --- Returns a flat list of every registered command (canonical entries only).
