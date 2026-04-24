@@ -5,22 +5,8 @@ local ChatConfigModel = import("/lua/ui/game/chat/config/ChatConfigModel.lua")
 -------------------------------------------------------------------------------
 -- Window visibility
 
---- Applies the `send_type` default-recipient option when the chat window
---- opens. If the user has already selected a specific player for a private
---- message, their choice is left alone.
-local function ApplyDefaultRecipient()
-    local model = ChatModel.GetSingleton()
-    if type(model.Recipient()) == 'number' then
-        return
-    end
-    local options = ChatConfigModel.GetSingleton().Committed()
-    local target = options.send_type and ChatModel.RecipientAllies or ChatModel.RecipientAll
-    model.Recipient:Set(target)
-end
-
 --- Shows the chat window.
 function OpenWindow()
-    ApplyDefaultRecipient()
     ChatModel.GetSingleton().WindowVisible:Set(true)
 end
 
@@ -32,11 +18,7 @@ end
 --- Toggles the chat window open or closed.
 function ToggleWindow()
     local lv = ChatModel.GetSingleton().WindowVisible
-    local willOpen = not lv()
-    if willOpen then
-        ApplyDefaultRecipient()
-    end
-    lv:Set(willOpen)
+    lv:Set(not lv())
 end
 
 -------------------------------------------------------------------------------
