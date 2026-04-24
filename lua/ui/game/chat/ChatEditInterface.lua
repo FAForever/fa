@@ -353,6 +353,12 @@ ChatEditInterface = ClassUI(Group) {
         self.EditBox:AcquireFocus()
     end,
 
+    --- Moves keyboard focus out of the edit box.
+    ---@param self UIChatEditInterface
+    AbandonFocus = function(self)
+        self.EditBox:AbandonFocus()
+    end,
+
     --- Empties our trash bag so every derived observer we allocated is
     --- destroyed — no `OnDirty` can fire into a torn-down `self`.
     ---@param self UIChatEditInterface

@@ -186,6 +186,7 @@ local ChatInterface = ClassUI(Window) {
                         self:Show()
                         self.Edit:AcquireFocus()
                     else
+                        self.Edit:AbandonFocus()
                         self:Hide()
                     end
                 end
