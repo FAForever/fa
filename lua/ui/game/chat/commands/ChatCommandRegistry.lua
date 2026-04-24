@@ -85,6 +85,53 @@ function Register(cmd)
     end
 end
 
+--- Defensive wrapper around `Register`: takes a module path, loads it, and
+--- registers its `Command` export — all inside pcalls so one broken file
+--- can't take down the entire registration pass (and with it the chat
+--- system + anything that depends on `ChatController.Init`).
+---
+--- Every failure — missing file, import error, missing or malformed
+--- `Command` export, Register throwing — is logged and swallowed.
+---@param path string
+function RegisterFromPath(path)
+    if not DiskGetFileInfo(path) then
+        WARN(string.format("Chat command skipped: file not found '%s'.", tostring(path)))
+        return
+    end
+
+    local ok, module = pcall(import, path)
+    if not ok then
+        WARN(string.format("Chat command skipped: failed to import '%s' (%s).",
+            tostring(path), tostring(module)))
+        return
+    end
+
+    local cmd = module and module.Command
+    if type(cmd) ~= 'table' then
+        WARN(string.format("Chat command skipped: '%s' does not export a `Command` table.",
+            tostring(path)))
+        return
+    end
+
+    if type(cmd.Name) ~= 'string' or cmd.Name == '' then
+        WARN(string.format("Chat command skipped: '%s' has an invalid `Command.Name`.",
+            tostring(path)))
+        return
+    end
+
+    if type(cmd.Execute) ~= 'function' then
+        WARN(string.format("Chat command skipped: '%s' has no `Command.Execute` function.",
+            tostring(path)))
+        return
+    end
+
+    local registered, err = pcall(Register, cmd)
+    if not registered then
+        WARN(string.format("Chat command skipped: Register('%s') threw (%s).",
+            tostring(path), tostring(err)))
+    end
+end
+
 --- Returns a flat list of every registered command (canonical entries only).
 ---@return UIChatCommand[]
 function GetAll()
@@ -250,12 +297,30 @@ function Dispatch(text)
     }
 
     if cmd.Accept then
-        local ok, reason = cmd.Accept(args, ctx)
+        -- Accept is user code — a crash here is a bug, not a rejection. Treat
+        -- it as a soft failure so the chat send path doesn't propagate the
+        -- throw up through the edit box's event handler. The full stack goes
+        -- to the log; chat only gets the "check the log" hint.
+        local pcallOk, ok, reason = pcall(cmd.Accept, args, ctx)
+        if not pcallOk then
+            WARN(string.format("/%s: Accept threw (%s).", cmd.Name, tostring(ok)))
+            return false, string.format(
+                "/%s: command errored while validating — see the log for details.",
+                cmd.Name)
+        end
         if not ok then
             return false, reason or string.format("/%s: command rejected.", cmd.Name)
         end
     end
 
-    cmd.Execute(args, ctx)
+    -- Same pcall treatment for Execute. Side effects that ran before the
+    -- throw aren't rolled back — this just keeps the chat input usable.
+    local executeOk, err = pcall(cmd.Execute, args, ctx)
+    if not executeOk then
+        WARN(string.format("/%s: Execute threw (%s).", cmd.Name, tostring(err)))
+        return false, string.format(
+            "/%s: command errored while running — see the log for details.",
+            cmd.Name)
+    end
     return true, nil
 end

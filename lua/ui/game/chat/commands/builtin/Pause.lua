@@ -1,19 +1,18 @@
 
 -------------------------------------------------------------------------------
--- /restart — immediately restart the current session. Available in
--- single-player and replay (skipped in multiplayer). Skips the confirmation
--- dialog that the escape-menu's Restart button shows — the command itself
--- is deliberate enough.
+-- /pause — pause the local simulation. Available in single-player and
+-- replay; multiplayer pausing goes through a vote/request flow handled by
+-- the existing hotkey, so this command stays out of the way there.
 
 ---@type UIChatCommand
 Command = {
-    Name = 'restart',
-    Description = 'Restart the current mission (single-player only).',
+    Name = 'pause',
+    Description = 'Pause the simulation.',
     ShouldRegister = function()
         return not SessionIsMultiplayer()
     end,
     Execute = function()
-        RestartSession()
+        SessionRequestPause()
     end,
 }
 

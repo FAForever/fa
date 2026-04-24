@@ -7,15 +7,13 @@
 -- Accepts `Rest` so a multi-word name goes through as-is: `/save before boss`
 -- saves to "before boss".
 
-local function IsSingleplayer()
-    return not SessionIsMultiplayer() and not SessionIsReplay()
-end
-
 ---@type UIChatCommand
 Command = {
     Name = 'save',
     Description = 'Quick-save the current session (optional name).',
-    ShouldRegister = IsSingleplayer,
+    ShouldRegister = function()
+        return not SessionIsMultiplayer()
+    end,
     Params = {
         { Name = 'name', Type = 'Rest', Optional = true },
     },

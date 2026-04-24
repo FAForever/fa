@@ -1,19 +1,19 @@
 
 -------------------------------------------------------------------------------
--- /restart — immediately restart the current session. Available in
--- single-player and replay (skipped in multiplayer). Skips the confirmation
--- dialog that the escape-menu's Restart button shows — the command itself
--- is deliberate enough.
+-- /end-mission — forfeits the current session and opens the score screen.
+-- Delegates to the same `EndGame` function the escape-menu button uses, so
+-- campaign vs. skirmish branching stays consistent. Available in
+-- single-player and replay.
 
 ---@type UIChatCommand
 Command = {
-    Name = 'restart',
-    Description = 'Restart the current mission (single-player only).',
+    Name = 'end-mission',
+    Description = 'Forfeit the current skirmish or mission and show the score screen.',
     ShouldRegister = function()
         return not SessionIsMultiplayer()
     end,
     Execute = function()
-        RestartSession()
+        import("/lua/ui/game/tabs.lua").EndGame()
     end,
 }
 

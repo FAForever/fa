@@ -10,15 +10,13 @@ local Prefs = import("/lua/user/prefs.lua")
 -- `LoadSavedGame`'s return values; the command stays silent on success
 -- because the game is already transitioning out.
 
-local function IsSingleplayer()
-    return not SessionIsMultiplayer() and not SessionIsReplay()
-end
-
 ---@type UIChatCommand
 Command = {
     Name = 'load',
     Description = 'Load a saved game by name (defaults to the quick-save slot).',
-    ShouldRegister = IsSingleplayer,
+    ShouldRegister = function()
+        return not SessionIsMultiplayer()
+    end,
     Params = {
         { Name = 'name', Type = 'Rest', Optional = true },
     },

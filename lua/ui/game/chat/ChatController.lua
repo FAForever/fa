@@ -67,21 +67,29 @@ end
 function RegisterBuiltinCommands()
     local Registry = import("/lua/ui/game/chat/commands/ChatCommandRegistry.lua")
 
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/All.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Allies.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Whisper.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/GiftUnits.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/GiftResources.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Recall.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/ToEngineers.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Taunt.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Mute.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Unmute.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Clear.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Restart.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Save.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Load.lua").Command)
-    Registry.Register(import("/lua/ui/game/chat/commands/builtin/Help.lua").Command)
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/All.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Allies.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Whisper.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/GiftUnits.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/GiftResources.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Recall.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/ToEngineers.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Taunt.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Mute.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Unmute.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Clear.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Restart.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Save.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Load.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Pause.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Resume.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Speed.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/EndMission.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/DebugLog.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/DebugStatistics.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Debugger.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/ToTick.lua")
+    Registry.RegisterFromPath("/lua/ui/game/chat/commands/builtin/Help.lua")
 end
 
 -------------------------------------------------------------------------------
@@ -228,7 +236,7 @@ local ToStrings = {
 --- appends it to the model history. Fields with natural defaults (colour,
 --- army ID, faction icon) fall back when the army data is missing or the
 --- sender is an observer.
----@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table, Id?: string }
+---@param args { Name: string, Text?: string, ArmyData?: table, IsObserver?: boolean, Recipient: UIChatRecipient, Camera?: table, Location?: UIChatEntryLocation, Id?: string }
 local function AppendChatLine(args)
     local armyData = args.ArmyData or {}
     -- Observers have no `faction`; fall through to the tail icon in
@@ -243,6 +251,7 @@ local function AppendChatLine(args)
         Faction   = (faction or 4) + 1,
         Recipient = args.Recipient,
         Camera    = args.Camera,
+        Location  = args.Location,
         Id        = args.Id,
     }
 end
@@ -293,6 +302,7 @@ function OnReceive(sender, msg)
         IsObserver = msg.Observer,
         Recipient  = to,
         Camera     = msg.camera,
+        Location   = msg.location,
         Id         = msg.Id,
     }
 end
@@ -351,6 +361,7 @@ local function OnEcho(senderData, recipientData, msg)
         ArmyData  = senderData,
         Recipient = msg.to,
         Camera    = msg.camera,
+        Location  = msg.location,
         Id        = msg.Id,
     }
 end
