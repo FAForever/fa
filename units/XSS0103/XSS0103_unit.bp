@@ -254,7 +254,7 @@ UnitBlueprint{
             FiringRandomness = 0,
             FiringTolerance = 1,
             Label = "AntiAir",
-            MaxRadius = 48,
+            MaxRadius = 44,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
             MuzzleVelocity = 45,
