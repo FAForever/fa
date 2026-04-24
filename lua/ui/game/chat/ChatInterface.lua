@@ -690,6 +690,13 @@ local ChatInterface = ClassUI(Window) {
         self.DragBR:SetTexture(self.DragBR.textures.up)
     end,
 
+    --- Engine-invoked when the user finishes dragging the window. The drag
+    --- handler steals focus mid-move, so re-acquire it so the user can keep
+    --- typing without a second click on the edit box.
+    OnMoveSet = function(self)
+        self.Edit:AcquireFocus()
+    end,
+
     --- Mouse wheel over the window scrolls the chat. `rotation` is in wheel
     --- units (usually ±120 per notch); one notch ≈ one line.
     OnMouseWheel = function(self, rotation)
